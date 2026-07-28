@@ -954,8 +954,33 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
             return;
         }
 
+        // La page publique de signature tourne dans la langue de son visiteur : quand l'entite a
+        // une langue fixee, le document la garde, sinon la signature d'un intervenant etranger
+        // regenererait le plan dans sa langue a lui, pour tout le monde. Avec MAIN_LANG_DEFAULT a
+        // 'auto' il n'y a pas de langue de reference : on ne peut que suivre la requete courante.
+        $outputLangs = $langs;
+        $defaultLang = getDolGlobalString('MAIN_LANG_DEFAULT');
+        if (!empty($defaultLang) && $defaultLang != 'auto' && $defaultLang != $langs->defaultlang) {
+            $outputLangs = new Translate('', $conf);
+            $outputLangs->setDefaultLang($defaultLang);
+        }
+
         $documentDir = $plan->element . 'document/' . dol_sanitizeFileName($plan->ref);
-        $relativeDir = 'digiriskdolibarr/' . $documentDir;
+        // Le chemin indexe dans llx_ecm_files est relatif a DOL_DATA_ROOT, et le multicompany
+        // intercale le numero d'entite : le deduire de dir_output plutot que de le coder en dur,
+        // sinon on cible le repertoire d'une autre entite
+        $relativeDir = trim(str_replace(DOL_DATA_ROOT, '', $conf->digiriskdolibarr->dir_output), '/') . '/' . $documentDir;
+
+        // On genere avant de supprimer : une generation en echec laisserait sinon le plan sans
+        // aucun document, alors que la diffusion est deja en ligne
+        $document   = new PreventionPlanDocument($this->db);
+        $moreParams = ['object' => $plan, 'user' => $user, 'objectType' => $plan->element];
+        if ($document->generateDocument('preventionplandocument', $outputLangs, 0, 0, 0, $moreParams) <= 0) {
+            dol_syslog('refreshPreventionPlanDocument : ' . $document->error, LOG_WARNING);
+            return;
+        }
+
+        $newFileName = basename($document->last_main_doc);
 
         // Anciennes generations : on ne touche qu'au repertoire du modele, jamais aux pieces
         // jointes deposees a la main sur le plan
@@ -963,24 +988,24 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
         $previous->fetchAll('', '', 0, 0, '(t.filepath:=:\'' . $this->db->escape($relativeDir) . '\')');
         if (is_array($previous->lines)) {
             foreach ($previous->lines as $previousFile) {
+                if ($previousFile->filename == $newFileName) {
+                    continue;
+                }
                 $oldFile = new EcmFiles($this->db);
                 if ($oldFile->fetch($previousFile->id) > 0) {
                     $oldFile->delete($user);
                 }
-                dol_delete_file($conf->digiriskdolibarr->dir_output . '/' . $documentDir . '/' . $previousFile->filename, 0, 1);
+                // disableglob : le nom porte la raison sociale, dont les crochets seraient pris
+                // pour une classe de caracteres et laisseraient le fichier sur le disque
+                dol_delete_file($conf->digiriskdolibarr->dir_output . '/' . $documentDir . '/' . $previousFile->filename, 1, 1);
             }
-        }
-
-        $document   = new PreventionPlanDocument($this->db);
-        $moreParams = ['object' => $plan, 'user' => $user, 'objectType' => $plan->element];
-        if ($document->generateDocument('preventionplandocument', $langs, 0, 0, 0, $moreParams) <= 0) {
-            dol_syslog('refreshPreventionPlanDocument : ' . $document->error, LOG_WARNING);
-            return;
         }
 
         // Rattachement au plan + cle de partage + favori : les trois conditions pour que la page
         // publique trouve le document et l'affiche en apercu
-        $this->shareGeneratedFile(basename($document->last_main_doc), $plan->table_element, $plan->id, $user, true);
+        if ($this->shareGeneratedFile($newFileName, $plan->table_element, $plan->id, $user, true) < 0) {
+            dol_syslog('refreshPreventionPlanDocument : partage impossible pour ' . $newFileName, LOG_WARNING);
+        }
     }
 
     /**
@@ -1019,20 +1044,27 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
      */
     protected function shareGeneratedFile(string $fileName, string $tableElement, int $objectId, User $user, bool $favorite = false): int
     {
+        global $conf;
+
         require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmfiles.class.php';
         require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
 
-        $search = new EcmFiles($this->db);
-        $search->fetchAll('', '', 1, 0, '(t.filename:=:\'' . $this->db->escape($fileName) . '\')');
-        if (!is_array($search->lines) || empty($search->lines)) {
+        // Requete directe plutot que le filtre universel de fetchAll : le nom de fichier porte la
+        // raison sociale, dont une parenthese ou une apostrophe casserait l'analyse du filtre.
+        // L'entite est indispensable, deux entites pouvant heberger un fichier de meme nom.
+        $sql  = 'SELECT rowid FROM ' . MAIN_DB_PREFIX . 'ecm_files';
+        $sql .= ' WHERE filename = \'' . $this->db->escape($fileName) . '\'';
+        $sql .= ' AND entity = ' . (int) $conf->entity;
+        $sql .= ' ORDER BY rowid DESC LIMIT 1';
+
+        $resql = $this->db->query($sql);
+        if (!$resql || $this->db->num_rows($resql) == 0) {
             return -1;
         }
+        $found = $this->db->fetch_object($resql);
 
-        // fetchAll ne rend que des EcmFilesLine, qui n'ont pas de methode update : il faut relire
-        // la ligne complete avant de pouvoir l'enregistrer
-        $line    = array_shift($search->lines);
         $ecmFile = new EcmFiles($this->db);
-        if ($ecmFile->fetch($line->id) <= 0) {
+        if ($ecmFile->fetch($found->rowid) <= 0) {
             return -1;
         }
 
