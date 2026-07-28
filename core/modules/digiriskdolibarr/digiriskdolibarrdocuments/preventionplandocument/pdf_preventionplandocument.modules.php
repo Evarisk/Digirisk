@@ -178,18 +178,17 @@ class pdf_preventionplandocument extends SaturneDocumentModel
     }
 
     /**
-     * Termine la page courante puis en ouvre une nouvelle.
+     * Ouvre une nouvelle page.
      *
-     * Le pied est pose ici, sur la page qu'on quitte, plutot que dans une passe finale : revenir
-     * sur des pages deja fermees avec setPage() puis supprimer une page surnumeraire avec
-     * deletePage() produisait des pieds mal places.
+     * Le pied n'est pas pose ici : TCPDF ouvre aussi des pages tout seul quand un texte long
+     * depasse, et ces pages la ne passeraient jamais par cette methode. Il est ecrit en une passe
+     * finale sur toutes les pages, par _pagefooter().
      *
      * @param  TCPDF $pdf PDF handler
      * @return void
      */
     protected function newPage($pdf)
     {
-        $this->writeFooter($pdf);
         $pdf->AddPage();
         $pdf->SetY($this->marge_haute);
     }
@@ -424,7 +423,11 @@ class pdf_preventionplandocument extends SaturneDocumentModel
     }
 
     /**
-     * Pose le pied sur la page courante uniquement.
+     * Pose le pied sur toutes les pages, une fois le contenu ecrit.
+     *
+     * En une passe finale plutot qu'au fil de l'eau : TCPDF ouvre des pages de lui-meme quand un
+     * texte long depasse, et ces pages n'auraient sinon ni pied ni numero. Le nombre total de
+     * pages n'est de toute facon connu qu'ici, TCPDI ne supportant pas AliasNbPages.
      *
      * @param  TCPDF $pdf PDF handler
      * @return void
@@ -435,23 +438,32 @@ class pdf_preventionplandocument extends SaturneDocumentModel
             return;
         }
 
-        $currentY = $pdf->GetY();
-
-        // Le pied s'ecrit dans la bande basse, sous le seuil de rupture : sans couper la rupture
-        // automatique son Cell ouvrirait une page de plus
-        $pdf->SetAutoPageBreak(false);
+        $currentPage = $pdf->getPage();
+        $currentY    = $pdf->GetY();
+        $totalPages  = $pdf->getNumPages();
+        $halfWidth   = $this->contentWidth($pdf) / 2;
 
         $pdf->SetFont('', '', $this->footerFontSize);
         $pdf->SetTextColor(140, 140, 140);
 
-        $halfWidth = $this->contentWidth($pdf) / 2;
-        $pdf->SetXY($this->marge_gauche, $pdf->getPageHeight() - 12);
-        $pdf->Cell($halfWidth, 5, $this->footerText, 0, 0, 'L');
-        $pdf->Cell($halfWidth, 5, 'Page ' . $pdf->getPage(), 0, 0, 'R');
+        for ($page = 1; $page <= $totalPages; $page++) {
+            $pdf->setPage($page);
+            // Le pied s'ecrit dans la bande basse, sous le seuil de rupture : sans couper la
+            // rupture automatique son Cell serait reporte en haut de la page suivante. A recouper
+            // apres chaque setPage, qui restaure les reglages memorises de la page.
+            $pdf->SetAutoPageBreak(false);
+            $pdf->SetXY($this->marge_gauche, $pdf->getPageHeight() - 12);
+            $pdf->Cell($halfWidth, 5, $this->footerText, 0, 0, 'L');
+            $pdf->Cell($halfWidth, 5, 'Page ' . $page . ' / ' . $totalPages, 0, 0, 'R');
+        }
 
         $pdf->SetTextColor(0, 0, 0);
+
+        // Rendre la main sur la position d'avant la passe : laisser le curseur dans la bande
+        // basse ferait ouvrir une page blanche des le retour de la rupture automatique
+        $pdf->setPage($currentPage);
+        $pdf->SetXY($this->marge_gauche, $currentY);
         $pdf->SetAutoPageBreak(true, self::FOOTER_BAND);
-        $pdf->SetY($currentY);
     }
 
     /**
@@ -483,8 +495,11 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $moreParam['hideTemplateName'] = 1;
         $object->module                = $this->module;
 
+        // buildDocumentFilename rend -1 en cas d'echec, sinon le chemin du fichier. Comparer ce
+        // chemin a 0 le compare en fait a la chaine '0' : sous Linux il commence par '/', qui est
+        // inferieur a '0', et la generation echouerait systematiquement
         $file = $this->buildDocumentFilename($objectDocument, $outputLangs, $object, $moreParam);
-        if ($file < 0) {
+        if (!is_string($file) || empty($file)) {
             $this->error = $langs->transnoentities('ErrorFileNameCanNotBeBuilt');
             return -1;
         }

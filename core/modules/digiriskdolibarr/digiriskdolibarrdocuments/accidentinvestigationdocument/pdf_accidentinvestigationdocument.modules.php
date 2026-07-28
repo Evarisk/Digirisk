@@ -352,8 +352,11 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
         $moreParam['hideTemplateName'] = 1;
         $object->module                = $this->module;
 
+        // buildDocumentFilename rend -1 en cas d'echec, sinon le chemin du fichier. Comparer ce
+        // chemin a 0 le compare en fait a la chaine '0' : sous Linux il commence par '/', qui est
+        // inferieur a '0', et la generation echouerait systematiquement
         $file = $this->buildDocumentFilename($objectDocument, $outputLangs, $object, $moreParam);
-        if ($file < 0) {
+        if (!is_string($file) || empty($file)) {
             $this->error = $langs->transnoentities('ErrorFileNameCanNotBeBuilt');
             return -1;
         }
