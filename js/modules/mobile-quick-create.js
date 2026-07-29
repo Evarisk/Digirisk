@@ -151,7 +151,9 @@ window.digiriskdolibarr.mobilequickcreate.saveSignature = function() {
     var signature = pad.toDataURL('image/png');
 
     $.ajax({
-        url: form.data('save-signature-url') + '?action=save',
+        // The payload travels as raw JSON, so the anti CSRF token has to go in the URL:
+        // without it Dolibarr answers 403 to every POST (MAIN_SECURITY_CSRF_WITH_TOKEN)
+        url: form.data('save-signature-url') + '?action=save&token=' + window.saturne.toolbox.getToken(),
         type: 'POST',
         processData: false,
         contentType: 'application/json',
@@ -167,8 +169,8 @@ window.digiriskdolibarr.mobilequickcreate.saveSignature = function() {
                 status.removeClass('success').addClass('error').text((resp && resp.error) ? resp.error : 'KO');
             }
         },
-        error: function() {
-            status.removeClass('success').addClass('error').text('KO');
+        error: function(jqXHR) {
+            status.removeClass('success').addClass('error').text('KO (HTTP ' + jqXHR.status + ')');
         }
     });
 };
