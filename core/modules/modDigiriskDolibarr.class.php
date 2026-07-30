@@ -2194,6 +2194,10 @@ class modDigiriskdolibarr extends DolibarrModules
 		delDocumentModel('legaldisplay_odt', 'legaldisplay');
 		delDocumentModel('firepermitdocument_odt', 'firepermitdocument');
 		delDocumentModel('preventionplandocument_odt', 'preventionplandocument');
+		// Modele PDF natif : sans cette suppression, la reactivation du module rejoue son insertion
+		// sur une ligne deja presente et addDocumentModel s'arrete sur une erreur de cle dupliquee,
+		// ce qui interrompt l'activation
+		delDocumentModel('preventionplandocument', 'preventionplandocument');
 		delDocumentModel('preventionplandocument_specimen_odt', 'preventionplandocumentspecimen');
 		delDocumentModel('groupmentdocument_odt', 'groupmentdocument');
 		delDocumentModel('groupmentdocument', 'groupmentdocument');
@@ -2213,6 +2217,7 @@ class modDigiriskdolibarr extends DolibarrModules
         delDocumentModel('papripact_a3_paysage_projectdocument', 'project');
         delDocumentModel('orque_projectdocument', 'project');
         delDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument');
+        delDocumentModel('accidentinvestigationdocument', 'accidentinvestigationdocument');
         delDocumentModel('registerdocument_odt', 'registerdocument');
         delDocumentModel('ticketdocument', 'ticketdocument');
 
