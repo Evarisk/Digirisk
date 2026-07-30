@@ -204,11 +204,27 @@ foreach ($signalisationCategories as $signalisationItem) {
             </div>
         </div>
 
-        <!-- Tags of the plan (native preventionplan category type) -->
-        <?php if (isModEnabled('categorie')) { ?>
+        <?php
+        // Tags of the plan (native preventionplan category type). Tant qu'aucune categorie n'est
+        // declaree, le multiselect s'affichait vide sans rien dire : on annonce l'absence et on
+        // donne le lien pour en creer une plutot que de laisser chercher.
+        if (isModEnabled('categorie')) {
+            $planTagOptions = $form->select_all_categories('preventionplan', '', 'parent', 64, 0, 1);
+            $planTagOptions = is_array($planTagOptions) ? $planTagOptions : [];
+        ?>
         <div class="digirisk-mobile-card">
             <div class="digirisk-mobile-card__title"><i class="fas fa-tags"></i> <?php print $langs->trans('Categories'); ?></div>
-            <?php print $form->multiselectarray('categories', $form->select_all_categories('preventionplan', '', 'parent', 64, 0, 1), $prefill['categories'], '', 0, 'digirisk-mobile-tags-select maxwidth500'); ?>
+            <?php if (!empty($planTagOptions)) {
+                print $form->multiselectarray('categories', $planTagOptions, $prefill['categories'], '', 0, 'digirisk-mobile-tags-select maxwidth500');
+            } else { ?>
+            <div class="digirisk-mobile-empty">
+                <i class="fas fa-info-circle"></i>
+                <span><?php print $langs->trans('MobilePPNoTagAvailable'); ?></span>
+            </div>
+            <a class="digirisk-mobile-empty__action" href="<?php print DOL_URL_ROOT . '/categories/card.php?action=create&type=preventionplan'; ?>" target="_blank">
+                <i class="fas fa-plus-circle"></i> <?php print $langs->trans('MobilePPCreateTag'); ?>
+            </a>
+            <?php } ?>
         </div>
         <?php } ?>
 

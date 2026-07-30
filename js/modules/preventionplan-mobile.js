@@ -106,6 +106,51 @@ window.digiriskdolibarr.preventionplanmobile.event = function() {
     $(document).on('click', '.digirisk-mobile-cert-add', window.digiriskdolibarr.preventionplanmobile.addCertification);
     $(document).on('click', '.digirisk-mobile-cert-item-delete', window.digiriskdolibarr.preventionplanmobile.removeCertification);
     $(document).on('submit', '.digirisk-mobile-form', window.digiriskdolibarr.preventionplanmobile.submitForm);
+    $(document).on('click', '.digirisk-mobile-extsign__resend', window.digiriskdolibarr.preventionplanmobile.resendExtSignatureEmail);
+};
+
+/**
+ * Send the signature link to the exterior company again from the success screen.
+ *
+ * The automatic email of the creation may have failed, or simply never reached its recipient: the
+ * button reports what happened instead of leaving the user guessing.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.preventionplanmobile.resendExtSignatureEmail = function() {
+    var button = $(this);
+    var card   = button.closest('.digirisk-mobile-extsign');
+    var status = card.find('.digirisk-mobile-extsign__status');
+    var planId = card.data('plan-id');
+
+    if (button.hasClass('button-disable')) {
+        return;
+    }
+    button.addClass('button-disable');
+
+    $.ajax({
+        url: document.URL.split('#')[0] + (document.URL.indexOf('?') >= 0 ? '&' : '?') + 'action=resend_ext_signature_email&token=' + window.saturne.toolbox.getToken(),
+        type: 'POST',
+        data: { plan_id: planId },
+        success: function(resp) {
+            button.removeClass('button-disable');
+            if (!resp) {
+                return;
+            }
+            status
+                .removeClass('digirisk-mobile-extsign__status--pending digirisk-mobile-extsign__status--sent digirisk-mobile-extsign__status--error')
+                .addClass(resp.success ? 'digirisk-mobile-extsign__status--sent' : 'digirisk-mobile-extsign__status--error')
+                .find('span').text(resp.message || '');
+            status.find('i').attr('class', resp.success ? 'fas fa-paper-plane' : 'fas fa-exclamation-circle');
+        },
+        error: function(jqXHR) {
+            button.removeClass('button-disable');
+            status
+                .removeClass('digirisk-mobile-extsign__status--pending digirisk-mobile-extsign__status--sent')
+                .addClass('digirisk-mobile-extsign__status--error')
+                .find('span').text('KO (HTTP ' + jqXHR.status + ')');
+        }
+    });
 };
 
 /**
