@@ -2126,6 +2126,7 @@ PwaNavAddFavorite = Ajouter aux favoris
 PwaNavRemoveFavorite = Retirer des favoris
 PwaHello = Bonjour %s
 PwaResultCount = %s résultat(s)
+AllStatus = Tous les statuts
 PwaTilePreventionPlanInProgress = Plans en cours
 PwaTilePreventionPlanToSign = Plans à signer
 PwaTileFirePermitInProgress = Permis en cours

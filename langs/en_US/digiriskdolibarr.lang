@@ -217,6 +217,16 @@ PwaNavAddFavorite = Add to favorites
 PwaNavRemoveFavorite = Remove from favorites
 PwaHello = Hello %s
 PwaResultCount = %s result(s)
+AllStatus = All statuses
+
+# Libelles metier utilises par l'interface mobile, jusqu'ici traduits en francais seulement
+PreventionPlan = Prevention plan
+PreventionPlanLinked = Linked prevention plan
+ExtSocietyResponsible = Exterior company manager
+CSSCTIntervention = CSSCT intervention
+PriorVisitDate = Joint prior inspection date
+PriorVisitText = Inspection note
+UsedEquipment = Equipment used
 PwaTilePreventionPlanInProgress = Plans in progress
 PwaTilePreventionPlanToSign = Plans to sign
 PwaTileFirePermitInProgress = Permits in progress
