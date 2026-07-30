@@ -73,6 +73,14 @@ $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successSha
     </div>
     <?php } ?>
 
+    <?php
+    // Bloc propre a l'objet cree (signature de l'entreprise exterieure pour un plan de prevention),
+    // insere ici pour que l'ecran commun reste identique d'un objet a l'autre
+    if (!empty($successExtraBlockFile) && file_exists($successExtraBlockFile)) {
+        require $successExtraBlockFile;
+    }
+    ?>
+
     <div class="digirisk-mobile-success__actions">
         <a class="digirisk-mobile-success__button" href="<?php print $successViewUrl; ?>"><?php print dol_escape_htmltag($successViewLabel); ?></a>
         <a class="digirisk-mobile-success__button" href="<?php print $successAgainUrl; ?>"><?php print dol_escape_htmltag($successAgainLabel); ?></a>
