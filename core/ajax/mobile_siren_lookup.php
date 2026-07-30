@@ -51,7 +51,7 @@ if (!$user->hasRight('digiriskdolibarr', 'preventionplan', 'write') && !$user->h
     exit;
 }
 
-$sql = 'SELECT rowid, nom, email, siren, siret FROM ' . MAIN_DB_PREFIX . 'societe';
+$sql = 'SELECT rowid, nom, email, siren, siret, address, zip, town FROM ' . MAIN_DB_PREFIX . 'societe';
 $sql .= ' WHERE entity IN (' . getEntity('societe') . ')';
 
 // Two ways in: the company was picked in the third party list, or its SIREN/SIRET was typed
@@ -110,11 +110,14 @@ echo json_encode([
     'success'  => true,
     'found'    => true,
     'societe'  => [
-        'id'    => (int) $obj->rowid,
-        'name'  => $obj->nom,
-        'email' => $obj->email,
-        'siren' => $obj->siren,
-        'siret' => $obj->siret,
+        'id'      => (int) $obj->rowid,
+        'name'    => $obj->nom,
+        'email'   => $obj->email,
+        'siren'   => $obj->siren,
+        'siret'   => $obj->siret,
+        'address' => $obj->address,
+        'zip'     => $obj->zip,
+        'town'    => $obj->town,
     ],
     'contacts' => $contacts,
 ]);
