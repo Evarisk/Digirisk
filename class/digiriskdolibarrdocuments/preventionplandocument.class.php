@@ -219,20 +219,23 @@ class PreventionPlanDocument extends DigiriskDocuments
 		$opening_hours_saturday  = explode(' ', $saturneSchedules->saturday);
 		$opening_hours_sunday    = explode(' ', $saturneSchedules->sunday);
 
-		$json['PreventionPlan']['lundi_matin']    = $opening_hours_monday[0];
-		$json['PreventionPlan']['lundi_aprem']    = $opening_hours_monday[1];
-		$json['PreventionPlan']['mardi_matin']    = $opening_hours_tuesday[0];
-		$json['PreventionPlan']['mardi_aprem']    = $opening_hours_tuesday[1];
-		$json['PreventionPlan']['mercredi_matin'] = $opening_hours_wednesday[0];
-		$json['PreventionPlan']['mercredi_aprem'] = $opening_hours_wednesday[1];
-		$json['PreventionPlan']['jeudi_matin']    = $opening_hours_thursday[0];
-		$json['PreventionPlan']['jeudi_aprem']    = $opening_hours_thursday[1];
-		$json['PreventionPlan']['vendredi_matin'] = $opening_hours_friday[0];
-		$json['PreventionPlan']['vendredi_aprem'] = $opening_hours_friday[1];
-		$json['PreventionPlan']['samedi_matin']   = $opening_hours_saturday[0];
-		$json['PreventionPlan']['samedi_aprem']   = $opening_hours_saturday[1];
-		$json['PreventionPlan']['dimanche_matin'] = $opening_hours_sunday[0];
-		$json['PreventionPlan']['dimanche_aprem'] = $opening_hours_sunday[1];
+		// Un jour sans horaire de l'apres-midi n'a qu'une moitie a exploser : le document se genere
+		// maintenant a chaque enregistrement du plan, un avertissement PHP par jour incomplet
+		// finirait dans la page ou dans la reponse JSON de l'interface mobile
+		$json['PreventionPlan']['lundi_matin']    = $opening_hours_monday[0]    ?? '';
+		$json['PreventionPlan']['lundi_aprem']    = $opening_hours_monday[1]    ?? '';
+		$json['PreventionPlan']['mardi_matin']    = $opening_hours_tuesday[0]   ?? '';
+		$json['PreventionPlan']['mardi_aprem']    = $opening_hours_tuesday[1]   ?? '';
+		$json['PreventionPlan']['mercredi_matin'] = $opening_hours_wednesday[0] ?? '';
+		$json['PreventionPlan']['mercredi_aprem'] = $opening_hours_wednesday[1] ?? '';
+		$json['PreventionPlan']['jeudi_matin']    = $opening_hours_thursday[0]  ?? '';
+		$json['PreventionPlan']['jeudi_aprem']    = $opening_hours_thursday[1]  ?? '';
+		$json['PreventionPlan']['vendredi_matin'] = $opening_hours_friday[0]    ?? '';
+		$json['PreventionPlan']['vendredi_aprem'] = $opening_hours_friday[1]    ?? '';
+		$json['PreventionPlan']['samedi_matin']   = $opening_hours_saturday[0]  ?? '';
+		$json['PreventionPlan']['samedi_aprem']   = $opening_hours_saturday[1]  ?? '';
+		$json['PreventionPlan']['dimanche_matin'] = $opening_hours_sunday[0]    ?? '';
+		$json['PreventionPlan']['dimanche_aprem'] = $opening_hours_sunday[1]    ?? '';
 
 		if (!empty($preventionplanlines) && $preventionplanlines > 0) {
 			foreach ($preventionplanlines as $line) {

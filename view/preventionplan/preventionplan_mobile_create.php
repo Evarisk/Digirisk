@@ -48,6 +48,7 @@ require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
 
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $user;
@@ -518,6 +519,12 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                 $saveRiskPhotos();
 
                 $db->commit();
+
+                // Les etapes ci-dessus sont toutes faites sans trigger : le document est regenere
+                // ici, une fois les risques et les photos en base, pour que la diffusion deja en
+                // ligne cesse de presenter la version d'avant modification
+                digiriskRefreshPreventionPlanDocument($db, (int) $object->id, $user, $langs, true);
+
                 $redirect = $_SERVER['PHP_SELF'] . '?created=' . $object->id;
                 setEventMessages($langs->trans('MobilePPUpdated', $object->ref), null, 'mesgs');
                 if ($isAjax) {
@@ -612,33 +619,20 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                     }
                 }
 
-                // Ask the exterior responsible to sign by email (email-only, no SMS configured)
+                // Le document est genere avant le mail : son destinataire arrive sur une page de
+                // signature qui doit deja presenter le plan, et la diffusion peut etre ouverte dans
+                // la foulee. Les etapes ci-dessus sont faites sans trigger, l'appel est donc force.
+                digiriskRefreshPreventionPlanDocument($db, (int) $object->id, $user, $langs, true);
+
+                // Ask the exterior responsible to sign by email (email-only, no SMS configured).
+                // L'echec n'annule pas la creation : l'ecran de succes affiche l'etat de l'envoi et
+                // permet de renvoyer le lien ou de faire signer sur le telephone.
                 $extSignatories = $signatory->fetchSignatory('ExtSocietyResponsible', $object->id, 'preventionplan');
                 if (is_array($extSignatories) && !empty($extSignatories)) {
                     $extSignatory = array_shift($extSignatories);
-                    if (isValidEmail($extSignatory->email) && dol_strlen(getDolGlobalString('MAIN_MAIL_EMAIL_FROM'))) {
-                        require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
-
-                        $signatureUrl = dol_buildpath('/custom/saturne/public/signature/add_signature.php?track_id=' . $extSignatory->signature_url . '&entity=' . $conf->entity . '&module_name=' . $moduleNameLowerCase . '&object_type=preventionplan&document_type=PreventionPlanDocument', 3);
-
-                        $from    = getDolGlobalString('MAIN_MAIL_EMAIL_FROM');
-                        $subject = $langs->transnoentities('MobilePPSignatureEmailSubject', $object->ref);
-                        $message = $langs->transnoentities('MobilePPSignatureEmailContent', $thirdparty->name, $signatureUrl);
-
-                        $mailfile = new CMailFile($subject, $extSignatory->email, $from, $message, [], [], [], '', '', 0, -1, '', '', '', '', 'mail');
-                        if (!$mailfile->error && (dol_strlen(getDolGlobalString('MAIN_MAIL_SMTPS_ID')) || getDolGlobalInt('SATURNE_USE_ALL_EMAIL_MODE') > 0)) {
-                            if ($mailfile->sendfile()) {
-                                $extSignatory->last_email_sent_date = dol_now();
-                                $extSignatory->update($user, true);
-                                $extSignatory->setPending($user, true);
-                            } else {
-                                setEventMessages($langs->trans('MobilePPWarningEmailNotSent'), null, 'warnings');
-                            }
-                        } else {
-                            setEventMessages($langs->trans('MobilePPWarningEmailNotConfigured'), null, 'warnings');
-                        }
-                    } else {
-                        setEventMessages($langs->trans('MobilePPWarningEmailNotConfigured'), null, 'warnings');
+                    $mailResult   = digiriskSendPreventionPlanSignatureEmail($db, $object, $extSignatory, $thirdparty->name, $user, $langs);
+                    if (!$mailResult['sent']) {
+                        setEventMessages($langs->trans('MobilePPWarningEmailNotSentDetail', $mailResult['error']), null, 'warnings');
                     }
                 }
 
@@ -679,6 +673,46 @@ if ($action == 'add_mobile' && $permissiontoadd) {
         echo json_encode(['success' => false, 'errors' => $errorMessages]);
         exit;
     }
+}
+
+/*
+ * Renvoi du lien de signature a l'entreprise exterieure depuis l'ecran de succes.
+ *
+ * L'envoi automatique de la creation peut avoir echoue, ou le destinataire ne jamais l'avoir recu :
+ * sans ce renvoi il faudrait repasser par Dolibarr, alors que la personne est encore sur place.
+ */
+if ($action == 'resend_ext_signature_email' && $permissiontoadd) {
+    ob_start();
+
+    $planId       = GETPOSTINT('plan_id');
+    $resendPlan   = new PreventionPlan($db);
+    $resendResult = ['sent' => false, 'error' => $langs->trans('ErrorRecordNotFound'), 'email' => ''];
+
+    if ($planId > 0 && $resendPlan->fetch($planId) > 0) {
+        $extSignatories = $signatory->fetchSignatory('ExtSocietyResponsible', $resendPlan->id, 'preventionplan');
+        if (is_array($extSignatories) && !empty($extSignatories)) {
+            $extSignatory = array_shift($extSignatories);
+            $extSociety   = $digiriskresources->fetchResourcesFromObject('ExtSociety', $resendPlan);
+            $societyName  = '';
+            if (!empty($extSociety->id) && $thirdparty->fetch($extSociety->id) > 0) {
+                $societyName = $thirdparty->name;
+            }
+
+            $resendResult = digiriskSendPreventionPlanSignatureEmail($db, $resendPlan, $extSignatory, $societyName, $user, $langs);
+        } else {
+            $resendResult['error'] = $langs->trans('MobilePPWarningNoRecipientEmail');
+        }
+    }
+
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => $resendResult['sent'],
+        'message' => $resendResult['sent'] ? $langs->trans('MobilePPSignatureEmailSentTo', $resendResult['email']) : $langs->trans('MobilePPWarningEmailNotSentDetail', $resendResult['error']),
+    ]);
+    exit;
 }
 
 /*
