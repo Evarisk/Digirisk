@@ -1275,6 +1275,144 @@ body.digirisk-mobile-create {
       text-align: center;
     }
   }
+
+  /* Signature de l'entreprise exterieure : l'ecran dit ou en est la demande et laisse agir tout de
+     suite, la personne concernee etant encore sur place quand le plan vient d'etre cree */
+  .digirisk-mobile-extsign {
+    padding: 16px 14px;
+
+    &__title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #2b7de9;
+    }
+
+    &__who {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 8px;
+    }
+
+    &__name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    &__email {
+      font-size: 12px;
+      color: #64748b;
+      word-break: break-all;
+    }
+
+    &__status {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 10px 11px;
+      font-size: 13px;
+      line-height: 1.45;
+      border-radius: 9px;
+
+      i {
+        flex-shrink: 0;
+        margin-top: 2px;
+        font-size: 13px;
+      }
+
+      &--done,
+      &--sent {
+        color: #14532d;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+
+        i {
+          color: #16a34a;
+        }
+      }
+
+      &--pending {
+        color: #78350f;
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+
+        i {
+          color: #d97706;
+        }
+      }
+
+      &--error {
+        color: #7f1d1d;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+
+        i {
+          color: #dc2626;
+        }
+      }
+    }
+
+    &__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+
+      .digirisk-mobile-success__button {
+        flex: 1 1 140px;
+        cursor: pointer;
+
+        /* Le bouton primaire du bloc est aligne avec le second, sa marge haute n'a pas lieu d'etre */
+        &--primary {
+          margin-top: 0;
+        }
+
+        &.button-disable {
+          opacity: 0.6;
+          pointer-events: none;
+        }
+      }
+    }
+
+    &__link {
+      margin-top: 12px;
+    }
+  }
+
+  /* Etat vide d'une carte : dire ce qui manque plutot que laisser un champ vide sans explication */
+  .digirisk-mobile-empty {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: #64748b;
+
+    i {
+      flex-shrink: 0;
+      margin-top: 2px;
+      color: #94a3b8;
+    }
+
+    &__action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #2b7de9;
+      text-decoration: none;
+    }
+  }
 }
 
 /* Read-only protections (EPI) display on the prevention plan card (desktop, not scoped to the mobile body) */

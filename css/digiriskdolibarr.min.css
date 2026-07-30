@@ -7371,6 +7371,126 @@ body.digirisk-mobile-create .digirisk-mobile-share .copied-to-clipboard {
   color: #16a34a;
   text-align: center;
 }
+body.digirisk-mobile-create {
+  /* Signature de l'entreprise exterieure : l'ecran dit ou en est la demande et laisse agir tout de
+     suite, la personne concernee etant encore sur place quand le plan vient d'etre cree */
+}
+body.digirisk-mobile-create .digirisk-mobile-extsign {
+  padding: 16px 14px;
+}
+body.digirisk-mobile-create .digirisk-mobile-extsign__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #2b7de9;
+}
+body.digirisk-mobile-create .digirisk-mobile-extsign__who {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 8px;
+}
+body.digirisk-mobile-create .digirisk-mobile-extsign__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+body.digirisk-mobile-create .digirisk-mobile-extsign__email {
+  font-size: 12px;
+  color: #64748b;
+  word-break: break-all;
+}
+body.digirisk-mobile-create .digirisk-mobile-extsign__status {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 11px;
+  font-size: 13px;
+  line-height: 1.45;
+  border-radius: 9px;
+}
+body.digirisk-mobile-create .digirisk-mobile-extsign__status i {
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-size: 13px;
+}
+body.digirisk-mobile-create .digirisk-mobile-extsign__status--done, body.digirisk-mobile-create .digirisk-mobile-extsign__status--sent {
+  color: #14532d;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+body.digirisk-mobile-create .digirisk-mobile-extsign__status--done i, body.digirisk-mobile-create .digirisk-mobile-extsign__status--sent i {
+  color: #16a34a;
+}
+body.digirisk-mobile-create .digirisk-mobile-extsign__status--pending {
+  color: #78350f;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+}
+body.digirisk-mobile-create .digirisk-mobile-extsign__status--pending i {
+  color: #d97706;
+}
+body.digirisk-mobile-create .digirisk-mobile-extsign__status--error {
+  color: #7f1d1d;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+body.digirisk-mobile-create .digirisk-mobile-extsign__status--error i {
+  color: #dc2626;
+}
+body.digirisk-mobile-create .digirisk-mobile-extsign__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+body.digirisk-mobile-create .digirisk-mobile-extsign__actions .digirisk-mobile-success__button {
+  flex: 1 1 140px;
+  cursor: pointer;
+  /* Le bouton primaire du bloc est aligne avec le second, sa marge haute n'a pas lieu d'etre */
+}
+body.digirisk-mobile-create .digirisk-mobile-extsign__actions .digirisk-mobile-success__button--primary {
+  margin-top: 0;
+}
+body.digirisk-mobile-create .digirisk-mobile-extsign__actions .digirisk-mobile-success__button.button-disable {
+  opacity: 0.6;
+  pointer-events: none;
+}
+body.digirisk-mobile-create .digirisk-mobile-extsign__link {
+  margin-top: 12px;
+}
+body.digirisk-mobile-create {
+  /* Etat vide d'une carte : dire ce qui manque plutot que laisser un champ vide sans explication */
+}
+body.digirisk-mobile-create .digirisk-mobile-empty {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #64748b;
+}
+body.digirisk-mobile-create .digirisk-mobile-empty i {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #94a3b8;
+}
+body.digirisk-mobile-create .digirisk-mobile-empty__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2b7de9;
+  text-decoration: none;
+}
 
 /* Read-only protections (EPI) display on the prevention plan card (desktop, not scoped to the mobile body) */
 .digirisk-protections-view {
