@@ -1544,10 +1544,21 @@ OldestTicketDescription                   = Ticket le plus ancien avec le temps 
 OldestMessageTicket                       = Ticket le plus ancien avec un message
 OldestMessageTicketDescription            = Ticket le plus ancien avec un message et le temps écoulé depuis la création du message
 MeanAnswerTime                            = Temps moyen de réponse
+MeanAnswerTimeDescription                 = Délai moyen entre l'ouverture et la clôture, calculé sur les tickets clôturés uniquement
+MeanFirstResponseTime                     = Délai moyen de première réponse
+MeanFirstResponseTimeDescription          = Délai moyen entre l'ouverture du ticket et le premier message visible par le déclarant. Les notes internes ne comptent pas, et les tickets sans message public sont exclus du calcul
 NbTicketPerUser                           = Nombre de tickets assignés par personnes en moyenne
 NbExchangePerTicket                       = Nombre d'échanges par ticket
 TicketRepartitionPerUserAndMeanAnswerTime = Répartition des tickets par utilisateur et temps moyen de réponse
 TopSocietyWithMostTickets                 = Top %s des sociétés avec le plus de tickets
+TicketsCreatedVersusClosedByMonth         = Tickets créés et clôturés sur les %s derniers mois
+TicketsCreated                            = Créés
+TicketsClosed                             = Clôturés
+OpenTicketsByStatus                       = Répartition des tickets ouverts par statut
+OpenTicketBacklogAge                      = Ancienneté des tickets ouverts (depuis la création)
+BacklogAgeUnderDays                       = Moins de %s jours
+BacklogAgeBetweenDays                     = De %s à %s jours
+BacklogAgeOverDays                        = Plus de %s jours
 ShowSelectedDateTypes                     = Sélectionnez le type de date à afficher
 
 # Email - Email
