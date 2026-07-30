@@ -77,7 +77,6 @@ function digiriskRefreshPreventionPlanDocument(DoliDB $db, int $planId, User $us
     if (!$force && isset($alreadyRefreshed[$planId])) {
         return 0;
     }
-    $alreadyRefreshed[$planId] = 1;
 
     require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmfiles.class.php';
     require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
@@ -88,6 +87,18 @@ function digiriskRefreshPreventionPlanDocument(DoliDB $db, int $planId, User $us
     if ($plan->fetch($planId) <= 0) {
         return -1;
     }
+
+    // Une reference provisoire ne survit pas a la validation : le document genere ici porterait ce
+    // nom et resterait dans un repertoire "(PROVxx)" que plus rien ne nettoie, a cote de celui
+    // genere avec la reference definitive, et la diffusion presenterait deux apercus. Le plan n'est
+    // de toute facon pas diffusable a ce stade : la generation attend la validation.
+    // Le marqueur de passage n'est pose qu'ici, pour que la validation qui suit dans la meme
+    // requete regenere bien avec la reference definitive.
+    if (empty($plan->ref) || preg_match('/^\(?PROV/i', $plan->ref)) {
+        return 0;
+    }
+
+    $alreadyRefreshed[$planId] = 1;
 
     // La page publique de signature tourne dans la langue de son visiteur : quand l'entite a une
     // langue fixee, le document la garde, sinon la signature d'un intervenant etranger regenererait
@@ -130,22 +141,26 @@ function digiriskRefreshPreventionPlanDocument(DoliDB $db, int $planId, User $us
     $newFileName = basename($document->last_main_doc);
 
     // Anciennes generations : on ne touche qu'au repertoire du modele, jamais aux pieces jointes
-    // deposees a la main sur le plan
-    $previous = new EcmFiles($db);
-    $previous->fetchAll('', '', 0, 0, '(t.filepath:=:\'' . $db->escape($relativeDir) . '\')');
-    if (is_array($previous->lines)) {
-        foreach ($previous->lines as $previousFile) {
-            if ($previousFile->filename == $newFileName) {
-                continue;
-            }
-            $oldFile = new EcmFiles($db);
-            if ($oldFile->fetch($previousFile->id) > 0) {
-                $oldFile->delete($user);
-            }
-            // disableglob : le nom porte la raison sociale, dont les crochets seraient pris pour une
-            // classe de caracteres et laisseraient le fichier sur le disque
-            dol_delete_file($conf->digiriskdolibarr->dir_output . '/' . $documentDir . '/' . $previousFile->filename, 1, 1);
+    // deposees a la main sur le plan.
+    // Requete directe plutot que le filtre universel de fetchAll : le chemin porte la reference du
+    // plan, dont une parenthese casserait l'analyse du filtre. Le nettoyage echouait alors sans
+    // bruit et les generations s'empilaient, la diffusion presentant plusieurs apercus.
+    $sql  = 'SELECT rowid, filename FROM ' . MAIN_DB_PREFIX . 'ecm_files';
+    $sql .= ' WHERE filepath = \'' . $db->escape($relativeDir) . '\'';
+    $sql .= ' AND entity = ' . (int) $conf->entity;
+
+    $resql = $db->query($sql);
+    while ($resql && ($previousFile = $db->fetch_object($resql))) {
+        if ($previousFile->filename == $newFileName) {
+            continue;
         }
+        $oldFile = new EcmFiles($db);
+        if ($oldFile->fetch($previousFile->rowid) > 0) {
+            $oldFile->delete($user);
+        }
+        // disableglob : le nom porte la raison sociale, dont les crochets seraient pris pour une
+        // classe de caracteres et laisseraient le fichier sur le disque
+        dol_delete_file($conf->digiriskdolibarr->dir_output . '/' . $documentDir . '/' . $previousFile->filename, 1, 1);
     }
 
     // Rattachement au plan + cle de partage + favori : les trois conditions pour que la page
