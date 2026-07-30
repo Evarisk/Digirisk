@@ -309,6 +309,17 @@ window.digiriskdolibarr.preventionplanmobile.fillFoundCompany = function(resp) {
     if (resp.societe.email) {
         $('.digirisk-mobile-ext-society-email').val(resp.societe.email);
     }
+    // L'adresse est celle du tiers resolu : elle n'ecrase pas une saisie en cours quand la fiche
+    // du tiers ne la renseigne pas
+    if (resp.societe.address) {
+        $('.digirisk-mobile-ext-society-address').val(resp.societe.address);
+    }
+    if (resp.societe.zip) {
+        $('.digirisk-mobile-ext-society-zip').val(resp.societe.zip);
+    }
+    if (resp.societe.town) {
+        $('.digirisk-mobile-ext-society-town').val(resp.societe.town);
+    }
     $('.digirisk-mobile-siren-result').removeClass('error').addClass('success').text((form.data('company-found-label') || '') + ' ' + resp.societe.name);
 
     var select = $('.digirisk-mobile-contact-select');
@@ -352,10 +363,14 @@ window.digiriskdolibarr.preventionplanmobile.selectContact = function() {
     var id     = $(this).val();
 
     if (id) {
+        var contactEmail = option.data('email') || '';
+
         $('.digirisk-mobile-resp-contact-id').val(id);
         $('.digirisk-mobile-resp-lastname').val(option.data('lastname')).prop('readonly', true);
         $('.digirisk-mobile-resp-firstname').val(option.data('firstname')).prop('readonly', true);
-        $('.digirisk-mobile-resp-email').val(option.data('email')).prop('readonly', true);
+        // L'email est desormais obligatoire : le verrouiller alors que la fiche du contact n'en a
+        // pas enfermerait l'utilisateur devant une erreur qu'il ne peut pas corriger
+        $('.digirisk-mobile-resp-email').val(contactEmail).prop('readonly', contactEmail !== '');
     } else {
         $('.digirisk-mobile-resp-contact-id').val('');
         $('.digirisk-mobile-resp-lastname').val('').prop('readonly', false);

@@ -96,6 +96,7 @@ $uploadToken   = saturne_get_upload_token($uploadContext);
 $isEdit  = false;
 $prefill = [
     'ext_society_id' => 0, 'ext_society_name' => '', 'ext_society_email' => '', 'siren' => '',
+    'ext_society_address' => '', 'ext_society_zip' => '', 'ext_society_town' => '',
     'resp_contact_id' => 0, 'resp_lastname' => '', 'resp_firstname' => '', 'resp_email' => '', 'resp_phone' => '',
     'date_start' => '', 'date_end' => '',
     'prior_visit_bool' => 0, 'prior_visit_text' => '', 'prior_visit_date' => '',
@@ -131,9 +132,12 @@ if ($id > 0 && $object->fetch($id) > 0) {
     // fetched Societe) for a single match, and 0 when there is none.
     $extSociety = $digiriskresources->fetchResourcesFromObject('ExtSociety', $object);
     if (is_object($extSociety) && $extSociety->id > 0) {
-        $prefill['ext_society_id']    = $extSociety->id;
-        $prefill['ext_society_name']  = $extSociety->name;
-        $prefill['ext_society_email'] = $extSociety->email;
+        $prefill['ext_society_id']      = $extSociety->id;
+        $prefill['ext_society_name']    = $extSociety->name;
+        $prefill['ext_society_email']   = $extSociety->email;
+        $prefill['ext_society_address'] = $extSociety->address;
+        $prefill['ext_society_zip']     = $extSociety->zip;
+        $prefill['ext_society_town']    = $extSociety->town;
         // Show back the most precise identifier the company has on file.
         $prefill['siren']             = dol_strlen($extSociety->idprof2) ? $extSociety->idprof2 : $extSociety->idprof1;
     }
@@ -264,6 +268,9 @@ if ($action == 'add_mobile' && $permissiontoadd) {
     $idProfInput   = digiriskMobileCleanIdProf(GETPOST('siren', 'alphanohtml'));
     $societyName   = trim(GETPOST('ext_society_name', 'alphanohtml'));
     $societyEmail  = trim(GETPOST('ext_society_email', 'alphanohtml'));
+    $societyAddr   = trim(GETPOST('ext_society_address', 'alphanohtml'));
+    $societyZip    = trim(GETPOST('ext_society_zip', 'alphanohtml'));
+    $societyTown   = trim(GETPOST('ext_society_town', 'alphanohtml'));
     $respContactId = GETPOSTINT('resp_contact_id');
     $respLastname  = trim(GETPOST('resp_lastname', 'alphanohtml'));
     $respFirstname = trim(GETPOST('resp_firstname', 'alphanohtml'));
@@ -393,9 +400,23 @@ if ($action == 'add_mobile' && $permissiontoadd) {
         }
     }
 
-    // Exterior responsible: either an existing contact or a lastname to create one
-    if ($respContactId <= 0 && !dol_strlen($respLastname)) {
-        $addError($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')));
+    // Exterior responsible: either an existing contact or enough data to create one
+    if ($respContactId <= 0) {
+        if (!dol_strlen($respLastname)) {
+            $addError($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Lastname')));
+        }
+        if (!dol_strlen($respFirstname)) {
+            $addError($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Firstname')));
+        }
+    }
+
+    // L'email du responsable portait une etoile sans etre verifie : on pouvait enregistrer sans, le
+    // contact etait cree sans adresse et la demande de signature ne pouvait plus partir. C'est tout
+    // le parcours qui repose dessus, y compris pour un contact deja existant qui n'en aurait pas.
+    if (!dol_strlen($respEmail)) {
+        $addError($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Email')));
+    } elseif (!isValidEmail($respEmail)) {
+        $addError($langs->trans('ErrorBadEMail', $respEmail));
     }
 
     // Dates: both required (say which one), end after start, at most one year apart
@@ -424,12 +445,25 @@ if ($action == 'add_mobile' && $permissiontoadd) {
         // 1. Resolve or create the exterior company
         if ($extSocietyId > 0) {
             $thirdparty->fetch($extSocietyId);
+
+            // L'adresse est affichee et modifiable dans le formulaire : la corriger sur place doit
+            // avoir un effet, sinon la saisie est silencieusement perdue. On n'ecrit que si elle a
+            // change, pour ne pas toucher au tiers a chaque enregistrement du plan.
+            if ($thirdparty->address != $societyAddr || $thirdparty->zip != $societyZip || $thirdparty->town != $societyTown) {
+                $thirdparty->address = $societyAddr;
+                $thirdparty->zip     = $societyZip;
+                $thirdparty->town    = $societyTown;
+                $thirdparty->update($thirdparty->id, $user);
+            }
         } else {
             // The first 9 digits are always the SIREN; a 14 digit input is a full SIRET.
             $thirdparty->name    = $societyName;
             $thirdparty->idprof1 = substr($idProfInput, 0, 9);
             $thirdparty->idprof2 = (dol_strlen($idProfInput) == 14) ? $idProfInput : '';
             $thirdparty->email   = $societyEmail;
+            $thirdparty->address = $societyAddr;
+            $thirdparty->zip     = $societyZip;
+            $thirdparty->town    = $societyTown;
             $thirdparty->client  = 0;
             $thirdparty->status  = 1;
             $resSoc = $thirdparty->create($user);
@@ -448,8 +482,13 @@ if ($action == 'add_mobile' && $permissiontoadd) {
         if (!$subError) {
             if ($respContactId > 0) {
                 $contact->fetch($respContactId);
-                if (!dol_strlen($respEmail)) {
-                    $respEmail = $contact->email;
+
+                // Un contact choisi dans la liste peut n'avoir aucune adresse : celle saisie ici
+                // est alors reportee sur sa fiche, faute de quoi la demande de signature repartirait
+                // dans le vide au prochain plan
+                if (dol_strlen($respEmail) && $contact->email != $respEmail) {
+                    $contact->email = $respEmail;
+                    $contact->update($contact->id, $user);
                 }
             } else {
                 $contact->socid     = $extSocietyId;

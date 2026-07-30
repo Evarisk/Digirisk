@@ -6464,6 +6464,33 @@ body.digirisk-mobile-create .digirisk-mobile-signature-status.success {
 }
 body.digirisk-mobile-create {
   /* SIREN */
+  /* Choix du tiers et sa loupe de resolution sur une seule ligne */
+}
+body.digirisk-mobile-create .digirisk-mobile-picker-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  /* select2 remplace le select par un conteneur a lui : les deux doivent ceder la place au bouton */
+}
+body.digirisk-mobile-create .digirisk-mobile-picker-row .digirisk-mobile-society-select,
+body.digirisk-mobile-create .digirisk-mobile-picker-row .select2-container,
+body.digirisk-mobile-create .digirisk-mobile-picker-row > select {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none;
+}
+body.digirisk-mobile-create .digirisk-mobile-picker-row .digirisk-mobile-siren-search {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 36px;
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1;
 }
 body.digirisk-mobile-create .digirisk-mobile-siren-row {
   display: flex;
