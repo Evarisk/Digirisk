@@ -92,6 +92,22 @@ class TicketDashboard extends DigiriskDolibarrDashboard
     }
 
     /**
+     * Get the criteria restricting the native ticket list to the tickets of a GP/UT
+     *
+     * The GP/UT is held by a chkbxlst extra field: the list expects an array of values, and only reads it when
+     * the hidden companion field telling the criteria was part of the form is there too.
+     *
+     * @param  int    $digiriskElementID ID of the GP/UT
+     * @return string                    Search criteria, already url encoded
+     */
+    public static function getDigiriskElementFilter(int $digiriskElementID): string
+    {
+        $criteria = 'search_options_digiriskdolibarr_ticket_service';
+
+        return $criteria . '_multiselect=1&' . $criteria . '%5B%5D=' . $digiriskElementID;
+    }
+
+    /**
      * Return ticket number by month for a year
      *
      * @param  int       $year Year
@@ -489,7 +505,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
             foreach ($categories as $category) {
                 $data[] = $ticketByCategoriesAndDigiriskElements[$digiriskElement->id][$category->id] ?? 0;
 
-                $datasetLinks[$datasetIndex][] = $this->getTicketListUrl(self::NOT_DRAFT_TICKETS_FILTER . '&search_category_ticket_list%5B%5D=' . $category->id . '&search_options_digiriskdolibarr_ticket_service=' . $digiriskElement->id);
+                $datasetLinks[$datasetIndex][] = $this->getTicketListUrl(self::NOT_DRAFT_TICKETS_FILTER . '&search_category_ticket_list%5B%5D=' . $category->id . '&' . self::getDigiriskElementFilter($digiriskElement->id));
                 $datasetIndex++;
             }
 
