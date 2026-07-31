@@ -117,6 +117,11 @@ class Risk extends SaturneObject
 
     private $cotations = [];
 
+    /**
+     * @var string Type of risk the dashboard is filtered on, read by the graphs to link to the matching list
+     */
+    protected string $dashboardRiskType = 'risk';
+
 	/**
 	 * Constructor
 	 *
@@ -983,6 +988,9 @@ class Risk extends SaturneObject
 
         $riskType = !empty($dashboardConfig->filters->riskType) ? $dashboardConfig->filters->riskType : 'risk';
 
+        // Kept for the graphs: the lists they open show the type of risk the dashboard is filtered on
+        $this->dashboardRiskType = $riskType;
+
         $dangerCategories                         = static::getDangerCategories($riskType);
         $riskByDangerCategoriesAndRiskAssessments = $this->getRiskByDangerCategoriesAndRiskAssessments($dangerCategories, $riskType);
 
@@ -1020,6 +1028,61 @@ class Risk extends SaturneObject
     }
 
     /**
+     * Get the levels of the cotation scale
+     *
+     * @return array Label, color and bounds of each level, indexed by level
+     */
+    public function getCotations(): array
+    {
+        return $this->cotations;
+    }
+
+    /**
+     * Get the risk list URL a graph part links to
+     *
+     * The graphs count the validated risks only, so the list they open leaves the other ones out.
+     *
+     * @param  array  $filters Criteria of the risk list, each one already url encoded
+     * @return string          Risk list URL
+     */
+    protected function getRiskListUrl(array $filters = []): string
+    {
+        $filters[] = 'risk_type=' . $this->dashboardRiskType;
+        $filters[] = 'search_status=' . self::STATUS_VALIDATED;
+
+        return dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '?' . implode('&', array_filter($filters));
+    }
+
+    /**
+     * Get the SQL criteria restricting a risk list to the risks assessed at a given level of the cotation scale
+     *
+     * A risk is assessed as many times as it is reviewed, and only its last validated assessment tells where it
+     * stands today: that is the one the dashboard graph counts, so the criteria reads the same one.
+     *
+     * @param  int    $cotationLevel Level of the cotation scale, from 1 (grey) to 4 (black)
+     * @return string                SQL criteria, empty when the level is not one of the scale
+     */
+    public function getCotationSqlFilter(int $cotationLevel): string
+    {
+        if (empty($this->cotations[$cotationLevel])) {
+            return '';
+        }
+
+        $riskAssessmentTable = MAIN_DB_PREFIX . (new RiskAssessment($this->db))->table_element;
+
+        // The highest level has no upper bound, a cotation computed with the advanced method can exceed its end
+        $cotationFilter = ' AND ra.cotation >= ' . (int) $this->cotations[$cotationLevel]['start'];
+        if (isset($this->cotations[$cotationLevel + 1])) {
+            $cotationFilter .= ' AND ra.cotation <= ' . (int) $this->cotations[$cotationLevel]['end'];
+        }
+
+        return ' AND r.rowid IN (SELECT ra.fk_risk FROM ' . $riskAssessmentTable . ' as ra'
+             . ' WHERE ra.status = ' . RiskAssessment::STATUS_VALIDATED . $cotationFilter
+             . ' AND ra.rowid = (SELECT MAX(lastra.rowid) FROM ' . $riskAssessmentTable . ' as lastra'
+             . ' WHERE lastra.fk_risk = ra.fk_risk AND lastra.status = ' . RiskAssessment::STATUS_VALIDATED . '))';
+    }
+
+    /**
      * Get risks by cotation
      *
      * @param array $riskByDangerCategoriesAndRiskAssessments Risk by danger categories and risk assessments
@@ -1044,6 +1107,13 @@ class Risk extends SaturneObject
         $array['labels']     = $this->cotations;
 
         $array['data'] = $riskByDangerCategoriesAndRiskAssessments['nbRiskByCotations'] ?? [];
+
+        $links = [];
+        foreach (array_keys($array['data']) as $cotationLevel) {
+            $links[] = $this->getRiskListUrl(['search_cotation=' . $cotationLevel]);
+        }
+
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['links' => $links]);
 
         return $array;
     }
@@ -1073,12 +1143,17 @@ class Risk extends SaturneObject
         $array['moreCSS']    = 'grid-2';
         $array['labels']     = $this->cotations;
 
+        // One series per level of the cotation scale, so each series carries the links of its own level
+        $datasetLinks = [];
         foreach ($dangerCategories as $dangerCategory) {
             $array['data'][$dangerCategory['position']][0] = $dangerCategory['name'];
             for ($i = 1; $i <= 4; $i++) {
                 $array['data'][$dangerCategory['position']]['y_combined_' . $array['labels'][$i]['label']] = !empty($riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk']) ? $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['riskAssessments'][$i] / $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'] : 0;
+                $datasetLinks[$i - 1][] = $this->getRiskListUrl(['search_category=' . $dangerCategory['position'], 'search_cotation=' . $i]);
             }
         }
+
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['datasetLinks' => $datasetLinks]);
 
         return $array;
     }
@@ -1116,10 +1191,14 @@ class Risk extends SaturneObject
             ]
         ];
 
+        $links = [];
         foreach ($dangerCategories as $dangerCategory) {
             $array['data'][$dangerCategory['position']][] = $dangerCategory['name'];
             $array['data'][$dangerCategory['position']][] = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'] ?? 0;
+            $links[]                                     = $this->getRiskListUrl(['search_category=' . $dangerCategory['position']]);
         }
+
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['links' => $links]);
 
         return $array;
     }

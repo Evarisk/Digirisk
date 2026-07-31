@@ -2791,3 +2791,30 @@ function digiriskformconfirm($page, $title, $question, $action, $formquestion = 
 
 	return $formconfirm;
 }
+
+/**
+ * Get the date range criteria of a Dolibarr list
+ *
+ * The bounds are the ones of the list search form, so a graph bar and the list it opens hold the same records
+ *
+ * @param  string $prefix Name of the list date filter, without its bound suffix ('search_date', 'search_accident_date')
+ * @param  int    $start  Timestamp of the first day of the range, 0 for no lower bound
+ * @param  int    $end    Timestamp of the last day of the range, 0 for no upper bound
+ * @return string         Search criteria, empty when the range is unbounded
+ */
+function digirisk_get_date_range_filter(string $prefix, int $start = 0, int $end = 0): string
+{
+    $filter = [];
+    foreach (['start' => $start, 'end' => $end] as $bound => $timestamp) {
+        if (empty($timestamp)) {
+            continue;
+        }
+
+        $date     = dol_getdate($timestamp);
+        $filter[] = $prefix . '_' . $bound . 'day=' . $date['mday'];
+        $filter[] = $prefix . '_' . $bound . 'month=' . $date['mon'];
+        $filter[] = $prefix . '_' . $bound . 'year=' . $date['year'];
+    }
+
+    return implode('&', $filter);
+}

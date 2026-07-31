@@ -583,6 +583,7 @@ AccidentWithoutRegister                  = Accidents ne possédant pas de regist
 AccidentWithRegister                     = Accidents possédant un registre
 WorkStopDurationDistribution             = Répartition du temps par arrêt de travail
 WorkStopDurationDistributionDigiriskElem = Répartition du temps d'arrêt travail par GP/UT
+WorkStopDuration                         = Durée d'arrêt de travail
 NoAbsence                                = Aucun arrêt
 UpTo4Days                                = Jusqu’à 4 jours
 UpTo21Days                               = Jusqu’à 21 jours

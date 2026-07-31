@@ -74,6 +74,49 @@ class Accident extends SaturneObject
 	const STATUS_LOCKED    = 2;
 	const STATUS_ARCHIVED  = 3;
 
+    /**
+     * @var array Upper bound in days, excluded, of each work stop duration bucket, 0 for the open ended one.
+     *            The dashboard graph and the accident list read the same bounds, so a pie slice and the list
+     *            it opens hold the same work stops
+     */
+    public const WORK_STOP_DURATION_LIMITS = [
+        'upTo4Days'       => 4,
+        'upTo21Days'      => 21,
+        'upTo3Months'     => 90,
+        'upTo6Months'     => 180,
+        'moreThan6Months' => 0
+    ];
+
+    /**
+     * @var string Criteria of the accident list matching the accidents without any work stop
+     */
+    public const NO_WORK_STOP_FILTER = 'none';
+
+    /**
+     * @var string Criteria of the accident list matching the accidents with at least one work stop
+     */
+    public const ANY_WORK_STOP_FILTER = 'any';
+
+    /**
+     * @var string Criteria of the accident list matching the accidents declared from a register
+     */
+    public const WITH_REGISTER_FILTER = 'with';
+
+    /**
+     * @var string Criteria of the accident list matching the accidents declared outside a register
+     */
+    public const WITHOUT_REGISTER_FILTER = 'without';
+
+    /**
+     * @var int Timestamp of the first day the dashboard covers, 0 when it covers every year
+     */
+    protected int $dashboardDateStart = 0;
+
+    /**
+     * @var int Timestamp of the last day the dashboard covers, 0 when it covers every year
+     */
+    protected int $dashboardDateEnd = 0;
+
 	/**
 	 * 'type' field format:
 	 *      'integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter[:Sortfield]]]',
@@ -377,6 +420,10 @@ class Accident extends SaturneObject
         }
         $endDate = dol_time_plus_duree($startDate, 1, 'y');
 
+        // The graphs only count the accidents of the selected year, so the lists they open filter on the same range
+        $this->dashboardDateStart = $year == -1 ? 0 : $startDate;
+        $this->dashboardDateEnd   = $year == -1 ? 0 : dol_time_plus_duree($endDate, -1, 'd');
+
         $join                   = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as a ON a.rowid = t.fk_accident';
         $accidentsWithWorkStops = saturne_fetch_all_object_type('AccidentWorkStop', 'DESC', 't.rowid', 0, 0, $year == -1 ? [] : ['customsql' => ' t.date_start_workstop >= \'' . dol_print_date($startDate, '%Y/%m/%d') . '\' AND t.date_start_workstop < \'' . dol_print_date($endDate, '%Y/%m/%d') . '\''], 'AND', false, true, false, $join);
         $accidents              = $this->fetchAll('', '', 0, 0, ['customsql' => ' t.status > ' . self::STATUS_DRAFT . ($year == -1 ? '' : ' AND t.accident_date >= \'' . dol_print_date($startDate, '%Y/%m/%d') . '\' AND t.accident_date < \'' . dol_print_date($endDate, '%Y/%m/%d') . '\'')]);
@@ -533,8 +580,15 @@ class Accident extends SaturneObject
             ],
         ];
 
-        $array['data']['accidents']            = count($accidentsWithWorkStops);
-        $array['data']['accidentswithoutDIAT'] = count($accidents) - $array['data']['accidents'];
+        // Counted on the accidents rather than on their work stops: an accident stopping work twice is one
+        // accident, and counting the work stops made the other part of the pie negative
+        $array['data']['accidents']            = count(array_unique(array_column($accidentsWithWorkStops, 'fk_accident')));
+        $array['data']['accidentswithoutDIAT'] = max(0, count($accidents) - $array['data']['accidents']);
+
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['links' => [
+            $this->getAccidentListUrl(['search_workstop=' . self::ANY_WORK_STOP_FILTER]),
+            $this->getAccidentListUrl(['search_workstop=' . self::NO_WORK_STOP_FILTER])
+        ]]);
 
         return $array;
     }
@@ -609,6 +663,17 @@ class Accident extends SaturneObject
                 $array['data'][] = array_values($accidentArray);
             }
         }
+
+        // One series per year and one bar per month, so each series carries the links of its own year
+        $datasetLinks = [];
+        for ($j = 0; $j < 3; $j++) {
+            $year = (int) date('Y') - 2 + $j;
+            for ($i = 1; $i < 13; $i++) {
+                $datasetLinks[$j][] = $this->getAccidentListUrl([], dol_get_first_day($year, $i), dol_get_last_day($year, $i));
+            }
+        }
+
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['datasetLinks' => $datasetLinks]);
 
         return $array;
     }
@@ -783,8 +848,9 @@ class Accident extends SaturneObject
     {
         global $langs;
 
+        // An accident created outside a ticket carries null, 0 or the -1 of an empty select, none of them a register
         $accidentWithoutRegister = count(array_filter($accident, function($elem) {
-            return $elem->fk_ticket === null;
+            return (int) $elem->fk_ticket <= 0;
         }));
         $array = [];
 
@@ -811,6 +877,12 @@ class Accident extends SaturneObject
         ];
 
         $array['data'] = [$accidentWithoutRegister, count($accident) - $accidentWithoutRegister];
+
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['links' => [
+            $this->getAccidentListUrl(['search_register=' . self::WITHOUT_REGISTER_FILTER]),
+            $this->getAccidentListUrl(['search_register=' . self::WITH_REGISTER_FILTER])
+        ]]);
+
         return $array;
     }
 
@@ -871,21 +943,13 @@ class Accident extends SaturneObject
             'moreThan6Months' => 0,
         ];
 
+        $links = [$this->getAccidentListUrl(['search_workstop=' . self::NO_WORK_STOP_FILTER])];
+
         $nbAccidensWithWorkStop = [];
         foreach ($accidentsWithWorkStop as $workstop) {
             $days = abs($workstop->date_end_workstop - $workstop->date_start_workstop) / 86400;
 
-            if ($days < 4) {
-                $array['data']['upTo4Days']++;
-            } elseif ($days < 21) {
-                $array['data']['upTo21Days']++;
-            } elseif ($days < 90) {
-                $array['data']['upTo3Months']++;
-            } elseif ($days < 180) {
-                $array['data']['upTo6Months']++;
-            } else {
-                $array['data']['moreThan6Months']++;
-            }
+            $array['data'][$this->getWorkStopDurationBucket($days)]++;
             $nbAccidensWithWorkStop[$workstop->fk_accident] = $workstop->fk_accident;
         }
         foreach ($accidents as $accident) {
@@ -893,7 +957,93 @@ class Accident extends SaturneObject
                 $array['data']['noAbsence']++;
             }
         }
+
+        foreach (array_keys(self::WORK_STOP_DURATION_LIMITS) as $bucket) {
+            $links[] = $this->getAccidentListUrl(['search_workstop=' . $bucket]);
+        }
+
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['links' => $links]);
+
         return $array;
+    }
+
+    /**
+     * Get the accident list URL a graph part links to
+     *
+     * The drafts are left out and the date range of the dashboard is carried over, so the list holds the same
+     * accidents as the graph.
+     *
+     * @param  array  $filters   Criteria of the accident list, each one already url encoded
+     * @param  int    $dateStart Timestamp of the first day of the range, 0 for the one of the dashboard
+     * @param  int    $dateEnd   Timestamp of the last day of the range, 0 for the one of the dashboard
+     * @return string            Accident list URL
+     */
+    protected function getAccidentListUrl(array $filters = [], int $dateStart = 0, int $dateEnd = 0): string
+    {
+        $filters[] = 'search_status=' . implode(',', [self::STATUS_VALIDATED, self::STATUS_LOCKED, self::STATUS_ARCHIVED]);
+        $filters[] = digirisk_get_date_range_filter(
+            'search_accident_date',
+            empty($dateStart) ? $this->dashboardDateStart : $dateStart,
+            empty($dateEnd) ? $this->dashboardDateEnd : $dateEnd
+        );
+
+        return dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . '?' . implode('&', array_filter($filters));
+    }
+
+    /**
+     * Get the work stop duration bucket a duration falls in
+     *
+     * @param  float  $nbDays Duration of the work stop, in days
+     * @return string         Key of the bucket, the open ended one when the duration is over every bound
+     */
+    public function getWorkStopDurationBucket(float $nbDays): string
+    {
+        foreach (self::WORK_STOP_DURATION_LIMITS as $bucket => $limit) {
+            if (empty($limit) || $nbDays < $limit) {
+                return $bucket;
+            }
+        }
+
+        return (string) array_key_last(self::WORK_STOP_DURATION_LIMITS);
+    }
+
+    /**
+     * Get the SQL criteria restricting an accident list to the accidents of a work stop bucket
+     *
+     * The duration is counted in days, as the dashboard graph does, so a pie slice and the list it opens hold
+     * the same accidents. An accident stopping work twice inside the same bucket counts once here and twice in
+     * the graph, which counts work stops.
+     *
+     * @param  string $bucket Key of a bucket of WORK_STOP_DURATION_LIMITS, or the none / any criteria
+     * @return string         SQL criteria, empty when the bucket is unknown
+     */
+    public function getWorkStopSqlFilter(string $bucket): string
+    {
+        $isBucketOfDuration = isset(self::WORK_STOP_DURATION_LIMITS[$bucket]);
+        if (!$isBucketOfDuration && !in_array($bucket, [self::NO_WORK_STOP_FILTER, self::ANY_WORK_STOP_FILTER])) {
+            return '';
+        }
+
+        $durationFilter = '';
+        if ($isBucketOfDuration) {
+            $duration   = 'ABS(TIMESTAMPDIFF(SECOND, ws.date_start_workstop, ws.date_end_workstop)) / 86400';
+            $lowerBound = 0;
+            foreach (self::WORK_STOP_DURATION_LIMITS as $currentBucket => $limit) {
+                if ($currentBucket == $bucket) {
+                    break;
+                }
+                $lowerBound = $limit;
+            }
+
+            $durationFilter = ' AND ' . $duration . ' >= ' . (int) $lowerBound;
+            if (!empty(self::WORK_STOP_DURATION_LIMITS[$bucket])) {
+                $durationFilter .= ' AND ' . $duration . ' < ' . (int) self::WORK_STOP_DURATION_LIMITS[$bucket];
+            }
+        }
+
+        return ' AND t.rowid ' . ($bucket == self::NO_WORK_STOP_FILTER ? 'NOT IN' : 'IN')
+             . ' (SELECT ws.fk_accident FROM ' . MAIN_DB_PREFIX . (new AccidentWorkStop($this->db))->table_element . ' as ws'
+             . ' WHERE ws.fk_accident > 0' . $durationFilter . ')';
     }
 
     /**
@@ -932,12 +1082,16 @@ class Accident extends SaturneObject
         unset($array['data'][null]);
 
         $array['labels'] = [];
+        $links           = [];
         foreach (array_keys($array['data']) as $digiriskElemId) {
             $digiriskElem = $digiriskElements[$digiriskElemId]['object'];
             $array['labels'][$digiriskElemId] = [
                 'label' => $digiriskElem->ref . ' - ' . $digiriskElem->label,
             ];
+            $links[] = $this->getAccidentListUrl(['search_fk_element=' . $digiriskElemId, 'search_workstop=' . self::ANY_WORK_STOP_FILTER]);
         }
+
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['links' => $links]);
 
         return $array;
     }

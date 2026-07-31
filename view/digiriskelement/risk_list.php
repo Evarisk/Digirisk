@@ -70,6 +70,8 @@ $limit       = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_
 $sortfield   = GETPOST('sortfield', 'alpha');
 $sortorder   = GETPOST('sortorder', 'alpha');
 $riskType    = GETPOSTISSET('risk_type') ? GETPOST('risk_type') : 'risk';
+// Level of the cotation scale the last assessment of the risk must fall in, 0 for all of them
+$searchCotation = GETPOSTINT('search_cotation');
 $page        = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
 $page        = is_numeric($page) ? $page : 0;
 $page        = $page == -1 ? 0 : $page;
@@ -216,6 +218,7 @@ if (empty($reshook)) {
 		$toselect              = '';
 		$search_array_options  = [];
         $search_category_array = [];
+        $searchCotation        = 0;
 	}
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')
 		|| GETPOST('button_search_x', 'alpha') || GETPOST('button_search.x', 'alpha') || GETPOST('button_search', 'alpha')) {
