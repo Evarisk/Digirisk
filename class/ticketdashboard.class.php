@@ -36,6 +36,15 @@ require_once __DIR__ . '/accident.class.php';
 class TicketDashboard extends DigiriskDolibarrDashboard
 {
     /**
+     * @var string Criteria restricting the native ticket list to the tickets the graphs count, the ones left
+     *             unread excluded, as their SQL filter on fk_statut does
+     */
+    public const NOT_DRAFT_TICKETS_FILTER = 'search_fk_statut%5B%5D=' . Ticket::STATUS_READ . '&search_fk_statut%5B%5D=' . Ticket::STATUS_ASSIGNED
+        . '&search_fk_statut%5B%5D=' . Ticket::STATUS_IN_PROGRESS . '&search_fk_statut%5B%5D=' . Ticket::STATUS_NEED_MORE_INFO
+        . '&search_fk_statut%5B%5D=' . Ticket::STATUS_WAITING . '&search_fk_statut%5B%5D=' . Ticket::STATUS_CLOSED
+        . '&search_fk_statut%5B%5D=' . Ticket::STATUS_CANCELED;
+
+    /**
      * @var DoliDB Database handler
      */
     public DoliDB $db;
@@ -80,6 +89,22 @@ class TicketDashboard extends DigiriskDolibarrDashboard
         if (dol_strlen($moreWhere) > 0) {
             $this->where .= $moreWhere;
         }
+    }
+
+    /**
+     * Get the criteria restricting the native ticket list to the tickets of a GP/UT
+     *
+     * The GP/UT is held by a chkbxlst extra field: the list expects an array of values, and only reads it when
+     * the hidden companion field telling the criteria was part of the form is there too.
+     *
+     * @param  int    $digiriskElementID ID of the GP/UT
+     * @return string                    Search criteria, already url encoded
+     */
+    public static function getDigiriskElementFilter(int $digiriskElementID): string
+    {
+        $criteria = 'search_options_digiriskdolibarr_ticket_service';
+
+        return $criteria . '_multiselect=1&' . $criteria . '%5B%5D=' . $digiriskElementID;
     }
 
     /**
@@ -398,6 +423,9 @@ class TicketDashboard extends DigiriskDolibarrDashboard
             $array['labels'][] = ['label' => $label];
         }
 
+        // Month each row of the graph stands for, zero based and counted from the start of the fiscal year
+        $rowMonths = [];
+
         $tickets = $this->getNbByMonthWithPrevYear($startYear, $endYear, getDolGlobalInt('SOCIETE_FISCAL_MONTH_START'));
         if (is_array($tickets) && !empty($tickets)) {
             if (!empty($dateStart) && !empty($dateEnd) && $startYear == $endYear) {
@@ -409,12 +437,26 @@ class TicketDashboard extends DigiriskDolibarrDashboard
                 foreach ($tickets as $key => $ticket) {
                     if ($key >= $startMonth && $key <= $endMonth) {
                         $array['data'][] = $ticket;
+                        $rowMonths[]     = $key;
                     }
                 }
             } else {
                 $array['data'] = $tickets;
+                $rowMonths     = array_keys($tickets);
             }
         }
+
+        // One series per year and one bar per month, so each series carries the links of its own year
+        $fiscalMonthOffset = max(0, getDolGlobalInt('SOCIETE_FISCAL_MONTH_START') - 1);
+        $datasetLinks      = [];
+        foreach ($labels as $datasetIndex => $year) {
+            foreach ($rowMonths as $rowMonth) {
+                $month                         = (($rowMonth + $fiscalMonthOffset) % 12) + 1;
+                $datasetLinks[$datasetIndex][] = $this->getTicketListUrl(self::NOT_DRAFT_TICKETS_FILTER . '&' . digirisk_get_date_range_filter('search_date', dol_get_first_day((int) $year, $month), dol_get_last_day((int) $year, $month)));
+            }
+        }
+
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['datasetLinks' => $datasetLinks]);
 
         return $array;
     }
@@ -455,14 +497,22 @@ class TicketDashboard extends DigiriskDolibarrDashboard
 
         // Chaque ligne doit compter exactement une valeur par catégorie, dans l'ordre des libellés :
         // une ligne plus courte déclenche des warnings "Undefined array key" dans DolGraph et décale les séries
+        // One series per tag and one bar per GP/UT, so each series carries the links of its own tag
+        $datasetLinks = [];
         foreach ($digiriskElements as $digiriskElement) {
-            $data = [$digiriskElement->ref . ' - ' . $digiriskElement->label];
+            $data         = [$digiriskElement->ref . ' - ' . $digiriskElement->label];
+            $datasetIndex = 0;
             foreach ($categories as $category) {
                 $data[] = $ticketByCategoriesAndDigiriskElements[$digiriskElement->id][$category->id] ?? 0;
+
+                $datasetLinks[$datasetIndex][] = $this->getTicketListUrl(self::NOT_DRAFT_TICKETS_FILTER . '&search_category_ticket_list%5B%5D=' . $category->id . '&' . self::getDigiriskElementFilter($digiriskElement->id));
+                $datasetIndex++;
             }
 
             $array['data'][$digiriskElement->id] = $data;
         }
+
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['datasetLinks' => $datasetLinks]);
 
         return $array;
     }

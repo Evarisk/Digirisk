@@ -117,6 +117,19 @@ class DigiriskDolibarrDashboard
         return $data;
     }
 
+    /**
+     * Get the ticket list URL a graph bar links to
+     *
+     * The Digirisk left menu is kept selected so the list opens in the same navigation context as the dashboard.
+     *
+     * @param  string $searchFilter Search criteria of the native ticket list, already url encoded
+     * @return string               Ticket list URL
+     */
+    protected function getTicketListUrl(string $searchFilter): string
+    {
+        return DOL_URL_ROOT . '/ticket/list.php?mainmenu=ticket&leftmenu=digiriskticketlist&' . $searchFilter;
+    }
+
     //@todo a bouger dans Saturne
     /**
      * Return nb of elements, total amount and avg amount each year

@@ -727,6 +727,7 @@ class DigiriskElement extends SaturneObject
             }
         }
 
+        $links = [];
         if (!empty($digiriskElements)) {
             foreach ($digiriskElements as $digiriskElement) {
                 $risks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.status = ' . Risk::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . ' AND t.type = "' . $riskType . '" AND t.fk_element = ' . $digiriskElement['object']->id]);
@@ -736,9 +737,12 @@ class DigiriskElement extends SaturneObject
                         'color' => SaturneDashboard::getColorRange($digiriskElement['object']->id)
                     ];
                     $array['data'][$digiriskElement['object']->id] = count($risks);
+                    $links[]                                       = dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '?risk_type=' . $riskType . '&search_status=' . Risk::STATUS_VALIDATED . '&search_fk_element=' . $digiriskElement['object']->id;
                 }
             }
         }
+
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['links' => $links]);
 
         return $array;
     }
@@ -796,6 +800,14 @@ class DigiriskElement extends SaturneObject
             }
             $array['data'] = array_count_values($children);
         }
+
+        // Each part counts the children of a groupment, so it opens the card of that groupment, where they sit
+        $links = [];
+        foreach (array_keys($array['data'] ?? []) as $digiriskElementId) {
+            $links[] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php', 1) . '?id=' . $digiriskElementId;
+        }
+
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['links' => $links]);
 
         return $array;
     }

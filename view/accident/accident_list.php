@@ -87,6 +87,14 @@ foreach ($accident->fields as $key => $val) {
 	if (GETPOST('search_' . $key, 'alpha') !== '') $search[$key] = GETPOST('search_' . $key, 'alpha');
 }
 
+// Criteria carried by no field of the accident: the work stops and the register are read on another table
+$searchWorkStop      = GETPOST('search_workstop', 'aZ09');
+$searchRegister      = GETPOST('search_register', 'aZ09');
+$searchAccidentDates = [
+	'start' => dol_mktime(0, 0, 0, GETPOSTINT('search_accident_date_startmonth'), GETPOSTINT('search_accident_date_startday'), GETPOSTINT('search_accident_date_startyear')),
+	'end'   => dol_mktime(23, 59, 59, GETPOSTINT('search_accident_date_endmonth'), GETPOSTINT('search_accident_date_endday'), GETPOSTINT('search_accident_date_endyear'))
+];
+
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = [];
 foreach ($accident->fields as $key => $val) {
@@ -147,6 +155,9 @@ if (empty($reshook)) {
 
 		$toselect             = '';
 		$search_array_options = [];
+		$searchWorkStop       = '';
+		$searchRegister       = '';
+		$searchAccidentDates  = ['start' => 0, 'end' => 0];
 	}
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')
 		|| GETPOST('button_search_x', 'alpha') || GETPOST('button_search.x', 'alpha') || GETPOST('button_search', 'alpha')) {
@@ -234,6 +245,17 @@ if ($fromid > 0) {
 	dol_banner_tab($userObject, 'fromiduser', $linkback, $user->rights->user->user->lire || $user->admin);
 }
 
+// Criteria to carry over when the list is sorted or paged
+$param = '';
+if (!empty($fromid))     $param .= '&fromid=' . urlencode($fromid);
+if (!empty($fromiduser)) $param .= '&fromiduser=' . urlencode($fromiduser);
+foreach ($search as $key => $val) {
+	if ($val !== '') $param .= '&search_' . $key . '=' . urlencode($val);
+}
+if (!empty($searchWorkStop)) $param .= '&search_workstop=' . urlencode($searchWorkStop);
+if (!empty($searchRegister)) $param .= '&search_register=' . urlencode($searchRegister);
+$param .= (!empty($searchAccidentDates['start']) || !empty($searchAccidentDates['end']) ? '&' . digirisk_get_date_range_filter('search_accident_date', $searchAccidentDates['start'], $searchAccidentDates['end']) : '');
+
 // Add $param from extra fields
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 
@@ -304,6 +326,12 @@ foreach ($search as $key => $val) {
 	if ($search[$key] != '') $sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 }
 
+if (!empty($searchAccidentDates['start'])) $sql .= " AND t.accident_date >= '" . $db->idate($searchAccidentDates['start']) . "'";
+if (!empty($searchAccidentDates['end']))   $sql .= " AND t.accident_date <= '" . $db->idate($searchAccidentDates['end']) . "'";
+if (!empty($searchWorkStop))               $sql .= $accident->getWorkStopSqlFilter($searchWorkStop);
+if ($searchRegister == Accident::WITH_REGISTER_FILTER)    $sql .= ' AND t.fk_ticket > 0';
+if ($searchRegister == Accident::WITHOUT_REGISTER_FILTER) $sql .= ' AND (t.fk_ticket IS NULL OR t.fk_ticket <= 0)';
+
 if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
 // Add where from extra fields
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
@@ -353,7 +381,21 @@ if ($search_all) {
 	print '<div class="divsearchfieldfilter">' . $langs->trans("FilterOnInto", $search_all) . join(', ', $fieldstosearchall) . '</div>';
 }
 
-$moreforfilter = '';
+// Work stops and register hold no column of their own, their filters sit above the list
+$workStopFilterLabels = [
+	Accident::ANY_WORK_STOP_FILTER => $langs->transnoentities('AccidentWithDIAT'),
+	Accident::NO_WORK_STOP_FILTER  => $langs->transnoentities('AccidentWithoutDIAT')
+];
+foreach (array_keys(Accident::WORK_STOP_DURATION_LIMITS) as $workStopBucket) {
+	$workStopFilterLabels[$workStopBucket] = $langs->transnoentities(ucfirst($workStopBucket));
+}
+
+$moreforfilter  = '<div class="divsearchfield">' . $langs->trans('WorkStopDuration') . ': ';
+$moreforfilter .= $form->selectarray('search_workstop', $workStopFilterLabels, $searchWorkStop, 1, 0, 0, '', 0, 0, 0, '', 'maxwidth200');
+$moreforfilter .= '</div>';
+$moreforfilter .= '<div class="divsearchfield">' . $langs->trans('AccidentRegister') . ': ';
+$moreforfilter .= $form->selectarray('search_register', [Accident::WITH_REGISTER_FILTER => $langs->transnoentities('AccidentWithRegister'), Accident::WITHOUT_REGISTER_FILTER => $langs->transnoentities('AccidentWithoutRegister')], $searchRegister, 1, 0, 0, '', 0, 0, 0, '', 'maxwidth200');
+$moreforfilter .= '</div>';
 
 $varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
@@ -363,6 +405,12 @@ print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sort
 
 $selectedfields                         = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 if ($massactionbutton) $selectedfields .= $form->showCheckAddButtons('checkforselect', 1);
+
+if ($moreforfilter) {
+	print '<div class="liste_titre liste_titre_bydiv centpercent">';
+	print $moreforfilter;
+	print '</div>';
+}
 
 print '<div class="div-table-responsive">';
 print '<table class="tagtable nobottomiftotal liste' . ($moreforfilter ? " listwithfilterbefore" : "") . '">' . "\n";
@@ -383,6 +431,14 @@ foreach ($accident->fields as $key => $val) {
 		if (isset($val['arrayofkeyval']) && is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key] ?? '', $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 		elseif (strpos($val['type'], 'integer:') === 0) {
 			print $accident->showInputField($val, $key, $search[$key] ?? '', '', '', 'search_', 'maxwidth150', 1);
+		} elseif ($key == 'accident_date') {
+			print '<div class="nowrap">';
+			// -1 rather than 0 so the fields stay empty when no bound is searched
+			print $form->selectDate($searchAccidentDates['start'] ?: -1, 'search_accident_date_start', 0, 0, 1, '', 1, 0, 0, '', '', '', '', 1, '', $langs->trans('From'));
+			print '</div>';
+			print '<div class="nowrap">';
+			print $form->selectDate($searchAccidentDates['end'] ?: -1, 'search_accident_date_end', 0, 0, 1, '', 1, 0, 0, '', '', '', '', 1, '', $langs->trans('to'));
+			print '</div>';
 		} elseif ( ! preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key] ?? '') . '">';
 		print '</td>';
 	}

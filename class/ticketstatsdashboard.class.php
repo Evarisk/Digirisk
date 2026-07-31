@@ -24,6 +24,9 @@
 // load Dolibarr librairies
 require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 
+// load DigiriskDolibarr librairies
+require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
+
 /**
  * Class to manage stats for tickets
  */
@@ -420,7 +423,7 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
         }
 
         // A mean answer time in days dwarfs a ticket count on a shared scale, so it gets its own Y axis
-        $array['morehtmlright'] = $this->getGraphOptionsInput(['links' => $links, 'secondAxisDataset' => 1]);
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['links' => $links, 'secondAxisDataset' => 1]);
 
         return $array;
     }
@@ -492,7 +495,7 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
             }
         }
 
-        $array['morehtmlright'] = $this->getGraphOptionsInput(['links' => $links]);
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['links' => $links]);
 
         return $array;
     }
@@ -570,12 +573,12 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
         $closedLinks  = [];
         foreach ($months as $month) {
             $array['data'][] = [$month['label'], $month['created'], $month['closed']];
-            $createdLinks[]  = $this->getTicketListUrl($this->getDateRangeFilter('search_date', $month['start'], $month['end']));
-            $closedLinks[]   = $this->getTicketListUrl($this->getDateRangeFilter('search_dateclose', $month['start'], $month['end']));
+            $createdLinks[]  = $this->getTicketListUrl(digirisk_get_date_range_filter('search_date', $month['start'], $month['end']));
+            $closedLinks[]   = $this->getTicketListUrl(digirisk_get_date_range_filter('search_dateclose', $month['start'], $month['end']));
         }
 
         // Each series filters on a date of its own, so the links are declared per dataset
-        $array['morehtmlright'] = $this->getGraphOptionsInput(['datasetLinks' => [$createdLinks, $closedLinks]]);
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['datasetLinks' => [$createdLinks, $closedLinks]]);
 
         return $array;
     }
@@ -635,7 +638,7 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
             }
         }
 
-        $array['morehtmlright'] = $this->getGraphOptionsInput(['links' => $links]);
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['links' => $links]);
 
         return $array;
     }
@@ -713,10 +716,10 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
         foreach ($buckets as $bucket) {
             $array['data'][] = [$bucket['label'], $bucket['nb']];
             // The list bound is the whole day, so the exclusive upper bound of the bucket is the day before
-            $links[] = $this->getTicketListUrl(self::OPEN_TICKETS_FILTER . '&' . $this->getDateRangeFilter('search_date', $bucket['from'], empty($bucket['to']) ? dol_now() : $bucket['to'] - 86400));
+            $links[] = $this->getTicketListUrl(self::OPEN_TICKETS_FILTER . '&' . digirisk_get_date_range_filter('search_date', $bucket['from'], empty($bucket['to']) ? dol_now() : $bucket['to'] - 86400));
         }
 
-        $array['morehtmlright'] = $this->getGraphOptionsInput(['links' => $links]);
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['links' => $links]);
 
         return $array;
     }
@@ -743,31 +746,6 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
     }
 
     /**
-     * Get the date range criteria of the native ticket list
-     *
-     * @param  string $prefix Name of the list date filter, without its bound suffix ('search_date', 'search_dateclose')
-     * @param  int    $start  Timestamp of the first day of the range, 0 for no lower bound
-     * @param  int    $end    Timestamp of the last day of the range, 0 for no upper bound
-     * @return string         Search criteria, empty when the range is unbounded
-     */
-    protected function getDateRangeFilter(string $prefix, int $start = 0, int $end = 0): string
-    {
-        $filter = [];
-        foreach (['start' => $start, 'end' => $end] as $bound => $timestamp) {
-            if (empty($timestamp)) {
-                continue;
-            }
-
-            $date     = dol_getdate($timestamp);
-            $filter[] = $prefix . '_' . $bound . 'day=' . $date['mday'];
-            $filter[] = $prefix . '_' . $bound . 'month=' . $date['mon'];
-            $filter[] = $prefix . '_' . $bound . 'year=' . $date['year'];
-        }
-
-        return implode('&', $filter);
-    }
-
-    /**
      * Check if a ticket is still open
      *
      * @param  Ticket $ticket Ticket to check
@@ -778,36 +756,4 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
         return !in_array($ticket->fk_statut, [Ticket::STATUS_CANCELED, Ticket::STATUS_CLOSED]);
     }
 
-    /**
-     * Get the ticket list URL a graph bar links to
-     *
-     * The Digirisk left menu is kept selected so the list opens in the same navigation context as the dashboard.
-     *
-     * @param  string $searchFilter Search criteria of the native ticket list, already url encoded
-     * @return string               Ticket list URL
-     */
-    protected function getTicketListUrl(string $searchFilter): string
-    {
-        return DOL_URL_ROOT . '/ticket/list.php?mainmenu=ticket&leftmenu=digiriskticketlist&' . $searchFilter;
-    }
-
-    /**
-     * Get the hidden input holding the options the ticket dashboard JS needs to enhance a graph
-     *
-     * Dashboard graphs are drawn on a canvas by DolGraph, which handles neither a link per bar nor a second Y
-     * axis, so both are declared here and applied by the ticket dashboard JS.
-     *
-     * @param  array $options Graph options: 'links' holds the ticket list URL of each bar, in the order of the data
-     *                        rows, 'datasetLinks' the same thing per dataset when the series do not share a filter,
-     *                        and 'secondAxisDataset' the index of the dataset to move to its own Y axis
-     * @return string         Hidden input to append to the graph title, empty when the graph has no data
-     */
-    protected function getGraphOptionsInput(array $options): string
-    {
-        if (empty($options['links']) && empty($options['datasetLinks'])) {
-            return '';
-        }
-
-        return '<input type="hidden" class="ticket-graph-options" value="' . dol_escape_htmltag(json_encode($options, JSON_UNESCAPED_UNICODE)) . '">';
-    }
 }
