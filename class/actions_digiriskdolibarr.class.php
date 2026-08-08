@@ -1473,7 +1473,7 @@ class ActionsDigiriskdolibarr
 				'documentType' => 'project',
                 'className'    => 'projectdocument',
 				'picto'        => 'project'
-			],
+			]
 
 		];
 
