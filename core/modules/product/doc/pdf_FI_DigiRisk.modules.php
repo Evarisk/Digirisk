@@ -207,10 +207,26 @@ class pdf_FI_DigiRisk extends ModelePDFProduct
         $contentId = $object->array_options['options_digirisk_identification'] ?? '';
         $currentY = $this->_drawBlock($pdf, "IDENTIFICATION & CARACTÉRISTIQUES", $contentId, array(50, 120, 200), $currentY, 95);
 
-        // Right side empty block (from mockup)
+        // Right side image block (from mockup)
+        $blockX = $this->marge_gauche + 95 + 2;
+        $blockY = $currentY - $this->lastBlockHeight;
+        $blockW = $this->page_largeur - $this->marge_gauche - $this->marge_droite - 97;
+        $blockH = $this->lastBlockHeight;
+        
         $pdf->SetFillColor(240, 245, 250);
         $pdf->SetDrawColor(200, 220, 240);
-        $pdf->Rect($this->marge_gauche + 95 + 2, $currentY - $this->lastBlockHeight, $this->page_largeur - $this->marge_gauche - $this->marge_droite - 97, $this->lastBlockHeight, 'DF');
+        $pdf->Rect($blockX, $blockY, $blockW, $blockH, 'DF');
+
+        // Retrieve and display product photo if available
+        $dir_product = $conf->product->dir_output . '/' . get_exdir(0, 0, 0, 1, $object, 'product') . '/';
+        $photos = $object->liste_photos($dir_product, 1);
+        if (is_array($photos) && count($photos) > 0 && !empty($photos[0]['photo'])) {
+            $photo_path = $dir_product . $photos[0]['photo'];
+            if (file_exists($photo_path)) {
+                // Fit image within the block with 2px padding, centered
+                $pdf->Image($photo_path, $blockX + 2, $blockY + 2, $blockW - 4, $blockH - 4, '', '', '', false, 300, '', false, false, 0, 'CM');
+            }
+        }
 
         // ----------------------------------------------------
         // SÉCURITÉ & PROTECTIONS
