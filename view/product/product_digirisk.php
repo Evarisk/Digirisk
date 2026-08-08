@@ -257,5 +257,38 @@ foreach ($digirisk_sections as $fieldkey => $section) {
 print '</div>'; // fichecenter
 print dol_get_fiche_end();
 
-llxFooter();
+// Fix for hidden preview icon (loupe) in Saturne theme or specific Dolibarr configurations
+print '
+<style>
+/* Force display of the preview icon next to documents */
+a.pictopreview {
+    display: inline-block !important;
+    margin-left: 8px !important;
+    text-decoration: none !important;
+    vertical-align: middle;
+}
+a.pictopreview span.fa-search-plus, a.pictopreview span.fas {
+    font-family: "Font Awesome 5 Free", "Font Awesome 6 Free", "FontAwesome" !important;
+    font-weight: 900 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-size: 1.1em;
+}
+a.pictopreview:hover {
+    text-decoration: none !important;
+}
+</style>
+<script>
+$(document).ready(function() {
+    // Fallback if fa-search-plus is not supported by the loaded FA version
+    $(".pictopreview span.fa-search-plus").each(function() {
+        if ($(this).css("content") === "none" || $(this).width() < 5) {
+            $(this).removeClass("fa-search-plus").addClass("fa-search");
+        }
+    });
+});
+</script>
+';
 
+llxFooter();
+$db->close();
