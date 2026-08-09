@@ -409,7 +409,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			// Set this to 1 if module has its own theme directory (theme)
 			'theme' => 0,
 			// Set this to relative path of css file if module has its own css file
-			'css' => [],
+			'css' => ['/digiriskdolibarr/css/patch_preview_icon.css'],
 			// Set this to relative path of js file if module must load a js on all pages
 			'js' => [],
 			// Set here all hooks context managed by module. To find available hook context, make a "grep -r '>initHooks(' *" on source code. You can also set hook context to 'all'
@@ -451,9 +451,7 @@ class modDigiriskdolibarr extends DolibarrModules
                 'saturnegetobjectsmetadata',
                 'digiriskdolibarrindex'
 			],
-			'tabs' => [
-				'mycompany_admin'
-			],
+
 			// Set this to 1 if features of module are opened to external users
 			'moduleforexternal' => 0,
 		];
@@ -909,6 +907,8 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->tabs[] = ['data' => 'user:+participation:'. $pictoDigirisk .$langs->trans('GP/UTParticipation').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php?fromid=__ID__']; // To add a new tab identified by code tabname1
         $this->tabs[] = ['data' => 'user:+accidents:'. $pictoDigirisk .$langs->trans('Accidents').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/accident/accident_list.php?fromiduser=__ID__']; // To add a new tab identified by code tabname1
         $this->tabs[] = ['data' => 'categories_ticket:+config:' . $pictoDigirisk .$langs->trans('WHSRegister') . ':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/ticket/category_config.php?id=__ID__&type=ticket'];
+        $this->tabs[] = ['data' => 'product:+digirisk:'      . $pictoDigirisk . 'Fiche technique:digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/product/product_digirisk.php?id=__ID__'];
+        $this->tabs[] = ['data' => 'product:+digirisk_risks:' . $pictoDigirisk . 'Risques:digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/product/product_digirisk_risks.php?id=__ID__'];
 
         // Dictionaries
         $this->dictionaries = [
@@ -2527,6 +2527,13 @@ class modDigiriskdolibarr extends DolibarrModules
             'ticket_category_config' => ['Label' => 'TicketCategoryConfig', 'type' => 'text', 'elementtype' => ['categorie'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('categorie') && isModEnabled('ticket')", 'moreparams' => []],
 
 			'ticket_categories' => ['Label' => 'Categories', 'type' => 'text', 'elementtype' => ['ticket'], 'position' => 1, 'list' => 2, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('categorie') && isModEnabled('ticket')", 'moreparams' => []],
+
+			'digirisk_identification' => ['Label' => 'DigiriskIdentification', 'type' => 'html', 'elementtype' => ['product'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('product')", 'moreparams' => ['visibility' => 0]],
+			'digirisk_security'       => ['Label' => 'DigiriskSecurity',       'type' => 'html', 'elementtype' => ['product'], 'position' => $this->numero . 20, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('product')", 'moreparams' => ['visibility' => 0]],
+			'digirisk_usermanual'     => ['Label' => 'DigiriskUserManual',     'type' => 'html', 'elementtype' => ['product'], 'position' => $this->numero . 30, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('product')", 'moreparams' => ['visibility' => 0]],
+			'digirisk_qualification'  => ['Label' => 'DigiriskQualification',  'type' => 'html', 'elementtype' => ['product'], 'position' => $this->numero . 40, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('product')", 'moreparams' => ['visibility' => 0]],
+			'digirisk_hygiene'        => ['Label' => 'DigiriskHygiene',        'type' => 'html', 'elementtype' => ['product'], 'position' => $this->numero . 50, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('product')", 'moreparams' => ['visibility' => 0]],
+			'digirisk_maintenance'    => ['Label' => 'DigiriskMaintenance',    'type' => 'html', 'elementtype' => ['product'], 'position' => $this->numero . 60, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('product')", 'moreparams' => ['visibility' => 0]],
 
 			'mobile_protections'   => ['Label' => 'MobileProtections',   'type' => 'text', 'elementtype' => ['digiriskdolibarr_preventionplan', 'digiriskdolibarr_firepermit'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')", 'moreparams' => []],
 			'mobile_certifications' => ['Label' => 'MobileCertifications', 'type' => 'text', 'elementtype' => ['digiriskdolibarr_preventionplan', 'digiriskdolibarr_firepermit'], 'position' => $this->numero . 11, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')", 'moreparams' => []],

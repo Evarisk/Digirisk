@@ -275,3 +275,22 @@ Signatures = Signatures
 SignaturePending = Pending
 PreventionPlanRiskPhotos = Risk photos
 InterventionPeriodOnly = This plan starts on %s and ends on %s.
+
+DigiRisk=DigiRisk
+DigiriskIdentification=IDENTIFICATION & CHARACTERISTICS
+DigiriskSecurity=SECURITY & PROTECTIONS
+DigiriskUserManual=SIMPLIFIED USER MANUAL
+DigiriskQualification=QUALIFICATION & ENABLEMENT
+DigiriskHygiene=HYGIENE & CLEANING
+DigiriskMaintenance=MAINTENANCE & CHECKS
+ClickToAddContent=Click to add content...
+
+AddProductRisk=Add product risk
+NewProductRisk=New product risk
+DangerCategory=Risk category
+SelectDangerCategory=Select a risk category
+DescribeRiskOnProduct=Describe the risk on this product...
+ConfirmDeleteProductRisk=Delete this risk?
+AddProtection=Add a protection
+
+SelectProtection=Select a protection (PPE)

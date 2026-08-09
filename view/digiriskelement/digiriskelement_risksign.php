@@ -103,7 +103,7 @@ $pagenext = $page + 1;
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array();
 foreach ($risksign->fields as $key => $val) {
-	if ($val['searchall']) $fieldstosearchall['t.' . $key] = $val['label'];
+	if (!empty($val['searchall'])) $fieldstosearchall['t.' . $key] = $val['label'];
 }
 
 // Definition of fields for list
@@ -112,7 +112,7 @@ foreach ($risksign->fields as $key => $val) {
 	if ($val['label'] == 'Entity' || $val['label'] == 'ParentElement') {
 		$val['visible'] = 0;
 	}
-	if ( ! empty($val['visible'])) $arrayfields['t.' . $key] = array('label' => $val['label'], 'checked' => (($val['visible'] < 0) ? 0 : 1), 'enabled' => ($val['enabled'] && ($val['visible'] != 3)), 'position' => $val['position']);
+	if (!empty($val['visible'])) $arrayfields['t.' . $key] = array('label' => $val['label'], 'checked' => (($val['visible'] < 0) ? 0 : 1), 'enabled' => (!empty($val['enabled']) && ($val['visible'] != 3)), 'position' => $val['position'] ?? 0);
 }
 
 // Extra fields

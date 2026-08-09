@@ -168,19 +168,17 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', '', '', 0, '', '', 1)
 print '<div class="fichecenter">';
 print '<div class="underbanner clearboth"></div>';
 
-// â”€â”€ Section definitions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $digirisk_sections = [
-    'digirisk_identification' => ['label' => 'IDENTIFICATION &amp; CARACT&Eacute;RISTIQUES', 'icon' => 'fa-clipboard-list', 'color' => '#c07500', 'bg' => '#fffbf0'],
-    'digirisk_security'       => ['label' => 'S&Eacute;CURIT&Eacute; &amp; PROTECTIONS',     'icon' => 'fa-shield-alt',    'color' => '#b72020', 'bg' => '#fff8f8'],
-    'digirisk_usermanual'     => ['label' => "MODE D'EMPLOI SIMPLIFI&Eacute;",                'icon' => 'fa-book-open',     'color' => '#1a7a3c', 'bg' => '#f4fff8'],
-    'digirisk_qualification'  => ['label' => 'QUALIFICATION &amp; HABILITATION',              'icon' => 'fa-graduation-cap','color' => '#1a5fa8', 'bg' => '#f4f8ff'],
-    'digirisk_hygiene'        => ['label' => 'HYGI&Egrave;NE &amp; NETTOYAGE',               'icon' => 'fa-soap',          'color' => '#0e7e7e', 'bg' => '#f4ffff'],
-    'digirisk_maintenance'    => ['label' => 'MAINTENANCE &amp; CONTR&Ocirc;LES',             'icon' => 'fa-tools',         'color' => '#8b4000', 'bg' => '#fff8f2'],
+    'digirisk_identification' => ['label' => mb_strtoupper($langs->transnoentities('DigiriskIdentification')), 'icon' => $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_IDENTIFICATION_ICON ?? 'fas fa-tag', 'color' => '#c07500', 'bg' => '#fffbf0'],
+    'digirisk_security'       => ['label' => mb_strtoupper($langs->transnoentities('DigiriskSecurity')),       'icon' => $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_SECURITY_ICON ?? 'fas fa-shield-alt', 'color' => '#b72020', 'bg' => '#fff8f8'],
+    'digirisk_usermanual'     => ['label' => mb_strtoupper($langs->transnoentities('DigiriskUserManual')),     'icon' => $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL_ICON ?? 'fas fa-book', 'color' => '#1a7a3c', 'bg' => '#f4fff8'],
+    'digirisk_qualification'  => ['label' => mb_strtoupper($langs->transnoentities('DigiriskQualification')),  'icon' => $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION_ICON ?? 'fas fa-graduation-cap','color' => '#1a5fa8', 'bg' => '#f4f8ff'],
+    'digirisk_hygiene'        => ['label' => mb_strtoupper($langs->transnoentities('DigiriskHygiene')),        'icon' => $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE_ICON ?? 'fas fa-broom', 'color' => '#0e7e7e', 'bg' => '#f4ffff'],
+    'digirisk_maintenance'    => ['label' => mb_strtoupper($langs->transnoentities('DigiriskMaintenance')),    'icon' => $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE_ICON ?? 'fas fa-wrench', 'color' => '#8b4000', 'bg' => '#fff8f2'],
 ];
 
 $currentEditField = ($action == 'edit_extras' && $permissiontoadd) ? $editfield : '';
 
-// â”€â”€ Shared CSS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 print '<style>
 .digirisk-section { border: 1px solid #ddd; border-radius: 6px; margin-bottom: 18px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.07); }
 .digirisk-section-header { display:flex; align-items:center; justify-content:space-between; padding:9px 14px; border-bottom-width:3px; border-bottom-style:solid; font-size:.95em; font-weight:bold; }
@@ -213,7 +211,7 @@ print '<style>
 .dr-btn-blue   { background:#1a5fa8; }
 </style>';
 
-// â”€â”€ 1. WYSIWYG extrafields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── 1. WYSIWYG extrafields ──────────────────────────────────────
 foreach ($digirisk_sections as $fieldkey => $section) {
     $val        = $object->array_options['options_' . $fieldkey] ?? '';
     $color      = $section['color'];
@@ -225,7 +223,7 @@ foreach ($digirisk_sections as $fieldkey => $section) {
 
     print '<div class="digirisk-section">';
     print '<div class="digirisk-section-header" style="border-bottom-color:' . $color . '; background:' . $bg . ';">';
-    print '<span class="digirisk-section-title" style="color:' . $color . ';"><i class="fas ' . $icon . '"></i>&nbsp;' . $label . '</span>';
+    print '<span class="digirisk-section-title" style="color:' . $color . ';"><i class="' . $icon . '"></i>&nbsp;' . $label . '</span>';
     if (!$isThisEdit && $permissiontoadd) {
         print '<a class="digirisk-edit-icon" href="' . $pencilUrl . '" title="' . $langs->trans('Modify') . '">' . img_edit() . '</a>';
     }

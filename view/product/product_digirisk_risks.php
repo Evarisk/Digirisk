@@ -57,6 +57,23 @@ foreach ($protectionCategories as $p) {
 
 // â”€â”€ Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
+// AJAX: save danger category
+if ($action == 'ajax_save_danger_category' && $permissiontoadd) {
+    header('Content-Type: application/json');
+    $riskId = GETPOSTINT('risk_id');
+    $catPos = GETPOSTINT('danger_category');
+    $ajRisk = new ProductRisk($db);
+    if ($ajRisk->fetch($riskId) > 0 && $ajRisk->fk_product == $object->id) {
+        $ajRisk->danger_category = $catPos;
+        $ajRisk->update($user);
+        $ajRisk->fetch($riskId);
+        echo json_encode(['ok' => true, 'date' => dol_print_date($ajRisk->tms, 'dayhour')]);
+    } else {
+        echo json_encode(['ok' => false]);
+    }
+    exit;
+}
+
 // AJAX: inline description save
 if ($action == 'ajax_save_risk_desc' && $permissiontoadd) {
     header('Content-Type: application/json');
@@ -347,7 +364,8 @@ foreach ($existingRisks as $risk) {
     print '<div class="dr-risk-header">';
     // Category icon
     if ($thumbUrl) {
-        print '<img class="dr-cat-icon" src="' . dol_escape_htmltag($thumbUrl) . '" alt="">';
+        $iconClickAttr = $permissiontoadd ? ' onclick="drOpenCatModal(\'update_' . $risk->id . '\')" style="cursor:pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity=0.7;" onmouseout="this.style.opacity=1;" title="' . dol_escape_htmltag($langs->trans('Modify')) . '"' : '';
+        print '<img class="dr-cat-icon" src="' . dol_escape_htmltag($thumbUrl) . '" alt=""' . $iconClickAttr . '>';
     }
     // Description inline (always editable)
     $descShort = !empty($risk->description) ? dol_escape_htmltag($risk->description) : '';
@@ -587,6 +605,38 @@ function drSelectCategory(pos, name, thumb) {
     if (target === "new") {
         document.getElementById("dr-new-cat-input").value = pos;
         document.getElementById("dr-new-form").submit();
+    } else if (target && target.startsWith("update_")) {
+        var riskId = target.split("_")[1];
+        var url = "' . dol_escape_js($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=ajax_save_danger_category&token=' . currentToken()) . '";
+        
+        var fd = new FormData();
+        fd.append("risk_id", riskId);
+        fd.append("danger_category", pos);
+
+        fetch(url, { method: "POST", body: fd })
+            .then(function(r){ return r.json(); })
+            .then(function(data) {
+                if (data.ok) {
+                    var block = document.getElementById("risk-" + riskId);
+                    if (block) {
+                        var img = block.querySelector(".dr-cat-icon");
+                        if (img && thumb) {
+                            img.src = thumb;
+                        }
+                        var headerDate = block.querySelector(".dr-risk-header .dr-risk-date");
+                        if (headerDate && data.date) { 
+                            headerDate.innerHTML = "<i class=\"fas fa-clock\" style=\"margin-right:3px;font-size:.8em;\"></i>" + data.date; 
+                        }
+                        
+                        block.classList.remove("dr-block-saved");
+                        void block.offsetWidth; // reflow
+                        block.classList.add("dr-block-saved");
+                        block.addEventListener("animationend", function() {
+                            block.classList.remove("dr-block-saved");
+                        }, { once: true });
+                    }
+                }
+            });
     }
 }
 
@@ -622,7 +672,6 @@ function drAddProtection(riskId) {
     drOpenProtModal(riskId);
 }
 function drDeleteProtection(riskId, protIdx, btn) {
-    if (!confirm("' . $langs->trans('ConfirmDelete') . '")) return;
     var container = document.getElementById("dr-prot-container-" + riskId);
     if (!container) return;
     var url = container.dataset.ajaxUrl + "&action=ajax_delete_protection";
@@ -632,12 +681,25 @@ function drDeleteProtection(riskId, protIdx, btn) {
     fetch(url, { method: "POST", body: fd })
         .then(function(r){ return r.json(); })
         .then(function(data) {
-            if (data.ok) { btn.closest(".dr-protection-row").remove(); }
+            if (data.ok) { 
+                btn.closest(".dr-protection-row").remove(); 
+                if (typeof $.jnotify !== "undefined") {
+                    $.jnotify(\'' . dol_escape_js($langs->transnoentities('RecordDeleted')) . '\', "success");
+                }
+            }
         });
 }
 
 /* Protection comment inline save */
 document.addEventListener("DOMContentLoaded", function() {
+    // Remove data-confirm from Saturne media delete buttons to avoid native popups
+    setTimeout(function() {
+        if (typeof $ !== "undefined") {
+            $("#saturne-btn-delete-photo").removeAttr("data-confirm");
+            $(".saturne-delete-media-icon, .saturne-file-delete").removeAttr("data-confirm");
+        }
+    }, 1000);
+
     document.querySelectorAll(".dr-prot-comment").forEach(function(el) {
         el.addEventListener("keydown", function(e) {
             if (e.key === "Enter") { e.preventDefault(); el.blur(); }

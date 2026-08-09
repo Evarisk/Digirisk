@@ -124,7 +124,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
         // Allowed triggers are a list of trigger from other module that should activate this file
 		if (!isModEnabled('digiriskdolibarr') || !$active) {
-			$allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE', 'TICKET_PUBLIC_INTERFACE_CREATE', 'TICKET_SIGN', 'SATURNE_SIGNATURE_SIGN', 'SATURNE_SIGNATURE_SIGN_PUBLIC'];
+			$allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE', 'TICKET_PUBLIC_INTERFACE_CREATE', 'TICKET_SIGN', 'SATURNE_SIGNATURE_SIGN', 'SATURNE_SIGNATURE_SIGN_PUBLIC', 'PRODUCT_CREATE'];
             if (!in_array($action, $allowedTriggers)) {
                 return 0;  // If module is not enabled or trigger is deactivated, we do nothing
             }
@@ -164,6 +164,39 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		}
 
         switch ($action) {
+            case 'PRODUCT_CREATE' :
+                $fieldsToDefault = [
+                    'digirisk_identification' => 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_IDENTIFICATION',
+                    'digirisk_security'       => 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_SECURITY',
+                    'digirisk_usermanual'     => 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL',
+                    'digirisk_qualification'  => 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION',
+                    'digirisk_hygiene'        => 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE',
+                    'digirisk_maintenance'    => 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE'
+                ];
+                $hasUpdates = false;
+                if (!isset($object->array_options)) {
+                    $object->array_options = [];
+                }
+                $updates = [];
+                foreach ($fieldsToDefault as $field => $const) {
+                    $val = trim($object->array_options['options_' . $field] ?? '');
+                    if ($val === '') {
+                        $def = trim(getDolGlobalString($const));
+                        if ($def !== '') {
+                            $object->array_options['options_' . $field] = $def;
+                            $updates[] = $field . " = '" . $this->db->escape($def) . "'";
+                            $hasUpdates = true;
+                        }
+                    }
+                }
+                if ($hasUpdates) {
+                    $sql = "UPDATE " . MAIN_DB_PREFIX . "product_extrafields SET ";
+                    $sql .= implode(', ', $updates);
+                    $sql .= " WHERE fk_object = " . ((int) $object->id);
+                    $this->db->query($sql);
+                }
+                break;
+
 			case 'COMPANY_DELETE' :
 				require_once __DIR__ . '/../../class/preventionplan.class.php';
 				require_once __DIR__ . '/../../class/firepermit.class.php';
