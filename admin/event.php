@@ -46,6 +46,7 @@ $action      = GETPOST('action', 'aZ09');
 $cancel      = GETPOST('cancel', 'alpha');
 $searchEvent = GETPOST('search_event', 'alpha');
 $backtopage  = GETPOST('backtopage', 'alpha');
+$param       = '';
 
 // Get list of triggers available
 $triggers = saturne_fetch_dictionary('c_digiriskdolibarr_action_trigger');
@@ -162,7 +163,7 @@ if (!empty($triggers)) {
             print '<td>' . $langs->trans($trigger->label) . '</td>';
             print '<td class="right">';
             $key = 'DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_' . $trigger->ref;
-            $value = $conf->global->$key;
+            $value = getDolGlobalString($key);
             print '<input class="oddeven" type="checkbox" name="' . $key . '"' . ((($action == 'selectall' || $value) && $action != "selectnone") ? ' checked' : '') . '>';
             print '</td></tr>';
         }

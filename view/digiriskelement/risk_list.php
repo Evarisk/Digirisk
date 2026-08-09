@@ -241,7 +241,7 @@ $form = new Form($db);
 $title    = $langs->trans(ucfirst($riskType) . 's');
 $helpUrl = 'FR:Module_Digirisk#.C3.89valuation_des_Risques';
 
-saturne_header(1,'', $title, $helpUrl);
+if (empty($noheader)) saturne_header(1,'', $title, $helpUrl);
 
 // Object card
 // ------------------------------------------------------------
@@ -264,5 +264,7 @@ if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
 <?php
 
 // End of page
-llxFooter();
-$db->close();
+if (empty($nofooter)) {
+    llxFooter();
+    $db->close();
+}

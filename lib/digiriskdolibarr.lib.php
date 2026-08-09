@@ -157,6 +157,11 @@ function digiriskdolibarr_admin_prepare_head(): array
     $head[$h][2] = 'digiai';
     $h++;
 
+    $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/product.php', 1);
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-cube pictofixedwidth"></i>' . $langs->trans('Product') : '<i class="fas fa-cube"></i>';
+    $head[$h][2] = 'product';
+    $h++;
+
     $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/event.php', 1);
     $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-calendar-alt pictofixedwidth"></i>' . $langs->trans('Events') : '<i class="fas fa-calendar-alt"></i>';
     $head[$h][2] = 'event';

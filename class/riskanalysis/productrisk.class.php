@@ -173,6 +173,7 @@ class ProductRisk extends CommonObject
     public function update(User $user): int
     {
         $sql = 'UPDATE ' . MAIN_DB_PREFIX . $this->table_element . ' SET'
+            . ' danger_category = ' . (int) $this->danger_category . ','
             . ' description = ' . ($this->description !== null ? "'" . $this->db->escape($this->description) . "'" : 'NULL') . ','
             . ' protections_json = ' . ($this->protections_json !== null ? "'" . $this->db->escape($this->protections_json) . "'" : 'NULL') . ','
             . ' tms = NOW(),'
