@@ -156,6 +156,7 @@ window.digiriskdolibarr.preventionplanmobile.resendExtSignatureEmail = function(
         url: document.URL.split('#')[0] + (document.URL.indexOf('?') >= 0 ? '&' : '?') + 'action=resend_ext_signature_email&token=' + window.saturne.toolbox.getToken(),
         type: 'POST',
         data: { plan_id: planId },
+        dataType: 'json',
         success: function(resp) {
             button.removeClass('button-disable');
             if (!resp) {
@@ -164,7 +165,7 @@ window.digiriskdolibarr.preventionplanmobile.resendExtSignatureEmail = function(
             status
                 .removeClass('digirisk-mobile-extsign__status--pending digirisk-mobile-extsign__status--sent digirisk-mobile-extsign__status--error')
                 .addClass(resp.success ? 'digirisk-mobile-extsign__status--sent' : 'digirisk-mobile-extsign__status--error')
-                .find('span').text(resp.message || 'Erreur inconnue (réponse vide)');
+                .find('span').text(resp.message ? resp.message : 'Erreur (réponse : ' + JSON.stringify(resp) + ')');
             status.find('i').attr('class', resp.success ? 'fas fa-paper-plane' : 'fas fa-exclamation-circle');
         },
         error: function(jqXHR) {
