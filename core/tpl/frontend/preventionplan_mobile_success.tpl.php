@@ -81,15 +81,15 @@ $successFacts = [
     $langs->trans('MobilePPSuccessTitle'),
     $langs->trans('MobileSuccessInteriorSignedOn', dol_print_date($object->date_creation, 'day'))
 ];
-if ($ppHasDocument) {
-    $successFacts[] = $langs->trans('MobileSuccessDocumentGenerated');
+
+if ($ppExtEmailSent) {
+    $successFacts[] = $langs->trans('MobileSuccessPlanSentByEmailOn', dol_print_date($ppExtSignatory->last_email_sent_date, 'day'));
 }
+
 if ($ppExtSigned) {
-    $successFacts[] = $langs->trans('MobileSuccessExteriorSigned');
-} elseif ($ppExtEmailSent) {
-    $successFacts[] = $langs->trans('MobileSuccessExteriorNotified');
+    $successFacts[] = $langs->trans('MobileSuccessExteriorSignedOn', dol_print_date($ppExtSignatory->signature_date ?? dol_now(), 'day'));
 } else {
-    $successFacts[] = $langs->trans('MobileSuccessExteriorNotNotified');
+    $successFacts[] = $langs->trans('MobileSuccessExteriorPendingSignature');
 }
 
 // Public spread page, shareable straight away with the people who have to join and sign this plan.
