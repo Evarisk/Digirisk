@@ -728,7 +728,6 @@ if ($action == 'add_mobile' && $permissiontoadd) {
         exit;
     }
 }
-
 /*
  * Renvoi du lien de signature a l'entreprise exterieure depuis l'ecran de succes.
  *
