@@ -582,7 +582,7 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                         ob_end_clean();
                     }
                     header('Content-Type: application/json');
-                    echo json_encode(['success' => true, 'redirect' => $redirect]);
+                    echo json_encode(['success' => true, 'redirect' => $redirect], JSON_INVALID_UTF8_SUBSTITUTE);
                     exit;
                 }
                 header('Location: ' . $redirect);
@@ -699,7 +699,7 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                         ob_end_clean();
                     }
                     header('Content-Type: application/json');
-                    echo json_encode(['success' => true, 'redirect' => $redirect]);
+                    echo json_encode(['success' => true, 'redirect' => $redirect], JSON_INVALID_UTF8_SUBSTITUTE);
                     exit;
                 }
                 header('Location: ' . $redirect);
@@ -727,7 +727,7 @@ if ($action == 'add_mobile' && $permissiontoadd) {
             ob_end_clean();
         }
         header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'errors' => $errorMessages]);
+        echo json_encode(['success' => false, 'errors' => $errorMessages], JSON_INVALID_UTF8_SUBSTITUTE);
         exit;
     }
 }
@@ -773,7 +773,7 @@ if ($action == 'resend_ext_signature_email' && $permissiontoadd) {
     echo json_encode([
         'success' => $resendResult['sent'],
         'message' => $resendResult['sent'] ? $langs->trans('MobilePPSignatureEmailSentTo', $resendResult['email']) : $langs->trans('MobilePPWarningEmailNotSentDetail', $errorMsg),
-    ]);
+    ], JSON_INVALID_UTF8_SUBSTITUTE);
     exit;
 }
 
