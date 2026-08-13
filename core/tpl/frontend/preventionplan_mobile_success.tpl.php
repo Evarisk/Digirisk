@@ -102,13 +102,18 @@ $successShareUrl = isModEnabled('doliletter')
 $successExtraBlockFile = __DIR__ . '/preventionplan_mobile_success_extsign.tpl.php';
 
 if ($ppHasDocument) {
-    $fileArray = dol_dir_list($conf->digiriskdolibarr->dir_output . '/preventionplandocument/' . dol_sanitizeFileName($object->ref), 'files', 0, '\.pdf$', 'date', 'DESC');
-    $filename = $fileArray[0]['name'];
-    $successViewUrl = DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr_preventionplan&entity=' . $conf->entity . '&file=' . urlencode(dol_sanitizeFileName($object->ref) . '/' . $filename);
+    // Generate view url for the PDF
+    $pdfFiles = dol_dir_list($conf->digiriskdolibarr->dir_output . '/preventionplandocument/' . dol_sanitizeFileName($object->ref), 'files', 0, '\.pdf$');
+    if (!empty($pdfFiles)) {
+        $pdfFile = $pdfFiles[0];
+        $filename = $pdfFile['name'];
+        $successViewUrl = DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('preventionplandocument/' . dol_sanitizeFileName($object->ref) . '/' . $filename);
+        $successViewLabel = $langs->trans('MobileSuccessViewDocument');
+    }
 } else {
     $successViewUrl = dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php', 1) . '?id=' . $object->id;
+    $successViewLabel  = $langs->trans('MobilePPViewPlan');
 }
-$successViewLabel  = $langs->trans('MobilePPViewPlan');
 $successAgainUrl   = $_SERVER['PHP_SELF'];
 $successAgainLabel = $langs->trans('MobilePPCreateAnother');
 
