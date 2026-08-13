@@ -306,3 +306,4 @@ AddProtection=Add a protection
 
 SelectProtection=Select a protection (PPE)
 DigiriskRisks=RISKS & PROTECTIONS
+MobileSuccessInteriorSignedOn = Interior responsible (EU) : Signed on %s
