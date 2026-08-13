@@ -2196,3 +2196,6 @@ MobileSuccessInteriorSignedOn=Responsable Entreprise Utilisatrice (EU) : Signé 
 MobileSuccessPlanSentByEmailOn = Plan de prévention envoyé par Email le %s
 MobileSuccessExteriorSignedOn = Responsable Entreprise Extérieure (EE) : Signé le %s
 MobileSuccessExteriorPendingSignature = Responsable Entreprise Extérieure (EE) : En attente de signature
+
+MobilePPErrorInvalidEmail = Veuillez respecter le format de l'email.
+MobilePPErrorInvalidPhone = Veuillez respecter le format du téléphone.

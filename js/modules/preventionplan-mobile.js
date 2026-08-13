@@ -109,6 +109,28 @@ window.digiriskdolibarr.preventionplanmobile.event = function() {
     $(document).on('click', '.digirisk-mobile-cert-item-delete', window.digiriskdolibarr.preventionplanmobile.removeCertification);
     $(document).on('submit', '.digirisk-mobile-form', window.digiriskdolibarr.preventionplanmobile.submitForm);
     $(document).on('click', '.digirisk-mobile-extsign__resend', window.digiriskdolibarr.preventionplanmobile.resendExtSignatureEmail);
+    $(document).on('input blur', '.digirisk-mobile-form input', window.digiriskdolibarr.preventionplanmobile.checkRealTimeValidity);
+};
+
+/**
+ * Handle real-time visual feedback on form fields (orange KO / green OK)
+ *
+ * @param  {Event} event input or blur event
+ * @return {void}
+ */
+window.digiriskdolibarr.preventionplanmobile.checkRealTimeValidity = function(event) {
+    var el = this;
+    if (el.value === '' && !el.required) {
+        $(el).removeClass('is-valid is-invalid');
+        return;
+    }
+    if (el.type === 'email' || el.pattern || el.required) {
+        if (el.checkValidity && el.checkValidity()) {
+            $(el).removeClass('is-invalid').addClass('is-valid');
+        } else if (el.checkValidity && !el.checkValidity()) {
+            $(el).removeClass('is-valid').addClass('is-invalid');
+        }
+    }
 };
 
 /**

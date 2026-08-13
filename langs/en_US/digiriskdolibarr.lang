@@ -306,3 +306,7 @@ SelectProtection=Select a protection (PPE)
 TechnicalSheet=Technical Sheet
 DigiriskRisks=RISKS & PROTECTIONS
 MobileSuccessInteriorSignedOn=Interior responsible (EU) : Signed on %s
+
+MobilePPErrorInvalidEmail = Please respect the email format.
+MobilePPErrorInvalidPhone = Please respect the phone format.
+MobileSuccessExteriorPendingSignature = Exterior Company Responsible (EE) : Pending signature

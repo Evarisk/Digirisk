@@ -1565,3 +1565,6 @@ body.digirisk-mobile-create {
     max-width: 130px;
   }
 }
+
+body.digirisk-mobile-create .digirisk-mobile-form input.is-invalid, body.digirisk-mobile-create .digirisk-mobile-form select.is-invalid { border: 2px solid #ff9800 !important; box-shadow: 0 0 5px rgba(255, 152, 0, 0.5); }
+body.digirisk-mobile-create .digirisk-mobile-form input.is-valid, body.digirisk-mobile-create .digirisk-mobile-form select.is-valid { border: 2px solid #4caf50 !important; box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); }
