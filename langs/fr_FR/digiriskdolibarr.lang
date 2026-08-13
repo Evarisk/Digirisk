@@ -2104,6 +2104,7 @@ MobilePPErrorCreatingPlan = Erreur lors de la création du plan de prévention.
 MobilePPDefaultsTitle = Valeurs par défaut (Création mobile)
 MobilePPDefaultDateStartToday = Date de début = date du jour
 MobilePPDefaultDuration = Durée par défaut de la période (jours)
+MobilePPEmailAutoSend = Envoyer automatiquement l'email de signature à la création
 
 # Mobile fire permit quick creation
 MobileFPPreventionPlanHelp = L'entreprise extérieure et la période du plan sélectionné sont reprises automatiquement.
