@@ -43,6 +43,14 @@ $successTitle = $langs->trans('MobilePPSuccessTitle');
 $successRefHtml = $object->getNomUrl(1);
 $successLabel = 'Réf. ' . $object->ref . ' - ' . $societyName . ' - du ' . dol_print_date($object->date_start, 'day') . ' au ' . dol_print_date($object->date_end, 'day');
 
+$successExtraInfoHtml = '<strong>Responsable Entreprise Utilisatrice (EI) : </strong>' . dol_escape_htmltag($user->getFullName($langs));
+if (dol_strlen($user->email)) {
+    $successExtraInfoHtml .= ', ' . dol_escape_htmltag($user->email);
+}
+if (dol_strlen($user->office_phone)) {
+    $successExtraInfoHtml .= ', ' . dol_escape_htmltag($user->office_phone);
+}
+
 // Entreprise exterieure : etat reel de la demande de signature. L'envoi automatique peut avoir
 // echoue et personne ne devait s'en apercevoir : l'ecran l'affiche et propose d'y remedier.
 $ppExtSignatory   = null;
