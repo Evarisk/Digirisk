@@ -304,6 +304,7 @@ DescribeRiskOnProduct=Describe the risk on this product...
 ConfirmDeleteProductRisk=Delete this risk?
 AddProtection=Add a protection
 
-SelectProtection=Select a protection (PPE)
+SelectProtection=Select a PPE protection
+TechnicalSheet=Technical Sheet
 DigiriskRisks=RISKS & PROTECTIONS
-MobileSuccessInteriorSignedOn = Interior responsible (EU) : Signed on %s
+MobileSuccessInteriorSignedOn=Interior responsible (EU) : Signed on %s
