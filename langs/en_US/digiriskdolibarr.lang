@@ -195,9 +195,6 @@ MobilePPDefaultsTitle = Default values (Mobile creation)
 MobilePPDefaultDateStartToday = Start date = today
 MobilePPDefaultDuration = Default period duration (days)
 MobilePPEmailAutoSend = Automatically send signature email on creation
-MobilePPEmailTemplateExt = Email template (External Manager)
-MobilePPEmailTemplateInt = Email template (Intervener)
-FirePermitEmailDefaultsTitle = Default email settings
 
 # Mobile fire permit quick creation
 MobileFPPreventionPlanHelp = The exterior company and the period of the selected plan are reused automatically.
@@ -304,7 +301,7 @@ DescribeRiskOnProduct=Describe the risk on this product...
 ConfirmDeleteProductRisk=Delete this risk?
 AddProtection=Add a protection
 
-SelectProtection=Select a PPE protection
+SelectProtection=Select a protection (PPE)
 TechnicalSheet=Technical Sheet
 DigiriskRisks=RISKS & PROTECTIONS
 MobileSuccessInteriorSignedOn=Interior responsible (EU) : Signed on %s
