@@ -452,12 +452,93 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                         $subject = $langs->transnoentities('MobileFPSignatureEmailSubject', $object->ref);
                         $message = $langs->transnoentities('MobileFPSignatureEmailContent', $thirdparty->name, $signatureUrl);
 
-                        $mailfile = new CMailFile($subject, $extSignatory->email, $from, $message, [], [], [], '', '', 0, -1, '', '', '', '', 'mail');
+                        // Override with custom template if configured
+                        $templateId = getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_EXT');
+                        $filepath = [];
+                        $mimetype = [];
+                        $filename = [];
+                        
+                        if ($templateId > 0) {
+                            require_once DOL_DOCUMENT_ROOT . '/core/class/cemailtemplate.class.php';
+                            $emailTemplate = new CEmailTemplate($db);
+                            if ($emailTemplate->fetch($templateId) > 0) {
+                                
+                                // Si la piece jointe est demandée, on genère et on cherche le document
+                                if ($emailTemplate->joinfiles == 1) {
+                                    require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskdolibarrdocuments/firepermitdocument.class.php';
+                                    $document = new FirePermitDocument($db);
+                                    $moreParams = ['object' => $object, 'user' => $user, 'objectType' => $object->element];
+                                    $document->generateDocument('firepermitdocument', $langs, 0, 0, 0, $moreParams);
+                                    
+                                    $dir = $conf->digiriskdolibarr->dir_output . '/' . $object->element . 'document/' . dol_sanitizeFileName($object->ref);
+                                    $fileArray = dol_dir_list($dir, 'files', 0, '\.pdf$', 'date', 'DESC');
+                                    if (!empty($fileArray)) {
+                                        $filepath[] = $dir . '/' . $fileArray[0]['name'];
+                                        $mimetype[] = 'application/pdf';
+                                        $filename[] = $fileArray[0]['name'];
+                                    }
+                                }
+
+                                $userFullName = $user->getFullName($langs);
+                                $userEmail = $user->email;
+                                $userPhonePro = $user->office_phone;
+                                $myCompanyName = $conf->global->MAIN_INFO_SOCIETE_NOM;
+                                $myCompanyFullAddress = trim($conf->global->MAIN_INFO_SOCIETE_ADDRESS . ' ' . $conf->global->MAIN_INFO_SOCIETE_ZIP . ' ' . $conf->global->MAIN_INFO_SOCIETE_TOWN);
+
+                                $subject = str_replace(
+                                    ['__PLAN_REF__', '__COMPANY_NAME__'], 
+                                    [$object->ref, $thirdparty->name], 
+                                    $emailTemplate->topic
+                                );
+                                $message = str_replace(
+                                    [
+                                        '__PLAN_REF__', '__COMPANY_NAME__', '__SIGNATURE_URL__',
+                                        '__USER_FULLNAME__', '__USER_EMAIL__', '__USER_PHONEPRO__',
+                                        '__MYCOMPANY_NAME__', '__MYCOMPANY_FULLADDRESS__'
+                                    ], 
+                                    [
+                                        $object->ref, $thirdparty->name, $signatureUrl,
+                                        $userFullName, $userEmail, $userPhonePro,
+                                        $myCompanyName, $myCompanyFullAddress
+                                    ], 
+                                    $emailTemplate->content
+                                );
+                            }
+                        }
+
+                        $mailfile = new CMailFile($subject, $extSignatory->email, $from, $message, $filepath, $mimetype, $filename, '', '', 0, -1, '', '', '', '', 'mail');
                         if (!$mailfile->error && (dol_strlen(getDolGlobalString('MAIN_MAIL_SMTPS_ID')) || getDolGlobalInt('SATURNE_USE_ALL_EMAIL_MODE') > 0)) {
                             if ($mailfile->sendfile()) {
                                 $extSignatory->last_email_sent_date = dol_now();
-                                $extSignatory->update($user, true);
+                                $db->query("UPDATE " . MAIN_DB_PREFIX . "saturne_object_signature SET last_email_sent_date = '" . $db->idate($extSignatory->last_email_sent_date) . "' WHERE rowid = " . (int)$extSignatory->id);
+                                // $extSignatory->update($user, true);
                                 $extSignatory->setPending($user, true);
+
+                                // Log the sent email as an agenda event
+                                require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+                                $actioncomm = new ActionComm($db);
+                                $actioncomm->type_code   = 'AC_EMAIL';
+                                $actioncomm->code        = 'AC_EMAIL';
+                                $actioncomm->label       = $subject;
+                                $actioncomm->note_private = $message;
+                                $actioncomm->fk_project  = $object->fk_project;
+                                $actioncomm->datep       = dol_now();
+                                $actioncomm->datef       = dol_now();
+                                $actioncomm->percentage  = 100;
+                                $actioncomm->socid       = $thirdparty->id;
+                                $actioncomm->contactid   = $contact->id;
+                                $actioncomm->authorid    = $user->id;
+                                $actioncomm->userownerid = $user->id;
+                                $actioncomm->email_from  = $from;
+                                $actioncomm->email_to    = $extSignatory->email;
+                                $actioncomm->email_subject = $subject;
+                                $actioncomm->email_msgid = '';
+                                $actioncomm->usertodo    = $user->id;
+                                $actioncomm->userdone    = $user->id;
+                                $actioncomm->fk_element  = $object->id;
+                                $actioncomm->elementtype = $object->element;
+                                $actioncomm->add($user);
+
                             } else {
                                 setEventMessages($langs->trans('MobilePPWarningEmailNotSent'), null, 'warnings');
                             }

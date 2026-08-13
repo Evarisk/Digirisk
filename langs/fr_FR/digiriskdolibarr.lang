@@ -2101,10 +2101,13 @@ MobilePPErrorCreatingThirdparty = Erreur lors de la création du tiers.
 MobilePPErrorCreatingContact = Erreur lors de la création du contact.
 MobilePPErrorUpdatingPlan = Erreur lors de la mise à jour du plan de prévention.
 MobilePPErrorCreatingPlan = Erreur lors de la création du plan de prévention.
-MobilePPDefaultsTitle = Valeurs par défaut (Création mobile)
-MobilePPDefaultDateStartToday = Date de début = date du jour
-MobilePPDefaultDuration = Durée par défaut de la période (jours)
+MobilePPDefaultsTitle = Réglages du plan de prévention
+MobilePPDefaultDateStartToday = Utiliser la date du jour comme date de début du plan de prévention
+MobilePPDefaultDuration = Définissez ici la durée par défaut de vos plans de prévention
 MobilePPEmailAutoSend = Envoyer automatiquement l'email de signature à la création
+MobilePPEmailTemplateExt = Choisissez le modèle d'Email qui sera envoyé au responsable de l'EE pour signer le PP
+MobilePPEmailTemplateInt = Choisissez le modèle d'Email qui sera envoyé à l'intervenant EE pour signer le PP
+FirePermitEmailDefaultsTitle = Réglages des emails par défaut
 
 # Mobile fire permit quick creation
 MobileFPPreventionPlanHelp = L'entreprise extérieure et la période du plan sélectionné sont reprises automatiquement.
