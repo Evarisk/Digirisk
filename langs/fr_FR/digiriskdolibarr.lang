@@ -2101,6 +2101,7 @@ MobilePPErrorCreatingThirdparty = Erreur lors de la création du tiers.
 MobilePPErrorCreatingContact = Erreur lors de la création du contact.
 MobilePPErrorUpdatingPlan = Erreur lors de la mise à jour du plan de prévention.
 MobilePPErrorCreatingPlan = Erreur lors de la création du plan de prévention.
+MobileSuccessViewDocument = Voir le document
 MobileSuccessPlanSentByEmailOn = Plan de prévention envoyé par Email le %s
 MobileSuccessExteriorSignedOn = Responsable Entreprise Extérieure (EE) : Signé le %s
 MobileSuccessExteriorPendingSignature = Responsable Entreprise Extérieure (EE) : En attente de signature
