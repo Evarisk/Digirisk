@@ -42,17 +42,18 @@ if (!empty($extSociety->id)) {
 $successTitle = '';
 $nomUrl = $object->getNomUrl(1);
 $customLinkText = '<span style="font-size: 0.55em; font-weight: normal; color: #444; vertical-align: middle;">Réf. </span>';
-$customLinkText .= '<span style="vertical-align: middle;">' . $object->ref . '-' . dol_escape_htmltag($societyName) . '</span>';
-$customLinkText .= '</a>';
-$customLinkText .= '<div style="font-size: 0.55em; font-weight: normal; color: #444; margin-top: 8px;">Date début : <span style="color: #22427c;">' . dol_print_date($object->date_start, 'day') . '</span></div>';
-$customLinkText .= '<div style="font-size: 0.55em; font-weight: normal; color: #444; margin-top: 2px;">Date de fin : <span style="color: #22427c;">' . dol_print_date($object->date_end, 'day') . '</span></div>';
+$customLinkText .= '<span style="vertical-align: middle;">' . $object->ref . '-' . dol_escape_htmltag($societyName) . '</span></a>';
 
 $successRefHtml = str_replace('>' . $object->ref . '</a>', '>' . $customLinkText, $nomUrl);
 $successLabel = '';
 
 global $mysoc;
 
-$successExtraInfoHtml = '<div style="margin-top: 15px; font-size: 0.9em; line-height: 1.6; color: #333;">';
+$successExtraInfoHtml = '<div style="margin-top: 5px; font-size: 0.9em; line-height: 1.6; color: #333;">';
+$successExtraInfoHtml .= '<div style="margin-bottom: 15px;">';
+$successExtraInfoHtml .= '<div>Date début : <span style="color: #22427c;">' . dol_print_date($object->date_start, 'day') . '</span></div>';
+$successExtraInfoHtml .= '<div>Date de fin : <span style="color: #22427c;">' . dol_print_date($object->date_end, 'day') . '</span></div>';
+$successExtraInfoHtml .= '</div>';
 $successExtraInfoHtml .= '<div><span style="color: #22427c;">Entreprise Utilisatrice (EI)</span> : ' . dol_escape_htmltag($mysoc->name) . '</div>';
 $successExtraInfoHtml .= '<div><span style="color: #22427c;">Responsable</span> : <span style="color: #22427c;">' . dol_escape_htmltag($user->getFullName($langs)) . '</span></div>';
 $successExtraInfoHtml .= '<div style="display: flex; gap: 30px;">';
