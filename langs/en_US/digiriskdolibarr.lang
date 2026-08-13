@@ -278,7 +278,7 @@ InterventionPeriodOnly = This plan starts on %s and ends on %s.
 
 DigiRisk=DigiRisk
 DigiriskIdentification=IDENTIFICATION & CHARACTERISTICS
-DigiriskSecurity=SECURITY & PROTECTIONS
+DigiriskSecurity=SECURITY
 DigiriskUserManual=SIMPLIFIED USER MANUAL
 DigiriskQualification=QUALIFICATION & ENABLEMENT
 DigiriskHygiene=HYGIENE & CLEANING
@@ -294,3 +294,4 @@ ConfirmDeleteProductRisk=Delete this risk?
 AddProtection=Add a protection
 
 SelectProtection=Select a protection (PPE)
+DigiriskRisks=RISKS & PROTECTIONS

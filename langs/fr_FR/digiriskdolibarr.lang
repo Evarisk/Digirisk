@@ -2165,15 +2165,11 @@ InterventionPeriodOnly = Ce plan debute le %s et finit le %s.
 
 DigiRisk=DigiRisk
 DigiriskIdentification=DESCRIPTION & CARACTÉRISTIQUES
-DigiriskSecurity=SÉCURITÉ & PROTECTIONS
+DigiriskSecurity=SÉCURITÉ
 DigiriskUserManual=MODE D'EMPLOI SIMPLIFIÉ
 DigiriskQualification=QUALIFICATION & HABILITATION
 DigiriskHygiene=HYGIÈNE & NETTOYAGE
 DigiriskMaintenance=MAINTENANCE & CONTRÔLES
-ClickToAddContent=Cliquez pour ajouter du contenu...
-
-AddProductRisk=Ajouter un risque produit
-NewProductRisk=Nouveau risque produit
 DangerCategory=Famille de risque
 SelectDangerCategory=Choisir une famille de risque
 DescribeRiskOnProduct=Decrire le risque sur ce produit...
@@ -2182,3 +2178,4 @@ AddProtection=Ajouter une protection
 
 SelectProtection=Choisir une protection EPI
 TechnicalSheet=Fiche Technique
+DigiriskRisks=RISQUES & PROTECTIONS

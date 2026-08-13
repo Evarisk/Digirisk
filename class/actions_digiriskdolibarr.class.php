@@ -243,6 +243,54 @@ class ActionsDigiriskdolibarr
 				<?php
 				print ajax_combobox('selectDIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE');
 			}
+		} else if (preg_match('/product\/admin\/product\.php$/', $_SERVER['PHP_SELF'])) {
+            $iconPath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
+            $title = '<img src="' . $iconPath . '" style="height:18px; width:18px; vertical-align:middle; margin-right:5px; margin-bottom:2px;"> Paramètres du pdf pour les produit : FI_DigiRisk (Fiche d\'Instruction)';
+            $titleHtml = load_fiche_titre($title, '', '');
+            
+            $valMode = getDolGlobalString('DIGIRISK_PDF_PHOTO_HEIGHT_MODE', 'photo');
+            $optText = '<option value="text"' . ($valMode=='text'?' selected':'') . '>Adapté au texte (cadre de gauche)</option>';
+            $optPhoto = '<option value="photo"' . ($valMode=='photo'?' selected':'') . '>Adapté à la photo (limite max)</option>';
+
+            $html = '<br>';
+            $html .= '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
+            $html .= '<input type="hidden" name="token" value="'.newToken().'">';
+            $html .= '<input type="hidden" name="action" value="setModuleOptions">';
+            $html .= $titleHtml;
+            $html .= '<div class="div-table-responsive-no-min">';
+            $html .= '<table class="noborder centpercent">';
+            $html .= '<tr class="liste_titre"><td>Paramètres FI_DigiRisk</td><td class="right" width="300">Valeur</td></tr>';
+            
+            $fields = [
+                'DIGIRISK_PDF_BORDER_THICKNESS' => ['label' => 'Épaisseur du liseret (mm)', 'default' => '0.5'],
+                'DIGIRISK_PDF_BORDER_RADIUS' => ['label' => 'Arrondi du liseret (mm)', 'default' => '2'],
+                'DIGIRISK_PDF_EQUIP_LEFT_RATIO' => ['label' => 'Ratio colonne Identification (%)', 'default' => '66'],
+                'DIGIRISK_PDF_PHOTO_MAX_WIDTH' => ['label' => 'Largeur max. photo équipement (mm)', 'default' => '80'],
+                'DIGIRISK_PDF_PHOTO_MAX_HEIGHT' => ['label' => 'Hauteur max. photo équipement (mm)', 'default' => '80']
+            ];
+            $i = 100;
+            foreach($fields as $k => $v) {
+                $val = dol_escape_htmltag(getDolGlobalString($k, $v['default']));
+                $btn = '<input type="submit" class="button button-edit" name="modify" value="'.$langs->trans("Modify").'">';
+                $html .= '<tr class="oddeven"><td>'.$v['label'].'</td><td class="right nowraponall"><input type="hidden" name="param'.$i.'" value="'.$k.'"><input type="text" name="value'.$i.'" value="'.$val.'" class="flat minwidth175"> '.$btn.'</td></tr>';
+                $i++;
+            }
+            
+            $btn = '<input type="submit" class="button button-edit" name="modify" value="'.$langs->trans("Modify").'">';
+            $html .= '<tr class="oddeven"><td>Mode de hauteur (Photo équipement)</td><td class="right nowraponall"><input type="hidden" name="param'.$i.'" value="DIGIRISK_PDF_PHOTO_HEIGHT_MODE"><select name="value'.$i.'" class="flat minwidth175">'.$optText.$optPhoto.'</select> '.$btn.'</td></tr>';
+            
+            $html .= '</table></div></form><br>';
+            
+            ?>
+            <script>
+                $(document).ready(function() {
+                    var modelsTable = $('table.noborder').eq(1).parent('.div-table-responsive-no-min');
+                    if (modelsTable.length) {
+                        modelsTable.after(<?php echo json_encode($html); ?>);
+                    }
+                });
+            </script>
+            <?php
 		} else if (preg_match('/\bticketcard\b/', $parameters['context'])) {
             if (GETPOST('action') != 'create') {
 
