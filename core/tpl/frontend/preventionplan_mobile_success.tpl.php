@@ -67,7 +67,10 @@ $ppExtSignatureUrl = !empty($ppExtSignatory) ? digiriskGetPreventionPlanSignatur
 $ppHasDocument = dol_is_dir($conf->digiriskdolibarr->dir_output . '/preventionplandocument/' . dol_sanitizeFileName($object->ref))
     && !empty(dol_dir_list($conf->digiriskdolibarr->dir_output . '/preventionplandocument/' . dol_sanitizeFileName($object->ref), 'files', 0, '\.pdf$'));
 
-$successFacts = [$langs->trans('MobileSuccessInteriorSignedOn', dol_print_date($object->date_creation, 'day'))];
+$successFacts = [
+    $langs->trans('MobilePPSuccessTitle'),
+    $langs->trans('MobileSuccessInteriorSignedOn', dol_print_date($object->date_creation, 'day'))
+];
 if ($ppHasDocument) {
     $successFacts[] = $langs->trans('MobileSuccessDocumentGenerated');
 }
