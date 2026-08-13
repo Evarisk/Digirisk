@@ -48,13 +48,15 @@ $customLinkText .= '</a><span style="font-size: 0.55em; font-weight: normal; col
 $successRefHtml = str_replace('>' . $object->ref . '</a>', '>' . $customLinkText, $nomUrl);
 $successLabel = '';
 
-$successExtraInfoHtml = '<strong>Responsable Entreprise Utilisatrice (EI) : </strong>' . dol_escape_htmltag($user->getFullName($langs));
-if (dol_strlen($user->email)) {
-    $successExtraInfoHtml .= ', ' . dol_escape_htmltag($user->email);
-}
-if (dol_strlen($user->office_phone)) {
-    $successExtraInfoHtml .= ', ' . dol_escape_htmltag($user->office_phone);
-}
+global $mysoc;
+
+$successExtraInfoHtml = '<div style="margin-top: 15px; font-size: 0.9em; line-height: 1.6; color: #333;">';
+$successExtraInfoHtml .= '<div><span style="color: #22427c;">Entreprise Utilisatrice (EI)</span> : ' . dol_escape_htmltag($mysoc->name) . '</div>';
+$successExtraInfoHtml .= '<div><span style="color: #22427c;">Responsable</span> : <span style="color: #22427c;">' . dol_escape_htmltag($user->getFullName($langs)) . '</span></div>';
+$successExtraInfoHtml .= '<div style="display: flex; gap: 30px;">';
+$successExtraInfoHtml .= '<div>Email : <span style="color: #22427c;">' . dol_escape_htmltag($user->email) . '</span></div>';
+$successExtraInfoHtml .= '<div>Tél : ' . dol_escape_htmltag($user->office_phone) . '</div>';
+$successExtraInfoHtml .= '</div></div>';
 
 // Entreprise exterieure : etat reel de la demande de signature. L'envoi automatique peut avoir
 // echoue et personne ne devait s'en apercevoir : l'ecran l'affiche et propose d'y remedier.
