@@ -164,7 +164,7 @@ window.digiriskdolibarr.preventionplanmobile.resendExtSignatureEmail = function(
             status
                 .removeClass('digirisk-mobile-extsign__status--pending digirisk-mobile-extsign__status--sent digirisk-mobile-extsign__status--error')
                 .addClass(resp.success ? 'digirisk-mobile-extsign__status--sent' : 'digirisk-mobile-extsign__status--error')
-                .find('span').text(resp.message || '');
+                .find('span').text(resp.message || 'Erreur inconnue (réponse vide)');
             status.find('i').attr('class', resp.success ? 'fas fa-paper-plane' : 'fas fa-exclamation-circle');
         },
         error: function(jqXHR) {
