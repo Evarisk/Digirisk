@@ -125,14 +125,14 @@ foreach ($signalisationCategories as $signalisationItem) {
                 </div>
                 <div class="digirisk-mobile-field">
                     <label><?php print $langs->trans('MobileSirenOrSiret'); ?> *</label>
-                    <input type="text" name="siren" class="digirisk-mobile-siren-input" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="<?php print dol_escape_htmltag($langs->trans('MobileSirenOrSiretPlaceholder')); ?>" value="<?php print dol_escape_htmltag($prefill["siren"]); ?>">
+                    <input type="text" name="siren" class="digirisk-mobile-siren-input" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="<?php print dol_escape_htmltag($langs->trans('MobileSirenOrSiretPlaceholder')); ?>" value="<?php print dol_escape_htmltag($prefill["siren"]); ?>" pattern="[\d\s]{9,20}" title="SIREN/SIRET (9 ou 14 chiffres)">
                 </div>
             </div>
             <div class="digirisk-mobile-siren-result"></div>
 
             <div class="digirisk-mobile-field">
                 <label><?php print $langs->trans('Email'); ?></label>
-                <input type="email" name="ext_society_email" class="digirisk-mobile-ext-society-email" autocomplete="off" value="<?php print dol_escape_htmltag($prefill["ext_society_email"]); ?>">
+                <input type="email" name="ext_society_email" class="digirisk-mobile-ext-society-email" autocomplete="off" value="<?php print dol_escape_htmltag($prefill["ext_society_email"]); ?>" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}">
             </div>
             <div class="digirisk-mobile-field">
                 <label><?php print $langs->trans('Address'); ?></label>
