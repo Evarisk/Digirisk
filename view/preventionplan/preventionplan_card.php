@@ -1642,10 +1642,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
         // Define output language
         $outputlangs = $langs;
         $newlang     = '';
-        if ($conf->global->MAIN_MULTILANGS && empty($newlang) && ! empty($_REQUEST['lang_id'])) {
+        if (!empty($conf->global->MAIN_MULTILANGS) && empty($newlang) && ! empty($_REQUEST['lang_id'])) {
             $newlang = $_REQUEST['lang_id'];
         }
-        if ($conf->global->MAIN_MULTILANGS && empty($newlang)) {
+        if (!empty($conf->global->MAIN_MULTILANGS) && empty($newlang)) {
             $newlang = $object->thirdparty->default_lang;
         }
 
@@ -1712,7 +1712,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
             }
         }
 
-        if (!array_key_exists($labourInspectorContact->id, $liste)) {
+        if (is_object($labourInspectorContact) && !empty($labourInspectorContact->id) && !array_key_exists($labourInspectorContact->id, $liste)) {
             $liste[$labourInspectorContact->id] = $labourInspectorContact->firstname . ' ' . $labourInspectorContact->lastname . (!empty($labourInspectorContact->email) ? ' <' . $labourInspectorContact->email . '>' : '');
         }
 
