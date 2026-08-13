@@ -125,9 +125,23 @@ function digiriskRefreshPreventionPlanDocument(DoliDB $db, int $planId, User $us
     $document   = new PreventionPlanDocument($db);
     $moreParams = ['object' => $plan, 'user' => $user, 'objectType' => $plan->element];
 
+    // PreventionPlanDocumentFillJSON() reads the plan ID via GETPOST('id').
+    // When called from an AJAX context (mobile creation), the parameter is absent:
+    // inject it so the document generator can resolve the plan.
+    $savedGetId = $_GET['id'] ?? null;
+    $_GET['id'] = $planId;
+
     ob_start();
     $generated  = $document->generateDocument('preventionplandocument', $outputLangs, 0, 0, 0, $moreParams);
     $strayOutput = ob_get_clean();
+
+    // Restore the original GET parameter
+    if ($savedGetId === null) {
+        unset($_GET['id']);
+    } else {
+        $_GET['id'] = $savedGetId;
+    }
+
     if (dol_strlen($strayOutput)) {
         dol_syslog('digiriskRefreshPreventionPlanDocument : sortie parasite de la generation : ' . dol_trunc($strayOutput, 500), LOG_WARNING);
     }
