@@ -470,7 +470,7 @@ if ($action == 'add_mobile' && $permissiontoadd) {
             if ($resSoc > 0) {
                 $extSocietyId = $resSoc;
             } else {
-                $errorMessages[] = $thirdparty->error ?: 'KO';
+                $errorMessages[] = $thirdparty->error ?: $langs->trans('MobilePPErrorCreatingThirdparty');
                 if (!$isAjax) {
                     setEventMessages($thirdparty->error, $thirdparty->errors, 'errors');
                 }
@@ -501,7 +501,7 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                 if ($resContact > 0) {
                     $respContactId = $resContact;
                 } else {
-                    $errorMessages[] = $contact->error ?: 'KO';
+                    $errorMessages[] = $contact->error ?: $langs->trans('MobilePPErrorCreatingContact');
                     if (!$isAjax) {
                         setEventMessages($contact->error, $contact->errors, 'errors');
                     }
@@ -578,7 +578,7 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                 exit;
             }
 
-            $errorMessages[] = $object->error ?: 'KO';
+            $errorMessages[] = $object->error ?: $langs->trans('MobilePPErrorUpdatingPlan');
             if (!$isAjax) {
                 setEventMessages($object->error, $object->errors, 'errors');
             }
@@ -689,7 +689,7 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                 header('Location: ' . $redirect);
                 exit;
             } else {
-                $errorMessages[] = $object->error ?: 'KO';
+                $errorMessages[] = $object->error ?: $langs->trans('MobilePPErrorCreatingPlan');
                 if (!$isAjax) {
                     setEventMessages($object->error, $object->errors, 'errors');
                 }

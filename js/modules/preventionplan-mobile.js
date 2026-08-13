@@ -148,7 +148,7 @@ window.digiriskdolibarr.preventionplanmobile.resendExtSignatureEmail = function(
             status
                 .removeClass('digirisk-mobile-extsign__status--pending digirisk-mobile-extsign__status--sent')
                 .addClass('digirisk-mobile-extsign__status--error')
-                .find('span').text('KO (HTTP ' + jqXHR.status + ')');
+                .find('span').text('Erreur serveur (HTTP ' + jqXHR.status + ')');
         }
     });
 };
@@ -214,11 +214,11 @@ window.digiriskdolibarr.preventionplanmobile.saveSignature = function() {
                 $('.digirisk-mobile-signature-saved').removeClass('hidden');
                 status.removeClass('error').addClass('success').text('');
             } else {
-                status.removeClass('success').addClass('error').text((resp && resp.error) ? resp.error : 'KO');
+                status.removeClass('success').addClass('error').text((resp && resp.error) ? resp.error : 'Erreur lors de l\'enregistrement');
             }
         },
         error: function(jqXHR) {
-            status.removeClass('success').addClass('error').text('KO (HTTP ' + jqXHR.status + ')');
+            status.removeClass('success').addClass('error').text('Erreur serveur (HTTP ' + jqXHR.status + ')');
         }
     });
 };
@@ -247,7 +247,7 @@ window.digiriskdolibarr.preventionplanmobile.searchSiren = function() {
         success: function(resp) {
             $('.digirisk-mobile-siren-search').removeClass('wpeo-loader');
             if (!resp || !resp.success) {
-                result.removeClass('success').addClass('error').text((resp && resp.error) ? resp.error : 'KO');
+                result.removeClass('success').addClass('error').text((resp && resp.error) ? resp.error : 'Erreur lors de la recherche');
                 return;
             }
             if (resp.found) {
@@ -259,7 +259,7 @@ window.digiriskdolibarr.preventionplanmobile.searchSiren = function() {
         },
         error: function() {
             $('.digirisk-mobile-siren-search').removeClass('wpeo-loader');
-            result.removeClass('success').addClass('error').text('KO');
+            result.removeClass('success').addClass('error').text('Erreur de connexion au serveur');
         }
     });
 };
@@ -771,11 +771,11 @@ window.digiriskdolibarr.preventionplanmobile.submitForm = function(event) {
                 window.location.href = resp.redirect; // keep the spinner during navigation
                 return;
             }
-            window.digiriskdolibarr.preventionplanmobile.showFormErrors((resp && resp.errors && resp.errors.length) ? resp.errors : ['KO']);
+            window.digiriskdolibarr.preventionplanmobile.showFormErrors((resp && resp.errors && resp.errors.length) ? resp.errors : ['Une erreur inattendue est survenue.']);
             resetSubmit();
         },
         error: function() {
-            window.digiriskdolibarr.preventionplanmobile.showFormErrors(['KO']);
+            window.digiriskdolibarr.preventionplanmobile.showFormErrors(['Erreur de connexion au serveur.']);
             resetSubmit();
         }
     });
