@@ -741,6 +741,12 @@ window.digiriskdolibarr.preventionplanmobile.submitForm = function(event) {
         submitBtn.prop('disabled', false).removeClass('wpeo-loader button-disable').addClass('button-blue');
     };
 
+    if (form[0].checkValidity && !form[0].checkValidity()) {
+        form[0].reportValidity();
+        resetSubmit();
+        return;
+    }
+
     if (form.attr('data-has-signature') !== '1') {
         resetSubmit();
         $('.digirisk-mobile-signature-status').removeClass('success').addClass('error').text(form.data('need-signature-label') || '');
