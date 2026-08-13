@@ -31,9 +31,11 @@ $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successSha
 ?>
 <div class="pwa-container digirisk-mobile">
     <div class="digirisk-mobile-card digirisk-mobile-success">
+        <?php if (!empty($successTitle)) { ?>
         <div class="digirisk-mobile-success__eyebrow">
             <i class="fas fa-check"></i> <?php print dol_escape_htmltag($successTitle); ?>
         </div>
+        <?php } ?>
         <div class="digirisk-mobile-success__ref"><?php print !empty($successRefHtml) ? $successRefHtml : dol_escape_htmltag($successRef); ?></div>
         <?php if (dol_strlen($successLabel)) { ?>
         <div class="digirisk-mobile-success__label"><?php print dol_escape_htmltag($successLabel); ?></div>
