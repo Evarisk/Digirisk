@@ -21,28 +21,7 @@
  *          Expects: $langs, $object, $ppExtSignatory, $ppExtSigned, $ppExtEmailSent, $ppExtSignatureUrl.
  */
 
-global $langs, $user;
-
-?>
-<div class="digirisk-mobile-card digirisk-mobile-extsign">
-    <div class="digirisk-mobile-extsign__title">
-        <i class="fas fa-file-signature"></i> SIGNATURE DE L'ENTREPRISE UTILISATRICE
-    </div>
-    <div class="digirisk-mobile-extsign__who">
-        <span class="digirisk-mobile-extsign__name"><?php print dol_escape_htmltag($user->getFullName($langs)); ?></span>
-        <?php if (dol_strlen($user->email)) { ?>
-        <span class="digirisk-mobile-extsign__email"><?php print dol_escape_htmltag($user->email); ?></span>
-        <?php } ?>
-        <?php if (dol_strlen($user->office_phone)) { ?>
-        <span class="digirisk-mobile-extsign__email"><?php print dol_escape_htmltag($user->office_phone); ?></span>
-        <?php } ?>
-    </div>
-    <div class="digirisk-mobile-extsign__status digirisk-mobile-extsign__status--done">
-        <i class="fas fa-check-circle"></i>
-        <span><?php print $langs->trans('MobileSuccessInteriorSigned'); ?></span>
-    </div>
-</div>
-<?php
+global $langs;
 
 if (empty($ppExtSignatory)) {
     return;
