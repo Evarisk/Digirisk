@@ -51,8 +51,14 @@ global $mysoc;
 
 $successExtraInfoHtml = '<div style="margin-top: 5px; font-size: 0.9em; line-height: 1.6; color: #333;">';
 $successExtraInfoHtml .= '<div style="margin-bottom: 15px;">';
+$successExtraInfoHtml .= '<div style="display: flex; gap: 15px; margin-bottom: 8px;">';
+$successExtraInfoHtml .= '<div style="color: #666;">Libellé</div>';
+$successExtraInfoHtml .= '<div style="color: #000;">' . dol_escape_htmltag($object->label) . '</div>';
+$successExtraInfoHtml .= '</div>';
+$successExtraInfoHtml .= '<div style="display: flex; gap: 30px;">';
 $successExtraInfoHtml .= '<div>Date début : <span style="color: #22427c;">' . dol_print_date($object->date_start, 'day') . '</span></div>';
 $successExtraInfoHtml .= '<div>Date de fin : <span style="color: #22427c;">' . dol_print_date($object->date_end, 'day') . '</span></div>';
+$successExtraInfoHtml .= '</div>';
 $successExtraInfoHtml .= '</div>';
 $successExtraInfoHtml .= '<div><span style="color: #22427c;">Entreprise Utilisatrice (EI)</span> : ' . dol_escape_htmltag($mysoc->name) . '</div>';
 $successExtraInfoHtml .= '<div><span style="color: #22427c;">Responsable</span> : <span style="color: #22427c;">' . dol_escape_htmltag($user->getFullName($langs)) . '</span></div>';
