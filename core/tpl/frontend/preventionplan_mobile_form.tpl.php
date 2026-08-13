@@ -174,7 +174,7 @@ foreach ($signalisationCategories as $signalisationItem) {
                 </div>
                 <div class="digirisk-mobile-field">
                     <label><?php print $langs->trans('Phone'); ?></label>
-                    <input type="tel" name="resp_phone" class="digirisk-mobile-resp-phone" autocomplete="off" value="<?php print dol_escape_htmltag($prefill["resp_phone"]); ?>" pattern="^(\+?\d{1,3}[-.\s]?)?(\(?\d{1,4}\)?[-.\s]?)?[\d\-.\s]{5,15}$" title="<?php print $langs->trans('MobilePPErrorInvalidPhone') ?: 'Veuillez saisir un numéro de téléphone valide.'; ?>">
+                    <input type="tel" name="resp_phone" class="digirisk-mobile-resp-phone" autocomplete="off" value="<?php print dol_escape_htmltag($prefill["resp_phone"]); ?>" pattern="^(\+?\d{1,3}[\-.\s]?)?(\(?\d{1,4}\)?[\-.\s]?)?[\d\-.\s]{5,15}$" title="<?php print $langs->trans('MobilePPErrorInvalidPhone') ?: 'Veuillez saisir un numéro de téléphone valide.'; ?>">
                 </div>
             </div>
             <div class="digirisk-mobile-help"><?php print $langs->trans('MobilePPEmailForSignatureHelp'); ?></div>
