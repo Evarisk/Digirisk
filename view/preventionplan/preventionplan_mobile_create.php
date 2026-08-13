@@ -763,10 +763,16 @@ if ($action == 'resend_ext_signature_email' && $permissiontoadd) {
     while (ob_get_level()) {
         ob_end_clean();
     }
+    
+    $errorMsg = !empty($resendResult['error']) ? $resendResult['error'] : '';
+    if (!empty($errorMsg) && function_exists('mb_check_encoding') && !mb_check_encoding($errorMsg, 'UTF-8')) {
+        $errorMsg = mb_convert_encoding($errorMsg, 'UTF-8', 'ISO-8859-1');
+    }
+
     header('Content-Type: application/json');
     echo json_encode([
         'success' => $resendResult['sent'],
-        'message' => $resendResult['sent'] ? $langs->trans('MobilePPSignatureEmailSentTo', $resendResult['email']) : $langs->trans('MobilePPWarningEmailNotSentDetail', $resendResult['error']),
+        'message' => $resendResult['sent'] ? $langs->trans('MobilePPSignatureEmailSentTo', $resendResult['email']) : $langs->trans('MobilePPWarningEmailNotSentDetail', $errorMsg),
     ]);
     exit;
 }
