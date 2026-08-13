@@ -105,6 +105,9 @@ if ($action == 'setMobileDefaults' && !GETPOST('cancel', 'alpha')) {
 	$defaultStartToday = GETPOSTINT('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY');
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY', $defaultStartToday ? 1 : 0, 'integer', 0, '', $conf->entity);
 
+	$defaultEmailAutoSend = GETPOSTINT('DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_AUTO_SEND');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_AUTO_SEND', $defaultEmailAutoSend ? 1 : 0, 'integer', 0, '', $conf->entity);
+
 	setEventMessages($langs->trans('SetupSaved'), null, 'mesgs');
 	if (!$error) {
 		header('Location: ' . $_SERVER['PHP_SELF']);
@@ -194,8 +197,9 @@ print '</form>';
 // --- Mobile creation defaults ---
 print load_fiche_titre('<i class="fas fa-mobile-alt"></i> ' . $langs->trans('MobilePPDefaultsTitle'), '', '');
 
-$defaultDuration   = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DURATION', 30);
-$defaultStartToday = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY', 1);
+$defaultDuration      = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DURATION', 30);
+$defaultStartToday    = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY', 1);
+$defaultEmailAutoSend = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_AUTO_SEND', 0);
 
 print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '" name="mobile_defaults_form">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -210,12 +214,17 @@ print '</tr>';
 // Default start date = today
 print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY">' . $langs->trans('MobilePPDefaultDateStartToday') . '</label></td>';
 print '<td><input type="checkbox" name="DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY" id="DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY" value="1"' . ($defaultStartToday ? ' checked' : '') . '> ' . $langs->trans('Yes') . '</td>';
-print '<td rowspan="2"><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '"></td>';
+print '<td rowspan="3"><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '"></td>';
 print '</tr>';
 
 // Default duration in days
 print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DURATION">' . $langs->trans('MobilePPDefaultDuration') . '</label></td>';
 print '<td><input type="number" name="DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DURATION" id="DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DURATION" value="' . $defaultDuration . '" min="1" max="365" class="flat minwidth100"> ' . $langs->trans('Days') . '</td>';
+print '</tr>';
+
+// Auto-send signature email on mobile creation
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_AUTO_SEND">' . $langs->trans('MobilePPEmailAutoSend') . '</label></td>';
+print '<td><input type="checkbox" name="DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_AUTO_SEND" id="DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_AUTO_SEND" value="1"' . ($defaultEmailAutoSend ? ' checked' : '') . '> ' . $langs->trans('Yes') . '</td>';
 print '</tr>';
 
 print '</table>';

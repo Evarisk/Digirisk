@@ -679,12 +679,15 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                 // Ask the exterior responsible to sign by email (email-only, no SMS configured).
                 // L'echec n'annule pas la creation : l'ecran de succes affiche l'etat de l'envoi et
                 // permet de renvoyer le lien ou de faire signer sur le telephone.
-                $extSignatories = $signatory->fetchSignatory('ExtSocietyResponsible', $object->id, 'preventionplan');
-                if (is_array($extSignatories) && !empty($extSignatories)) {
-                    $extSignatory = array_shift($extSignatories);
-                    $mailResult   = digiriskSendPreventionPlanSignatureEmail($db, $object, $extSignatory, $thirdparty->name, $user, $langs);
-                    if (!$mailResult['sent']) {
-                        setEventMessages($langs->trans('MobilePPWarningEmailNotSentDetail', $mailResult['error']), null, 'warnings');
+                $autoSendEmail = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_AUTO_SEND', 0);
+                if ($autoSendEmail) {
+                    $extSignatories = $signatory->fetchSignatory('ExtSocietyResponsible', $object->id, 'preventionplan');
+                    if (is_array($extSignatories) && !empty($extSignatories)) {
+                        $extSignatory = array_shift($extSignatories);
+                        $mailResult   = digiriskSendPreventionPlanSignatureEmail($db, $object, $extSignatory, $thirdparty->name, $user, $langs);
+                        if (!$mailResult['sent']) {
+                            setEventMessages($langs->trans('MobilePPWarningEmailNotSentDetail', $mailResult['error']), null, 'warnings');
+                        }
                     }
                 }
 

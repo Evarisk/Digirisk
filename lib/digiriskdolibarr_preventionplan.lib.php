@@ -268,6 +268,29 @@ function digiriskSendPreventionPlanSignatureEmail(DoliDB $db, PreventionPlan $pl
     $signatory->update($user, true);
     $signatory->setPending($user, true);
 
+    // Log the sent email as an agenda event
+    require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+    $actioncomm = new ActionComm($db);
+    $actioncomm->type_code   = 'AC_EMAIL';
+    $actioncomm->code        = 'AC_EMAIL';
+    $actioncomm->label       = $langs->transnoentities('MobilePPSignatureEmailSubject', $plan->ref);
+    $actioncomm->note_private = $langs->transnoentities('MobilePPSignatureEmailContent', $societyName, digiriskGetPreventionPlanSignatureUrl($signatory));
+    $actioncomm->fk_project  = $plan->fk_project;
+    $actioncomm->datep       = dol_now();
+    $actioncomm->datef       = dol_now();
+    $actioncomm->percentage  = -1; // Not applicable
+    $actioncomm->socid       = (isset($signatory->fk_soc) && $signatory->fk_soc > 0) ? $signatory->fk_soc : (isset($plan->fk_soc) ? $plan->fk_soc : 0);
+    $actioncomm->contactid   = $signatory->fk_object;
+    $actioncomm->authorid    = $user->id;
+    $actioncomm->userownerid = $user->id;
+    $actioncomm->email_from  = getDolGlobalString('MAIN_MAIL_EMAIL_FROM');
+    $actioncomm->email_to    = $signatory->email;
+    $actioncomm->email_subject = $langs->transnoentities('MobilePPSignatureEmailSubject', $plan->ref);
+    $actioncomm->email_msgid = '';
+    $actioncomm->fk_element  = $plan->id;
+    $actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
+    $actioncomm->create($user);
+
     $result['sent'] = true;
 
     return $result;
