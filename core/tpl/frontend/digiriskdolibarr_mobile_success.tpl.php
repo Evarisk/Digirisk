@@ -49,8 +49,19 @@ $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successSha
 
         <?php if (!empty($successFacts)) { ?>
         <ul class="digirisk-mobile-success__facts">
-            <?php foreach ($successFacts as $successFact) { ?>
-            <li><i class="fas fa-check-circle"></i><span><?php print dol_escape_htmltag($successFact); ?></span></li>
+            <?php foreach ($successFacts as $successFact) {
+                $icon = 'fa-check-circle';
+                $color = '';
+                $text = $successFact;
+                if (is_array($successFact)) {
+                    $text = $successFact['text'];
+                    if (!empty($successFact['status']) && $successFact['status'] === 'pending') {
+                        $icon = 'fa-times-circle';
+                        $color = 'color: #d32f2f;';
+                    }
+                }
+            ?>
+            <li><i class="fas <?php print $icon; ?>" style="<?php print $color; ?>"></i><span><?php print dol_escape_htmltag($text); ?></span></li>
             <?php } ?>
         </ul>
         <?php } ?>

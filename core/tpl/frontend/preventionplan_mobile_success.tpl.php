@@ -95,7 +95,10 @@ if ($ppExtEmailSent) {
 if ($ppExtSigned) {
     $successFacts[] = $langs->trans('MobileSuccessExteriorSignedOn', dol_print_date($ppExtSignatory->signature_date ?? dol_now(), 'day'));
 } else {
-    $successFacts[] = $langs->trans('MobileSuccessExteriorPendingSignature');
+    $successFacts[] = [
+        'text' => $langs->trans('MobileSuccessExteriorPendingSignature'),
+        'status' => 'pending'
+    ];
 }
 
 // Public spread page, shareable straight away with the people who have to join and sign this plan.
