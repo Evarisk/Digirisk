@@ -40,8 +40,8 @@ if (!empty($extSociety->id)) {
 }
 
 $successTitle = $langs->trans('MobilePPSuccessTitle');
-$successRefHtml = $object->getNomUrl(1);
-$successLabel = 'Réf. ' . $object->ref . ' - ' . $societyName . ' - du ' . dol_print_date($object->date_start, 'day') . ' au ' . dol_print_date($object->date_end, 'day');
+$successRefHtml = 'Réf. ' . $object->getNomUrl(1) . ' - ' . dol_escape_htmltag($societyName) . ' - du ' . dol_print_date($object->date_start, 'day') . ' au ' . dol_print_date($object->date_end, 'day');
+$successLabel = '';
 
 $successExtraInfoHtml = '<strong>Responsable Entreprise Utilisatrice (EI) : </strong>' . dol_escape_htmltag($user->getFullName($langs));
 if (dol_strlen($user->email)) {
