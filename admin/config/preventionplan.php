@@ -108,6 +108,12 @@ if ($action == 'setMobileDefaults' && !GETPOST('cancel', 'alpha')) {
 	$defaultEmailAutoSend = GETPOSTINT('DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_AUTO_SEND');
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_AUTO_SEND', $defaultEmailAutoSend ? 1 : 0, 'integer', 0, '', $conf->entity);
 
+	$emailTemplateExt = GETPOSTINT('DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_TEMPLATE_EXT');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_TEMPLATE_EXT', $emailTemplateExt, 'integer', 0, '', $conf->entity);
+
+	$emailTemplateInt = GETPOSTINT('DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_TEMPLATE_INT');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_TEMPLATE_INT', $emailTemplateInt, 'integer', 0, '', $conf->entity);
+
 	setEventMessages($langs->trans('SetupSaved'), null, 'mesgs');
 	if (!$error) {
 		header('Location: ' . $_SERVER['PHP_SELF']);
@@ -195,11 +201,23 @@ print '</table>';
 print '</form>';
 
 // --- Mobile creation defaults ---
-print load_fiche_titre('<i class="fas fa-mobile-alt"></i> ' . $langs->trans('MobilePPDefaultsTitle'), '', '');
+print load_fiche_titre($langs->trans('MobilePPDefaultsTitle'), '', '');
 
 $defaultDuration      = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DURATION', 30);
 $defaultStartToday    = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY', 1);
 $defaultEmailAutoSend = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_AUTO_SEND', 0);
+$emailTemplateExt     = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_TEMPLATE_EXT', 0);
+$emailTemplateInt     = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_TEMPLATE_INT', 0);
+
+// Fetch email templates
+$emailTemplatesList = ['0' => ''];
+$sql = "SELECT rowid, label FROM " . MAIN_DB_PREFIX . "c_email_templates WHERE type_template = 'preventionplan' AND active = 1 ORDER BY position ASC, label ASC";
+$resql = $db->query($sql);
+if ($resql) {
+	while ($obj = $db->fetch_object($resql)) {
+		$emailTemplatesList[$obj->rowid] = $obj->label;
+	}
+}
 
 print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '" name="mobile_defaults_form">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -214,7 +232,7 @@ print '</tr>';
 // Default start date = today
 print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY">' . $langs->trans('MobilePPDefaultDateStartToday') . '</label></td>';
 print '<td><input type="checkbox" name="DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY" id="DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY" value="1"' . ($defaultStartToday ? ' checked' : '') . '> ' . $langs->trans('Yes') . '</td>';
-print '<td rowspan="3"><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '"></td>';
+print '<td rowspan="5"><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '"></td>';
 print '</tr>';
 
 // Default duration in days
@@ -222,9 +240,19 @@ print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAU
 print '<td><input type="number" name="DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DURATION" id="DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DURATION" value="' . $defaultDuration . '" min="1" max="365" class="flat minwidth100"> ' . $langs->trans('Days') . '</td>';
 print '</tr>';
 
+// Email Template Ext
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_TEMPLATE_EXT">' . $langs->trans('MobilePPEmailTemplateExt') . '</label></td>';
+print '<td>' . $form->selectarray('DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_TEMPLATE_EXT', $emailTemplatesList, $emailTemplateExt, 0, 0, 0, '', 1) . '</td>';
+print '</tr>';
+
 // Auto-send signature email on mobile creation
 print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_AUTO_SEND">' . $langs->trans('MobilePPEmailAutoSend') . '</label></td>';
 print '<td><input type="checkbox" name="DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_AUTO_SEND" id="DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_AUTO_SEND" value="1"' . ($defaultEmailAutoSend ? ' checked' : '') . '> ' . $langs->trans('Yes') . '</td>';
+print '</tr>';
+
+// Email Template Int
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_TEMPLATE_INT">' . $langs->trans('MobilePPEmailTemplateInt') . '</label></td>';
+print '<td>' . $form->selectarray('DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_TEMPLATE_INT', $emailTemplatesList, $emailTemplateInt, 0, 0, 0, '', 1) . '</td>';
 print '</tr>';
 
 print '</table>';

@@ -77,6 +77,20 @@ $ppExtName = trim($ppExtSignatory->firstname . ' ' . $ppExtSignatory->lastname);
         </div>
         <span class="copied-to-clipboard" style="display: none;"><?php print $langs->trans('CopiedToClipboard'); ?></span>
     </div>
+
+    <?php if ($ppExtEmailSent) {
+        $sql = "SELECT label, note_private FROM " . MAIN_DB_PREFIX . "actioncomm WHERE elementtype = 'preventionplan' AND fk_element = " . (int)$object->id . " AND type_code = 'AC_EMAIL' ORDER BY datep DESC LIMIT 1";
+        $resql = $db->query($sql);
+        if ($resql && $db->num_rows($resql) > 0) {
+            $actionObj = $db->fetch_object($resql);
+            print '<div style="margin-top: 20px; font-size: 0.9em; color: #555;">';
+            print '<strong>Mail envoyé à :</strong> ' . dol_escape_htmltag($ppExtSignatory->email) . '<br>';
+            print '<strong>Titre :</strong> ' . dol_escape_htmltag($actionObj->label) . '<br>';
+            print '<strong>Sujet :</strong><br><div style="border: 1px solid #ccc; padding: 10px; margin-top: 5px; background: #fafafa;">' . dol_htmlcleanlastbr($actionObj->note_private) . '</div>';
+            print '</div>';
+        }
+    } ?>
+
     <?php } ?>
 
     <?php } ?>

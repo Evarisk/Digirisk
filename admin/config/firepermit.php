@@ -91,6 +91,20 @@ if ($action == 'setMaitreOeuvre') {
 	}
 }
 
+if ($action == 'setEmailsDefaults' && !GETPOST('cancel', 'alpha')) {
+	$emailTemplateExt = GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_EXT');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_EXT', $emailTemplateExt, 'integer', 0, '', $conf->entity);
+
+	$emailTemplateInt = GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_INT');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_INT', $emailTemplateInt, 'integer', 0, '', $conf->entity);
+
+	setEventMessages($langs->trans('SetupSaved'), null, 'mesgs');
+	if (!$error) {
+		header('Location: ' . $_SERVER['PHP_SELF']);
+		exit;
+	}
+}
+
 /*
  * View
  */
@@ -166,6 +180,46 @@ print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' .
 print '</td>';
 print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 print '</td></tr>';
+
+print '</table>';
+print '</form>';
+
+// --- Email defaults ---
+print load_fiche_titre('<i class="fas fa-envelope"></i> ' . $langs->trans('FirePermitEmailDefaultsTitle'), '', '');
+
+$emailTemplateExt = getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_EXT', 0);
+$emailTemplateInt = getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_INT', 0);
+
+// Fetch email templates
+$emailTemplatesList = ['0' => ''];
+$sql = "SELECT rowid, label FROM " . MAIN_DB_PREFIX . "c_email_templates WHERE type_template = 'firepermit' AND active = 1 ORDER BY position ASC, label ASC";
+$resql = $db->query($sql);
+if ($resql) {
+	while ($obj = $db->fetch_object($resql)) {
+		$emailTemplatesList[$obj->rowid] = $obj->label;
+	}
+}
+
+print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '" name="email_defaults_form">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="setEmailsDefaults">';
+print '<table class="noborder centpercent editmode">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans('Option') . '</td>';
+print '<td>' . $langs->trans('DefaultValue') . '</td>';
+print '<td>' . $langs->trans('Action') . '</td>';
+print '</tr>';
+
+// Email Template Ext
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_EXT">' . $langs->trans('MobilePPEmailTemplateExt') . '</label></td>';
+print '<td>' . $form->selectarray('DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_EXT', $emailTemplatesList, $emailTemplateExt, 0, 0, 0, '', 1) . '</td>';
+print '<td rowspan="2"><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '"></td>';
+print '</tr>';
+
+// Email Template Int
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_INT">' . $langs->trans('MobilePPEmailTemplateInt') . '</label></td>';
+print '<td>' . $form->selectarray('DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_INT', $emailTemplatesList, $emailTemplateInt, 0, 0, 0, '', 1) . '</td>';
+print '</tr>';
 
 print '</table>';
 print '</form>';

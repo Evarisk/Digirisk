@@ -54,9 +54,11 @@ window.digiriskdolibarr.preventionplanmobile.bound = false;
  */
 window.digiriskdolibarr.preventionplanmobile.init = function() {
     // The fire permit interface shares every selector of this one, and both modules delegate on
-    // document: bind only when the prevention plan form is the one on screen.
+    // document: bind only when the prevention plan form or success screen is the one on screen.
     var form = $('.digirisk-mobile-form--preventionplan');
-    if (!form.length) {
+    var successBlock = $('.digirisk-mobile-extsign');
+    
+    if (!form.length && !successBlock.length) {
         return;
     }
 

@@ -117,11 +117,6 @@ function digiriskdolibarr_admin_prepare_head(): array
     $head[$h][2] = 'digiriskelement';
     $h++;
 
-    $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/preventionplan.php', 1);
-    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-info pictofixedwidth"></i>' . $langs->trans('PreventionPlan') : '<i class="fas fa-info"></i>';
-    $head[$h][2] = 'preventionplan';
-    $h++;
-
     $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/actionplan.php', 1);
     $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-columns pictofixedwidth"></i>' . $langs->trans('ActionPlan') : '<i class="fas fa-columns"></i>';
     $head[$h][2] = 'actionplan';
@@ -130,6 +125,11 @@ function digiriskdolibarr_admin_prepare_head(): array
     $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/ticket_kanban.php', 1);
     $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-th-large pictofixedwidth"></i>' . $langs->trans('TicketKanban') : '<i class="fas fa-th-large"></i>';
     $head[$h][2] = 'ticket_kanban';
+    $h++;
+
+    $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/preventionplan.php', 1);
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-info pictofixedwidth"></i>' . $langs->trans('PreventionPlan') : '<i class="fas fa-info"></i>';
+    $head[$h][2] = 'preventionplan';
     $h++;
 
     $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/firepermit.php', 1);

@@ -251,7 +251,63 @@ function digiriskSendPreventionPlanSignatureEmail(DoliDB $db, PreventionPlan $pl
     $subject      = $langs->transnoentities('MobilePPSignatureEmailSubject', $plan->ref);
     $message      = $langs->transnoentities('MobilePPSignatureEmailContent', $societyName, $signatureUrl);
 
-    $mailfile = new CMailFile($subject, $signatory->email, $from, $message, [], [], [], '', '', 0, -1, '', '', '', '', 'mail');
+    // Override with custom template if configured
+    $templateId = 0;
+    if ($signatory->role === 'ExtSocietyResponsible') {
+        $templateId = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_TEMPLATE_EXT');
+    } elseif ($signatory->role === 'ExtSocietyAttendant') {
+        $templateId = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_TEMPLATE_INT');
+    }
+
+    $filepath = [];
+    $mimetype = [];
+    $filename = [];
+
+    if ($templateId > 0) {
+        require_once DOL_DOCUMENT_ROOT . '/core/class/cemailtemplate.class.php';
+        $emailTemplate = new CEmailTemplate($db);
+        if ($emailTemplate->fetch($templateId) > 0) {
+            
+            // Si la piece jointe est demandée, on genère et on cherche le document
+            if ($emailTemplate->joinfiles == 1) {
+                digiriskGeneratePreventionPlanDocument($plan->id);
+                $dir = $conf->digiriskdolibarr->dir_output . '/' . $plan->element . 'document/' . dol_sanitizeFileName($plan->ref);
+                $fileArray = dol_dir_list($dir, 'files', 0, '\.pdf$', 'date', 'DESC');
+                if (!empty($fileArray)) {
+                    $filepath[] = $dir . '/' . $fileArray[0]['name'];
+                    $mimetype[] = 'application/pdf';
+                    $filename[] = $fileArray[0]['name'];
+                }
+            }
+
+            $userFullName = $user->getFullName($langs);
+            $userEmail = $user->email;
+            $userPhonePro = $user->office_phone;
+            $myCompanyName = $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $myCompanyFullAddress = trim($conf->global->MAIN_INFO_SOCIETE_ADDRESS . ' ' . $conf->global->MAIN_INFO_SOCIETE_ZIP . ' ' . $conf->global->MAIN_INFO_SOCIETE_TOWN);
+
+            $subject = str_replace(
+                ['__PLAN_REF__', '__COMPANY_NAME__'], 
+                [$plan->ref, $societyName], 
+                $emailTemplate->topic
+            );
+            $message = str_replace(
+                [
+                    '__PLAN_REF__', '__COMPANY_NAME__', '__SIGNATURE_URL__',
+                    '__USER_FULLNAME__', '__USER_EMAIL__', '__USER_PHONEPRO__',
+                    '__MYCOMPANY_NAME__', '__MYCOMPANY_FULLADDRESS__'
+                ], 
+                [
+                    $plan->ref, $societyName, $signatureUrl,
+                    $userFullName, $userEmail, $userPhonePro,
+                    $myCompanyName, $myCompanyFullAddress
+                ], 
+                $emailTemplate->content
+            );
+        }
+    }
+
+    $mailfile = new CMailFile($subject, $signatory->email, $from, $message, $filepath, $mimetype, $filename, '', '', 0, -1, '', '', '', '', 'mail');
     if ($mailfile->error) {
         $result['error'] = $mailfile->error;
 
@@ -265,7 +321,8 @@ function digiriskSendPreventionPlanSignatureEmail(DoliDB $db, PreventionPlan $pl
     }
 
     $signatory->last_email_sent_date = dol_now();
-    $signatory->update($user, true);
+    $db->query("UPDATE " . MAIN_DB_PREFIX . "saturne_object_signature SET last_email_sent_date = '" . $db->idate($signatory->last_email_sent_date) . "' WHERE rowid = " . (int)$signatory->id);
+    // $signatory->update($user, true);
     $signatory->setPending($user, true);
 
     // Log the sent email as an agenda event
@@ -273,8 +330,8 @@ function digiriskSendPreventionPlanSignatureEmail(DoliDB $db, PreventionPlan $pl
     $actioncomm = new ActionComm($db);
     $actioncomm->type_code   = 'AC_EMAIL';
     $actioncomm->code        = 'AC_EMAIL';
-    $actioncomm->label       = $langs->transnoentities('MobilePPSignatureEmailSubject', $plan->ref);
-    $actioncomm->note_private = $langs->transnoentities('MobilePPSignatureEmailContent', $societyName, digiriskGetPreventionPlanSignatureUrl($signatory));
+    $actioncomm->label       = $subject;
+    $actioncomm->note_private = $message;
     $actioncomm->fk_project  = $plan->fk_project;
     $actioncomm->datep       = dol_now();
     $actioncomm->datef       = dol_now();
@@ -285,7 +342,7 @@ function digiriskSendPreventionPlanSignatureEmail(DoliDB $db, PreventionPlan $pl
     $actioncomm->userownerid = $user->id;
     $actioncomm->email_from  = getDolGlobalString('MAIN_MAIL_EMAIL_FROM');
     $actioncomm->email_to    = $signatory->email;
-    $actioncomm->email_subject = $langs->transnoentities('MobilePPSignatureEmailSubject', $plan->ref);
+    $actioncomm->email_subject = $subject;
     $actioncomm->email_msgid = '';
     $actioncomm->fk_element  = $plan->id;
     $actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
