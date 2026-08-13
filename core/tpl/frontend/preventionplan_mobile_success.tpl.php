@@ -22,11 +22,26 @@
  *          Expects: $db, $langs, $signatory, $user, $object (fetched prevention plan).
  */
 
-global $db, $langs, $signatory, $user;
+global $db, $langs, $signatory, $user, $digiriskresources;
+
+if (empty($digiriskresources)) {
+    require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskresources.class.php';
+    $digiriskresources = new DigiriskResources($db);
+}
+
+$extSociety = $digiriskresources->fetchResourcesFromObject('ExtSociety', $object);
+$societyName = '';
+if (!empty($extSociety->id)) {
+    require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+    $thirdparty = new Societe($db);
+    if ($thirdparty->fetch($extSociety->id) > 0) {
+        $societyName = $thirdparty->name;
+    }
+}
 
 $successTitle = $langs->trans('MobilePPSuccessTitle');
-$successRef   = $object->ref;
-$successLabel = $object->label;
+$successRefHtml = $object->getNomUrl(1);
+$successLabel = 'Réf. ' . $object->ref . ' - ' . $societyName . ' - du ' . dol_print_date($object->date_start, 'day') . ' au ' . dol_print_date($object->date_end, 'day');
 
 // Entreprise exterieure : etat reel de la demande de signature. L'envoi automatique peut avoir
 // echoue et personne ne devait s'en apercevoir : l'ecran l'affiche et propose d'y remedier.
@@ -44,7 +59,7 @@ $ppExtSignatureUrl = !empty($ppExtSignatory) ? digiriskGetPreventionPlanSignatur
 $ppHasDocument = dol_is_dir($conf->digiriskdolibarr->dir_output . '/preventionplandocument/' . dol_sanitizeFileName($object->ref))
     && !empty(dol_dir_list($conf->digiriskdolibarr->dir_output . '/preventionplandocument/' . dol_sanitizeFileName($object->ref), 'files', 0, '\.pdf$'));
 
-$successFacts = [$langs->trans('MobileSuccessInteriorSigned')];
+$successFacts = [];
 if ($ppHasDocument) {
     $successFacts[] = $langs->trans('MobileSuccessDocumentGenerated');
 }
@@ -65,7 +80,13 @@ $successShareUrl = isModEnabled('doliletter')
 // Bloc propre au plan de prevention, insere par l'ecran de succes commun
 $successExtraBlockFile = __DIR__ . '/preventionplan_mobile_success_extsign.tpl.php';
 
-$successViewUrl   = dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php', 1) . '?id=' . $object->id;
+if ($ppHasDocument) {
+    $fileArray = dol_dir_list($conf->digiriskdolibarr->dir_output . '/preventionplandocument/' . dol_sanitizeFileName($object->ref), 'files', 0, '\.pdf$', 'date', 'DESC');
+    $filename = $fileArray[0]['name'];
+    $successViewUrl = DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr_preventionplan&entity=' . $conf->entity . '&file=' . urlencode(dol_sanitizeFileName($object->ref) . '/' . $filename);
+} else {
+    $successViewUrl = dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php', 1) . '?id=' . $object->id;
+}
 $successViewLabel  = $langs->trans('MobilePPViewPlan');
 $successAgainUrl   = $_SERVER['PHP_SELF'];
 $successAgainLabel = $langs->trans('MobilePPCreateAnother');
