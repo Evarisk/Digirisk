@@ -1,0 +1,1 @@
+<?php require '../../main.inc.php'; $langs->load('digiriskdolibarr@digiriskdolibarr'); $text = $langs->trans('MobileSuccessInteriorSignedOn', '13/08/2026'); var_dump($text); var_dump(dol_escape_htmltag($text));
