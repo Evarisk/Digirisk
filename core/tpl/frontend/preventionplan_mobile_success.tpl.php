@@ -43,7 +43,9 @@ $successTitle = '';
 $nomUrl = $object->getNomUrl(1);
 $customLinkText = '<span style="font-size: 0.55em; font-weight: normal; color: #444; vertical-align: middle;">Réf. </span>';
 $customLinkText .= '<span style="vertical-align: middle;">' . $object->ref . '-' . dol_escape_htmltag($societyName) . '</span>';
-$customLinkText .= '</a><span style="font-size: 0.55em; font-weight: normal; color: #444; margin-left: 8px; vertical-align: middle;"> - ' . dol_print_date($object->date_start, 'day') . ' au ' . dol_print_date($object->date_end, 'day') . '</span>';
+$customLinkText .= '</a>';
+$customLinkText .= '<div style="font-size: 0.55em; font-weight: normal; color: #444; margin-top: 8px;">Date début : <span style="color: #22427c;">' . dol_print_date($object->date_start, 'day') . '</span></div>';
+$customLinkText .= '<div style="font-size: 0.55em; font-weight: normal; color: #444; margin-top: 2px;">Date de fin : <span style="color: #22427c;">' . dol_print_date($object->date_end, 'day') . '</span></div>';
 
 $successRefHtml = str_replace('>' . $object->ref . '</a>', '>' . $customLinkText, $nomUrl);
 $successLabel = '';
