@@ -191,6 +191,7 @@ MobilePPErrorCreatingThirdparty = Error creating the third party.
 MobilePPErrorCreatingContact = Error creating the contact.
 MobilePPErrorUpdatingPlan = Error updating the prevention plan.
 MobilePPErrorCreatingPlan = Error creating the prevention plan.
+MobileSuccessViewDocument = View the document
 MobilePPDefaultsTitle = Default values (Mobile creation)
 MobilePPDefaultDateStartToday = Start date = today
 MobilePPDefaultDuration = Default period duration (days)
