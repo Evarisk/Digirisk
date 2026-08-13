@@ -187,6 +187,10 @@ MobilePPCertifications = Required certifications
 MobilePPAddCertification = Add a certification
 MobileCertifications = Certifications (mobile)
 MobilePPUploadCertPhoto = Upload a photo
+MobilePPErrorCreatingThirdparty = Error creating the third party.
+MobilePPErrorCreatingContact = Error creating the contact.
+MobilePPErrorUpdatingPlan = Error updating the prevention plan.
+MobilePPErrorCreatingPlan = Error creating the prevention plan.
 
 # Mobile fire permit quick creation
 MobileFPPreventionPlanHelp = The exterior company and the period of the selected plan are reused automatically.
