@@ -198,6 +198,18 @@ if ($action == 'deletePhoto' && $permissiontoadd) {
     }
 }
 
+// Update global risks description for this product
+if ($action == 'update_risks_desc' && $permissiontoadd) {
+    $object->array_options['options_digirisk_risks'] = GETPOST('options_digirisk_risks', 'restricthtml');
+    $result = $object->updateExtraField('digirisk_risks', '', $user);
+    if ($result < 0) {
+        setEventMessages($object->error, $object->errors, 'errors');
+    } else {
+        setEventMessages($langs->trans('RecordSaved'), null, 'mesgs');
+    }
+    $action = 'view';
+}
+
 // Add a new product risk
 if ($action == 'add_product_risk' && $permissiontoadd) {
     $newRisk                   = new ProductRisk($db);
@@ -303,12 +315,12 @@ print '<style>
 .dr-header-photos { display:flex; gap:4px; align-items:center; flex-shrink:0; }
 .dr-header-photo { width:32px; height:32px; border-radius:3px; overflow:hidden; border:1px solid #ccc; flex-shrink:0; }
 .dr-header-photo img { width:100%; height:100%; object-fit:cover; }
-/* Saturne media block in header: uniform 48x48 buttons */
-.dr-risk-header .linked-medias { margin:0; flex-shrink:0; }
-.dr-risk-header .saturne-media-upload-block { gap:6px; }
-.dr-risk-header .saturne-upload-label { width:48px; min-width:48px; height:48px; min-height:48px; border-radius:10px; }
-.dr-risk-header .saturne-upload-label i { font-size:18px; }
-.dr-risk-header .open-media-editor-as-gallery { width:48px; min-width:48px; height:48px; min-height:48px; border-radius:10px; }
+/* Saturne media block in header: force perfect vertical alignment */
+.dr-risk-header .linked-medias { margin:0 !important; padding:0 !important; flex-shrink:0; display:inline-flex !important; align-items:center !important; line-height:0 !important; }
+.dr-risk-header .add-medias { margin:0 !important; padding:0 !important; }
+.dr-risk-header .saturne-media-upload-block { gap:6px !important; align-items:center !important; margin:0 !important; padding:0 !important; }
+.dr-risk-header .saturne-media-gallery { display:inline-flex !important; align-items:center !important; gap:6px !important; margin:0 !important; padding:0 !important; }
+.dr-risk-header .fast-upload-options { margin:0 !important; padding:0 !important; height:0 !important; overflow:hidden !important; }
 .dr-risk-header .saturne-media-count-badge { font-size:10px; height:16px; min-width:16px; padding:0 3px; top:-5px; right:-5px; }
 /* Edit mode body */
 .dr-risk-body { padding:10px 12px; }
@@ -342,11 +354,52 @@ print '<style>
 
 // ── Add button (top-LEFT) ─────────────────────────────────────────────────────────
 if ($permissiontoadd) {
-    print '<div style="margin-bottom:10px;">';
-    print '<button type="button" class="butAction" onclick="drOpenCatModal(\'new\')" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:4px;background:#1a5fa8;color:#fff;border:none;cursor:pointer;font-size:1em;">';
-    print '<i class="fas fa-plus"></i> ' . $langs->trans('AddProductRisk');
-    print '</button>';
+    // Add button and title banner
+    $risksTitle = mb_strtoupper($langs->transnoentities('DigiriskRisks'));
+    $risksIcon = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_ICON ?? 'fas fa-exclamation-triangle';
+    $risksColor = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_SVG_COLOR ?? '#D32F2F';
+    // Fetch extrafield or use global default
+    $object->fetch_optionals();
+    $risksDefaultDesc = $object->array_options['options_digirisk_risks'] ?? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS ?? '';
+    
+    $editRisksDesc = (GETPOST('action', 'aZ09') == 'edit_risks_desc');
+
+    print '<div style="border-bottom: 2px solid ' . dol_escape_htmltag($risksColor) . '; padding-bottom: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">';
+    print '<div style="color: ' . dol_escape_htmltag($risksColor) . '; font-size: 1.1em; font-weight: bold;">';
+    print '<i class="' . dol_escape_htmltag($risksIcon) . '" style="margin-right: 8px;"></i> ' . $risksTitle;
     print '</div>';
+
+    print '<button type="button" class="wpeo-button button-square-40 button-blue" onclick="drOpenCatModal(\'new\')" title="' . dol_escape_htmltag($langs->trans('AddProductRisk')) . '">';
+    print '<i class="fas fa-exclamation-triangle button-icon"></i>';
+    print '<i class="fas fa-plus-circle button-add animated"></i>';
+    print '</button>';
+    
+    print '</div>';
+
+    if ($editRisksDesc) {
+        print '<div style="margin-bottom: 20px;">';
+        print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '">';
+        print '<input type="hidden" name="token" value="' . currentToken() . '">';
+        print '<input type="hidden" name="action" value="update_risks_desc">';
+        
+        require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
+        $doleditor = new DolEditor('options_digirisk_risks', $risksDefaultDesc, '', 150, 'dolibarr_details', 'In', false, true, true, ROWS_5, '100%');
+        $doleditor->Create();
+        
+        print '<div style="text-align: right; margin-top: 10px;">';
+        print '<input type="submit" class="button button-save" value="' . $langs->trans('Save') . '">';
+        print ' <a href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '" class="button button-cancel">' . $langs->trans('Cancel') . '</a>';
+        print '</div>';
+        print '</form></div>';
+    } else {
+        print '<div style="margin-bottom: 20px; font-size: 0.95em; color: #333; display: flex; justify-content: space-between; align-items: flex-start;">';
+        print '<div style="flex: 1;">' . (empty($risksDefaultDesc) ? '<span style="color:#aaa;font-style:italic;">' . $langs->trans('NoDescription') . '</span>' : $risksDefaultDesc) . '</div>';
+        if ($permissiontoadd) {
+            $pencilUrl = $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=edit_risks_desc&token=' . currentToken();
+            print '<a href="' . $pencilUrl . '" title="' . $langs->trans('Modify') . '" style="margin-left: 10px; opacity: 0.5;">' . img_edit() . '</a>';
+        }
+        print '</div>';
+    }
 }
 
 // ── Existing risks ─────────────────────────────────────────────────────────────
@@ -376,6 +429,14 @@ foreach ($existingRisks as $risk) {
         data-ajax-url="' . dol_escape_htmltag($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=ajax_save_risk_desc&token=' . currentToken()) . '"
         data-placeholder="' . dol_escape_htmltag($placeholder) . '"
         spellcheck="false">' . $descShort . '</span>';
+        
+    // Add Protection button (right aligned, matching Saturne media block style)
+    if ($permissiontoadd) {
+        print '<div style="display: inline-flex; align-items: center; justify-content: center; width: 50px; min-width: 50px; height: 50px; min-height: 50px; cursor: pointer; flex-shrink: 0; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,.05);" onclick="drAddProtection(' . $risk->id . ')" title="' . dol_escape_htmltag($langs->trans('AddProtection')) . '">';
+        print '<img src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/icons/digirisk_add_protection_icon.png" style="width:100%; height:100%; object-fit:contain; border-radius:12px;" alt="">';
+        print '</div>';
+    }
+
     // Saturne media block in header (always visible)
     $riskSubDir = 'medias/product/' . $object->id . '/risks/' . $risk->id;
     print saturne_render_media_block('digiriskdolibarr', $riskSubDir, 'risk-' . $risk->id, '', [
@@ -433,10 +494,7 @@ foreach ($existingRisks as $risk) {
             }
             print '</div>';
         }
-        print '</div>';
-        if ($permissiontoadd) {
-            print '<button type="button" class="dr-add-protection" onclick="drAddProtection(' . $risk->id . ')" style="margin-top:4px;"><i class="fas fa-plus-circle"></i> ' . $langs->trans('AddProtection') . '</button>';
-        }
+        print '</div>'; // dr-prot-inline
         print '</div>'; // dr-risk-body
     }
 
