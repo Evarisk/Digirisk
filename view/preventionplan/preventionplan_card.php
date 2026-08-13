@@ -1199,18 +1199,14 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
             // Send email
             $displayButton = $onPhone ? '<i class="fas fa-envelope fa-2x"></i>' : '<i class="fas fa-envelope"></i>' . ' ' . $langs->trans('SendMail') . ' ';
-            if ($object->status == PreventionPlan::STATUS_LOCKED) {
-                $fileParams = dol_most_recent_file($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref);
-                $file       = is_array($fileParams) ? $fileParams['fullname'] : '';
-                if (!empty($file) && file_exists($file) && !strstr($fileParams['name'], 'specimen')) {
-                    $forcebuilddoc = 0;
-                } else {
-                    $forcebuilddoc = 1;
-                }
-                print dolGetButtonAction($displayButton, '', 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=' . $forcebuilddoc . '&mode=init#formmailbeforetitle');
+            $fileParams = dol_most_recent_file($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref);
+            $file       = is_array($fileParams) ? $fileParams['fullname'] : '';
+            if (!empty($file) && file_exists($file) && !strstr($fileParams['name'], 'specimen')) {
+                $forcebuilddoc = 0;
             } else {
-                print '<span class="butActionRefused classfortooltip" title="'.dol_escape_htmltag($langs->trans('ObjectMustBeLockedToSendEmail', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+                $forcebuilddoc = 1;
             }
+            print dolGetButtonAction($displayButton, '', 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=' . $forcebuilddoc . '&mode=init#formmailbeforetitle');
 
 			// Archive
 			$displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Archive');
