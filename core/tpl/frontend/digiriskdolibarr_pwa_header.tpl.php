@@ -31,7 +31,11 @@ if (empty($mysoc)) {
 }
 
 $logoFile = '';
-if (!empty($mysoc->logo_squarred)) {
+if (!empty($mysoc->logo_squarred_mini)) {
+    $logoFile = 'logos/thumbs/' . $mysoc->logo_squarred_mini;
+} elseif (!empty($mysoc->logo_squarred_small)) {
+    $logoFile = 'logos/thumbs/' . $mysoc->logo_squarred_small;
+} elseif (!empty($mysoc->logo_squarred)) {
     $logoFile = 'logos/thumbs/' . $mysoc->logo_squarred;
 } elseif (!empty($mysoc->logo)) {
     $logoFile = 'logos/thumbs/' . $mysoc->logo;
@@ -45,8 +49,13 @@ if (!empty($mysoc->logo_squarred)) {
         } ?>
         <span class="digirisk-pwa-header__title"><?php print dol_escape_htmltag(!empty($pwaHeaderTitle) ? $pwaHeaderTitle : ''); ?></span>
     </div>
-    <div class="digirisk-pwa-header__user">
-        <i class="fas fa-user-circle"></i>
+    <a href="<?php print DOL_URL_ROOT; ?>/user/card.php?id=<?php print $user->id; ?>" class="digirisk-pwa-header__user" style="text-decoration: none;">
+        <?php if (!empty($user->photo)) {
+            $userPhotoUrl = DOL_URL_ROOT . '/viewimage.php?cache=1&modulepart=userphoto&file=' . urlencode($user->photo);
+            print '<img src="' . $userPhotoUrl . '" alt="" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">';
+        } else {
+            print '<i class="fas fa-user-circle"></i>';
+        } ?>
         <span class="digirisk-pwa-header__username"><?php print dol_escape_htmltag($user->getFullName($langs)); ?></span>
-    </div>
+    </a>
 </div>
