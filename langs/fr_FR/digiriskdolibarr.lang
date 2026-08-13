@@ -2101,6 +2101,9 @@ MobilePPErrorCreatingThirdparty = Erreur lors de la création du tiers.
 MobilePPErrorCreatingContact = Erreur lors de la création du contact.
 MobilePPErrorUpdatingPlan = Erreur lors de la mise à jour du plan de prévention.
 MobilePPErrorCreatingPlan = Erreur lors de la création du plan de prévention.
+MobileSuccessPlanSentByEmailOn = Plan de prévention envoyé par Email le %s
+MobileSuccessExteriorSignedOn = Responsable Entreprise Extérieure (EE) : Signé le %s
+MobileSuccessExteriorPendingSignature = Responsable Entreprise Extérieure (EE) : En attente de signature
 MobilePPDefaultsTitle = Valeurs par défaut (Création mobile)
 MobilePPDefaultDateStartToday = Date de début = date du jour
 MobilePPDefaultDuration = Durée par défaut de la période (jours)
@@ -2188,3 +2191,7 @@ SelectProtection=Choisir une protection EPI
 TechnicalSheet=Fiche Technique
 DigiriskRisks=RISQUES & PROTECTIONS
 MobileSuccessInteriorSignedOn=Responsable Entreprise Utilisatrice (EU) : Signé le %s
+
+MobileSuccessPlanSentByEmailOn = Plan de prévention envoyé par Email le %s
+MobileSuccessExteriorSignedOn = Responsable Entreprise Extérieure (EE) : Signé le %s
+MobileSuccessExteriorPendingSignature = Responsable Entreprise Extérieure (EE) : En attente de signature
