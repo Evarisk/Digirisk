@@ -66,7 +66,7 @@ $ppExtName = trim($ppExtSignatory->firstname . ' ' . $ppExtSignatory->lastname);
             <i class="fas fa-signature"></i> <?php print $langs->trans('MobilePPExtSignNow'); ?>
         </a>
         <button type="button" class="digirisk-mobile-success__button digirisk-mobile-extsign__resend">
-            <i class="fas fa-paper-plane"></i> <?php print $langs->trans('MobilePPExtResendEmail'); ?>
+            <i class="fas fa-paper-plane"></i> <?php print $ppExtEmailSent ? $langs->trans('MobilePPExtResendEmail') : $langs->trans('MobilePPExtSendEmail'); ?>
         </button>
     </div>
 
