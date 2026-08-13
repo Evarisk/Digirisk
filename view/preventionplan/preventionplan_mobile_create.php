@@ -94,11 +94,18 @@ $uploadToken   = saturne_get_upload_token($uploadContext);
  */
 
 $isEdit  = false;
+
+// Default dates from admin config
+$defaultStartToday = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY', 1);
+$defaultDuration   = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DURATION', 30);
+$defaultDateStart  = $defaultStartToday ? dol_print_date(dol_now(), '%Y-%m-%d') : '';
+$defaultDateEnd    = $defaultStartToday ? dol_print_date(dol_time_plus_duree(dol_now(), $defaultDuration, 'd'), '%Y-%m-%d') : '';
+
 $prefill = [
     'ext_society_id' => 0, 'ext_society_name' => '', 'ext_society_email' => '', 'siren' => '',
     'ext_society_address' => '', 'ext_society_zip' => '', 'ext_society_town' => '',
     'resp_contact_id' => 0, 'resp_lastname' => '', 'resp_firstname' => '', 'resp_email' => '', 'resp_phone' => '',
-    'date_start' => '', 'date_end' => '',
+    'date_start' => $defaultDateStart, 'date_end' => $defaultDateEnd,
     'prior_visit_bool' => 0, 'prior_visit_text' => '', 'prior_visit_date' => '',
     'cssct_intervention' => 0, 'categories' => [],
     'risks' => [], 'certifications' => [],
@@ -470,9 +477,11 @@ if ($action == 'add_mobile' && $permissiontoadd) {
             if ($resSoc > 0) {
                 $extSocietyId = $resSoc;
             } else {
-                $errorMessages[] = $thirdparty->error ?: $langs->trans('MobilePPErrorCreatingThirdparty');
+                $msg = (dol_strlen($thirdparty->error) && $thirdparty->error !== 'KO') ? $thirdparty->error : $langs->trans('MobilePPErrorCreatingThirdparty');
+                dol_syslog('preventionplan_mobile_create: thirdparty->create failed: ' . $thirdparty->error . ' | ' . implode(', ', (array) $thirdparty->errors), LOG_ERR);
+                $errorMessages[] = $msg;
                 if (!$isAjax) {
-                    setEventMessages($thirdparty->error, $thirdparty->errors, 'errors');
+                    setEventMessages($msg, null, 'errors');
                 }
                 $subError++;
             }
@@ -501,9 +510,11 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                 if ($resContact > 0) {
                     $respContactId = $resContact;
                 } else {
-                    $errorMessages[] = $contact->error ?: $langs->trans('MobilePPErrorCreatingContact');
+                    $msg = (dol_strlen($contact->error) && $contact->error !== 'KO') ? $contact->error : $langs->trans('MobilePPErrorCreatingContact');
+                    dol_syslog('preventionplan_mobile_create: contact->create failed: ' . $contact->error . ' | ' . implode(', ', (array) $contact->errors), LOG_ERR);
+                    $errorMessages[] = $msg;
                     if (!$isAjax) {
-                        setEventMessages($contact->error, $contact->errors, 'errors');
+                        setEventMessages($msg, null, 'errors');
                     }
                     $subError++;
                 }
@@ -578,9 +589,11 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                 exit;
             }
 
-            $errorMessages[] = $object->error ?: $langs->trans('MobilePPErrorUpdatingPlan');
+            $msg = (dol_strlen($object->error) && $object->error !== 'KO') ? $object->error : $langs->trans('MobilePPErrorUpdatingPlan');
+            dol_syslog('preventionplan_mobile_create: object->update failed: ' . $object->error . ' | ' . implode(', ', (array) $object->errors), LOG_ERR);
+            $errorMessages[] = $msg;
             if (!$isAjax) {
-                setEventMessages($object->error, $object->errors, 'errors');
+                setEventMessages($msg, null, 'errors');
             }
             $subError++;
         }
@@ -689,9 +702,11 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                 header('Location: ' . $redirect);
                 exit;
             } else {
-                $errorMessages[] = $object->error ?: $langs->trans('MobilePPErrorCreatingPlan');
+                $msg = (dol_strlen($object->error) && $object->error !== 'KO') ? $object->error : $langs->trans('MobilePPErrorCreatingPlan');
+                dol_syslog('preventionplan_mobile_create: object->create failed: ' . $object->error . ' | ' . implode(', ', (array) $object->errors), LOG_ERR);
+                $errorMessages[] = $msg;
                 if (!$isAjax) {
-                    setEventMessages($object->error, $object->errors, 'errors');
+                    setEventMessages($msg, null, 'errors');
                 }
                 $subError++;
             }

@@ -92,6 +92,26 @@ if ($action == 'setMaitreOeuvre') {
 	}
 }
 
+if ($action == 'setMobileDefaults' && !GETPOST('cancel', 'alpha')) {
+	$defaultDuration = GETPOSTINT('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DURATION');
+	if ($defaultDuration < 1) {
+		$defaultDuration = 30;
+	}
+	if ($defaultDuration > 365) {
+		$defaultDuration = 365;
+	}
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DURATION', $defaultDuration, 'integer', 0, '', $conf->entity);
+
+	$defaultStartToday = GETPOSTINT('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY', $defaultStartToday ? 1 : 0, 'integer', 0, '', $conf->entity);
+
+	setEventMessages($langs->trans('SetupSaved'), null, 'mesgs');
+	if (!$error) {
+		header('Location: ' . $_SERVER['PHP_SELF']);
+		exit;
+	}
+}
+
 /*
  * View
  */
@@ -167,6 +187,36 @@ print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' .
 print '</td>';
 print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 print '</td></tr>';
+
+print '</table>';
+print '</form>';
+
+// --- Mobile creation defaults ---
+print load_fiche_titre('<i class="fas fa-mobile-alt"></i> ' . $langs->trans('MobilePPDefaultsTitle'), '', '');
+
+$defaultDuration   = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DURATION', 30);
+$defaultStartToday = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY', 1);
+
+print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '" name="mobile_defaults_form">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="setMobileDefaults">';
+print '<table class="noborder centpercent editmode">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans('Option') . '</td>';
+print '<td>' . $langs->trans('DefaultValue') . '</td>';
+print '<td>' . $langs->trans('Action') . '</td>';
+print '</tr>';
+
+// Default start date = today
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY">' . $langs->trans('MobilePPDefaultDateStartToday') . '</label></td>';
+print '<td><input type="checkbox" name="DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY" id="DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY" value="1"' . ($defaultStartToday ? ' checked' : '') . '> ' . $langs->trans('Yes') . '</td>';
+print '<td rowspan="2"><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '"></td>';
+print '</tr>';
+
+// Default duration in days
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DURATION">' . $langs->trans('MobilePPDefaultDuration') . '</label></td>';
+print '<td><input type="number" name="DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DURATION" id="DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DURATION" value="' . $defaultDuration . '" min="1" max="365" class="flat minwidth100"> ' . $langs->trans('Days') . '</td>';
+print '</tr>';
 
 print '</table>';
 print '</form>';

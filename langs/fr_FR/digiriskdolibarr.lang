@@ -2101,6 +2101,9 @@ MobilePPErrorCreatingThirdparty = Erreur lors de la création du tiers.
 MobilePPErrorCreatingContact = Erreur lors de la création du contact.
 MobilePPErrorUpdatingPlan = Erreur lors de la mise à jour du plan de prévention.
 MobilePPErrorCreatingPlan = Erreur lors de la création du plan de prévention.
+MobilePPDefaultsTitle = Valeurs par défaut (Création mobile)
+MobilePPDefaultDateStartToday = Date de début = date du jour
+MobilePPDefaultDuration = Durée par défaut de la période (jours)
 
 # Mobile fire permit quick creation
 MobileFPPreventionPlanHelp = L'entreprise extérieure et la période du plan sélectionné sont reprises automatiquement.
