@@ -39,7 +39,7 @@ if (!empty($extSociety->id)) {
     }
 }
 
-$successTitle = $langs->trans('MobilePPSuccessTitle');
+$successTitle = '';
 $nomUrl = $object->getNomUrl(1);
 $customLinkText = '<span style="font-size: 0.55em; font-weight: normal; color: #444; vertical-align: middle;">Réf. </span>';
 $customLinkText .= '<span style="vertical-align: middle;">' . $object->ref . '-' . dol_escape_htmltag($societyName) . '</span>';
