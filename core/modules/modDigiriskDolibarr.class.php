@@ -1636,21 +1636,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'user'     => 0,
         ];
 
-		$this->menu[$r++] = [
-			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskfirepermit',
-			'type'     => 'left',
-			'titre'    => $langs->transnoentities('PwaApplication'),
-			'prefix'   => '<i class="fas fa-mobile-alt pictofixedwidth" style="padding-right: 4px;"></i>',
-			'mainmenu' => 'digiriskdolibarr',
-			'leftmenu' => 'digiriskfirepermitpwa',
-			'url'      => '/custom/digiriskdolibarr/public/mobile_firepermit.php' . ((!isModEnabled('multicompany')) ? '?entity=' . $conf->entity : ''),
-			'langs'    => '',
-			'position' => 100 + $r,
-			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',
-			'perms'    => '$user->rights->digiriskdolibarr->firepermit->read',
-			'target'   => '',
-			'user'     => 0,
-		];
+
 
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
