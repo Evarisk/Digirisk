@@ -42,7 +42,7 @@ if (!empty($mysoc->logo_squarred_mini)) {
 }
 ?>
 <div id="id-top" class="digirisk-pwa-header">
-    <a href="<?php print DOL_URL_ROOT; ?>/custom/digiriskdolibarr/view/frontend/pwa_home.php" class="digirisk-pwa-header__brand" style="text-decoration: none;">
+    <a href="<?php print DOL_URL_ROOT; ?>/custom/digiriskdolibarr/digiriskdolibarrindex.php" class="digirisk-pwa-header__brand" style="text-decoration: none;">
         <?php if (!empty($logoFile)) {
             $logoUrl = DOL_URL_ROOT . '/viewimage.php?cache=1&modulepart=mycompany&file=' . urlencode($logoFile);
             print '<img class="digirisk-pwa-header__logo" src="' . $logoUrl . '" alt="">';
