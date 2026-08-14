@@ -42,13 +42,20 @@ if (!empty($mysoc->logo_squarred_mini)) {
 }
 ?>
 <div id="id-top" class="digirisk-pwa-header">
-    <div class="digirisk-pwa-header__brand">
+    <a href="<?php print DOL_URL_ROOT; ?>/custom/digiriskdolibarr/view/frontend/pwa_home.php" class="digirisk-pwa-header__brand" style="text-decoration: none;">
         <?php if (!empty($logoFile)) {
             $logoUrl = DOL_URL_ROOT . '/viewimage.php?cache=1&modulepart=mycompany&file=' . urlencode($logoFile);
             print '<img class="digirisk-pwa-header__logo" src="' . $logoUrl . '" alt="">';
         } ?>
-        <span class="digirisk-pwa-header__title"><?php print dol_escape_htmltag(!empty($pwaHeaderTitle) ? $pwaHeaderTitle : ''); ?></span>
-    </div>
+        <span class="digirisk-pwa-header__title">
+            <?php 
+            print dol_escape_htmltag($mysoc->name); 
+            if (!empty($pwaHeaderTitle) && $pwaHeaderTitle !== $langs->trans('PwaNavHome') && $pwaHeaderTitle !== 'Accueil') {
+                print ' - ' . dol_escape_htmltag($pwaHeaderTitle);
+            }
+            ?>
+        </span>
+    </a>
     <a href="<?php print DOL_URL_ROOT; ?>/user/card.php?id=<?php print $user->id; ?>" class="digirisk-pwa-header__user" style="text-decoration: none;">
         <?php if (!empty($user->photo)) {
             $userPhotoUrl = DOL_URL_ROOT . '/viewimage.php?cache=1&modulepart=userphoto&file=' . urlencode($user->photo);
