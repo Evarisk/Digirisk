@@ -2129,7 +2129,7 @@ MobileFPViewPermit = Voir le permis
 MobileFPCreateAnother = Créer un autre permis
 
 # Digirisk PWA
-PwaApplication = Application
+PwaApplication = App Mobile
 PwaNavHome = Accueil
 PwaNavPreventionPlans = Plans
 PwaNavFirePermits = Permis

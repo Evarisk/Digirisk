@@ -1572,20 +1572,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		];
 
-		$this->menu[$r++] = [
-			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskpreventionplan',
-			'type'     => 'left',
-			'titre'    => '<i class="fas fa-mobile-alt pictofixedwidth"></i>' . $langs->transnoentities('MobileQuickCreation'),
-			'mainmenu' => 'digiriskdolibarr',
-			'leftmenu' => 'digiriskdolibarr_preventionplanmobile',
-			'url'      => '/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php',
-			'langs'    => 'digiriskdolibarr@digiriskdolibarr',
-			'position' => 100 + $r,
-			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',
-			'perms'    => '$user->rights->digiriskdolibarr->preventionplan->write',
-			'target'   => '',
-			'user'     => 2,
-		];
 
         $this->menu[$r++] = [
             'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskpreventionplan',
@@ -1634,20 +1620,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		];
 
-		$this->menu[$r++] = [
-			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskfirepermit',
-			'type'     => 'left',
-			'titre'    => '<i class="fas fa-mobile-alt pictofixedwidth"></i>' . $langs->transnoentities('MobileQuickCreation'),
-			'mainmenu' => 'digiriskdolibarr',
-			'leftmenu' => 'digiriskdolibarr_firepermitmobile',
-			'url'      => '/digiriskdolibarr/view/firepermit/firepermit_mobile_create.php',
-			'langs'    => 'digiriskdolibarr@digiriskdolibarr',
-			'position' => 100 + $r,
-			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',
-			'perms'    => '$user->rights->digiriskdolibarr->firepermit->write',
-			'target'   => '',
-			'user'     => 2,
-		];
 
         $this->menu[$r++] = [
             'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskfirepermit',
@@ -1667,7 +1639,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskfirepermit',
 			'type'     => 'left',
-			'titre'    => $langs->transnoentities('Application'),
+			'titre'    => $langs->transnoentities('PwaApplication'),
 			'prefix'   => '<i class="fas fa-mobile-alt pictofixedwidth" style="padding-right: 4px;"></i>',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskfirepermitpwa',
