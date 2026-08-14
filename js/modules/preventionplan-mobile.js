@@ -170,10 +170,20 @@ window.digiriskdolibarr.preventionplanmobile.resendExtSignatureEmail = function(
         },
         error: function(jqXHR) {
             button.removeClass('button-disable');
+            
+            var defaultError = 'Erreur serveur (HTTP ' + jqXHR.status + ')';
+            if (jqXHR.status === 200) {
+                var mailErrorMsg = status.closest('.digirisk-mobile-extsign').data('error-mail');
+                if (mailErrorMsg) {
+                    defaultError = mailErrorMsg;
+                }
+            }
+
             status
-                .removeClass('digirisk-mobile-extsign__status--pending digirisk-mobile-extsign__status--sent')
+                .removeClass('digirisk-mobile-extsign__status--pending digirisk-mobile-extsign__status--sent digirisk-mobile-extsign__status--error')
                 .addClass('digirisk-mobile-extsign__status--error')
-                .find('span').text('Erreur serveur (HTTP ' + jqXHR.status + ')');
+                .find('span').text(defaultError);
+            status.find('i').attr('class', 'fas fa-exclamation-circle');
         }
     });
 };
