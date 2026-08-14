@@ -402,6 +402,12 @@ class modDigiriskdolibarr extends DolibarrModules
 			'menus' => 0,
 			// Set this to 1 if module overwrite template dir (core/tpl)
 			'tpl' => 0,
+			// Declare category dictionary types (to make them manageable in standard categories/tags views)
+			'categories' => [
+				'accident'       => 'Accident',
+				'preventionplan' => 'PreventionPlan',
+				'firepermit'     => 'FirePermit',
+			],
 			// Set this to 1 if module has its own barcode directory (core/modules/barcode)
 			'barcode' => 0,
 			// Set this to 1 if module has its own models directory (core/modules/xxx)
