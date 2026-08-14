@@ -49,6 +49,11 @@ $action      = GETPOST('action', 'alpha');
 $fromid      = GETPOST('fromid', 'int');
 $fromiduser  = GETPOST('fromiduser', 'int');
 
+$limit = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
+$page  = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
+$page  = is_numeric($page) ? $page : 0;
+$page  = $page == -1 ? 0 : $page;
+
 $offset   = $limit * $page;
 $pageprev = $page - 1;
 $pagenext = $page + 1;
