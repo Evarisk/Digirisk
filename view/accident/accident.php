@@ -46,6 +46,8 @@ saturne_load_langs(['projects', 'companies', 'commercial']);
 
 // Get parameters
 $action      = GETPOST('action', 'alpha');
+$fromid      = GETPOST('fromid', 'int');
+$fromiduser  = GETPOST('fromiduser', 'int');
 
 $offset   = $limit * $page;
 $pageprev = $page - 1;
@@ -55,6 +57,7 @@ $hookmanager->initHooks(['digiriskelementview', 'accidentlist']); // Note that c
 
 $id = GETPOST('id', 'int'); // get if for actions_fetchobject.inc.php
 // Load accident object, why ?
+$object = new Accident($db);
 include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
 //Permission for accident
@@ -90,7 +93,7 @@ if ($fromid > 0) {
         $userObject->fetch($fromiduser, '', '', 1);
         $userObject->loadRights();
         saturne_get_fiche_head($userObject, 'accidents', $langs->trans('Accidents'));
-    } elseif ($accident->id > 0) {
+    } elseif (!empty($object) && $object->id > 0) {
         saturne_get_fiche_head($object,'elementAccidents', $langs->trans('Accident'));
     }
 }
