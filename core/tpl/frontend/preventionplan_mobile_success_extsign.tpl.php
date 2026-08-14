@@ -29,7 +29,7 @@ if (empty($ppExtSignatory)) {
 
 $ppExtName = trim($ppExtSignatory->firstname . ' ' . $ppExtSignatory->lastname);
 ?>
-<div class="digirisk-mobile-card digirisk-mobile-extsign" data-plan-id="<?php print (int) $object->id; ?>">
+<div class="digirisk-mobile-card digirisk-mobile-extsign" data-plan-id="<?php print (int) $object->id; ?>" data-error-mail="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorMailServerNotConfigured')); ?>">
     <div class="digirisk-mobile-extsign__title">
         <i class="fas fa-file-signature"></i> <?php print $langs->trans('MobilePPExtSignatureTitle'); ?>
     </div>

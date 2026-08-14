@@ -2200,3 +2200,4 @@ MobileSuccessExteriorPendingSignature = Responsable Entreprise Extérieure (EE) 
 MobilePPErrorInvalidEmail = Veuillez respecter le format de l'email.
 MobilePPErrorInvalidPhone = Veuillez respecter le format du téléphone.
 MobilePPExtSendEmail = Envoyer le mail
+MobilePPErrorMailServerNotConfigured = Votre serveur de mail n'est pas configuré, veuillez contacter l'administrateur.
