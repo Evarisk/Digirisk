@@ -28,6 +28,12 @@ global $langs, $user;
 <div class="pwa-container digirisk-pwa">
     <div class="digirisk-pwa-hello"><?php print $langs->trans('PwaHello', $user->firstname ?: $user->lastname); ?></div>
 
+    <?php if (!isModEnabled('doliletter')) { ?>
+        <div style="background-color: #fdf2f2; color: #d32f2f; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 0.9em; text-align: center; border: 1px solid #f9caca;">
+            <?php print $langs->trans('MobilePPDoliletterNotInstalled'); ?>
+        </div>
+    <?php } ?>
+
     <?php if (!empty($homeTiles)) { ?>
     <div class="digirisk-pwa-tiles">
         <?php foreach ($homeTiles as $homeTile) { ?>
