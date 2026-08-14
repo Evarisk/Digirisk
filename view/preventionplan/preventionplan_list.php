@@ -231,6 +231,9 @@ if (empty($reshook)) {
 
 
 $title   = $langs->trans("PreventionPlanList");
+if (!isModEnabled('doliletter')) {
+	$title .= ' <span class="error" style="font-size: 0.8em; font-weight: normal; margin-left: 20px;">' . $langs->trans('MobilePPDoliletterNotInstalled') . '</span>';
+}
 $helpUrl = 'FR:Module_Digirisk#DigiRisk_-_Plan_de_pr.C3.A9vention';
 
 saturne_header(0, '', $title, $helpUrl);

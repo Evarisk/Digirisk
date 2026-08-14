@@ -200,6 +200,9 @@ if (empty($reshook)) {
  */
 
 $title    = $langs->trans("FirePermitList");
+if (!isModEnabled('doliletter')) {
+	$title .= ' <span class="error" style="font-size: 0.8em; font-weight: normal; margin-left: 20px;">' . $langs->trans('MobilePPDoliletterNotInstalled') . '</span>';
+}
 $helpUrl = 'FR:Module_Digirisk#DigiRisk_-_Permis_de_feu';
 
 saturne_header(1, "", $title, $helpUrl);
