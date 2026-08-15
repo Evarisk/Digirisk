@@ -47,8 +47,14 @@ $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successSha
         </div>
         <?php } ?>
 
-        <?php if (!empty($successFacts)) { ?>
-        <ul class="digirisk-mobile-success__facts">
+    </div>
+
+    <?php if (!empty($successCustomFactsHtml)) {
+        print $successCustomFactsHtml;
+    } elseif (!empty($successFacts)) { ?>
+    <div class="digirisk-mobile-card digirisk-mobile-success-facts">
+        <div class="digirisk-mobile-extsign__title" style="margin-bottom: 15px;"><i class="fas fa-chart-line"></i> Avancement</div>
+        <ul class="digirisk-mobile-success__facts" style="margin-bottom: 0;">
             <?php foreach ($successFacts as $successFact) {
                 $icon = 'fa-check-circle';
                 $color = '';
@@ -59,38 +65,23 @@ $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successSha
                         $icon = 'fa-times-circle';
                         $color = 'color: #d32f2f;';
                     }
+                    if (!empty($successFact['icon'])) {
+                        $icon = $successFact['icon'];
+                    }
+                    if (!empty($successFact['color'])) {
+                        $color = 'color: ' . $successFact['color'] . ';';
+                    }
                 }
             ?>
             <li><i class="fas <?php print $icon; ?>" style="<?php print $color; ?>"></i><span><?php print dol_escape_htmltag($text); ?></span></li>
             <?php } ?>
         </ul>
-        <?php } ?>
-    </div>
-
-    <?php if (dol_strlen($successShareUrl)) { ?>
-    <div class="digirisk-mobile-card digirisk-mobile-share">
-        <div class="digirisk-mobile-share__title"><?php print $langs->trans('MobileSpreadShareTitle'); ?></div>
-        <div class="digirisk-mobile-share__text"><?php print $langs->trans('MobileSpreadShareText'); ?></div>
-
-        <?php if (dol_strlen($successQrCode)) { ?>
-        <div class="digirisk-mobile-share__qr">
-            <div class="digirisk-mobile-share__qr-frame"><?php print $successQrCode; ?></div>
-        </div>
-        <?php } ?>
-
-        <div class="digirisk-mobile-share__copy copy-signatureurl-container">
-            <div class="digirisk-mobile-share__link">
-                <a href="<?php print $successShareUrl; ?>" target="_blank"><?php print dol_escape_htmltag($successShareUrl); ?></a>
-                <i class="fas fa-clipboard copy-signatureurl" data-signature-url="<?php print dol_escape_htmltag($successShareUrl); ?>" title="<?php print dol_escape_htmltag($langs->trans('ClickToCopyToClipboard')); ?>"></i>
-            </div>
-            <span class="copied-to-clipboard" style="display: none;"><?php print $langs->trans('CopiedToClipboard'); ?></span>
-        </div>
-
-        <a class="digirisk-mobile-success__button digirisk-mobile-success__button--primary" href="<?php print $successShareUrl; ?>" target="_blank">
-            <i class="fas fa-external-link-alt"></i> <?php print $langs->trans('MobileSpreadOpen'); ?>
-        </a>
     </div>
     <?php } ?>
+
+    <?php if (!empty($successEuBlockHtml)) {
+        print $successEuBlockHtml;
+    } ?>
 
     <?php
     // Bloc propre a l'objet cree (signature de l'entreprise exterieure pour un plan de prevention),
@@ -99,6 +90,41 @@ $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successSha
         require $successExtraBlockFile;
     }
     ?>
+
+    <?php if (dol_strlen($successShareUrl)) { ?>
+    <?php
+    $shareIsDisabled = isset($successShareEnabled) && $successShareEnabled === false;
+    $shareOpacityStyle = $shareIsDisabled ? 'opacity: 0.3; pointer-events: none;' : '';
+    ?>
+    <div class="digirisk-mobile-card digirisk-mobile-share">
+        <div class="digirisk-mobile-share__title"><?php print $langs->trans('MobileSpreadShareTitle'); ?></div>
+        <div class="digirisk-mobile-share__text"><?php print $langs->trans('MobileSpreadShareText'); ?></div>
+
+        <?php if (dol_strlen($successQrCode)) { ?>
+        <div class="digirisk-mobile-share__qr" style="<?php print $shareOpacityStyle; ?>">
+            <div class="digirisk-mobile-share__qr-frame"><?php print $successQrCode; ?></div>
+        </div>
+        <?php } ?>
+
+        <div class="digirisk-mobile-share__copy copy-signatureurl-container" style="<?php print $shareOpacityStyle; ?>">
+            <div class="digirisk-mobile-share__link">
+                <a href="<?php print $successShareUrl; ?>" target="_blank"><?php print dol_escape_htmltag($successShareUrl); ?></a>
+                <i class="fas fa-clipboard copy-signatureurl" data-signature-url="<?php print dol_escape_htmltag($successShareUrl); ?>" title="<?php print dol_escape_htmltag($langs->trans('ClickToCopyToClipboard')); ?>"></i>
+            </div>
+            <span class="copied-to-clipboard" style="display: none;"><?php print $langs->trans('CopiedToClipboard'); ?></span>
+        </div>
+
+        <?php if ($shareIsDisabled && !empty($successShareDisabledText)) { ?>
+        <div style="margin-top: 15px; padding: 12px; background: #fff3cd; color: #856404; border-radius: 6px; text-align: center; font-size: 0.9em; font-weight: 500;">
+            <i class="fas fa-exclamation-triangle"></i> <?php print dol_escape_htmltag($successShareDisabledText); ?>
+        </div>
+        <?php } else { ?>
+        <a class="digirisk-mobile-success__button digirisk-mobile-success__button--primary" href="<?php print $successShareUrl; ?>" target="_blank">
+            <i class="fas fa-external-link-alt"></i> <?php print $langs->trans('MobileSpreadOpen'); ?>
+        </a>
+        <?php } ?>
+    </div>
+    <?php } ?>
 
     <div class="digirisk-mobile-success__actions">
         <a class="digirisk-mobile-success__button" href="<?php print $successViewUrl; ?>"><?php print dol_escape_htmltag($successViewLabel); ?></a>

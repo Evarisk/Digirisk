@@ -30,23 +30,33 @@ if (empty($ppExtSignatory)) {
 $ppExtName = trim($ppExtSignatory->firstname . ' ' . $ppExtSignatory->lastname);
 ?>
 <div class="digirisk-mobile-card digirisk-mobile-extsign" data-plan-id="<?php print (int) $object->id; ?>" data-error-mail="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorMailServerNotConfigured')); ?>">
-    <div class="digirisk-mobile-extsign__title">
-        <i class="fas fa-file-signature"></i> <?php print $langs->trans('MobilePPExtSignatureTitle'); ?>
-    </div>
-
-    <div class="digirisk-mobile-extsign__who">
-        <span class="digirisk-mobile-extsign__name"><?php print dol_escape_htmltag(dol_strlen($ppExtName) ? $ppExtName : $langs->trans('ExtSocietyResponsible')); ?></span>
-        <?php if (dol_strlen($ppExtSignatory->email)) { ?>
-        <span class="digirisk-mobile-extsign__email"><?php print dol_escape_htmltag($ppExtSignatory->email); ?></span>
+    <div class="digirisk-mobile-extsign__title" style="display: flex; justify-content: space-between; align-items: center;">
+        <div><i class="fas fa-hard-hat"></i> Entreprise Extérieure ( EE )</div>
+        <?php if ($ppExtSigned) { ?>
+        <div style="font-size: 0.65em; background: #e6f2e9; color: #2d6a3c; padding: 4px 8px; border-radius: 15px; font-weight: bold; line-height: 1.2;">
+            <i class="fas fa-check"></i> Signé le <?php print dol_print_date($ppExtSignatory->signature_date, 'dayhour'); ?>
+        </div>
         <?php } ?>
     </div>
 
-    <?php if ($ppExtSigned) { ?>
-    <div class="digirisk-mobile-extsign__status digirisk-mobile-extsign__status--done">
-        <i class="fas fa-check-circle"></i>
-        <span><?php print $langs->trans('MobilePPExtAlreadySigned', dol_print_date($ppExtSignatory->signature_date, 'dayhour')); ?></span>
+    <div class="digirisk-mobile-extsign__who" style="display: flex; flex-direction: column; gap: 4px; font-size: 0.9em; margin-bottom: 12px; margin-top: 10px;">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;">
+            <div><span style="color: #666;">Tiers :</span> <span style="color: #000; font-weight: 500;"><?php print !empty($thirdparty) ? dol_escape_htmltag($thirdparty->name) : ''; ?></span></div>
+            <div><span style="color: #666;">Siren :</span> <span style="color: #000;"><?php print !empty($thirdparty) ? dol_escape_htmltag($thirdparty->idprof1) : ''; ?></span></div>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;">
+            <div><span style="color: #666;">Resp.</span> <span style="color: #000; font-weight: 500;"><?php print dol_escape_htmltag(dol_strlen($ppExtName) ? $ppExtName : $langs->trans('ExtSocietyResponsible')); ?></span></div>
+            <div><span style="color: #666;">Tél :</span> <span style="color: #000;"><?php print !empty($ppExtSignatory->phone) ? dol_escape_htmltag($ppExtSignatory->phone) : ''; ?></span></div>
+        </div>
+        <?php if (dol_strlen($ppExtSignatory->email) || !empty($ppExtSignatory->job)) { ?>
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;">
+            <div><span style="color: #666;">Mail :</span> <span style="color: #000;"><?php print dol_escape_htmltag($ppExtSignatory->email); ?></span></div>
+            <div><span style="color: #666;">Poste :</span> <span style="color: #000;"><?php print !empty($ppExtSignatory->job) ? dol_escape_htmltag($ppExtSignatory->job) : ''; ?></span></div>
+        </div>
+        <?php } ?>
     </div>
-    <?php } else { ?>
+
+    <?php if (!$ppExtSigned) { ?>
 
     <div class="digirisk-mobile-extsign__status <?php print $ppExtEmailSent ? 'digirisk-mobile-extsign__status--sent' : 'digirisk-mobile-extsign__status--pending'; ?>">
         <i class="fas <?php print $ppExtEmailSent ? 'fa-paper-plane' : 'fa-exclamation-circle'; ?>"></i>
