@@ -88,7 +88,7 @@ list($listRows, $listTotal, $listTotalPages) = digiriskPwaFetchList('FirePermit'
         'ref'        => $record->ref,
         'title'      => $record->label,
         'lines'      => $lines,
-        'statusHtml' => $record->getLibStatut(3),
+        'statusHtml' => digiriskPwaStatusHtml($record),
     ];
 });
 

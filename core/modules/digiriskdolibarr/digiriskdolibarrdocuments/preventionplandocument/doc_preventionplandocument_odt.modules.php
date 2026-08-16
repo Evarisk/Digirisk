@@ -303,20 +303,20 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         $opening_hours_saturday  = explode(' ', $saturneSchedules->saturday);
         $opening_hours_sunday    = explode(' ', $saturneSchedules->sunday);
 
-        $tmpArray['lundi_matin']    = $opening_hours_monday[0];
-        $tmpArray['lundi_aprem']    = $opening_hours_monday[1];
-        $tmpArray['mardi_matin']    = $opening_hours_tuesday[0];
-        $tmpArray['mardi_aprem']    = $opening_hours_tuesday[1];
-        $tmpArray['mercredi_matin'] = $opening_hours_wednesday[0];
-        $tmpArray['mercredi_aprem'] = $opening_hours_wednesday[1];
-        $tmpArray['jeudi_matin']    = $opening_hours_thursday[0];
-        $tmpArray['jeudi_aprem']    = $opening_hours_thursday[1];
-        $tmpArray['vendredi_matin'] = $opening_hours_friday[0];
-        $tmpArray['vendredi_aprem'] = $opening_hours_friday[1];
-        $tmpArray['samedi_matin']   = $opening_hours_saturday[0];
-        $tmpArray['samedi_aprem']   = $opening_hours_saturday[1];
-        $tmpArray['dimanche_matin'] = $opening_hours_sunday[0];
-        $tmpArray['dimanche_aprem'] = $opening_hours_sunday[1];
+        $tmpArray['lundi_matin']    = $opening_hours_monday[0] ?? '';
+        $tmpArray['lundi_aprem']    = $opening_hours_monday[1] ?? '';
+        $tmpArray['mardi_matin']    = $opening_hours_tuesday[0] ?? '';
+        $tmpArray['mardi_aprem']    = $opening_hours_tuesday[1] ?? '';
+        $tmpArray['mercredi_matin'] = $opening_hours_wednesday[0] ?? '';
+        $tmpArray['mercredi_aprem'] = $opening_hours_wednesday[1] ?? '';
+        $tmpArray['jeudi_matin']    = $opening_hours_thursday[0] ?? '';
+        $tmpArray['jeudi_aprem']    = $opening_hours_thursday[1] ?? '';
+        $tmpArray['vendredi_matin'] = $opening_hours_friday[0] ?? '';
+        $tmpArray['vendredi_aprem'] = $opening_hours_friday[1] ?? '';
+        $tmpArray['samedi_matin']   = $opening_hours_saturday[0] ?? '';
+        $tmpArray['samedi_aprem']   = $opening_hours_saturday[1] ?? '';
+        $tmpArray['dimanche_matin'] = $opening_hours_sunday[0] ?? '';
+        $tmpArray['dimanche_aprem'] = $opening_hours_sunday[1] ?? '';
 
         if (is_array($object->lines) && !empty($object->lines)) {
             $tmpArray['interventions_info'] = count($object->lines) . ' ' . $langs->trans('PreventionPlanLine');

@@ -104,6 +104,36 @@ function digiriskPwaFetchList(string $className, string $search, string $status,
 }
 
 /**
+ * Render the status icon for a record in the PWA lists
+ *
+ * @param object $record The object record (PreventionPlan or FirePermit)
+ * @return string HTML of the status badge
+ */
+function digiriskPwaStatusHtml($record): string
+{
+    $icon = 'fa-info';
+    $statusType = 'status0';
+
+    if ($record->status == $record::STATUS_DRAFT) {
+        $icon = 'fa-edit';
+        $statusType = 'status0';
+    } elseif ($record->status == $record::STATUS_VALIDATED) {
+        $icon = 'fa-signature';
+        $statusType = 'status3';
+    } elseif ($record->status == $record::STATUS_LOCKED) {
+        $icon = 'fa-lock';
+        $statusType = 'status8';
+    } elseif ($record->status == $record::STATUS_ARCHIVED) {
+        $icon = 'fa-archive';
+        $statusType = 'status8';
+    }
+
+    $title = strip_tags($record->getLibStatut(1));
+
+    return '<span class="badge badge-status badge-' . $statusType . '" title="' . dol_escape_htmltag($title) . '"><i class="fas ' . $icon . '"></i></span>';
+}
+
+/**
  * Count the records of an object type sitting in a given status.
  *
  * @param  string $className Object class to count ('PreventionPlan', 'FirePermit')

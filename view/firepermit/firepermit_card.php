@@ -743,7 +743,7 @@ if ($action == 'create') {
     // Categories
     if (!empty($conf->categorie->enabled)) {
         print '<tr><td>'.$langs->trans("Categories").'</td><td>';
-        $categoryArborescence = $form->select_all_categories('firepermit', '', 'parent', 64, 0, 1);
+        $categoryArborescence = $form->select_all_categories('digiriskfirepermit', '', 'parent', 64, 0, 1);
         print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, GETPOST('categories', 'array'), '', 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
         print '<a class="butActionNew" href="' . DOL_URL_ROOT . '/categories/index.php?type=firepermit&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans('AddCategories') . '"></span></a>';
         print "</td></tr>";
@@ -891,7 +891,7 @@ if (($id || $ref) && $action == 'edit') {
     // Tags-Categories
     if ($conf->categorie->enabled) {
         print '<tr><td>'.$langs->trans("Categories").'</td><td>';
-        $categoryArborescence = $form->select_all_categories('firepermit', '', 'parent', 64, 0, 1);
+        $categoryArborescence = $form->select_all_categories('digiriskfirepermit', '', 'parent', 64, 0, 1);
         $c = new Categorie($db);
         $cats = $c->containing($object->id, 'firepermit');
         $arrayselected = array();

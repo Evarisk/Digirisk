@@ -97,7 +97,7 @@ $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successSha
     $shareOpacityStyle = $shareIsDisabled ? 'opacity: 0.3; pointer-events: none;' : '';
     ?>
     <div class="digirisk-mobile-card digirisk-mobile-share">
-        <div class="digirisk-mobile-share__title"><?php print $langs->trans('MobileSpreadShareTitle'); ?></div>
+        <div class="digirisk-mobile-share__title"><i class="fas fa-paper-plane" style="margin-right: 8px;"></i><?php print $langs->trans('MobileSpreadShareTitle'); ?></div>
         <div class="digirisk-mobile-share__text"><?php print $langs->trans('MobileSpreadShareText'); ?></div>
 
         <?php if (dol_strlen($successQrCode)) { ?>

@@ -56,16 +56,10 @@ $svgCalendar = '<svg viewBox="0 0 448 512" fill="#4a55d1" width="20px" height="2
 $successTitle = '';
 
 $nomUrl = $object->getNomUrl(0);
-$nomUrlModified = str_replace('>' . $object->ref . '</a>', '>Réf. ' . $object->ref . '</a>', $nomUrl);
+$nomUrlModified = str_replace('>' . $object->ref . '</a>', '>RÉF. ' . $object->ref . '</a>', $nomUrl);
+$nomUrlModified = str_replace('<a ', '<a style="color: inherit; text-decoration: none;" ', $nomUrlModified);
 
-$successRefHtml = '<div style="display: flex; align-items: center; border-bottom: 1px solid #eaeaea; padding-bottom: 15px; margin-bottom: 15px; width: 100%;">';
-$successRefHtml .= '<div style="margin-right: 15px;">' . $svgClipboard . '</div>';
-$successRefHtml .= '<div style="display: flex; align-items: center; flex-wrap: wrap;">';
-$successRefHtml .= '<div style="font-size: 0.9em; color: #888; text-transform: uppercase;">';
-$successRefHtml .= $nomUrlModified;
-$successRefHtml .= '<span style="margin: 0 8px; color: #ccc; font-weight: normal;">|</span>';
-$successRefHtml .= '<span style="font-weight: bold; color: #111; font-size: 1.2em;">PLAN DE PRÉVENTION</span>';
-$successRefHtml .= '</div></div></div>';
+$successRefHtml = '';
 
 $successLabel = ''; 
 
@@ -124,14 +118,16 @@ $ppExtSignatureUrl = !empty($ppExtSignatory) ? digiriskGetPreventionPlanSignatur
 $ppHasDocument = dol_is_dir($conf->digiriskdolibarr->dir_output . '/preventionplandocument/' . dol_sanitizeFileName($object->ref))
     && !empty(dol_dir_list($conf->digiriskdolibarr->dir_output . '/preventionplandocument/' . dol_sanitizeFileName($object->ref), 'files', 0, '\.pdf$'));
 
+$svgClipboardInner = '<path d="M30 15 H20 C14.5 15 10 19.5 10 25 V85 C10 90.5 14.5 95 20 95 H80 C85.5 95 90 90.5 90 85 V25 C90 19.5 85.5 15 80 15 H70" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><rect x="35" y="5" width="30" height="15" rx="5" fill="none" stroke="currentColor" stroke-width="8"/><circle cx="50" cy="15" r="3" fill="currentColor"/><line x1="25" y1="40" x2="75" y2="40" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="25" y1="55" x2="75" y2="55" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="25" y1="70" x2="50" y2="70" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><circle cx="75" cy="75" r="25" fill="#ffffff"/><circle cx="75" cy="75" r="20" fill="currentColor"/><path d="M65 75 L72 82 L85 65" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>';
+
 $steps = [
     [
         'title'   => 'PP créé',
         'status'  => 'FAIT',
         'date'    => dol_print_date($object->date_creation, 'day'),
         'done'    => true,
-        'viewBox' => '0 0 24 24',
-        'svg'     => '<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>'
+        'viewBox' => '0 0 100 100',
+        'svg'     => $svgClipboardInner
     ],
     [
         'title'   => 'Resp. EU',
@@ -151,17 +147,17 @@ $steps = [
     ],
     [
         'title'   => 'Verrouiller',
-        'status'  => 'À FAIRE',
+        'status'  => ($object->status >= PreventionPlan::STATUS_LOCKED) ? 'FAIT' : 'À FAIRE',
         'date'    => '',
-        'done'    => false,
+        'done'    => ($object->status >= PreventionPlan::STATUS_LOCKED),
         'viewBox' => '0 0 24 24',
         'svg'     => '<path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>'
     ],
     [
         'title'   => 'Archiver',
-        'status'  => 'À FAIRE',
+        'status'  => ($object->status >= PreventionPlan::STATUS_ARCHIVED) ? 'FAIT' : 'À FAIRE',
         'date'    => '',
-        'done'    => false,
+        'done'    => ($object->status >= PreventionPlan::STATUS_ARCHIVED),
         'viewBox' => '0 0 24 24',
         'svg'     => '<path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>'
     ]
@@ -171,8 +167,11 @@ $svgClipboard = '<svg viewBox="0 0 384 512" fill="#4a55d1" width="60px" height="
 $svgTarget = '<svg viewBox="0 0 512 512" fill="#4a55d1" width="24px" height="24px"><path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0 0 114.6 0 256s114.6 256 256 256zm0-448c105.9 0 192 86.1 192 192s-86.1 192-192 192S64 361.9 64 256 150.1 64 256 64zm0 320c70.6 0 128-57.4 128-128s-57.4-128-128-128-128 57.4-128 128 57.4 128 128 128zm0-192c35.3 0 64 28.7 64 64s-28.7 64-64 64-64-28.7-64-64 28.7-64 64-64z"/></svg>';
 $svgCalendar = '<svg viewBox="0 0 448 512" fill="#4a55d1" width="24px" height="24px"><path d="M400 64h-48V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H160V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H48C21.5 64 0 85.5 0 112v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48zM48 96h352c8.8 0 16 7.2 16 16v48H32v-48c0-8.8 7.2-16 16-16zm352 384H48c-8.8 0-16-7.2-16-16V192h384v272c0 8.8-7.2 16-16 16z"/></svg>';
 
-$successCustomFactsHtml = '<div class="digirisk-mobile-card digirisk-mobile-success-facts" style="padding: 20px 5px;">';
-$successCustomFactsHtml .= '<div class="digirisk-mobile-extsign__title" style="margin-bottom: 25px; padding: 0 10px;"><i class="fas fa-chart-line"></i> Avancement</div>';
+$successCustomFactsHtml = '<div style="margin-bottom: 20px; border-bottom: 1px dashed #eaeaea; padding-bottom: 15px;">';
+$successCustomFactsHtml .= '<div class="digirisk-mobile-extsign__title" style="margin-bottom: 25px; padding: 0 5px; display: flex; justify-content: space-between; align-items: center;">';
+$successCustomFactsHtml .= '<div style="color: #4a55d1; font-weight: bold; font-size: 1.1em; text-transform: uppercase;"><i class="fas fa-chart-line" style="margin-right: 5px;"></i> Avancement</div>';
+$successCustomFactsHtml .= '<div style="font-size: 0.8em; background: #e6f2e9; color: #2d6a3c; padding: 4px 10px; border-radius: 15px; font-weight: bold;"><i class="fas fa-check" style="margin-right:5px;"></i> ' . $nomUrlModified . '</div>';
+$successCustomFactsHtml .= '</div>';
 $successCustomFactsHtml .= '<div style="display: flex; justify-content: space-between; overflow-x: auto; padding-bottom: 10px; margin: 0 5px;">';
 
 foreach ($steps as $index => $step) {
@@ -214,8 +213,13 @@ foreach ($steps as $index => $step) {
 }
 
 $successCustomFactsHtml .= '</div>'; // close flex
+$successCustomFactsHtml .= '</div>'; // close wrapper
 
-$successCustomFactsHtml .= '</div>'; // close card
+$successRef = '';
+
+$successExtraInfoHtml = $successCustomFactsHtml . $successExtraInfoHtml;
+$successCustomFactsHtml = '';
+
 
 // Public spread page, shareable straight away with the people who have to join and sign this plan.
 // Only relevant when DoliLetter (which serves the spread public page) is enabled.
