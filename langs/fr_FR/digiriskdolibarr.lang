@@ -2202,3 +2202,10 @@ MobilePPErrorInvalidPhone = Veuillez respecter le format du téléphone.
 MobilePPExtSendEmail = Envoyer le mail
 MobilePPErrorMailServerNotConfigured = Votre serveur de mail n'est pas configuré, veuillez contacter l'administrateur.
 MobilePPDoliletterNotInstalled = Le module Doliletter n'est pas installé. La diffusion des plans de prévention et permis de feu ne sera pas disponible (Contactez votre administrateur)
+
+# Statuts et types pour les tooltips
+preventionplan = Plan de prévention
+Locked = Verrouillé
+InProgress = En cours
+ValidatePendingSignature = En attente de signature
+Archived = Archivé

@@ -686,7 +686,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                     </div>
                     <?php if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) : ?>
                         <div class="risk-categories"><span class="title"><?php echo $langs->trans("Categories"); ?></span>
-                            <?php $categoryArborescence = $form->select_all_categories('risk', '', 'parent', 64, 0, 1);
+                            <?php $categoryArborescence = $form->select_all_categories('digiriskrisk', '', 'parent', 64, 0, 1);
                             print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, GETPOST('categories', 'array'), '', 0, 'minwidth100imp widthcentpercentminusxx maxwidth400'); ?>
                             <a class="butActionNew" href="<?php echo DOL_URL_ROOT . '/categories/index.php?type=risk&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create'); ?>" target="_blank">
                                 <span class="fa fa-plus-circle valignmiddle paddingleft" title="<?php echo $langs->trans('AddCategories'); ?>"></span>
@@ -1157,7 +1157,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
                                 // Tags-Categories
                                 if ($conf->categorie->enabled && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
                                     print '<div class="risk-categories"><span class="title">'.$langs->trans("Categories").'</span>';
-                                    $categoryArborescence = $form->select_all_categories('risk', '', 'parent', 64, 0, 1);
+                                    $categoryArborescence = $form->select_all_categories('digiriskrisk', '', 'parent', 64, 0, 1);
                                     $c                    = new Categorie($db);
                                     $cats                 = $c->containing($risk->id, 'risk');
                                     $arrayselected        = [];

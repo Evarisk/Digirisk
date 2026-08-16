@@ -73,41 +73,78 @@ class ActionsDigiriskdolibarr
         $error = 0; // Error counter
 
         if (strpos($parameters['context'], 'category') !== false) {
-            $tags = [
-                'accident' => [
+            $this->results = [
+                'digiriskaccident' => [
                     'id'        => 436302001,
-                    'code'      => 'accident',
+                    'code'      => 'digiriskaccident',
                     'obj_class' => 'Accident',
                     'obj_table' => 'digiriskdolibarr_accident',
+                    'label'     => 'Accident',
                 ],
-                'preventionplan' => [
+                'digiriskpreventionplan' => [
                     'id'        => 436302002,
-                    'code'      => 'preventionplan',
+                    'code'      => 'digiriskpreventionplan',
                     'obj_class' => 'PreventionPlan',
                     'obj_table' => 'digiriskdolibarr_preventionplan',
+                    'label'     => 'PreventionPlan',
                 ],
-                'firepermit' => [
+                'digiriskfirepermit' => [
                     'id'        => 436302003,
-                    'code'      => 'firepermit',
+                    'code'      => 'digiriskfirepermit',
                     'obj_class' => 'FirePermit',
                     'obj_table' => 'digiriskdolibarr_firepermit',
+                    'label'     => 'FirePermit',
                 ],
-                'risk' => [
+                'digiriskrisk' => [
                     'id'        => 436302004,
-                    'code'      => 'risk',
+                    'code'      => 'digiriskrisk',
                     'obj_class' => 'Risk',
                     'obj_table' => 'digiriskdolibarr_risk',
+                    'label'     => 'Risk',
                 ],
             ];
+            
+            return 0; // 0 means array_merge_recursive with existing results
         }
 
-        if (!$error) {
-            $this->results = $tags;
-            return 0; // or return 1 to replace standard code
-        } else {
-            $this->errors[] = 'Error message';
-            return -1;
+        return $error;
+    }
+
+    /**
+     * Overwrites properties for getElementProperties
+     *
+     * @param array $parameters
+     * @param Object $object
+     * @param string $action
+     * @param HookManager $hookmanager
+     * @return int
+     */
+    public function getElementProperties($parameters, &$object, &$action, $hookmanager)
+    {
+        if (in_array('elementproperties', explode(':', $parameters['context']))) {
+            $elementType = $parameters['elementType'];
+            
+            $map = [
+                'digiriskaccident' => ['classfile' => 'accident', 'classname' => 'Accident', 'classpath' => 'custom/digiriskdolibarr/class'],
+                'digiriskpreventionplan' => ['classfile' => 'preventionplan', 'classname' => 'PreventionPlan', 'classpath' => 'custom/digiriskdolibarr/class'],
+                'digiriskfirepermit' => ['classfile' => 'firepermit', 'classname' => 'FirePermit', 'classpath' => 'custom/digiriskdolibarr/class'],
+                'digiriskrisk' => ['classfile' => 'risk', 'classname' => 'Risk', 'classpath' => 'custom/digiriskdolibarr/class/riskanalysis']
+            ];
+
+            if (isset($map[$elementType])) {
+                $this->results = array(
+                    'module' => 'digiriskdolibarr',
+                    'classfile' => $map[$elementType]['classfile'],
+                    'classname' => $map[$elementType]['classname'],
+                    'classpath' => $map[$elementType]['classpath'],
+                    'element' => $elementType,
+                    'subelement' => $elementType,
+                    'table_element' => 'digiriskdolibarr_' . $map[$elementType]['classfile']
+                );
+                return 1; // Return 1 to replace standard code entirely
+            }
         }
+        return 0;
     }
 
     /**
@@ -1722,4 +1759,5 @@ class ActionsDigiriskdolibarr
             }
         }
     }
+
 }

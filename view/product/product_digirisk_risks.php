@@ -433,7 +433,7 @@ foreach ($existingRisks as $risk) {
     // Add Protection button (right aligned, matching Saturne media block style)
     if ($permissiontoadd) {
         print '<div style="display: inline-flex; align-items: center; justify-content: center; width: 50px; min-width: 50px; height: 50px; min-height: 50px; cursor: pointer; flex-shrink: 0; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,.05);" onclick="drAddProtection(' . $risk->id . ')" title="' . dol_escape_htmltag($langs->trans('AddProtection')) . '">';
-        print '<img src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/icons/digirisk_add_protection_icon.png" style="width:100%; height:100%; object-fit:contain; border-radius:12px;" alt="">';
+        print '<img src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/OBLIGATION/OBLIGATION-general.jpg" style="width:100%; height:100%; object-fit:contain; border-radius:12px;" alt="">';
         print '</div>';
     }
 

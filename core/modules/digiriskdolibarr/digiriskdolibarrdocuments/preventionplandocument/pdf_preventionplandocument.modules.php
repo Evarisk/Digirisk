@@ -414,7 +414,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
 
         $pdf->SetFont('', 'B', $size + 6);
         $pdf->SetTextColor($this->accent[0], $this->accent[1], $this->accent[2]);
-        $pdf->SetXY($this->marge_gauche, $posY + 14);
+        $pdf->SetXY($this->marge_gauche, $posY + 2);
         $pdf->Cell($this->contentWidth($pdf), 9, $outputLangs->transnoentities('PreventionPlan'), 0, 1, 'C');
         $pdf->SetTextColor(0, 0, 0);
 
@@ -576,7 +576,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $this->sectionPriorVisit($pdf, $object, $data, $outputLangs, $size);
         $this->sectionIntervention($pdf, $object, $outputLangs, $size);
         $this->sectionRisks($pdf, $object, $outputLangs, $size);
-        $this->sectionAttendants($pdf, $object, $outputLangs, $size);
+        $this->sectionCertifications($pdf, $object, $outputLangs, $size);
         $this->sectionSignatures($pdf, $object, $outputLangs, $size);
 
         $this->_pagefooter($pdf, $object, $outputLangs, $size);
@@ -1214,46 +1214,32 @@ class pdf_preventionplandocument extends SaturneDocumentModel
      * @param  float     $size        Taille de police
      * @return void
      */
-    protected function sectionAttendants($pdf, $object, Translate $outputLangs, float $size)
+    protected function sectionCertifications($pdf, $object, Translate $outputLangs, float $size)
     {
-        // Les signataires ne sont pas dans le JSON du document : on les lit a la source
-        $signatory   = new SaturneSignature($this->db, $this->module, $object->element);
-        $signatories = $signatory->fetchSignatories($object->id, $object->element);
-        $attendants  = [];
-        if (is_array($signatories)) {
-            foreach ($signatories as $item) {
-                if ($item->role != 'MasterWorker') {
-                    $attendants[] = $item;
-                }
-            }
-        }
-        if (empty($attendants)) {
+        $mobileCertifications = !empty($object->array_options['options_mobile_certifications']) ? json_decode($object->array_options['options_mobile_certifications'], true) : [];
+        if (empty($mobileCertifications)) {
             return;
         }
 
-        $this->sectionTitle($pdf, $outputLangs->transnoentities('PreventionPlanAttendants'), $size);
+        require_once dol_buildpath('/digiriskdolibarr/lib/digiriskdolibarr_mobile.lib.php', 0);
+        $certificationOptions = digiriskGetCertificationOptions(false);
+
+        $this->sectionTitle($pdf, $outputLangs->transnoentities('MobilePPCertifications'), $size);
 
         $width  = $this->contentWidth($pdf);
-        $widths = [$width * 0.20, $width * 0.20, $width * 0.30, $width * 0.18, $width * 0.12];
+        $widths = [$width * 0.85, $width * 0.15];
         $header = [
-            $outputLangs->transnoentities('Lastname'),
-            $outputLangs->transnoentities('Firstname'),
-            $outputLangs->transnoentities('Email'),
-            $outputLangs->transnoentities('Phone'),
-            $outputLangs->transnoentities('Status'),
+            $outputLangs->transnoentities('Label'),
+            $outputLangs->transnoentities('MobilePPMandatory')
         ];
 
         $rows = [];
-        foreach ($attendants as $attendant) {
-            if (!is_object($attendant)) {
-                continue;
-            }
+        foreach ($mobileCertifications as $mobileCertification) {
+            $certLabel = isset($certificationOptions[$mobileCertification['code']]) ? $certificationOptions[$mobileCertification['code']] : $mobileCertification['code'];
+            $mandatoryLabel = !empty($mobileCertification['mandatory']) ? $outputLangs->transnoentities('Yes') : $outputLangs->transnoentities('No');
             $rows[] = [
-                dol_strtoupper($attendant->lastname ?? ''),
-                ucfirst($attendant->firstname ?? ''),
-                $attendant->email ?? '',
-                $attendant->phone ?? '',
-                ['text' => $this->signatoryStatus($attendant, $outputLangs), 'align' => 'C'],
+                $certLabel,
+                ['text' => $mandatoryLabel, 'align' => 'C']
             ];
         }
 

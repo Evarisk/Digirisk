@@ -89,6 +89,10 @@ $project            = new Project($db);
 // Load object
 if ($id > 0 || !empty($ref)) {
 	$object->fetch($id, $ref);
+    if ($object->status == PreventionPlan::STATUS_LOCKED && in_array($action, ['edit', 'update', 'update_extras'])) {
+        $action = '';
+        setEventMessages($langs->trans('ErrorRecordIsLocked'), null, 'errors');
+    }
 }
 
 $deletedElements = $digiriskelement->getMultiEntityTrashList();
@@ -408,7 +412,7 @@ if (empty($reshook)) {
 		$parentId           = GETPOST('parent_id');
 
 		// Initialize object preventionplan line
-		$preventionplandet->date_creation     = $object->db->idate($now);
+		$preventionplandet->date_creation     = $object->db->idate(dol_now());
 		$preventionplandet->ref               = $refPreventionPlanDetMod->getNextValue($preventionplandet);
 		$preventionplandet->entity            = $conf->entity;
 		$preventionplandet->status            = PreventionPlanLine::STATUS_VALIDATED;
@@ -419,18 +423,51 @@ if (empty($reshook)) {
 		$preventionplandet->fk_element        = $location;
 
 		// Check parameters
-		if ($location < 1) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Location')), null, 'errors');
-			$error++;
-		}
 
 		if ($riskCategoryId < 0 || $riskCategoryId == 'undefined') {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('INRSRisk')), null, 'errors');
 			$error++;
 		}
 
+		// Check uniqueness
+		$existing = $preventionplandet->fetchAll('', '', 0, 0, ['fk_preventionplan' => $parentId, 'category' => $riskCategoryId]);
+		if (!empty($existing)) {
+			setEventMessages("Cette catégorie de risque (INRS) est déjà présente dans le plan.", null, 'errors');
+			$error++;
+		}
+
 		if ( ! $error) {
 			$result = $preventionplandet->create($user, false);
+			if ($result > 0) {
+				// Update JSON extrafields
+				$object->fetch($parentId);
+				$protections = !empty($object->array_options['options_mobile_protections']) ? json_decode($object->array_options['options_mobile_protections'], true) : [];
+				$riskCompanies = !empty($object->array_options['options_mobile_risk_companies']) ? json_decode($object->array_options['options_mobile_risk_companies'], true) : [];
+
+				$backendPositions = GETPOST('backend_protection_position', 'array');
+				$backendComments = GETPOST('backend_protection_comment', 'array');
+				
+				$protections = array_filter($protections, function($p) use ($riskCategoryId) { return $p['risk_category'] != $riskCategoryId; });
+				
+				if (is_array($backendPositions)) {
+					foreach ($backendPositions as $idx => $pos) {
+						$protections[] = [
+							'risk_category' => $riskCategoryId,
+							'position'      => $pos,
+							'comment'       => $backendComments[$idx] ?? ''
+						];
+					}
+				}
+				
+				$riskCompanies[$riskCategoryId] = [
+					'eu' => GETPOST('backend_company_eu', 'int') ? 1 : 0,
+					'ee' => GETPOST('backend_company_ee', 'int') ? 1 : 0,
+				];
+
+				$object->array_options['options_mobile_protections'] = json_encode(array_values($protections));
+				$object->array_options['options_mobile_risk_companies'] = json_encode($riskCompanies);
+				$object->update($user);
+			}
 			if ($result > 0) {
 				// Creation prevention plan line OK
 				setEventMessages($langs->trans('AddPreventionPlanLine') . ' ' . $preventionplandet->ref . ' ' . $langs->trans('PreventionPlanMessage'), array());
@@ -457,6 +494,16 @@ if (empty($reshook)) {
 		$parentId           = GETPOST('parent_id');
 
 		$preventionplandet->fetch($lineid);
+		$oldCategoryId = $preventionplandet->category;
+
+		// Check uniqueness
+		if ($oldCategoryId != $riskCategoryId) {
+			$existing = $preventionplandet->fetchAll('', '', 0, 0, ['fk_preventionplan' => $parentId, 'category' => $riskCategoryId]);
+			if (!empty($existing)) {
+				setEventMessages("Cette catégorie de risque (INRS) est déjà présente dans le plan.", null, 'errors');
+				$error++;
+			}
+		}
 
 		// Initialize object prevention plan line
 		$preventionplandet->description       = $actionsDescription;
@@ -477,6 +524,41 @@ if (empty($reshook)) {
 
 		if ( ! $error) {
 			$result = $preventionplandet->update($user, false);
+			if ($result > 0) {
+				// Update JSON extrafields
+				$object->fetch($parentId);
+				$protections = !empty($object->array_options['options_mobile_protections']) ? json_decode($object->array_options['options_mobile_protections'], true) : [];
+				$riskCompanies = !empty($object->array_options['options_mobile_risk_companies']) ? json_decode($object->array_options['options_mobile_risk_companies'], true) : [];
+
+				$backendPositions = GETPOST('backend_protection_position', 'array');
+				$backendComments = GETPOST('backend_protection_comment', 'array');
+				
+				if ($oldCategoryId != $riskCategoryId) {
+					$protections = array_filter($protections, function($p) use ($oldCategoryId) { return $p['risk_category'] != $oldCategoryId; });
+					unset($riskCompanies[$oldCategoryId]);
+				}
+
+				$protections = array_filter($protections, function($p) use ($riskCategoryId) { return $p['risk_category'] != $riskCategoryId; });
+				
+				if (is_array($backendPositions)) {
+					foreach ($backendPositions as $idx => $pos) {
+						$protections[] = [
+							'risk_category' => $riskCategoryId,
+							'position'      => $pos,
+							'comment'       => $backendComments[$idx] ?? ''
+						];
+					}
+				}
+				
+				$riskCompanies[$riskCategoryId] = [
+					'eu' => GETPOST('backend_company_eu', 'int') ? 1 : 0,
+					'ee' => GETPOST('backend_company_ee', 'int') ? 1 : 0,
+				];
+
+				$object->array_options['options_mobile_protections'] = json_encode(array_values($protections));
+				$object->array_options['options_mobile_risk_companies'] = json_encode($riskCompanies);
+				$object->update($user);
+			}
 			if ($result > 0) {
 				// Update prevention plan line OK
 				setEventMessages($langs->trans('UpdatePreventionPlanLine') . ' ' . $preventionplandet->ref . ' ' . $langs->trans('PreventionPlanMessage'), array());
@@ -768,7 +850,7 @@ if ($action == 'create') {
     // Categories
     if (!empty($conf->categorie->enabled)) {
         print '<tr><td>'.$langs->trans("Categories").'</td><td>';
-        $categoryArborescence = $form->select_all_categories('preventionplan', '', 'parent', 64, 0, 1);
+        $categoryArborescence = $form->select_all_categories('digiriskpreventionplan', '', 'parent', 64, 0, 1);
         print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, GETPOST('categories', 'array'), '', 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
         print '<a class="butActionNew" href="' . DOL_URL_ROOT . '/categories/index.php?type=preventionplan&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans('AddCategories') . '"></span></a>';
         print "</td></tr>";
@@ -936,7 +1018,7 @@ if (($id || $ref) && $action == 'edit') {
     // Tags-Categories
     if ($conf->categorie->enabled) {
         print '<tr><td>'.$langs->trans("Categories").'</td><td>';
-        $categoryArborescence = $form->select_all_categories('preventionplan', '', 'parent', 64, 0, 1);
+        $categoryArborescence = $form->select_all_categories('digiriskpreventionplan', '', 'parent', 64, 0, 1);
         $c = new Categorie($db);
         $cats = $c->containing($object->id, 'preventionplan');
         $arrayselected = array();
@@ -1242,12 +1324,23 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 		print '<tr class="liste_titre">';
 		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
-		print '<td>' . $langs->trans('GP/UT') . '</td>';
-		print '<td>' . $form->textwithpicto($langs->trans('ActionsDescription'), $langs->trans("ActionsDescriptionTooltip")) . '</td>';
+		print '<td>' . $langs->trans('ActionsDescription') . '</td>';
 		print '<td class="center">' . $form->textwithpicto($langs->trans('INRSRisk'), $langs->trans('INRSRiskTooltip')) . '</td>';
+		print '<td class="center">Entreprises</td>';
 		print '<td>' . $form->textwithpicto($langs->trans('PreventionMethod'), $langs->trans('PreventionMethodTooltip')) . '</td>';
+		print '<td class="center">Photos</td>';
 		print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsPreventionPlanRisk') . '</td>';
 		print '</tr>';
+
+		$signalisationFile       = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json';
+		$allSigs                 = file_exists($signalisationFile) ? (json_decode(file_get_contents($signalisationFile), true) ?: []) : [];
+		$protectionMap = [];
+		foreach ($allSigs as $sig) {
+			$protectionMap[$sig['position']] = $sig;
+		}
+
+		$planProtections = !empty($object->array_options['options_mobile_protections']) ? json_decode($object->array_options['options_mobile_protections'], true) : [];
+		$planCompanies = !empty($object->array_options['options_mobile_risk_companies']) ? json_decode($object->array_options['options_mobile_risk_companies'], true) : [];
 
 		if ( ! empty($preventionplandets) && $preventionplandets > 0) {
 			print '<tr>';
@@ -1267,9 +1360,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print $item->ref;
 					print '</td>';
 
-					print '<td>';
-					print $digiriskelementtmp->selectDigiriskElementList($item->fk_element, 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth100 maxwidth300', 0, false, 1);
-					print '</td>';
+print '<input type="hidden" name="fk_element" value="0">';
 
 					$coldisplay++;
 					print '<td>';
@@ -1311,7 +1402,38 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 					$coldisplay++;
 					print '<td>';
-					print '<textarea name="preventionmethod" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->prevention_method . '</textarea>' . "\n";
+					$eu = isset($planCompanies[$item->category]['eu']) ? $planCompanies[$item->category]['eu'] : 1;
+					$ee = isset($planCompanies[$item->category]['ee']) ? $planCompanies[$item->category]['ee'] : 1;
+					print '<label><input type="checkbox" name="backend_company_eu" value="1" ' . ($eu ? 'checked' : '') . '> EU</label><br>';
+					print '<label><input type="checkbox" name="backend_company_ee" value="1" ' . ($ee ? 'checked' : '') . '> EE</label>';
+					print '</td>';
+
+					$coldisplay++;
+					print '<td>';
+					print '<div class="backend-protections" id="backend-protections-' . $item->id . '">';
+					$catProtections = array_filter($planProtections, function($p) use ($item) { return $p['risk_category'] == $item->category; });
+					foreach ($catProtections as $idx => $p) {
+						$thumb = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/protections/' . $p['position'] . '.png';
+						print '<div style="display:flex; align-items:center; margin-bottom:5px;">';
+						print '<img src="'.$thumb.'" style="height:30px; margin-right:5px;">';
+						print '<input type="hidden" name="backend_protection_position[]" value="'.$p['position'].'">';
+						print '<input type="text" name="backend_protection_comment[]" value="'.dol_escape_htmltag($p['comment']).'" style="width:150px;">';
+						print '<button type="button" onclick="this.parentNode.remove()" class="button button-small" style="margin-left:5px; padding:2px 5px;"><i class="fas fa-trash"></i></button>';
+						print '</div>';
+					}
+					print '</div>';
+					print '<div style="margin-top:5px;">';
+					print '<div onclick="addProtectionRow(' . $item->id . ')" style="display:inline-block; cursor:pointer; width:40px; height:40px;" title="' . dol_escape_htmltag($langs->trans('AddProtection')) . '">';
+					print '<img src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/OBLIGATION/OBLIGATION-general.jpg" style="width:100%; height:100%; object-fit:contain; border-radius:4px;" alt="+ EPI">';
+					print '</div>';
+					print '</div>';
+					print '</td>';
+
+					$coldisplay++;
+					print '<td>';
+					// Photo upload block
+					$blockUploadSubDir = $object->ref . '/risk-' . $item->category;
+					print saturne_render_media_block('digiriskdolibarr', $blockUploadSubDir, 'risk-' . $item->category, 'digiriskdolibarr,preventionplan,write', ['show_photo' => true, 'show_audio' => false, 'show_file' => false]);
 					print '</td>';
 
 					$coldisplay += $colspan;
@@ -1331,14 +1453,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print $item->ref;
 					print '</td>';
 
-					print '<td>';
-					if ($item->fk_element > 0) {
-						$resFetchElement = $digiriskelement->fetch($item->fk_element);
-						print $resFetchElement > 0 ? $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1) : '<span class="opacitymedium">&mdash;</span>';
-					} else {
-						print '<span class="opacitymedium">&mdash;</span>';
-					}
-					print '</td>';
+
 
 					$coldisplay++;
 					print '<td>';
@@ -1360,8 +1475,46 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 
 					$coldisplay++;
+					print '<td class="center">';
+					$eu = isset($planCompanies[$item->category]['eu']) ? $planCompanies[$item->category]['eu'] : 1;
+					$ee = isset($planCompanies[$item->category]['ee']) ? $planCompanies[$item->category]['ee'] : 1;
+					if ($eu) print '<span class="badge" style="background:#4a55d1; color:white; padding:2px 5px; border-radius:3px;">EU</span> ';
+					if ($ee) print '<span class="badge" style="background:#d14a55; color:white; padding:2px 5px; border-radius:3px;">EE</span>';
+					print '</td>';
+
+					$coldisplay++;
 					print '<td>';
-					print dol_strlen($item->prevention_method) ? $item->prevention_method : '<span class="opacitymedium">&mdash;</span>';
+					$catProtections = array_filter($planProtections, function($p) use ($item) { return $p['risk_category'] == $item->category; });
+					if (empty($catProtections)) {
+						print '<span class="opacitymedium">&mdash;</span>';
+					} else {
+						foreach ($catProtections as $p) {
+							$thumb = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/protections/' . $p['position'] . '.png';
+							print '<div style="display:flex; align-items:center; margin-bottom:2px;">';
+							print '<img src="'.$thumb.'" style="height:24px; margin-right:5px;" title="'.dol_escape_htmltag($p['name'] ?? '').'">';
+							if (!empty($p['comment'])) print '<span>'.dol_escape_htmltag($p['comment']).'</span>';
+							print '</div>';
+						}
+					}
+					print '</td>';
+
+					$coldisplay++;
+					print '<td class="center">';
+					// Display photos
+					$riskDir = $conf->digiriskdolibarr->dir_output . '/preventionplan/' . $object->ref . '/risk-' . $item->category;
+					if (dol_is_dir($riskDir)) {
+						$files = dol_dir_list($riskDir, 'files', 0, '\.(png|jpg|jpeg|gif)$', 'name', 'ASC');
+						if (!empty($files)) {
+							foreach ($files as $file) {
+								$url = DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&entity=1&file=preventionplan/' . $object->ref . '/risk-' . $item->category . '/' . urlencode($file['name']);
+								print '<a href="'.$url.'" target="_blank"><img src="'.$url.'" style="height:40px; margin:2px; border-radius:4px; border:1px solid #ccc;"></a>';
+							}
+						} else {
+							print '<span class="opacitymedium">&mdash;</span>';
+						}
+					} else {
+						print '<span class="opacitymedium">&mdash;</span>';
+					}
 					print '</td>';
 
 					$coldisplay += $colspan;
@@ -1402,9 +1555,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '<td>';
 			print $refPreventionPlanDetMod->getNextValue($preventionplandet);
 			print '</td>';
-			print '<td>';
-			print $digiriskelementtmp->selectDigiriskElementList('', 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth100 maxwidth300', '', false, 1);
-			print '</td>';
+print '<input type="hidden" name="fk_element" value="0">';
 
 			$coldisplay++;
 			print '<td>';
@@ -1440,10 +1591,28 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			<?php
 			print '</td>';
 
+			// Companies
+			$coldisplay++;
+			print '<td class="center">';
+			print '<div style="margin-bottom:2px;"><label><input type="checkbox" name="backend_company_eu" value="1" checked> <span class="badge badge-info" title="' . dol_escape_htmltag($langs->trans('MobilePPUserCompany')) . '">' . $langs->trans('MobilePPUserCompanyShort') . '</span></label></div>';
+			print '<div><label><input type="checkbox" name="backend_company_ee" value="1" checked> <span class="badge badge-info" title="' . dol_escape_htmltag($langs->trans('MobilePPExteriorCompany')) . '">' . $langs->trans('MobilePPExteriorCompanyShort') . '</span></label></div>';
+			print '</td>';
+
+			// Protections (EPI)
 			$coldisplay++;
 			print '<td>';
-			print '<textarea name="preventionmethod" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
+			print '<div class="backend-protections" id="backend-protections-new">';
+			print '</div>';
+			print '<div style="margin-top:5px;">';
+			print '<div onclick="addProtectionRow(\'new\')" style="display:inline-block; cursor:pointer; width:40px; height:40px;" title="' . dol_escape_htmltag($langs->trans('AddProtection')) . '">';
+			print '<img src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/OBLIGATION/OBLIGATION-general.jpg" style="width:100%; height:100%; object-fit:contain; border-radius:4px;" alt="+ EPI">';
+			print '</div>';
+			print '</div>';
 			print '</td>';
+
+			// Photos
+			$coldisplay++;
+			print '<td class="center"><span class="opacitymedium">Enregistrez pour ajouter des photos</span></td>';
 
 			$coldisplay += $colspan;
 			print '<td class="center" colspan="' . $colspan . '">';
@@ -1457,6 +1626,29 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</form>';
 		}
 		print '</table>';
+
+		// JS for adding protections
+		print '<script>
+		function addProtectionRow(id) {
+			var container = $("#backend-protections-" + id);
+			
+			var selectHtml = \'<select name="backend_protection_position[]" style="width:100px; margin-right:5px;">\';';
+		foreach ($allSigs as $p) {
+			if (strpos($p['name_thumbnail'], 'OBLIGATION/') === 0) {
+				print 'selectHtml += \'<option value="'.$p['position'].'">'.dol_escape_js($p['name']).'</option>\';';
+			}
+		}
+		print '			selectHtml += \'</select>\';
+			
+			var row = $(\'<div style="display:flex; align-items:center; margin-bottom:5px;">\' +
+				selectHtml +
+				\'<input type="text" name="backend_protection_comment[]" placeholder="Commentaire..." style="width:150px;">\' +
+				\'<button type="button" onclick="this.parentNode.remove()" class="button button-small" style="margin-left:5px; padding:2px 5px;"><i class="fas fa-trash"></i></button>\' +
+			\'</div>\');
+			container.append(row);
+		}
+		</script>';
+
 		} else {
 			// Read-only risk list, styled like the protections block for theme consistency.
 			// Each risk shows what the mobile interface captured for it: photos and protections (EPI).
@@ -1586,7 +1778,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			}
 		}
 
-		print saturne_show_documents($modulepart, $dirFiles, $filedir, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, 0, 0, 0, $title, 0, 0, empty($soc->default_lang) ? '' : $soc->default_lang, $object, 0, 'remove_file', (($object->status > $object::STATUS_VALIDATED) ? 1 : 0), $langs->trans('ObjectMustBeLockedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))));
+		print saturne_show_documents($modulepart, $dirFiles, $filedir, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, 0, 0, 0, $title, 0, 0, empty($soc->default_lang) ? '' : $soc->default_lang, $object, 0, 'remove_file', 1, $langs->trans('ObjectMustBeLockedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))));
 	}
 
 	if ($permissiontoadd) {

@@ -76,14 +76,16 @@ list($listRows, $listTotal, $listTotalPages) = digiriskPwaFetchList('PreventionP
     $lines[] = ['icon' => 'fa-calendar-alt', 'text' => digiriskPwaFormatPeriod($record->date_start, $record->date_end)];
 
     return [
-        'url'        => dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php', 1) . '?id=' . $record->id,
+        'url'        => ($record->status == PreventionPlan::STATUS_DRAFT)
+            ? dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1) . '?id=' . $record->id
+            : dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1) . '?created=' . $record->id,
         'editUrl'    => ($record->status == PreventionPlan::STATUS_DRAFT && $user->hasRight('digiriskdolibarr', 'preventionplan', 'write'))
             ? dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1) . '?id=' . $record->id
             : '',
         'ref'        => $record->ref,
         'title'      => $record->label,
         'lines'      => $lines,
-        'statusHtml' => $record->getLibStatut(3),
+        'statusHtml' => digiriskPwaStatusHtml($record),
     ];
 });
 

@@ -63,6 +63,13 @@ $id      = GETPOSTINT('id'); // > 0 => edit an existing prevention plan with the
 
 // Initialize technical objects
 $object            = new PreventionPlan($db);
+
+if ($id > 0 && $object->fetch($id) > 0) {
+    if ($object->status == PreventionPlan::STATUS_LOCKED) {
+        accessforbidden($langs->trans('ErrorRecordIsLocked'));
+    }
+}
+
 $preventionplandet = new PreventionPlanLine($db);
 $signatory         = new SaturneSignature($db, $moduleNameLowerCase, $object->element);
 $digiriskresources = new DigiriskResources($db);
@@ -102,6 +109,7 @@ $defaultDateStart  = $defaultStartToday ? dol_print_date(dol_now(), '%Y-%m-%d') 
 $defaultDateEnd    = $defaultStartToday ? dol_print_date(dol_time_plus_duree(dol_now(), $defaultDuration, 'd'), '%Y-%m-%d') : '';
 
 $prefill = [
+    'label' => '',
     'ext_society_id' => 0, 'ext_society_name' => '', 'ext_society_email' => '', 'siren' => '',
     'ext_society_address' => '', 'ext_society_zip' => '', 'ext_society_town' => '',
     'resp_contact_id' => 0, 'resp_lastname' => '', 'resp_firstname' => '', 'resp_email' => '', 'resp_phone' => '',
@@ -115,6 +123,7 @@ if ($id > 0 && $object->fetch($id) > 0) {
     $isEdit = true;
     $object->fetch_optionals();
 
+    $prefill['label']      = $object->label;
     $prefill['date_start'] = $object->date_start ? dol_print_date($object->date_start, '%Y-%m-%d') : '';
     $prefill['date_end']   = $object->date_end   ? dol_print_date($object->date_end, '%Y-%m-%d')   : '';
 
@@ -199,6 +208,33 @@ if ($id > 0 && $object->fetch($id) > 0) {
     }
 
     $prefill['certifications'] = !empty($object->array_options['options_mobile_certifications']) ? json_decode($object->array_options['options_mobile_certifications'], true) : [];
+
+    // Fetch schedules
+    require_once __DIR__ . '/../../../saturne/class/saturneschedules.class.php';
+    $saturneSchedules = new SaturneSchedules($db);
+    $saturneSchedules->fetch(0, '', ' AND element_type = "preventionplan" AND element_id = ' . $object->id . ' AND status = 1');
+    
+    foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as $day) {
+        $parts = explode(' ', $saturneSchedules->$day);
+        $prefill['schedule_' . $day . '_am'] = $parts[0] ?? 'N/A';
+        $prefill['schedule_' . $day . '_pm'] = $parts[1] ?? 'N/A';
+    }
+} else {
+    // Default values for new plan
+    $defaultDays = [
+        'monday'    => $conf->global->MAIN_INFO_OPENINGHOURS_MONDAY ?? '',
+        'tuesday'   => $conf->global->MAIN_INFO_OPENINGHOURS_TUESDAY ?? '',
+        'wednesday' => $conf->global->MAIN_INFO_OPENINGHOURS_WEDNESDAY ?? '',
+        'thursday'  => $conf->global->MAIN_INFO_OPENINGHOURS_THURSDAY ?? '',
+        'friday'    => $conf->global->MAIN_INFO_OPENINGHOURS_FRIDAY ?? '',
+        'saturday'  => $conf->global->MAIN_INFO_OPENINGHOURS_SATURDAY ?? '',
+        'sunday'    => $conf->global->MAIN_INFO_OPENINGHOURS_SUNDAY ?? ''
+    ];
+    foreach ($defaultDays as $day => $val) {
+        $parts = explode(' ', trim($val));
+        $prefill['schedule_' . $day . '_am'] = !empty($parts[0]) ? $parts[0] : 'N/A';
+        $prefill['schedule_' . $day . '_pm'] = !empty($parts[1]) ? $parts[1] : 'N/A';
+    }
 }
 
 /*
@@ -263,6 +299,7 @@ if ($action == 'add_mobile' && $permissiontoadd) {
 
     // Collect an error: record it for the AJAX JSON response and, in classic mode, show it on the reloaded page.
     $addError = function ($message) use (&$error, &$errorMessages, $isAjax) {
+        $message = dol_html_entity_decode($message, ENT_QUOTES);
         $errorMessages[] = $message;
         $error++;
         if (!$isAjax) {
@@ -293,6 +330,14 @@ if ($action == 'add_mobile' && $permissiontoadd) {
 
     $cssctIntervention = GETPOSTINT('cssct_intervention');
     $planCategories    = GETPOST('categories', 'array');
+
+    // Schedules
+    $schedules = [];
+    foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as $day) {
+        $am = trim(GETPOST('schedule_' . $day . '_am', 'alphanohtml'));
+        $pm = trim(GETPOST('schedule_' . $day . '_pm', 'alphanohtml'));
+        $schedules[$day] = trim($am . ' ' . $pm);
+    }
 
     // Selected risks (danger categories) — read here so both the create and the edit paths can use them.
     // Each risk block carries its own description, photos and protections, all keyed by the block index.
@@ -400,7 +445,7 @@ if ($action == 'add_mobile' && $permissiontoadd) {
     // Exterior company: either an existing third party or enough data to create one
     if ($extSocietyId <= 0) {
         if (!dol_strlen($societyName)) {
-            $addError($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSociety')));
+            $addError($langs->trans('ErrorFieldRequired', $langs->transnoentities('ExtSociety')));
         }
         if (!digiriskMobileIsValidIdProf($idProfInput)) {
             $addError($langs->trans('MobilePPErrorInvalidSiren'));
@@ -410,10 +455,10 @@ if ($action == 'add_mobile' && $permissiontoadd) {
     // Exterior responsible: either an existing contact or enough data to create one
     if ($respContactId <= 0) {
         if (!dol_strlen($respLastname)) {
-            $addError($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Lastname')));
+            $addError($langs->trans('ErrorFieldRequired', $langs->transnoentities('Lastname')));
         }
         if (!dol_strlen($respFirstname)) {
-            $addError($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Firstname')));
+            $addError($langs->trans('ErrorFieldRequired', $langs->transnoentities('Firstname')));
         }
     }
 
@@ -421,7 +466,7 @@ if ($action == 'add_mobile' && $permissiontoadd) {
     // contact etait cree sans adresse et la demande de signature ne pouvait plus partir. C'est tout
     // le parcours qui repose dessus, y compris pour un contact deja existant qui n'en aurait pas.
     if (!dol_strlen($respEmail)) {
-        $addError($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Email')));
+        $addError($langs->trans('ErrorFieldRequired', $langs->transnoentities('Email')));
     } elseif (!isValidEmail($respEmail)) {
         $addError($langs->trans('ErrorBadEMail', $respEmail));
     }
@@ -523,7 +568,9 @@ if ($action == 'add_mobile' && $permissiontoadd) {
 
         // 3b. Edit mode: update the existing plan (no re-validation, no re-signature, no email)
         if (!$subError && $isEdit) {
-            $object->label              = $langs->transnoentities('PreventionPlan') . ' - ' . $thirdparty->name;
+            $object->element            = 'preventionplan';
+            $postedLabel = GETPOST('label', 'alpha');
+            $object->label = trim($postedLabel) ? trim($postedLabel) : ($langs->transnoentities('PreventionPlan') . ' - ' . $thirdparty->name);
             $object->date_start         = $dateStart;
             $object->date_end           = $dateEnd;
             $object->prior_visit_bool   = $priorVisitBool;
@@ -570,6 +617,22 @@ if ($action == 'add_mobile' && $permissiontoadd) {
 
                 $db->commit();
 
+                // Save schedules
+                require_once __DIR__ . '/../../../saturne/class/saturneschedules.class.php';
+                $saturneSchedules = new SaturneSchedules($db);
+                $saturneSchedules->fetch(0, '', ' AND element_type = "preventionplan" AND element_id = ' . $object->id . ' AND status = 1');
+                $saturneSchedules->element_type = 'preventionplan';
+                $saturneSchedules->element_id = $object->id;
+                $saturneSchedules->status = 1;
+                foreach ($schedules as $day => $val) {
+                    $saturneSchedules->$day = $val;
+                }
+                if ($saturneSchedules->id > 0) {
+                    $saturneSchedules->update($user);
+                } else {
+                    $saturneSchedules->create($user);
+                }
+
                 // Les etapes ci-dessus sont toutes faites sans trigger : le document est regenere
                 // ici, une fois les risques et les photos en base, pour que la diffusion deja en
                 // ligne cesse de presenter la version d'avant modification
@@ -605,7 +668,8 @@ if ($action == 'add_mobile' && $permissiontoadd) {
             $object->ref_ext       = 'digirisk_' . $object->ref;
             $object->date_creation = $db->idate($now);
             $object->tms           = $now;
-            $object->label         = $langs->transnoentities('PreventionPlan') . ' - ' . $thirdparty->name;
+            $postedLabel = GETPOST('label', 'alpha');
+            $object->label         = trim($postedLabel) ? trim($postedLabel) : ($langs->transnoentities('PreventionPlan') . ' - ' . $thirdparty->name);
             $object->status        = PreventionPlan::STATUS_DRAFT;
             $object->fk_project    = $fkProject;
             $object->date_start    = $dateStart;
@@ -670,6 +734,17 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                         $masterWorker->setSigned($user, true);
                     }
                 }
+
+                // Save schedules
+                require_once __DIR__ . '/../../../saturne/class/saturneschedules.class.php';
+                $saturneSchedules = new SaturneSchedules($db);
+                $saturneSchedules->element_type = 'preventionplan';
+                $saturneSchedules->element_id = $object->id;
+                $saturneSchedules->status = 1;
+                foreach ($schedules as $day => $val) {
+                    $saturneSchedules->$day = $val;
+                }
+                $saturneSchedules->create($user);
 
                 // Le document est genere avant le mail : son destinataire arrive sur une page de
                 // signature qui doit deja presenter le plan, et la diffusion peut etre ouverte dans
@@ -781,7 +856,7 @@ if ($action == 'resend_ext_signature_email' && $permissiontoadd) {
  * View
  */
 
-$title    = $langs->trans('MobileQuickCreation');
+$title    = mb_strtoupper($langs->transnoentities('preventionplan'), 'UTF-8');
 $help_url = 'FR:Module_Digirisk';
 $moreJS   = [
     '/custom/saturne/js/saturne.min.js',
