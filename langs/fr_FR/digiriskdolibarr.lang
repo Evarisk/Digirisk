@@ -2209,3 +2209,9 @@ Locked = Verrouillé
 InProgress = En cours
 ValidatePendingSignature = En attente de signature
 Archived = Archivé
+
+ProductFIChaptersManagement=Personnalisation des chapitres Fiche d'Instruction
+DefaultContent=Contenu par défaut
+CustomSvgUploaded=SVG personnalisé
+DeleteCustomSvg=Supprimer
+DefaultSvgUsed=SVG par défaut
