@@ -134,6 +134,14 @@ print dol_get_fiche_head($head, 'product', $title, -1, "digiriskdolibarr_color@d
 print load_fiche_titre('<i class="fas fa-cube"></i> ' . $langs->trans("ProductFIChaptersManagement"), '', '');
 print '<hr>';
 
+print '<script>
+function resetChap(key, label, icon, color) {
+	$("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_LABEL\']").val("");
+	$("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_ICON\']").val(icon);
+	$("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_COLOR\']").val(color);
+}
+</script>';
+
 print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="action" value="update">';
@@ -200,13 +208,15 @@ foreach ($chaptersConfig as $key => $default) {
 	$svgDisplay = '';
 	if (file_exists($svgPath)) {
 		$svgContent = file_get_contents($svgPath);
-		$svgContent = preg_replace('/<svg([^>]*)>/i', '<svg$1 fill="' . dol_escape_htmltag($colorVal) . '">', $svgContent);
+		$svgContent = preg_replace('/<svg([^>]*)>/i', '<svg$1 fill="' . dol_escape_htmltag($colorVal) . '" width="32" height="32">', $svgContent);
 		$svgContent = preg_replace('/fill="[^"]*"/i', 'fill="' . dol_escape_htmltag($colorVal) . '"', $svgContent);
 		$svgDisplay = '<div style="width:32px; height:32px; float:left; margin-right: 8px;">' . $svgContent . '</div>';
 	}
 
 	print '<tr class="oddeven">';
-	print '<td style="vertical-align: top;"><strong>' . $default['name'] . '</strong></td>';
+	print '<td style="vertical-align: top;">';
+	print '<a href="#" onclick="resetChap(\'' . $key . '\', \'' . dol_escape_js($default['name']) . '\', \'' . dol_escape_js($default['icon']) . '\', \'' . dol_escape_js($default['color']) . '\'); return false;" class="text-muted" title="Rétablir les valeurs standard" style="margin-right:8px;"><i class="fas fa-undo"></i></a>';
+	print '<strong>' . $default['name'] . '</strong></td>';
 	print '<td style="vertical-align: top;"><input type="text" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_LABEL" value="' . dol_escape_htmltag($labelVal) . '" placeholder="' . dol_escape_htmltag($default['name']) . '" class="minwidth200"></td>';
 	print '<td style="vertical-align: top;"><input type="text" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_ICON" value="' . dol_escape_htmltag($iconVal) . '" class="minwidth100"></td>';
 	print '<td style="vertical-align: top;"><input type="color" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_COLOR" value="' . dol_escape_htmltag($colorVal) . '"></td>';
@@ -215,7 +225,7 @@ foreach ($chaptersConfig as $key => $default) {
 	print '<input type="file" name="file_' . $key . '" accept=".svg">';
 	if ($hasSvg) {
 		print '<br><small class="text-success"><i class="fas fa-check"></i> ' . $langs->trans("CustomSvgUploaded") . '</small>';
-		print ' &nbsp; <a href="' . $_SERVER["PHP_SELF"] . '?action=delete_svg&chap=' . $key . '" class="text-danger" title="' . $langs->trans("DeleteCustomSvg") . '"><i class="fas fa-trash"></i></a>';
+		print ' &nbsp; <a href="' . $_SERVER["PHP_SELF"] . '?action=delete_svg&chap=' . $key . '" class="text-danger" title="Rétablir le SVG standard"><i class="fas fa-undo"></i></a>';
 	} else {
 		print '<br><small class="text-muted">' . $langs->trans("DefaultSvgUsed") . '</small>';
 	}
