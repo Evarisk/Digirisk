@@ -244,6 +244,10 @@ print '<style>
 // ── 1. WYSIWYG extrafields ──────────────────────────────────────
 foreach ($digirisk_sections as $fieldkey => $section) {
     $val        = $object->array_options['options_' . $fieldkey] ?? '';
+    if (empty(trim(strip_tags(str_replace('&nbsp;', ' ', $val))))) {
+        $defaultKey = 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . strtoupper(str_replace('digirisk_', '', $fieldkey)) . '_DESC';
+        $val = $conf->global->$defaultKey ?? '';
+    }
     $color      = $section['color'];
     $bg         = $section['bg'];
     $icon       = $section['icon'];

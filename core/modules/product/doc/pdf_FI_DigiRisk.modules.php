@@ -342,6 +342,9 @@ class pdf_FI_DigiRisk extends ModelePDFProduct
         // DESCRIPTION & CARACTÉRISTIQUES
         // ----------------------------------------------------
         $contentDescRaw = $object->array_options['options_digirisk_identification'] ?? '';
+        if (empty(trim(strip_tags(str_replace('&nbsp;', ' ', $contentDescRaw))))) {
+            $contentDescRaw = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_IDENTIFICATION_DESC ?? '';
+        }
         $contentDesc = trim(strip_tags(str_replace('&nbsp;', ' ', $contentDescRaw)));
         if (!empty($contentDesc)) {
             $svgIdent = $getSvgPath('digirisk_identification_icon.svg');
@@ -353,6 +356,9 @@ class pdf_FI_DigiRisk extends ModelePDFProduct
         // SÉCURITÉ (WYSIWYG)
         // ----------------------------------------------------
         $contentSecWysiwygRaw = $object->array_options['options_digirisk_security'] ?? '';
+        if (empty(trim(strip_tags(str_replace('&nbsp;', ' ', $contentSecWysiwygRaw))))) {
+            $contentSecWysiwygRaw = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_SECURITY_DESC ?? '';
+        }
         $contentSecWysiwyg = trim(strip_tags(str_replace('&nbsp;', ' ', $contentSecWysiwygRaw)));
         if (!empty($contentSecWysiwyg)) {
             $svgSecWysiwyg = $getSvgPath('digirisk_security_icon.svg');
@@ -553,6 +559,9 @@ class pdf_FI_DigiRisk extends ModelePDFProduct
         // MODE D'EMPLOI SIMPLIFIÉ
         // ----------------------------------------------------
         $contentUsage = $object->array_options['options_digirisk_usermanual'] ?? '';
+        if (empty(trim(strip_tags(str_replace('&nbsp;', ' ', $contentUsage))))) {
+            $contentUsage = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL_DESC ?? '';
+        }
         $svgUsage = $getSvgPath('digirisk_usermanual_icon.svg');
         $titleUsage = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL_LABEL) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL_LABEL : "MODE D'EMPLOI SIMPLIFIÉ";
         $colorUsage = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL_COLOR) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL_COLOR : '#1a7a3c';
@@ -562,6 +571,9 @@ class pdf_FI_DigiRisk extends ModelePDFProduct
         // QUALIFICATION & HABILITATION
         // ----------------------------------------------------
         $contentQualif = $object->array_options['options_digirisk_qualification'] ?? '';
+        if (empty(trim(strip_tags(str_replace('&nbsp;', ' ', $contentQualif))))) {
+            $contentQualif = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION_DESC ?? '';
+        }
         $svgQualif = $getSvgPath('digirisk_qualification_icon.svg');
         $titleQualif = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION_LABEL) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION_LABEL : "QUALIFICATION & HABILITATION";
         $colorQualif = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION_COLOR) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION_COLOR : '#1a5fa8';
@@ -571,6 +583,9 @@ class pdf_FI_DigiRisk extends ModelePDFProduct
         // HYGIÈNE & NETTOYAGE
         // ----------------------------------------------------
         $contentHyg = $object->array_options['options_digirisk_hygiene'] ?? '';
+        if (empty(trim(strip_tags(str_replace('&nbsp;', ' ', $contentHyg))))) {
+            $contentHyg = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE_DESC ?? '';
+        }
         $svgHyg = $getSvgPath('digirisk_hygiene_icon.svg');
         $titleHyg = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE_LABEL) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE_LABEL : "HYGIÈNE & NETTOYAGE";
         $colorHyg = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE_COLOR) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE_COLOR : '#0e7e7e';
@@ -580,6 +595,9 @@ class pdf_FI_DigiRisk extends ModelePDFProduct
         // MAINTENANCE & CONTRÔLES
         // ----------------------------------------------------
         $contentMaint = $object->array_options['options_digirisk_maintenance'] ?? '';
+        if (empty(trim(strip_tags(str_replace('&nbsp;', ' ', $contentMaint))))) {
+            $contentMaint = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE_DESC ?? '';
+        }
         $svgMaint = $getSvgPath('digirisk_maintenance_icon.svg');
         $titleMaint = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE_LABEL) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE_LABEL : "MAINTENANCE & CONTRÔLES";
         $colorMaint = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE_COLOR) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE_COLOR : '#8b4000';
