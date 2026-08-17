@@ -355,7 +355,7 @@ print '<style>
 // ── Add button (top-LEFT) ─────────────────────────────────────────────────────────
 if ($permissiontoadd) {
     // Add button and title banner
-    $risksTitle = mb_strtoupper($langs->transnoentities('DigiriskRisks'));
+    $risksTitle = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_LABEL) ? mb_strtoupper($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_LABEL) : mb_strtoupper($langs->transnoentities('DigiriskRisks'));
     $risksIcon = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_ICON ?? 'fas fa-exclamation-triangle';
     $risksColor = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_COLOR ?? '#D32F2F';
     $object->fetch_optionals();
