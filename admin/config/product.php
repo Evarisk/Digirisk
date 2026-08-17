@@ -55,6 +55,17 @@ saturne_check_access($permissiontoread);
 
 $error = 0;
 
+if ($action == 'delete_svg') {
+	$chap = GETPOST('chap', 'alpha');
+	$iconsDir = $conf->digiriskdolibarr->dir_output . '/icons';
+	$destName = 'digirisk_' . strtolower($chap) . '_icon.svg';
+	if (file_exists($iconsDir . '/' . $destName)) {
+		unlink($iconsDir . '/' . $destName);
+	}
+	header("Location: " . $_SERVER["PHP_SELF"]);
+	exit;
+}
+
 if (($action == 'update' && ! GETPOST("cancel", 'alpha'))) {
 	$risksIcon = GETPOST('DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_ICON', 'alpha');
 	$risksColor = GETPOST('DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_SVG_COLOR', 'alpha');
@@ -120,7 +131,7 @@ print load_fiche_titre($title, $linkback, 'title_setup');
 $head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'product', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
 
-print load_fiche_titre('<i class="fas fa-cube"></i> ' . $langs->trans("ProductManagement"), '', '');
+print load_fiche_titre('<i class="fas fa-cube"></i> ' . $langs->trans("ProductFIChaptersManagement"), '', '');
 print '<hr>';
 
 print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data">';
@@ -184,6 +195,7 @@ foreach ($chaptersConfig as $key => $default) {
 
 	$svgName = 'digirisk_' . strtolower($key) . '_icon.svg';
 	$hasSvg = file_exists($iconsDir . '/' . $svgName);
+	$svgUrl = $hasSvg ? DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&file=icons/' . urlencode($svgName) : dol_buildpath('/digiriskdolibarr/img/icons/' . $svgName, 1);
 
 	print '<tr class="oddeven">';
 	print '<td style="vertical-align: top;"><strong>' . $default['name'] . '</strong></td>';
@@ -191,16 +203,23 @@ foreach ($chaptersConfig as $key => $default) {
 	print '<td style="vertical-align: top;"><input type="text" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_ICON" value="' . dol_escape_htmltag($iconVal) . '" class="minwidth100"></td>';
 	print '<td style="vertical-align: top;"><input type="color" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_COLOR" value="' . dol_escape_htmltag($colorVal) . '"></td>';
 	print '<td style="vertical-align: top;">';
+	print '<img src="' . $svgUrl . '" width="32" style="background-color: ' . dol_escape_htmltag($colorVal) . '; padding: 3px; border-radius: 4px; float:left; margin-right: 8px;">';
 	print '<input type="file" name="file_' . $key . '" accept=".svg">';
 	if ($hasSvg) {
 		print '<br><small class="text-success"><i class="fas fa-check"></i> ' . $langs->trans("CustomSvgUploaded") . '</small>';
+		print ' &nbsp; <a href="' . $_SERVER["PHP_SELF"] . '?action=delete_svg&chap=' . $key . '" class="text-danger" title="' . $langs->trans("DeleteCustomSvg") . '"><i class="fas fa-trash"></i></a>';
+	} else {
+		print '<br><small class="text-muted">' . $langs->trans("DefaultSvgUsed") . '</small>';
 	}
 	print '</td>';
 	print '</tr>';
 	print '<tr class="oddeven"><td colspan="5">';
 	print '<label style="margin-bottom: 5px; display: inline-block;">' . $langs->trans("DefaultContent") . ' (' . $default['name'] . ')</label>';
+	print ' &nbsp; <a href="#" onclick="$(\'#editor_' . $key . '\').toggle(); return false;" title="Modifier"><i class="fas fa-pencil-alt"></i></a>';
+	print '<div id="editor_' . $key . '" style="display:none; margin-top: 10px;">';
 	$doleditor = new DolEditor('DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_DESC', $descVal, '', 100, 'dolibarr_details', 'In', false, true, true, ROWS_3, '100%');
 	$doleditor->Create();
+	print '</div>';
 	print '</td></tr>';
 }
 
