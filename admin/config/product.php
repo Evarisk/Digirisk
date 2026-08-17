@@ -175,13 +175,13 @@ print '<br>';
 print load_fiche_titre('<i class="fas fa-file-pdf"></i> ' . $langs->trans("ProductFIChaptersManagement", "Gestion des chapitres de la Fiche d'Instruction (FI)"), '', '');
 print '<hr>';
 
-print '<table class="noborder centpercent editmode">';
+print '<table class="noborder" width="100%">';
 print '<tr class="liste_titre">';
-print '<td>' . $langs->trans("Chapter") . '</td>';
-print '<td>' . $langs->trans("Label") . '</td>';
-print '<td>' . $langs->trans("Icon") . '</td>';
-print '<td>' . $langs->trans("Color") . '</td>';
-print '<td>' . $langs->trans("SVG Image") . ' (.svg)</td>';
+print '<th class="liste_titre">Chapitre (Aperçu Web)</th>';
+print '<th class="liste_titre">Libellé personnalisé</th>';
+print '<th class="liste_titre">Icône FA (Web)</th>';
+print '<th class="liste_titre">Couleur (Web & PDF)</th>';
+print '<th class="liste_titre">Image SVG (PDF)</th>';
 print '</tr>';
 
 $chaptersConfig = [
@@ -216,7 +216,10 @@ foreach ($chaptersConfig as $key => $default) {
 	print '<tr class="oddeven">';
 	print '<td style="vertical-align: top;">';
 	print '<a href="#" onclick="resetChap(\'' . $key . '\', \'' . dol_escape_js($default['name']) . '\', \'' . dol_escape_js($default['icon']) . '\', \'' . dol_escape_js($default['color']) . '\'); return false;" class="text-muted" title="Rétablir les valeurs standard" style="margin-right:8px;"><i class="fas fa-undo"></i></a>';
-	print '<strong>' . $default['name'] . '</strong></td>';
+	
+	$displayLabel = !empty($labelVal) ? $labelVal : $default['name'];
+	$displayIcon  = !empty($iconVal) ? $iconVal : $default['icon'];
+	print '<strong><i class="' . dol_escape_htmltag($displayIcon) . '"></i> ' . dol_escape_htmltag($displayLabel) . '</strong></td>';
 	print '<td style="vertical-align: top;"><input type="text" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_LABEL" value="' . dol_escape_htmltag($labelVal) . '" placeholder="' . dol_escape_htmltag($default['name']) . '" class="minwidth200"></td>';
 	print '<td style="vertical-align: top;"><input type="text" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_ICON" value="' . dol_escape_htmltag($iconVal) . '" class="minwidth100"></td>';
 	print '<td style="vertical-align: top;"><input type="color" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_COLOR" value="' . dol_escape_htmltag($colorVal) . '"></td>';
