@@ -394,11 +394,11 @@ class pdf_FI_DigiRisk extends ModelePDFProduct
 
         $contentSec = '';
         $object->fetch_optionals();
-        $risksDefaultDesc = $object->array_options['options_digirisk_risks'] ?? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS ?? '';
+        $risksDefaultDesc = $object->array_options['options_digirisk_risks'] ?? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_DESC ?? '';
 
         // Draw the section title
         $svgRisks = $getSvgPath('digirisk_risks_icon.svg');
-        $colorRisks = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_SVG_COLOR ?? '#d32f2f';
+        $colorRisks = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_COLOR ?? '#d32f2f';
         $titleRisks = mb_strtoupper($langs->transnoentities('DigiriskRisks'));
 
         if (!empty($risksDefaultDesc)) {
@@ -432,7 +432,7 @@ class pdf_FI_DigiRisk extends ModelePDFProduct
                 $hasPhoto = ($riskPhotoUrl && file_exists($riskPhotoUrl));
 
                 // Color for the risk block (use the same color as the RISQUES section)
-                $borderColorHex = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_SVG_COLOR ?? '#d32f2f';
+                $borderColorHex = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_COLOR ?? '#d32f2f';
 
                 // Build HTML for this single risk block
                 $blockHtml = '<table width="100%" cellpadding="0" cellspacing="0" border="0">';
