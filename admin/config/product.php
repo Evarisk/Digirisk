@@ -312,7 +312,7 @@ foreach ($tablesConfig as $tableDef) {
 	}
 	print '</td>';
 	print '<td style="vertical-align: top;"><input type="color" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_COLOR" value="' . dol_escape_htmltag($colorVal) . '"></td>';
-	print '<td style="vertical-align: top; text-align: center;"><button type="submit" class="button" title="' . dol_escape_htmltag($langs->trans("Save")) . '" style="padding: 4px 8px;"><i class="fas fa-save"></i></button></td>';
+	print '<td style="vertical-align: top; text-align: center;"><button type="submit" class="button" title="' . dol_escape_htmltag($langs->trans("Save")) . '" style="padding: 0; width: 32px; height: 32px; min-width: 32px; display: inline-flex; align-items: center; justify-content: center;"><i class="fas fa-save" style="margin:0;"></i></button></td>';
 	print '</tr>';
 	print '<tr class="oddeven"><td colspan="6">';
 	print '<label style="margin-bottom: 5px; display: inline-block;">' . $langs->trans("DefaultContent") . ' (' . $default['name'] . ')</label>';
