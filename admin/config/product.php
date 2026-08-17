@@ -136,10 +136,44 @@ print '<hr>';
 
 print '<script>
 function resetChap(key, label, icon, color) {
-	$("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_LABEL\']").val("");
-	$("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_ICON\']").val(icon);
+	$("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_LABEL\']").val("").trigger("input");
+	$("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_ICON\']").val(icon).trigger("input");
 	$("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_COLOR\']").val(color);
 }
+
+$(document).ready(function() {
+	$("input[name^=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_\']").on("input", function() {
+		var name = $(this).attr("name");
+		if (name.endsWith("_LABEL") || name.endsWith("_ICON")) {
+			var key = name.replace("DIGIRISKDOLIBARR_PRODUCT_DEFAULT_", "").replace("_LABEL", "").replace("_ICON", "");
+			
+			var labelVal = $("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_LABEL\']").val();
+			var iconVal = $("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_ICON\']").val();
+			
+			// Auto-correct FA6 to FA5
+			if (iconVal.indexOf("fa-solid ") !== -1) {
+				iconVal = iconVal.replace("fa-solid ", "fas ");
+				$("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_ICON\']").val(iconVal);
+			}
+			if (iconVal.indexOf("fa-regular ") !== -1) {
+				iconVal = iconVal.replace("fa-regular ", "far ");
+				$("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_ICON\']").val(iconVal);
+			}
+			
+			if (labelVal === "") labelVal = $("#preview_label_" + key).data("default");
+			if (iconVal === "") iconVal = $("#preview_icon_" + key).data("default");
+			
+			$("#preview_label_" + key).text(" " + labelVal);
+			$("#preview_icon_" + key).attr("class", iconVal);
+			
+			// Visual effect
+			$("#preview_container_" + key).css({"color": "#28a745", "transition": "none"});
+			setTimeout(function() {
+				$("#preview_container_" + key).css({"color": "", "transition": "color 0.5s ease"});
+			}, 100);
+		}
+	});
+});
 </script>';
 
 print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data">';
@@ -219,7 +253,7 @@ foreach ($chaptersConfig as $key => $default) {
 	
 	$displayLabel = !empty($labelVal) ? $labelVal : $default['name'];
 	$displayIcon  = !empty($iconVal) ? $iconVal : $default['icon'];
-	print '<strong><i class="' . dol_escape_htmltag($displayIcon) . '"></i> ' . dol_escape_htmltag($displayLabel) . '</strong></td>';
+	print '<strong id="preview_container_' . $key . '"><i id="preview_icon_' . $key . '" class="' . dol_escape_htmltag($displayIcon) . '" data-default="' . dol_escape_htmltag($default['icon']) . '"></i><span id="preview_label_' . $key . '" data-default="' . dol_escape_htmltag($default['name']) . '"> ' . dol_escape_htmltag($displayLabel) . '</span></strong></td>';
 	print '<td style="vertical-align: top;"><input type="text" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_LABEL" value="' . dol_escape_htmltag($labelVal) . '" placeholder="' . dol_escape_htmltag($default['name']) . '" class="minwidth200"></td>';
 	print '<td style="vertical-align: top;"><input type="text" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_ICON" value="' . dol_escape_htmltag($iconVal) . '" class="minwidth100"></td>';
 	print '<td style="vertical-align: top;"><input type="color" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_COLOR" value="' . dol_escape_htmltag($colorVal) . '"></td>';
