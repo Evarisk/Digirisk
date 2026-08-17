@@ -67,6 +67,7 @@ if ($action == 'delete_svg') {
 }
 
 if (($action == 'update' && ! GETPOST("cancel", 'alpha'))) {
+	file_put_contents(DOL_DATA_ROOT . '/digiriskdolibarr/debug_post.txt', print_r($_POST, true), FILE_APPEND);
 	// No separate risks save block needed anymore, it will be handled by the generic chapters loop
 
 	// Ensure icons directory exists
@@ -178,7 +179,8 @@ $(document).ready(function() {
 	$("input[type=\'text\'][name^=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_\'], input[type=\'color\'][name^=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_\']").on("change", function() {
 		var key = $(this).attr("name").replace("DIGIRISKDOLIBARR_PRODUCT_DEFAULT_", "").replace("_LABEL", "").replace("_ICON", "").replace("_COLOR", "");
 		
-		var formData = new FormData($(this).closest("form")[0]);
+		var formEl = document.getElementById("configForm");
+		var formData = new FormData(formEl);
 		formData.set("action", "update");
 		formData.set("ajax", "1");
 		
@@ -200,24 +202,13 @@ $(document).ready(function() {
 
 	// Reload on radio change to update preview immediately
 	$("input[type=\'radio\'][name$=\'_USE_SVG\']").on("change", function() {
-		var formData = new FormData($(this).closest("form")[0]);
-		formData.set("action", "update");
-		formData.set("ajax", "1");
-		$.ajax({
-			url: window.location.href,
-			type: "POST",
-			data: formData,
-			processData: false,
-			contentType: false,
-			success: function() {
-				window.location.reload();
-			}
-		});
+		var formEl = document.getElementById("configForm");
+		formEl.submit();
 	});
 });
 </script>';
 
-print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data">';
+print '<form id="configForm" method="POST" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="action" value="update">';
 
