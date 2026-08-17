@@ -363,9 +363,22 @@ if ($permissiontoadd) {
     
     $editRisksDesc = (GETPOST('action', 'aZ09') == 'edit_risks_desc');
 
+    $useSvg = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_USE_SVG ?? 0;
+    $svgPath = $conf->digiriskdolibarr->dir_output . '/icons/digirisk_risks_icon.svg';
+    $hasSvg = file_exists($svgPath);
+    
+    if ($useSvg && $hasSvg) {
+        $svgContent = file_get_contents($svgPath);
+        $svgContent = preg_replace('/<svg([^>]*)>/i', '<svg$1 fill="' . dol_escape_htmltag($risksColor) . '" width="20" height="20">', $svgContent);
+        $svgContent = preg_replace('/fill="[^"]*"/i', 'fill="' . dol_escape_htmltag($risksColor) . '"', $svgContent);
+        $iconHtml = '<span style="display:inline-block; margin-right:8px; vertical-align:middle;">' . $svgContent . '</span>';
+    } else {
+        $iconHtml = '<i class="' . dol_escape_htmltag($risksIcon) . '" style="margin-right: 8px;"></i> ';
+    }
+
     print '<div style="border-bottom: 2px solid ' . dol_escape_htmltag($risksColor) . '; padding-bottom: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">';
-    print '<div style="color: ' . dol_escape_htmltag($risksColor) . '; font-size: 1.1em; font-weight: bold;">';
-    print '<i class="' . dol_escape_htmltag($risksIcon) . '" style="margin-right: 8px;"></i> ' . $risksTitle;
+    print '<div style="color: ' . dol_escape_htmltag($risksColor) . '; font-size: 1.1em; font-weight: bold; display: flex; align-items: center;">';
+    print $iconHtml . $risksTitle;
     print '</div>';
 
     print '<button type="button" class="wpeo-button button-square-40 button-blue" onclick="drOpenCatModal(\'new\')" title="' . dol_escape_htmltag($langs->trans('AddProductRisk')) . '">';
