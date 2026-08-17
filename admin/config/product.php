@@ -126,7 +126,7 @@ $head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'product', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
 
 print load_fiche_titre('<i class="fas fa-cube"></i> ' . $langs->trans("ProductFIChaptersManagement"), '', '');
-print '<hr>';
+print '<div class="opacitymedium" style="margin-bottom: 20px;">' . $langs->trans("ProductFIChaptersManagementSub") . '</div>';
 
 print '<script>
 function resetChap(key, label, icon, color) {
@@ -172,8 +172,6 @@ print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="action" value="update">';
 
 // Configuration for FI Chapters
-print load_fiche_titre('<i class="fas fa-file-pdf"></i> ' . $langs->trans("ProductFIChaptersManagement", "Personnalisation des chapitres Fiche d'Instruction <br><small>Personnalisation de l'onglet risque dans la fiche produit</small>"), '', '');
-print '<hr>';
 
 print '<table class="noborder" width="100%">';
 print '<tr class="liste_titre">';
