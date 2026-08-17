@@ -2210,7 +2210,8 @@ InProgress = En cours
 ValidatePendingSignature = En attente de signature
 Archived = Archivé
 
-ProductFIChaptersManagement=Personnalisation des chapitres Fiche d'Instruction <br><small>Personnalisation de l'onglet risque dans la fiche produit</small>
+ProductFIChaptersManagement=Personnalisation des chapitres Fiche d'Instruction
+ProductFIChaptersManagementSub=Personnalisation de l'onglet risque dans la fiche produit
 DefaultContent=Contenu par défaut
 CustomSvgUploaded=SVG personnalisé
 DeleteCustomSvg=Supprimer
