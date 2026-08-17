@@ -2211,7 +2211,7 @@ ValidatePendingSignature = En attente de signature
 Archived = Archivé
 
 ProductFIChaptersManagement=Personnalisation des chapitres Fiche d'Instruction
-ProductFIChaptersManagementSub=Personnalisation de l'onglet risque dans la fiche produit
+ProductFIChaptersManagementSub=Personnalisation de l'onglet "Fiche d'instruction" et de l'onglet "Risques" dans la fiche produit
 DefaultContent=Contenu par défaut
 CustomSvgUploaded=SVG personnalisé
 DeleteCustomSvg=Supprimer
