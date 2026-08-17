@@ -135,8 +135,6 @@ print load_fiche_titre($title, $linkback, 'title_setup');
 $head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'product', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
 
-print load_fiche_titre('<i class="fas fa-cube"></i> ' . $langs->trans("ProductFIChaptersManagement"), '', '');
-print '<div class="opacitymedium" style="margin-bottom: 20px;">' . $langs->trans("ProductFIChaptersManagementSub") . '</div>';
 
 print '<script>
 function resetChap(key, label, icon, color) {
