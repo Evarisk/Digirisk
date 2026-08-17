@@ -262,7 +262,7 @@ foreach ($chaptersConfig as $key => $default) {
 	print '<input type="file" name="file_' . $key . '" accept=".svg">';
 	if ($hasSvg) {
 		print '<br><small class="text-success"><i class="fas fa-check"></i> ' . $langs->trans("CustomSvgUploaded") . '</small>';
-		print ' &nbsp; <a href="' . $_SERVER["PHP_SELF"] . '?action=delete_svg&chap=' . $key . '" class="text-danger" title="Rétablir le SVG standard"><i class="fas fa-undo"></i></a>';
+		print ' &nbsp; <a href="' . $_SERVER["PHP_SELF"] . '?action=delete_svg&chap=' . $key . '&token=' . newToken() . '" class="text-danger" title="Rétablir le SVG standard"><i class="fas fa-undo"></i></a>';
 	} else {
 		print '<br><small class="text-muted">' . $langs->trans("DefaultSvgUsed") . '</small>';
 	}
