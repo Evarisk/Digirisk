@@ -169,12 +169,42 @@ print '<div class="fichecenter">';
 print '<div class="underbanner clearboth"></div>';
 
 $digirisk_sections = [
-    'digirisk_identification' => ['label' => mb_strtoupper($langs->transnoentities('DigiriskIdentification')), 'icon' => $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_IDENTIFICATION_ICON ?? 'fas fa-tag', 'color' => '#c07500', 'bg' => '#fffbf0'],
-    'digirisk_security'       => ['label' => mb_strtoupper($langs->transnoentities('DigiriskSecurity')),       'icon' => $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_SECURITY_ICON ?? 'fas fa-shield-alt', 'color' => '#b72020', 'bg' => '#fff8f8'],
-    'digirisk_usermanual'     => ['label' => mb_strtoupper($langs->transnoentities('DigiriskUserManual')),     'icon' => $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL_ICON ?? 'fas fa-book', 'color' => '#1a7a3c', 'bg' => '#f4fff8'],
-    'digirisk_qualification'  => ['label' => mb_strtoupper($langs->transnoentities('DigiriskQualification')),  'icon' => $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION_ICON ?? 'fas fa-graduation-cap','color' => '#1a5fa8', 'bg' => '#f4f8ff'],
-    'digirisk_hygiene'        => ['label' => mb_strtoupper($langs->transnoentities('DigiriskHygiene')),        'icon' => $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE_ICON ?? 'fas fa-broom', 'color' => '#0e7e7e', 'bg' => '#f4ffff'],
-    'digirisk_maintenance'    => ['label' => mb_strtoupper($langs->transnoentities('DigiriskMaintenance')),    'icon' => $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE_ICON ?? 'fas fa-wrench', 'color' => '#8b4000', 'bg' => '#fff8f2'],
+    'digirisk_identification' => [
+		'label' => mb_strtoupper(!empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_IDENTIFICATION_LABEL) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_IDENTIFICATION_LABEL : $langs->transnoentities('DigiriskIdentification')),
+		'icon' => !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_IDENTIFICATION_ICON) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_IDENTIFICATION_ICON : 'fas fa-tag',
+		'color' => !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_IDENTIFICATION_COLOR) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_IDENTIFICATION_COLOR : '#c07500',
+		'bg' => '#fffbf0'
+	],
+    'digirisk_security' => [
+		'label' => mb_strtoupper(!empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_SECURITY_LABEL) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_SECURITY_LABEL : $langs->transnoentities('DigiriskSecurity')),
+		'icon' => !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_SECURITY_ICON) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_SECURITY_ICON : 'fas fa-shield-alt',
+		'color' => !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_SECURITY_COLOR) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_SECURITY_COLOR : '#b72020',
+		'bg' => '#fff8f8'
+	],
+    'digirisk_usermanual' => [
+		'label' => mb_strtoupper(!empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL_LABEL) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL_LABEL : $langs->transnoentities('DigiriskUserManual')),
+		'icon' => !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL_ICON) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL_ICON : 'fas fa-book',
+		'color' => !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL_COLOR) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL_COLOR : '#1a7a3c',
+		'bg' => '#f4fff8'
+	],
+    'digirisk_qualification' => [
+		'label' => mb_strtoupper(!empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION_LABEL) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION_LABEL : $langs->transnoentities('DigiriskQualification')),
+		'icon' => !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION_ICON) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION_ICON : 'fas fa-graduation-cap',
+		'color' => !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION_COLOR) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION_COLOR : '#1a5fa8',
+		'bg' => '#f4f8ff'
+	],
+    'digirisk_hygiene' => [
+		'label' => mb_strtoupper(!empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE_LABEL) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE_LABEL : $langs->transnoentities('DigiriskHygiene')),
+		'icon' => !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE_ICON) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE_ICON : 'fas fa-broom',
+		'color' => !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE_COLOR) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE_COLOR : '#0e7e7e',
+		'bg' => '#f4ffff'
+	],
+    'digirisk_maintenance' => [
+		'label' => mb_strtoupper(!empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE_LABEL) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE_LABEL : $langs->transnoentities('DigiriskMaintenance')),
+		'icon' => !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE_ICON) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE_ICON : 'fas fa-wrench',
+		'color' => !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE_COLOR) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE_COLOR : '#8b4000',
+		'bg' => '#fff8f2'
+	],
 ];
 
 $currentEditField = ($action == 'edit_extras' && $permissiontoadd) ? $editfield : '';
