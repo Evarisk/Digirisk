@@ -147,7 +147,6 @@ $(document).ready(function() {
 		if (name.endsWith("_LABEL") || name.endsWith("_ICON")) {
 			var key = name.replace("DIGIRISKDOLIBARR_PRODUCT_DEFAULT_", "").replace("_LABEL", "").replace("_ICON", "");
 			
-			var labelVal = $("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_LABEL\']").val();
 			var iconVal = $("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_ICON\']").val();
 			
 			// Auto-correct FA6 to FA5
@@ -160,10 +159,8 @@ $(document).ready(function() {
 				$("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_ICON\']").val(iconVal);
 			}
 			
-			if (labelVal === "") labelVal = $("#preview_label_" + key).data("default");
 			if (iconVal === "") iconVal = $("#preview_icon_" + key).data("default");
 			
-			$("#preview_label_" + key).text(" " + labelVal);
 			$("#preview_icon_" + key).attr("class", iconVal);
 			
 			// Visual effect
@@ -212,7 +209,6 @@ print '<hr>';
 print '<table class="noborder" width="100%">';
 print '<tr class="liste_titre">';
 print '<th class="liste_titre">Chapitre (Aperçu Web)</th>';
-print '<th class="liste_titre">Libellé personnalisé</th>';
 print '<th class="liste_titre">Icône FA (Web)</th>';
 print '<th class="liste_titre">Couleur (Web & PDF)</th>';
 print '<th class="liste_titre">Image SVG (PDF)</th>';
@@ -253,8 +249,9 @@ foreach ($chaptersConfig as $key => $default) {
 	
 	$displayLabel = !empty($labelVal) ? $labelVal : $default['name'];
 	$displayIcon  = !empty($iconVal) ? $iconVal : $default['icon'];
-	print '<strong id="preview_container_' . $key . '"><i id="preview_icon_' . $key . '" class="' . dol_escape_htmltag($displayIcon) . '" data-default="' . dol_escape_htmltag($default['icon']) . '"></i><span id="preview_label_' . $key . '" data-default="' . dol_escape_htmltag($default['name']) . '"> ' . dol_escape_htmltag($displayLabel) . '</span></strong></td>';
-	print '<td style="vertical-align: top;"><input type="text" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_LABEL" value="' . dol_escape_htmltag($labelVal) . '" placeholder="' . dol_escape_htmltag($default['name']) . '" class="minwidth200"></td>';
+	print '<strong id="preview_container_' . $key . '"><i id="preview_icon_' . $key . '" class="' . dol_escape_htmltag($displayIcon) . '" data-default="' . dol_escape_htmltag($default['icon']) . '" style="margin-right:6px;"></i>';
+	print '<input type="text" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_LABEL" id="preview_label_' . $key . '" value="' . dol_escape_htmltag($displayLabel) . '" placeholder="' . dol_escape_htmltag($default['name']) . '" style="border:none; background:transparent; font-weight:bold; width:220px; outline:none; border-bottom:1px dashed #ccc; color:inherit;" onfocus="this.style.borderBottom=\'1px solid #666\'" onblur="this.style.borderBottom=\'1px dashed #ccc\'" data-default="' . dol_escape_htmltag($default['name']) . '">';
+	print '</strong></td>';
 	print '<td style="vertical-align: top;"><input type="text" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_ICON" value="' . dol_escape_htmltag($iconVal) . '" class="minwidth100"></td>';
 	print '<td style="vertical-align: top;"><input type="color" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_COLOR" value="' . dol_escape_htmltag($colorVal) . '"></td>';
 	print '<td style="vertical-align: top;">';
