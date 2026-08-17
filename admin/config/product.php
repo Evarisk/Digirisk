@@ -138,9 +138,9 @@ print dol_get_fiche_head($head, 'product', $title, -1, "digiriskdolibarr_color@d
 
 print '<script>
 function resetChap(key, label, icon, color) {
-	$("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_LABEL\']").val("").trigger("input");
-	$("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_ICON\']").val(icon).trigger("input");
-	$("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_COLOR\']").val(color);
+	$("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_LABEL\']").val("").trigger("input").trigger("change");
+	$("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_ICON\']").val(icon).trigger("input").trigger("change");
+	$("input[name=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_" + key + "_COLOR\']").val(color).trigger("change");
 }
 
 $(document).ready(function() {
