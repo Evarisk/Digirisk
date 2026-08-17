@@ -1,0 +1,3 @@
+ALTER TABLE llx_digiriskdolibarr_product_risk ADD UNIQUE INDEX uk_digiriskdolibarr_product_risk_ref (ref, entity);
+ALTER TABLE llx_digiriskdolibarr_product_risk ADD INDEX idx_digiriskdolibarr_product_risk_fk_product (fk_product);
+ALTER TABLE llx_digiriskdolibarr_product_risk ADD INDEX idx_digiriskdolibarr_product_risk_danger_category (danger_category);
