@@ -82,11 +82,14 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha'))) {
 		$icon  = GETPOST('DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_ICON', 'alpha');
 		$color = GETPOST('DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_COLOR', 'alpha');
 		$desc  = GETPOST('DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_DESC', 'restricthtml');
+		$desc  = GETPOST('DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_DESC', 'restricthtml');
+		$useSvg = GETPOST('DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_USE_SVG', 'int');
 		
 		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_LABEL', $label, 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_ICON', $icon, 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_COLOR', $color, 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_DESC', $desc, 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_USE_SVG', $useSvg, 'chaine', 0, '', $conf->entity);
 		
 		// Handle SVG upload
 		$fileKey = 'file_' . $chap;
@@ -200,6 +203,23 @@ $(document).ready(function() {
 			}
 		});
 	});
+
+	// Reload on radio change to update preview immediately
+	$("input[type=\'radio\'][name$=\'_USE_SVG\']").on("change", function() {
+		var formData = new FormData($("form")[0]);
+		formData.set("action", "update");
+		formData.set("ajax", "1");
+		$.ajax({
+			url: window.location.href,
+			type: "POST",
+			data: formData,
+			processData: false,
+			contentType: false,
+			success: function() {
+				window.location.reload();
+			}
+		});
+	});
 });
 </script>';
 
@@ -240,9 +260,10 @@ foreach ($tablesConfig as $tableDef) {
 	print '<table class="noborder" width="100%" style="margin-bottom: 30px;">';
 	print '<tr class="liste_titre">';
 	print '<th class="liste_titre">Chapitre (Aperçu Web)</th>';
-	print '<th class="liste_titre">Icône FA (Web)</th>';
-	print '<th class="liste_titre">Couleur (Web & PDF)</th>';
-	print '<th class="liste_titre">Image SVG (PDF)</th>';
+	print '<th class="liste_titre">Source de l\'icône</th>';
+	print '<th class="liste_titre">Icône FA</th>';
+	print '<th class="liste_titre">Image SVG</th>';
+	print '<th class="liste_titre">Couleur</th>';
 	print '</tr>';
 
 	foreach ($tableDef['data'] as $key => $default) {
@@ -250,17 +271,22 @@ foreach ($tablesConfig as $tableDef) {
 	$iconVal  = $conf->global->{'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_ICON'} ?? $default['icon'];
 	$colorVal = $conf->global->{'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_COLOR'} ?? $default['color'];
 	$descVal  = $conf->global->{'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_DESC'} ?? '';
+	$useSvg   = $conf->global->{'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_USE_SVG'} ?? 0;
 
 	$svgName = 'digirisk_' . strtolower($key) . '_icon.svg';
 	$hasSvg = file_exists($iconsDir . '/' . $svgName);
 	$svgPath = $hasSvg ? $iconsDir . '/' . $svgName : DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/icons/' . $svgName;
 
 	$svgDisplay = '';
+	$svgPreviewInline = '';
 	if (file_exists($svgPath)) {
 		$svgContent = file_get_contents($svgPath);
-		$svgContent = preg_replace('/<svg([^>]*)>/i', '<svg$1 fill="' . dol_escape_htmltag($colorVal) . '" width="32" height="32">', $svgContent);
-		$svgContent = preg_replace('/fill="[^"]*"/i', 'fill="' . dol_escape_htmltag($colorVal) . '"', $svgContent);
-		$svgDisplay = '<div style="width:32px; height:32px; float:left; margin-right: 8px;">' . $svgContent . '</div>';
+		$svgPreviewInline = preg_replace('/<svg([^>]*)>/i', '<svg$1 fill="' . dol_escape_htmltag($colorVal) . '" width="20" height="20">', $svgContent);
+		$svgPreviewInline = preg_replace('/fill="[^"]*"/i', 'fill="' . dol_escape_htmltag($colorVal) . '"', $svgPreviewInline);
+		
+		$svgContentLarge = preg_replace('/<svg([^>]*)>/i', '<svg$1 fill="' . dol_escape_htmltag($colorVal) . '" width="32" height="32">', $svgContent);
+		$svgContentLarge = preg_replace('/fill="[^"]*"/i', 'fill="' . dol_escape_htmltag($colorVal) . '"', $svgContentLarge);
+		$svgDisplay = '<div style="width:32px; height:32px; float:left; margin-right: 8px;">' . $svgContentLarge . '</div>';
 	}
 
 	print '<tr class="oddeven">';
@@ -269,11 +295,21 @@ foreach ($tablesConfig as $tableDef) {
 	
 	$displayLabel = !empty($labelVal) ? $labelVal : $default['name'];
 	$displayIcon  = !empty($iconVal) ? $iconVal : $default['icon'];
-	print '<strong id="preview_container_' . $key . '"><i id="preview_icon_' . $key . '" class="' . dol_escape_htmltag($displayIcon) . '" data-default="' . dol_escape_htmltag($default['icon']) . '" style="margin-right:6px;"></i>';
+	print '<strong id="preview_container_' . $key . '">';
+	if ($useSvg && file_exists($svgPath)) {
+		print '<span id="preview_icon_' . $key . '" style="display:inline-block; margin-right:6px; vertical-align:middle;">' . $svgPreviewInline . '</span>';
+	} else {
+		print '<i id="preview_icon_' . $key . '" class="' . dol_escape_htmltag($displayIcon) . '" data-default="' . dol_escape_htmltag($default['icon']) . '" style="margin-right:6px;"></i>';
+	}
 	print '<input type="text" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_LABEL" id="preview_label_' . $key . '" value="' . dol_escape_htmltag($displayLabel) . '" placeholder="' . dol_escape_htmltag($default['name']) . '" style="border:none; background:transparent; font-weight:bold; width:220px; outline:none; border-bottom:1px dashed #ccc; color:inherit;" onfocus="this.style.borderBottom=\'1px solid #666\'" onblur="this.style.borderBottom=\'1px dashed #ccc\'" data-default="' . dol_escape_htmltag($default['name']) . '">';
 	print '</strong></td>';
+	
+	print '<td style="vertical-align: top;">';
+	print '<label style="display:block; margin-bottom:4px;"><input type="radio" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_USE_SVG" value="0" ' . ($useSvg == 0 ? 'checked' : '') . '> FontAwesome</label>';
+	print '<label style="display:block;"><input type="radio" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_USE_SVG" value="1" ' . ($useSvg == 1 ? 'checked' : '') . '> Image SVG</label>';
+	print '</td>';
+	
 	print '<td style="vertical-align: top;"><input type="text" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_ICON" value="' . dol_escape_htmltag($iconVal) . '" class="minwidth100"></td>';
-	print '<td style="vertical-align: top;"><input type="color" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_COLOR" value="' . dol_escape_htmltag($colorVal) . '"></td>';
 	print '<td style="vertical-align: top;">';
 	print $svgDisplay;
 	print '<input type="file" name="file_' . $key . '" accept=".svg">';
@@ -284,6 +320,7 @@ foreach ($tablesConfig as $tableDef) {
 		print '<br><small class="text-muted">' . $langs->trans("DefaultSvgUsed") . '</small>';
 	}
 	print '</td>';
+	print '<td style="vertical-align: top;"><input type="color" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_COLOR" value="' . dol_escape_htmltag($colorVal) . '"></td>';
 	print '</tr>';
 	print '<tr class="oddeven"><td colspan="5">';
 	print '<label style="margin-bottom: 5px; display: inline-block;">' . $langs->trans("DefaultContent") . ' (' . $default['name'] . ')</label>';

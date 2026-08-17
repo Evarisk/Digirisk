@@ -255,9 +255,23 @@ foreach ($digirisk_sections as $fieldkey => $section) {
     $isThisEdit = ($currentEditField === $fieldkey);
     $pencilUrl  = $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=edit_extras&attribute=' . urlencode($fieldkey) . '&token=' . currentToken();
 
+    $keyStr = strtoupper(str_replace('digirisk_', '', $fieldkey));
+    $useSvg = $conf->global->{'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $keyStr . '_USE_SVG'} ?? 0;
+    $svgPath = $conf->digiriskdolibarr->dir_output . '/icons/digirisk_' . strtolower($keyStr) . '_icon.svg';
+    $hasSvg = file_exists($svgPath);
+    
+    if ($useSvg && $hasSvg) {
+        $svgContent = file_get_contents($svgPath);
+        $svgContent = preg_replace('/<svg([^>]*)>/i', '<svg$1 fill="' . dol_escape_htmltag($color) . '" width="20" height="20">', $svgContent);
+        $svgContent = preg_replace('/fill="[^"]*"/i', 'fill="' . dol_escape_htmltag($color) . '"', $svgContent);
+        $iconHtml = '<span style="display:inline-block; margin-right:8px; vertical-align:middle;">' . $svgContent . '</span>';
+    } else {
+        $iconHtml = '<i class="' . dol_escape_htmltag($icon) . '"></i>&nbsp;';
+    }
+
     print '<div class="digirisk-section">';
     print '<div class="digirisk-section-header" style="border-bottom-color:' . $color . '; background:' . $bg . ';">';
-    print '<span class="digirisk-section-title" style="color:' . $color . ';"><i class="' . $icon . '"></i>&nbsp;' . $label . '</span>';
+    print '<span class="digirisk-section-title" style="color:' . $color . ';">' . $iconHtml . $label . '</span>';
     if (!$isThisEdit && $permissiontoadd) {
         print '<a class="digirisk-edit-icon" href="' . $pencilUrl . '" title="' . $langs->trans('Modify') . '">' . img_edit() . '</a>';
     }

@@ -333,9 +333,15 @@ class pdf_FI_DigiRisk extends ModelePDFProduct
         $defaultIconsDir = __DIR__ . '/../../../../img/icons/';
         
         // Helper function to get correct SVG path
-        $getSvgPath = function($baseName) use ($iconsDir, $defaultIconsDir) {
+        $getSvgPath = function($baseName) use ($iconsDir, $defaultIconsDir, $conf) {
+            $chap = strtoupper(str_replace(['digirisk_', '_icon.svg'], '', $baseName));
+            $useSvg = $conf->global->{'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_USE_SVG'} ?? 0;
+            
             $customPath = $iconsDir . $baseName;
-            return file_exists($customPath) ? $customPath : $defaultIconsDir . $baseName;
+            if ($useSvg && file_exists($customPath)) {
+                return $customPath;
+            }
+            return $defaultIconsDir . $baseName;
         };
 
         // ----------------------------------------------------
