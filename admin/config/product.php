@@ -64,6 +64,12 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha'))) {
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_SVG_COLOR", $risksColor, 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS", $risksDesc, 'chaine', 0, '', $conf->entity);
 
+	// Ensure icons directory exists
+	$iconsDir = $conf->digiriskdolibarr->dir_output . '/icons';
+	if (!is_dir($iconsDir)) {
+		dol_mkdir($iconsDir);
+	}
+
 	// Chapter configurations
 	$chapters = ['IDENTIFICATION', 'SECURITY', 'USERMANUAL', 'QUALIFICATION', 'HYGIENE', 'MAINTENANCE'];
 	foreach ($chapters as $chap) {
@@ -74,6 +80,16 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha'))) {
 		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_LABEL', $label, 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_ICON', $icon, 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_COLOR', $color, 'chaine', 0, '', $conf->entity);
+		
+		// Handle SVG upload
+		$fileKey = 'file_' . $chap;
+		if (!empty($_FILES[$fileKey]['name']) && $_FILES[$fileKey]['error'] == 0) {
+			$ext = pathinfo($_FILES[$fileKey]['name'], PATHINFO_EXTENSION);
+			if (strtolower($ext) == 'svg') {
+				$destName = 'digirisk_' . strtolower($chap) . '_icon.svg';
+				dol_move_uploaded_file($_FILES[$fileKey]['tmp_name'], $iconsDir . '/' . $destName, 1);
+			}
+		}
 	}
 
 	header("Location: " . $_SERVER["PHP_SELF"]);
@@ -105,7 +121,7 @@ print dol_get_fiche_head($head, 'product', $title, -1, "digiriskdolibarr_color@d
 print load_fiche_titre('<i class="fas fa-cube"></i> ' . $langs->trans("ProductManagement"), '', '');
 print '<hr>';
 
-print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="action" value="update">';
 
@@ -144,6 +160,7 @@ print '<td>' . $langs->trans("Chapter") . '</td>';
 print '<td>' . $langs->trans("Label") . '</td>';
 print '<td>' . $langs->trans("Icon") . '</td>';
 print '<td>' . $langs->trans("Color") . '</td>';
+print '<td>' . $langs->trans("SVG Image") . ' (.svg)</td>';
 print '</tr>';
 
 $chaptersConfig = [
@@ -155,16 +172,27 @@ $chaptersConfig = [
 	'MAINTENANCE'    => ['name' => 'Maintenance & Contrôles', 'icon' => 'fas fa-wrench', 'color' => '#8b4000']
 ];
 
+$iconsDir = $conf->digiriskdolibarr->dir_output . '/icons';
+
 foreach ($chaptersConfig as $key => $default) {
 	$labelVal = $conf->global->{'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_LABEL'} ?? '';
 	$iconVal  = $conf->global->{'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_ICON'} ?? $default['icon'];
 	$colorVal = $conf->global->{'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_COLOR'} ?? $default['color'];
+
+	$svgName = 'digirisk_' . strtolower($key) . '_icon.svg';
+	$hasSvg = file_exists($iconsDir . '/' . $svgName);
 
 	print '<tr class="oddeven">';
 	print '<td><strong>' . $default['name'] . '</strong></td>';
 	print '<td><input type="text" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_LABEL" value="' . dol_escape_htmltag($labelVal) . '" placeholder="' . dol_escape_htmltag($default['name']) . '" class="minwidth200"></td>';
 	print '<td><input type="text" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_ICON" value="' . dol_escape_htmltag($iconVal) . '" class="minwidth100"></td>';
 	print '<td><input type="color" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_COLOR" value="' . dol_escape_htmltag($colorVal) . '"></td>';
+	print '<td>';
+	print '<input type="file" name="file_' . $key . '" accept=".svg">';
+	if ($hasSvg) {
+		print '<br><small class="text-success"><i class="fas fa-check"></i> ' . $langs->trans("CustomSvgUploaded") . '</small>';
+	}
+	print '</td>';
 	print '</tr>';
 }
 
