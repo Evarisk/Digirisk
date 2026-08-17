@@ -29,7 +29,7 @@ class pdf_FI_DigiRisk extends ModelePDFProduct
         global $langs;
         $this->db = $db;
         $iconPath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
-        $this->name = '<img src="' . $iconPath . '" style="height:16px; width:16px; vertical-align:middle; margin-right:5px;"> FI_DigiRisk';
+        $this->name = 'FI_DigiRisk';
         $this->description = $langs->transnoentities("Fiche Instruction DigiRisk");
 
         $this->type = 'pdf';
