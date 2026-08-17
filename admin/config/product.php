@@ -195,7 +195,15 @@ foreach ($chaptersConfig as $key => $default) {
 
 	$svgName = 'digirisk_' . strtolower($key) . '_icon.svg';
 	$hasSvg = file_exists($iconsDir . '/' . $svgName);
-	$svgUrl = $hasSvg ? DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&file=icons/' . urlencode($svgName) : dol_buildpath('/digiriskdolibarr/img/icons/' . $svgName, 1);
+	$svgPath = $hasSvg ? $iconsDir . '/' . $svgName : DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/icons/' . $svgName;
+
+	$svgDisplay = '';
+	if (file_exists($svgPath)) {
+		$svgContent = file_get_contents($svgPath);
+		$svgContent = preg_replace('/<svg([^>]*)>/i', '<svg$1 fill="' . dol_escape_htmltag($colorVal) . '">', $svgContent);
+		$svgContent = preg_replace('/fill="[^"]*"/i', 'fill="' . dol_escape_htmltag($colorVal) . '"', $svgContent);
+		$svgDisplay = '<div style="width:32px; height:32px; float:left; margin-right: 8px;">' . $svgContent . '</div>';
+	}
 
 	print '<tr class="oddeven">';
 	print '<td style="vertical-align: top;"><strong>' . $default['name'] . '</strong></td>';
@@ -203,7 +211,7 @@ foreach ($chaptersConfig as $key => $default) {
 	print '<td style="vertical-align: top;"><input type="text" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_ICON" value="' . dol_escape_htmltag($iconVal) . '" class="minwidth100"></td>';
 	print '<td style="vertical-align: top;"><input type="color" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_COLOR" value="' . dol_escape_htmltag($colorVal) . '"></td>';
 	print '<td style="vertical-align: top;">';
-	print '<img src="' . $svgUrl . '" width="32" style="background-color: ' . dol_escape_htmltag($colorVal) . '; padding: 3px; border-radius: 4px; float:left; margin-right: 8px;">';
+	print $svgDisplay;
 	print '<input type="file" name="file_' . $key . '" accept=".svg">';
 	if ($hasSvg) {
 		print '<br><small class="text-success"><i class="fas fa-check"></i> ' . $langs->trans("CustomSvgUploaded") . '</small>';
