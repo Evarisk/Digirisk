@@ -519,10 +519,17 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $moreParam['hideTemplateName'] = 1;
         $object->module                = $this->module;
 
+        $refOrig = $object->ref;
+        if (preg_match('/^specimen/i', $object->ref)) {
+            $object->ref = 'specimen';
+        }
+
         // buildDocumentFilename rend -1 en cas d'echec, sinon le chemin du fichier. Comparer ce
         // chemin a 0 le compare en fait a la chaine '0' : sous Linux il commence par '/', qui est
         // inferieur a '0', et la generation echouerait systematiquement
         $file = $this->buildDocumentFilename($objectDocument, $outputLangs, $object, $moreParam);
+        
+        $object->ref = $refOrig;
         if (!is_string($file) || empty($file)) {
             $this->error = $langs->transnoentities('ErrorFileNameCanNotBeBuilt');
             return -1;
@@ -1275,13 +1282,15 @@ class pdf_preventionplandocument extends SaturneDocumentModel
     {
         // Le JSON du document ne porte pas les signataires : on les lit par leur role, sinon les
         // deux encadres restent vides alors que l'EU a signe des la creation
+        global $conf;
+
         $signatory = new SaturneSignature($this->db, $this->module, $object->element);
-
-        $masters  = $signatory->fetchSignatory('MasterWorker', $object->id, $object->element);
-        $master   = (is_array($masters) && !empty($masters)) ? array_shift($masters) : null;
-
+        
+        $masters   = $signatory->fetchSignatory('MasterWorker', $object->id, $object->element);
         $exteriors = $signatory->fetchSignatory('ExtSocietyResponsible', $object->id, $object->element);
-        $exterior  = (is_array($exteriors) && !empty($exteriors)) ? array_shift($exteriors) : null;
+
+        $master   = (is_array($masters) && !empty($masters)) ? array_shift($masters) : null;
+        $exterior = (is_array($exteriors) && !empty($exteriors)) ? array_shift($exteriors) : null;
 
         $gap       = 6;
         $boxWidth  = ($this->contentWidth($pdf) - $gap) / 2;
@@ -1358,16 +1367,18 @@ class pdf_preventionplandocument extends SaturneDocumentModel
             return '';
         }
 
-        $parts = explode(',', $signatory->signature);
-        if (count($parts) < 2) {
-            return '';
+        $imagePath = tempnam(sys_get_temp_dir(), 'sig_');
+        // TCPDF requires an extension to determine image type. We rename the temp file to have a .png extension.
+        rename($imagePath, $imagePath . '.png');
+        $imagePath .= '.png';
+
+        $signatureData = explode(',', $signatory->signature);
+        if (count($signatureData) > 1) {
+            file_put_contents($imagePath, base64_decode($signatureData[1]));
+        } else {
+            file_put_contents($imagePath, base64_decode($signatory->signature));
         }
 
-        $path = $this->tmpDir . '/signature_' . ((int) ($signatory->id ?? 0)) . '.png';
-        if (file_put_contents($path, base64_decode($parts[1])) === false) {
-            return '';
-        }
-
-        return $path;
+        return $imagePath;
     }
 }
