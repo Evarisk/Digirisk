@@ -171,31 +171,45 @@ print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" enctype="multip
 print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="action" value="update">';
 
-// Configuration for FI Chapters
-
-print '<table class="noborder" width="100%">';
-print '<tr class="liste_titre">';
-print '<th class="liste_titre">Chapitre (Aperçu Web)</th>';
-print '<th class="liste_titre">Icône FA (Web)</th>';
-print '<th class="liste_titre">Couleur (Web & PDF)</th>';
-print '<th class="liste_titre">Image SVG (PDF)</th>';
-print '</tr>';
-
-$chaptersConfig = [
-	'RISKS'          => ['name' => 'Risques & Protections', 'icon' => 'fas fa-exclamation-triangle', 'color' => '#d32f2f'],
-	'IDENTIFICATION' => ['name' => 'Identification & Caractéristiques', 'icon' => 'fas fa-tag', 'color' => '#c07500'],
-	'SECURITY'       => ['name' => 'Sécurité & Protections', 'icon' => 'fas fa-shield-alt', 'color' => '#b72020'],
-	'USERMANUAL'     => ['name' => 'Mode d\'emploi simplifié', 'icon' => 'fas fa-book', 'color' => '#1a7a3c'],
-	'QUALIFICATION'  => ['name' => 'Qualification & Habilitation', 'icon' => 'fas fa-graduation-cap', 'color' => '#1a5fa8'],
-	'HYGIENE'        => ['name' => 'Hygiène & Nettoyage', 'icon' => 'fas fa-broom', 'color' => '#0e7e7e'],
-	'MAINTENANCE'    => ['name' => 'Maintenance & Contrôles', 'icon' => 'fas fa-wrench', 'color' => '#8b4000']
+$tablesConfig = [
+	[
+		'title' => $langs->trans("ProductFIChaptersManagementSub"),
+		'icon'  => 'fas fa-shield-alt',
+		'data'  => [
+			'RISKS' => ['name' => 'Risques & Protections', 'icon' => 'fas fa-exclamation-triangle', 'color' => '#d32f2f']
+		]
+	],
+	[
+		'title' => $langs->trans("ProductFIChaptersManagement"),
+		'icon'  => 'fas fa-file-pdf',
+		'data'  => [
+			'IDENTIFICATION' => ['name' => 'Identification & Caractéristiques', 'icon' => 'fas fa-tag', 'color' => '#c07500'],
+			'SECURITY'       => ['name' => 'Sécurité & Protections', 'icon' => 'fas fa-shield-alt', 'color' => '#b72020'],
+			'USERMANUAL'     => ['name' => 'Mode d\'emploi simplifié', 'icon' => 'fas fa-book', 'color' => '#1a7a3c'],
+			'QUALIFICATION'  => ['name' => 'Qualification & Habilitation', 'icon' => 'fas fa-graduation-cap', 'color' => '#1a5fa8'],
+			'HYGIENE'        => ['name' => 'Hygiène & Nettoyage', 'icon' => 'fas fa-broom', 'color' => '#0e7e7e'],
+			'MAINTENANCE'    => ['name' => 'Maintenance & Contrôles', 'icon' => 'fas fa-wrench', 'color' => '#8b4000']
+		]
+	]
 ];
-
-$iconsDir = $conf->digiriskdolibarr->dir_output . '/icons';
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 
-foreach ($chaptersConfig as $key => $default) {
+$iconsDir = $conf->digiriskdolibarr->dir_output . '/icons';
+
+foreach ($tablesConfig as $tableDef) {
+	print load_fiche_titre('<i class="' . $tableDef['icon'] . '"></i> ' . $tableDef['title'], '', '');
+	print '<hr>';
+
+	print '<table class="noborder" width="100%" style="margin-bottom: 30px;">';
+	print '<tr class="liste_titre">';
+	print '<th class="liste_titre">Chapitre (Aperçu Web)</th>';
+	print '<th class="liste_titre">Icône FA (Web)</th>';
+	print '<th class="liste_titre">Couleur (Web & PDF)</th>';
+	print '<th class="liste_titre">Image SVG (PDF)</th>';
+	print '</tr>';
+
+	foreach ($tableDef['data'] as $key => $default) {
 	$labelVal = $conf->global->{'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_LABEL'} ?? '';
 	$iconVal  = $conf->global->{'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_ICON'} ?? $default['icon'];
 	$colorVal = $conf->global->{'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_COLOR'} ?? $default['color'];
@@ -243,9 +257,9 @@ foreach ($chaptersConfig as $key => $default) {
 	$doleditor->Create();
 	print '</div>';
 	print '</td></tr>';
+	}
+	print '</table><br>';
 }
-
-print '</table>';
 
 print '<div class="center" style="margin-top: 15px;">';
 print '<input type="submit" class="button button-save" name="save" value="' . $langs->trans("Save") . '">';
