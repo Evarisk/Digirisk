@@ -252,6 +252,7 @@ foreach ($tablesConfig as $tableDef) {
 	print '<th class="liste_titre">Icône FA</th>';
 	print '<th class="liste_titre">Image SVG</th>';
 	print '<th class="liste_titre">Couleur</th>';
+	print '<th class="liste_titre" width="50"></th>';
 	print '</tr>';
 
 	foreach ($tableDef['data'] as $key => $default) {
@@ -305,12 +306,13 @@ foreach ($tablesConfig as $tableDef) {
 		print '<br><small class="text-success"><i class="fas fa-check"></i> ' . $langs->trans("CustomSvgUploaded") . '</small>';
 		print ' &nbsp; <a href="' . $_SERVER["PHP_SELF"] . '?action=delete_svg&chap=' . $key . '&token=' . newToken() . '" class="text-danger" title="Rétablir le SVG standard"><i class="fas fa-undo"></i></a>';
 	} else {
-		print '<br><small class="text-muted">' . $langs->trans("DefaultSvgUsed") . '</small>';
+		print '<br><small class="text-muted" style="font-size:0.8em; opacity:0.7;">Icône par défaut</small>';
 	}
 	print '</td>';
 	print '<td style="vertical-align: top;"><input type="color" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_COLOR" value="' . dol_escape_htmltag($colorVal) . '"></td>';
+	print '<td style="vertical-align: top; text-align: center;"><button type="submit" class="button" title="' . dol_escape_htmltag($langs->trans("Save")) . '" style="padding: 4px 8px;"><i class="fas fa-save"></i></button></td>';
 	print '</tr>';
-	print '<tr class="oddeven"><td colspan="5">';
+	print '<tr class="oddeven"><td colspan="6">';
 	print '<label style="margin-bottom: 5px; display: inline-block;">' . $langs->trans("DefaultContent") . ' (' . $default['name'] . ')</label>';
 	print ' &nbsp; <a href="#" onclick="$(\'#editor_' . $key . '\').toggle(); return false;" title="Modifier"><i class="fas fa-pencil-alt"></i></a>';
 	print '<div id="editor_' . $key . '" style="display:none; margin-top: 10px;">';
@@ -321,10 +323,6 @@ foreach ($tablesConfig as $tableDef) {
 	}
 	print '</table><br>';
 }
-
-print '<div class="center" style="margin-top: 15px;">';
-print '<input type="submit" class="button button-save" name="save" value="' . $langs->trans("Save") . '">';
-print '</div>';
 
 print '</form>';
 
