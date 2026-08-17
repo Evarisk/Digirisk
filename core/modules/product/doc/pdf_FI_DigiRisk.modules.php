@@ -197,6 +197,9 @@ class pdf_FI_DigiRisk extends ModelePDFProduct
         // ----------------------------------------------------
         // IDENTIFICATION EQUIPEMENT (Left) + PHOTO (Right)
         // ----------------------------------------------------
+        $titleIdent = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_IDENTIFICATION_LABEL) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_IDENTIFICATION_LABEL : 'IDENTIFICATION EQUIPEMENT';
+        $colorIdent = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_IDENTIFICATION_COLOR) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_IDENTIFICATION_COLOR : '#c07500';
+
         $entrepotStr = '';
         if (!empty($object->fk_default_warehouse)) {
             require_once DOL_DOCUMENT_ROOT . '/product/stock/class/entrepot.class.php';
@@ -353,8 +356,9 @@ class pdf_FI_DigiRisk extends ModelePDFProduct
         $contentSecWysiwyg = trim(strip_tags(str_replace('&nbsp;', ' ', $contentSecWysiwygRaw)));
         if (!empty($contentSecWysiwyg)) {
             $svgSecWysiwyg = $getSvgPath('digirisk_security_icon.svg');
-            $colorSecWysiwyg = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_SECURITY_SVG_COLOR ?? '#d32f2f';
-            $currentY = $this->_drawBlock($pdf, "SÉCURITÉ", $contentSecWysiwygRaw, array(200, 50, 50), $currentY, 0, $svgSecWysiwyg, $colorSecWysiwyg);
+            $titleSec = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_SECURITY_LABEL) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_SECURITY_LABEL : 'SÉCURITÉ';
+            $colorSecWysiwyg = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_SECURITY_COLOR) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_SECURITY_COLOR : '#b72020';
+            $currentY = $this->_drawBlock($pdf, mb_strtoupper($titleSec), $contentSecWysiwygRaw, array(200, 50, 50), $currentY, 0, $svgSecWysiwyg, $colorSecWysiwyg);
         }
 
         // ----------------------------------------------------
@@ -550,32 +554,36 @@ class pdf_FI_DigiRisk extends ModelePDFProduct
         // ----------------------------------------------------
         $contentUsage = $object->array_options['options_digirisk_usermanual'] ?? '';
         $svgUsage = $getSvgPath('digirisk_usermanual_icon.svg');
-        $colorUsage = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL_SVG_COLOR ?? '#388e3c';
-        $currentY = $this->_drawBlock($pdf, "MODE D'EMPLOI SIMPLIFIÉ", $contentUsage, array(60, 160, 100), $currentY, 0, $svgUsage, $colorUsage);
+        $titleUsage = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL_LABEL) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL_LABEL : "MODE D'EMPLOI SIMPLIFIÉ";
+        $colorUsage = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL_COLOR) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL_COLOR : '#1a7a3c';
+        $currentY = $this->_drawBlock($pdf, mb_strtoupper($titleUsage), $contentUsage, array(60, 160, 100), $currentY, 0, $svgUsage, $colorUsage);
 
         // ----------------------------------------------------
         // QUALIFICATION & HABILITATION
         // ----------------------------------------------------
         $contentQualif = $object->array_options['options_digirisk_qualification'] ?? '';
         $svgQualif = $getSvgPath('digirisk_qualification_icon.svg');
-        $colorQualif = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION_SVG_COLOR ?? '#1976d2';
-        $currentY = $this->_drawBlock($pdf, "QUALIFICATION & HABILITATION", $contentQualif, array(40, 80, 160), $currentY, 0, $svgQualif, $colorQualif);
+        $titleQualif = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION_LABEL) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION_LABEL : "QUALIFICATION & HABILITATION";
+        $colorQualif = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION_COLOR) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION_COLOR : '#1a5fa8';
+        $currentY = $this->_drawBlock($pdf, mb_strtoupper($titleQualif), $contentQualif, array(40, 80, 160), $currentY, 0, $svgQualif, $colorQualif);
 
         // ----------------------------------------------------
         // HYGIÈNE & NETTOYAGE
         // ----------------------------------------------------
         $contentHyg = $object->array_options['options_digirisk_hygiene'] ?? '';
         $svgHyg = $getSvgPath('digirisk_hygiene_icon.svg');
-        $colorHyg = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE_SVG_COLOR ?? '#f57f17';
-        $currentY = $this->_drawBlock($pdf, "HYGIÈNE & NETTOYAGE", $contentHyg, array(220, 140, 40), $currentY, 0, $svgHyg, $colorHyg);
+        $titleHyg = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE_LABEL) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE_LABEL : "HYGIÈNE & NETTOYAGE";
+        $colorHyg = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE_COLOR) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE_COLOR : '#0e7e7e';
+        $currentY = $this->_drawBlock($pdf, mb_strtoupper($titleHyg), $contentHyg, array(220, 140, 40), $currentY, 0, $svgHyg, $colorHyg);
 
         // ----------------------------------------------------
         // MAINTENANCE & CONTRÔLES
         // ----------------------------------------------------
         $contentMaint = $object->array_options['options_digirisk_maintenance'] ?? '';
         $svgMaint = $getSvgPath('digirisk_maintenance_icon.svg');
-        $colorMaint = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE_SVG_COLOR ?? '#e64a19';
-        $currentY = $this->_drawBlock($pdf, "MAINTENANCE & CONTRÔLES", $contentMaint, array(60, 120, 180), $currentY, 0, $svgMaint, $colorMaint);
+        $titleMaint = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE_LABEL) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE_LABEL : "MAINTENANCE & CONTRÔLES";
+        $colorMaint = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE_COLOR) ? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE_COLOR : '#8b4000';
+        $currentY = $this->_drawBlock($pdf, mb_strtoupper($titleMaint), $contentMaint, array(60, 120, 180), $currentY, 0, $svgMaint, $colorMaint);
 
         // ----------------------------------------------------
         // FOOTER MSG

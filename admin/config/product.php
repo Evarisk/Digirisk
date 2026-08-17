@@ -64,6 +64,18 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha'))) {
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_SVG_COLOR", $risksColor, 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS", $risksDesc, 'chaine', 0, '', $conf->entity);
 
+	// Chapter configurations
+	$chapters = ['IDENTIFICATION', 'SECURITY', 'USERMANUAL', 'QUALIFICATION', 'HYGIENE', 'MAINTENANCE'];
+	foreach ($chapters as $chap) {
+		$label = GETPOST('DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_LABEL', 'alpha');
+		$icon  = GETPOST('DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_ICON', 'alpha');
+		$color = GETPOST('DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_COLOR', 'alpha');
+		
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_LABEL', $label, 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_ICON', $icon, 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_COLOR', $color, 'chaine', 0, '', $conf->entity);
+	}
+
 	header("Location: " . $_SERVER["PHP_SELF"]);
 	exit;
 }
@@ -119,6 +131,42 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 $doleditor = new DolEditor('DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS', $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS ?? '', '', 150, 'dolibarr_details', 'In', false, true, true, ROWS_4, '100%');
 $doleditor->Create();
 print '</td></tr>';
+print '</table>';
+
+// Configuration for FI Chapters
+print '<br>';
+print load_fiche_titre('<i class="fas fa-file-pdf"></i> ' . $langs->trans("ProductFIChaptersManagement", "Gestion des chapitres de la Fiche d'Instruction (FI)"), '', '');
+print '<hr>';
+
+print '<table class="noborder centpercent editmode">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans("Chapter") . '</td>';
+print '<td>' . $langs->trans("Label") . '</td>';
+print '<td>' . $langs->trans("Icon") . '</td>';
+print '<td>' . $langs->trans("Color") . '</td>';
+print '</tr>';
+
+$chaptersConfig = [
+	'IDENTIFICATION' => ['name' => 'Identification & Caractéristiques', 'icon' => 'fas fa-tag', 'color' => '#c07500'],
+	'SECURITY'       => ['name' => 'Sécurité & Protections', 'icon' => 'fas fa-shield-alt', 'color' => '#b72020'],
+	'USERMANUAL'     => ['name' => 'Mode d\'emploi simplifié', 'icon' => 'fas fa-book', 'color' => '#1a7a3c'],
+	'QUALIFICATION'  => ['name' => 'Qualification & Habilitation', 'icon' => 'fas fa-graduation-cap', 'color' => '#1a5fa8'],
+	'HYGIENE'        => ['name' => 'Hygiène & Nettoyage', 'icon' => 'fas fa-broom', 'color' => '#0e7e7e'],
+	'MAINTENANCE'    => ['name' => 'Maintenance & Contrôles', 'icon' => 'fas fa-wrench', 'color' => '#8b4000']
+];
+
+foreach ($chaptersConfig as $key => $default) {
+	$labelVal = $conf->global->{'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_LABEL'} ?? '';
+	$iconVal  = $conf->global->{'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_ICON'} ?? $default['icon'];
+	$colorVal = $conf->global->{'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_COLOR'} ?? $default['color'];
+
+	print '<tr class="oddeven">';
+	print '<td><strong>' . $default['name'] . '</strong></td>';
+	print '<td><input type="text" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_LABEL" value="' . dol_escape_htmltag($labelVal) . '" placeholder="' . dol_escape_htmltag($default['name']) . '" class="minwidth200"></td>';
+	print '<td><input type="text" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_ICON" value="' . dol_escape_htmltag($iconVal) . '" class="minwidth100"></td>';
+	print '<td><input type="color" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_COLOR" value="' . dol_escape_htmltag($colorVal) . '"></td>';
+	print '</tr>';
+}
 
 print '</table>';
 
