@@ -262,7 +262,7 @@ foreach ($digirisk_sections as $fieldkey => $section) {
     
     if ($useSvg && $hasSvg) {
         $svgContent = file_get_contents($svgPath);
-        $svgContent = preg_replace('/<svg([^>]*)>/i', '<svg$1 fill="' . dol_escape_htmltag($color) . '" width="20" height="20">', $svgContent);
+        $svgContent = preg_replace('/<svg([^>]*)>/i', '<svg$1 fill="' . dol_escape_htmltag($color) . '" style="width: 1.25em; height: 1.25em; vertical-align: -0.125em;">', $svgContent);
         $svgContent = preg_replace('/fill="[^"]*"/i', 'fill="' . dol_escape_htmltag($color) . '"', $svgContent);
         $iconHtml = '<span style="display:inline-block; margin-right:8px; vertical-align:middle;">' . $svgContent . '</span>';
     } else {
