@@ -175,16 +175,10 @@ $(document).ready(function() {
 	});
 
 	// Autosave on change
-	$("input[name^=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_\']").on("change", function() {
-		var name = $(this).attr("name");
-		var key = "";
-		if (name.includes("_LABEL")) key = name.replace("DIGIRISKDOLIBARR_PRODUCT_DEFAULT_", "").replace("_LABEL", "");
-		else if (name.includes("_ICON")) key = name.replace("DIGIRISKDOLIBARR_PRODUCT_DEFAULT_", "").replace("_ICON", "");
-		else if (name.includes("_COLOR")) key = name.replace("DIGIRISKDOLIBARR_PRODUCT_DEFAULT_", "").replace("_COLOR", "");
+	$("input[type=\'text\'][name^=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_\'], input[type=\'color\'][name^=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_\']").on("change", function() {
+		var key = $(this).attr("name").replace("DIGIRISKDOLIBARR_PRODUCT_DEFAULT_", "").replace("_LABEL", "").replace("_ICON", "").replace("_COLOR", "");
 		
-		if (!key) return;
-
-		var formData = new FormData($("form")[0]);
+		var formData = new FormData($(this).closest("form")[0]);
 		formData.set("action", "update");
 		formData.set("ajax", "1");
 		
@@ -206,7 +200,7 @@ $(document).ready(function() {
 
 	// Reload on radio change to update preview immediately
 	$("input[type=\'radio\'][name$=\'_USE_SVG\']").on("change", function() {
-		var formData = new FormData($("form")[0]);
+		var formData = new FormData($(this).closest("form")[0]);
 		formData.set("action", "update");
 		formData.set("ajax", "1");
 		$.ajax({
