@@ -303,8 +303,10 @@ foreach ($tablesConfig as $tableDef) {
 	print $svgDisplay;
 	print '<input type="file" name="file_' . $key . '" accept=".svg">';
 	if ($hasSvg) {
-		print '<br><small class="text-success"><i class="fas fa-check"></i> ' . $langs->trans("CustomSvgUploaded") . '</small>';
+		print '<br><span style="font-size:0.8em;">';
+		print '<span class="text-success"><i class="fas fa-check"></i> ' . $langs->trans("CustomSvgUploaded") . '</span>';
 		print ' &nbsp; <a href="' . $_SERVER["PHP_SELF"] . '?action=delete_svg&chap=' . $key . '&token=' . newToken() . '" class="text-danger" title="Rétablir le SVG standard"><i class="fas fa-undo"></i></a>';
+		print '</span>';
 	} else {
 		print '<br><small class="text-muted" style="font-size:0.8em; opacity:0.7;">Icône par défaut</small>';
 	}
