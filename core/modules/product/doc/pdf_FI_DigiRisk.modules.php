@@ -399,7 +399,7 @@ class pdf_FI_DigiRisk extends ModelePDFProduct
         // Draw the section title
         $svgRisks = $getSvgPath('digirisk_risks_icon.svg');
         $colorRisks = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_COLOR ?? '#d32f2f';
-        $titleRisks = mb_strtoupper($langs->transnoentities('DigiriskRisks'));
+        $titleRisks = !empty($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_LABEL) ? mb_strtoupper($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_LABEL) : mb_strtoupper($langs->transnoentities('DigiriskRisks'));
 
         if (!empty($risksDefaultDesc)) {
             $contentSec = $risksDefaultDesc;
