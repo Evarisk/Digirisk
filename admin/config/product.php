@@ -165,7 +165,9 @@ $(document).ready(function() {
 			
 			if (iconVal === "") iconVal = $("#preview_icon_" + key).data("default");
 			
-			$("#preview_icon_" + key).attr("class", iconVal);
+			if ($("#preview_icon_" + key).is("i")) {
+				$("#preview_icon_" + key).attr("class", iconVal);
+			}
 			
 			// Visual effect
 			$("#preview_container_" + key).css({"color": "#28a745", "transition": "none"});
@@ -179,17 +181,20 @@ $(document).ready(function() {
 	$("input[type=\'text\'][name^=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_\'], input[type=\'color\'][name^=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_\']").on("change", function() {
 		var key = $(this).attr("name").replace("DIGIRISKDOLIBARR_PRODUCT_DEFAULT_", "").replace("_LABEL", "").replace("_ICON", "").replace("_COLOR", "");
 		
-		var formEl = document.getElementById("configForm");
-		var formData = new FormData(formEl);
-		formData.set("action", "update");
-		formData.set("ajax", "1");
+		var data = {
+			action: "update",
+			ajax: "1",
+			token: $("input[name=\'token\']").val()
+		};
+		$("input[name^=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_\'], textarea[name^=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_\']").each(function() {
+			if ($(this).is(":radio") && !$(this).is(":checked")) return;
+			data[$(this).attr("name")] = $(this).val();
+		});
 		
 		$.ajax({
 			url: window.location.href,
 			type: "POST",
-			data: formData,
-			processData: false,
-			contentType: false,
+			data: data,
 			success: function() {
 				// Visual effect for save
 				$("#preview_container_" + key).css({"color": "#28a745", "transition": "none"});
