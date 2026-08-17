@@ -172,7 +172,7 @@ print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="action" value="update">';
 
 // Configuration for FI Chapters
-print load_fiche_titre('<i class="fas fa-file-pdf"></i> ' . $langs->trans("ProductFIChaptersManagement", "Gestion des chapitres de la Fiche d'Instruction (FI)"), '', '');
+print load_fiche_titre('<i class="fas fa-file-pdf"></i> ' . $langs->trans("ProductFIChaptersManagement", "Personnalisation des chapitres Fiche d'Instruction <br><small>Personnalisation de l'onglet risque dans la fiche produit</small>"), '', '');
 print '<hr>';
 
 print '<table class="noborder" width="100%">';
