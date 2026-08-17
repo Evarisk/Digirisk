@@ -193,6 +193,8 @@ $chaptersConfig = [
 
 $iconsDir = $conf->digiriskdolibarr->dir_output . '/icons';
 
+require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
+
 foreach ($chaptersConfig as $key => $default) {
 	$labelVal = $conf->global->{'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_LABEL'} ?? '';
 	$iconVal  = $conf->global->{'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $key . '_ICON'} ?? $default['icon'];
