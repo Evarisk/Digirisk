@@ -99,6 +99,12 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha'))) {
 		}
 	}
 
+	if (GETPOST('ajax')) {
+		header('Content-Type: application/json');
+		echo json_encode(['success' => true]);
+		exit;
+	}
+
 	header("Location: " . $_SERVER["PHP_SELF"]);
 	exit;
 }
@@ -163,6 +169,36 @@ $(document).ready(function() {
 				$("#preview_container_" + key).css({"color": "", "transition": "color 0.5s ease"});
 			}, 100);
 		}
+	});
+
+	// Autosave on change
+	$("input[name^=\'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_\']").on("change", function() {
+		var name = $(this).attr("name");
+		var key = "";
+		if (name.includes("_LABEL")) key = name.replace("DIGIRISKDOLIBARR_PRODUCT_DEFAULT_", "").replace("_LABEL", "");
+		else if (name.includes("_ICON")) key = name.replace("DIGIRISKDOLIBARR_PRODUCT_DEFAULT_", "").replace("_ICON", "");
+		else if (name.includes("_COLOR")) key = name.replace("DIGIRISKDOLIBARR_PRODUCT_DEFAULT_", "").replace("_COLOR", "");
+		
+		if (!key) return;
+
+		var formData = new FormData($("form")[0]);
+		formData.set("action", "update");
+		formData.set("ajax", "1");
+		
+		$.ajax({
+			url: window.location.href,
+			type: "POST",
+			data: formData,
+			processData: false,
+			contentType: false,
+			success: function() {
+				// Visual effect for save
+				$("#preview_container_" + key).css({"color": "#28a745", "transition": "none"});
+				setTimeout(function() {
+					$("#preview_container_" + key).css({"color": "", "transition": "color 1s ease"});
+				}, 500);
+			}
+		});
 	});
 });
 </script>';
