@@ -67,13 +67,7 @@ if ($action == 'delete_svg') {
 }
 
 if (($action == 'update' && ! GETPOST("cancel", 'alpha'))) {
-	$risksIcon = GETPOST('DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_ICON', 'alpha');
-	$risksColor = GETPOST('DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_SVG_COLOR', 'alpha');
-	$risksDesc = GETPOST('DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS', 'restricthtml');
-
-	dolibarr_set_const($db, "DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_ICON", $risksIcon, 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, "DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_SVG_COLOR", $risksColor, 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, "DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS", $risksDesc, 'chaine', 0, '', $conf->entity);
+	// No separate risks save block needed anymore, it will be handled by the generic chapters loop
 
 	// Ensure icons directory exists
 	$iconsDir = $conf->digiriskdolibarr->dir_output . '/icons';
@@ -82,7 +76,7 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha'))) {
 	}
 
 	// Chapter configurations
-	$chapters = ['IDENTIFICATION', 'SECURITY', 'USERMANUAL', 'QUALIFICATION', 'HYGIENE', 'MAINTENANCE'];
+	$chapters = ['RISKS', 'IDENTIFICATION', 'SECURITY', 'USERMANUAL', 'QUALIFICATION', 'HYGIENE', 'MAINTENANCE'];
 	foreach ($chapters as $chap) {
 		$label = GETPOST('DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_LABEL', 'alpha');
 		$icon  = GETPOST('DIGIRISKDOLIBARR_PRODUCT_DEFAULT_' . $chap . '_ICON', 'alpha');
@@ -177,32 +171,7 @@ print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" enctype="multip
 print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="action" value="update">';
 
-print '<table class="noborder centpercent editmode">';
-print '<tr class="liste_titre">';
-print '<td>' . $langs->trans("Parameter") . '</td>';
-print '<td>' . $langs->trans("Value") . '</td>';
-print '</tr>';
-
-// Default Risk Icon
-print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_ICON">' . $langs->trans("DefaultRiskIcon", "Icone des risques par défaut") . '</label><br><small>ex: fas fa-exclamation-triangle</small></td><td>';
-print '<input type="text" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_ICON" value="' . dol_escape_htmltag($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_ICON ?? 'fas fa-exclamation-triangle') . '" class="minwidth200">';
-print '</td></tr>';
-
-// Default Risk Color
-print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_SVG_COLOR">' . $langs->trans("DefaultRiskColor", "Couleur des risques par défaut") . '</label><br><small>ex: #D32F2F</small></td><td>';
-print '<input type="color" name="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_SVG_COLOR" value="' . dol_escape_htmltag($conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_SVG_COLOR ?? '#D32F2F') . '">';
-print '</td></tr>';
-
-// Default Risk Description
-print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS">' . $langs->trans("DefaultRiskDescription", "Description des risques par défaut") . '</label></td><td>';
-require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
-$doleditor = new DolEditor('DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS', $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS ?? '', '', 150, 'dolibarr_details', 'In', false, true, true, ROWS_4, '100%');
-$doleditor->Create();
-print '</td></tr>';
-print '</table>';
-
 // Configuration for FI Chapters
-print '<br>';
 print load_fiche_titre('<i class="fas fa-file-pdf"></i> ' . $langs->trans("ProductFIChaptersManagement", "Gestion des chapitres de la Fiche d'Instruction (FI)"), '', '');
 print '<hr>';
 
@@ -215,6 +184,7 @@ print '<th class="liste_titre">Image SVG (PDF)</th>';
 print '</tr>';
 
 $chaptersConfig = [
+	'RISKS'          => ['name' => 'Risques & Protections', 'icon' => 'fas fa-exclamation-triangle', 'color' => '#d32f2f'],
 	'IDENTIFICATION' => ['name' => 'Identification & Caractéristiques', 'icon' => 'fas fa-tag', 'color' => '#c07500'],
 	'SECURITY'       => ['name' => 'Sécurité & Protections', 'icon' => 'fas fa-shield-alt', 'color' => '#b72020'],
 	'USERMANUAL'     => ['name' => 'Mode d\'emploi simplifié', 'icon' => 'fas fa-book', 'color' => '#1a7a3c'],

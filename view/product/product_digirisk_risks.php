@@ -357,10 +357,9 @@ if ($permissiontoadd) {
     // Add button and title banner
     $risksTitle = mb_strtoupper($langs->transnoentities('DigiriskRisks'));
     $risksIcon = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_ICON ?? 'fas fa-exclamation-triangle';
-    $risksColor = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_SVG_COLOR ?? '#D32F2F';
-    // Fetch extrafield or use global default
+    $risksColor = $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_COLOR ?? '#D32F2F';
     $object->fetch_optionals();
-    $risksDefaultDesc = $object->array_options['options_digirisk_risks'] ?? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS ?? '';
+    $risksDefaultDesc = $object->array_options['options_digirisk_risks'] ?? $conf->global->DIGIRISKDOLIBARR_PRODUCT_DEFAULT_RISKS_DESC ?? '';
     
     $editRisksDesc = (GETPOST('action', 'aZ09') == 'edit_risks_desc');
 
