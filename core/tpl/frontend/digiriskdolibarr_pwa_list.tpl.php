@@ -86,9 +86,6 @@ $listPageUrl = function (int $page) use ($listBaseUrl, $listSearch, $listStatus)
                     <div class="digirisk-pwa-card__line"><i class="fas <?php print dol_escape_htmltag($listRowLine['icon']); ?>"></i> <?php print dol_escape_htmltag($listRowLine['text']); ?></div>
                 <?php } ?>
             </a>
-            <?php if (!empty($listRow['editUrl'])) { ?>
-                <a class="digirisk-pwa-card__edit" href="<?php print dol_escape_htmltag($listRow['editUrl']); ?>" aria-label="<?php print dol_escape_htmltag($langs->trans('Modify')); ?>"><i class="fas fa-edit"></i></a>
-            <?php } ?>
         </div>
         <?php } ?>
     </div>

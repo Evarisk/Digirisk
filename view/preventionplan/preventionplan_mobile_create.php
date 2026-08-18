@@ -806,6 +806,23 @@ if ($action == 'add_mobile' && $permissiontoadd) {
         exit;
     }
 }
+
+/*
+ * Verrouillage du plan de prevention depuis l'ecran de succes.
+ */
+if ($action == 'lock_mobile' && $permissiontoadd) {
+    $planId = GETPOSTINT('plan_id');
+    $lockPlan = new PreventionPlan($db);
+    
+    if ($planId > 0 && $lockPlan->fetch($planId) > 0) {
+        $lockPlan->setLocked($user, false);
+        digiriskRefreshPreventionPlanDocument($db, (int) $lockPlan->id, $user, $langs, true);
+    }
+    
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?created=' . $planId);
+    exit;
+}
+
 /*
  * Renvoi du lien de signature a l'entreprise exterieure depuis l'ecran de succes.
  *
