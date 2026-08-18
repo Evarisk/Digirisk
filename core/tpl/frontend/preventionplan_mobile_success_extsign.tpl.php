@@ -69,17 +69,34 @@ $ppExtName = trim($ppExtSignatory->firstname . ' ' . $ppExtSignatory->lastname);
         </span>
     </div>
 
-    <?php if (dol_strlen($ppExtSignatureUrl)) { ?>
+    <?php } ?>
+
+    <?php if (dol_strlen($ppExtSignatureUrl) || $ppExtSigned) { ?>
     <div class="digirisk-mobile-extsign__actions">
+        <?php if (!$ppExtSigned) { ?>
         <!-- La personne est sur place : elle signe sur ce telephone, sans passer par sa boite mail -->
-        <a class="digirisk-mobile-success__button digirisk-mobile-success__button--primary" href="<?php print $ppExtSignatureUrl; ?>">
+        <a class="digirisk-mobile-success__button digirisk-mobile-success__button--primary" href="<?php print $ppExtSignatureUrl; ?>" target="_blank">
             <i class="fas fa-signature"></i> <?php print $langs->trans('MobilePPExtSignNow'); ?>
         </a>
         <button type="button" class="digirisk-mobile-success__button digirisk-mobile-extsign__resend">
             <i class="fas fa-paper-plane"></i> <?php print $ppExtEmailSent ? $langs->trans('MobilePPExtResendEmail') : $langs->trans('MobilePPExtSendEmail'); ?>
         </button>
+        <?php } ?>
+
+        <?php if ($object->status < PreventionPlan::STATUS_LOCKED) { ?>
+            <?php if ($ppExtSigned) { ?>
+                <a href="<?php print $_SERVER['PHP_SELF']; ?>?action=lock_mobile&plan_id=<?php print $object->id; ?>" class="digirisk-mobile-success__button digirisk-mobile-success__button--primary">
+                    <i class="fas fa-lock"></i> Verrouiller
+                </a>
+            <?php } else { ?>
+                <button type="button" class="digirisk-mobile-success__button" style="opacity: 0.5; cursor: not-allowed;" disabled title="Le plan doit être signé avant d'être verrouillé">
+                    <i class="fas fa-lock"></i> Verrouiller
+                </button>
+            <?php } ?>
+        <?php } ?>
     </div>
 
+    <?php if (!$ppExtSigned) { ?>
     <div class="digirisk-mobile-extsign__link copy-signatureurl-container">
         <div class="digirisk-mobile-share__link">
             <a href="<?php print $ppExtSignatureUrl; ?>" target="_blank"><?php print dol_escape_htmltag($ppExtSignatureUrl); ?></a>
@@ -102,6 +119,5 @@ $ppExtName = trim($ppExtSignatory->firstname . ' ' . $ppExtSignatory->lastname);
     } ?>
 
     <?php } ?>
-
     <?php } ?>
 </div>

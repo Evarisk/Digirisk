@@ -227,11 +227,8 @@ $successShareUrl = isModEnabled('doliletter')
     ? dol_buildpath('/custom/doliletter/public/spread/add_spread.php', 3) . '?id=' . $object->id . '&object_type=digiriskdolibarr_preventionplan'
     : '';
 
-$successShareEnabled = $ppExtSigned;
-$successShareDisabledText = $langs->trans('MobileSpreadAvailableAfterSignatures');
-if ($successShareDisabledText == 'MobileSpreadAvailableAfterSignatures') {
-    $successShareDisabledText = 'La diffusion sera disponible dès que les responsables auront signé.';
-}
+$successShareEnabled = $ppExtSigned && ($object->status >= PreventionPlan::STATUS_LOCKED);
+$successShareDisabledText = 'La diffusion sera disponible dès que le plan sera signé par les responsables et verrouillé.';
 
 // Bloc propre au plan de prevention, insere par l'ecran de succes commun
 $successExtraBlockFile = __DIR__ . '/preventionplan_mobile_success_extsign.tpl.php';

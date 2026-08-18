@@ -121,6 +121,7 @@ if ($action == 'setMobileDefaults' && !GETPOST('cancel', 'alpha')) {
 	}
 }
 
+
 /*
  * View
  */
@@ -257,6 +258,37 @@ print '</tr>';
 
 print '</table>';
 print '</form>';
+
+// --- Public spread defaults ---
+print load_fiche_titre($langs->trans('MobilePPSpreadDefaultsTitle'), '', '');
+
+print '<table class="noborder centpercent editmode">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans('Option') . '</td>';
+print '<td class="center">' . $langs->trans('Action') . '</td>';
+print '</tr>';
+
+// Count
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATURE_COUNT">' . $langs->trans('MobilePPSpreadShowCount') . '</label></td>';
+print '<td class="center">' . ajax_constantonoff('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATURE_COUNT') . '</td>';
+print '</tr>';
+
+// Name
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_NAME">' . $langs->trans('MobilePPSpreadShowName') . '</label></td>';
+print '<td class="center">' . ajax_constantonoff('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_NAME') . '</td>';
+print '</tr>';
+
+// Contact
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_CONTACT">' . $langs->trans('MobilePPSpreadShowContact') . '</label></td>';
+print '<td class="center">' . ajax_constantonoff('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_CONTACT') . '</td>';
+print '</tr>';
+
+// Hide Public Note
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_SPREAD_HIDE_PUBLIC_NOTE">' . $langs->trans('MobilePPSpreadHidePublicNote') . '</label></td>';
+print '<td class="center">' . ajax_constantonoff('DIGIRISKDOLIBARR_SPREAD_HIDE_PUBLIC_NOTE') . '</td>';
+print '</tr>';
+
+print '</table>';
 
 // Page end
 print dol_get_fiche_end();
