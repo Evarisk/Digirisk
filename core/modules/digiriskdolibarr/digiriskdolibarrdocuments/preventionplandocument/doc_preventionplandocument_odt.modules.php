@@ -274,14 +274,14 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         $tmpArray['titre_prevention']             = $object->ref;
         $tmpArray['raison_du_plan_de_prevention'] = $object->label;
 
-        $tmpArray['pompier_number']   = $arrayData['pompier_number'];
-        $tmpArray['samu_number']      = $arrayData['samu_number'];
-        $tmpArray['emergency_number'] = $arrayData['emergency_number'];
-        $tmpArray['police_number']    = $arrayData['police_number'];
+        $tmpArray['pompier_number']   = $arrayData['pompier_number'] ?? '';
+        $tmpArray['samu_number']      = $arrayData['samu_number'] ?? '';
+        $tmpArray['emergency_number'] = $arrayData['emergency_number'] ?? '';
+        $tmpArray['police_number']    = $arrayData['police_number'] ?? '';
 
-        $tmpArray['moyen_generaux_mis_disposition'] = $arrayData['moyen_generaux_mis_disposition'];
-        $tmpArray['consigne_generale']              = $arrayData['consigne_generale'];
-        $tmpArray['premiers_secours']               = $arrayData['premiers_secours'];
+        $tmpArray['moyen_generaux_mis_disposition'] = $arrayData['moyen_generaux_mis_disposition'] ?? '';
+        $tmpArray['consigne_generale']              = $arrayData['consigne_generale'] ?? '';
+        $tmpArray['premiers_secours']               = $arrayData['premiers_secours'] ?? '';
 
         $tmpArray['prior_visit_date'] = dol_print_date($object->prior_visit_date, 'dayhour');
         $tmpArray['prior_visit_text'] = $object->prior_visit_text;
@@ -325,7 +325,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         }
 
         // Information internal society
-        $intSociety = $arrayData['society_inside'];
+        $intSociety = $arrayData['society_inside'] ?? null;
         if (!empty($intSociety) && $intSociety > 0) {
             $tmpArray['society_title']    = $intSociety->name ?? '';
             $tmpArray['society_siret_id'] = $intSociety->siret ?? '';
@@ -337,7 +337,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         }
 
         // Information external society
-        $extSociety = $arrayData['society_outside'];
+        $extSociety = $arrayData['society_outside'] ?? null;
         if (!empty($extSociety) && $extSociety > 0) {
             $tmpArray['society_outside_title']    = $extSociety->name ?? '';
             $tmpArray['society_outside_siret_id'] = $extSociety->siret ?? '';
@@ -346,7 +346,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
             $tmpArray['society_outside_town']     = $extSociety->town ?? '';
         }
 
-        $extSocietyIntervenants = (array) $arrayData['intervenant_exterieur'];
+        $extSocietyIntervenants = (array) ($arrayData['intervenant_exterieur'] ?? []);
         if (!empty($extSocietyIntervenants)) {
             $tmpArray['intervenants_info'] = count($extSocietyIntervenants);
         } else {
@@ -356,7 +356,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         $tempDir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1] . '/temp/';
 
         // MasterWorker
-        $masterWorker = $arrayData['maitre_oeuvre'];
+        $masterWorker = $arrayData['maitre_oeuvre'] ?? null;
         if (!empty($masterWorker) && $masterWorker > 0) {
             $tmpArray['maitre_oeuvre_lname']          = strtoupper($masterWorker->lastname);
             $tmpArray['maitre_oeuvre_fname']          = ucfirst($masterWorker->firstname);
@@ -383,7 +383,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         }
 
         // External society responsible
-        $extSocietyResponsible = $arrayData['responsable_exterieur'];
+        $extSocietyResponsible = $arrayData['responsable_exterieur'] ?? null;
         if (!empty($extSocietyResponsible) && $extSocietyResponsible > 0) {
             $tmpArray['intervenant_exterieur_lname']          = strtoupper($extSocietyResponsible->lastname);
             $tmpArray['intervenant_exterieur_fname']          = ucfirst($extSocietyResponsible->firstname);
