@@ -198,8 +198,8 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 					}
 					$tmpArray['name']     = $line->firstname;
 					$tmpArray['lastname'] = $line->lastname;
-					$tmpArray['phone']    = $line->phone;
-					$tmpArray['mail']     = $line->email;
+					$tmpArray['phone']    = $line->phone ?? '';
+					$tmpArray['mail']     = $line->email ?? '';
 					$tmpArray['status']   = $line->getLibStatut(1);
 
 					$k++;
@@ -327,23 +327,23 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         // Information internal society
         $intSociety = $arrayData['society_inside'];
         if (!empty($intSociety) && $intSociety > 0) {
-            $tmpArray['society_title']    = $intSociety->name;
-            $tmpArray['society_siret_id'] = $intSociety->siret;
-            $tmpArray['society_address']  = $intSociety->address;
-            $tmpArray['society_postcode'] = $intSociety->postal;
-            $tmpArray['society_town']     = $intSociety->town;
-            $tmpArray['society_mail']     = $intSociety->email;
-            $tmpArray['society_phone']    = $intSociety->phone;
+            $tmpArray['society_title']    = $intSociety->name ?? '';
+            $tmpArray['society_siret_id'] = $intSociety->siret ?? '';
+            $tmpArray['society_address']  = $intSociety->address ?? '';
+            $tmpArray['society_postcode'] = $intSociety->postal ?? '';
+            $tmpArray['society_town']     = $intSociety->town ?? '';
+            $tmpArray['society_mail']     = $intSociety->email ?? '';
+            $tmpArray['society_phone']    = $intSociety->phone ?? '';
         }
 
         // Information external society
         $extSociety = $arrayData['society_outside'];
         if (!empty($extSociety) && $extSociety > 0) {
-            $tmpArray['society_outside_title']    = $extSociety->name;
-            $tmpArray['society_outside_siret_id'] = $extSociety->siret;
-            $tmpArray['society_outside_address']  = $extSociety->address;
-            $tmpArray['society_outside_postcode'] = $extSociety->postal;
-            $tmpArray['society_outside_town']     = $extSociety->town;
+            $tmpArray['society_outside_title']    = $extSociety->name ?? '';
+            $tmpArray['society_outside_siret_id'] = $extSociety->siret ?? '';
+            $tmpArray['society_outside_address']  = $extSociety->address ?? '';
+            $tmpArray['society_outside_postcode'] = $extSociety->postal ?? '';
+            $tmpArray['society_outside_town']     = $extSociety->town ?? '';
         }
 
         $extSocietyIntervenants = (array) $arrayData['intervenant_exterieur'];
@@ -360,8 +360,8 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         if (!empty($masterWorker) && $masterWorker > 0) {
             $tmpArray['maitre_oeuvre_lname']          = strtoupper($masterWorker->lastname);
             $tmpArray['maitre_oeuvre_fname']          = ucfirst($masterWorker->firstname);
-            $tmpArray['maitre_oeuvre_email']          = $masterWorker->email;
-            $tmpArray['maitre_oeuvre_phone']          = $masterWorker->phone;
+            $tmpArray['maitre_oeuvre_email']          = $masterWorker->email ?? '';
+            $tmpArray['maitre_oeuvre_phone']          = $masterWorker->phone ?? '';
             $tmpArray['maitre_oeuvre_signature_date'] = dol_print_date($masterWorker->signature_date > 0 ? $masterWorker->signature_date : dol_now(), 'dayhour', 'tzuser');
         } else {
             $tmpArray['maitre_oeuvre_lname']          = '';
@@ -387,8 +387,8 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         if (!empty($extSocietyResponsible) && $extSocietyResponsible > 0) {
             $tmpArray['intervenant_exterieur_lname']          = strtoupper($extSocietyResponsible->lastname);
             $tmpArray['intervenant_exterieur_fname']          = ucfirst($extSocietyResponsible->firstname);
-            $tmpArray['intervenant_exterieur_email']          = $extSocietyResponsible->email;
-            $tmpArray['intervenant_exterieur_phone']          = $extSocietyResponsible->phone;
+            $tmpArray['intervenant_exterieur_email']          = $extSocietyResponsible->email ?? '';
+            $tmpArray['intervenant_exterieur_phone']          = $extSocietyResponsible->phone ?? '';
             $tmpArray['intervenant_exterieur_signature_date'] = dol_print_date($extSocietyResponsible->signature_date > 0 ? $extSocietyResponsible->signature_date : dol_now(), 'dayhour', 'tzuser');
         } else {
             $tmpArray['intervenant_exterieur_lname']          = '';
