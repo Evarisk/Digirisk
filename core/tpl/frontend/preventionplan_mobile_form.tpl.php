@@ -130,7 +130,7 @@ foreach ($signalisationCategories as $signalisationItem) {
             $creationWorkflowHtml .= '<div class="digirisk-mobile-extsign__title" style="margin-bottom: 10px; padding: 0 5px; display: flex; justify-content: space-between; align-items: center;">';
             $creationWorkflowHtml .= '<div style="color: #4a55d1; font-weight: bold; font-size: 1.1em; text-transform: uppercase;"><i class="fas fa-chart-line" style="margin-right: 5px;"></i> Avancement</div>';
             if (!empty($isEdit) && $object->ref) {
-                $creationWorkflowHtml .= '<div style="font-size: 0.8em; background: #e6f2e9; color: #2d6a3c; padding: 4px 10px; border-radius: 15px; font-weight: bold;"><i class="fas fa-check" style="margin-right:5px;"></i> RÉF. ' . dol_escape_htmltag($object->ref) . '</div>';
+                $creationWorkflowHtml .= '<div style="font-size: 0.9em;">' . $object->getNomUrl(1) . '</div>';
             }
             $creationWorkflowHtml .= '</div>';
             $creationWorkflowHtml .= '<div style="display: flex; justify-content: space-between; overflow-x: auto; padding-bottom: 0px; margin: 0 5px;">';
