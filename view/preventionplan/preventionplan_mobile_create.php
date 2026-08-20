@@ -308,7 +308,8 @@ if ($action == 'add_mobile' && $permissiontoadd) {
     };
 
     // Read parameters
-    $extSocietyId  = GETPOSTINT('ext_society_id');
+    $extSocietyMode= GETPOST('ext_society_mode', 'aZ09');
+    $extSocietyId  = ($extSocietyMode === 'new') ? 0 : GETPOSTINT('ext_society_id');
     $idProfInput   = digiriskMobileCleanIdProf(GETPOST('siren', 'alphanohtml'));
     $societyName   = trim(GETPOST('ext_society_name', 'alphanohtml'));
     $societyEmail  = trim(GETPOST('ext_society_email', 'alphanohtml'));

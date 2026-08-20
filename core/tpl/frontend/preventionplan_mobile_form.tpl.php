@@ -339,7 +339,21 @@ foreach ($signalisationCategories as $signalisationItem) {
              the third party list, resolve it by SIREN, or type everything for a company to create -->
         <div class="digirisk-mobile-card">
             <div class="digirisk-mobile-card__title"><i class="fas fa-industry"></i> <?php print $langs->trans('MobilePPExteriorCompany'); ?></div>
-            <div class="digirisk-mobile-field">
+            
+            <div class="digirisk-mobile-field" style="margin-bottom: 15px;">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <label class="digirisk-mobile-check" style="margin-bottom: 0;">
+                        <input type="radio" name="ext_society_mode" id="mode_existing" value="existing" <?php print (!empty($prefill['ext_society_id']) || empty($prefill['ext_society_name'])) ? 'checked' : ''; ?>>
+                        <span style="font-weight: 500;"><?php print $langs->trans('MobilePPChooseExistingCompany'); ?></span>
+                    </label>
+                    <label class="digirisk-mobile-check" style="margin-bottom: 0;">
+                        <input type="radio" name="ext_society_mode" id="mode_new" value="new" <?php print (empty($prefill['ext_society_id']) && !empty($prefill['ext_society_name'])) ? 'checked' : ''; ?>>
+                        <span style="font-weight: 500;"><?php print $langs->trans('MobilePPOrFillManually') != 'MobilePPOrFillManually' ? $langs->trans('MobilePPOrFillManually') : 'Créer un nouveau tiers'; ?></span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="section_existing_company" class="digirisk-mobile-field <?php print (empty($prefill['ext_society_id']) && !empty($prefill['ext_society_name'])) ? 'hidden' : ''; ?>">
                 <label><?php print $langs->trans('MobilePPChooseExistingCompany'); ?></label>
                 <!-- La loupe accompagne le choix du tiers : elle resout l'entreprise, que son
                      identifiant vienne de la liste ou du SIREN saisi plus bas -->
@@ -348,36 +362,37 @@ foreach ($signalisationCategories as $signalisationItem) {
                     <button type="button" class="digirisk-mobile-siren-search wpeo-button button-blue" aria-label="<?php print dol_escape_htmltag($langs->trans('Search')); ?>"><i class="fas fa-search"></i></button>
                 </div>
             </div>
-            <div class="digirisk-mobile-separator"><span><?php print $langs->trans('MobilePPOrFillManually'); ?></span></div>
 
-            <div class="digirisk-mobile-row">
-                <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('CompanyName'); ?> *</label>
-                    <input type="text" name="ext_society_name" class="digirisk-mobile-ext-society-name" value="<?php print dol_escape_htmltag($prefill["ext_society_name"]); ?>">
+            <div id="section_new_company" class="<?php print (!empty($prefill['ext_society_id']) || empty($prefill['ext_society_name'])) ? 'hidden' : ''; ?>">
+                <div class="digirisk-mobile-row">
+                    <div class="digirisk-mobile-field">
+                        <label><?php print $langs->trans('CompanyName'); ?> *</label>
+                        <input type="text" name="ext_society_name" class="digirisk-mobile-ext-society-name" value="<?php print dol_escape_htmltag($prefill["ext_society_name"]); ?>">
+                    </div>
+                    <div class="digirisk-mobile-field">
+                        <label><?php print $langs->trans('MobileSirenOrSiret'); ?> *</label>
+                        <input type="text" name="siren" class="digirisk-mobile-siren-input" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="<?php print dol_escape_htmltag($langs->trans('MobileSirenOrSiretPlaceholder')); ?>" value="<?php print dol_escape_htmltag($prefill["siren"]); ?>" pattern="[\d\s]{9,20}" title="SIREN/SIRET (9 ou 14 chiffres)">
+                    </div>
                 </div>
-                <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('MobileSirenOrSiret'); ?> *</label>
-                    <input type="text" name="siren" class="digirisk-mobile-siren-input" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="<?php print dol_escape_htmltag($langs->trans('MobileSirenOrSiretPlaceholder')); ?>" value="<?php print dol_escape_htmltag($prefill["siren"]); ?>" pattern="[\d\s]{9,20}" title="SIREN/SIRET (9 ou 14 chiffres)">
-                </div>
-            </div>
-            <div class="digirisk-mobile-siren-result"></div>
+                <div class="digirisk-mobile-siren-result"></div>
 
-            <div class="digirisk-mobile-field">
-                <label><?php print $langs->trans('Email'); ?></label>
-                <input type="email" name="ext_society_email" class="digirisk-mobile-ext-society-email" autocomplete="off" value="<?php print dol_escape_htmltag($prefill["ext_society_email"]); ?>" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}">
-            </div>
-            <div class="digirisk-mobile-field">
-                <label><?php print $langs->trans('Address'); ?></label>
-                <textarea name="ext_society_address" class="digirisk-mobile-ext-society-address" rows="2"><?php print dol_escape_htmltag($prefill["ext_society_address"]); ?></textarea>
-            </div>
-            <div class="digirisk-mobile-row">
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('Zip'); ?></label>
-                    <input type="text" name="ext_society_zip" class="digirisk-mobile-ext-society-zip" inputmode="numeric" autocomplete="off" value="<?php print dol_escape_htmltag($prefill["ext_society_zip"]); ?>">
+                    <label><?php print $langs->trans('Email'); ?></label>
+                    <input type="email" name="ext_society_email" class="digirisk-mobile-ext-society-email" autocomplete="off" value="<?php print dol_escape_htmltag($prefill["ext_society_email"]); ?>" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}">
                 </div>
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('Town'); ?></label>
-                    <input type="text" name="ext_society_town" class="digirisk-mobile-ext-society-town" autocomplete="off" value="<?php print dol_escape_htmltag($prefill["ext_society_town"]); ?>">
+                    <label><?php print $langs->trans('Address'); ?></label>
+                    <textarea name="ext_society_address" class="digirisk-mobile-ext-society-address" rows="2"><?php print dol_escape_htmltag($prefill["ext_society_address"]); ?></textarea>
+                </div>
+                <div class="digirisk-mobile-row">
+                    <div class="digirisk-mobile-field">
+                        <label><?php print $langs->trans('Zip'); ?></label>
+                        <input type="text" name="ext_society_zip" class="digirisk-mobile-ext-society-zip" inputmode="numeric" autocomplete="off" value="<?php print dol_escape_htmltag($prefill["ext_society_zip"]); ?>">
+                    </div>
+                    <div class="digirisk-mobile-field">
+                        <label><?php print $langs->trans('Town'); ?></label>
+                        <input type="text" name="ext_society_town" class="digirisk-mobile-ext-society-town" autocomplete="off" value="<?php print dol_escape_htmltag($prefill["ext_society_town"]); ?>">
+                    </div>
                 </div>
             </div>
 
@@ -653,3 +668,25 @@ foreach ($signalisationCategories as $signalisationItem) {
 // Photo editor the Saturne media block opens on every shot (crop, rotate, annotate)
 $langs->load('medias@saturne');
 include dol_buildpath('/saturne/core/tpl/medias/photo_editor_modal.tpl.php');
+
+
+?>
+<script <?php print (function_exists("getNonce") ? "nonce=\"".getNonce()."\"" : ""); ?>>
+$(document).ready(function() {
+    function toggleSocietyMode() {
+        if ($("#mode_new").is(":checked")) {
+            $("#section_existing_company").addClass("hidden");
+            $("#section_new_company").removeClass("hidden");
+            // Clear the select if they switch to new, so we don`t accidentally submit ext_society_id
+            $(".digirisk-mobile-ext-society-id").val(0);
+        } else {
+            $("#section_existing_company").removeClass("hidden");
+            $("#section_new_company").addClass("hidden");
+        }
+    }
+    
+    $(document).on("change", "input[name=\"ext_society_mode\"]", toggleSocietyMode);
+});
+</script>
+<?php
+
