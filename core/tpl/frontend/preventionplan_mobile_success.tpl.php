@@ -55,9 +55,7 @@ $svgCalendar = '<svg viewBox="0 0 448 512" fill="#4a55d1" width="20px" height="2
 
 $successTitle = '';
 
-$nomUrl = $object->getNomUrl(0);
-$nomUrlModified = str_replace('>' . $object->ref . '</a>', '>RÉF. ' . $object->ref . '</a>', $nomUrl);
-$nomUrlModified = str_replace('<a ', '<a style="color: inherit; text-decoration: none;" ', $nomUrlModified);
+
 
 $successRefHtml = '';
 
@@ -170,7 +168,7 @@ $svgCalendar = '<svg viewBox="0 0 448 512" fill="#4a55d1" width="24px" height="2
 $successCustomFactsHtml = '<div style="margin-bottom: 20px; border-bottom: 1px dashed #eaeaea; padding-bottom: 15px;">';
 $successCustomFactsHtml .= '<div class="digirisk-mobile-extsign__title" style="margin-bottom: 25px; padding: 0 5px; display: flex; justify-content: space-between; align-items: center;">';
 $successCustomFactsHtml .= '<div style="color: #4a55d1; font-weight: bold; font-size: 1.1em; text-transform: uppercase;"><i class="fas fa-chart-line" style="margin-right: 5px;"></i> Avancement</div>';
-$successCustomFactsHtml .= '<div style="font-size: 0.8em; background: #e6f2e9; color: #2d6a3c; padding: 4px 10px; border-radius: 15px; font-weight: bold;"><i class="fas fa-check" style="margin-right:5px;"></i> ' . $nomUrlModified . '</div>';
+    $successCustomFactsHtml .= '<div style="font-size: 0.9em;">' . $object->getNomUrl(1) . '</div>';
 $successCustomFactsHtml .= '</div>';
 $successCustomFactsHtml .= '<div style="display: flex; justify-content: space-between; overflow-x: auto; padding-bottom: 10px; margin: 0 5px;">';
 
