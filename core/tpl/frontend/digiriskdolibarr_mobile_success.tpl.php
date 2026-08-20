@@ -126,8 +126,19 @@ $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successSha
     </div>
     <?php } ?>
 
+    <?php
+    $diffusionModDisabled = !isModEnabled('doliletter');
+    if ($diffusionModDisabled) {
+    ?>
+    <div style="text-align: center; color: #d32f2f; margin-bottom: 5px; font-size: 0.9em; padding: 0 15px;">
+        <i class="fas fa-exclamation-triangle"></i> Module DoliLetter manquant pour la diffusion - Contacter votre administrateur
+    </div>
+    <?php } ?>
     <div class="digirisk-mobile-success__actions">
         <a class="digirisk-mobile-success__button" href="<?php print $successViewUrl; ?>"><?php print dol_escape_htmltag($successViewLabel); ?></a>
         <a class="digirisk-mobile-success__button" href="<?php print $successAgainUrl; ?>"><?php print dol_escape_htmltag($successAgainLabel); ?></a>
+        <a class="digirisk-mobile-success__button" href="<?php print $diffusionModDisabled ? '#' : $successShareUrl; ?>" <?php print $diffusionModDisabled ? 'style="opacity: 0.5; pointer-events: none;"' : 'target="_blank"'; ?>>
+            Diffusion
+        </a>
     </div>
 </div>
