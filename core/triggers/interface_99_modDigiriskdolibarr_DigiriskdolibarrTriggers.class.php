@@ -1006,8 +1006,29 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
         // Une signature change le document : sans regeneration, la diffusion continue de presenter
         // une version datee a des gens qui n'ont aucun moyen de s'en apercevoir.
         $signatureTriggers = ['SATURNE_SIGNATURE_SIGN', 'SATURNE_SIGNATURE_SIGN_PUBLIC', 'SATURNE_SIGNATURE_PENDING_SIGNATURE'];
-        if (in_array($action, $signatureTriggers) && isset($object->object_type) && $object->object_type == 'preventionplan' && $object->fk_object > 0) {
-            $this->refreshPreventionPlanDocument((int) $object->fk_object, $user, $langs);
+        if (in_array($action, $signatureTriggers) && isset($object->object_type) && in_array($object->object_type, ['preventionplan', 'firepermit']) && $object->fk_object > 0) {
+            require_once DOL_DOCUMENT_ROOT . '/custom/saturne/class/saturnesignature.class.php';
+            $signatory = new SaturneSignature($this->db);
+            
+            // Check if all signatures are collected
+            if ($signatory->checkSignatoriesSignatures((int) $object->fk_object, $object->object_type) === 1) {
+                if ($object->object_type === 'preventionplan') {
+                    require_once __DIR__ . '/../../class/preventionplan.class.php';
+                    $docToLock = new PreventionPlan($this->db);
+                } else {
+                    require_once __DIR__ . '/../../class/firepermit.class.php';
+                    $docToLock = new FirePermit($this->db);
+                }
+                
+                if ($docToLock->fetch((int) $object->fk_object) > 0 && $docToLock->status == $docToLock::STATUS_VALIDATED) {
+                    // Auto-lock the document. This will fire PREVENTIONPLAN_LOCK or FIREPERMIT_LOCK.
+                    $docToLock->setLocked($user, false);
+                }
+            }
+
+            if ($object->object_type === 'preventionplan') {
+                $this->refreshPreventionPlanDocument((int) $object->fk_object, $user, $langs);
+            }
         }
     }
 
