@@ -2221,3 +2221,6 @@ DefaultContent=Contenu par défaut
 CustomSvgUploaded=SVG personnalisé
 DeleteCustomSvg=Supprimer
 DefaultSvgUsed=SVG par défaut
+
+PwaTilePreventionPlanLocked = Plans validés
+PwaTileFirePermitLocked = Permis validés
