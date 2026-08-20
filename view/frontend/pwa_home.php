@@ -63,7 +63,7 @@ if ($canReadPreventionPlan) {
     ];
     $homeTiles[] = [
         'icon'  => 'fa-lock',
-        'label' => $langs->transnoentities('PwaTilePreventionPlanLocked') ?: 'Plans validés',
+        'label' => $langs->transnoentities('PwaTilePreventionPlanLocked') ?: 'Plans validÃ©s',
         'count' => digiriskPwaCountByStatus('PreventionPlan', PreventionPlan::STATUS_LOCKED),
         'url'   => $listPreventionPlanUrl . '?status=' . PreventionPlan::STATUS_LOCKED,
     ];
@@ -83,7 +83,7 @@ if ($canReadFirePermit) {
     ];
     $homeTiles[] = [
         'icon'  => 'fa-lock',
-        'label' => $langs->transnoentities('PwaTileFirePermitLocked') ?: 'Permis validés',
+        'label' => $langs->transnoentities('PwaTileFirePermitLocked') ?: 'Permis validÃ©s',
         'count' => digiriskPwaCountByStatus('FirePermit', FirePermit::STATUS_LOCKED),
         'url'   => $listFirePermitUrl . '?status=' . FirePermit::STATUS_LOCKED,
     ];
