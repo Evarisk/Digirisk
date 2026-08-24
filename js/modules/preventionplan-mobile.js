@@ -405,7 +405,7 @@ window.digiriskdolibarr.preventionplanmobile.selectContact = function() {
         $('.digirisk-mobile-resp-firstname').val(option.data('firstname')).prop('readonly', true);
         // L'email est desormais obligatoire : le verrouiller alors que la fiche du contact n'en a
         // pas enfermerait l'utilisateur devant une erreur qu'il ne peut pas corriger
-        $('.digirisk-mobile-resp-email').val(contactEmail).prop('readonly', contactEmail !== '');
+        $('.digirisk-mobile-resp-email').val(contactEmail).prop('readonly', false);
     } else {
         $('.digirisk-mobile-resp-contact-id').val('');
         $('.digirisk-mobile-resp-lastname').val('').prop('readonly', false);

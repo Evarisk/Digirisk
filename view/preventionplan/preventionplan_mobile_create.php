@@ -498,13 +498,33 @@ if ($action == 'add_mobile' && $permissiontoadd) {
         if ($extSocietyId > 0) {
             $thirdparty->fetch($extSocietyId);
 
+            $hasAddressChange = ($thirdparty->address != $societyAddr || $thirdparty->zip != $societyZip || $thirdparty->town != $societyTown);
+            $hasSirenChange   = false;
+
+            if (dol_strlen($idProfInput)) {
+                $idprof1 = substr($idProfInput, 0, 9);
+                $idprof2 = (dol_strlen($idProfInput) == 14) ? $idProfInput : '';
+                if (empty($thirdparty->idprof1) || empty($thirdparty->idprof2)) {
+                    if (empty($thirdparty->idprof1) && !empty($idprof1)) {
+                        $thirdparty->idprof1 = $idprof1;
+                        $hasSirenChange = true;
+                    }
+                    if (empty($thirdparty->idprof2) && !empty($idprof2)) {
+                        $thirdparty->idprof2 = $idprof2;
+                        $hasSirenChange = true;
+                    }
+                }
+            }
+
             // L'adresse est affichee et modifiable dans le formulaire : la corriger sur place doit
             // avoir un effet, sinon la saisie est silencieusement perdue. On n'ecrit que si elle a
-            // change, pour ne pas toucher au tiers a chaque enregistrement du plan.
-            if ($thirdparty->address != $societyAddr || $thirdparty->zip != $societyZip || $thirdparty->town != $societyTown) {
-                $thirdparty->address = $societyAddr;
-                $thirdparty->zip     = $societyZip;
-                $thirdparty->town    = $societyTown;
+            // change, pour ne pas toucher au tiers a chaque enregistrement du plan. De meme pour le SIREN/SIRET.
+            if ($hasAddressChange || $hasSirenChange) {
+                if ($hasAddressChange) {
+                    $thirdparty->address = $societyAddr;
+                    $thirdparty->zip     = $societyZip;
+                    $thirdparty->town    = $societyTown;
+                }
                 $thirdparty->update($thirdparty->id, $user);
             }
         } else {
