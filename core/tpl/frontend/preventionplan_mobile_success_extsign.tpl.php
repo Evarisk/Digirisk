@@ -104,6 +104,14 @@ $ppExtName = trim($ppExtSignatory->firstname . ' ' . $ppExtSignatory->lastname);
         </div>
         <span class="copied-to-clipboard" style="display: none;"><?php print $langs->trans('CopiedToClipboard'); ?></span>
     </div>
+    
+    <script>
+    document.addEventListener("visibilitychange", function() {
+        if (document.visibilityState === 'visible') {
+            location.reload();
+        }
+    });
+    </script>
 
     <?php if ($ppExtEmailSent) {
         $sql = "SELECT label, note_private FROM " . MAIN_DB_PREFIX . "actioncomm WHERE elementtype = 'preventionplan' AND fk_element = " . (int)$object->id . " AND type_code = 'AC_EMAIL' ORDER BY datep DESC LIMIT 1";
