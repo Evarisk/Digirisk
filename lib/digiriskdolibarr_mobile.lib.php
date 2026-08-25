@@ -195,6 +195,55 @@ function digiriskMobileIsValidIdProf(string $value): bool
 }
 
 /**
+ * Find the third party an exterior company block describes, before creating a new one.
+ *
+ * The mobile forms let the user either pick a company in the list or type its details. Typing them
+ * used to create a new third party every single time, so a company already on file but whose SIREN
+ * is missing or written differently came back as a duplicate. Match on the identifier first, then
+ * fall back on the company name, which is what the user actually recognises.
+ *
+ * @param  DoliDB $db      Database handler
+ * @param  string $idProf  SIREN or SIRET as typed (may hold spaces or dots)
+ * @param  string $name    Company name as typed
+ * @return int             Id of the third party found, 0 when there is none
+ */
+function digiriskMobileFindThirdparty(DoliDB $db, string $idProf = '', string $name = ''): int
+{
+    require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+
+    $idProfClean = digiriskMobileCleanIdProf($idProf);
+
+    if (digiriskMobileIsValidIdProf($idProfClean)) {
+        // A SIRET starts with the SIREN of its company, so comparing the first 9 digits of both
+        // columns matches whichever of the two was typed and whichever the company has on file.
+        // Done in SQL rather than through fetch() because stored values may carry spaces or dots.
+        $sirenPart = substr($idProfClean, 0, 9);
+
+        $sql  = 'SELECT rowid FROM ' . MAIN_DB_PREFIX . 'societe';
+        $sql .= ' WHERE entity IN (' . getEntity('societe') . ')';
+        $sql .= "   AND (REPLACE(REPLACE(REPLACE(siren, ' ', ''), '.', ''), '-', '') = '" . $db->escape($sirenPart) . "'";
+        $sql .= "    OR LEFT(REPLACE(REPLACE(REPLACE(siret, ' ', ''), '.', ''), '-', ''), 9) = '" . $db->escape($sirenPart) . "')";
+        $sql .= ' ORDER BY rowid ASC';
+
+        $resql = $db->query($sql);
+        if ($resql && $db->num_rows($resql)) {
+            $obj = $db->fetch_object($resql);
+            return (int) $obj->rowid;
+        }
+    }
+
+    $name = trim($name);
+    if (dol_strlen($name)) {
+        $thirdparty = new Societe($db);
+        if ($thirdparty->fetch(0, $name) > 0) {
+            return (int) $thirdparty->id;
+        }
+    }
+
+    return 0;
+}
+
+/**
  * Directory holding the photos taken for one risk of a mobile-created object.
  *
  * Keyed by danger category rather than by line ref: the edit path replaces the lines (new refs),
