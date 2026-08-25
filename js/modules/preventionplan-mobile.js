@@ -275,8 +275,12 @@ window.digiriskdolibarr.preventionplanmobile.searchSiren = function() {
 
     window.saturne.loader.display($('.digirisk-mobile-siren-search'));
 
+    // Le nom part avec l'identifiant : une entreprise deja en base dont le SIREN n'est pas
+    // renseigne se retrouve par sa raison sociale au lieu d'etre annoncee comme a creer
+    var companyName = $('.digirisk-mobile-ext-society-name').val() || '';
+
     $.ajax({
-        url: form.data('siren-lookup-url') + '?siren=' + encodeURIComponent(siren),
+        url: form.data('siren-lookup-url') + '?siren=' + encodeURIComponent(siren) + '&name=' + encodeURIComponent(companyName),
         type: 'GET',
         dataType: 'json',
         success: function(resp) {

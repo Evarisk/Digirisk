@@ -51,31 +51,29 @@ if (!$user->hasRight('digiriskdolibarr', 'preventionplan', 'write') && !$user->h
     exit;
 }
 
-$sql = 'SELECT rowid, nom, email, siren, siret, address, zip, town FROM ' . MAIN_DB_PREFIX . 'societe';
-$sql .= ' WHERE entity IN (' . getEntity('societe') . ')';
-
-// Two ways in: the company was picked in the third party list, or its SIREN/SIRET was typed
+// Two ways in: the company was picked in the third party list, or its details were typed
 $socid = GETPOSTINT('socid');
-if ($socid > 0) {
-    $sql .= ' AND rowid = ' . $socid;
-} else {
-    // Keep only digits: matches numbers stored with or without spaces/dots.
+if ($socid <= 0) {
     $idProfClean = digiriskMobileCleanIdProf(GETPOST('siren', 'alphanohtml'));
+    $companyName = trim(GETPOST('name', 'alphanohtml'));
 
-    if (!digiriskMobileIsValidIdProf($idProfClean)) {
+    if (!digiriskMobileIsValidIdProf($idProfClean) && !dol_strlen($companyName)) {
         echo json_encode(['success' => false, 'error' => 'InvalidSiren']);
         exit;
     }
 
-    // A SIRET starts with the SIREN of its company, so comparing the first 9 digits on both columns
-    // matches whichever of the two the user typed and whichever of the two the company has on file.
-    $sirenPart = substr($idProfClean, 0, 9);
-
-    $sql .= " AND (REPLACE(REPLACE(REPLACE(siren, ' ', ''), '.', ''), '-', '') = '" . $db->escape($sirenPart) . "'";
-    $sql .= "  OR LEFT(REPLACE(REPLACE(REPLACE(siret, ' ', ''), '.', ''), '-', ''), 9) = '" . $db->escape($sirenPart) . "')";
+    // Same rule as the create path: identifier first, then the company name. Announcing that a new
+    // company will be created while it is already on file is what produced the duplicates.
+    $socid = digiriskMobileFindThirdparty($db, $idProfClean, $companyName);
+    if ($socid <= 0) {
+        echo json_encode(['success' => true, 'found' => false]);
+        exit;
+    }
 }
 
-$sql .= ' ORDER BY rowid ASC';
+$sql  = 'SELECT rowid, nom, email, siren, siret, address, zip, town FROM ' . MAIN_DB_PREFIX . 'societe';
+$sql .= ' WHERE entity IN (' . getEntity('societe') . ')';
+$sql .= ' AND rowid = ' . ((int) $socid);
 
 $resql = $db->query($sql);
 if (!$resql) {
