@@ -525,7 +525,8 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				<?php
 				print getNomUrlEntity($risk, 1, 'nolink', 1);
 			} elseif ($key == 'fk_element') {
-                if (is_object($alldigiriskelement[$risk->fk_element])) {
+                // L'élément parent est absent de la liste s'il a été mis à la corbeille
+                if (is_object($alldigiriskelement[$risk->fk_element] ?? null)) {
                     // Display either parent element or every parent elements of the risk according to conf
                     if (!getDolGlobalInt('DIGIRISKDOLIBARR_RISK_LIST_PARENT_VIEW')) {
                         print $alldigiriskelement[$risk->fk_element]->getNomUrl(1, 'blank', 0, '', -1, 1);
