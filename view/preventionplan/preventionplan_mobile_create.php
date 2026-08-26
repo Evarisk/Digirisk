@@ -495,6 +495,13 @@ if ($action == 'add_mobile' && $permissiontoadd) {
         $subError = 0;
 
         // 1. Resolve or create the exterior company
+        // Typing the details instead of picking the company in the list used to create a new third
+        // party every time, so a company already on file whose SIREN is missing or written
+        // differently came back as a duplicate. Resolve it first, and only create what is new.
+        if ($extSocietyId <= 0) {
+            $extSocietyId = digiriskMobileFindThirdparty($db, $idProfInput, $societyName);
+        }
+
         if ($extSocietyId > 0) {
             $thirdparty->fetch($extSocietyId);
 

@@ -291,6 +291,12 @@ if ($action == 'add_mobile' && $permissiontoadd) {
         $subError = 0;
 
         // 1. Resolve or create the exterior company
+        // Same duplicate as the prevention plan: typing the details instead of picking the company
+        // in the list created a new third party even when that company was already on file.
+        if ($extSocietyId <= 0) {
+            $extSocietyId = digiriskMobileFindThirdparty($db, $idProfInput, $societyName);
+        }
+
         if ($extSocietyId > 0) {
             $thirdparty->fetch($extSocietyId);
         } else {

@@ -21,11 +21,17 @@
  *          Expects: $langs, $object, $ppExtSignatory, $ppExtSigned, $ppExtEmailSent, $ppExtSignatureUrl.
  */
 
-global $langs;
+global $db, $langs;
 
 if (empty($ppExtSignatory)) {
     return;
 }
+
+require_once __DIR__ . '/../../../lib/digiriskdolibarr_mobile.lib.php';
+
+// Etat des signatures au moment du rendu : le script ci-dessous le compare a celui du serveur
+$ppSignatureState    = digiriskMobileGetSignatureState($db, $object);
+$ppSignatureStateUrl = dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_preventionplan_signature_state.php', 1);
 
 $ppExtName = trim($ppExtSignatory->firstname . ' ' . $ppExtSignatory->lastname);
 ?>
@@ -106,11 +112,54 @@ $ppExtName = trim($ppExtSignatory->firstname . ' ' . $ppExtSignatory->lastname);
     </div>
     
     <script>
-    document.addEventListener("visibilitychange", function() {
-        if (document.visibilityState === 'visible') {
-            location.reload();
+    /*
+     * La signature se donne le plus souvent ailleurs que sur cet ecran : telephone qui a scanne le
+     * QR code, lien du mail ouvert sur un autre appareil. Recharger au retour d'onglet ne suffit
+     * donc pas, la page restant visible pendant tout ce temps : on interroge l'etat des signatures
+     * et on ne recharge que lorsqu'il a change.
+     */
+    (function() {
+        var url       = <?php print json_encode($ppSignatureStateUrl); ?>;
+        var planId    = <?php print (int) $object->id; ?>;
+        var lastState = <?php print json_encode($ppSignatureState['state']); ?>;
+        var timer     = null;
+
+        function check() {
+            fetch(url + '?id=' + planId, {credentials: 'same-origin'})
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (data && data.success && data.state && data.state !== lastState) {
+                        location.reload();
+                    }
+                })
+                .catch(function() { /* hors ligne ou session expiree : on retentera au prochain tour */ });
         }
-    });
+
+        function start() {
+            if (timer === null) {
+                timer = setInterval(check, 15000);
+            }
+        }
+
+        function stop() {
+            if (timer !== null) {
+                clearInterval(timer);
+                timer = null;
+            }
+        }
+
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                check();
+                start();
+            } else {
+                // Inutile d'interroger le serveur pour un ecran que personne ne regarde
+                stop();
+            }
+        });
+
+        start();
+    }());
     </script>
 
     <?php if ($ppExtEmailSent) {
