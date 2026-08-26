@@ -7,38 +7,72 @@
     border-collapse: collapse;
   }
   .tagtr {
-    //display: flex;
     border-bottom: 1px solid rgba(0,0,0,0.2);
   }
   .tagtd {
     padding: 0.3em 0;
   }
+  // Même gabarit que pour les risques partagés : grille à pistes fixes pour que toutes
+  // les lignes s'alignent, et height: auto pour neutraliser le `height: 2em` que le thème
+  // eldy applique à `.confirmquestions .tagtr .tagtd`
   .tagtr > .tagtd:first-child {
-    display: flex;
+    display: grid;
+    grid-template-columns:
+      minmax(0, 1fr)    // entité
+      minmax(0, 1.1fr)  // unité de travail
+      minmax(0, 2.4fr)  // signalisation
+      4.4em             // badge « déjà importé »
+      1.1em;            // sélection de toute l'unité de travail
+    align-items: center;
+    column-gap: 0.5em;
+    height: auto;
 
-    .importsharedrisksign:not(.imported) {
-      width: 30%;
-    }
-    .importsharedrisksign.imported {
-      width: 10%;
-      text-align: center;
-      font-size: 12px;
+    > * {
+      min-width: 0;
     }
     .importsharedrisksign {
+      overflow-wrap: anywhere;
+
       img {
         float: left;
         margin-right: 0.4em;
-        max-width: 35px;
+        max-width: 22px;
+        height: 22px;
       }
+      // overflow crée un contexte de formatage : le libellé reste aligné à côté de
+      // l'icône au lieu de repasser dessous à partir de la deuxième ligne
       > span {
         display: block;
+        overflow: hidden;
       }
       .importsharedrisksign-ref {
         font-weight: 600;
       }
     }
+    // Badge et case de sélection groupée sont épinglés : ils apparaissent chacun sur une
+    // partie des lignes seulement, l'auto-placement les ferait glisser d'une piste.
+    // La vue génère la classe au pluriel, les deux sont ciblées.
+    .importsharedrisksign.imported,
+    .importsharedrisksigns.imported {
+      grid-column: 4;
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.2;
+    }
+    // Collée à droite de la cellule pour venir toucher la case de sélection de la ligne,
+    // qui est dans la cellule suivante
+    > input[type="checkbox"] {
+      grid-column: 5;
+      justify-self: end;
+      margin: 0;
+    }
   }
   .tagtr > .tagtd:last-child {
     vertical-align: middle;
+    padding-left: 0;
+
+    input[type="checkbox"] {
+      margin-left: 3px;
+    }
   }
 }

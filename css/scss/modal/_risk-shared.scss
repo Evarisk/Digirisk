@@ -7,38 +7,91 @@
     border-collapse: collapse;
   }
   .tagtr {
-    //display: flex;
     border-bottom: 1px solid rgba(0,0,0,0.2);
   }
   .tagtd {
     padding: 0.3em 0;
   }
+  // Chaque ligne est une cellule unique contenant les colonnes du risque partagé. Une
+  // grille au gabarit fixe garantit que toutes les lignes s'alignent, y compris celles
+  // qui portent la case « tout sélectionner » ou le badge « déjà importé » : ces deux
+  // pistes gardent leur largeur même quand elles sont vides.
+  // height: auto est indispensable car le thème eldy impose
+  // `.confirmquestions .tagtr .tagtd { height: 2em }` : hors table-cell cette hauteur
+  // devient fixe et le contenu déborde sur les lignes suivantes.
   .tagtr > .tagtd:first-child {
-    display: flex;
+    display: grid;
+    grid-template-columns:
+      minmax(0, 1fr)    // entité
+      minmax(0, 1.1fr)  // unité de travail
+      minmax(0, 1.9fr)  // risque
+      2.4em             // cotation
+      2.6em             // vignette de l'évaluation
+      minmax(0, 1.7fr)  // commentaire de l'évaluation
+      4.4em             // badge « déjà importé »
+      1.1em;            // sélection de toute l'unité de travail
+    align-items: center;
+    column-gap: 0.5em;
+    height: auto;
 
-    .importsharedrisk:not(.imported):not(.risk-evaluation-cotation) {
-      width: 30%;
-    }
-    .importsharedrisk.imported {
-      width: 10%;
-      text-align: center;
-      font-size: 12px;
+    > * {
+      min-width: 0;
     }
     .importsharedrisk {
+      overflow-wrap: anywhere;
+
       img {
         float: left;
         margin-right: 0.4em;
-        max-width: 35px;
+        max-width: 22px;
+        height: 22px;
       }
+      // overflow crée un contexte de formatage : le libellé reste aligné à côté de
+      // l'icône au lieu de repasser dessous à partir de la deuxième ligne
       > span {
         display: block;
+        overflow: hidden;
       }
       .importsharedrisk-ref {
         font-weight: 600;
       }
     }
+    // Badge et case de sélection groupée sont épinglés : ils apparaissent chacun sur une
+    // partie des lignes seulement, l'auto-placement les ferait glisser d'une piste
+    .importsharedrisk.imported {
+      grid-column: 7;
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.2;
+    }
+    // La cotation garde ses 50px sur les autres écrans, trop large pour ce listing dense
+    > .risk-evaluation-cotation {
+      width: 2.4em;
+      min-width: 0;
+      height: 2.4em;
+      line-height: 2.4em;
+      font-size: 13px;
+      margin-right: 0;
+    }
+    .risk-evaluation-photo .photo {
+      width: 2.6em;
+      height: 2.6em;
+      object-fit: cover;
+    }
+    // Collée à droite de la cellule pour venir toucher la case de sélection de la ligne,
+    // qui est dans la cellule suivante
+    > input[type="checkbox"] {
+      grid-column: 8;
+      justify-self: end;
+      margin: 0;
+    }
   }
   .tagtr > .tagtd:last-child {
     vertical-align: middle;
+    padding-left: 0;
+
+    input[type="checkbox"] {
+      margin-left: 3px;
+    }
   }
 }
