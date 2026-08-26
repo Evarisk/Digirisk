@@ -271,7 +271,9 @@ if ($sharedrisks) {
 
 		$previousDigiriskElement = 0;
 		foreach ($allrisks as $key => $risks) {
-			$digiriskelementtmp = $alldigiriskelement[$risks->fk_element];
+			// Un risque partagé peut pointer sur un élément mis à la corbeille : il est absent
+			// de la liste des éléments actifs, la ligne est alors simplement ignorée
+			$digiriskelementtmp = $alldigiriskelement[$risks->fk_element] ?? null;
 
 			if(is_object($digiriskelementtmp)) {
 				$digiriskelementtmp->element = 'digiriskdolibarr';
@@ -319,7 +321,7 @@ if ($sharedrisks) {
 					$pathToThumb  = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/');
 					$nophoto      = DOL_URL_ROOT.'/public/theme/common/nophoto.png';
 
-					$importValue .= '<div class="risk-evaluation-photo risk-evaluation-photo-'. ($lastEvaluation->id > 0 ? $lastEvaluation->id : 0) .  ($risk->id > 0 ? ' risk-' . $risk->id : ' risk-new') .' open-medias-linked" style="margin-right: 0.5em">';
+					$importValue .= '<div class="risk-evaluation-photo risk-evaluation-photo-'. ($lastEvaluation->id > 0 ? $lastEvaluation->id : 0) .  ($risk->id > 0 ? ' risk-' . $risk->id : ' risk-new') .' open-medias-linked">';
 					$importValue .= '<span class="risk-evaluation-photo-single">';
 					$importValue .= '<input class="filepath-to-riskassessment filepath-to-riskassessment-'.( $risk->id > 0 ? $risk->id : 'new') .'" type="hidden" value="'. $pathToThumb .'">';
 					$importValue .=	'<input class="filename" type="hidden" value="">';
