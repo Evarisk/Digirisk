@@ -57,12 +57,14 @@ if (!empty($mysoc->logo_squarred_mini)) {
         </span>
     </a>
     <a href="<?php print DOL_URL_ROOT; ?>/user/card.php?id=<?php print $user->id; ?>" class="digirisk-pwa-header__user" style="text-decoration: none;">
-        <?php if (!empty($user->photo)) {
-            $userPhotoUrl = DOL_URL_ROOT . '/viewimage.php?cache=1&modulepart=userphoto&file=' . urlencode($user->photo);
-            print '<img src="' . $userPhotoUrl . '" alt="" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">';
-        } else {
-            print '<i class="fas fa-user-circle"></i>';
-        } ?>
+        <?php
+        // Build the URL through Form::showphoto(): a user photo lives in <user id>/photos/, so a
+        // hand-made viewimage.php link missing that sub-directory always renders as a broken
+        // image. It also falls back to a generic icon when the file is absent from the disk.
+        require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
+        $pwaHeaderForm = new Form($db);
+        print $pwaHeaderForm->showphoto('userphoto', $user, 0, 0, 0, 'digirisk-pwa-header__avatar', 'small', 0);
+        ?>
         <span class="digirisk-pwa-header__username"><?php print dol_escape_htmltag($user->getFullName($langs)); ?></span>
     </a>
 </div>
