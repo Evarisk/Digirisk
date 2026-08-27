@@ -977,7 +977,7 @@ li.route .row-container .actions .delete-element-btn i {
   pointer-events: none;
 }
 .save-organization:hover {
-  background: rgb(0%, 43.9555987684%, 85.0980392157%);
+  background: rgb(0, 112.0867768595, 217);
   box-shadow: 0 6px 20px rgba(13, 138, 255, 0.5);
   transform: scale(1.1);
 }
@@ -3178,7 +3178,7 @@ textarea.action-textarea:not(:last-child) {
 }
 .tac-timeline__step--current {
   background: rgba(233, 173, 79, 0.16);
-  color: rgb(87.4248366013%, 57.6209150327%, 10.9281045752%);
+  color: rgb(222.9333333333, 146.9333333333, 27.8666666667);
   font-weight: 600;
   box-shadow: 0 0 0 2px rgba(233, 173, 79, 0.18);
   animation: tac-timeline-pulse 1.6s ease-in-out infinite;
@@ -3429,7 +3429,7 @@ textarea.action-textarea:not(:last-child) {
 .tac-hero__density-btn.is-active:hover,
 .tac-hero__tagsmode-btn.is-active:hover,
 .tac-hero__actionsmode-btn.is-active:hover {
-  background: rgb(0%, 49.1208880246%, 95.0980392157%);
+  background: rgb(0, 125.2582644628, 242.5);
   color: #fff;
 }
 
@@ -3462,7 +3462,7 @@ textarea.action-textarea:not(:last-child) {
   border-color: #0d8aff;
 }
 .tac-hero__customize--active:hover {
-  background: rgb(0%, 49.1208880246%, 95.0980392157%);
+  background: rgb(0, 125.2582644628, 242.5);
   color: #fff;
 }
 
@@ -3855,9 +3855,9 @@ textarea.action-textarea:not(:last-child) {
   color: #fff;
 }
 .tac-edit-actions__save:hover {
-  background: rgb(0%, 49.1208880246%, 95.0980392157%);
+  background: rgb(0, 125.2582644628, 242.5);
   color: #fff;
-  border-color: rgb(0%, 49.1208880246%, 95.0980392157%);
+  border-color: rgb(0, 125.2582644628, 242.5);
 }
 
 .tac-editing {
@@ -4513,7 +4513,7 @@ textarea.action-textarea:not(:last-child) {
 }
 .tac-thread__tag--private {
   background: rgba(233, 173, 79, 0.18);
-  color: rgb(83.8692810458%, 55.2774806892%, 10.4836601307%);
+  color: rgb(213.8666666667, 140.9575757576, 26.7333333333);
 }
 .tac-thread__tag--mail {
   background: rgba(122, 92, 240, 0.14);
@@ -4723,7 +4723,7 @@ textarea.action-textarea:not(:last-child) {
   gap: 6px;
 }
 .tac-thread__reply-send:hover {
-  background: rgb(0%, 49.1208880246%, 95.0980392157%);
+  background: rgb(0, 125.2582644628, 242.5);
 }
 .tac-thread__reply-send[disabled] {
   opacity: 0.5;
@@ -4793,13 +4793,13 @@ textarea.action-textarea:not(:last-child) {
 .tac-toast.is-success,
 .ticket-action-card__toast.is-success {
   background: rgba(34, 191, 78, 0.12);
-  color: rgb(7.8933333333%, 44.3419607843%, 18.1082352941%);
+  color: rgb(20.128, 113.072, 46.176);
   border: 1px solid rgba(34, 191, 78, 0.4);
 }
 .tac-toast.is-error,
 .ticket-action-card__toast.is-error {
   background: rgba(224, 83, 83, 0.12);
-  color: rgb(81.6721723172%, 14.7199845455%, 14.7199845455%);
+  color: rgb(208.2640394089, 37.5359605911, 37.5359605911);
   border: 1px solid rgba(224, 83, 83, 0.4);
 }
 
@@ -4999,7 +4999,7 @@ textarea.action-textarea:not(:last-child) {
   transition: background 0.15s ease, box-shadow 0.15s ease;
 }
 .tac-picker-topbar__btn:hover {
-  background: rgb(0%, 48.0878301734%, 93.0980392157%);
+  background: rgb(0, 122.6239669421, 237.4);
   box-shadow: 0 4px 12px rgba(13, 138, 255, 0.3);
 }
 .tac-picker-topbar__btn i {
@@ -5173,12 +5173,12 @@ textarea.action-textarea:not(:last-child) {
 .tac-qc-toast.is-error {
   background: rgba(224, 83, 83, 0.1);
   border: 1px solid rgba(224, 83, 83, 0.4);
-  color: rgb(84.7889500628%, 15.6032068%, 15.6032068%);
+  color: rgb(216.2118226601, 39.7881773399, 39.7881773399);
 }
 .tac-qc-toast.is-success {
   background: rgba(34, 191, 78, 0.1);
   border: 1px solid rgba(34, 191, 78, 0.4);
-  color: rgb(8.4977777778%, 47.7375163399%, 19.4949019608%);
+  color: rgb(21.6693333333, 121.7306666667, 49.712);
 }
 
 .tac-qc-actions {
@@ -5214,7 +5214,7 @@ textarea.action-textarea:not(:last-child) {
 }
 .tac-qc-btn--secondary:hover {
   background: rgba(0, 0, 0, 0.04);
-  border-color: rgb(78.4995737425%, 80.1534526854%, 83.4612105712%);
+  border-color: rgb(200.1739130435, 204.3913043478, 212.8260869565);
 }
 .tac-qc-btn--primary {
   background: #0d8aff;
@@ -5222,7 +5222,7 @@ textarea.action-textarea:not(:last-child) {
   border-color: #0d8aff;
 }
 .tac-qc-btn--primary:hover {
-  background: rgb(0%, 48.0878301734%, 93.0980392157%);
+  background: rgb(0, 122.6239669421, 237.4);
   box-shadow: 0 4px 12px rgba(13, 138, 255, 0.3);
 }
 .tac-qc-btn--primary[disabled] {
@@ -5292,7 +5292,7 @@ textarea.action-textarea:not(:last-child) {
 }
 .tac-qc-dropzone__hint {
   font-size: 0.75em;
-  color: rgb(57.6003337505%, 59.9190654985%, 64.5565289946%);
+  color: rgb(146.8808510638, 152.7936170213, 164.6191489362);
 }
 
 .tac-qc-file-input {
@@ -6265,6 +6265,17 @@ body.digirisk-mobile-create #id-top.digirisk-pwa-header .digirisk-pwa-header__us
 body.digirisk-mobile-create #id-top.digirisk-pwa-header .digirisk-pwa-header__user i {
   font-size: 20px;
   color: #475569;
+}
+body.digirisk-mobile-create #id-top.digirisk-pwa-header .digirisk-pwa-header__avatar,
+body.digirisk-mobile-create #id-top.digirisk-pwa-header img.digirisk-pwa-header__avatar {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  font-size: 11px;
+  line-height: 24px;
+  text-align: center;
 }
 body.digirisk-mobile-create #id-top.digirisk-pwa-header .digirisk-pwa-header__username {
   color: #475569;
@@ -8480,13 +8491,13 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   background: #0d8aff;
 }
 .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(3).active::after {
-  background: rgb(0%, 38.7903095122%, 75.0980392157%);
+  background: rgb(0, 98.9152892562, 191.5);
 }
 .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(4).active::after {
-  background: rgb(0%, 23.2944417436%, 45.0980392157%);
+  background: rgb(0, 59.4008264463, 115);
 }
 .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(5).active::after {
-  background: rgb(0%, 7.798573975%, 15.0980392157%);
+  background: rgb(0, 19.8863636364, 38.5);
 }
 .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(6).active::after {
   background: black;
@@ -8899,29 +8910,61 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   padding: 0.3em 0;
 }
 #dialog-confirm-actionButtonImportSharedRisks .tagtr > .tagtd:first-child {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1.9fr) 2.4em 2.6em minmax(0, 1.7fr) 4.4em 1.1em;
+  align-items: center;
+  column-gap: 0.5em;
+  height: auto;
 }
-#dialog-confirm-actionButtonImportSharedRisks .tagtr > .tagtd:first-child .importsharedrisk:not(.imported):not(.risk-evaluation-cotation) {
-  width: 30%;
+#dialog-confirm-actionButtonImportSharedRisks .tagtr > .tagtd:first-child > * {
+  min-width: 0;
 }
-#dialog-confirm-actionButtonImportSharedRisks .tagtr > .tagtd:first-child .importsharedrisk.imported {
-  width: 10%;
-  text-align: center;
-  font-size: 12px;
+#dialog-confirm-actionButtonImportSharedRisks .tagtr > .tagtd:first-child .importsharedrisk {
+  overflow-wrap: anywhere;
 }
 #dialog-confirm-actionButtonImportSharedRisks .tagtr > .tagtd:first-child .importsharedrisk img {
   float: left;
   margin-right: 0.4em;
-  max-width: 35px;
+  max-width: 22px;
+  height: 22px;
 }
 #dialog-confirm-actionButtonImportSharedRisks .tagtr > .tagtd:first-child .importsharedrisk > span {
   display: block;
+  overflow: hidden;
 }
 #dialog-confirm-actionButtonImportSharedRisks .tagtr > .tagtd:first-child .importsharedrisk .importsharedrisk-ref {
   font-weight: 600;
 }
+#dialog-confirm-actionButtonImportSharedRisks .tagtr > .tagtd:first-child .importsharedrisk.imported {
+  grid-column: 7;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.2;
+}
+#dialog-confirm-actionButtonImportSharedRisks .tagtr > .tagtd:first-child > .risk-evaluation-cotation {
+  width: 2.4em;
+  min-width: 0;
+  height: 2.4em;
+  line-height: 2.4em;
+  font-size: 13px;
+  margin-right: 0;
+}
+#dialog-confirm-actionButtonImportSharedRisks .tagtr > .tagtd:first-child .risk-evaluation-photo .photo {
+  width: 2.6em;
+  height: 2.6em;
+  object-fit: cover;
+}
+#dialog-confirm-actionButtonImportSharedRisks .tagtr > .tagtd:first-child > input[type=checkbox] {
+  grid-column: 8;
+  justify-self: end;
+  margin: 0;
+}
 #dialog-confirm-actionButtonImportSharedRisks .tagtr > .tagtd:last-child {
   vertical-align: middle;
+  padding-left: 0;
+}
+#dialog-confirm-actionButtonImportSharedRisks .tagtr > .tagtd:last-child input[type=checkbox] {
+  margin-left: 3px;
 }
 
 #dialog-confirm-actionButtonImportSharedRiskSigns .confirmtext {
@@ -8938,29 +8981,49 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   padding: 0.3em 0;
 }
 #dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:first-child {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 2.4fr) 4.4em 1.1em;
+  align-items: center;
+  column-gap: 0.5em;
+  height: auto;
 }
-#dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:first-child .importsharedrisksign:not(.imported) {
-  width: 30%;
+#dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:first-child > * {
+  min-width: 0;
 }
-#dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:first-child .importsharedrisksign.imported {
-  width: 10%;
-  text-align: center;
-  font-size: 12px;
+#dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:first-child .importsharedrisksign {
+  overflow-wrap: anywhere;
 }
 #dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:first-child .importsharedrisksign img {
   float: left;
   margin-right: 0.4em;
-  max-width: 35px;
+  max-width: 22px;
+  height: 22px;
 }
 #dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:first-child .importsharedrisksign > span {
   display: block;
+  overflow: hidden;
 }
 #dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:first-child .importsharedrisksign .importsharedrisksign-ref {
   font-weight: 600;
 }
+#dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:first-child .importsharedrisksign.imported,
+#dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:first-child .importsharedrisksigns.imported {
+  grid-column: 4;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.2;
+}
+#dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:first-child > input[type=checkbox] {
+  grid-column: 5;
+  justify-self: end;
+  margin: 0;
+}
 #dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:last-child {
   vertical-align: middle;
+  padding-left: 0;
+}
+#dialog-confirm-actionButtonImportSharedRiskSigns .tagtr > .tagtd:last-child input[type=checkbox] {
+  margin-left: 3px;
 }
 
 .wpeo-modal.modal-photo.modal-active {
@@ -9300,7 +9363,7 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   }
   #id-container.page-ut-gp-list .side-nav .side-nav-responsive:hover {
     cursor: pointer;
-    background: rgb(26.5942684766%, 41.9909502262%, 64.3861236802%);
+    background: rgb(67.8153846154, 107.0769230769, 164.1846153846);
   }
   #id-container.page-ut-gp-list .side-nav #id-left {
     position: absolute;
