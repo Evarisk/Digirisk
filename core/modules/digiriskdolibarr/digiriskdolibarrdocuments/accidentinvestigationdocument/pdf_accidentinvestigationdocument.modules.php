@@ -452,7 +452,7 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
         $preventiveActionTask = is_array($actionTask) ? array_pop($actionTask) : null;
         $totalCATask          = is_object($curativeActionTask) ? $curativeActionTask->hasChildren() : 0;
         $totalPATask          = is_object($preventiveActionTask) ? $preventiveActionTask->hasChildren() : 0;
-        $totalBudget          = get_recursive_task_budget($object->fk_task);
+        $totalBudget          = get_recursive_task_budget((int) $object->fk_task);
 
         $data = [
             'investigation_date_start' => $object->date_start ? dol_print_date($object->date_start, 'dayhour', 'tzuser') : '',

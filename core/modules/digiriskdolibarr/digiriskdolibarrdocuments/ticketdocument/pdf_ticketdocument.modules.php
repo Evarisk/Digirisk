@@ -22,6 +22,9 @@
      * \brief   File of class to generate control document pdf
      */
 
+    // Load Dolibarr libraries
+    require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+
     // Load Saturne libraries
     require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
     require_once __DIR__ . '/../../../../../../saturne/lib/medias.lib.php';
