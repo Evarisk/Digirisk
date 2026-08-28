@@ -6,7 +6,7 @@
  *
  * Variables expected from calling TPL:
  * - $t                      array  Enriched task data (one entry of $tasksJson)
- * - $kanbanThresholds       array  Column threshold config
+ * - $kanbanColumns           array  Columns from digiriskActionPlanGetKanbanColumns()
  * - $allUsers               array  Internal users (responsible / contributor selectors)
  * - $allContacts            array  External contacts (contributor selector)
  * - $allAvailableCategories array  Categories (tag selector)
@@ -104,22 +104,14 @@
             $respFullname = $t['responsible'][0]['fullname'];
             $respId       = $t['responsible'][0]['id'];
         }
-        // Color matching progress bar
-        $p = $t['progress'];
-        if ($p <= $kanbanThresholds['draft_max']) {
-            $respColor = '#999999';
-        } elseif ($p <= $kanbanThresholds['progress_max']) {
-            $respColor = '#e9ad4f';
-        } elseif ($p <= $kanbanThresholds['control_max']) {
-            $respColor = '#3085d6';
-        } else {
-            $respColor = '#47e58e';
-        }
+        // Colour of the column the progress falls in, shared with the progress bar below
+        $cardColumn = digiriskActionPlanGetColumnForProgress($kanbanColumns, (int) $t['progress']);
+        $cardColor  = !empty($cardColumn) ? $cardColumn['color'] : '#999999';
         ?>
         <div class="kanban-responsible-wrapper" data-task-id="<?= $t['id'] ?>" data-current-user="<?= $respId ?>">
             <span class="kanban-initial kanban-initial-responsible <?= empty($respInitial) ? 'kanban-initial-empty' : '' ?>"
                   title="<?= dol_escape_htmltag($respFullname ?: $langs->trans('Unassigned')) ?>"
-                  style="background: <?= $respColor ?>">
+                  style="background: <?= dol_escape_htmltag($cardColor) ?>">
                 <?= $respInitial ?: '?' ?>
             </span>
             <!-- Hidden searchable dropdown, shown on click (same UI as contributor selector) -->
@@ -221,19 +213,8 @@
     <!-- Progress bar -->
     <div class="kanban-card-progress">
         <div class="kanban-progress-bar">
-            <?php
-            if ($t['progress'] <= $kanbanThresholds['draft_max']) {
-                $barClass = 'progress-grey';
-            } elseif ($t['progress'] <= $kanbanThresholds['progress_max']) {
-                $barClass = 'progress-yellow';
-            } elseif ($t['progress'] <= $kanbanThresholds['control_max']) {
-                $barClass = 'progress-blue';
-            } else {
-                $barClass = 'progress-green';
-            }
-            ?>
-            <div class="kanban-progress-fill <?= $barClass ?>"
-                 style="width: <?= $t['progress'] ?>%"></div>
+            <div class="kanban-progress-fill"
+                 style="width: <?= $t['progress'] ?>%; background: <?= dol_escape_htmltag($cardColor) ?>"></div>
         </div>
         <span class="kanban-progress-text"><?= $t['progress'] ?>%</span>
     </div>

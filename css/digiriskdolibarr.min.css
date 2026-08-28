@@ -1922,18 +1922,6 @@ textarea.action-textarea:not(:last-child) {
   border-radius: 7px;
   transition: width 0.4s ease;
 }
-.apgp-fill.progress-grey {
-  background: #999999;
-}
-.apgp-fill.progress-yellow {
-  background: #e9ad4f;
-}
-.apgp-fill.progress-blue {
-  background: #3085d6;
-}
-.apgp-fill.progress-green {
-  background: #47e58e;
-}
 
 .apgp-subtitle {
   margin-top: 6px;
@@ -2765,18 +2753,6 @@ textarea.action-textarea:not(:last-child) {
   height: 100%;
   border-radius: 4px;
   transition: width 0.05s linear;
-}
-.kanban-progress-fill.progress-grey {
-  background: #999999;
-}
-.kanban-progress-fill.progress-yellow {
-  background: #e9ad4f;
-}
-.kanban-progress-fill.progress-blue {
-  background: #3085d6;
-}
-.kanban-progress-fill.progress-green {
-  background: #47e58e;
 }
 
 .kanban-progress-text {

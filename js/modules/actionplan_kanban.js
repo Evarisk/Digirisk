@@ -234,26 +234,20 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
             return Math.max(0, Math.min(100, pct));
         }
 
-        // Visual update – use column thresholds for color
+        // Visual update — the colour comes from the column the percentage falls in
         function updateVisual(pct) {
             $fill.css('width', pct + '%');
-            $fill.removeClass('progress-grey progress-yellow progress-blue progress-green');
 
-            // Find which column this pct belongs to
-            var colorClass = 'progress-grey';
+            var columnColor = $card.closest('.kanban-column').data('color');
             $('.kanban-column').each(function() {
                 var min = parseInt($(this).data('progress-min'));
                 var max = parseInt($(this).data('progress-max'));
                 if (pct >= min && pct <= max) {
-                    var col = $(this).data('column');
-                    if (col === 'draft')    colorClass = 'progress-grey';
-                    if (col === 'progress') colorClass = 'progress-yellow';
-                    if (col === 'control')  colorClass = 'progress-blue';
-                    if (col === 'done')     colorClass = 'progress-green';
+                    columnColor = $(this).data('color');
                     return false;
                 }
             });
-            $fill.addClass(colorClass);
+            $fill.css('background', columnColor);
             $text.text(pct + '%');
         }
 
@@ -727,19 +721,16 @@ window.digiriskdolibarr.actionplanKanban.initSortable = function() {
             var $card    = ui.item;
             var $column  = $(this);
             var taskId   = $card.data('task-id');
-            var colKey   = $column.data('column');
             var progressMax = $column.closest('.kanban-column').data('progress-max');
             var progressMin = $column.closest('.kanban-column').data('progress-min');
             var currentProgress = $card.data('progress');
 
-            // Determine new progress based on column
+            // Determine new progress based on column: a percentage already inside the range is
+            // kept, otherwise the card takes the lowest value of the column. Columns come from
+            // the configuration or from the dictionary, so no column key is assumed here (the
+            // historical draft and done columns are the [0,0] and [100,100] ranges).
             var newProgress = currentProgress;
-            if (colKey === 'draft') {
-                newProgress = 0;
-            } else if (colKey === 'done') {
-                newProgress = 100;
-            } else if (currentProgress < progressMin || currentProgress > progressMax) {
-                // If task is outside the column range, set to column min
+            if (currentProgress < progressMin || currentProgress > progressMax) {
                 newProgress = progressMin;
             }
 
@@ -748,13 +739,10 @@ window.digiriskdolibarr.actionplanKanban.initSortable = function() {
             $card.find('.kanban-progress-fill').css('width', newProgress + '%');
             $card.find('.kanban-progress-text').text(newProgress + '%');
 
-            // Update progress bar color
-            var $fill = $card.find('.kanban-progress-fill');
-            $fill.removeClass('progress-grey progress-yellow progress-blue progress-green');
-            if (colKey === 'draft')         $fill.addClass('progress-grey');
-            else if (colKey === 'progress') $fill.addClass('progress-yellow');
-            else if (colKey === 'control')  $fill.addClass('progress-blue');
-            else                            $fill.addClass('progress-green');
+            // Update progress bar color with the colour of the target column
+            var columnColor = $column.closest('.kanban-column').data('color');
+            $card.find('.kanban-progress-fill').css('background', columnColor);
+            $card.find('.kanban-initial-responsible').css('background', columnColor);
 
             // Remove empty state from target
             $column.find('.kanban-empty').remove();
@@ -798,7 +786,7 @@ window.digiriskdolibarr.actionplanKanban.initLazyLoad = function() {
 /**
  * Inject the next chunk of deferred cards into a column.
  *
- * @param {string} colKey Column key (draft / progress / control / done)
+ * @param {string} colKey Column key
  */
 window.digiriskdolibarr.actionplanKanban.loadMore = function(colKey) {
     var remaining = window.digiriskdolibarr.actionplanKanban.deferredCards[colKey] || [];
@@ -889,16 +877,7 @@ window.digiriskdolibarr.actionplanKanban.saveProgress = function(taskId, newProg
  * @param {string} origHtml Original progress bar HTML (fallback)
  */
 window.digiriskdolibarr.actionplanKanban.updateProgress = function($card, taskId, val, origHtml) {
-    // Restore progress bar
-    var colorClass = val === 0 ? 'progress-red' : (val < 100 ? 'progress-yellow' : 'progress-green');
-    var barHtml = '<div class="kanban-progress-bar">' +
-                  '<div class="kanban-progress-fill ' + colorClass + '" style="width:' + val + '%"></div>' +
-                  '</div>' +
-                  '<span class="kanban-progress-text">' + val + '%</span>';
-    $card.find('.kanban-card-progress').html(barHtml);
-    $card.data('progress', val);
-
-    // Find target column based on thresholds
+    // Find the column the new percentage falls in — its colour paints the card
     var targetColumn = null;
     $('.kanban-column').each(function() {
         var $col = $(this);
@@ -909,6 +888,16 @@ window.digiriskdolibarr.actionplanKanban.updateProgress = function($card, taskId
             return false;
         }
     });
+    var columnColor = targetColumn ? targetColumn.data('color') : $card.closest('.kanban-column').data('color');
+
+    // Restore progress bar
+    var barHtml = '<div class="kanban-progress-bar">' +
+                  '<div class="kanban-progress-fill" style="width:' + val + '%; background:' + columnColor + '"></div>' +
+                  '</div>' +
+                  '<span class="kanban-progress-text">' + val + '%</span>';
+    $card.find('.kanban-card-progress').html(barHtml);
+    $card.find('.kanban-initial-responsible').css('background', columnColor);
+    $card.data('progress', val);
 
     // Move card to target column if needed
     if (targetColumn) {

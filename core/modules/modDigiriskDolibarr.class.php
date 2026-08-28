@@ -930,7 +930,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 MAIN_DB_PREFIX . 'c_accidentinvestigation_attendants_role',
                 MAIN_DB_PREFIX . 'c_preventionplan_attendants_role',
                 MAIN_DB_PREFIX . 'c_firepermit_attendants_role',
-                MAIN_DB_PREFIX . 'c_digiriskdolibarr_certification'
+                MAIN_DB_PREFIX . 'c_digiriskdolibarr_certification',
+                MAIN_DB_PREFIX . 'c_digiriskdolibarr_actionplan_column'
             ],
             // Label of tables
             'tablib' => [
@@ -942,7 +943,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 'AccidentInvestigationRole',
                 'PreventionPlanRole',
                 'FirePermitRole',
-                'CertificationDictionary'
+                'CertificationDictionary',
+                'ActionPlanColumnDictionary'
             ],
             // Request to select fields
             'tabsql' => [
@@ -954,11 +956,13 @@ class modDigiriskdolibarr extends DolibarrModules
                 'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_accidentinvestigation_attendants_role as f',
                 'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_preventionplan_attendants_role as f',
                 'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_firepermit_attendants_role as f',
-                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_certification as f'
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_certification as f',
+                'SELECT f.rowid as rowid, f.ref, f.label, f.progress_min, f.progress_max, f.color, f.picto, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_actionplan_column as f'
             ],
             // Sort order
             'tabsqlsort' => [
                 'code ASC',
+                'position ASC',
                 'position ASC',
                 'position ASC',
                 'position ASC',
@@ -978,7 +982,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 'ref,label,description,position',
                 'ref,label,description,position',
                 'ref,label,description,position',
-                'ref,label,description,position'
+                'ref,label,description,position',
+                'ref,label,progress_min,progress_max,color,picto,position'
             ],
             // List of fields (list of fields to edit a record)
             'tabfieldvalue' => [
@@ -990,7 +995,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 'ref,label,description,position',
                 'ref,label,description,position',
                 'ref,label,description,position',
-                'ref,label,description,position'
+                'ref,label,description,position',
+                'ref,label,progress_min,progress_max,color,picto,position'
             ],
             // List of fields (list of fields for insert)
             'tabfieldinsert' => [
@@ -1002,10 +1008,12 @@ class modDigiriskdolibarr extends DolibarrModules
                 'ref,label,description,position',
                 'ref,label,description,position',
                 'ref,label,description,position',
-                'ref,label,description,position'
+                'ref,label,description,position',
+                'ref,label,progress_min,progress_max,color,picto,position'
             ],
             // Name of columns with primary key (try to always name it 'rowid')
             'tabrowid' => [
+                'rowid',
                 'rowid',
                 'rowid',
                 'rowid',
@@ -1026,7 +1034,26 @@ class modDigiriskdolibarr extends DolibarrModules
                 !empty($conf->digiriskdolibarr->enabled),
                 !empty($conf->digiriskdolibarr->enabled),
                 !empty($conf->digiriskdolibarr->enabled),
+                !empty($conf->digiriskdolibarr->enabled),
                 !empty($conf->digiriskdolibarr->enabled)
+            ],
+            // Help tooltip shown when editing a record
+            'tabhelp' => [
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [
+                    'progress_min' => $langs->trans('ActionPlanColumnProgressHelp'),
+                    'progress_max' => $langs->trans('ActionPlanColumnProgressHelp'),
+                    'color'        => $langs->trans('ActionPlanColumnColorHelp'),
+                    'picto'        => $langs->trans('ActionPlanColumnPictoHelp')
+                ]
             ]
         ];
 

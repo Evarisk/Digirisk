@@ -2242,3 +2242,19 @@ DefaultSvgUsed=SVG par défaut
 
 PwaTilePreventionPlanLocked = Plans validés
 PwaTileFirePermitLocked = Permis validés
+
+# ===========================================================================
+# Action plan Kanban columns dictionary — issue #5017
+# ===========================================================================
+ActionPlanColumnDictionary           = Colonnes du Kanban du plan d'action
+ActionPlanColumnDictionaryDesc       = Colonnes affichées sur le Kanban du PAPRIPACT lorsque le mode dictionnaire est activé : libellé, plage de progression, couleur et icône
+KanbanColumnSource                   = Source des colonnes
+KanbanColumnSourceDesc               = Découper le Kanban avec les seuils de pourcentage ci-dessous (fonctionnement historique) ou avec le dictionnaire des colonnes
+KanbanColumnSourceThresholds         = Seuils de pourcentage (par défaut)
+KanbanColumnSourceDictionary         = Dictionnaire des colonnes
+ActionPlanColumnProgressHelp         = Bornes de progression couvertes par la colonne, de 0 à 100
+ActionPlanColumnColorHelp            = Couleur hexadécimale de la colonne, par exemple #3085d6
+ActionPlanColumnPictoHelp            = Nom d'icône Font Awesome, par exemple fa-check
+Progress_min                         = Progression min.
+Progress_max                         = Progression max.
+Picto                                = Icône

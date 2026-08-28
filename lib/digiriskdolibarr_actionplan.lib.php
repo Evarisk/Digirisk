@@ -366,3 +366,105 @@ function digiriskActionPlanFilterTasks(DoliDB $db, array $taskIDs, array $filter
 
     return $keptTaskIDs;
 }
+
+/**
+ * Return the Kanban columns of the action plan
+ *
+ * Two sources: the percentage thresholds of the module configuration, which is the historical
+ * behaviour and stays the default, or the column dictionary once the configuration points to it.
+ * The dictionary is ignored when it holds no active column, so a board is never left empty.
+ *
+ * @param  DoliDB $db Database handler
+ * @return array      Ordered columns: [['key', 'label', 'icon', 'color', 'min', 'max'], ...]
+ */
+function digiriskActionPlanGetKanbanColumns(DoliDB $db): array
+{
+    global $langs;
+
+    if (getDolGlobalString('DIGIRISKDOLIBARR_KANBAN_COLUMN_SOURCE') == 'dictionary') {
+        $dictionaryColumns = digiriskActionPlanGetDictionaryColumns($db);
+        if (!empty($dictionaryColumns)) {
+            return $dictionaryColumns;
+        }
+    }
+
+    $draftMax    = getDolGlobalInt('DIGIRISKDOLIBARR_KANBAN_DRAFT_MAX', 0);
+    $progressMax = getDolGlobalInt('DIGIRISKDOLIBARR_KANBAN_PROGRESS_MAX', 80);
+    $controlMax  = getDolGlobalInt('DIGIRISKDOLIBARR_KANBAN_CONTROL_MAX', 99);
+
+    return [
+        ['key' => 'draft',    'label' => $langs->trans('ColumnDraft'),      'icon' => 'fa-pencil-alt', 'color' => '#999999', 'min' => 0,                'max' => $draftMax],
+        ['key' => 'progress', 'label' => $langs->trans('ColumnInProgress'), 'icon' => 'fa-play',       'color' => '#e9ad4f', 'min' => $draftMax + 1,    'max' => $progressMax],
+        ['key' => 'control',  'label' => $langs->trans('ColumnInControl'),  'icon' => 'fa-search',     'color' => '#3085d6', 'min' => $progressMax + 1, 'max' => $controlMax],
+        ['key' => 'done',     'label' => $langs->trans('ColumnDone'),       'icon' => 'fa-check',      'color' => '#47e58e', 'min' => 100,              'max' => 100],
+    ];
+}
+
+/**
+ * Return the active columns of the action plan column dictionary
+ *
+ * The seeded rows carry a translation key as label, a renamed one carries free text:
+ * trans() returns the key unchanged when it is not a translation, so both work.
+ *
+ * @param  DoliDB $db Database handler
+ * @return array      Ordered columns, empty when the dictionary holds no active row
+ */
+function digiriskActionPlanGetDictionaryColumns(DoliDB $db): array
+{
+    global $langs;
+
+    $sql  = 'SELECT rowid, ref, label, progress_min, progress_max, color, picto FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_actionplan_column';
+    $sql .= ' WHERE active = 1';
+    $sql .= '   AND entity IN (0, ' . getEntity('c_digiriskdolibarr_actionplan_column') . ')';
+    $sql .= ' ORDER BY position ASC, rowid ASC';
+
+    $resql = $db->query($sql);
+    if (!$resql) {
+        dol_syslog(__FUNCTION__ . ': ' . $db->lasterror(), LOG_ERR);
+        return [];
+    }
+
+    $columns = [];
+    while ($obj = $db->fetch_object($resql)) {
+        $columns[] = [
+            'key'   => 'dict' . (int) $obj->rowid,
+            'label' => $langs->trans($obj->label),
+            'icon'  => !empty($obj->picto) ? $obj->picto : 'fa-columns',
+            'color' => !empty($obj->color) ? $obj->color : '#999999',
+            'min'   => (int) $obj->progress_min,
+            'max'   => (int) $obj->progress_max,
+        ];
+    }
+    $db->free($resql);
+
+    return $columns;
+}
+
+/**
+ * Return the column a progress percentage falls in
+ *
+ * Dictionary ranges may leave holes, so a percentage matching no range falls back on the last
+ * column starting below it, and on the first column when it stands before every range.
+ *
+ * @param  array $columns  Columns from digiriskActionPlanGetKanbanColumns()
+ * @param  int   $progress Progress percentage of the corrective action
+ * @return array           Matching column, empty array when there is no column at all
+ */
+function digiriskActionPlanGetColumnForProgress(array $columns, int $progress): array
+{
+    if (empty($columns)) {
+        return [];
+    }
+
+    $fallbackColumn = [];
+    foreach ($columns as $column) {
+        if ($progress >= $column['min'] && $progress <= $column['max']) {
+            return $column;
+        }
+        if ($progress > $column['max']) {
+            $fallbackColumn = $column;
+        }
+    }
+
+    return !empty($fallbackColumn) ? $fallbackColumn : $columns[0];
+}

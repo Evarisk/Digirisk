@@ -6,7 +6,7 @@
  *
  * Variables expected from calling PHP:
  * - $tasksJson          array  Task data (enriched)
- * - $kanbanThresholds   array  Column threshold config
+ * - $kanbanColumns      array  Columns from digiriskActionPlanGetKanbanColumns()
  * - $globalProgress     int    Global PAPRIPACT progress (average of all task percentages)
  * - $globalTaskCount    int    Total number of corrective actions
  * - $langs              Translate
@@ -16,39 +16,21 @@
 // Number of cards rendered live per column; the rest are lazy-loaded by the JS module
 $kanbanPageSize = getDolGlobalInt('DIGIRISKDOLIBARR_KANBAN_PAGE_SIZE', 30);
 
-// Kanban columns definition
-$columns = [
-    'draft'    => ['label' => $langs->trans('ColumnDraft'),      'icon' => 'fa-pencil-alt', 'color' => '#999999', 'min' => 0,  'max' => $kanbanThresholds['draft_max']],
-    'progress' => ['label' => $langs->trans('ColumnInProgress'), 'icon' => 'fa-play',       'color' => '#e9ad4f', 'min' => $kanbanThresholds['draft_max'] + 1, 'max' => $kanbanThresholds['progress_max']],
-    'control'  => ['label' => $langs->trans('ColumnInControl'),  'icon' => 'fa-search',     'color' => '#3085d6', 'min' => $kanbanThresholds['progress_max'] + 1, 'max' => $kanbanThresholds['control_max']],
-    'done'     => ['label' => $langs->trans('ColumnDone'),       'icon' => 'fa-check',      'color' => '#47e58e', 'min' => 100, 'max' => 100],
-];
-
 // Sort tasks into columns
-$columnTasks = ['draft' => [], 'progress' => [], 'control' => [], 'done' => []];
+$columnTasks = [];
+foreach ($kanbanColumns as $kanbanColumn) {
+    $columnTasks[$kanbanColumn['key']] = [];
+}
 foreach ($tasksJson as $t) {
-    $p = $t['progress'];
-    if ($p <= $kanbanThresholds['draft_max']) {
-        $columnTasks['draft'][] = $t;
-    } elseif ($p <= $kanbanThresholds['progress_max']) {
-        $columnTasks['progress'][] = $t;
-    } elseif ($p <= $kanbanThresholds['control_max']) {
-        $columnTasks['control'][] = $t;
-    } else {
-        $columnTasks['done'][] = $t;
+    $taskColumn = digiriskActionPlanGetColumnForProgress($kanbanColumns, (int) $t['progress']);
+    if (!empty($taskColumn)) {
+        $columnTasks[$taskColumn['key']][] = $t;
     }
 }
 
-// Global progress bar color, matching the per-card threshold logic
-if ($globalProgress <= $kanbanThresholds['draft_max']) {
-    $globalBarClass = 'progress-grey';
-} elseif ($globalProgress <= $kanbanThresholds['progress_max']) {
-    $globalBarClass = 'progress-yellow';
-} elseif ($globalProgress <= $kanbanThresholds['control_max']) {
-    $globalBarClass = 'progress-blue';
-} else {
-    $globalBarClass = 'progress-green';
-}
+// Global progress bar colour, taken from the column the average falls in
+$globalColumn = digiriskActionPlanGetColumnForProgress($kanbanColumns, $globalProgress);
+$globalColor  = !empty($globalColumn) ? $globalColumn['color'] : '#999999';
 ?>
 
 <div class="actionplan-global-progress">
@@ -57,7 +39,7 @@ if ($globalProgress <= $kanbanThresholds['draft_max']) {
         <span class="apgp-percent"><?= $globalProgress ?>%</span>
     </div>
     <div class="apgp-bar">
-        <div class="apgp-fill <?= $globalBarClass ?>" style="width: <?= $globalProgress ?>%"></div>
+        <div class="apgp-fill" style="width: <?= $globalProgress ?>%; background: <?= dol_escape_htmltag($globalColor) ?>"></div>
     </div>
     <div class="apgp-subtitle"><?= $langs->trans('ActionPlanGlobalProgressInfo', $globalTaskCount) ?></div>
 </div>
@@ -81,16 +63,19 @@ if ($globalProgress <= $kanbanThresholds['draft_max']) {
 </div>
 
 <div class="kanban-board" data-token="<?= newToken() ?>">
-    <?php foreach ($columns as $colKey => $colDef) : ?>
-        <div class="kanban-column" data-column="<?= $colKey ?>"
-             data-progress-min="<?= $colDef['min'] ?>"
-             data-progress-max="<?= $colDef['max'] ?>">
-            <div class="kanban-column-header" style="border-top: 3px solid <?= $colDef['color'] ?>">
-                <span class="kanban-column-icon"><i class="fas <?= $colDef['icon'] ?>"></i></span>
-                <span class="kanban-column-title"><?= $colDef['label'] ?></span>
+    <?php foreach ($kanbanColumns as $colDef) :
+        $colKey = $colDef['key'];
+    ?>
+        <div class="kanban-column" data-column="<?= dol_escape_htmltag($colKey) ?>"
+             data-progress-min="<?= (int) $colDef['min'] ?>"
+             data-progress-max="<?= (int) $colDef['max'] ?>"
+             data-color="<?= dol_escape_htmltag($colDef['color']) ?>">
+            <div class="kanban-column-header" style="border-top: 3px solid <?= dol_escape_htmltag($colDef['color']) ?>">
+                <span class="kanban-column-icon"><i class="fas <?= dol_escape_htmltag($colDef['icon']) ?>"></i></span>
+                <span class="kanban-column-title"><?= dol_escape_htmltag($colDef['label']) ?></span>
                 <span class="kanban-column-count"><?= count($columnTasks[$colKey]) ?></span>
             </div>
-            <div class="kanban-column-body kanban-sortable" data-column="<?= $colKey ?>">
+            <div class="kanban-column-body kanban-sortable" data-column="<?= dol_escape_htmltag($colKey) ?>">
                 <?php if (empty($columnTasks[$colKey])) : ?>
                     <div class="kanban-empty"><?= $langs->trans('NoTasks') ?></div>
                 <?php endif; ?>
@@ -111,10 +96,10 @@ if ($globalProgress <= $kanbanThresholds['draft_max']) {
                 }
                 ?>
                 <?php if (!empty($deferredCards)) : ?>
-                    <button type="button" class="kanban-load-more" data-column="<?= $colKey ?>" data-remaining="<?= count($deferredCards) ?>" data-label="<?= dol_escape_htmltag($langs->trans('KanbanLoadMore', '%s')) ?>">
+                    <button type="button" class="kanban-load-more" data-column="<?= dol_escape_htmltag($colKey) ?>" data-remaining="<?= count($deferredCards) ?>" data-label="<?= dol_escape_htmltag($langs->trans('KanbanLoadMore', '%s')) ?>">
                         <i class="fas fa-chevron-down"></i> <span class="kanban-load-more-text"><?= $langs->trans('KanbanLoadMore', count($deferredCards)) ?></span>
                     </button>
-                    <script type="application/json" class="kanban-deferred-data" data-column="<?= $colKey ?>"><?= json_encode($deferredCards, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) ?></script>
+                    <script type="application/json" class="kanban-deferred-data" data-column="<?= dol_escape_htmltag($colKey) ?>"><?= json_encode($deferredCards, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) ?></script>
                 <?php endif; ?>
             </div>
         </div>
