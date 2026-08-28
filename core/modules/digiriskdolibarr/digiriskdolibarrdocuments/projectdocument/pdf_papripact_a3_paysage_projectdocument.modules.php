@@ -280,10 +280,12 @@ class pdf_papripact_a3_paysage_projectdocument
 
             $objectDocumentRef = dol_sanitizeFileName($objectDocument->ref);
 
-            $dir = $conf->projet->dir_output . '/' . (dol_strlen($object->ref) > 0 ? $object->ref : '');
-
+            // A generated report is filed with the project it reports on, a specimen has no
+            // project: file it in the module directory, where the admin preview looks for it
             if ($moreParam['specimen'] == 1 && $moreParam['zone'] == 'public') {
-                $dir .= 'public_specimen';
+                $dir = getMultidirOutput($objectDocument, $objectDocument->module) . '/' . $objectDocument->element . '/public_specimen';
+            } else {
+                $dir = $conf->projet->dir_output . '/' . (dol_strlen($object->ref) > 0 ? $object->ref : '');
             }
 
             if (!file_exists($dir)) {
