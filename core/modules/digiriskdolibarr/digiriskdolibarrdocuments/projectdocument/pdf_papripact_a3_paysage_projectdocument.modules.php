@@ -30,8 +30,10 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/pdf.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 
+require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/riskassessment.class.php';
+require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_actionplan.lib.php';
 
 /**
  *	Class to manage generation of project document papripact_a3_paysage
@@ -190,7 +192,8 @@ class pdf_papripact_a3_paysage_projectdocument
         if ($this->orientation == 'L' || $this->orientation == 'Landscape') {
             $this->posxref                   = $this->marge_gauche + 1;           // Start position
             $this->posxlabel                 = $this->posxref + 25;               // Ref: 35mm
-            $this->posxdatestart             = $this->posxlabel + 120;             // Label: 65mm (main content)
+            $this->posxelement               = $this->posxlabel + 95;             // Label: 95mm (main content)
+            $this->posxdatestart             = $this->posxelement + 25;           // GP/UT: 25mm
             $this->posxdateend               = $this->posxdatestart + 20;         // Start Date: 25mm
             $this->posxworkload              = $this->posxdateend + 20;           // End Date: 25mm
             $this->posxbudget                = $this->posxworkload + 30;          // Workload: 30mm
@@ -202,6 +205,7 @@ class pdf_papripact_a3_paysage_projectdocument
         } else {
             $this->posxref                   = $this->marge_gauche + 1;
             $this->posxlabel                 = $this->marge_gauche + 25;
+            $this->posxelement               = $this->marge_gauche + 28;
             $this->posxdatestart             = $this->marge_gauche + 30;
             $this->posxdateend               = $this->marge_gauche + 40;
             $this->posxworkload              = $this->marge_gauche + 60;
@@ -215,6 +219,7 @@ class pdf_papripact_a3_paysage_projectdocument
         if ($this->page_largeur < 210) { // To work with US executive format
             $this->posxref                   -= 20;
             $this->posxlabel                 -= 20;
+            $this->posxelement               -= 20;
             $this->posxdatestart             -= 20;
             $this->posxdateend               -= 20;
             $this->posxworkload              -= 20;
@@ -350,6 +355,15 @@ class pdf_papripact_a3_paysage_projectdocument
 
 				$object->lines = $tasksarray;
 
+				// The document follows the criteria applied on the action plan screen (GP/UT, risk level, tags)
+				if (!empty($moreParam['actionPlanFilters']) && digiriskActionPlanHasFilters($moreParam['actionPlanFilters'])) {
+					$keptTaskIDs   = digiriskActionPlanFilterTasks($this->db, array_map(function ($line) { return (int) $line->id; }, $object->lines), $moreParam['actionPlanFilters']);
+					$keptTaskMap   = array_flip($keptTaskIDs);
+					$object->lines = array_values(array_filter($object->lines, function ($line) use ($keptTaskMap) {
+						return isset($keptTaskMap[(int) $line->id]);
+					}));
+				}
+
 				$nblines = count($object->lines);
 
 				$pdf->Open();
@@ -416,6 +430,7 @@ class pdf_papripact_a3_paysage_projectdocument
 
 				// Sort the info by descending order of cotation
 				$objectDoc = array();
+				$digiriskElementLabels = array();
 				for ($i = 0; $i < $nblines; $i++) {
                     $object->lines[$i]->fetch_optionals();
                     // A corrective action is not necessarily linked to a risk: reset and guard the fetch to avoid a fatal on a null fk_risk
@@ -440,10 +455,23 @@ class pdf_papripact_a3_paysage_projectdocument
 
                     $risk->category = $fkRisk > 0 ? $risk->getDangerCategoryName($risk) : '';
 
+                    // GP/UT carrying the risk — the same element carries many risks, resolve it once.
+                    // The column is narrow, the ref sits on its own line above the truncated label.
+                    $elementText = '';
+                    if ($fkRisk > 0 && $risk->fk_element > 0) {
+                        $elementID = (int) $risk->fk_element;
+                        if (!isset($digiriskElementLabels[$elementID])) {
+                            $digiriskElement                   = new DigiriskElement($this->db);
+                            $digiriskElementLabels[$elementID] = $digiriskElement->fetch($elementID) > 0 ? $digiriskElement->ref . "\n" . dol_trunc($digiriskElement->label, 15) : '';
+                        }
+                        $elementText = $digiriskElementLabels[$elementID];
+                    }
+
 					$tmpArray = array("cotation" => empty($lastEvaluation->cotation) ? 0 : $lastEvaluation->cotation);
 					$tmpArray += array("task_ref" => $object->lines[$i]->ref);
 					$tmpArray += array("risk_ref" => $risk->ref);
                     $tmpArray += array("risk_category" => $risk->category);
+                    $tmpArray += array("element" => $elementText);
 					$tmpArray += array("label" => $object->lines[$i]->label);
 					$tmpArray += array("budget" => $object->lines[$i]->budget_amount);
 					$tmpArray += array("progress" => $object->lines[$i]->progress ? $object->lines[$i]->progress . '%' : '');
@@ -473,6 +501,7 @@ class pdf_papripact_a3_paysage_projectdocument
 					$libelleline      = $objectDoc[$i]['label'];
 					$riskref          = $objectDoc[$i]['risk_ref'];
                     $riskcategory     = $objectDoc[$i]['risk_category'];
+                    $elementline      = $objectDoc[$i]['element'];
 					$lastEvaluation   = $objectDoc[$i]['cotation'];
 					$budget           = price($objectDoc[$i]['budget'], 0, $langs, 1, 0, 0, $conf->currency);
 					$progress         = $objectDoc[$i]['progress'];
@@ -487,7 +516,7 @@ class pdf_papripact_a3_paysage_projectdocument
 					$pdf->startTransaction();
 					// Label
 					$pdf->SetXY($this->posxlabel, $curY);
-					$pdf->MultiCell($this->posxdatestart - $this->posxlabel, 3, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
+					$pdf->MultiCell($this->posxelement - $this->posxlabel, 3, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
                     $labelHeightAfter = $pdf->GetY();
                     $labelHeight = $labelHeightAfter - $labelHeightBefore;
 					$posyafter = $labelHeightAfter; // Y position reached by the label, used below to know if there is still room for the total block
@@ -542,7 +571,7 @@ class pdf_papripact_a3_paysage_projectdocument
 								// Label
 								$pdf->SetXY($this->posxlabel, $curY);
 								$posybefore = $pdf->GetY();
-								$pdf->MultiCell($this->posxdatestart - $this->posxlabel, 6, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
+								$pdf->MultiCell($this->posxelement - $this->posxlabel, 6, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
 								$pageposafter = $pdf->getPage();
 								$posyafter    = $pdf->GetY();
 							}
@@ -569,6 +598,12 @@ class pdf_papripact_a3_paysage_projectdocument
 					// Ref of task
 					$pdf->SetXY($this->posxref, $curY);
 					$pdf->MultiCell($this->posxlabel - $this->posxref, 6, $outputLangs->convToOutputCharset($ref), 0, 'L');
+
+                    // GP/UT carrying the risk of the task
+                    $pdf->SetXY($this->posxelement, $curY);
+                    $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 3);
+                    $pdf->MultiCell($this->posxdatestart - $this->posxelement, 3, $outputLangs->convToOutputCharset($elementline), 0, 'L');
+                    $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1);
 
                     // Date start and end
                     $pdf->SetXY($this->posxdatestart, $curY);
@@ -770,7 +805,11 @@ class pdf_papripact_a3_paysage_projectdocument
 
         // Task label
         $pdf->SetXY($this->posxlabel, $tab_top + 1);
-        $pdf->MultiCell($this->posxdatestart - $this->posxlabel, 3, $outputLangs->transnoentities('Label'), 0, 'L');
+        $pdf->MultiCell($this->posxelement - $this->posxlabel, 3, $outputLangs->transnoentities('Label'), 0, 'L');
+
+        // GP/UT carrying the risk of the task
+        $pdf->SetXY($this->posxelement, $tab_top + 1);
+        $pdf->MultiCell($this->posxdatestart - $this->posxelement, 3, $outputLangs->transnoentities('ActionPlanElement'), 0, 'L');
 
         // Date start
         $pdf->SetXY($this->posxdatestart, $tab_top + 1);

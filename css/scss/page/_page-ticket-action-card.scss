@@ -1981,6 +1981,99 @@ $tac-border:       #e5e7eb;
 }
 
 // ---------------------------------------------------------------------------
+// Tag filter — issue #4907. Applies to every dimension board at once.
+// ---------------------------------------------------------------------------
+.tac-picker-tagfilter {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid $tac-border;
+    border-radius: 8px;
+
+    &__label {
+        font-size: 0.8em;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        color: #888;
+        white-space: nowrap;
+        padding-top: 3px;
+
+        i { margin-right: 3px; }
+    }
+
+    &__chips {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+        flex: 1;
+        max-height: 84px;
+        overflow-y: auto;
+    }
+
+    &__chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 2px 10px;
+        background: #fff;
+        border: 1px solid $tac-border;
+        border-radius: 12px;
+        font-family: inherit;
+        font-size: 0.78em;
+        font-weight: 600;
+        color: #444;
+        cursor: pointer;
+        transition: background 0.15s ease, color 0.15s ease;
+
+        &:hover { background: #f5f8ff; }
+
+        &.selected {
+            background: $tac-blue;
+            border-color: $tac-blue;
+            color: #fff;
+
+            .tac-picker-tagfilter__dot { background: #fff !important; }
+        }
+    }
+
+    &__dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    &__reset {
+        display: none;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        background: #fff;
+        border: 1px solid $tac-border;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 0.78em;
+        font-weight: 600;
+        color: #666;
+        cursor: pointer;
+
+        &.visible { display: inline-flex; }
+
+        &:hover { border-color: #e05353; color: #e05353; }
+    }
+}
+
+.tac-picker-card--filtered {
+    display: none !important;
+}
+
+// ---------------------------------------------------------------------------
 // Quick-create drawer.
 // ---------------------------------------------------------------------------
 .tac-quick-create {

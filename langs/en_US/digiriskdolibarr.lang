@@ -310,3 +310,21 @@ MobileSuccessInteriorSignedOn=Interior responsible (EU) : Signed on %s
 MobilePPErrorInvalidEmail = Please respect the email format.
 MobilePPErrorInvalidPhone = Please respect the phone format.
 MobileSuccessExteriorPendingSignature = Exterior Company Responsible (EE) : Pending signature
+
+# ===========================================================================
+# Action plan filters — issue #4907 (GP/UT, risk level, tags)
+# ===========================================================================
+ActionPlanElement                    = GP/WU
+ActionPlanFilterElementChildren      = With the sub elements
+ActionPlanFilterElementChildrenHelp  = Include the corrective actions of the GP/WU below the selected one
+ActionPlanFilterScale                = Risk level
+ActionPlanFilterAllScales            = All levels
+ActionPlanFilterTags                 = Tags
+ActionPlanFilterCount                = %s corrective action(s) displayed out of %s
+ActionPlanDictionaries               = Kanban lists
+ActionPlanDictionariesDesc           = Manage the values offered in the action plan and Kanban lists
+ActionPlanTagDictionary              = Corrective action tags
+ActionPlanTagDictionaryDesc          = Tags (task categories) offered on the cards and in the action plan Kanban filter
+ActionPlanTicketDictionaries         = Ticket Kanban dictionaries
+ActionPlanTicketDictionariesDesc     = Types, groups and severities making up the ticket Kanban columns
+ActionPlanManageDictionary           = Manage

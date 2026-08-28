@@ -1681,6 +1681,7 @@ window.digiriskdolibarr.ticketPickerKanban.init = function() {
     window.digiriskdolibarr.ticketPickerKanban.initSortable();
     window.digiriskdolibarr.ticketPickerKanban.initSettings();
     window.digiriskdolibarr.ticketPickerKanban.initQuickCreate();
+    window.digiriskdolibarr.ticketPickerKanban.restoreTagFilter();
 
     // Restore the last active tab from localStorage.
     var savedDim = localStorage.getItem('tacPickerActiveDim');
@@ -1822,6 +1823,17 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
     // Prevent drag on tag elements
     $(document).on('mousedown', '.tac-picker-kanban-board .kanban-tag, .tac-picker-kanban-board .kanban-tag-remove, .tac-picker-kanban-board .kanban-add-tag-btn, .tac-picker-kanban-board .kanban-tag-dropdown, .tac-picker-kanban-board .kanban-tag-option', function(e) {
         e.stopPropagation();
+    });
+
+    // Tag filter — toggling a chip filters every board at once
+    $(document).on('click', '#tacPickerTagFilter .tac-picker-tagfilter__chip', function() {
+        $(this).toggleClass('selected');
+        window.digiriskdolibarr.ticketPickerKanban.applyTagFilter();
+    });
+
+    $(document).on('click', '#tacPickerTagFilterReset', function() {
+        $('#tacPickerTagFilter .tac-picker-tagfilter__chip').removeClass('selected');
+        window.digiriskdolibarr.ticketPickerKanban.applyTagFilter();
     });
 
     // Tab switching — persist active dim in localStorage so F5 keeps the current tab.
@@ -2016,15 +2028,86 @@ window.digiriskdolibarr.ticketPickerKanban.initSortable = function() {
 };
 
 /**
- * Update column header counters after a card move.
+ * Update column header counters after a card move. Cards hidden by the tag filter
+ * are left out so a column shows what it currently displays.
  *
  * @return {void}
  */
 window.digiriskdolibarr.ticketPickerKanban.updateCounts = function() {
     $('.tac-picker-column').each(function() {
-        var count = $(this).find('.tac-picker-card').length;
+        var count = $(this).find('.tac-picker-card').not('.tac-picker-card--filtered').length;
         $(this).find('.kanban-column-count').text(count);
     });
+};
+
+/**
+ * Tag ids currently selected in the filter bar.
+ *
+ * @return {Array} Category ids, as strings
+ */
+window.digiriskdolibarr.ticketPickerKanban.getFilteredTags = function() {
+    var catIds = [];
+    $('#tacPickerTagFilter .tac-picker-tagfilter__chip.selected').each(function() {
+        catIds.push(String($(this).data('cat-id')));
+    });
+
+    return catIds;
+};
+
+/**
+ * Hide the cards carrying none of the selected tags, on every board at once.
+ * The selection is kept in localStorage so a reload reopens the same filter.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.applyTagFilter = function() {
+    var selectedTags = window.digiriskdolibarr.ticketPickerKanban.getFilteredTags();
+
+    $('.tac-picker-card').each(function() {
+        var $card = $(this);
+        var keep  = true;
+
+        if (selectedTags.length) {
+            keep = $card.find('.kanban-card-tags .kanban-tag').filter(function() {
+                return selectedTags.indexOf(String($(this).data('cat-id'))) !== -1;
+            }).length > 0;
+        }
+
+        $card.toggleClass('tac-picker-card--filtered', !keep);
+    });
+
+    $('#tacPickerTagFilterReset').toggleClass('visible', selectedTags.length > 0);
+
+    try {
+        localStorage.setItem('tacPickerTagFilter', JSON.stringify(selectedTags));
+    } catch (e) {
+        // Private browsing: the filter simply does not survive the reload
+    }
+
+    window.digiriskdolibarr.ticketPickerKanban.updateCounts();
+};
+
+/**
+ * Re-select the tags kept from the previous visit and filter the boards accordingly.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.restoreTagFilter = function() {
+    var savedTags = [];
+    try {
+        savedTags = JSON.parse(localStorage.getItem('tacPickerTagFilter') || '[]');
+    } catch (e) {
+        savedTags = [];
+    }
+    if (!$.isArray(savedTags) || !savedTags.length) {
+        return;
+    }
+
+    savedTags.forEach(function(catId) {
+        $('#tacPickerTagFilter .tac-picker-tagfilter__chip[data-cat-id="' + catId + '"]').addClass('selected');
+    });
+
+    window.digiriskdolibarr.ticketPickerKanban.applyTagFilter();
 };
 
 /**
@@ -2193,6 +2276,8 @@ window.digiriskdolibarr.ticketPickerKanban.saveTagAdd = function(ticketId, catId
                 $opt.addClass('assigned').append('<i class="fas fa-check" style="margin-left:auto;font-size:9px;color:#28a745"></i>');
                 $card.addClass('kanban-card-saved');
                 setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);
+                // The card now carries one more tag, it may enter the filtered selection
+                window.digiriskdolibarr.ticketPickerKanban.applyTagFilter();
             } else {
                 $card.addClass('kanban-card-error');
                 setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
@@ -2228,6 +2313,8 @@ window.digiriskdolibarr.ticketPickerKanban.saveTagRemove = function(ticketId, ca
                 $tag.slideUp(150, function() {
                     $(this).remove();
                     $card.find('.kanban-tag-option[data-value="' + catId + '"]').removeClass('assigned').find('.fa-check').remove();
+                    // The card lost a tag, it may fall out of the filtered selection
+                    window.digiriskdolibarr.ticketPickerKanban.applyTagFilter();
                 });
                 $card.addClass('kanban-card-saved');
                 setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);
