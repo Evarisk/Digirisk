@@ -1596,6 +1596,210 @@ textarea.action-textarea:not(:last-child) {
   }
 }
 /* =============================================
+ * ACTION PLAN FILTERS (GP/UT, RISK LEVEL, TAGS)
+ * ============================================= */
+.actionplan-filter-bar {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+.actionplan-filter-bar .apf-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.actionplan-filter-bar .apf-row-tags {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #e8e8e8;
+}
+.actionplan-filter-bar label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  white-space: nowrap;
+  margin: 0;
+}
+.actionplan-filter-bar label i {
+  color: #999;
+  margin-right: 3px;
+}
+.actionplan-filter-bar select {
+  max-width: 300px;
+}
+
+.apf-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.apf-children-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.apf-scale-dots {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.apf-scale-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+.apf-scale-dot.selected {
+  box-shadow: 0 0 0 2px #3085d6;
+}
+
+.apf-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.apf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #fff;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #444;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.apf-btn:hover {
+  background: #f5f8ff;
+  border-color: #3085d6;
+  color: #3085d6;
+}
+
+.apf-btn-reset:hover {
+  background: #fdf3f3;
+  border-color: #e05353;
+  color: #e05353;
+}
+
+.apf-count {
+  font-size: 12px;
+  color: #888;
+  white-space: nowrap;
+}
+.apf-count i {
+  margin-right: 3px;
+}
+.apf-count.filtered {
+  color: #3085d6;
+  font-weight: 600;
+}
+
+.apf-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 96px;
+  overflow-y: auto;
+}
+
+.apf-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid #d0d0d0;
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #444;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.apf-tag input {
+  display: none;
+}
+.apf-tag.selected {
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+}
+.apf-tag.selected .apf-tag-dot {
+  background: #fff !important;
+}
+
+.apf-tag-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* GP/UT of the linked risk, shown on each Kanban card */
+.kanban-card-element {
+  margin-bottom: 8px;
+}
+
+.kanban-element-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  background: #eef4fc;
+  border: 1px solid #cfe0f5;
+  border-radius: 10px;
+  padding: 1px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #263c5c;
+}
+.kanban-element-badge:hover {
+  background: #dfeafb;
+}
+.kanban-element-badge i {
+  font-size: 9px;
+  opacity: 0.7;
+}
+
+.kanban-element-ref {
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.kanban-element-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kanban-element-workunit {
+  background: #eaf4ff;
+  border-color: #c6e0ff;
+  color: #0d8aff;
+}
+
+@media (max-width: 767px) {
+  .actionplan-filter-bar .apf-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .apf-actions {
+    margin-left: 0;
+  }
+}
+/* =============================================
  * KANBAN SETTINGS
  * ============================================= */
 .kanban-settings-wrapper {
@@ -5004,6 +5208,96 @@ textarea.action-textarea:not(:last-child) {
 }
 .tac-picker-topbar__btn i {
   font-size: 0.9em;
+}
+
+.tac-picker-tagfilter {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+.tac-picker-tagfilter__label {
+  font-size: 0.8em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #888;
+  white-space: nowrap;
+  padding-top: 3px;
+}
+.tac-picker-tagfilter__label i {
+  margin-right: 3px;
+}
+.tac-picker-tagfilter__chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+  max-height: 84px;
+  overflow-y: auto;
+}
+.tac-picker-tagfilter__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 10px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.78em;
+  font-weight: 600;
+  color: #444;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.tac-picker-tagfilter__chip:hover {
+  background: #f5f8ff;
+}
+.tac-picker-tagfilter__chip.selected {
+  background: #0d8aff;
+  border-color: #0d8aff;
+  color: #fff;
+}
+.tac-picker-tagfilter__chip.selected .tac-picker-tagfilter__dot {
+  background: #fff !important;
+}
+.tac-picker-tagfilter__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.tac-picker-tagfilter__reset {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.78em;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+}
+.tac-picker-tagfilter__reset.visible {
+  display: inline-flex;
+}
+.tac-picker-tagfilter__reset:hover {
+  border-color: #e05353;
+  color: #e05353;
+}
+
+.tac-picker-card--filtered {
+  display: none !important;
 }
 
 .tac-quick-create {

@@ -1789,6 +1789,24 @@ ActionPlanTaskDateStartChanged     = Date début modifiée : %s → %s
 ActionPlanTaskDateEndChanged       = Date fin modifiée : %s → %s
 
 # ===========================================================================
+# Action plan filters — issue #4907 (GP/UT, risk level, tags)
+# ===========================================================================
+ActionPlanElement                    = GP/UT
+ActionPlanFilterElementChildren      = Avec les sous-éléments
+ActionPlanFilterElementChildrenHelp  = Inclure les actions correctives des GP/UT enfants du GP/UT sélectionné
+ActionPlanFilterScale                = Niveau de risque
+ActionPlanFilterAllScales            = Tous les niveaux
+ActionPlanFilterTags                 = Tags
+ActionPlanFilterCount                = %s action(s) corrective(s) affichée(s) sur %s
+ActionPlanDictionaries               = Listes du Kanban
+ActionPlanDictionariesDesc           = Gérer les valeurs proposées dans les listes du plan d'action et des Kanban
+ActionPlanTagDictionary              = Tags des actions correctives
+ActionPlanTagDictionaryDesc          = Tags (catégories de tâches) proposés sur les cartes et dans le filtre du Kanban du plan d'action
+ActionPlanTicketDictionaries         = Dictionnaires des Kanban tickets
+ActionPlanTicketDictionariesDesc     = Types, groupes et sévérités qui composent les colonnes des Kanban tickets
+ActionPlanManageDictionary           = Gérer
+
+# ===========================================================================
 # Ticket action card — issue #4443 (1-click tile UI)
 # ===========================================================================
 TicketActionCard                     = Action ticket

@@ -79,6 +79,19 @@
     <!-- Label -->
     <div class="kanban-card-label"><?= dol_escape_htmltag($t['label']) ?></div>
 
+    <!-- GP/UT carrying the linked risk -->
+    <?php if (!empty($t['element_ref'])) : ?>
+        <div class="kanban-card-element">
+            <a href="<?= DOL_URL_ROOT ?>/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php?id=<?= (int) $t['element_id'] ?>"
+               class="kanban-element-badge kanban-element-<?= dol_escape_htmltag($t['element_type']) ?>" target="_blank"
+               title="<?= dol_escape_htmltag($t['element_ref'] . ' - ' . $t['element_label']) ?>">
+                <i class="fas fa-sitemap"></i>
+                <span class="kanban-element-ref"><?= dol_escape_htmltag($t['element_ref']) ?></span>
+                <span class="kanban-element-label"><?= dol_escape_htmltag($t['element_label']) ?></span>
+            </a>
+        </div>
+    <?php endif; ?>
+
     <!-- Contacts row: [Resp initial] | [Contrib initials] [count] [👤+] -->
     <div class="kanban-card-contacts">
         <!-- Responsible: clickable initial circle -->

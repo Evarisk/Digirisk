@@ -34,6 +34,7 @@ global $conf, $db, $langs, $user;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
+require_once DOL_DOCUMENT_ROOT . "/categories/class/categorie.class.php";
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr.lib.php';
 
@@ -169,6 +170,38 @@ foreach ($kanbanSettings as $constName => $cfg) {
 print '</table>';
 print '<div class="center"><input type="submit" class="button button-save" value="' . $langs->trans("Save") . '"></div>';
 print '</form>';
+
+// Lists feeding the Kanban boards — their values live in Dolibarr categories and dictionaries,
+// the shortcuts below open the screen managing each one
+print '<br>';
+print load_fiche_titre('<i class="fas fa-list-ul"></i> ' . $langs->trans("ActionPlanDictionaries"), '', '');
+print '<hr>';
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans("Name") . '</td>';
+print '<td>' . $langs->trans("Description") . '</td>';
+print '<td class="center">' . $langs->trans("Action") . '</td>';
+print '</tr>';
+
+$kanbanDictionaries = [
+    ['ActionPlanTagDictionary', 'ActionPlanTagDictionaryDesc', DOL_URL_ROOT . '/categories/categorie_list.php?type=' . Categorie::TYPE_PROJECT_TASK],
+];
+if (isModEnabled('ticket')) {
+    $kanbanDictionaries[] = ['ActionPlanTicketDictionaries', 'ActionPlanTicketDictionariesDesc', DOL_URL_ROOT . '/admin/dict.php'];
+}
+
+foreach ($kanbanDictionaries as $kanbanDictionary) {
+    print '<tr class="oddeven"><td>';
+    print $langs->trans($kanbanDictionary[0]);
+    print '</td><td>';
+    print $langs->trans($kanbanDictionary[1]);
+    print '</td><td class="center">';
+    print '<a class="butAction" href="' . $kanbanDictionary[2] . '" target="_blank"><i class="fas fa-external-link-alt"></i> ' . $langs->trans('ActionPlanManageDictionary') . '</a>';
+    print '</td></tr>';
+}
+
+print '</table>';
 
 // Page end
 print dol_get_fiche_end();

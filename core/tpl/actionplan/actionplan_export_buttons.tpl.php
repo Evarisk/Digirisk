@@ -21,9 +21,10 @@
  * \brief   Top-right export toolbar for the action plan (CSV / A3 PDF / Gantt PNG)
  *
  * Variables expected from calling PHP:
- * - $view  string    Current view ('kanban' or 'gantt')
- * - $user  User      Current user (permission checks)
- * - $langs Translate Translation object
+ * - $view              string    Current view ('kanban' or 'gantt')
+ * - $actionPlanFilters array     Criteria from digiriskActionPlanGetFilters(), carried over to the exports
+ * - $user              User      Current user (permission checks)
+ * - $langs             Translate Translation object
  */
 
 // Server-side exports POST to the current view (CSRF token included); the Gantt
@@ -36,6 +37,7 @@ $exportAction = $_SERVER['PHP_SELF'] . '?view=' . urlencode($view);
         <form method="POST" action="<?php echo $exportAction; ?>" class="ap-export-form">
             <input type="hidden" name="token" value="<?php echo newToken(); ?>">
             <input type="hidden" name="action" value="exportCsv">
+            <?php echo digiriskActionPlanFilterHiddenInputs($actionPlanFilters); ?>
             <button type="submit" class="ap-export-btn" title="<?php echo dol_escape_htmltag($langs->trans('ActionPlanExportCsv')); ?>">
                 <i class="fas fa-download"></i>
                 <span class="ap-export-label">CSV</span>
@@ -47,6 +49,7 @@ $exportAction = $_SERVER['PHP_SELF'] . '?view=' . urlencode($view);
             <input type="hidden" name="token" value="<?php echo newToken(); ?>">
             <input type="hidden" name="action" value="builddoc">
             <input type="hidden" name="model" value="papripact_a3_paysage_projectdocument">
+            <?php echo digiriskActionPlanFilterHiddenInputs($actionPlanFilters); ?>
             <button type="submit" class="ap-export-btn" title="<?php echo dol_escape_htmltag($langs->trans('ActionPlanExportA3')); ?>">
                 <i class="fas fa-download"></i>
                 <span class="ap-export-label">A3</span>
