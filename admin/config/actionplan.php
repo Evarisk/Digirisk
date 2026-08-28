@@ -68,6 +68,11 @@ if ($action == 'update_kanban') {
     dolibarr_set_const($db, 'DIGIRISKDOLIBARR_KANBAN_DRAFT_MAX', GETPOSTINT('DIGIRISKDOLIBARR_KANBAN_DRAFT_MAX'), 'chaine', 0, '', $conf->entity);
     dolibarr_set_const($db, 'DIGIRISKDOLIBARR_KANBAN_PROGRESS_MAX', GETPOSTINT('DIGIRISKDOLIBARR_KANBAN_PROGRESS_MAX'), 'chaine', 0, '', $conf->entity);
     dolibarr_set_const($db, 'DIGIRISKDOLIBARR_KANBAN_CONTROL_MAX', GETPOSTINT('DIGIRISKDOLIBARR_KANBAN_CONTROL_MAX'), 'chaine', 0, '', $conf->entity);
+    $columnSource = GETPOST('DIGIRISKDOLIBARR_KANBAN_COLUMN_SOURCE', 'aZ09');
+    if (!in_array($columnSource, ['thresholds', 'dictionary'])) {
+        $columnSource = 'thresholds';
+    }
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_KANBAN_COLUMN_SOURCE', $columnSource, 'chaine', 0, '', $conf->entity);
     setEventMessages($langs->trans('SetupSaved'), null, 'mesgs');
 }
 
@@ -150,6 +155,20 @@ print '<td>' . $langs->trans("Description") . '</td>';
 print '<td class="center">' . $langs->trans("Value") . '</td>';
 print '</tr>';
 
+// Source of the Kanban columns: the percentage thresholds below (default) or the column dictionary
+$columnSource = getDolGlobalString('DIGIRISKDOLIBARR_KANBAN_COLUMN_SOURCE', 'thresholds');
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('KanbanColumnSource');
+print '</td><td>';
+print $langs->trans('KanbanColumnSourceDesc');
+print '</td><td class="center">';
+print '<select name="DIGIRISKDOLIBARR_KANBAN_COLUMN_SOURCE" class="flat minwidth200">';
+print '<option value="thresholds" ' . ($columnSource != 'dictionary' ? 'selected' : '') . '>' . $langs->trans('KanbanColumnSourceThresholds') . '</option>';
+print '<option value="dictionary" ' . ($columnSource == 'dictionary' ? 'selected' : '') . '>' . $langs->trans('KanbanColumnSourceDictionary') . '</option>';
+print '</select>';
+print '</td></tr>';
+
 $kanbanSettings = [
     'DIGIRISKDOLIBARR_KANBAN_PAGE_SIZE'    => ['KanbanPageSize', 'KanbanPageSizeDesc', 30, 1],
     'DIGIRISKDOLIBARR_KANBAN_DRAFT_MAX'    => ['KanbanDraftMax', 'KanbanDraftMaxDesc', 0, 0],
@@ -185,6 +204,7 @@ print '<td class="center">' . $langs->trans("Action") . '</td>';
 print '</tr>';
 
 $kanbanDictionaries = [
+    ['ActionPlanColumnDictionary', 'ActionPlanColumnDictionaryDesc', DOL_URL_ROOT . '/admin/dict.php'],
     ['ActionPlanTagDictionary', 'ActionPlanTagDictionaryDesc', DOL_URL_ROOT . '/categories/categorie_list.php?type=' . Categorie::TYPE_PROJECT_TASK],
 ];
 if (isModEnabled('ticket')) {

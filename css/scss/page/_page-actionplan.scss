@@ -534,11 +534,6 @@
     height: 100%;
     border-radius: 7px;
     transition: width 0.4s ease;
-
-    &.progress-grey   { background: #999999; }
-    &.progress-yellow { background: #e9ad4f; }
-    &.progress-blue   { background: #3085d6; }
-    &.progress-green  { background: #47e58e; }
 }
 
 .apgp-subtitle {
@@ -1409,11 +1404,6 @@
     height: 100%;
     border-radius: 4px;
     transition: width 0.05s linear;
-
-    &.progress-grey   { background: #999999; }
-    &.progress-yellow { background: #e9ad4f; }
-    &.progress-blue   { background: #3085d6; }
-    &.progress-green  { background: #47e58e; }
 }
 
 .kanban-progress-text {

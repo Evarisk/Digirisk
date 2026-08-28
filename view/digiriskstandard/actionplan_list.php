@@ -901,12 +901,8 @@ if ($resCats) {
     $db->free($resCats);
 }
 
-// Kanban column thresholds (configurable)
-$kanbanThresholds = [
-    'draft_max'   => getDolGlobalInt('DIGIRISKDOLIBARR_KANBAN_DRAFT_MAX', 0),
-    'progress_max' => getDolGlobalInt('DIGIRISKDOLIBARR_KANBAN_PROGRESS_MAX', 80),
-    'control_max'  => getDolGlobalInt('DIGIRISKDOLIBARR_KANBAN_CONTROL_MAX', 99),
-];
+// Kanban columns: percentage thresholds of the configuration, or the column dictionary
+$kanbanColumns = digiriskActionPlanGetKanbanColumns($db);
 
 // Batch file counts for all tasks (single query instead of N+1)
 $taskFileCounts = [];

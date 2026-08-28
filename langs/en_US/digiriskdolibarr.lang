@@ -328,3 +328,19 @@ ActionPlanTagDictionaryDesc          = Tags (task categories) offered on the car
 ActionPlanTicketDictionaries         = Ticket Kanban dictionaries
 ActionPlanTicketDictionariesDesc     = Types, groups and severities making up the ticket Kanban columns
 ActionPlanManageDictionary           = Manage
+
+# ===========================================================================
+# Action plan Kanban columns dictionary — issue #5017
+# ===========================================================================
+ActionPlanColumnDictionary           = Action plan Kanban columns
+ActionPlanColumnDictionaryDesc       = Columns displayed on the PAPRIPACT Kanban when the dictionary mode is on: label, progress range, colour and icon
+KanbanColumnSource                   = Column source
+KanbanColumnSourceDesc               = Split the Kanban with the percentage thresholds below (historical behaviour) or with the column dictionary
+KanbanColumnSourceThresholds         = Percentage thresholds (default)
+KanbanColumnSourceDictionary         = Column dictionary
+ActionPlanColumnProgressHelp         = Progress bounds covered by the column, from 0 to 100
+ActionPlanColumnColorHelp            = Hexadecimal colour of the column, for instance #3085d6
+ActionPlanColumnPictoHelp            = Font Awesome icon name, for instance fa-check
+Progress_min                         = Min. progress
+Progress_max                         = Max. progress
+Picto                                = Icon
