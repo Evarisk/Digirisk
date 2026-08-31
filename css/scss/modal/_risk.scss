@@ -65,6 +65,9 @@
 .element-linked-medias {
   .add-medias td {
     vertical-align: top;
+    // Dolibarr underlines the cells of every table nested in a .noborder list, and the modal is
+    // printed inside the risk list: that rule drew a stray line under the upload buttons.
+    border-bottom: 0 !important;
   }
 
   .element-linked-medias-list {

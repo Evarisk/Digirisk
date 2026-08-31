@@ -347,7 +347,7 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 					<?php endif; ?>
                     <div class="riskassessment-medias linked-medias riskassessment-from-riskassessment-create-<?php echo $risk->id ?>">
                         <div class="element-linked-medias element-linked-medias-0 risk-<?php echo $risk->id ?>">
-                            <div class="medias section-title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
+                            <div class="medias section-title"><i class="fas fa-images"></i> <?php echo $langs->trans('Medias'); ?></div>
                             <table class="add-medias">
                                 <tr>
                                     <td>
@@ -415,6 +415,9 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 			</div>
 			<!-- Modal-Footer -->
 			<div class="modal-footer">
+				<div class="wpeo-button button-grey modal-close">
+					<span><?php echo $langs->trans('CloseModal'); ?></span>
+				</div>
 				<?php if ($permissiontoadd) : ?>
 					<div class="risk-evaluation-create wpeo-button button-blue button-disable modal-close"value="<?php echo $risk->id ?>">
 						<i class="fas fa-plus"></i> <span style="color: #fff"><?php echo $langs->trans('Add'); ?></span>
