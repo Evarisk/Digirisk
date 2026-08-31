@@ -41,7 +41,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-saturne_load_langs(['users']);
+saturne_load_langs(['admin', 'users']);
 
 // Get parameters
 $id          = GETPOST('id', 'int');
@@ -100,13 +100,32 @@ if (empty($resHook)) {
         $data['validate_text']         = GETPOST('validate_text', 'restricthtml');
         $data['success_message']       = GETPOST('success_message', 'restricthtml');
 
+        // A field made visible by another category of the path is rendered as a disabled checkbox, so the
+        // browser never posts it: its inherited visibility must be known before clearing the required flag
+        $inheritedConfig = [];
+        $categoryWays    = $object->get_all_ways();
+        foreach ($categoryWays[0] as $category) {
+            if ($category->id == $id) {
+                continue;
+            }
+            $categoryConfig = json_decode($category->array_options['options_ticket_category_config'] ?? '', true);
+            foreach (is_array($categoryConfig) ? $categoryConfig : [] as $configKey => $configValue) {
+                if ($configValue === 'on') {
+                    $inheritedConfig[$configKey] = true;
+                }
+            }
+        }
+
         $extraFields->attributes['ticket']['label']['digiriskdolibarr_ticket_email'] = $langs->trans('Email');
         foreach ($extraFields->attributes['ticket']['label'] as $key => $field) {
             $extraFieldVisible  = $key . '_visible';
             $extraFieldRequired = $key . '_required';
 
-            $data[$extraFieldVisible]  = GETPOST($extraFieldVisible);
-            $data[$extraFieldRequired] = GETPOST($extraFieldRequired);
+            $data[$extraFieldVisible] = GETPOST($extraFieldVisible);
+
+            // A field hidden from the public interface can not be required on it
+            $isVisible                 = !empty($data[$extraFieldVisible]) || !empty($inheritedConfig[$extraFieldVisible]);
+            $data[$extraFieldRequired] = $isVisible ? GETPOST($extraFieldRequired) : '';
         }
         $config = json_decode($object->array_options['options_ticket_category_config'], true);
         if (empty($config)) {
@@ -462,18 +481,25 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
                     }
                 }
 
+                $visibleInherited  = !empty($keysWithValueOn[$extraFieldVisible]);
+                $requiredInherited = !empty($keysWithValueOn[$extraFieldRequired]);
+
+                // A field hidden from the public interface can not be required on it
+                $isVisible  = $visibleInherited || !empty($ticketCategoryConfig->$extraFieldVisible);
+                $isRequired = $isVisible && ($requiredInherited || !empty($ticketCategoryConfig->$extraFieldRequired));
+
                 // Extra field visible and required
                 print '<tr class="oddeven dragable-item" data-name="' . $key . '"><td>';
-                print ($fields[$key]['picto'] ? img_picto('', $fields[$key]['picto'], 'class="paddingrightonly"') : getPictoForType($extraFields->attributes['ticket']['type'][$key])) . $form->textwithpicto($langs->transnoentities('Ticket' . ucfirst($label) . 'Visible'), $langs->transnoentities('Ticket' . ucfirst($label) . 'VisibleHelp'), 1, 'info') . '</td>';
+                print (!empty($fields[$key]['picto']) ? img_picto('', $fields[$key]['picto'], 'class="paddingrightonly"') : getPictoForType($extraFields->attributes['ticket']['type'][$key])) . $form->textwithpicto($langs->transnoentities('Ticket' . ucfirst($label) . 'Visible'), $langs->transnoentities('Ticket' . ucfirst($label) . 'VisibleHelp'), 1, 'info') . '</td>';
                 print '</td><td class="center">';
-                print '<input type="checkbox" id="' . $extraFieldVisible . '" name="' . $extraFieldVisible . '"' . ($keysWithValueOn[$extraFieldVisible] || $ticketCategoryConfig->$extraFieldVisible ? ' checked' : '') . ($keysWithValueOn[$extraFieldVisible] ? ' disabled' : '') . '>';
-                if ($keysWithValueOn[$extraFieldVisible]) {
+                print '<input type="checkbox" id="' . $extraFieldVisible . '" name="' . $extraFieldVisible . '"' . ($isVisible ? ' checked' : '') . ($visibleInherited ? ' disabled' : '') . '>';
+                if ($visibleInherited) {
                     print $form->textwithtooltip($langs->transnoentities('Inherited'), $langs->transnoentities('PermissionInheritedFromConfig'));
                 }
                 print '</td><td class="center">';
-                if (!in_array($key, ['digiriskdolibarr_ticket_photo'])) {
-                    print '<input type="checkbox" id="' . $extraFieldRequired . '" name="' . $extraFieldRequired . '"' . ($keysWithValueOn[$extraFieldRequired] || $ticketCategoryConfig->$extraFieldRequired ? ' checked=""' : '') . ($keysWithValueOn[$extraFieldRequired] ? ' disabled' : '') . '>';
-                    if ($keysWithValueOn[$extraFieldRequired]) {
+                if (!in_array($key, ['photo'])) {
+                    print '<input type="checkbox" id="' . $extraFieldRequired . '" name="' . $extraFieldRequired . '"' . ($isRequired ? ' checked=""' : '') . ($requiredInherited || !$isVisible ? ' disabled' : '') . ($requiredInherited ? ' data-inherited="1"' : '') . '>';
+                    if ($requiredInherited) {
                         print $form->textwithtooltip($langs->transnoentities('Inherited'), $langs->transnoentities('PermissionInheritedFromConfig'));
                     }
                 }

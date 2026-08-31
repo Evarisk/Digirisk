@@ -121,6 +121,7 @@ window.digiriskdolibarr.ticket.event = function() {
   $(document).on( 'keydown', '.digirisk-ticket-card .select2-selection', window.digiriskdolibarr.ticket.tabSelect2Keydown);
 
   $(document).on( 'change', '.param-table input, .param-table select, .param-table textarea', window.digiriskdolibarr.ticket.handleParamChange);
+  $(document).on( 'change', '.param-table input[type="checkbox"][id$="_visible"]', window.digiriskdolibarr.ticket.handleVisibleChange);
   // CKEDITOR is only loaded on pages with a rich-text editor. Guard the global
   // so this handler never throws "CKEDITOR is not defined" — an uncaught error
   // here aborts the whole digiriskdolibarr init chain (no try/catch in the
@@ -387,6 +388,28 @@ window.digiriskdolibarr.ticket.handleParamChange = function() {
 	}
 	var $btn = $('.' + $table.data('btn'));
 	$btn.prop('disabled', false);
+};
+
+/**
+ * Ticket category config (#3627) — keep the "Required" checkbox coherent with its "Visible" one:
+ * a field hidden from the public interface can not be required on it, so unchecking "Visible"
+ * clears and locks "Required", and checking it back unlocks it.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.handleVisibleChange = function() {
+	var $required = $('#' + $(this).attr('id').replace(/_visible$/, '_required'));
+	if (!$required.length || $required.data('inherited')) {
+		return;
+	}
+	if ($(this).prop('checked')) {
+		$required.prop('disabled', false);
+	} else {
+		$required.prop('checked', false).prop('disabled', true);
+	}
 };
 
 /**
