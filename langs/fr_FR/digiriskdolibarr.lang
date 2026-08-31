@@ -2262,3 +2262,14 @@ ActionPlanColumnPictoHelp            = Nom d'icône Font Awesome, par exemple fa
 Progress_min                         = Progression min.
 Progress_max                         = Progression max.
 Picto                                = Icône
+
+# Suivi du temps passé
+GenerateTimeSpentReport = Générer le suivi de temps (PDF)
+TimeSpentReport = Suivi du temps passé
+TimeSpentReportUsersHelp = Laisser vide pour prendre toutes les personnes ayant saisi du temps sur ce projet.
+TimeSpentReportSummary = Récapitulatif par utilisateur
+TimeSpentReportGrandTotal = Total général
+TimeSpentReportGeneratedAt = Généré le
+TimeSpentReportWholePeriod = Depuis le début du projet
+TimeSpentReportNoData = Aucun temps passé ne correspond aux utilisateurs et à la période sélectionnés.
+TimeSpentDocumentPDFDescription = Suivi du temps passé sur un projet, groupé par utilisateur

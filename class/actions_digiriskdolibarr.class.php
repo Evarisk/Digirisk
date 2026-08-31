@@ -188,7 +188,8 @@ class ActionsDigiriskdolibarr
      */
     public function addHtmlHeader(array $parameters): int
     {
-        if (strpos($parameters['context'], 'ticketcard') !== false) {
+        // La modale du suivi de temps s'appuie sur la librairie Saturne, absente des pages natives
+        if (preg_match('/ticketcard|projecttasktime/', $parameters['context'])) {
             $resourcesRequired = [
                 'css' => '/custom/saturne/css/saturne.min.css',
                 'js'  => '/custom/saturne/js/saturne.min.js'
@@ -786,6 +787,38 @@ class ActionsDigiriskdolibarr
 
                 require __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
             }
+        } else if (strpos($parameters['context'], 'projecttasktime') !== false) {
+            if ($action == 'builddoc' && GETPOST('model', 'alpha') == 'timespent_projectdocument') {
+                require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+                require_once __DIR__ . '/digiriskdolibarrdocuments/projectdocument.class.php';
+
+                // time.php ne charge pas errors, d'ou les messages d'echec du modele affiches en
+                // clair (ErrorCanNotCreateDir, ErrorRecordNotFound) sans ce chargement
+                $langs->loadLangs(['errors', 'digiriskdolibarr@digiriskdolibarr']);
+
+                // doActions passe avant que la page n'ait charge le projet : le formulaire de la
+                // modale porte son id
+                $project = new Project($this->db);
+                if ($project->fetch(GETPOSTINT('projectid')) <= 0) {
+                    setEventMessages($langs->trans('ErrorRecordNotFound'), [], 'errors');
+                    return 0;
+                }
+
+                // documents_action.tpl.php travaille sur $object : ici le projet, pas la tache
+                $object = $project;
+
+                $document        = new ProjectDocument($this->db);
+                $permissiontoadd = $user->hasRight('projet', 'lire');
+
+                $moreParams = [
+                    'modulePart'         => 'project',
+                    'timeSpentUserIds'   => GETPOST('timespent_users', 'array:int'),
+                    'timeSpentDateStart' => dol_mktime(0, 0, 0, GETPOSTINT('timespent_date_startmonth'), GETPOSTINT('timespent_date_startday'), GETPOSTINT('timespent_date_startyear')),
+                    'timeSpentDateEnd'   => dol_mktime(23, 59, 59, GETPOSTINT('timespent_date_endmonth'), GETPOSTINT('timespent_date_endday'), GETPOSTINT('timespent_date_endyear'))
+                ];
+
+                require __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
+            }
         } elseif (preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context'])) {
 			if ($action == 'list') {
 				if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) {
@@ -811,6 +844,137 @@ class ActionsDigiriskdolibarr
             return -1;
 		}
 	}
+
+    /**
+     * Overloading the formConfirm function : replacing the parent's function with the one below.
+     *
+     * Pose sur l'onglet Temps consomme d'un projet le bouton et la modale de generation du suivi
+     * de temps en PDF. Ce hook est le seul point de la page qui soit hors du formulaire de la
+     * liste : la modale y porte donc son propre formulaire, sans imbrication.
+     *
+     * @param  array  $parameters Hook metadata (context, etc...)
+     * @param  object $object     The object to process
+     * @return int                < 0 on error, 0 on success, 1 to replace standard code
+     */
+    public function formConfirm(array $parameters, $object): int
+    {
+        global $db, $form, $langs, $user;
+
+        if (strpos($parameters['context'], 'projecttasktime') === false) {
+            return 0;
+        }
+
+        $project = $parameters['projectstatic'] ?? null;
+        if (!is_object($project) || $project->id <= 0 || !$user->hasRight('projet', 'lire')) {
+            return 0;
+        }
+
+        // Le document couvre tout le projet : ne le proposer que sur l'onglet Temps consomme du
+        // projet, pas sur celui d'une tache ou il promettrait le temps de la seule tache affichee
+        if (GETPOSTINT('projectid') <= 0 && !GETPOST('project_ref', 'alpha')) {
+            return 0;
+        }
+
+        $langs->loadLangs(['projects', 'digiriskdolibarr@digiriskdolibarr']);
+
+        // Ne proposer que les personnes qui ont reellement saisi du temps sur ce projet : une
+        // liste de tous les utilisateurs n'aurait aucun rapport avec le contenu du document
+        $userIds = [];
+        $sql     = 'SELECT DISTINCT et.fk_user';
+        $sql    .= ' FROM ' . MAIN_DB_PREFIX . 'element_time as et';
+        $sql    .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'projet_task as pt ON pt.rowid = et.fk_element';
+        $sql    .= " WHERE et.elementtype = 'task'";
+        $sql    .= ' AND pt.fk_projet = ' . (int) $project->id;
+        $sql    .= ' AND et.fk_user > 0';
+
+        $resql = $db->query($sql);
+        if ($resql) {
+            while ($obj = $db->fetch_object($resql)) {
+                $userIds[] = (int) $obj->fk_user;
+            }
+            $db->free($resql);
+        }
+
+        if (empty($userIds)) {
+            return 0;
+        }
+
+        if (!is_object($form)) {
+            require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
+            $form = new Form($db);
+        }
+
+        // Periode par defaut : le mois en cours, le cas le plus courant d'un releve de temps
+        $now       = dol_getdate(dol_now());
+        $dateStart = dol_mktime(0, 0, 0, GETPOSTINT('timespent_date_startmonth'), GETPOSTINT('timespent_date_startday'), GETPOSTINT('timespent_date_startyear'));
+        $dateEnd   = dol_mktime(0, 0, 0, GETPOSTINT('timespent_date_endmonth'), GETPOSTINT('timespent_date_endday'), GETPOSTINT('timespent_date_endyear'));
+        if (empty($dateStart)) {
+            $dateStart = dol_get_first_day($now['year'], $now['mon']);
+        }
+        if (empty($dateEnd)) {
+            $dateEnd = dol_get_last_day($now['year'], $now['mon']);
+        }
+
+        $selectedUsers = GETPOST('timespent_users', 'array:int');
+        $formUrl       = $_SERVER['PHP_SELF'] . '?projectid=' . $project->id . (!empty($parameters['withproject']) ? '&withproject=1' : '');
+
+        $out  = '<div class="tabsAction">';
+        $out .= '<span class="butAction modal-open">';
+        $out .= '<input type="hidden" class="modal-options" data-modal-to-open="digirisk-timespent-report-modal">';
+        $out .= '<i class="fas fa-file-pdf paddingright"></i>' . $langs->trans('GenerateTimeSpentReport');
+        $out .= '</span>';
+        $out .= '</div>';
+
+        // Le formulaire enveloppe la modale plutot que d'etre pose dedans : la mise en page de
+        // .modal-container repose sur ses descendants directs
+        $out .= '<form method="POST" action="' . $formUrl . '">';
+        $out .= '<input type="hidden" name="token" value="' . newToken() . '">';
+        $out .= '<input type="hidden" name="action" value="builddoc">';
+        $out .= '<input type="hidden" name="model" value="timespent_projectdocument">';
+        $out .= '<input type="hidden" name="projectid" value="' . $project->id . '">';
+        $out .= '<input type="hidden" name="withproject" value="' . (!empty($parameters['withproject']) ? 1 : 0) . '">';
+
+        $out .= '<div class="wpeo-modal modal-flex" id="digirisk-timespent-report-modal">';
+        $out .= '<div class="modal-container wpeo-modal-event">';
+
+        $out .= '<div class="modal-header">';
+        $out .= '<h2 class="modal-title">' . $langs->trans('GenerateTimeSpentReport') . '</h2>';
+        $out .= '<div class="modal-close"><i class="fas fa-times"></i></div>';
+        $out .= '</div>';
+
+        $out .= '<div class="modal-content">';
+        $out .= '<table class="border centpercent">';
+
+        $out .= '<tr><td class="titlefieldcreate">' . $langs->trans('Users') . '</td><td>';
+        // select_dolusers n'honore $include que sous forme de tableau : une chaine ne filtre rien
+        $out .= $form->select_dolusers($selectedUsers, 'timespent_users', 0, null, 0, $userIds, '', 0, 0, 0, '', 0, '', 'minwidth300 maxwidth500 widthcentpercentminusx', 0, 0, true);
+        $out .= '<div class="opacitymedium">' . $langs->trans('TimeSpentReportUsersHelp') . '</div>';
+        $out .= '</td></tr>';
+
+        $out .= '<tr><td>' . $langs->trans('DateStart') . '</td><td>';
+        $out .= $form->selectDate($dateStart, 'timespent_date_start', 0, 0, 1, '', 1, 0);
+        $out .= '</td></tr>';
+
+        $out .= '<tr><td>' . $langs->trans('DateEnd') . '</td><td>';
+        $out .= $form->selectDate($dateEnd, 'timespent_date_end', 0, 0, 1, '', 1, 0);
+        $out .= '</td></tr>';
+
+        $out .= '</table>';
+        $out .= '</div>';
+
+        $out .= '<div class="modal-footer">';
+        $out .= '<div class="wpeo-button button-grey modal-close"><span>' . $langs->trans('Cancel') . '</span></div>';
+        $out .= '<button type="submit" class="wpeo-button button-blue"><span>' . $langs->trans('Generate') . '</span></button>';
+        $out .= '</div>';
+
+        $out .= '</div>';
+        $out .= '</div>';
+        $out .= '</form>';
+
+        $this->resprints = $out;
+
+        return 0; // or return 1 to replace standard code
+    }
 
     /**
      * Overloading the addMoreActionsButtons function : replacing the parent's function with the one below
