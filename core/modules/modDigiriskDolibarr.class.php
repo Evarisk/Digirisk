@@ -371,7 +371,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$this->errors[] = $langs->trans('activateModuleDependNotSatisfied', 'Digirisk', 'Saturne');
 		}
 
-		$langs->loadLangs(['digiriskdolibarr@digiriskdolibarr', 'categories']);
+		$langs->loadLangs(['digiriskdolibarr@digiriskdolibarr', 'categories', 'ticket']);
 
 		// Id for module (must be unique).
 		// Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
@@ -1731,6 +1731,53 @@ class modDigiriskdolibarr extends DolibarrModules
             'perms'    => '$user->rights->digiriskdolibarr->lire && $user->rights->digiriskdolibarr->accidentinvestigation->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
             'target'   => '',
             'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+        ];
+
+        // Issue #4706 - Registre des tickets accessible directement depuis le menu gauche Digirisk.
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+            'type'     => 'left',			                // This is a Left menu entry
+            'titre'    => $langs->transnoentities('Ticket'),
+            'prefix'   => '<i class="fas fa-ticket-alt pictofixedwidth"></i>',
+            'mainmenu' => 'digiriskdolibarr',
+            'leftmenu' => 'digiriskticket',
+            'url'      => '/digiriskdolibarr/view/ticket/ticket_management_dashboard.php',
+            'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+            'position' => 100 + $r,
+            'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'ticket\')',  // Define condition to show or hide menu entry. Use '!empty($conf->digiriskdolibarr->enabled)' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'perms'    => '$user->rights->digiriskdolibarr->lire && $user->rights->ticket->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+            'target'   => '',
+            'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+        ];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskticket',
+            'type'     => 'left',
+            'titre'    => '<i class="fas fa-list pictofixedwidth"></i>' . $langs->transnoentities('TicketList'),
+            'mainmenu' => 'digiriskdolibarr',
+            'leftmenu' => 'digiriskdolibarr_ticketlist',
+            'url'      => '/ticket/list.php',
+            'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+            'position' => 100 + $r,
+            'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'ticket\')',
+            'perms'    => '$user->rights->digiriskdolibarr->lire && $user->rights->ticket->read',
+            'target'   => '',
+            'user'     => 0,
+        ];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskticket',
+            'type'     => 'left',
+            'titre'    => '<i class="fas fa-tags pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('Categories'),
+            'mainmenu' => 'digiriskdolibarr',
+            'leftmenu' => 'digiriskdolibarr_tickettags',
+            'url'      => '/categories/categorie_list.php?type=ticket',
+            'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+            'position' => 100 + $r,
+            'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'ticket\') && isModEnabled(\'categorie\')',
+            'perms'    => '$user->rights->digiriskdolibarr->lire && $user->rights->ticket->read',
+            'target'   => '',
+            'user'     => 0,
         ];
 
 		$this->menu[$r++] = [
