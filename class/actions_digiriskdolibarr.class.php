@@ -996,7 +996,7 @@ class ActionsDigiriskdolibarr
      */
     protected function projectDocumentsBlock(Project $project, string $urlSource): string
     {
-        global $conf, $db, $user;
+        global $conf, $db, $langs, $user;
 
         require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
         require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
@@ -1005,7 +1005,7 @@ class ActionsDigiriskdolibarr
         $projectRefDir = dol_sanitizeFileName($project->ref);
 
         // genallowed a 0 : la generation passe par la modale, qui porte les filtres du document
-        return $formFile->showdocuments(
+        $block = $formFile->showdocuments(
             'project',
             $projectRefDir,
             $conf->projet->dir_output . '/' . $projectRefDir,
@@ -1025,6 +1025,17 @@ class ActionsDigiriskdolibarr
             '',
             $project
         );
+
+        // showdocuments ne rend ni titre ni tableau tant que le projet n'a aucun fichier : il ne
+        // renvoie alors que des commentaires HTML, et la page n'affiche rien du tout avant la
+        // premiere generation. Le test porte sur le rendu et non sur $formFile->numoffiles, qui
+        // vaut 2 meme a vide : ses deux incrementations sont placees hors des boucles foreach
+        if (strpos($block, '<table') === false) {
+            $block  = '<div class="titre paddingbottom">' . $langs->trans('Documents') . '</div>';
+            $block .= '<div class="opacitymedium paddingbottom">' . $langs->trans('NoFileFound') . '</div>';
+        }
+
+        return $block;
     }
 
     /**
