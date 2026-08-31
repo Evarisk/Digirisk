@@ -788,20 +788,16 @@ class ActionsDigiriskdolibarr
                 require __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
             }
         } else if (strpos($parameters['context'], 'projecttasktime') !== false) {
-            // La suppression vient du bloc des documents pose sous le bouton de generation
-            $buildTimeSpentDoc = $action == 'builddoc' && GETPOST('model', 'alpha') == 'timespent_projectdocument';
-            $removeProjectFile = $action == 'remove_file' && GETPOSTINT('projectid') > 0;
-
-            if ($buildTimeSpentDoc || $removeProjectFile) {
+            if ($action == 'builddoc' && GETPOST('model', 'alpha') == 'timespent_projectdocument') {
                 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
                 require_once __DIR__ . '/digiriskdolibarrdocuments/projectdocument.class.php';
 
-                // time.php ne charge ni other ni errors, d'ou les messages de documents_action
-                // affiches en clair (FileWasRemoved) sans ce chargement
-                $langs->loadLangs(['other', 'errors', 'digiriskdolibarr@digiriskdolibarr']);
+                // time.php ne charge pas errors, d'ou les messages d'echec du modele affiches en
+                // clair (ErrorCanNotCreateDir, ErrorRecordNotFound) sans ce chargement
+                $langs->loadLangs(['errors', 'digiriskdolibarr@digiriskdolibarr']);
 
                 // doActions passe avant que la page n'ait charge le projet : le formulaire de la
-                // modale et les liens du bloc documents portent son id
+                // modale porte son id
                 $project = new Project($this->db);
                 if ($project->fetch(GETPOSTINT('projectid')) <= 0) {
                     setEventMessages($langs->trans('ErrorRecordNotFound'), [], 'errors');
@@ -811,11 +807,8 @@ class ActionsDigiriskdolibarr
                 // documents_action.tpl.php travaille sur $object : ici le projet, pas la tache
                 $object = $project;
 
-                $document           = new ProjectDocument($this->db);
-                $permissiontoadd    = $user->hasRight('projet', 'lire');
-                $permissiontodelete = $user->hasRight('projet', 'creer');
-                // Le lien de suppression porte le chemin relatif <ref projet>/<fichier>
-                $upload_dir         = $conf->projet->dir_output;
+                $document        = new ProjectDocument($this->db);
+                $permissiontoadd = $user->hasRight('projet', 'lire');
 
                 $moreParams = [
                     'modulePart'         => 'project',
@@ -978,63 +971,9 @@ class ActionsDigiriskdolibarr
         $out .= '</div>';
         $out .= '</form>';
 
-        // Les documents du projet juste sous le bouton : le fichier qu'on vient de generer est
-        // ainsi a portee de clic, sans passer par l'onglet Fichiers joints du projet
-        $out .= $this->projectDocumentsBlock($project, $formUrl);
-
         $this->resprints = $out;
 
         return 0; // or return 1 to replace standard code
-    }
-
-    /**
-     * Bloc des documents du projet, tel que l'onglet Fichiers joints le presente.
-     *
-     * @param  Project $project Projet courant
-     * @param  string  $urlSource URL de retour des actions du bloc
-     * @return string             Code HTML du bloc
-     */
-    protected function projectDocumentsBlock(Project $project, string $urlSource): string
-    {
-        global $conf, $db, $langs, $user;
-
-        require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-        require_once __DIR__ . '/../../saturne/lib/documents.lib.php';
-
-        $projectRefDir = dol_sanitizeFileName($project->ref);
-
-        // genallowed a 0 : la generation passe par la modale, qui porte les filtres du document.
-        // C'est aussi ce qui evite a saturne_show_documents de chercher une liste de modeles pour
-        // le modulepart 'project', qui n'en declare pas
-        $block = saturne_show_documents(
-            'project',
-            $projectRefDir,
-            $conf->projet->dir_output . '/' . $projectRefDir,
-            $urlSource,
-            0,
-            $user->hasRight('projet', 'creer'),
-            '',
-            0,
-            0,
-            0,
-            1,
-            '',
-            '',
-            '',
-            '',
-            '',
-            $project
-        );
-
-        // Le bloc ne rend ni titre ni tableau tant que le projet n'a aucun fichier : sans ce repli
-        // la page n'affiche rien du tout avant la premiere generation, et on croit le bloc absent
-        if (strpos($block, '<table') === false) {
-            // Meme titre que celui pose par saturne_show_documents quand il a des fichiers
-            $block  = load_fiche_titre($langs->trans('Documents'), '', '', 0, 'builddoc');
-            $block .= '<div class="opacitymedium paddingbottom">' . $langs->trans('NoFileFound') . '</div>';
-        }
-
-        return $block;
     }
 
     /**
