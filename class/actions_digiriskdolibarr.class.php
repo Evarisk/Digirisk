@@ -998,14 +998,15 @@ class ActionsDigiriskdolibarr
     {
         global $conf, $db, $langs, $user;
 
-        require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
         require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+        require_once __DIR__ . '/../../saturne/lib/documents.lib.php';
 
-        $formFile      = new FormFile($db);
         $projectRefDir = dol_sanitizeFileName($project->ref);
 
-        // genallowed a 0 : la generation passe par la modale, qui porte les filtres du document
-        $block = $formFile->showdocuments(
+        // genallowed a 0 : la generation passe par la modale, qui porte les filtres du document.
+        // C'est aussi ce qui evite a saturne_show_documents de chercher une liste de modeles pour
+        // le modulepart 'project', qui n'en declare pas
+        $block = saturne_show_documents(
             'project',
             $projectRefDir,
             $conf->projet->dir_output . '/' . $projectRefDir,
@@ -1013,7 +1014,6 @@ class ActionsDigiriskdolibarr
             0,
             $user->hasRight('projet', 'creer'),
             '',
-            0,
             0,
             0,
             0,
@@ -1026,12 +1026,11 @@ class ActionsDigiriskdolibarr
             $project
         );
 
-        // showdocuments ne rend ni titre ni tableau tant que le projet n'a aucun fichier : il ne
-        // renvoie alors que des commentaires HTML, et la page n'affiche rien du tout avant la
-        // premiere generation. Le test porte sur le rendu et non sur $formFile->numoffiles, qui
-        // vaut 2 meme a vide : ses deux incrementations sont placees hors des boucles foreach
+        // Le bloc ne rend ni titre ni tableau tant que le projet n'a aucun fichier : sans ce repli
+        // la page n'affiche rien du tout avant la premiere generation, et on croit le bloc absent
         if (strpos($block, '<table') === false) {
-            $block  = '<div class="titre paddingbottom">' . $langs->trans('Documents') . '</div>';
+            // Meme titre que celui pose par saturne_show_documents quand il a des fichiers
+            $block  = load_fiche_titre($langs->trans('Documents'), '', '', 0, 'builddoc');
             $block .= '<div class="opacitymedium paddingbottom">' . $langs->trans('NoFileFound') . '</div>';
         }
 
