@@ -404,3 +404,6 @@ TimeSpentReportGeneratedAt = Generated on
 TimeSpentReportWholePeriod = Since the beginning of the project
 TimeSpentReportNoData = No time spent matches the selected users and period.
 TimeSpentDocumentPDFDescription = Time spent on a project, grouped by user
+
+# Risk list dashboard - issue #4388
+RisksNotAssessed                     = Risks not assessed

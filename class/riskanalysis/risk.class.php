@@ -63,6 +63,12 @@ class Risk extends SaturneObject
     public const STATUS_LOCKED    = 2;
     public const STATUS_ARCHIVED  = 3;
 
+    /**
+     * @var int Pseudo level of the cotation scale gathering the risks without any validated assessment.
+     *          Negative so it never collides with a real level, -1 being the empty value of the list filter.
+     */
+    public const COTATION_NOT_ASSESSED = -2;
+
 	/**
 	 * @var string String with name of icon for risk. Must be the part after the 'object_' into object_risk.png
 	 */
@@ -1059,27 +1065,113 @@ class Risk extends SaturneObject
      * A risk is assessed as many times as it is reviewed, and only its last validated assessment tells where it
      * stands today: that is the one the dashboard graph counts, so the criteria reads the same one.
      *
-     * @param  int    $cotationLevel Level of the cotation scale, from 1 (grey) to 4 (black)
+     * @param  int    $cotationLevel Level of the cotation scale, from 1 (grey) to 4 (black),
+     *                               or COTATION_NOT_ASSESSED for the risks still to assess
      * @return string                SQL criteria, empty when the level is not one of the scale
      */
     public function getCotationSqlFilter(int $cotationLevel): string
     {
-        if (empty($this->cotations[$cotationLevel])) {
+        if ($cotationLevel != self::COTATION_NOT_ASSESSED && empty($this->cotations[$cotationLevel])) {
             return '';
         }
 
         $riskAssessmentTable = MAIN_DB_PREFIX . (new RiskAssessment($this->db))->table_element;
 
-        // The highest level has no upper bound, a cotation computed with the advanced method can exceed its end
-        $cotationFilter = ' AND ra.cotation >= ' . (int) $this->cotations[$cotationLevel]['start'];
-        if (isset($this->cotations[$cotationLevel + 1])) {
-            $cotationFilter .= ' AND ra.cotation <= ' . (int) $this->cotations[$cotationLevel]['end'];
+        if ($cotationLevel == self::COTATION_NOT_ASSESSED) {
+            // A risk still to assess is one the levels of the scale leave out: its last validated assessment
+            // is missing, or carries no cotation at all
+            $operator       = 'NOT IN';
+            $cotationFilter = ' WHERE lastra.cotation IS NOT NULL';
+        } else {
+            $operator = 'IN';
+
+            // The highest level has no upper bound, a cotation computed with the advanced method can exceed its end
+            $cotationFilter = ' WHERE lastra.cotation >= ' . (int) $this->cotations[$cotationLevel]['start'];
+            if (isset($this->cotations[$cotationLevel + 1])) {
+                $cotationFilter .= ' AND lastra.cotation <= ' . (int) $this->cotations[$cotationLevel]['end'];
+            }
         }
 
-        return ' AND r.rowid IN (SELECT ra.fk_risk FROM ' . $riskAssessmentTable . ' as ra'
-             . ' WHERE ra.status = ' . RiskAssessment::STATUS_VALIDATED . $cotationFilter
-             . ' AND ra.rowid = (SELECT MAX(lastra.rowid) FROM ' . $riskAssessmentTable . ' as lastra'
-             . ' WHERE lastra.fk_risk = ra.fk_risk AND lastra.status = ' . RiskAssessment::STATUS_VALIDATED . '))';
+        // The last validated assessment of every risk is picked in one pass: correlating that subquery to each
+        // risk costs a full scan of the assessments per risk, seconds long on a base of a few thousand risks
+        return ' AND r.rowid ' . $operator . ' (SELECT lastid.fk_risk'
+             . ' FROM (SELECT ra.fk_risk as fk_risk, MAX(ra.rowid) as rowid FROM ' . $riskAssessmentTable . ' as ra'
+             . ' WHERE ra.status = ' . RiskAssessment::STATUS_VALIDATED . ' GROUP BY ra.fk_risk) as lastid'
+             . ' INNER JOIN ' . $riskAssessmentTable . ' as lastra ON lastra.rowid = lastid.rowid'
+             . $cotationFilter . ')';
+    }
+
+    /**
+     * Get the level of the cotation scale a cotation falls in
+     *
+     * @param  float $cotation Cotation of a risk assessment
+     * @return int             Level of the scale, from 1 (grey) to 4 (black)
+     */
+    public function getCotationLevel(float $cotation): int
+    {
+        $level = (int) array_key_first($this->cotations);
+        foreach ($this->cotations as $cotationLevel => $cotationScale) {
+            if ($cotation >= $cotationScale['start']) {
+                $level = $cotationLevel;
+            }
+        }
+
+        return $level;
+    }
+
+    /**
+     * Get the number of risks by level of the cotation scale, for the dashboard of the risk list
+     *
+     * Counts the risks the list shows when no filter is set: the ones of the current entity attached to an
+     * active element. A risk is placed on the level of its last validated assessment, the one
+     * getCotationSqlFilter() reads, so each count matches the number of rows the list shows once filtered
+     * on that level.
+     *
+     * @param  string $riskType Type of risk ('risk' or 'riskenvironmental')
+     * @return array            Number of risks, by level of the scale plus 'total' and COTATION_NOT_ASSESSED
+     */
+    public function getRiskCountsByCotationLevel(string $riskType = 'risk'): array
+    {
+        global $conf;
+
+        $counts = ['total' => 0, self::COTATION_NOT_ASSESSED => 0];
+        foreach (array_keys($this->cotations) as $cotationLevel) {
+            $counts[$cotationLevel] = 0;
+        }
+
+        $riskAssessmentTable = MAIN_DB_PREFIX . (new RiskAssessment($this->db))->table_element;
+        $elementTable        = MAIN_DB_PREFIX . (new DigiriskElement($this->db))->table_element;
+
+        $sql  = 'SELECT lastra.cotation as cotation, COUNT(r.rowid) as nb';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as r';
+        $sql .= ' INNER JOIN ' . $elementTable . ' as e ON e.rowid = r.fk_element';
+        $sql .= ' AND e.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND e.entity = ' . (int) $conf->entity;
+        // The last assessment of every risk is picked in one pass: correlating that subquery to each risk
+        // costs a full scan of the assessments per risk, seconds long on a document unique of a few thousand
+        $sql .= ' LEFT JOIN (SELECT ra.fk_risk as fk_risk, MAX(ra.rowid) as rowid FROM ' . $riskAssessmentTable . ' as ra';
+        $sql .= ' WHERE ra.status = ' . RiskAssessment::STATUS_VALIDATED . ' GROUP BY ra.fk_risk) as lastid ON lastid.fk_risk = r.rowid';
+        $sql .= ' LEFT JOIN ' . $riskAssessmentTable . ' as lastra ON lastra.rowid = lastid.rowid';
+        $sql .= ' WHERE r.entity IN (' . getEntity($this->element) . ')';
+        $sql .= " AND r.type = '" . $this->db->escape($riskType) . "'";
+        $sql .= ' GROUP BY lastra.cotation';
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . implode(',', $this->errors), LOG_ERR);
+
+            return $counts;
+        }
+
+        while ($obj = $this->db->fetch_object($resql)) {
+            $cotationLevel = isset($obj->cotation) ? $this->getCotationLevel((float) $obj->cotation) : self::COTATION_NOT_ASSESSED;
+
+            $counts[$cotationLevel] += (int) $obj->nb;
+            $counts['total']        += (int) $obj->nb;
+        }
+        $this->db->free($resql);
+
+        return $counts;
     }
 
     /**

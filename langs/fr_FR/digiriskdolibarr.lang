@@ -1107,6 +1107,7 @@ GreyRisk                                         = Risque faible
 OrangeRisk                                       = Risque à planifier
 RedRisk                                          = Risque à traiter
 BlackRisk                                        = Risque inacceptable
+RisksNotAssessed                                 = Risques non évalués
 RisksRepartitionByDangerCategories               = Répartition des risques par catégorie de danger
 RiskListsByDangerCategories                      = Liste des risques par catégorie de danger
 DigiriskElementsRepartitionByDepth               = Répartition de l'arborescence des groupements de niveau %s

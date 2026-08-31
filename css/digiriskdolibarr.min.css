@@ -6467,6 +6467,98 @@ textarea.action-textarea:not(:last-child) {
   background: #0d8aff;
 }
 
+/** Risk list dashboard: number of risks by level of the cotation scale, shown above the risk list.
+    Each tile filters the list on its own level (see digiriskdolibarr_riskdashboard_view.tpl.php) */
+.risk-dashboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.risk-dashboard__tile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  color: #333333;
+  text-decoration: none;
+  transition: all 0.2s ease-out;
+}
+.risk-dashboard__tile:hover {
+  border-color: #0d8aff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+.risk-dashboard__tile.selected {
+  border-color: #0d8aff;
+  box-shadow: 0 0 0 2px #0d8aff;
+}
+.risk-dashboard__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 38px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: #ececec;
+  color: rgba(0, 0, 0, 0.8);
+  font-size: 18px;
+  font-weight: 700;
+}
+.risk-dashboard__count[data-scale=total] {
+  background: #0d8aff;
+  color: #fff;
+}
+.risk-dashboard__count[data-scale="1"] {
+  background: #ececec;
+}
+.risk-dashboard__count[data-scale="2"] {
+  background: #e9ad4f;
+  color: #fff;
+}
+.risk-dashboard__count[data-scale="3"] {
+  background: #e05353;
+  color: #fff;
+}
+.risk-dashboard__count[data-scale="4"] {
+  background: #2b2b2b;
+  color: #fff;
+}
+.risk-dashboard__count[data-scale=notassessed] {
+  background: #fff;
+  border: 1px dashed #b0b0b0;
+}
+.risk-dashboard__label {
+  font-size: 13px;
+  font-weight: 600;
+}
+.risk-dashboard {
+  /** The environmental risks have their own color, as everywhere else in the module */
+}
+.risk-dashboard--riskenvironmental .risk-dashboard__count[data-scale=total] {
+  background: #22bf4e;
+}
+@media screen and (max-width: 480px) {
+  .risk-dashboard {
+    gap: 6px;
+  }
+  .risk-dashboard__tile {
+    flex: 1 1 auto;
+    padding: 4px 8px 4px 4px;
+  }
+  .risk-dashboard__count {
+    min-width: 34px;
+    height: 30px;
+    font-size: 15px;
+  }
+  .risk-dashboard__label {
+    font-size: 11px;
+  }
+}
+
 /* Mobile quick-creation interfaces, shared by the prevention plan
    (view/preventionplan/preventionplan_mobile_create.php) and the fire permit
    (view/firepermit/firepermit_mobile_create.php). */
