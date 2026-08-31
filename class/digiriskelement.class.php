@@ -89,7 +89,7 @@ class DigiriskElement extends SaturneObject
         'import_key'       => ['type' => 'integer', 'label' => 'ImportId', 'enabled' => '1', 'position' => 60, 'notnull' => 1, 'visible' => -2,],
         'status'           => ['type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 70, 'notnull' => 1, 'default' => 1, 'visible' => 1, 'index' => 1,],
         'label'            => ['type' => 'varchar(255)', 'label' => 'Label', 'enabled' => '1', 'position' => 80, 'notnull' => 1, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth400', 'showoncombobox' => '1',],
-        'description'      => ['type' => 'textarea', 'label' => 'Description', 'enabled' => '1', 'position' => 90, 'notnull' => 0, 'visible' => 3,],
+        'description'      => ['type' => 'html', 'label' => 'Description', 'enabled' => '1', 'position' => 90, 'notnull' => 0, 'visible' => 3,],
         'element_type'     => ['type' => 'varchar(50)', 'label' => 'ElementType', 'enabled' => '1', 'position' => 100, 'notnull' => -1, 'visible' => 1,],
         'photo'            => ['type' => 'varchar(255)', 'label' => 'Photo', 'enabled' => '1', 'position' => 105, 'notnull' => -1, 'visible' => -2,],
         'show_in_selector' => ['type' => 'boolean', 'label' => 'ShowInSelectOnPublicTicketInterface', 'enabled' => '1', 'position' => 106, 'notnull' => 1, 'visible' => 1, 'default' => 1,],
@@ -603,11 +603,16 @@ class DigiriskElement extends SaturneObject
 
         // Description shown after a comment icon, made inline-editable (contenteditable) when the
         // user can write; saved via saturne_update_field.php like the list inline edits.
+        // The field is filled with the WYSIWYG editor on the card, so the banner only shows its
+        // plain text projection: block tags would break the one line banner layout and the inline
+        // editor handles plain text only. Closing block tags become spaces so paragraphs and list
+        // items are not glued together once the markup is dropped.
         $descriptionIcon = '<i class="fas fa-comment-dots" title="' . dol_escape_htmltag($langs->trans("Description")) . '"></i> ';
+        $descriptionText = dol_string_nohtmltag(str_replace(['</p>', '</li>'], ' ', $this->description));
         if (!empty($user->rights->digiriskdolibarr->digiriskelement->write)) {
-            $descriptionHtml = $descriptionIcon . '<span class="contenteditable" contenteditable="true" role="textbox" aria-label="' . dol_escape_htmltag($langs->trans("Description")) . '" data-field="description" data-id="' . ((int) $this->id) . '" data-element="' . dol_escape_htmltag($this->element . '@' . $this->module) . '" data-table="' . dol_escape_htmltag($this->table_element) . '" data-type="text" data-success="' . dol_escape_htmltag($langs->trans("RecordSaved")) . '" data-error="' . dol_escape_htmltag($langs->trans("Error")) . '">' . dol_escape_htmltag($this->description) . '</span>';
+            $descriptionHtml = $descriptionIcon . '<span class="contenteditable" contenteditable="true" role="textbox" aria-label="' . dol_escape_htmltag($langs->trans("Description")) . '" data-field="description" data-id="' . ((int) $this->id) . '" data-element="' . dol_escape_htmltag($this->element . '@' . $this->module) . '" data-table="' . dol_escape_htmltag($this->table_element) . '" data-type="text" data-success="' . dol_escape_htmltag($langs->trans("RecordSaved")) . '" data-error="' . dol_escape_htmltag($langs->trans("Error")) . '">' . dol_escape_htmltag($descriptionText) . '</span>';
         } else {
-            $descriptionHtml = $descriptionIcon . dol_escape_htmltag($this->description);
+            $descriptionHtml = $descriptionIcon . dol_escape_htmltag($descriptionText);
         }
 
         if ($result > 0) {
