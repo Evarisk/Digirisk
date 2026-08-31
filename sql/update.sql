@@ -279,3 +279,6 @@ WHERE ef.fk_object IS NULL
 -- 23.1.x - prevention plan public/private notes
 ALTER TABLE llx_digiriskdolibarr_preventionplan ADD note_public text NULL AFTER cssct_intervention;
 ALTER TABLE llx_digiriskdolibarr_preventionplan ADD note_private text NULL AFTER note_public;
+
+-- 23.1.x - remove orphan const left by the deleted module_parts['tabs'] declaration
+DELETE FROM llx_const WHERE name = 'MAIN_MODULE_DIGIRISKDOLIBARR_TABS';
