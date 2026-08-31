@@ -247,6 +247,12 @@ if (empty($noheader)) saturne_header(1,'', $title, $helpUrl);
 // ------------------------------------------------------------
 $allRisks = 1;
 if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_RISKS)) {
+    // A dashboard full of zeros teaches nothing on a document unique without any risk of that type yet
+    $riskCountsByCotationLevel = $risk->getRiskCountsByCotationLevel($riskType);
+    if ($riskCountsByCotationLevel['total'] > 0) {
+        require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_riskdashboard_view.tpl.php';
+    }
+
 	$contextpage = 'risklist';
 	require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risklist_view.tpl.php';
 }

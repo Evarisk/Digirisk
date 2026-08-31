@@ -399,9 +399,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
     if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
         $sql .= Categorie::getFilterSelectQuery('risk', 'r.rowid', $search_category_array);
     }
-    if ($searchCotation > 0) {
-        $sql .= $risk->getCotationSqlFilter($searchCotation);
-    }
+    $sql .= $risk->getCotationSqlFilter($searchCotation);
     // Add where from extra fields
     include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
     // Add where from hooks
@@ -515,9 +513,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
     if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
         $sql .= Categorie::getFilterSelectQuery('risk', 'r.rowid', $search_category_array);
     }
-    if ($searchCotation > 0) {
-        $sql .= $risk->getCotationSqlFilter($searchCotation);
-    }
+    $sql .= $risk->getCotationSqlFilter($searchCotation);
 
     // Add where from extra fields
     include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
@@ -579,7 +575,7 @@ foreach ($search as $key => $val) {
     if (is_array($search[$key]) && count($search[$key])) foreach ($search[$key] as $skey) $param .= '&search_' . $key . '[]=' . urlencode($skey);
     else $param                                                                                  .= '&search_' . $key . '=' . urlencode($search[$key]);
 }
-if ($searchCotation > 0) $param .= '&search_cotation=' . urlencode($searchCotation);
+if ($searchCotation > 0 || $searchCotation == Risk::COTATION_NOT_ASSESSED) $param .= '&search_cotation=' . urlencode($searchCotation);
 // Add $param from extra fields
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 
@@ -965,6 +961,7 @@ foreach ($evaluation->fields as $key => $val) {
             foreach ($risk->getCotations() as $cotationLevel => $cotation) {
                 $cotationLabels[$cotationLevel] = $cotation['label'];
             }
+            $cotationLabels[Risk::COTATION_NOT_ASSESSED] = $langs->trans('RisksNotAssessed');
             print $form->selectarray('search_cotation', $cotationLabels, $searchCotation, 1, 0, 0, '', 0, 0, 0, '', 'maxwidth100');
         }
         print '</td>';
