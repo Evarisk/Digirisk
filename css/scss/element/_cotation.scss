@@ -1,8 +1,15 @@
 .risk-evaluation-cotation {
-  width: 50px;
+  /* The longest label ("81-100") is exactly as wide as the 50px square that holds it: size the chip
+     on its own text so it keeps some padding, and keep the square look for the shorter ones. */
+  box-sizing: border-box;
+  width: max-content;
   min-width: 50px;
+  padding: 0 10px;
   height: 50px;
   line-height: 50px;
+  /* Badge: never shrink nor wrap, whatever flex or table cell it is dropped into. */
+  flex: none;
+  white-space: nowrap;
   text-align: center;
   border-radius: 6px;
   background: $color__grey;

@@ -1,9 +1,16 @@
 @charset "UTF-8";
 .risk-evaluation-cotation {
-  width: 50px;
+  /* The longest label ("81-100") is exactly as wide as the 50px square that holds it: size the chip
+     on its own text so it keeps some padding, and keep the square look for the shorter ones. */
+  box-sizing: border-box;
+  width: max-content;
   min-width: 50px;
+  padding: 0 10px;
   height: 50px;
   line-height: 50px;
+  /* Badge: never shrink nor wrap, whatever flex or table cell it is dropped into. */
+  flex: none;
+  white-space: nowrap;
   text-align: center;
   border-radius: 6px;
   background: #ececec;
@@ -9099,6 +9106,7 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
     cover each other and steal their neighbour clicks: keep them spaced on a wrapping row */
 .element-linked-medias .add-medias td {
   vertical-align: top;
+  border-bottom: 0 !important;
 }
 .element-linked-medias .element-linked-medias-list {
   display: flex;
@@ -9453,8 +9461,95 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   align-items: center;
 }
 
+/** Add / edit evaluation modals share the same layout.
+    The container hugs its content: the simple method no longer leaves a large empty area above the
+    footer, and only the content scrolls when the advanced method grid is taller than the window. */
+.risk-evaluation-add-modal, .risk-evaluation-edit-modal {
+  /** Method switch (simple / advanced) and its help icon on the same baseline */
+  /** The cotation labels ("81-100") are as wide as the 50px square that holds them, so they touched
+      both of its edges: equal columns sized on the longest label give every chip some breathing room */
+  /** saturne_show_medias_linked() falls back to nophoto.png: next to the two upload buttons that
+      placeholder reads as a third, disabled one */
+  /** Reminder of the evaluation being replaced: read-only, so it is set apart from the form above */
+}
 .risk-evaluation-add-modal .modal-container, .risk-evaluation-edit-modal .modal-container {
-  max-height: 750px;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  max-height: calc(100% - 4em);
+  /** min-height: 0 lets the flex item shrink below its content so its own overflow-y takes over */
+}
+.risk-evaluation-add-modal .modal-container .modal-header, .risk-evaluation-add-modal .modal-container .modal-footer, .risk-evaluation-edit-modal .modal-container .modal-header, .risk-evaluation-edit-modal .modal-container .modal-footer {
+  height: auto;
+  flex: 0 0 auto;
+}
+.risk-evaluation-add-modal .modal-container .modal-content, .risk-evaluation-edit-modal .modal-container .modal-content {
+  height: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+.risk-evaluation-add-modal .risk-evaluation-header, .risk-evaluation-edit-modal .risk-evaluation-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.risk-evaluation-add-modal .risk-evaluation-header .fa-info-circle, .risk-evaluation-edit-modal .risk-evaluation-header .fa-info-circle {
+  margin-left: 0.75em;
+}
+.risk-evaluation-add-modal .cotation-listing, .risk-evaluation-edit-modal .cotation-listing {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.risk-evaluation-add-modal .cotation-listing .risk-evaluation-cotation, .risk-evaluation-edit-modal .cotation-listing .risk-evaluation-cotation {
+  width: auto;
+  margin: 0;
+}
+.risk-evaluation-add-modal .element-linked-medias-list img[src*=nophoto],
+.risk-evaluation-add-modal .last-risk-assessment .photo img[src*=nophoto], .risk-evaluation-edit-modal .element-linked-medias-list img[src*=nophoto],
+.risk-evaluation-edit-modal .last-risk-assessment .photo img[src*=nophoto] {
+  display: none;
+}
+.risk-evaluation-add-modal .last-risk-assessment, .risk-evaluation-edit-modal .last-risk-assessment {
+  padding: 1em;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.03);
+}
+.risk-evaluation-add-modal .last-risk-assessment h2, .risk-evaluation-edit-modal .last-risk-assessment h2 {
+  margin: 0 0 0.8em;
+  font-size: 16px;
+}
+.risk-evaluation-add-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper, .risk-evaluation-edit-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper {
+  gap: 1.5em;
+  align-items: flex-start;
+  /** Below the tablet breakpoint the two columns squeeze the cotation chips into a single
+      column: stack the comment under them instead */
+}
+@media (max-width: 770px) {
+  .risk-evaluation-add-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper, .risk-evaluation-edit-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper {
+    flex-wrap: wrap;
+    /** saturne collapses every .wpeo-gridlayout to one column below this breakpoint (with
+        !important): a four step scale reads better as a compact wrapping row */
+  }
+  .risk-evaluation-add-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .risk-evaluation-content, .risk-evaluation-add-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .risk-evaluation-comment, .risk-evaluation-edit-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .risk-evaluation-content, .risk-evaluation-edit-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .risk-evaluation-comment {
+    width: 100%;
+  }
+  .risk-evaluation-add-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .cotation-listing, .risk-evaluation-edit-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .cotation-listing {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+.risk-evaluation-add-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .cotation-standard, .risk-evaluation-edit-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .cotation-standard {
+  margin-right: 0;
+}
+.risk-evaluation-add-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .risk-evaluation-comment, .risk-evaluation-edit-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .risk-evaluation-comment {
+  margin-left: 0;
+  /** A one line field next to a 50px high cotation row looks unfinished: align both columns */
+}
+.risk-evaluation-add-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .risk-evaluation-comment textarea, .risk-evaluation-edit-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .risk-evaluation-comment textarea {
+  height: 50px !important;
+  min-height: 50px !important;
 }
 
 .risk-evaluation-edit-modal .wpeo-modal.modal-risk.modal-active {
