@@ -194,7 +194,10 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
 
             foreach ($orderedDigiriskElements as $orderedDigiriskElementId => $orderedDigiriskElement) {
                 $tmpArray['digiriskElementLabel']         = 'S' . $orderedDigiriskElement['object']->entity . ' - ' . $orderedDigiriskElement['object']->ref . ' - ' . $orderedDigiriskElement['object']->label;
-                $tmpArray['description']                  = $orderedDigiriskElement['object']->description;
+                // The description is filled with the WYSIWYG editor and the ODT library only keeps
+                // inline tags: closing block tags become spaces so paragraphs and list items are
+                // not glued together in the document.
+                $tmpArray['description']                  = str_replace(['</p>', '</li>'], ' ', $orderedDigiriskElement['object']->description);
                 $tmpArray['totalRiskAssessmentCotations'] = $riskByRiskAssessmentCotations[$orderedDigiriskElementId]['totalRiskAssessmentCotations'] ?: 0;
                 foreach ($riskAssessmentCotationTypes as $i => $riskAssessmentCotationType) {
                     $tmpArray['nb' . $riskAssessmentCotationType] = $riskByRiskAssessmentCotations[$orderedDigiriskElementId][$i] ?? 0;
