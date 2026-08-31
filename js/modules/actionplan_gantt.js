@@ -156,6 +156,24 @@ window.digiriskdolibarr.actionplanGantt.renderHeader = function(startDate, endDa
 };
 
 /**
+ * Turn the colour of a column into the translucent background of a bar
+ *
+ * @param  {string} color Hexadecimal colour of the column, empty when the column carries none
+ * @return {string}       rgba() colour, empty string when the colour cannot be read
+ */
+window.digiriskdolibarr.actionplanGantt.softColor = function(color) {
+    if (!/^#[0-9a-f]{6}$/i.test(color || '')) {
+        return '';
+    }
+
+    var red   = parseInt(color.substr(1, 2), 16);
+    var green = parseInt(color.substr(3, 2), 16);
+    var blue  = parseInt(color.substr(5, 2), 16);
+
+    return 'rgba(' + red + ', ' + green + ', ' + blue + ', 0.25)';
+};
+
+/**
  * Render task bars in the timeline
  *
  * @param {Array}  tasks     Task data array
@@ -201,17 +219,23 @@ window.digiriskdolibarr.actionplanGantt.renderBars = function(tasks, startDate, 
         var right = Math.ceil((taskEnd - startDate) / (24 * 60 * 60 * 1000)) * dayWidth;
         var width = Math.max(right - left, dayWidth); // At least 1 day width
 
-        var colorClass = 'gantt-bar-red';
-        if (task.progress >= 100) {
-            colorClass = 'gantt-bar-green';
-        } else if (task.progress > 0) {
-            colorClass = 'gantt-bar-yellow';
+        // Colour of the column the progress falls in, so the Gantt follows the configured scale
+        var softColor  = window.digiriskdolibarr.actionplanGantt.softColor(task.color);
+        var colorClass = '';
+        var barStyle   = 'left:' + left + 'px;width:' + width + 'px';
+
+        if (softColor) {
+            barStyle += ';background:' + softColor + ';border:1px solid ' + task.color;
+        } else {
+            // No colour on the column (or an unreadable one): keep the historical three-tone bars
+            colorClass = task.progress >= 100 ? 'gantt-bar-green' : (task.progress > 0 ? 'gantt-bar-yellow' : 'gantt-bar-red');
         }
 
         var progressWidth = Math.round(width * task.progress / 100);
+        var progressStyle = 'width:' + progressWidth + 'px' + (softColor ? ';background:' + task.color : '');
 
-        var barHtml = '<div class="gantt-bar ' + colorClass + '" style="left:' + left + 'px;width:' + width + 'px">';
-        barHtml += '<div class="gantt-bar-progress" style="width:' + progressWidth + 'px"></div>';
+        var barHtml = '<div class="gantt-bar ' + colorClass + '" style="' + barStyle + '">';
+        barHtml += '<div class="gantt-bar-progress" style="' + progressStyle + '"></div>';
         barHtml += '<span class="gantt-bar-label">' + task.progress + '%</span>';
         barHtml += '<div class="gantt-tooltip">';
         barHtml += '<strong>' + task.ref + '</strong> — ' + task.label + '<br>';
