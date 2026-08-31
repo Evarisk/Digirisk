@@ -275,3 +275,7 @@ FROM llx_projet_task t
 LEFT JOIN llx_projet_task_extrafields ef ON ef.fk_object = t.rowid
 WHERE ef.fk_object IS NULL
   AND (t.label LIKE '% - T1 - %' OR t.label LIKE '% - T2 - %');
+
+-- 23.1.x - prevention plan public/private notes
+ALTER TABLE llx_digiriskdolibarr_preventionplan ADD note_public text NULL AFTER cssct_intervention;
+ALTER TABLE llx_digiriskdolibarr_preventionplan ADD note_private text NULL AFTER note_public;

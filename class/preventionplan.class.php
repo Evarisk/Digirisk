@@ -89,6 +89,8 @@ class PreventionPlan extends SaturneObject
         'prior_visit_text'     => ['type' => 'text',         'label' => 'PriorVisitText',    'enabled' => 1, 'position' => 100, 'notnull' => 0, 'visible' => 3],
         'prior_visit_date'     => ['type' => 'datetime',     'label' => 'PriorVisitDate',    'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => 3],
         'cssct_intervention'   => ['type' => 'boolean',      'label' => 'CSSCTIntervention', 'enabled' => 1, 'position' => 120, 'notnull' => 0, 'visible' => 3],
+        'note_public'          => ['type' => 'html',         'label' => 'NotePublic',        'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => 0],
+        'note_private'         => ['type' => 'html',         'label' => 'NotePrivate',       'enabled' => 1, 'position' => 135, 'notnull' => 0, 'visible' => 0],
         'fk_user_creat'        => ['type' => 'integer:User:user/class/user.class.php',           'label' => 'UserAuthor', 'picto' => 'user',    'enabled' => 1,                         'position' => 140, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
         'fk_user_modif'        => ['type' => 'integer:User:user/class/user.class.php',           'label' => 'UserModif',  'picto' => 'user',    'enabled' => 1,                         'position' => 150, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
         'fk_project'           => ['type' => 'integer:Project:projet/class/project.class.php:1', 'label' => 'Project',    'picto' => 'project', 'enabled' => '$conf->project->enabled', 'position' => 85,  'notnull' => 1, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'projet.rowid'],
