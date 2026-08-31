@@ -445,8 +445,17 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
 
             $category = new Categorie($this->db);
 
+            // Only the ticket categories picked in the module setup are printed, all of them when the setup is empty
+            $allowedCategoryIds = array_filter(array_map('intval', explode(',', getDolGlobalString('DIGIRISKDOLIBARR_TICKET_DOCUMENT_CATEGORIES'))));
+
             foreach ($tickets as $ticket) {
                 $categories = $category->containing($ticket->id, Categorie::TYPE_TICKET);
+                if (!is_array($categories)) {
+                    $categories = [];
+                }
+                if (!empty($allowedCategoryIds)) {
+                    $categories = array_filter($categories, fn($cat) => in_array((int) $cat->id, $allowedCategoryIds, true));
+                }
 
                 $tmpArray = [
                     'refticket'                 => $ticket->ref,

@@ -387,3 +387,9 @@ ActionPlanTaskTagAdded               = Tag added: %s
 ActionPlanTaskTagRemoved             = Tag removed: ID %s
 ActionPlanTaskContributorAdded       = Contributor added: %s
 ActionPlanTaskContributorRemoved     = Contributor removed: ID %s
+
+# Ticket categories printed in documents - issue #3677
+TicketDocumentsConfig                = Ticket documents
+TicketCategoriesInDocuments          = Categories displayed in documents
+TicketCategoriesInDocumentsSetting   = This option restricts the ticket categories displayed in the ticket list of documents (Single Document, groupment sheet, etc.). When no category is selected, all of them are displayed
+TicketCategoriesInDocumentsSet       = Categories displayed in documents have been set
