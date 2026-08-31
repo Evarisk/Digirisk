@@ -945,6 +945,28 @@ class ActionsDigiriskdolibarr
     }
 
     /**
+     * Overloading the viewDictionaryFieldlist function : replacing the parent's function with the one below
+     *
+     * The Kanban column dictionary stores a translation key as label, so a column keeps its meaning in
+     * every language. The generic dictionary page prints that key as is: translate it on the row it is
+     * about to render, a label renamed by the admin coming back unchanged from trans().
+     *
+     * @param  array  $parameters Hook metadata (context, tabname, etc...)
+     * @param  object $object     Dictionary line about to be displayed
+     * @return int                0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function viewDictionaryFieldlist(array $parameters, $object): int
+    {
+        global $langs;
+
+        if (($parameters['tabname'] ?? '') == MAIN_DB_PREFIX . 'c_digiriskdolibarr_actionplan_column' && !empty($object->label)) {
+            $object->label = $langs->trans($object->label);
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
 	 *  Overloading the printFieldListFrom function : replacing the parent's function with the one below
 	 *
 	 * @param Hook $parameters metadatas (context, etc...)

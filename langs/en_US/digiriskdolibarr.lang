@@ -344,3 +344,46 @@ ActionPlanColumnPictoHelp            = Font Awesome icon name, for instance fa-c
 Progress_min                         = Min. progress
 Progress_max                         = Max. progress
 Picto                                = Icon
+
+# ===========================================================================
+# Action plan — Kanban, Gantt, project selector and logs — issue #4751
+# ===========================================================================
+ActionPlanView                       = Action plan
+ActionPlanKanban                     = Kanban
+ActionPlanDisplayedProject           = Displayed project
+ActionPlanChangeProject              = Change project
+ActionPlanDefaultProject             = Risk assessment document (default)
+ActionPlanNoProjectConfigured        = No project configured
+ActionPlanGlobalProgress             = Overall PAPRIPACT progress
+ActionPlanGlobalProgressInfo         = Average progress of %s corrective action(s)
+ActionPlanExportA3                   = Download the PAPRIPACT as an A3 landscape PDF
+ActionPlanExportCsv                  = Download the PAPRIPACT as a CSV file
+ActionPlanExportGantt                = Download the Gantt chart as a PNG image
+ColumnDraft                          = Draft
+ColumnInProgress                     = In progress
+ColumnInControl                      = To be checked
+ColumnDone                           = Done
+ColumnWidth                          = Width
+ColumnGap                            = Spacing
+KanbanLoadMore                       = Show more (%s)
+LinkedRisk                           = Linked risk
+Responsible                          = Responsible
+Unassigned                           = Unassigned
+AddCategory                          = Add a category
+ExternalContacts                     = External contacts
+RemoveContact                        = Remove the contact
+ActionPlanLogLabel                   = Label change
+ActionPlanLogWorkload                = Workload change
+ActionPlanLogBudget                  = Budget change
+ActionPlanLogProgress                = Progress change
+ActionPlanLogTag                     = Tag change
+ActionPlanLogContributorAdd          = Contributor added
+ActionPlanLogContributorRemove       = Contributor removed
+ActionPlanTaskLabelChanged           = Label changed: "%s" → "%s"
+ActionPlanTaskWorkloadChanged        = Workload changed: %s → %s
+ActionPlanTaskBudgetChanged          = Budget changed: %s → %s
+ActionPlanTaskProgressChanged        = Progress changed: %s%% → %s%%
+ActionPlanTaskTagAdded               = Tag added: %s
+ActionPlanTaskTagRemoved             = Tag removed: ID %s
+ActionPlanTaskContributorAdded       = Contributor added: %s
+ActionPlanTaskContributorRemoved     = Contributor removed: ID %s
