@@ -265,6 +265,12 @@ if ($action == 'setMainCategory') {
 	setEventMessages($langs->transnoentities('MainCategorySet'), array());
 }
 
+if ($action == 'setTicketCategoriesInDocuments') {
+	$documentCategories = GETPOST('documentCategories', 'array');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_DOCUMENT_CATEGORIES', implode(',', array_map('intval', $documentCategories)), 'chaine', 0, '', $conf->entity);
+	setEventMessages($langs->transnoentities('TicketCategoriesInDocumentsSet'), array());
+}
+
 if ($action == 'setParentCategoryLabel') {
 	$label = GETPOST('parentCategoryLabel');
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL', $label, 'chaine', 0, '', $conf->entity);
@@ -880,6 +886,45 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print '</div>';
 	print '<span class="opacitymedium">' . $langs->transnoentities("TicketPublicInterfaceConfigDocumentation") . '</span> : <a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#DigiRisk_-_Registre_de_s.C3.A9curit.C3.A9_et_Tickets" target="_blank" >' . $langs->transnoentities('DigiriskDocumentation') . '</a>';
 }
+
+print load_fiche_titre($langs->transnoentities("TicketDocumentsConfig"), '', '');
+
+print '<div class="div-table-responsive-no-min">';
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->transnoentities("Parameters") . '</td>';
+print '<td class="center">' . $langs->transnoentities("Value") . '</td>';
+print '<td class="center">' . $langs->transnoentities("Action") . '</td>';
+print '<td class="center">' . $langs->transnoentities("ShortInfo") . '</td>';
+print '</tr>';
+
+// Set ticket categories printed in documents
+print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="setTicketCategoriesInDocuments">';
+print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+print '<input type="hidden" name="page_y">';
+
+$ticketCategories            = $form->select_all_categories(Categorie::TYPE_TICKET, null, 'parent', null, null, 1);
+$ticketCategoriesInDocuments = array_filter(explode(',', getDolGlobalString('DIGIRISKDOLIBARR_TICKET_DOCUMENT_CATEGORIES')));
+
+print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketCategoriesInDocuments") . '</td>';
+print '<td class="center">';
+print img_picto('', 'category', 'class="pictofixedwidth"') . $form->multiselectarray('documentCategories', $ticketCategories, $ticketCategoriesInDocuments, 0, 0, 'minwidth200 maxwidth400');
+print '</td>';
+
+print '<td class="center">';
+print '<input type="submit" class="button reposition" value="' . $langs->transnoentities('Save') . '">';
+print '</td>';
+
+print '<td class="center">';
+print $form->textwithpicto('', $langs->transnoentities("TicketCategoriesInDocumentsSetting"));
+print '</td>';
+print '</tr>';
+print '</form>';
+
+print '</table>';
+print '</div>';
 
 print load_fiche_titre($langs->transnoentities("TicketStatistics"), '', '');
 
