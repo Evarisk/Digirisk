@@ -1700,6 +1700,10 @@ class ActionsDigiriskdolibarr
 				'documentType' => 'listingrisksaction',
 				'picto'        => 'fontawesome_fa-exclamation_fas_#d35968'
 			],
+            'ListingRisksEnvironmentalDocument' => [
+                'documentType' => 'listingrisksenvironmentaldocument',
+                'picto'        => 'fontawesome_fa-leaf_fas_#d35968'
+            ],
             'ListingRisksEnvironmentalAction' => [
                 'documentType' => 'listingrisksenvironmentalaction',
                 'picto'        => 'fontawesome_fa-exclamation_fas_#d35968'

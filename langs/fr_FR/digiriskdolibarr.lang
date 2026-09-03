@@ -1150,6 +1150,13 @@ ListingRisksEnvironmentalActionGenerated   = Génération de listing des risques
 listingrisksenvironmentalaction.odt        = Listing des risques environnementaux avec actions correctives
 listingrisksenvironmentalaction_custom.odt = Listing des risques environnementaux avec actions correctives personnalisé
 
+#
+# ListingRisksEnvironmentalDocument - Listing des risques environnementaux documents
+#
+
+# Data - Donnée
+ListingRisksEnvironmentalDocument = Listing risques environnementaux
+
 
 
 #
