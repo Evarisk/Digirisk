@@ -1,0 +1,21 @@
+---
+name: Build assets
+
+on:
+    push:
+        branches:
+            - main
+            - develop
+        paths:
+            - 'css/scss/**'
+            - 'js/**/*.js'
+            - '!js/**/*.min.js'
+
+jobs:
+    build:
+      uses: Evarisk/Saturne/.github/workflows/build-assets-reusable.yml@main
+      with:
+        module: digiriskdolibarr
+
+      permissions:
+        contents: write
