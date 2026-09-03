@@ -18,6 +18,12 @@ global $user, $db, $langs, $conf;
 
 header('Content-Type: application/json');
 
+if (!$user->hasRight('digiriskdolibarr', 'risk', 'write')) {
+    http_response_code(403);
+    echo json_encode(['error' => $langs->trans('PermissionDenied')]);
+    exit;
+}
+
 $data = json_decode(file_get_contents('php://input'), true);
 
 if (!$data) {
@@ -25,62 +31,85 @@ if (!$data) {
     echo json_encode(['error' => 'Invalid data']);
     exit;
 }
-$risk = new Risk($db);
+
+// Single risk (DigiAI, 'Faire le point' method) or batch of risks (ED 6403 grid)
+$risksData = (isset($data['risks']) && is_array($data['risks'])) ? $data['risks'] : [$data];
+
+$risk           = new Risk($db);
 $riskAssessment = new RiskAssessment($db);
-$project = new Project($db);
+$project        = new Project($db);
 
 $numberingModuleName = [
-    'riskanalysis/' . $risk->element       => $conf->global->DIGIRISKDOLIBARR_RISK_ADDON,
+    'riskanalysis/' . $risk->element          => $conf->global->DIGIRISKDOLIBARR_RISK_ADDON,
     'riskanalysis/' . $riskAssessment->element => $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON,
-    $project->element                      => $conf->global->PROJECT_ADDON,
-    'project/task'                         => $conf->global->PROJECT_TASK_ADDON,
+    $project->element                         => $conf->global->PROJECT_ADDON,
+    'project/task'                            => $conf->global->PROJECT_TASK_ADDON,
 ];
 
 list($refRiskMod, $refEvaluationMod, $refProjectMod, $refTaskMod) = saturne_require_objects_mod($numberingModuleName, 'digiriskdolibarr');
 
+$error        = 0;
+$errorMessage = '';
+$nbCreated    = 0;
 
-$risk->fk_element  = $data['fk_element'] ?? 0;
-$risk->ref         = $refRiskMod->getNextValue($risk);
-$risk->category    = $data['category'];
-$risk->sub_category = $data['sub_category'] ?? 0;
-$risk->description = $data['description'];
-$risk->status      = 1;
-$risk->fk_projet   = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+$db->begin();
 
-$result = $risk->create($user);
-if ($result > 0) {
-    $eval = new RiskAssessment($db);
-    $eval->fk_risk = $risk->id;
-    $eval->ref = $refEvaluationMod->getNextValue($eval);
-    $eval->cotation = $data['cotation'];
-    $eval->status = 1;
-    $eval->method = $data['method'] ?? 'simple';
-    $eval->comment = $data['description'] ?? '';
-    $eval->date_riskassessment = $data['riskassessment_date'] ? strtotime($data['riskassessment_date']) : dol_now();
-    $result2 = $eval->create($user);
+foreach ($risksData as $riskData) {
+    $risk               = new Risk($db);
+    $risk->fk_element   = $riskData['fk_element'] ?? 0;
+    $risk->ref          = $refRiskMod->getNextValue($risk);
+    $risk->category     = $riskData['category'] ?? 0;
+    $risk->sub_category = $riskData['sub_category'] ?? 0;
+    $risk->description  = $riskData['description'] ?? '';
+    $risk->status       = 1;
+    $risk->fk_projet    = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 
-    if ($result2 > 0) {
-        $tasks = $data['tasks'] ?? [];
-
-        foreach ($tasks as $tasktitle) {
-            $task = new Task($db);
-            $task->ref   = $refTaskMod->getNextValue('', $task);
-            $task->label = $tasktitle;
-            $task->description = '';
-            $task->status = 1;
-            $task->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
-            $task->array_options['options_fk_risk'] = $risk->id;
-            $task->date_start = dol_now();
-            $task->date_end = dol_now() + 86400;
-            $task->create($user);
-        }
-
-    } else {
-        echo json_encode(['error' => $eval->db]);
-        exit;
+    if ($risk->create($user) <= 0) {
+        $error++;
+        $errorMessage = $risk->errorsToString() ?: $risk->error;
+        break;
     }
 
-    echo json_encode(['success' => $result2]);
+    $eval                     = new RiskAssessment($db);
+    $eval->fk_risk            = $risk->id;
+    $eval->ref                = $refEvaluationMod->getNextValue($eval);
+    $eval->cotation           = $riskData['cotation'] ?? 0;
+    $eval->status             = 1;
+    $eval->method             = $riskData['method'] ?? 'simple';
+    $eval->comment            = $riskData['description'] ?? '';
+    $eval->date_riskassessment = !empty($riskData['riskassessment_date']) ? strtotime($riskData['riskassessment_date']) : dol_now();
+
+    if ($eval->create($user) <= 0) {
+        $error++;
+        $errorMessage = $eval->errorsToString() ?: $eval->error;
+        break;
+    }
+
+    foreach (($riskData['tasks'] ?? []) as $taskTitle) {
+        $task                                   = new Task($db);
+        $task->ref                              = $refTaskMod->getNextValue('', $task);
+        $task->label                            = $taskTitle;
+        $task->description                      = '';
+        $task->status                           = 1;
+        $task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+        $task->array_options['options_fk_risk'] = $risk->id;
+        $task->date_start                       = dol_now();
+        $task->date_end                         = dol_now() + 86400;
+
+        if ($task->create($user) <= 0) {
+            $error++;
+            $errorMessage = $task->errorsToString() ?: $task->error;
+            break 2;
+        }
+    }
+
+    $nbCreated++;
+}
+
+if ($error) {
+    $db->rollback();
+    echo json_encode(['error' => dol_strlen($errorMessage) > 0 ? $errorMessage : $langs->trans('Error')]);
 } else {
-    echo json_encode(['error' => $risk->db]);
+    $db->commit();
+    echo json_encode(['success' => $nbCreated]);
 }

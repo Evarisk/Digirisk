@@ -202,6 +202,46 @@ window.digiriskdolibarr.risk_table_common.submitRisks = function(risksData, succ
 };
 
 /**
+ * Soumission AJAX de plusieurs risques en une seule requête (numérotation séquentielle garantie côté serveur)
+ *
+ * @param {Array}    risksData     Array des données de risques à créer
+ * @param {function} errorCallback Callback en cas d'erreur (optionnel)
+ */
+window.digiriskdolibarr.risk_table_common.submitRisksBatch = function(risksData, errorCallback) {
+  const token      = window.saturne.toolbox.getToken();
+  const dolUrlRoot = $('#dol_url_root').val() || window.location.origin;
+
+  const onError = function(message) {
+    if (typeof errorCallback === 'function') {
+      errorCallback(message);
+    }
+    alert(message);
+  };
+
+  $.ajax({
+    url: dolUrlRoot + '/custom/digiriskdolibarr/core/ajax/create_risk.php?token=' + token,
+    method: 'POST',
+    data: JSON.stringify({ risks: risksData }),
+    contentType: 'application/json',
+    dataType: 'json',
+    cache: false,
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest'
+    },
+    success: function(response) {
+      if (response && response.success > 0) {
+        window.location.reload();
+      } else {
+        onError(response && response.error ? response.error : 'Aucun risque n\'a pu être ajouté. Veuillez vérifier.');
+      }
+    },
+    error: function(xhr, status, error) {
+      onError('Aucun risque n\'a pu être ajouté. Veuillez vérifier. (' + error + ')');
+    }
+  });
+};
+
+/**
  * Extraction des données d'une ligne de risque
  *
  * @param {jQuery} row - La ligne du tableau

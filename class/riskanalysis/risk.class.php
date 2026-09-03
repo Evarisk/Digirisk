@@ -286,7 +286,7 @@ class Risk extends SaturneObject
             $array[$entity]['riskByRiskAssessmentLevels'][$scale][] = $risk;
             $array[$entity]['riskByRiskAssessmentCotations'][$fkElement]['totalRiskAssessmentCotations'] += $risk->riskAssessmentCotation;
             $array[$entity]['riskByRiskAssessmentCotations'][$fkElement][$scale]++;
-            if ($risk->sub_category >= 0) {
+            if ($risk->category == 17 && $risk->sub_category >= 0) {
                 $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$risk->sub_category][$risk->riskAssessmentDate] = $riskAssessment->cotation;
             }
             $array[$entity]['riskByCategories'][$risk->category ?? ''][$scale]++;
@@ -613,10 +613,10 @@ class Risk extends SaturneObject
     /**
      * Get risk sub categories from the JSON file
      *
-     * @param string $riskType Subtype of risk
-     * @return array           Array of risk sub categories, or empty array on failure
+     * @param  string $method Evaluation method to filter on ('fairelepoint', 'ed6403'), empty for all
+     * @return array          Array of risk sub categories, or empty array on failure
      */
-    public static function getDangerSubCategories(): array
+    public static function getDangerSubCategories(string $method = ''): array
     {
         $filePath = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/dangerSubCategories.json';
 
@@ -630,6 +630,15 @@ class Risk extends SaturneObject
         if (!isset($riskSubCategories[0]) || !is_array($riskSubCategories[0])) {
             return [];
         }
+
+        if (dol_strlen($method) > 0) {
+            foreach ($riskSubCategories[0] as $categoryPosition => $subCategories) {
+                $riskSubCategories[0][$categoryPosition] = array_values(array_filter($subCategories, function ($subCategory) use ($method) {
+                    return ($subCategory['method'] ?? 'fairelepoint') == $method;
+                }));
+            }
+        }
+
         return $riskSubCategories[0];
     }
 
@@ -700,6 +709,9 @@ class Risk extends SaturneObject
      */
     public function getDangerSubCategoryScaleLabel($scale) {
         global $langs;
+        if (!isset($scale)) {
+            return $langs->trans('-');
+        }
         if ($scale < 48) {
             return $langs->trans('Weak');
         } elseif ($scale < 51) {
@@ -707,7 +719,7 @@ class Risk extends SaturneObject
         } elseif ($scale < 80) {
             return $langs->trans('High');
         } else {
-            return $langs->trans('-');
+            return $langs->trans('Extreme');
         }
     }
 

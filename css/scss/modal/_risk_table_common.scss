@@ -1,5 +1,6 @@
 .risk-table-common,
 .psychosocial-risk-table,
+.psychosocial-risk-ed6403-table,
 .risque-table {
   width: 100%;
   border-collapse: collapse;
@@ -76,7 +77,8 @@
 }
 
 .risk-row-common,
-.psychosocial-risk-row {
+.psychosocial-risk-row,
+.psychosocial-risk-ed6403-row {
   &:hover {
     background-color: #f8f9fa;
   }
@@ -97,19 +99,22 @@
 }
 
 .risk-content-common,
-.psychosocial-risk-content {
+.psychosocial-risk-content,
+.psychosocial-risk-ed6403-content {
   max-height: 60vh;
   overflow-y: auto;
 }
 
 .risk-wrapper-common,
-.psychosocial-risk-wrapper {
+.psychosocial-risk-wrapper,
+.psychosocial-risk-ed6403-wrapper {
   padding: 10px;
 }
 
 
 .select-risk,
-.select-psychosocial-risk {
+.select-psychosocial-risk,
+.select-psychosocial-risk-ed6403 {
   cursor: pointer;
   transform: scale(1.2);
   margin: 0 auto;
@@ -148,4 +153,159 @@
     border: 3px solid #000000;
     box-shadow: none;
   }
+}
+
+/* Grille d'évaluation des facteurs de risques psychosociaux - outil RPS-DU de l'INRS (ED 6403) */
+.psychosocial-risk-ed6403-add {
+  margin-left: 10px;
+}
+
+.psychosocial-risk-ed6403-add-modal {
+  .modal-container {
+    max-width: 90%;
+    max-height: 85%;
+  }
+}
+
+.psychosocial-risk-ed6403-help {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  border-left: 4px solid $color__primary;
+  background-color: #f2f8ff;
+  font-size: 12px;
+}
+
+.psychosocial-risk-ed6403-table {
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 7%;
+  }
+
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 6%;
+  }
+
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 24%;
+    text-align: left;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 20%;
+  }
+
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 15%;
+  }
+
+  th:nth-child(6),
+  td:nth-child(6) {
+    width: 14%;
+  }
+
+  th:nth-child(7),
+  td:nth-child(7) {
+    width: 14%;
+  }
+
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+
+  textarea.flat {
+    width: 100%;
+    box-sizing: border-box;
+    resize: vertical;
+    overflow: auto;
+  }
+
+  .riskassessment-date {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.5em;
+  }
+
+  .cotation-standard {
+    display: block;
+  }
+
+  // Les 4 réponses de la grille INRS sur 2 colonnes : les libellés restent lisibles quelle que soit la largeur de la modale
+  .cotation-listing {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3px;
+  }
+
+  .risk-evaluation-cotation.cotation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-width: 0;
+    height: auto;
+    min-height: 46px;
+    line-height: 1.2;
+    margin-right: 0;
+    padding: 4px 2px;
+    font-size: 11px;
+    font-weight: 600;
+
+    &.rps-cotation-level-1 {
+      background: #92d050;
+      color: rgba(0, 0, 0, 0.8);
+    }
+
+    &.rps-cotation-level-2 {
+      background: #ffff00;
+      color: rgba(0, 0, 0, 0.8);
+    }
+
+    &.rps-cotation-level-3 {
+      background: #ffc000;
+      color: rgba(0, 0, 0, 0.8);
+    }
+
+    &.rps-cotation-level-4 {
+      background: #ff0000;
+      color: #ffffff;
+    }
+
+    &.selected-cotation {
+      border: 3px solid #000000;
+      box-shadow: none;
+    }
+  }
+}
+
+.psychosocial-ed6403-family-header {
+  td {
+    padding: 12px;
+    border-top: 2px solid #dee2e6;
+    background-color: #f8f9fa;
+    font-weight: bold;
+    text-align: left;
+  }
+
+  i {
+    margin-right: 8px;
+  }
+}
+
+.rps-criterion-title {
+  font-weight: bold;
+}
+
+.rps-criterion-question {
+  margin-top: 3px;
+  color: #666666;
+  font-size: 11px;
+  font-style: italic;
 }

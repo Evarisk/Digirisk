@@ -407,3 +407,26 @@ TimeSpentDocumentPDFDescription = Time spent on a project, grouped by user
 
 # Risk list dashboard - issue #4388
 RisksNotAssessed                     = Risks not assessed
+
+# Psychosocial risks - INRS RPS-DU grid (ED 6403)
+PsychosocialRisks = Psychosocial risks
+PreventionActions = Prevention actions
+AddPsychosocialRiskFaireLePoint = Add psychosocial risks (INRS "Faire le point" tool)
+AddPsychosocialRiskED6403 = Add psychosocial risks (INRS RPS-DU grid - ED 6403)
+AddPsychosocialRiskED6403Title = Psychosocial risk factors assessment grid - RPS-DU tool (ED 6403)
+AddPsychosocialRiskED6403Help = Rate each criterion with the answer matching the work situation being assessed. The color of the answer gives the risk level: green = low, yellow = to plan, orange = to handle, red = unacceptable.
+AddSelectedPsychosocialRisksED6403 = Add selected criteria
+SelectAllCriteria = Select all
+RPSCriterion = Criterion
+RPSCotation = Rating
+RPSAnswerNever = Never / No
+RPSAnswerSometimes = Sometimes / Rather no
+RPSAnswerOften = Often / Rather yes
+RPSAnswerAlways = Always / Yes
+RPSFamilyWorkIntensityComplexity = Work intensity and complexity
+RPSFamilyDifficultWorkingHours = Difficult working hours
+RPSFamilyEmotionalRequirements = Emotional requirements
+RPSFamilyLowAutonomy = Low autonomy at work
+RPSFamilyDegradedSocialRelations = Degraded social relations at work
+RPSFamilyValueConflicts = Value conflicts
+RPSFamilyJobInsecurity = Job and work insecurity

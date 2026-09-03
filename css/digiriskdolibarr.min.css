@@ -8458,6 +8458,14 @@ td .wpeo-dropdown.category-danger.dropdown-active {
   position: static;
 }
 
+/* Fermé, le panneau n'est masqué que par opacity : ses 360px de haut restent dans le flux du
+   tableau et gonflent la hauteur défilable de .div-table-responsive (overflow: auto), qui
+   affiche alors une barre de défilement verticale ne montrant rien — y compris sur une liste
+   vide. On le sort donc du flux tant que le dropdown n'est pas ouvert. */
+.div-table-responsive .wpeo-dropdown:not(.dropdown-active) .saturne-dropdown-content {
+  display: none;
+}
+
 /** Cell header */
 .table-cell-header {
   display: flex;
@@ -8874,6 +8882,7 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 
 .risk-table-common,
 .psychosocial-risk-table,
+.psychosocial-risk-ed6403-table,
 .risque-table {
   width: 100%;
   border-collapse: collapse;
@@ -8884,6 +8893,8 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 .risk-table-common td,
 .psychosocial-risk-table th,
 .psychosocial-risk-table td,
+.psychosocial-risk-ed6403-table th,
+.psychosocial-risk-ed6403-table td,
 .risque-table th,
 .risque-table td {
   padding: 8px 12px;
@@ -8893,6 +8904,7 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 }
 .risk-table-common th,
 .psychosocial-risk-table th,
+.psychosocial-risk-ed6403-table th,
 .risque-table th {
   background-color: #f8f9fa;
   font-weight: bold;
@@ -8902,6 +8914,8 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 .risk-table-common td:nth-child(1),
 .psychosocial-risk-table th:nth-child(1),
 .psychosocial-risk-table td:nth-child(1),
+.psychosocial-risk-ed6403-table th:nth-child(1),
+.psychosocial-risk-ed6403-table td:nth-child(1),
 .risque-table th:nth-child(1),
 .risque-table td:nth-child(1) {
   width: 10%;
@@ -8912,6 +8926,8 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 .risk-table-common td:nth-child(2),
 .psychosocial-risk-table th:nth-child(2),
 .psychosocial-risk-table td:nth-child(2),
+.psychosocial-risk-ed6403-table th:nth-child(2),
+.psychosocial-risk-ed6403-table td:nth-child(2),
 .risque-table th:nth-child(2),
 .risque-table td:nth-child(2) {
   width: 10%;
@@ -8922,6 +8938,8 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 .risk-table-common td:nth-child(3),
 .psychosocial-risk-table th:nth-child(3),
 .psychosocial-risk-table td:nth-child(3),
+.psychosocial-risk-ed6403-table th:nth-child(3),
+.psychosocial-risk-ed6403-table td:nth-child(3),
 .risque-table th:nth-child(3),
 .risque-table td:nth-child(3) {
   width: 15%;
@@ -8931,6 +8949,8 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 .risk-table-common td:nth-child(4),
 .psychosocial-risk-table th:nth-child(4),
 .psychosocial-risk-table td:nth-child(4),
+.psychosocial-risk-ed6403-table th:nth-child(4),
+.psychosocial-risk-ed6403-table td:nth-child(4),
 .risque-table th:nth-child(4),
 .risque-table td:nth-child(4) {
   width: 15%;
@@ -8941,6 +8961,8 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 .risk-table-common td:nth-child(5),
 .psychosocial-risk-table th:nth-child(5),
 .psychosocial-risk-table td:nth-child(5),
+.psychosocial-risk-ed6403-table th:nth-child(5),
+.psychosocial-risk-ed6403-table td:nth-child(5),
 .risque-table th:nth-child(5),
 .risque-table td:nth-child(5) {
   width: 10%;
@@ -8949,17 +8971,21 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 .risk-table-common td:nth-child(6),
 .psychosocial-risk-table th:nth-child(6),
 .psychosocial-risk-table td:nth-child(6),
+.psychosocial-risk-ed6403-table th:nth-child(6),
+.psychosocial-risk-ed6403-table td:nth-child(6),
 .risque-table th:nth-child(6),
 .risque-table td:nth-child(6) {
   width: 15%;
 }
 .risk-table-common .cotation-container,
 .psychosocial-risk-table .cotation-container,
+.psychosocial-risk-ed6403-table .cotation-container,
 .risque-table .cotation-container {
   text-align: center;
 }
 .risk-table-common .cotation-listing,
 .psychosocial-risk-table .cotation-listing,
+.psychosocial-risk-ed6403-table .cotation-listing,
 .risque-table .cotation-listing {
   justify-content: center;
   gap: 5px;
@@ -8967,6 +8993,7 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 @media (max-width: 768px) {
   .risk-table-common,
   .psychosocial-risk-table,
+  .psychosocial-risk-ed6403-table,
   .risque-table {
     font-size: 12px;
   }
@@ -8974,6 +9001,8 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   .risk-table-common td,
   .psychosocial-risk-table th,
   .psychosocial-risk-table td,
+  .psychosocial-risk-ed6403-table th,
+  .psychosocial-risk-ed6403-table td,
   .risque-table th,
   .risque-table td {
     padding: 5px 8px;
@@ -8981,7 +9010,8 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 }
 
 .risk-row-common:hover,
-.psychosocial-risk-row:hover {
+.psychosocial-risk-row:hover,
+.psychosocial-risk-ed6403-row:hover {
   background-color: #f8f9fa;
 }
 
@@ -8999,18 +9029,21 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 }
 
 .risk-content-common,
-.psychosocial-risk-content {
+.psychosocial-risk-content,
+.psychosocial-risk-ed6403-content {
   max-height: 60vh;
   overflow-y: auto;
 }
 
 .risk-wrapper-common,
-.psychosocial-risk-wrapper {
+.psychosocial-risk-wrapper,
+.psychosocial-risk-ed6403-wrapper {
   padding: 10px;
 }
 
 .select-risk,
-.select-psychosocial-risk {
+.select-psychosocial-risk,
+.select-psychosocial-risk-ed6403 {
   cursor: pointer;
   transform: scale(1.2);
   margin: 0 auto;
@@ -9045,6 +9078,136 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 .psychosocial-risk-table .selected-cotation {
   border: 3px solid #000000;
   box-shadow: none;
+}
+
+/* Grille d'évaluation des facteurs de risques psychosociaux - outil RPS-DU de l'INRS (ED 6403) */
+.psychosocial-risk-ed6403-add {
+  margin-left: 10px;
+}
+
+.psychosocial-risk-ed6403-add-modal .modal-container {
+  max-width: 90%;
+  max-height: 85%;
+}
+
+.psychosocial-risk-ed6403-help {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  border-left: 4px solid #0d8aff;
+  background-color: #f2f8ff;
+  font-size: 12px;
+}
+
+.psychosocial-risk-ed6403-table th:nth-child(1),
+.psychosocial-risk-ed6403-table td:nth-child(1) {
+  width: 7%;
+}
+.psychosocial-risk-ed6403-table th:nth-child(2),
+.psychosocial-risk-ed6403-table td:nth-child(2) {
+  width: 6%;
+}
+.psychosocial-risk-ed6403-table th:nth-child(3),
+.psychosocial-risk-ed6403-table td:nth-child(3) {
+  width: 24%;
+  text-align: left;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+.psychosocial-risk-ed6403-table th:nth-child(4),
+.psychosocial-risk-ed6403-table td:nth-child(4) {
+  width: 20%;
+}
+.psychosocial-risk-ed6403-table th:nth-child(5),
+.psychosocial-risk-ed6403-table td:nth-child(5) {
+  width: 15%;
+}
+.psychosocial-risk-ed6403-table th:nth-child(6),
+.psychosocial-risk-ed6403-table td:nth-child(6) {
+  width: 14%;
+}
+.psychosocial-risk-ed6403-table th:nth-child(7),
+.psychosocial-risk-ed6403-table td:nth-child(7) {
+  width: 14%;
+}
+.psychosocial-risk-ed6403-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.psychosocial-risk-ed6403-table textarea.flat {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  overflow: auto;
+}
+.psychosocial-risk-ed6403-table .riskassessment-date {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5em;
+}
+.psychosocial-risk-ed6403-table .cotation-standard {
+  display: block;
+}
+.psychosocial-risk-ed6403-table .cotation-listing {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3px;
+}
+.psychosocial-risk-ed6403-table .risk-evaluation-cotation.cotation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 0;
+  height: auto;
+  min-height: 46px;
+  line-height: 1.2;
+  margin-right: 0;
+  padding: 4px 2px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.psychosocial-risk-ed6403-table .risk-evaluation-cotation.cotation.rps-cotation-level-1 {
+  background: #92d050;
+  color: rgba(0, 0, 0, 0.8);
+}
+.psychosocial-risk-ed6403-table .risk-evaluation-cotation.cotation.rps-cotation-level-2 {
+  background: #ffff00;
+  color: rgba(0, 0, 0, 0.8);
+}
+.psychosocial-risk-ed6403-table .risk-evaluation-cotation.cotation.rps-cotation-level-3 {
+  background: #ffc000;
+  color: rgba(0, 0, 0, 0.8);
+}
+.psychosocial-risk-ed6403-table .risk-evaluation-cotation.cotation.rps-cotation-level-4 {
+  background: #ff0000;
+  color: #ffffff;
+}
+.psychosocial-risk-ed6403-table .risk-evaluation-cotation.cotation.selected-cotation {
+  border: 3px solid #000000;
+  box-shadow: none;
+}
+
+.psychosocial-ed6403-family-header td {
+  padding: 12px;
+  border-top: 2px solid #dee2e6;
+  background-color: #f8f9fa;
+  font-weight: bold;
+  text-align: left;
+}
+.psychosocial-ed6403-family-header i {
+  margin-right: 8px;
+}
+
+.rps-criterion-title {
+  font-weight: bold;
+}
+
+.rps-criterion-question {
+  margin-top: 3px;
+  color: #666666;
+  font-size: 11px;
+  font-style: italic;
 }
 
 .wpeo-modal[class*=modal-risk] .modal-container .modal-header {
@@ -9464,29 +9627,26 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 /** Add / edit evaluation modals share the same layout.
     The container hugs its content: the simple method no longer leaves a large empty area above the
     footer, and only the content scrolls when the advanced method grid is taller than the window. */
-.risk-evaluation-add-modal, .risk-evaluation-edit-modal {
-  /** Method switch (simple / advanced) and its help icon on the same baseline */
-  /** The cotation labels ("81-100") are as wide as the 50px square that holds them, so they touched
-      both of its edges: equal columns sized on the longest label give every chip some breathing room */
-  /** saturne_show_medias_linked() falls back to nophoto.png: next to the two upload buttons that
-      placeholder reads as a third, disabled one */
-  /** Reminder of the evaluation being replaced: read-only, so it is set apart from the form above */
-}
 .risk-evaluation-add-modal .modal-container, .risk-evaluation-edit-modal .modal-container {
   display: flex;
   flex-direction: column;
   height: auto;
   max-height: calc(100% - 4em);
-  /** min-height: 0 lets the flex item shrink below its content so its own overflow-y takes over */
 }
 .risk-evaluation-add-modal .modal-container .modal-header, .risk-evaluation-add-modal .modal-container .modal-footer, .risk-evaluation-edit-modal .modal-container .modal-header, .risk-evaluation-edit-modal .modal-container .modal-footer {
   height: auto;
   flex: 0 0 auto;
 }
+.risk-evaluation-add-modal .modal-container, .risk-evaluation-edit-modal .modal-container {
+  /** min-height: 0 lets the flex item shrink below its content so its own overflow-y takes over */
+}
 .risk-evaluation-add-modal .modal-container .modal-content, .risk-evaluation-edit-modal .modal-container .modal-content {
   height: auto;
   min-height: 0;
   flex: 1 1 auto;
+}
+.risk-evaluation-add-modal, .risk-evaluation-edit-modal {
+  /** Method switch (simple / advanced) and its help icon on the same baseline */
 }
 .risk-evaluation-add-modal .risk-evaluation-header, .risk-evaluation-edit-modal .risk-evaluation-header {
   display: flex;
@@ -9495,6 +9655,10 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 }
 .risk-evaluation-add-modal .risk-evaluation-header .fa-info-circle, .risk-evaluation-edit-modal .risk-evaluation-header .fa-info-circle {
   margin-left: 0.75em;
+}
+.risk-evaluation-add-modal, .risk-evaluation-edit-modal {
+  /** The cotation labels ("81-100") are as wide as the 50px square that holds them, so they touched
+      both of its edges: equal columns sized on the longest label give every chip some breathing room */
 }
 .risk-evaluation-add-modal .cotation-listing, .risk-evaluation-edit-modal .cotation-listing {
   display: grid;
@@ -9505,10 +9669,17 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   width: auto;
   margin: 0;
 }
+.risk-evaluation-add-modal, .risk-evaluation-edit-modal {
+  /** saturne_show_medias_linked() falls back to nophoto.png: next to the two upload buttons that
+      placeholder reads as a third, disabled one */
+}
 .risk-evaluation-add-modal .element-linked-medias-list img[src*=nophoto],
 .risk-evaluation-add-modal .last-risk-assessment .photo img[src*=nophoto], .risk-evaluation-edit-modal .element-linked-medias-list img[src*=nophoto],
 .risk-evaluation-edit-modal .last-risk-assessment .photo img[src*=nophoto] {
   display: none;
+}
+.risk-evaluation-add-modal, .risk-evaluation-edit-modal {
+  /** Reminder of the evaluation being replaced: read-only, so it is set apart from the form above */
 }
 .risk-evaluation-add-modal .last-risk-assessment, .risk-evaluation-edit-modal .last-risk-assessment {
   padding: 1em;
@@ -9529,11 +9700,13 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 @media (max-width: 770px) {
   .risk-evaluation-add-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper, .risk-evaluation-edit-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper {
     flex-wrap: wrap;
-    /** saturne collapses every .wpeo-gridlayout to one column below this breakpoint (with
-        !important): a four step scale reads better as a compact wrapping row */
   }
   .risk-evaluation-add-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .risk-evaluation-content, .risk-evaluation-add-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .risk-evaluation-comment, .risk-evaluation-edit-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .risk-evaluation-content, .risk-evaluation-edit-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .risk-evaluation-comment {
     width: 100%;
+  }
+  .risk-evaluation-add-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper, .risk-evaluation-edit-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper {
+    /** saturne collapses every .wpeo-gridlayout to one column below this breakpoint (with
+        !important): a four step scale reads better as a compact wrapping row */
   }
   .risk-evaluation-add-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .cotation-listing, .risk-evaluation-edit-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .cotation-listing {
     display: flex;
