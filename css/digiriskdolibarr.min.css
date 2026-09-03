@@ -8458,6 +8458,14 @@ td .wpeo-dropdown.category-danger.dropdown-active {
   position: static;
 }
 
+/* Fermé, le panneau n'est masqué que par opacity : ses 360px de haut restent dans le flux du
+   tableau et gonflent la hauteur défilable de .div-table-responsive (overflow: auto), qui
+   affiche alors une barre de défilement verticale ne montrant rien — y compris sur une liste
+   vide. On le sort donc du flux tant que le dropdown n'est pas ouvert. */
+.div-table-responsive .wpeo-dropdown:not(.dropdown-active) .saturne-dropdown-content {
+  display: none;
+}
+
 /** Cell header */
 .table-cell-header {
   display: flex;
@@ -9464,29 +9472,26 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 /** Add / edit evaluation modals share the same layout.
     The container hugs its content: the simple method no longer leaves a large empty area above the
     footer, and only the content scrolls when the advanced method grid is taller than the window. */
-.risk-evaluation-add-modal, .risk-evaluation-edit-modal {
-  /** Method switch (simple / advanced) and its help icon on the same baseline */
-  /** The cotation labels ("81-100") are as wide as the 50px square that holds them, so they touched
-      both of its edges: equal columns sized on the longest label give every chip some breathing room */
-  /** saturne_show_medias_linked() falls back to nophoto.png: next to the two upload buttons that
-      placeholder reads as a third, disabled one */
-  /** Reminder of the evaluation being replaced: read-only, so it is set apart from the form above */
-}
 .risk-evaluation-add-modal .modal-container, .risk-evaluation-edit-modal .modal-container {
   display: flex;
   flex-direction: column;
   height: auto;
   max-height: calc(100% - 4em);
-  /** min-height: 0 lets the flex item shrink below its content so its own overflow-y takes over */
 }
 .risk-evaluation-add-modal .modal-container .modal-header, .risk-evaluation-add-modal .modal-container .modal-footer, .risk-evaluation-edit-modal .modal-container .modal-header, .risk-evaluation-edit-modal .modal-container .modal-footer {
   height: auto;
   flex: 0 0 auto;
 }
+.risk-evaluation-add-modal .modal-container, .risk-evaluation-edit-modal .modal-container {
+  /** min-height: 0 lets the flex item shrink below its content so its own overflow-y takes over */
+}
 .risk-evaluation-add-modal .modal-container .modal-content, .risk-evaluation-edit-modal .modal-container .modal-content {
   height: auto;
   min-height: 0;
   flex: 1 1 auto;
+}
+.risk-evaluation-add-modal, .risk-evaluation-edit-modal {
+  /** Method switch (simple / advanced) and its help icon on the same baseline */
 }
 .risk-evaluation-add-modal .risk-evaluation-header, .risk-evaluation-edit-modal .risk-evaluation-header {
   display: flex;
@@ -9495,6 +9500,10 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 }
 .risk-evaluation-add-modal .risk-evaluation-header .fa-info-circle, .risk-evaluation-edit-modal .risk-evaluation-header .fa-info-circle {
   margin-left: 0.75em;
+}
+.risk-evaluation-add-modal, .risk-evaluation-edit-modal {
+  /** The cotation labels ("81-100") are as wide as the 50px square that holds them, so they touched
+      both of its edges: equal columns sized on the longest label give every chip some breathing room */
 }
 .risk-evaluation-add-modal .cotation-listing, .risk-evaluation-edit-modal .cotation-listing {
   display: grid;
@@ -9505,10 +9514,17 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   width: auto;
   margin: 0;
 }
+.risk-evaluation-add-modal, .risk-evaluation-edit-modal {
+  /** saturne_show_medias_linked() falls back to nophoto.png: next to the two upload buttons that
+      placeholder reads as a third, disabled one */
+}
 .risk-evaluation-add-modal .element-linked-medias-list img[src*=nophoto],
 .risk-evaluation-add-modal .last-risk-assessment .photo img[src*=nophoto], .risk-evaluation-edit-modal .element-linked-medias-list img[src*=nophoto],
 .risk-evaluation-edit-modal .last-risk-assessment .photo img[src*=nophoto] {
   display: none;
+}
+.risk-evaluation-add-modal, .risk-evaluation-edit-modal {
+  /** Reminder of the evaluation being replaced: read-only, so it is set apart from the form above */
 }
 .risk-evaluation-add-modal .last-risk-assessment, .risk-evaluation-edit-modal .last-risk-assessment {
   padding: 1em;
@@ -9529,11 +9545,13 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 @media (max-width: 770px) {
   .risk-evaluation-add-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper, .risk-evaluation-edit-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper {
     flex-wrap: wrap;
-    /** saturne collapses every .wpeo-gridlayout to one column below this breakpoint (with
-        !important): a four step scale reads better as a compact wrapping row */
   }
   .risk-evaluation-add-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .risk-evaluation-content, .risk-evaluation-add-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .risk-evaluation-comment, .risk-evaluation-edit-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .risk-evaluation-content, .risk-evaluation-edit-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .risk-evaluation-comment {
     width: 100%;
+  }
+  .risk-evaluation-add-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper, .risk-evaluation-edit-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper {
+    /** saturne collapses every .wpeo-gridlayout to one column below this breakpoint (with
+        !important): a four step scale reads better as a compact wrapping row */
   }
   .risk-evaluation-add-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .cotation-listing, .risk-evaluation-edit-modal .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .cotation-listing {
     display: flex;
