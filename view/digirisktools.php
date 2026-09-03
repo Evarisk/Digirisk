@@ -856,7 +856,7 @@ if ($action == 'repair_digirisk_element') {
     }
 
     foreach ($ObjectToDeletes as $object) {
-        $result = $object->delete($user, '', false);
+        $result = $object->delete($user, 0, false);
         if ($result <= 0) {
             $errors[] = $object->errors;
         }
@@ -942,7 +942,7 @@ if ($action == 'repair_risk_assessment') {
     }
 
     foreach ($ObjectToDeletes as $object) {
-        $result = $object->delete($user, '', false);
+        $result = $object->delete($user, 0, false);
         if ($result <= 0) {
             $errors[] = $object->errors;
         }
