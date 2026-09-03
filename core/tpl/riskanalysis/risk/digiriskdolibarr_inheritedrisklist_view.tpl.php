@@ -120,7 +120,7 @@
 					}
 				}
 			}
-			if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
+			if ($search_all) $sql .= $risk->getSearchAllSqlFilter($fieldstosearchall, $search_all);
 			// Add where from extra fields
 			include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
 			// Add where from hooks
@@ -158,8 +158,9 @@
 				$num = $db->num_rows($resql);
 			}
 
-			// Direct jump if only one record found
-			if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && !$page) {
+			// Direct jump if only one record found, out of reach once the page header has been printed : the redirect
+			// would only raise a "headers already sent" warning and leave the list truncated
+			if ($num == 1 && !headers_sent() && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && !$page) {
 				$obj = $db->fetch_object($resql);
 				$id = $obj->rowid;
 				header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $id);
@@ -234,7 +235,7 @@
 					}
 				}
 			}
-			if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
+			if ($search_all) $sql .= $risk->getSearchAllSqlFilter($fieldstosearchall, $search_all);
 			// Add where from extra fields
 			include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
 			// Add where from hooks
@@ -272,8 +273,9 @@
 				$num = $db->num_rows($resql);
 			}
 
-			// Direct jump if only one record found
-			if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && !$page) {
+			// Direct jump if only one record found, out of reach once the page header has been printed : the redirect
+			// would only raise a "headers already sent" warning and leave the list truncated
+			if ($num == 1 && !headers_sent() && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && !$page) {
 				$obj = $db->fetch_object($resql);
 				$id = $obj->rowid;
 				header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $id);
