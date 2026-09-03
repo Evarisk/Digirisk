@@ -905,7 +905,7 @@ if ($action == 'repair_risk') {
     }
 
     foreach ($ObjectToDeletes as $object) {
-        $result = $object->delete($user, '', false);
+        $result = $object->delete($user, 0, false);
         if ($result <= 0) {
             $errors[] = $object->errors;
         }
