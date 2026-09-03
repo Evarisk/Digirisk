@@ -1825,6 +1825,61 @@ class ActionsDigiriskdolibarr
 	}
 
     /**
+     * Overloading the addSearchEntry function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function addSearchEntry(array $parameters): int
+    {
+        global $langs, $user;
+
+        if (strpos($parameters['context'], 'searchform') === false || !$user->hasRight('digiriskdolibarr', 'lire')) {
+            return 0;
+        }
+
+        // The search box is built before the module lang file is loaded, the labels would come out as their key
+        $langs->load('digiriskdolibarr@digiriskdolibarr');
+
+        // Lists opened from the search box, keyed by the right they need : picto, label and path of the list
+        $lists = [
+            'risk'                  => ['exclamation-triangle', 'Riskprofessionals',     'view/digiriskelement/risk_list.php?risk_type=risk'],
+            'riskenvironmental'     => ['leaf',                 'Riskenvironmentals',    'view/digiriskelement/risk_list.php?risk_type=riskenvironmental'],
+            'preventionplan'        => ['info',                 'PreventionPlan',        'view/preventionplan/preventionplan_list.php'],
+            'firepermit'            => ['fire-alt',             'FirePermit',            'view/firepermit/firepermit_list.php'],
+            'accident'              => ['user-injured',         'Accident',              'view/accident/accident_list.php'],
+            'accidentinvestigation' => ['search',               'AccidentInvestigation', 'view/accidentinvestigation/accidentinvestigation_list.php']
+        ];
+
+        $moduleNum     = 436302;
+        $position      = 0;
+        $searchEntries = [];
+        foreach ($lists as $rightName => $list) {
+            if (!$user->hasRight('digiriskdolibarr', $rightName, 'read')) {
+                continue;
+            }
+
+            list($picto, $langKey, $listPath) = $list;
+
+            $position += 10;
+            $picto     = 'fontawesome_fa-' . $picto . '_fas_#d35968';
+            $url       = dol_buildpath('custom/digiriskdolibarr/' . $listPath, 1) . (strpos($listPath, '?') !== false ? '&' : '?') . 'mainmenu=digiriskdolibarr';
+
+            $searchEntries['searchinto' . $rightName] = [
+                'position' => $moduleNum . sprintf('%02d', $position),
+                'img'      => $picto,
+                'label'    => $langs->trans($langKey),
+                'text'     => img_picto('', $picto, 'class="pictofixedwidth"') . $langs->trans($langKey),
+                'url'      => $url . (!empty($parameters['search_boxvalue']) ? '&search_all=' . urlencode($parameters['search_boxvalue']) : '')
+            ];
+        }
+
+        $this->results = $searchEntries;
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
      * Overloading the saturneExtendGetObjectsMetadata function : replacing the parent's function with the one below
      *
      * @param  array $parameters Hook metadata (context, etc...)

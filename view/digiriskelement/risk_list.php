@@ -139,6 +139,10 @@ $fieldstosearchall = array();
 foreach ($risk->fields as $key => $val) {
 	if (!empty($val['searchall'])) $fieldstosearchall['r.' . $key] = $val['label'];
 }
+// A risk is also brought back by the ref of one of its assessments, see Risk::getSearchAllSqlFilter()
+foreach ($evaluation->fields as $key => $val) {
+	if (!empty($val['searchall'])) $fieldstosearchall['ra.' . $key] = 'RiskAssessment';
+}
 
 // Definition of array of fields for columns
 $arrayfields = array();

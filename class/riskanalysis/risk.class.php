@@ -1102,6 +1102,43 @@ class Risk extends SaturneObject
     }
 
     /**
+     * Get the SQL criteria of the "search in all" of a risk list
+     *
+     * The refs of the assessments (RA...) are looked up as well: an assessment has no list of its own, so a
+     * search made on its ref has to bring back the risk it belongs to instead of nothing.
+     *
+     * @param  array  $fieldsToSearchAll Fields to search into, keyed by their name prefixed with their table alias,
+     *                                   "ra." standing for the assessments of the risk
+     * @param  string $searchAll         Searched value
+     * @return string                    SQL criteria, empty when there is nothing to search into
+     */
+    public function getSearchAllSqlFilter(array $fieldsToSearchAll, string $searchAll): string
+    {
+        $riskFields       = [];
+        $assessmentFields = [];
+        foreach (array_keys($fieldsToSearchAll) as $field) {
+            if (strpos($field, 'ra.') === 0) {
+                $assessmentFields[] = $field;
+            } else {
+                $riskFields[] = $field;
+            }
+        }
+
+        $criterias = [];
+        if (!empty($riskFields)) {
+            $criterias[] = natural_search($riskFields, $searchAll, 0, 1);
+        }
+        if (!empty($assessmentFields)) {
+            $riskAssessmentTable = MAIN_DB_PREFIX . (new RiskAssessment($this->db))->table_element;
+
+            $criterias[] = 'r.rowid IN (SELECT ra.fk_risk FROM ' . $riskAssessmentTable . ' as ra'
+                         . ' WHERE ' . natural_search($assessmentFields, $searchAll, 0, 1) . ')';
+        }
+
+        return empty($criterias) ? '' : ' AND (' . implode(' OR ', $criterias) . ')';
+    }
+
+    /**
      * Get the level of the cotation scale a cotation falls in
      *
      * @param  float $cotation Cotation of a risk assessment
