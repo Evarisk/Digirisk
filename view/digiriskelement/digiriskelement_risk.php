@@ -403,6 +403,7 @@ if ($object->id > 0) {
 	}
 
 	require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_psychosocial_risk_modal.tpl.php';
+	require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_psychosocial_risk_ed6403_modal.tpl.php';
 }
 
 ?>

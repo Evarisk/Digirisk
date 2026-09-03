@@ -598,10 +598,16 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
         $newcardbutton .= '	<input type="hidden" class="modal-options" data-modal-to-open="risk_add'. $object->id .'" data-from-id="'. $object->id .'" data-from-type="digiriskelement" data-from-subtype="photo" data-from-subdir="photos"/>';
         $newcardbutton .= '</div>';
 
-        // Bouton pour les risques psychosociaux
-        $newcardbutton .= '<div class="psychosocial-risk-add wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open" style="margin-left: 10px;" aria-label="' . $langs->trans('AddPsychosocialRisk') . '" value="' . $object->id . '">';
+        // Bouton pour les risques psychosociaux - outil "Faire le point" de l'INRS
+        $newcardbutton .= '<div class="psychosocial-risk-add wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open" style="margin-left: 10px;" aria-label="' . $langs->trans('AddPsychosocialRiskFaireLePoint') . '" value="' . $object->id . '">';
         $newcardbutton .= '<i class="fas fa-brain button-icon"></i><i class="fas fa-plus-circle button-add animated"></i>';
         $newcardbutton .= '	<input type="hidden" class="modal-options" data-modal-to-open="psychosocial_risk_add" data-from-id="'. $object->id .'" data-from-type="digiriskelement" data-from-subtype="photo" data-from-subdir="photos"/>';
+        $newcardbutton .= '</div>';
+
+        // Bouton pour les risques psychosociaux - grille RPS-DU de l'INRS (ED 6403)
+        $newcardbutton .= '<div class="psychosocial-risk-ed6403-add wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open" aria-label="' . $langs->trans('AddPsychosocialRiskED6403') . '" value="' . $object->id . '">';
+        $newcardbutton .= '<i class="fas fa-clipboard-list button-icon"></i><i class="fas fa-plus-circle button-add animated"></i>';
+        $newcardbutton .= '	<input type="hidden" class="modal-options" data-modal-to-open="psychosocial_risk_ed6403_add" data-from-id="'. $object->id .'" data-from-type="digiriskelement" data-from-subtype="photo" data-from-subdir="photos"/>';
         $newcardbutton .= '</div>';
 
         // Bouton importer des risques partagés : icône seule + texte en tooltip, à côté des boutons d'ajout (id conservé pour déclencher la popup de confirmation)
@@ -613,8 +619,9 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
     } else {
         $newcardbutton = '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="' . $langs->trans('PermissionDenied') . '" data-direction="left" value="' . $object->id . '"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
 
-        // Bouton désactivé pour les risques psychosociaux
+        // Boutons désactivés pour les risques psychosociaux
         $newcardbutton .= '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" style="margin-left: 10px;" aria-label="' . $langs->trans('PermissionDenied') . '" data-direction="left" value="' . $object->id . '"><i class="fas fa-brain button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
+        $newcardbutton .= '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" style="margin-left: 10px;" aria-label="' . $langs->trans('PermissionDenied') . '" data-direction="left" value="' . $object->id . '"><i class="fas fa-clipboard-list button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
     } ?>
     <!-- RISK ADD MODAL-->
     <div class="risk-add-modal" value="<?php echo $object->id ?>">

@@ -3,42 +3,310 @@
     {
       "name": "Exigences émotionnelles",
       "label": "EmotionalRequirements",
+      "method": "fairelepoint",
       "position": 0
     },
     {
       "name": "Intensité et temps de travail",
       "label": "WorkIntensityAndTime",
+      "method": "fairelepoint",
       "position": 1
     },
     {
       "name": "Autonomie",
       "label": "Autonomy",
+      "method": "fairelepoint",
       "position": 2
     },
     {
       "name": "Rapports sociaux au travail",
       "label": "SocialRelationsAtWork",
+      "method": "fairelepoint",
       "position": 3
     },
     {
       "name": "Sens du travail",
       "label": "MeaningOfWork",
+      "method": "fairelepoint",
       "position": 4
     },
     {
       "name": "Insécurité de la situation de travail",
       "label": "WorkSituationInsecurity",
+      "method": "fairelepoint",
       "position": 5
     },
     {
       "name": "Contexte de prévention dans l'entreprise",
       "label": "CompanyPreventionInformations",
+      "method": "fairelepoint",
       "position": 6
     },
     {
       "name": "Impact des RPS sur l'entreprise et les salariés",
       "label": "RPSImpactOnCompanyAndEmployees",
+      "method": "fairelepoint",
       "position": 7
+    },
+    {
+      "name": "Contraintes de rythmes de travail",
+      "label": "RPSED6403Criterion1",
+      "question": "Les salariés sont-ils soumis à des contraintes de rythmes élevés ?",
+      "family": "Intensité et complexité du travail",
+      "familyLabel": "RPSFamilyWorkIntensityComplexity",
+      "reversed": false,
+      "method": "ed6403",
+      "position": 100
+    },
+    {
+      "name": "Niveau de précision des objectifs de travail",
+      "label": "RPSED6403Criterion2",
+      "question": "Les objectifs des salariés sont-ils clairement définis ?",
+      "family": "Intensité et complexité du travail",
+      "familyLabel": "RPSFamilyWorkIntensityComplexity",
+      "reversed": true,
+      "method": "ed6403",
+      "position": 101
+    },
+    {
+      "name": "Adéquation des objectifs de travail avec les moyens et les responsabilités",
+      "label": "RPSED6403Criterion3",
+      "question": "Les objectifs fixés sont-ils compatibles avec les moyens et responsabilités alloués aux salariés pour les atteindre ?",
+      "family": "Intensité et complexité du travail",
+      "familyLabel": "RPSFamilyWorkIntensityComplexity",
+      "reversed": true,
+      "method": "ed6403",
+      "position": 102
+    },
+    {
+      "name": "Compatibilité des instructions de travail entre elles",
+      "label": "RPSED6403Criterion4",
+      "question": "Les salariés reçoivent-ils des instructions, des ordres ou demandes qui peuvent être contradictoires entre eux ?",
+      "family": "Intensité et complexité du travail",
+      "familyLabel": "RPSFamilyWorkIntensityComplexity",
+      "reversed": false,
+      "method": "ed6403",
+      "position": 103
+    },
+    {
+      "name": "Gestion de la polyvalence",
+      "label": "RPSED6403Criterion5",
+      "question": "Les salariés sont-ils amenés à changer de tâches, de postes ou de fonctions à l'improviste pour répondre aux contraintes du moment ?",
+      "family": "Intensité et complexité du travail",
+      "familyLabel": "RPSFamilyWorkIntensityComplexity",
+      "reversed": false,
+      "method": "ed6403",
+      "position": 104
+    },
+    {
+      "name": "Interruption dans le travail",
+      "label": "RPSED6403Criterion6",
+      "question": "Les salariés sont-ils fréquemment interrompus au cours de leur travail par des tâches non prévues ?",
+      "family": "Intensité et complexité du travail",
+      "familyLabel": "RPSFamilyWorkIntensityComplexity",
+      "reversed": false,
+      "method": "ed6403",
+      "position": 105
+    },
+    {
+      "name": "Attention et vigilance dans le travail",
+      "label": "RPSED6403Criterion7",
+      "question": "Les salariés exercent-ils des activités qui nécessitent une attention soutenue ou une vigilance permanente ?",
+      "family": "Intensité et complexité du travail",
+      "familyLabel": "RPSFamilyWorkIntensityComplexity",
+      "reversed": false,
+      "method": "ed6403",
+      "position": 106
+    },
+    {
+      "name": "Durée hebdomadaire de travail",
+      "label": "RPSED6403Criterion8",
+      "question": "Arrive-t-il que des salariés travaillent plus de 45 heures par semaine ?",
+      "family": "Horaires de travail difficiles",
+      "familyLabel": "RPSFamilyDifficultWorkingHours",
+      "reversed": false,
+      "method": "ed6403",
+      "position": 107
+    },
+    {
+      "name": "Travail en horaires atypiques",
+      "label": "RPSED6403Criterion9",
+      "question": "Les salariés sont-ils soumis à des horaires de nuit, alternants ou décalés ?",
+      "family": "Horaires de travail difficiles",
+      "familyLabel": "RPSFamilyDifficultWorkingHours",
+      "reversed": false,
+      "method": "ed6403",
+      "position": 108
+    },
+    {
+      "name": "Extension de la disponibilité en dehors des horaires de travail",
+      "label": "RPSED6403Criterion10",
+      "question": "Les salariés sont-ils contactés en dehors des horaires de travail pour des raisons professionnelles ?",
+      "family": "Horaires de travail difficiles",
+      "familyLabel": "RPSFamilyDifficultWorkingHours",
+      "reversed": false,
+      "method": "ed6403",
+      "position": 109
+    },
+    {
+      "name": "Prévisibilité des horaires et anticipation de leur changement",
+      "label": "RPSED6403Criterion11",
+      "question": "Les salariés connaissent-ils suffisamment à l'avance leurs horaires de travail ou les changements éventuels de leur planning de travail ?",
+      "family": "Horaires de travail difficiles",
+      "familyLabel": "RPSFamilyDifficultWorkingHours",
+      "reversed": true,
+      "method": "ed6403",
+      "position": 110
+    },
+    {
+      "name": "Conciliation entre vie professionnelle et vie personnelle",
+      "label": "RPSED6403Criterion12",
+      "question": "L'entreprise permet-elle aux salariés de concilier vie professionnelle et vie personnelle ?",
+      "family": "Horaires de travail difficiles",
+      "familyLabel": "RPSFamilyDifficultWorkingHours",
+      "reversed": true,
+      "method": "ed6403",
+      "position": 111
+    },
+    {
+      "name": "Tensions avec le public",
+      "label": "RPSED6403Criterion13",
+      "question": "L'organisation du travail (politique marketing, ressources mises à disposition, etc.) génère-t-elle des situations de tension avec le public (client, usagers, patients, etc.) ?",
+      "family": "Exigences émotionnelles",
+      "familyLabel": "RPSFamilyEmotionalRequirements",
+      "reversed": false,
+      "method": "ed6403",
+      "position": 112
+    },
+    {
+      "name": "Confrontation à la souffrance d'autrui",
+      "label": "RPSED6403Criterion14",
+      "question": "Les salariés ont-ils les moyens d'agir efficacement face à la souffrance, à la détresse ou aux difficultés des personnes qu'ils ont à prendre en charge (patients, usagers, clients, etc.) ?",
+      "family": "Exigences émotionnelles",
+      "familyLabel": "RPSFamilyEmotionalRequirements",
+      "reversed": true,
+      "method": "ed6403",
+      "position": 113
+    },
+    {
+      "name": "Maîtrise des émotions",
+      "label": "RPSED6403Criterion15",
+      "question": "Dans leur travail, les salariés se doivent-ils de « faire bonne figure » en toutes circonstances ?",
+      "family": "Exigences émotionnelles",
+      "familyLabel": "RPSFamilyEmotionalRequirements",
+      "reversed": false,
+      "method": "ed6403",
+      "position": 114
+    },
+    {
+      "name": "Autonomie dans la tâche",
+      "label": "RPSED6403Criterion16",
+      "question": "Les salariés ont-ils des marges de manœuvre dans la manière de réaliser leur travail dès lors que les objectifs sont atteints ?",
+      "family": "Faible autonomie au travail",
+      "familyLabel": "RPSFamilyLowAutonomy",
+      "reversed": true,
+      "method": "ed6403",
+      "position": 115
+    },
+    {
+      "name": "Autonomie temporelle",
+      "label": "RPSED6403Criterion17",
+      "question": "Les salariés peuvent-ils interrompre momentanément leur travail quand ils en ressentent le besoin ?",
+      "family": "Faible autonomie au travail",
+      "familyLabel": "RPSFamilyLowAutonomy",
+      "reversed": true,
+      "method": "ed6403",
+      "position": 116
+    },
+    {
+      "name": "Utilisation et développement des compétences",
+      "label": "RPSED6403Criterion18",
+      "question": "Les salariés peuvent-ils utiliser leurs compétences professionnelles et en développer de nouvelles ?",
+      "family": "Faible autonomie au travail",
+      "familyLabel": "RPSFamilyLowAutonomy",
+      "reversed": true,
+      "method": "ed6403",
+      "position": 117
+    },
+    {
+      "name": "Soutien de la part des collègues",
+      "label": "RPSED6403Criterion19",
+      "question": "Existe-t-il des possibilités d'entraide entre les salariés, par exemple en cas de surcharge de travail ou de travail délicat ou compliqué ?",
+      "family": "Rapports sociaux au travail dégradés",
+      "familyLabel": "RPSFamilyDegradedSocialRelations",
+      "reversed": true,
+      "method": "ed6403",
+      "position": 118
+    },
+    {
+      "name": "Soutien de la part des supérieurs hiérarchiques",
+      "label": "RPSED6403Criterion20",
+      "question": "Les salariés reçoivent-ils un soutien de la part de l'encadrement ?",
+      "family": "Rapports sociaux au travail dégradés",
+      "familyLabel": "RPSFamilyDegradedSocialRelations",
+      "reversed": true,
+      "method": "ed6403",
+      "position": 119
+    },
+    {
+      "name": "Désaccords professionnels",
+      "label": "RPSED6403Criterion21",
+      "question": "Existe-t-il entre les salariés des causes de désaccord ayant pour origine l'organisation du travail (flou sur le rôle de chacun, inégalité de traitement, etc.) ?",
+      "family": "Rapports sociaux au travail dégradés",
+      "familyLabel": "RPSFamilyDegradedSocialRelations",
+      "reversed": false,
+      "method": "ed6403",
+      "position": 120
+    },
+    {
+      "name": "Reconnaissance dans le travail",
+      "label": "RPSED6403Criterion22",
+      "question": "Les salariés reçoivent-ils des marques de reconnaissance de leur travail de la part de l'entreprise ?",
+      "family": "Rapports sociaux au travail dégradés",
+      "familyLabel": "RPSFamilyDegradedSocialRelations",
+      "reversed": true,
+      "method": "ed6403",
+      "position": 121
+    },
+    {
+      "name": "Qualité empêchée",
+      "label": "RPSED6403Criterion23",
+      "question": "Les salariés considèrent-ils qu'ils font un travail de qualité ?",
+      "family": "Conflits de valeurs",
+      "familyLabel": "RPSFamilyValueConflicts",
+      "reversed": true,
+      "method": "ed6403",
+      "position": 122
+    },
+    {
+      "name": "Travail inutile",
+      "label": "RPSED6403Criterion24",
+      "question": "Les salariés estiment-ils en général que leur travail est reconnu comme utile ?",
+      "family": "Conflits de valeurs",
+      "familyLabel": "RPSFamilyValueConflicts",
+      "reversed": true,
+      "method": "ed6403",
+      "position": 123
+    },
+    {
+      "name": "Insécurité socio-économique (emploi, salaire, carrière…)",
+      "label": "RPSED6403Criterion25",
+      "question": "Les salariés sont-ils confrontés à des incertitudes quant au maintien de leur activité dans les prochains mois ?",
+      "family": "Insécurité de l'emploi et du travail",
+      "familyLabel": "RPSFamilyJobInsecurity",
+      "reversed": false,
+      "method": "ed6403",
+      "position": 124
+    },
+    {
+      "name": "Conduite du changement dans l'entreprise",
+      "label": "RPSED6403Criterion26",
+      "question": "Les changements sont-ils suffisamment anticipés, accompagnés, et clairement expliqués aux salariés ?",
+      "family": "Insécurité de l'emploi et du travail",
+      "familyLabel": "RPSFamilyJobInsecurity",
+      "reversed": true,
+      "method": "ed6403",
+      "position": 125
     }
   ]
 }]

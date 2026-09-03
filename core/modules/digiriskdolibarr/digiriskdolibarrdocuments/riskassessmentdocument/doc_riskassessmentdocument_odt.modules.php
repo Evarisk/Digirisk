@@ -72,7 +72,8 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
         $risk = new Risk($this->db);
 
         $array['dangerCategories'] = Risk::getDangerCategories();
-        $array['dangerSubCategories'] = Risk::getDangerSubCategories();
+        // Only the 'Faire le point' method is laid out in the ODT template, the ED 6403 criteria appear in the standard risk lists
+        $array['dangerSubCategories'] = Risk::getDangerSubCategories('fairelepoint');
 
         $riskArray = $risk->loadRiskInfos($moreParam);
 
@@ -446,10 +447,13 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
             $risk = new Risk($db);
             $psychosocialRisksByGPUT = $moreParam['psychosocialRisksByGPUT'];
             $tmpArray = [];
-            $dangerSubCategories = $risk->getDangerSubCategories();
+            // Only the 'Faire le point' method is laid out in the ODT template, the ED 6403 criteria appear in the standard risk lists
+            $dangerSubCategories = $risk->getDangerSubCategories('fairelepoint');
+            $subCategoryPositions = [];
 
             foreach($dangerSubCategories[17] as $dangerSubCategory) {
-                $subCategoryName = $risk->getDangerSubCategoryName(17, $dangerSubCategory['position']);
+                $subCategoryPositions[]   = $dangerSubCategory['position'];
+                $subCategoryName          = $risk->getDangerSubCategoryName(17, $dangerSubCategory['position']);
                 $formattedSubCategoryName = lcfirst($subCategoryName) . 'Scale';
                 $tmpArray[$formattedSubCategoryName] = '-';
             }
@@ -460,6 +464,9 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
                     $tmpArray['digiriskElementLabel'] = 'S' . $digiriskElement->entity . ' - ' . $digiriskElement->ref . ' - ' . $digiriskElement->label;
                     if (is_array($psychosocialRiskByGPUT) && !empty($psychosocialRiskByGPUT)) {
                         foreach($psychosocialRiskByGPUT as $riskAssessmentCotationType => $riskAssessments) {
+                            if (!in_array($riskAssessmentCotationType, $subCategoryPositions)) {
+                                continue;
+                            }
                             $subCategoryName = $risk->getDangerSubCategoryName(17, $riskAssessmentCotationType);
                             $formattedSubCategoryName = lcfirst($subCategoryName) . 'Scale';
                             $lastRiskAssessmentCotation = null;
