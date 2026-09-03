@@ -9,6 +9,14 @@ td .wpeo-dropdown.category-danger.dropdown-active {
   position: static;
 }
 
+/* Fermé, le panneau n'est masqué que par opacity : ses 360px de haut restent dans le flux du
+   tableau et gonflent la hauteur défilable de .div-table-responsive (overflow: auto), qui
+   affiche alors une barre de défilement verticale ne montrant rien — y compris sur une liste
+   vide. On le sort donc du flux tant que le dropdown n'est pas ouvert. */
+.div-table-responsive .wpeo-dropdown:not(.dropdown-active) .saturne-dropdown-content {
+  display: none;
+}
+
 /** Cell header */
 .table-cell-header {
   display: flex;
