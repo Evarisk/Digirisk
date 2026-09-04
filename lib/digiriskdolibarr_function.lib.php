@@ -2818,3 +2818,75 @@ function digirisk_get_date_range_filter(string $prefix, int $start = 0, int $end
 
     return implode('&', $filter);
 }
+
+/**
+ * Get the collection giving the author of a risk assessment, a task or a time spent line
+ *
+ * Risk lists only display the few users their rows reference, but used to load them with
+ * User::fetchAll(), which issues a fetch() and a fetch_optionals() per user of the whole
+ * database (two queries each). The collection returned here loads a user the first time
+ * its id is read and keeps the array syntax of the templates.
+ *
+ * @return DigiriskLazyMap Collection of User objects, keyed by user id
+ */
+function digirisk_get_user_list(): DigiriskLazyMap
+{
+    global $db;
+
+    require_once __DIR__ . '/../class/digirisklazymap.class.php';
+
+    static $userList = null;
+    if ($userList === null) {
+        $userList = new DigiriskLazyMap(function ($userId) use ($db) {
+            $userAuthor = new User($db);
+
+            // A row may reference a user that no longer exists; the callers type-hint User,
+            // so hand them an empty object rather than null
+            if ($userId > 0) {
+                $userAuthor->fetch($userId);
+            }
+
+            return $userAuthor;
+        });
+    }
+
+    return $userList;
+}
+
+/**
+ * Get the collection giving the risk assessments of a risk
+ *
+ * Risk lists are paginated and read this collection by risk id, but used to build it from a
+ * RiskAssessment::fetchAll() with neither limit nor entity filter, so every risk assessment
+ * of every entity was instantiated on each page. The collection returned here queries the
+ * assessments of a risk the first time that risk is read.
+ *
+ * @return DigiriskLazyMap Collection of arrays of RiskAssessment objects, keyed by risk id
+ */
+function digirisk_get_risk_assessments_by_risk(): DigiriskLazyMap
+{
+    global $db;
+
+    require_once __DIR__ . '/../class/digirisklazymap.class.php';
+    require_once __DIR__ . '/../class/riskanalysis/riskassessment.class.php';
+
+    static $riskAssessmentsByRisk = null;
+    if ($riskAssessmentsByRisk === null) {
+        $riskAssessmentsByRisk = new DigiriskLazyMap(function ($riskId) use ($db) {
+            if ($riskId <= 0) {
+                return [];
+            }
+
+            // Shared risks belong to other entities, so keep the entity filter off as the
+            // preloading it replaces did
+            $riskAssessment = new RiskAssessment($db);
+            $riskAssessment->ismultientitymanaged = 0;
+
+            $riskAssessments = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 't.fk_risk = ' . (int) $riskId]);
+
+            return is_array($riskAssessments) ? $riskAssessments : [];
+        });
+    }
+
+    return $riskAssessmentsByRisk;
+}
