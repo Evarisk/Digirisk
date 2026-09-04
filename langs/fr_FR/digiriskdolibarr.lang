@@ -810,6 +810,9 @@ RiskAssessmentDocumentImportantNote                       = Notes importantes :<
 GenerateZipArchiveWithDigiriskElementDocuments            = Génération d'une archive ZIP avec le Document Unique
 GenerateZipArchiveWithDigiriskElementDocumentsDescription = Génération automatique d'une archive ZIP contenant le Document Unique et toutes les fiches de poste lors de la génération du Document Unique
 RiskAssessmentDocumentDescription                         = Plan d'action Document Unique
+ErrorFailToFetchDigiriskElements                          = Erreur : impossible de récupérer les groupements et unités de travail à inclure dans l'archive ZIP
+ErrorNoDocumentModelFound                                 = Erreur : aucun modèle de document disponible pour <b>%s</b>
+ErrorFailToGenerateDigiriskElementDocument                = Erreur : la génération du document de <b>%s</b> a échoué, il est absent de l'archive ZIP
 
 # Boxes - Widget
 NextGenerateDate  = Prochain génération
