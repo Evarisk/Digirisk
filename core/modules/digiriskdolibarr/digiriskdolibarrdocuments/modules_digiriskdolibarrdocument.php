@@ -40,6 +40,16 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
     public string $module = 'digiriskdolibarr';
 
     /**
+     * @var array Lang key of each risk assessment level, indexed by evaluation scale
+     */
+    public const RISK_ASSESSMENT_LEVEL_LABELS = [
+        1 => 'GreyRisk',
+        2 => 'OrangeRisk',
+        3 => 'RedRisk',
+        4 => 'BlackRisk'
+    ];
+
+    /**
      * Set risk by risk assessment levels segment
      *
      * @param Odf       $odfHandler  Object builder odf library
@@ -65,17 +75,23 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             $digiriskElements           = $moreParam['digiriskElements'];
             $riskByRiskAssessmentLevels = $moreParam['riskByRiskAssessmentLevels'];
             $riskAssessmentLevel        = explode('Risks', $moreParam['segmentName'])[1];
+            // A cotation level with no risk used to be merged as one row full of "-". The four levels
+            // share the same table, so up to four unreadable rows landed in the middle of the list.
+            // The row now names the level it stands for, and the columns that mean nothing here stay
+            // empty instead of showing a dash — issue #4459
             if (empty($digiriskElements) || empty($riskByRiskAssessmentLevels) || empty($riskByRiskAssessmentLevels[$riskAssessmentLevel])) {
+                $levelLabel = $outputLangs->transnoentities(static::RISK_ASSESSMENT_LEVEL_LABELS[$riskAssessmentLevel] ?? '');
+
                 $tmpArray['digiriskElementLabel']   = '';
                 $tmpArray['picto']                  = '';
-                $tmpArray['riskCategoryName']       = '-';
-                $tmpArray['ref']                    = '-';
-                $tmpArray['riskAssessmentCotation'] = '-';
-                $tmpArray['description']            = '-';
-                $tmpArray['riskAssessmentComment']  = '-';
-                $tmpArray['riskTaskUncompleted']    = '-';
-                $tmpArray['riskTaskCompleted']      = '-';
-                $tmpArray['riskAssessment_photo']   = '-';
+                $tmpArray['riskCategoryName']       = '';
+                $tmpArray['ref']                    = '';
+                $tmpArray['riskAssessmentCotation'] = '';
+                $tmpArray['description']            = $outputLangs->transnoentities('NoRiskAtThisLevel', $levelLabel);
+                $tmpArray['riskAssessmentComment']  = '';
+                $tmpArray['riskTaskUncompleted']    = '';
+                $tmpArray['riskTaskCompleted']      = '';
+                $tmpArray['riskAssessment_photo']   = '';
 
                 SaturneDocumentModel::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
                 $odfHandler->mergeSegment($listLines);
@@ -465,7 +481,7 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                     'subject'                   => $ticket->subject,
                     'message'                   => $ticket->message,
                     'progress'                  => ($ticket->progress ?: 0) . ' %',
-                    'digiriskelement_ref_label' => $ticket->digiriskElementRef . ' - ' . $ticket->digiriskElementLabel,
+                    'digiriskelement_ref_label' => $ticket->digiriskElementRefLabel ?? '',
                     'status'                    => $ticket->getLibStatut()
                 ];
 
