@@ -261,29 +261,108 @@ function ticketstats_prepare_head(): array
 /**
  * Load ticket infos
  *
+ * The GP/UT a ticket belongs to used to be resolved with an INNER JOIN on the
+ * digiriskdolibarr_ticket_service extrafield. That field is a chkbxlst, so it holds a
+ * comma-separated list of ids: the join silently dropped every ticket carrying several
+ * GP/UT and every ticket carrying none. Combined with the "d.status = validated"
+ * condition, a ticket whose GP/UT had been deleted disappeared too. The elements are now
+ * resolved in PHP, so a register is always listed whatever its GP/UT — issue #4459.
+ *
  * @param  array     $moreParam More param (filterTicket)
  * @return array     $array     Array of tickets
  * @throws Exception
  */
 function load_ticket_infos(array $moreParam = []): array
 {
-    // Load DigiriskDolibarr libraries
-    require_once __DIR__ . '/../class/digiriskelement.class.php';
-
     $array = [];
 
-    $select           = ', d.ref AS digiriskElementRef, d.label AS digiriskElementLabel';
-    $moreSelects      = ['digiriskElementRef', 'digiriskElementLabel'];
-    $join             = ' INNER JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement AS d ON d.rowid = eft.digiriskdolibarr_ticket_service';
-    $filter           = 't.fk_project = ' . getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PROJECT') . ' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ($moreParam['filterTicket'] ?? '');
-    $array['tickets'] = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  ['customsql' => $filter], 'AND', true, true, false, $join, [], $select, $moreSelects);
+    $filter           = 't.fk_project = ' . getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PROJECT') . ($moreParam['filterTicket'] ?? '');
+    $array['tickets'] = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => $filter], 'AND', true, true);
     if (!is_array($array['tickets']) || empty($array['tickets'])) {
         $array['tickets'] = [];
     }
 
+    digiriskdolibarr_ticket_set_digirisk_elements($array['tickets']);
+
     $array['nbTickets'] = count($array['tickets']);
 
     return $array;
+}
+
+/**
+ * Set on each ticket the "REF - Label" list of the GP/UT it is attached to — issue #4459
+ *
+ * The digiriskdolibarr_ticket_service extrafield is a chkbxlst, so its raw value is a
+ * comma-separated list of digirisk element ids. Every element is read in a single query,
+ * deleted ones included: a register must keep naming where the event happened even once
+ * the GP/UT is gone.
+ *
+ * @param  array $tickets Tickets to complete, each one gets a digiriskElementRefLabel property
+ * @return void
+ */
+function digiriskdolibarr_ticket_set_digirisk_elements(array $tickets): void
+{
+    global $db;
+
+    $elementIds = [];
+    foreach ($tickets as $ticket) {
+        $ticket->digiriskElementRefLabel = '';
+        foreach (digiriskdolibarr_ticket_service_ids($ticket) as $elementId) {
+            $elementIds[$elementId] = $elementId;
+        }
+    }
+
+    if (empty($elementIds)) {
+        return;
+    }
+
+    $sql   = 'SELECT rowid, ref, label FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement';
+    $sql  .= ' WHERE rowid IN (' . $db->sanitize(implode(',', $elementIds)) . ')';
+    $resql = $db->query($sql);
+    if (!$resql) {
+        dol_syslog(__FUNCTION__ . ' ' . $db->lasterror(), LOG_ERR);
+        return;
+    }
+
+    $elements = [];
+    while ($obj = $db->fetch_object($resql)) {
+        $elements[(int) $obj->rowid] = $obj->ref . ' - ' . $obj->label;
+    }
+    $db->free($resql);
+
+    foreach ($tickets as $ticket) {
+        $refLabels = [];
+        foreach (digiriskdolibarr_ticket_service_ids($ticket) as $elementId) {
+            if (!empty($elements[$elementId])) {
+                $refLabels[] = $elements[$elementId];
+            }
+        }
+
+        $ticket->digiriskElementRefLabel = implode(', ', $refLabels);
+    }
+}
+
+/**
+ * Read the digirisk element ids stored in the chkbxlst ticket_service extrafield
+ *
+ * @param  object $ticket Ticket carrying the extrafield
+ * @return int[]          Digirisk element ids, empty when no GP/UT is set
+ */
+function digiriskdolibarr_ticket_service_ids($ticket): array
+{
+    $rawValue = $ticket->array_options['options_digiriskdolibarr_ticket_service'] ?? '';
+    if (is_array($rawValue)) {
+        $rawValue = implode(',', $rawValue);
+    }
+
+    $elementIds = [];
+    foreach (explode(',', (string) $rawValue) as $elementId) {
+        if ((int) $elementId > 0) {
+            $elementIds[] = (int) $elementId;
+        }
+    }
+
+    return $elementIds;
 }
 
 /**

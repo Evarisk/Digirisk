@@ -190,7 +190,11 @@ class Risk extends SaturneObject
     /**
      * Load risk infos
      *
-     * @param  array     $moreParam More param (tmparray/filterRisk)
+     * filterRiskDate replaces the generic filter when the caller needs a condition on the
+     * riskassessment table too: the shared filter only knows the "t" alias, and a risk
+     * re-evaluated over the period never has its own date_creation nor tms touched — issue #4459
+     *
+     * @param  array     $moreParam More param (tmparray/filterRisk/filterRiskDate)
      * @return array     $array     Array of risks (current and shared)
      * @throws Exception
      */
@@ -215,7 +219,8 @@ class Risk extends SaturneObject
         $sharedJoin .= ' INNER JOIN ' . $this->db->prefix() . $this->module . '_digiriskelement AS d ON (d.rowid = ee.fk_target AND d.entity = ' . $conf->entity . ')';
         $sharedJoin .= ' INNER JOIN ' . $this->db->prefix() . $this->module . '_riskassessment AS ra ON t.rowid = ra.fk_risk';
 
-        $filter        = 't.status = ' . Risk::STATUS_VALIDATED . ' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED .  ($moreParam['filter'] ?? '') . (!empty($moreParam['filterRisk']) ? $moreParam['filterRisk'] : ' AND t.type = \'risk\'');
+        $dateFilter    = $moreParam['filterRiskDate'] ?? ($moreParam['filter'] ?? '');
+        $filter        = 't.status = ' . Risk::STATUS_VALIDATED . ' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED .  $dateFilter . (!empty($moreParam['filterRisk']) ? $moreParam['filterRisk'] : ' AND t.type = \'risk\'');
         $currentFilter = $filter . ' AND t.entity = ' . $conf->entity;
 
         $array['riskByEntities']   = [];

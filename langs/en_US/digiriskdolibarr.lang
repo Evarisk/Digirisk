@@ -465,3 +465,10 @@ WorkUnitDocument                           = Work unit sheet
 ErrorFailToFetchDigiriskElements           = Error: unable to fetch the groupments and work units to include in the ZIP archive
 ErrorNoDocumentModelFound                  = Error: no document model available for <b>%s</b>
 ErrorFailToGenerateDigiriskElementDocument = Error: generation of the <b>%s</b> document failed, it is missing from the ZIP archive
+
+# Audit report - issue #4459
+NoRiskAtThisLevel = No risk at this level (%s)
+GreyRisk          = Low risk
+OrangeRisk        = Risk to be planned
+RedRisk           = Risk to be handled
+BlackRisk         = Unacceptable risk

@@ -2328,3 +2328,6 @@ firepermit = Permis de feu
 ErrorRecordIsLocked = Cet enregistrement est verrouillé, il ne peut plus être modifié.
 MobilePPEmailTemplateExt = Modèle d'email pour le responsable de l'entreprise extérieure
 MobilePPEmailTemplateInt = Modèle d'email pour les intervenants de l'entreprise extérieure
+
+# Audit report - issue #4459
+NoRiskAtThisLevel = Aucun risque de ce niveau (%s)
