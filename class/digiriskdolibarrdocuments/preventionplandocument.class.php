@@ -25,6 +25,9 @@
 require_once __DIR__ . '/../digiriskdocuments.class.php';
 require_once __DIR__ . '/../digiriskresources.class.php';
 
+// Load Saturne libraries
+require_once __DIR__ . '/../../../saturne/lib/dolibarr.lib.php';
+
 /**
  * Class for PreventionPlanDocument
  */
@@ -202,7 +205,7 @@ class PreventionPlanDocument extends DigiriskDocuments
 		$json['PreventionPlan']['date']['end']        = $preventionplan->date_end;
 		$json['PreventionPlan']['cssct_intervention'] = $preventionplan->cssct_intervention;
 		$json['PreventionPlan']['prior_visit_bool']   = $preventionplan->prior_visit_bool;
-		$json['PreventionPlan']['prior_visit_text']   = $preventionplan->prior_visit_text;
+		$json['PreventionPlan']['prior_visit_text']   = saturne_flatten_wysiwyg_blocks($preventionplan->prior_visit_text, true);
 		$json['PreventionPlan']['prior_visit_date']   = $preventionplan->prior_visit_date;
 
 		$morewhere = ' AND element_id = ' . $preventionplan->id;

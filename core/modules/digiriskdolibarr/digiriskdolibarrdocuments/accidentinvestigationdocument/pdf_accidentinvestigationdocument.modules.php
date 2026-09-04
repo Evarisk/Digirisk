@@ -516,7 +516,8 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
             $societe->fetch($accident->fk_soc);
             $data['gp_ut'] = $societe->name;
         } else {
-            $data['gp_ut'] = $accident->accident_location;
+            // Cellule de tableau non HTML : le champ saisi en WYSIWYG y est aplati
+            $data['gp_ut'] = saturne_flatten_wysiwyg_blocks($accident->accident_location, true);
         }
 
         $data['causality_tree_photo'] = '';

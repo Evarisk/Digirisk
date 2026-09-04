@@ -27,6 +27,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 
 // Load Saturne libraries
 require_once __DIR__ . '/../../../../../saturne/core/modules/saturne/modules_saturne.php';
+require_once __DIR__ . '/../../../../../saturne/lib/dolibarr.lib.php';
 
 /**
  * Parent class for documents models
@@ -390,7 +391,7 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                     'identifiantAccident'  => $accident->ref,
                     'AccidentName'         => $accident->label,
                     'AccidentWorkStopDays' => $accident->nbAccidentWorkStop,
-                    'AccidentComment'      => $accident->description,
+                    'AccidentComment'      => saturne_flatten_wysiwyg_blocks($accident->description),
                 ];
 
                 static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);

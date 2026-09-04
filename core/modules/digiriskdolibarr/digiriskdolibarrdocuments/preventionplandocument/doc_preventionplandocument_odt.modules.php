@@ -30,6 +30,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 require_once __DIR__ . '/../../../../../../saturne/class/saturneschedules.class.php';
+require_once __DIR__ . '/../../../../../../saturne/lib/dolibarr.lib.php';
 
 require_once __DIR__ . '/../../../../../class/evaluator.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
@@ -284,7 +285,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         $tmpArray['premiers_secours']               = $arrayData['premiers_secours'] ?? '';
 
         $tmpArray['prior_visit_date'] = dol_print_date($object->prior_visit_date, 'dayhour');
-        $tmpArray['prior_visit_text'] = $object->prior_visit_text;
+        $tmpArray['prior_visit_text'] = saturne_flatten_wysiwyg_blocks($object->prior_visit_text);
 
         $tmpArray['date_start_intervention_PPP'] = dol_print_date($object->date_start, 'dayhour');
         $tmpArray['date_end_intervention_PPP']   = dol_print_date($object->date_end, 'dayhour');

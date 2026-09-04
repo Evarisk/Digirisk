@@ -28,6 +28,7 @@ require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 // Load Saturne libraries.
 require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
 require_once __DIR__ . '/../../saturne/class/saturneschedules.class.php';
+require_once __DIR__ . '/../../saturne/lib/dolibarr.lib.php';
 
 /**
  * Class for PreventionPlan
@@ -86,7 +87,7 @@ class PreventionPlan extends SaturneObject
         'date_start'           => ['type' => 'date',         'label' => 'DateStart',         'enabled' => 1, 'position' => 70,  'notnull' => 0, 'visible' => 1],
         'date_end'             => ['type' => 'date',         'label' => 'DateEnd',           'enabled' => 1, 'position' => 80,  'notnull' => 0, 'visible' => 1],
         'prior_visit_bool'     => ['type' => 'boolean',      'label' => 'PriorVisit',        'enabled' => 1, 'position' => 90,  'notnull' => 0, 'visible' => 3],
-        'prior_visit_text'     => ['type' => 'text',         'label' => 'PriorVisitText',    'enabled' => 1, 'position' => 100, 'notnull' => 0, 'visible' => 3],
+        'prior_visit_text'     => ['type' => 'html',         'label' => 'PriorVisitText',    'enabled' => 1, 'position' => 100, 'notnull' => 0, 'visible' => 3],
         'prior_visit_date'     => ['type' => 'datetime',     'label' => 'PriorVisitDate',    'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => 3],
         'cssct_intervention'   => ['type' => 'boolean',      'label' => 'CSSCTIntervention', 'enabled' => 1, 'position' => 120, 'notnull' => 0, 'visible' => 3],
         'note_public'          => ['type' => 'html',         'label' => 'NotePublic',        'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => 0],
@@ -407,7 +408,7 @@ class PreventionPlan extends SaturneObject
         $ret .= $langs->transnoentities('CSSCTIntervention') . ' : ' . ($this->cssct_intervention ? $langs->transnoentities("Yes") : $langs->transnoentities("No")) . '<br>';
         $ret .= $langs->transnoentities('PriorVisit') . ' : ' . ($this->prior_visit_bool ? $langs->transnoentities("Yes") : $langs->transnoentities("No")) . '<br>';
         if ($this->prior_visit_bool) {
-            $ret .= $langs->transnoentities('PriorVisitText') . ' : ' . (!empty($this->prior_visit_text) ? $this->prior_visit_text : 'N/A') . '<br>';
+            $ret .= $langs->transnoentities('PriorVisitText') . ' : ' . (!empty($this->prior_visit_text) ? dol_nl2br(saturne_flatten_wysiwyg_blocks($this->prior_visit_text, true)) : 'N/A') . '<br>';
             $ret .= (dol_strlen($this->prior_visit_date) > 0 ? $langs->transnoentities('PriorVisitDate') . ' : ' . dol_print_date($this->prior_visit_date, 'dayhoursec') . '<br>' : '');
         }
 

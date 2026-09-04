@@ -128,7 +128,8 @@ if ($id > 0 && $object->fetch($id) > 0) {
     $prefill['date_end']   = $object->date_end   ? dol_print_date($object->date_end, '%Y-%m-%d')   : '';
 
     $prefill['prior_visit_bool'] = (int) $object->prior_visit_bool;
-    $prefill['prior_visit_text'] = (string) $object->prior_visit_text;
+    // Le formulaire mobile est un textarea simple : le HTML saisi en WYSIWYG cote bureau y est aplati
+    $prefill['prior_visit_text'] = saturne_flatten_wysiwyg_blocks((string) $object->prior_visit_text, true);
     $prefill['prior_visit_date'] = $object->prior_visit_date ? dol_print_date($object->prior_visit_date, '%Y-%m-%d') : '';
 
     $prefill['cssct_intervention'] = (int) $object->cssct_intervention;

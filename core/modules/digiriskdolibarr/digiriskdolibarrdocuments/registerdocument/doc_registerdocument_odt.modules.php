@@ -35,6 +35,7 @@ require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
 // Load saturne libraries
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 require_once __DIR__ . '/../../../../../../saturne/class/saturnesignature.class.php';
+require_once __DIR__ . '/../../../../../../saturne/lib/dolibarr.lib.php';
 
 /**
  *	Class to build documents using ODF templates generator
@@ -136,7 +137,7 @@ class doc_registerdocument_odt extends SaturneDocumentModel
                         $tmpArray['register_fullname'] = $ticket->array_options['options_digiriskdolibarr_ticket_lastname'] . ' ' . $ticket->array_options['options_digiriskdolibarr_ticket_firstname'];
                         $tmpArray['register_datehour'] = dol_print_date($ticket->array_options['options_digiriskdolibarr_ticket_date'], 'day');
                         $tmpArray['register_location'] = $digiriskElement->ref . ' ' . $digiriskElement->label;
-                        $tmpArray['register_circumstances'] = $accidentSingle->description;
+                        $tmpArray['register_circumstances'] = saturne_flatten_wysiwyg_blocks($accidentSingle->description);
 
                         $lesionNatures = '';
                         $lesionLocation = '';

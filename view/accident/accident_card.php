@@ -64,7 +64,7 @@ $fk_parent           = GETPOST('fk_parent', 'int');
 $fromiduser          = GETPOST('fromiduser', 'int'); //element id
 $accident_type       = GETPOST('accident_type');
 $external_accident   = GETPOST('external_accident');
-$accident_location   = GETPOST('accident_location');
+$accident_location   = GETPOST('accident_location', 'restricthtml');
 $fk_soc              = GETPOST('fk_soc');
 $fkTicket            = GETPOSTISSET('fk_ticket') ? GETPOST('fk_ticket', 'int') : 0;
 
@@ -158,10 +158,10 @@ if (empty($reshook)) {
 		$user_employer_id   = GETPOST('fk_user_employer');
 		$digiriskelement_id = GETPOST('fk_element');
 		$label              = GETPOST('label');
-		$description        = GETPOST('description');
+		$description        = GETPOST('description', 'restricthtml');
 		$accident_type      = GETPOST('accident_type');
 		$external_accident  = GETPOST('external_accident');
-		$accident_location  = GETPOST('accident_location');
+		$accident_location  = GETPOST('accident_location', 'restricthtml');
         $extSocietyId       = GETPOST('fk_soc');
 
         // Initialize object accident
@@ -259,7 +259,7 @@ if (empty($reshook)) {
 		$description        = GETPOST('description', 'restricthtml');
 		$accident_type      = GETPOST('accident_type');
 		$external_accident  = GETPOST('external_accident');
-		$accident_location  = GETPOST('accident_location');
+		$accident_location  = GETPOST('accident_location', 'restricthtml');
         $extSocietyId       = GETPOST('fk_soc');
 		$user_victim_id	    = GETPOST('fk_user_victim');
 
@@ -690,7 +690,7 @@ if ($action == 'create') {
 
 	//AccidentLocation -- lieu de l'accident
 	print '<tr class="accident_location_field" ' . (GETPOST('external_accident') == 3 ? '' : 'style="display:none"') . '><td class="minwidth300">' . $langs->trans("AccidentLocation") . '</td><td>';
-	$doleditor = new DolEditor('accident_location', GETPOST('accident_location'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor = new DolEditor('accident_location', GETPOST('accident_location', 'restricthtml'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
 
@@ -702,7 +702,7 @@ if ($action == 'create') {
 
 	//Description -- Description
 	print '<tr class="content_field"><td><label for="content">' . $langs->trans("Description") . '</label></td><td>';
-	$doleditor = new DolEditor('description', GETPOST('description'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor = new DolEditor('description', GETPOST('description', 'restricthtml'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
 
@@ -1046,7 +1046,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $thirdparty->getNomUrl(1);
 			break;
 		case 3:
-			print $object->accident_location;
+			print dolPrintHTML($object->accident_location);
 			break;
 	}
 	print '</td></tr>';
@@ -1056,7 +1056,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $form->textwithpicto($langs->trans("Description"), $langs->trans("GaugeCounter"), 1, 'info');
 	print '</td>';
 	print '<td>';
-	print $object->description;
+	print dolPrintHTML($object->description);
 	print '</td></tr>';
 
     print '</table>';
