@@ -183,9 +183,10 @@ class PreventionPlan extends SaturneObject
         unset($object->import_key);
 
         // Clear fields
+        // Date creation must be set before ref: numbering modules build the YYMM part of the ref from it
+        $object->date_creation = dol_now();
         $object->ref           = $refPreventionPlanMod->getNextValue($object);
         $object->label         = $options['clone_label'];
-        $object->date_creation = dol_now();
         $object->status        = self::STATUS_DRAFT;
 
         // Create clone
@@ -228,6 +229,8 @@ class PreventionPlan extends SaturneObject
             if (!empty($options['preventionplan_risk'])) {
                 if (is_array($preventionplandets) && !empty($preventionplandets)) {
                     foreach ($preventionplandets as $line) {
+                        // Date creation must be reset before ref: it is kept from the cloned line otherwise
+                        $line->date_creation     = dol_now();
                         $line->ref               = $refPreventionPlanDetMod->getNextValue($line);
                         $line->fk_preventionplan = $preventionPlanID;
                         $line->create($user, 1);

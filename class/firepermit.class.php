@@ -177,9 +177,10 @@ class FirePermit extends SaturneObject
         unset($object->import_key);
 
         // Clear fields
+        // Date creation must be set before ref: numbering modules build the YYMM part of the ref from it
+        $object->date_creation = dol_now();
         $object->ref           = $refFirePermitMod->getNextValue($object);
         $object->label         = $options['clone_label'];
-        $object->date_creation = dol_now();
         $object->status        = self::STATUS_DRAFT;
 
         // Create clone
@@ -222,6 +223,8 @@ class FirePermit extends SaturneObject
             if (!empty($options['firepermit_risk'])) {
                 if (is_array($firepermitdets) && !empty($firepermitdets)) {
                     foreach ($firepermitdets as $line) {
+                        // Date creation must be reset before ref: it is kept from the cloned line otherwise
+                        $line->date_creation = dol_now();
                         $line->ref           = $refFirePermitDetMod->getNextValue($line);
                         $line->fk_firepermit = $firePermitID;
                         $line->create($user, 1);
