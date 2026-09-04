@@ -48,7 +48,7 @@ $exportAction = $_SERVER['PHP_SELF'] . '?view=' . urlencode($view);
         <form method="POST" action="<?php echo $exportAction; ?>" class="ap-export-form">
             <input type="hidden" name="token" value="<?php echo newToken(); ?>">
             <input type="hidden" name="action" value="builddoc">
-            <input type="hidden" name="model" value="papripact_a3_paysage_projectdocument">
+            <input type="hidden" name="model" value="<?php echo dol_escape_htmltag(getDolGlobalString('DIGIRISKDOLIBARR_PROJECTDOCUMENT_DEFAULT_MODEL', 'papripact_a3_paysage_projectdocument')); ?>">
             <?php echo digiriskActionPlanFilterHiddenInputs($actionPlanFilters); ?>
             <button type="submit" class="ap-export-btn" title="<?php echo dol_escape_htmltag($langs->trans('ActionPlanExportA3')); ?>">
                 <i class="fas fa-download"></i>
