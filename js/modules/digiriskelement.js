@@ -28,7 +28,7 @@ window.digiriskdolibarr.digiriskelement.init = function() {
  * @return {void}
  */
 window.digiriskdolibarr.digiriskelement.event = function() {
-	$( document ).on( 'click', '#select_all_shared_elements_by_digiriskelement', window.digiriskdolibarr.digiriskelement.selectAllSharedElementByDigiriskElement );
+	$( document ).on( 'click', '.select-all-shared-elements-by-digiriskelement', window.digiriskdolibarr.digiriskelement.selectAllSharedElementByDigiriskElement );
 	$( document ).on( 'click', '#select_all_shared_elements', window.digiriskdolibarr.digiriskelement.selectAllSharedElements );
 };
 
@@ -41,17 +41,12 @@ window.digiriskdolibarr.digiriskelement.event = function() {
  * @return {void}
  */
 window.digiriskdolibarr.digiriskelement.selectAllSharedElementByDigiriskElement = function ( event ) {
-	let digiriskelementid = $(this).attr('name');
-	if(this.checked) {
-		// Iterate each checkbox
-		$(this).closest('.ui-widget').find('.importsharedelement-digiriskelement-' + digiriskelementid).not(':disabled').each(function() {
-			this.checked = true;
-		});
-	} else {
-		$(this).closest('.ui-widget').find('.importsharedelement-digiriskelement-' + digiriskelementid).not(':disabled').each(function() {
-			this.checked = false;
-		});
-	}
+	let digiriskelementid = $(this).data('digiriskelement-id');
+	let checked           = this.checked;
+
+	$(this).closest('.ui-widget').find('.importsharedelement-digiriskelement-' + digiriskelementid).not(':disabled').each(function() {
+		this.checked = checked;
+	});
 };
 
 /**
@@ -63,14 +58,11 @@ window.digiriskdolibarr.digiriskelement.selectAllSharedElementByDigiriskElement 
  * @return {void}
  */
 window.digiriskdolibarr.digiriskelement.selectAllSharedElements = function ( event ) {
-	if(this.checked) {
-		// Iterate each checkbox
-		$(this).closest('.ui-widget').find(':checkbox').not(':disabled').not('#select_all_shared_elements_by_digiriskelement').each(function() {
-			this.checked = true;
-		});
-	} else {
-		$(this).closest('.ui-widget').find(':checkbox').not(':disabled').not('#select_all_shared_elements_by_digiriskelement').each(function() {
-			this.checked = false;
-		});
-	}
+	let checked = this.checked;
+
+	// Les cases de groupe suivent l'état global : les laisser de côté afficherait des groupes
+	// décochés au-dessus de lignes cochées
+	$(this).closest('.ui-widget').find(':checkbox').not(':disabled').each(function() {
+		this.checked = checked;
+	});
 };

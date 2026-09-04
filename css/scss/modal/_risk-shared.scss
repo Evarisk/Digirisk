@@ -14,8 +14,7 @@
   }
   // Chaque ligne est une cellule unique contenant les colonnes du risque partagé. Une
   // grille au gabarit fixe garantit que toutes les lignes s'alignent, y compris celles
-  // qui portent la case « tout sélectionner » ou le badge « déjà importé » : ces deux
-  // pistes gardent leur largeur même quand elles sont vides.
+  // qui portent le badge « déjà importé » : sa piste garde sa largeur même à vide.
   // height: auto est indispensable car le thème eldy impose
   // `.confirmquestions .tagtr .tagtd { height: 2em }` : hors table-cell cette hauteur
   // devient fixe et le contenu déborde sur les lignes suivantes.
@@ -28,8 +27,7 @@
       2.4em             // cotation
       2.6em             // vignette de l'évaluation
       minmax(0, 1.7fr)  // commentaire de l'évaluation
-      4.4em             // badge « déjà importé »
-      1.1em;            // sélection de toute l'unité de travail
+      4.4em;            // badge « déjà importé »
     align-items: center;
     column-gap: 0.5em;
     height: auto;
@@ -56,8 +54,8 @@
         font-weight: 600;
       }
     }
-    // Badge et case de sélection groupée sont épinglés : ils apparaissent chacun sur une
-    // partie des lignes seulement, l'auto-placement les ferait glisser d'une piste
+    // Le badge est épinglé : il n'apparaît que sur une partie des lignes, l'auto-placement
+    // le ferait glisser d'une piste
     .importsharedrisk.imported {
       grid-column: 7;
       text-align: center;
@@ -78,12 +76,23 @@
       height: 2.6em;
       object-fit: cover;
     }
-    // Collée à droite de la cellule pour venir toucher la case de sélection de la ligne,
-    // qui est dans la cellule suivante
-    > input[type="checkbox"] {
-      grid-column: 8;
-      justify-self: end;
-      margin: 0;
+  }
+  // Ligne d'en-tête d'un élément partagé : elle porte la case « tout sélectionner » de
+  // l'élément, séparée des cases de ligne pour ne plus être prise pour l'une d'elles
+  .tagtr > .tagtd.importsharedrisk-group:first-child {
+    display: flex;
+    align-items: baseline;
+    column-gap: 0.5em;
+    height: auto;
+    padding-left: 0.3em;
+
+    .importsharedrisk-group-label {
+      display: flex;
+      column-gap: 0.4em;
+    }
+    .importsharedrisk-group-hint {
+      font-size: 11px;
+      opacity: 0.6;
     }
   }
   .tagtr > .tagtd:last-child {
