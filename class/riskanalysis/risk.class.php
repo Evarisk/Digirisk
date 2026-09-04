@@ -238,7 +238,7 @@ class Risk extends SaturneObject
             $array['shared']['riskByRiskAssessmentLevels']    = [];
         }
 
-        if (isset($moreParam['tmparray']['showSharedRisk_nocheck']) && $moreParam['tmparray']['showSharedRisk_nocheck'] === true) {
+        if (!empty($moreParam['tmparray']['showSharedRisk_nocheck'])) {
             $array['shared']['risks'] = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $filter], 'AND', false, true, false, $sharedJoin, [], $sharedSelect, $sharedMoreSelects);
             if (!is_array($array['shared']['risks']) || empty($array['shared']['risks'])) {
                 $array['shared']['risks']                         = [];
@@ -338,8 +338,6 @@ class Risk extends SaturneObject
 	 */
 	public function fetchRisksOrderedByCotation($parent_id, $get_children_data = false, $get_parents_data = false, $get_shared_data = false, $moreParams = [])
 	{
-        global $conf;
-
 		$object         = new DigiriskElement($this->db);
 		$risk           = new Risk($this->db);
         $riskAssessment = new RiskAssessment($this->db);
@@ -360,11 +358,22 @@ class Risk extends SaturneObject
 			}
 		}
 
+		$risksOrderedByDigiriskElement = [];
+
+		// Entity management is disabled above when shared risks are requested, so $riskList holds the risks of every entity of the database
+		// Only the risks carried by a digirisk element visible from the current entity belong to this listing
+		$visibleDigiriskElements = is_array($objects) ? $objects : [];
+		if ($get_shared_data && is_array($activeDigiriskElements)) {
+			$visibleDigiriskElements += $activeDigiriskElements;
+		}
+
 		if (is_array($riskList) && !empty($riskList)) {
 			foreach ($riskList as $riskSingle) {
-				$riskSingle->lastEvaluation                               = $riskAssessmentsOrderedByRisk[$riskSingle->id];
-				$riskSingle->appliedOn                                    = $riskSingle->fk_element;
-				$risksOrderedByDigiriskElement[$riskSingle->fk_element][] = $riskSingle;
+				$riskSingle->lastEvaluation = $riskAssessmentsOrderedByRisk[$riskSingle->id] ?? null;
+				$riskSingle->appliedOn      = $riskSingle->fk_element;
+				if (isset($visibleDigiriskElements[$riskSingle->fk_element])) {
+					$risksOrderedByDigiriskElement[$riskSingle->fk_element][] = $riskSingle;
+				}
 			}
 		}
 		$risks = [];
@@ -403,12 +412,10 @@ class Risk extends SaturneObject
 				// RISKS parent children.
 				if ( !empty($children_ids)) {
 					foreach ($children_ids as $child_id) {
-						if (is_array($risksOrderedByDigiriskElement[$child_id]) && !empty($risksOrderedByDigiriskElement[$child_id])) {
-                            foreach ($risksOrderedByDigiriskElement[$child_id] as $riskOfChildDigiriskElement) {
-                                if ($riskOfChildDigiriskElement->entity == $conf->entity) {
-                                    $risks[] = $riskOfChildDigiriskElement;
-                                }
-                            }
+						// The entity scope is already applied when $risksOrderedByDigiriskElement is built
+						// Filtering again on $risk->entity dropped every children risk on a mono entity install, where the entity field is unset from $fields
+						if (!empty($risksOrderedByDigiriskElement[$child_id]) && is_array($risksOrderedByDigiriskElement[$child_id])) {
+							$risks = array_merge($risks, $risksOrderedByDigiriskElement[$child_id]);
 						}
 					}
 				}
