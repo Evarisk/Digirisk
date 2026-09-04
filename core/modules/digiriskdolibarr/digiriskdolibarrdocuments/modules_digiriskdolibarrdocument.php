@@ -390,7 +390,7 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                     'identifiantAccident'  => $accident->ref,
                     'AccidentName'         => $accident->label,
                     'AccidentWorkStopDays' => $accident->nbAccidentWorkStop,
-                    'AccidentComment'      => $accident->description,
+                    'AccidentComment'      => str_replace(['</p>', '</li>'], '<br>', $accident->description),
                 ];
 
                 static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);

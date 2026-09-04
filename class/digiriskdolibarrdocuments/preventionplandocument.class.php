@@ -202,7 +202,7 @@ class PreventionPlanDocument extends DigiriskDocuments
 		$json['PreventionPlan']['date']['end']        = $preventionplan->date_end;
 		$json['PreventionPlan']['cssct_intervention'] = $preventionplan->cssct_intervention;
 		$json['PreventionPlan']['prior_visit_bool']   = $preventionplan->prior_visit_bool;
-		$json['PreventionPlan']['prior_visit_text']   = $preventionplan->prior_visit_text;
+		$json['PreventionPlan']['prior_visit_text']   = dol_htmlentitiesbr_decode(strip_tags(str_replace(['</p>', '</li>'], '<br>', $preventionplan->prior_visit_text), '<br>'));
 		$json['PreventionPlan']['prior_visit_date']   = $preventionplan->prior_visit_date;
 
 		$morewhere = ' AND element_id = ' . $preventionplan->id;

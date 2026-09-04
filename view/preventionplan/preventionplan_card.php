@@ -168,7 +168,7 @@ if (empty($reshook)) {
 		$labourInspectorContactId = GETPOST('labour_inspector_contact');
 		$label                    = GETPOST('label');
 		$priorVisitBool           = GETPOST('prior_visit_bool');
-		$priorVisitText           = GETPOST('prior_visit_text');
+		$priorVisitText           = GETPOST('prior_visit_text', 'restricthtml');
 		$cssctInterventation      = GETPOST('cssct_intervention');
 
 		// Initialize object preventionplan
@@ -288,7 +288,7 @@ if (empty($reshook)) {
 		$labourInspectorContactId = GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : 0;
 		$label                    = GETPOST('label');
 		$priorVisitBool           = GETPOST('prior_visit_bool');
-		$priorVisitText           = GETPOST('prior_visit_text');
+		$priorVisitText           = GETPOST('prior_visit_text', 'restricthtml');
 		$cssctInterventation      = GETPOST('cssct_intervention');
 
 		// Initialize object preventionplan
@@ -818,7 +818,7 @@ if ($action == 'create') {
 
 	//Prior Visit Texte -- Note de l'inspection
 	print '<tr  class="prior_visit_text_field hidden"' . (GETPOST('prior_visit_bool') ? '' : 'style="display:none"') . '><td class="minwidth400"><label for="prior_visit_text">' . $langs->trans("PriorVisitText") . '</label></td><td>';
-	$doleditor = new DolEditor('prior_visit_text', GETPOST('prior_visit_text'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor = new DolEditor('prior_visit_text', GETPOST('prior_visit_text', 'restricthtml'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
 
@@ -1173,7 +1173,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print $langs->trans("PriorVisitText");
 		print '</td>';
 		print '<td>';
-		print $object->prior_visit_text;
+		print dolPrintHTML($object->prior_visit_text);
 		print '</td></tr>';
 	}
 

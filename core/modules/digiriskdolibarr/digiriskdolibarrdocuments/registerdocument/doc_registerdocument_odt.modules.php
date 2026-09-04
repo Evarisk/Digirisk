@@ -136,7 +136,8 @@ class doc_registerdocument_odt extends SaturneDocumentModel
                         $tmpArray['register_fullname'] = $ticket->array_options['options_digiriskdolibarr_ticket_lastname'] . ' ' . $ticket->array_options['options_digiriskdolibarr_ticket_firstname'];
                         $tmpArray['register_datehour'] = dol_print_date($ticket->array_options['options_digiriskdolibarr_ticket_date'], 'day');
                         $tmpArray['register_location'] = $digiriskElement->ref . ' ' . $digiriskElement->label;
-                        $tmpArray['register_circumstances'] = $accidentSingle->description;
+                        // Champ saisi en WYSIWYG : la librairie ODT ne garde que les balises inline
+                        $tmpArray['register_circumstances'] = str_replace(['</p>', '</li>'], '<br>', $accidentSingle->description);
 
                         $lesionNatures = '';
                         $lesionLocation = '';

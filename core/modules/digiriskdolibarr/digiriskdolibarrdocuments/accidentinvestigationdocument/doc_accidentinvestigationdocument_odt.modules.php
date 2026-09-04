@@ -247,7 +247,8 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTDigiriskDolibarrDoc
 			$societe->fetch($accident->fk_soc);
 			$tmpArray['gp_ut'] = $societe->name;
 		} else {
-			$tmpArray['gp_ut'] = $accident->accident_location;
+			// Champ saisi en WYSIWYG : la librairie ODT ne garde que les balises inline
+			$tmpArray['gp_ut'] = str_replace(['</p>', '</li>'], '<br>', $accident->accident_location);
 		}
 
 		$tmpArray['victim_skills']        = $object->victim_skills;

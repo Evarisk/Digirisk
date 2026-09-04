@@ -243,6 +243,32 @@ class pdf_preventionplandocument extends SaturneDocumentModel
     }
 
     /**
+     * Paragraphe issu d'un champ WYSIWYG : le HTML est rendu tel quel (gras, italique, listes).
+     *
+     * @param  TCPDF  $pdf   PDF handler
+     * @param  string $html  Contenu HTML
+     * @param  float  $size  Taille de police
+     * @param  array  $color Couleur du texte
+     * @return void
+     */
+    protected function htmlParagraph($pdf, string $html, float $size, array $color = [60, 60, 60])
+    {
+        if (!dol_strlen($html)) {
+            return;
+        }
+
+        // getNumLines ne sait pas mesurer du HTML : la hauteur est estimee sur le texte brut
+        $height = $pdf->getNumLines(dol_string_nohtmltag($html, 0), $this->contentWidth($pdf)) * $this->height;
+        $this->checkPageBreak($pdf, $height);
+
+        $pdf->SetFont('', '', $size);
+        $pdf->SetTextColor($color[0], $color[1], $color[2]);
+        $pdf->writeHTMLCell($this->contentWidth($pdf), $this->height, $this->marge_gauche, $pdf->GetY(), $html, 0, 1, false, true, 'L');
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Ln(1);
+    }
+
+    /**
      * Tableau generique.
      *
      * $rows est une liste de lignes, chaque ligne une liste de cellules. Une cellule est une
@@ -812,7 +838,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
 
         if (dol_strlen($object->prior_visit_text)) {
             $this->paragraph($pdf, $outputLangs->transnoentities('PriorVisitComments'), $size - 1, 'B', [40, 40, 40]);
-            $this->paragraph($pdf, dol_string_nohtmltag($object->prior_visit_text, 0), $size - 1, '', [40, 40, 40]);
+            $this->htmlParagraph($pdf, $object->prior_visit_text, $size - 1, [40, 40, 40]);
         }
     }
 
