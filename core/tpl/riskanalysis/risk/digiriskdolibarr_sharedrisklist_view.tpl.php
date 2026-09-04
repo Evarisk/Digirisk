@@ -330,7 +330,7 @@ include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 $arrayofmassactions = [];
 $massactionbutton   = $form->selectMassAction('', $arrayofmassactions);
 
-$title = $langs->trans('DigiriskElementShared' . ucfirst($riskType) . 'sList');
+$title = digirisk_trans_risk_type('DigiriskElementShared', $riskType, 'sList');
 print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr_color.png@digiriskdolibarr', 0, '', '', $limit, 0, 0, 1);
 
 include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';

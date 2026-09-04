@@ -598,7 +598,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
         // Bouton importer des risques partagés : icône seule + texte en tooltip, à côté des boutons d'ajout (id conservé pour déclencher la popup de confirmation)
         if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
-            $newcardbutton .= '<div class="import-shared-risks wpeo-button button-square-40 button-secondary wpeo-tooltip-event" id="actionButtonImportSharedRisks" style="margin-left: 10px;" aria-label="' . $langs->trans('ImportShared' . ucfirst($riskType) . 's') . '" value="' . $object->id . '">';
+            $newcardbutton .= '<div class="import-shared-risks wpeo-button button-square-40 button-secondary wpeo-tooltip-event" id="actionButtonImportSharedRisks" style="margin-left: 10px;" aria-label="' . digirisk_trans_risk_type('ImportShared', $riskType, 's') . '" value="' . $object->id . '">';
             $newcardbutton .= '<i class="fas fa-file-import button-icon"></i>';
             $newcardbutton .= '</div>';
         }
@@ -614,7 +614,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
             <div class="modal-container wpeo-modal-event">
                 <!-- Modal-Header -->
                 <div class="modal-header" style="align-items: center; display: flex;">
-                    <h2 class="modal-title" style="flex: 1;"><?php print $langs->trans('Add' . ucfirst($riskType) . 'Title') . ' ' . $refRiskMod->getNextValue($risk); ?></h2>
+                    <h2 class="modal-title" style="flex: 1;"><?php print digirisk_trans_risk_type('Add', $riskType, 'Title') . ' ' . $refRiskMod->getNextValue($risk); ?></h2>
                     <?php if ($permissiontoadd) : ?>
                         <div class="risk-create wpeo-button button-primary button-disable modal-close" style="margin-right: 15px; margin-bottom: 0;">
                             <span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
@@ -854,7 +854,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
     </div>
 <?php endif; ?>
     <input type="hidden" id="dol_url_root" value="<?php echo DOL_URL_ROOT; ?>">
-<?php $title = $langs->trans('DigiriskElement' . ucfirst($riskType) . 'sList');
+<?php $title = digirisk_trans_risk_type('DigiriskElement', $riskType, 'sList');
 print '<div class="div-title-and-table-responsive">';
 print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, $risk->picto, 0, $newcardbutton ?? '', '', $limit, 0, 0, 1);
 
