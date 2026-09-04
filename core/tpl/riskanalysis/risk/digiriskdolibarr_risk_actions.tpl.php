@@ -411,9 +411,11 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 	$task->array_options['options_fk_risk'] = $riskID;
 
 	$result = $task->create($user, true);
-    $task->add_contact($executiveUser, 'TASKEXECUTIVE', 'internal');
 
 	if ($result > 0) {
+		if (!empty($executiveUser)) {
+			$task->add_contact($executiveUser, 'TASKEXECUTIVE', 'internal');
+		}
 		if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_CREATE)) $task->call_trigger('TASK_CREATE', $user);
 		// Creation task OK
 		$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -423,7 +425,7 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 	} else {
 		// Delete task KO
 		header('HTTP/1.1 500 Internal Server Booboo');
-		die(json_encode(array('message' => html_entity_decode($langs->transnoentities($task->errors[0])), 'code' => '1339')));
+		die(json_encode(array('message' => html_entity_decode($langs->transnoentities($task->errorsToString())), 'code' => '1339')));
 	}
 }
 
@@ -481,7 +483,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 	} else {
 		// Delete task KO
 		header('HTTP/1.1 500 Internal Server Booboo');
-		die(json_encode(array('message' => html_entity_decode($langs->transnoentities($task->errors[0])), 'code' => '1338')));
+		die(json_encode(array('message' => html_entity_decode($langs->transnoentities($task->errorsToString())), 'code' => '1338')));
 	}
 }
 
