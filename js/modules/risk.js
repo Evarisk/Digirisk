@@ -198,7 +198,7 @@ window.digiriskdolibarr.risk.createRisk = function ( event ) {
 			}
 		}),
 		processData: false,
-    contentType: 'application/json charset=utf-8',
+    contentType: 'application/json',
 		success: function ( resp ) {
 			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 
@@ -273,7 +273,7 @@ window.digiriskdolibarr.risk.saveRisk = function ( event ) {
 			newParent: newParent,
       categories: categories
 		}),
-    contentType: 'application/json charset=utf-8',
+    contentType: 'application/json',
 		success: function ( resp ) {
 			$('.wpeo-loader').removeClass('wpeo-loader');
 			let actionContainerSuccess = $('.messageSuccessRiskEdit');
@@ -339,7 +339,7 @@ window.digiriskdolibarr.risk.unlinkSharedRisk = function ( event ) {
 		data: JSON.stringify({
 			riskID: riskId,
 		}),
-    contentType: 'application/json charset=utf-8',
+    contentType: 'application/json',
 		success: function ( resp ) {
 			//refresh shared risk list form
 			$('.confirmquestions').html($(resp).find('.confirmquestions').children())

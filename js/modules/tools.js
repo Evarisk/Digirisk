@@ -56,7 +56,7 @@ window.digiriskdolibarr.tools.submitForm = function( e ) {
     url: window.location.href + querySeparator + 'action=import_global_dolibarr' + '&token=' + token,
     type: 'POST',
     data: formData,
-    contentType: 'multipart/form-data',
+    contentType: false,
     processData: false,
     success: function(resp) {
       let error = $(resp).find("input[name='error']");
