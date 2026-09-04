@@ -342,7 +342,12 @@ if ($sharedrisksigns) {
 
 		$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'name' =>'select_all_shared_elements', 'value' => 0);
 
-		$previousDigiriskElement = 0;
+		// Les lignes sont d'abord regroupées par élément partagé, puis rendues : la case
+		// « tout sélectionner » d'un élément n'a de sens qu'à partir de deux signalisations
+		// encore importables, et ce décompte n'est connu qu'une fois l'élément parcouru
+		$rowsByElement       = [];
+		$importableByElement = [];
+		$headerByElement     = [];
 		foreach ($allrisksigns as $key => $risksigns) {
 			$digiriskelementtmp->fetch($risksigns->fk_element);
 			$digiriskelementtmp->element = 'digiriskdolibarr';
@@ -367,18 +372,35 @@ if ($sharedrisksigns) {
 				$importValue .= '<span>' . dol_trunc($risksigns->description, 32) . '</span>';
 				$importValue .= '</div>';
 
-				if ($alreadyImported == 0 && $previousDigiriskElement != $digiriskelementtmp->id) {
-					$importValue .= '<input type="checkbox" id="select_all_shared_elements_by_digiriskelement" name="' . $digiriskelementtmp->id . '" value="0">';
-				}
-				$previousDigiriskElement = $digiriskelementtmp->id;
+				$headerByElement[$digiriskelementtmp->id] = '<span class="importsharedrisksign-ref">' . $digiriskelementtmp->ref . '</span>'
+					. '<span>' . dol_trunc($digiriskelementtmp->label, 48) . '</span>';
 
 				if ($alreadyImported > 0) {
-					$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'morecss' => 'importsharedelement-digiriskelement-'.$digiriskelementtmp->id, 'name' => $risksigns->id, 'label' => $importValue . '<span class="importsharedrisksigns imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
+					$rowsByElement[$digiriskelementtmp->id][] = array('type' => 'checkbox', 'morecss' => 'importsharedelement-digiriskelement-'.$digiriskelementtmp->id, 'name' => $risksigns->id, 'label' => $importValue . '<span class="importsharedrisksigns imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
 				} else {
-					$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'morecss' => 'importsharedelement-digiriskelement-'.$digiriskelementtmp->id, 'name' => $risksigns->id, 'label' => $importValue, 'value' => 0);
+					$importableByElement[$digiriskelementtmp->id] = ($importableByElement[$digiriskelementtmp->id] ?? 0) + 1;
+					$rowsByElement[$digiriskelementtmp->id][] = array('type' => 'checkbox', 'morecss' => 'importsharedelement-digiriskelement-'.$digiriskelementtmp->id, 'name' => $risksigns->id, 'label' => $importValue, 'value' => 0);
 				}
 			}
 
+		}
+
+		foreach ($rowsByElement as $digiriskElementId => $digiriskElementRows) {
+			// La case de groupe est une ligne à part entière, libellée : collée à la case de la
+			// signalisation elle était prise pour la case de sélection de la ligne (#4615). Le
+			// type 'other' la garde hors de $formquestion : seules les cases de ligne sont postées
+			if (($importableByElement[$digiriskElementId] ?? 0) > 1) {
+				$formquestionimportsharedrisksigns[] = array(
+					'type'    => 'other',
+					'tdclass' => 'importsharedrisksign-group',
+					'label'   => '<div class="importsharedrisksign importsharedrisksign-group-label">' . $headerByElement[$digiriskElementId] . '</div>'
+						. '<span class="importsharedrisksign-group-hint">' . $langs->trans('SelectAllSharedRiskSignsOfElement') . '</span>',
+					'value'   => '<input type="checkbox" class="flat select-all-shared-elements-by-digiriskelement" id="select_all_shared_elements_by_digiriskelement_' . $digiriskElementId . '" name="select_all_shared_elements_by_digiriskelement_' . $digiriskElementId . '" data-digiriskelement-id="' . $digiriskElementId . '">'
+				);
+			}
+			foreach ($digiriskElementRows as $digiriskElementRow) {
+				$formquestionimportsharedrisksigns[] = $digiriskElementRow;
+			}
 		}
 		$formconfirm .= digiriskformconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ImportSharedRiskSigns'), '', 'confirm_import_shared_risksigns', $formquestionimportsharedrisksigns, 'yes', 'actionButtonImportSharedRiskSigns', 800, 800);
 	}

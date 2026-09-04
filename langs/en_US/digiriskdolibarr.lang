@@ -453,3 +453,8 @@ MobilePPErrorMailServerNotConfigured = Your mail server is not configured, pleas
 MobilePPExtSendEmail = Send the email
 MobilePPEmailTemplateExt = Email template for the exterior company responsible
 MobilePPEmailTemplateInt = Email template for the exterior company attendants
+
+# Shared risks/signages import modal - issue #4615
+SelectAllSharedRisksOfElement              = Select all the risks of this element
+SelectAllSharedRiskenvironmentalsOfElement = Select all the environmental risks of this element
+SelectAllSharedRiskSignsOfElement          = Select all the signages of this element

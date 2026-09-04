@@ -21,8 +21,7 @@
       minmax(0, 1fr)    // entité
       minmax(0, 1.1fr)  // unité de travail
       minmax(0, 2.4fr)  // signalisation
-      4.4em             // badge « déjà importé »
-      1.1em;            // sélection de toute l'unité de travail
+      4.4em;            // badge « déjà importé »
     align-items: center;
     column-gap: 0.5em;
     height: auto;
@@ -49,8 +48,8 @@
         font-weight: 600;
       }
     }
-    // Badge et case de sélection groupée sont épinglés : ils apparaissent chacun sur une
-    // partie des lignes seulement, l'auto-placement les ferait glisser d'une piste.
+    // Le badge est épinglé : il n'apparaît que sur une partie des lignes, l'auto-placement
+    // le ferait glisser d'une piste.
     // La vue génère la classe au pluriel, les deux sont ciblées.
     .importsharedrisksign.imported,
     .importsharedrisksigns.imported {
@@ -59,12 +58,23 @@
       font-size: 11px;
       line-height: 1.2;
     }
-    // Collée à droite de la cellule pour venir toucher la case de sélection de la ligne,
-    // qui est dans la cellule suivante
-    > input[type="checkbox"] {
-      grid-column: 5;
-      justify-self: end;
-      margin: 0;
+  }
+  // Ligne d'en-tête d'un élément partagé : elle porte la case « tout sélectionner » de
+  // l'élément, séparée des cases de ligne pour ne plus être prise pour l'une d'elles
+  .tagtr > .tagtd.importsharedrisksign-group:first-child {
+    display: flex;
+    align-items: baseline;
+    column-gap: 0.5em;
+    height: auto;
+    padding-left: 0.3em;
+
+    .importsharedrisksign-group-label {
+      display: flex;
+      column-gap: 0.4em;
+    }
+    .importsharedrisksign-group-hint {
+      font-size: 11px;
+      opacity: 0.6;
     }
   }
   .tagtr > .tagtd:last-child {
