@@ -17,9 +17,9 @@
 /**
  * \file    js/modules/mobile-quick-create.js
  * \ingroup digiriskdolibarr
- * \brief   JavaScript shared by the mobile quick-creation interfaces (prevention plan, fire permit).
- *          Everything is driven by data attributes on .digirisk-mobile-form, so the same code serves
- *          both object types: only the form template changes.
+ * \brief   JavaScript of the mobile fire permit interface (creation form and success screen).
+ *          Everything is driven by data attributes on .digirisk-mobile-form, and the rows are cloned
+ *          from the <template> fragments the server renders, so both stay identical.
  */
 
 'use strict';
@@ -35,14 +35,19 @@ window.digiriskdolibarr.mobilequickcreate = {};
 window.digiriskdolibarr.mobilequickcreate.signaturePad = null;
 
 /**
- * Monotonic index used to key protection rows (kept unique across deletions).
+ * Monotonic index used to key type of work blocks (kept unique across deletions).
  */
-window.digiriskdolibarr.mobilequickcreate.protectionIndex = 0;
+window.digiriskdolibarr.mobilequickcreate.riskIndex = 0;
 
 /**
  * Monotonic index used to key certification rows (kept unique across deletions).
  */
 window.digiriskdolibarr.mobilequickcreate.certIndex = 0;
+
+/**
+ * Timer polling the signature state on the success screen (null while nothing is watched).
+ */
+window.digiriskdolibarr.mobilequickcreate.signatureStateTimer = null;
 
 /**
  * Guard so the delegated events are attached exactly once (framework init OR the DOM-ready fallback).
@@ -56,13 +61,16 @@ window.digiriskdolibarr.mobilequickcreate.bound = false;
  */
 window.digiriskdolibarr.mobilequickcreate.init = function() {
     // The prevention plan interface shares every selector of this one, and both modules delegate on
-    // document: bind only when the fire permit form is the one on screen.
-    var form = $('.digirisk-mobile-form--firepermit');
-    if (!form.length) {
+    // document: bind only when the fire permit form or success screen is the one on screen.
+    var form         = $('.digirisk-mobile-form--firepermit');
+    var successBlock = $('.digirisk-mobile-extsign--firepermit');
+
+    if (!form.length && !successBlock.length) {
         return;
     }
 
     window.digiriskdolibarr.mobilequickcreate.event();
+
     // Initialise the drawing canvas straight away if it is visible.
     if (form.find('.digirisk-mobile-signature-draw').length && !form.find('.digirisk-mobile-signature-draw').hasClass('hidden')) {
         window.digiriskdolibarr.mobilequickcreate.initCanvas();
@@ -71,8 +79,12 @@ window.digiriskdolibarr.mobilequickcreate.init = function() {
 
     // Edit mode: rows already rendered server-side occupy the first indexes, so keep counting after them
     if (form.length) {
-        window.digiriskdolibarr.mobilequickcreate.protectionIndex = parseInt(form.data('protection-start-index'), 10) || 0;
-        window.digiriskdolibarr.mobilequickcreate.certIndex       = parseInt(form.data('cert-start-index'), 10) || 0;
+        window.digiriskdolibarr.mobilequickcreate.riskIndex = parseInt(form.data('risk-start-index'), 10) || 0;
+        window.digiriskdolibarr.mobilequickcreate.certIndex = parseInt(form.data('cert-start-index'), 10) || 0;
+    }
+
+    if (successBlock.length) {
+        window.digiriskdolibarr.mobilequickcreate.startSignatureStateWatch();
     }
 };
 
@@ -88,14 +100,23 @@ window.digiriskdolibarr.mobilequickcreate.event = function() {
     window.digiriskdolibarr.mobilequickcreate.bound = true;
     $(document).on('click', '.digirisk-mobile-signature-clear', window.digiriskdolibarr.mobilequickcreate.clearSignature);
     $(document).on('click', '.digirisk-mobile-signature-save', window.digiriskdolibarr.mobilequickcreate.saveSignature);
+    $(document).on('click', '.digirisk-mobile-signature-show', window.digiriskdolibarr.mobilequickcreate.openSignaturePreview);
+    $(document).on('click', '.digirisk-mobile-signature-preview-close', window.digiriskdolibarr.mobilequickcreate.closeSignaturePreview);
+    $(document).on('click', '.digirisk-mobile-signature-edit', window.digiriskdolibarr.mobilequickcreate.editSignature);
     $(document).on('click', '.digirisk-mobile-siren-search', window.digiriskdolibarr.mobilequickcreate.searchSiren);
+    // Bound on the id: select_company renders either a select or, on big databases, an ajax
+    // autocompleter whose hidden input carries that same id
+    $(document).on('change', '#ext_society_picker', window.digiriskdolibarr.mobilequickcreate.selectSociety);
     $(document).on('change', '.digirisk-mobile-contact-select', window.digiriskdolibarr.mobilequickcreate.selectContact);
     $(document).on('change', '.digirisk-mobile-preventionplan-select', window.digiriskdolibarr.mobilequickcreate.selectPreventionPlan);
     $(document).on('change', '.digirisk-mobile-date-start, .digirisk-mobile-date-end', window.digiriskdolibarr.mobilequickcreate.checkDates);
+    $(document).on('click', '.digirisk-mobile-schedules-copy', window.digiriskdolibarr.mobilequickcreate.copyCompanyHours);
     $(document).on('click', '.digirisk-mobile-risk-add', window.digiriskdolibarr.mobilequickcreate.openRiskModal);
     $(document).on('click', '.digirisk-mobile-risk-modal-close, .digirisk-mobile-risk-modal__overlay', window.digiriskdolibarr.mobilequickcreate.closeRiskModal);
     $(document).on('click', '.digirisk-mobile-risk-option', window.digiriskdolibarr.mobilequickcreate.addRisk);
-    $(document).on('click', '.digirisk-mobile-risk-item-delete', window.digiriskdolibarr.mobilequickcreate.removeRisk);
+    $(document).on('click', '.digirisk-mobile-risk-block__delete', window.digiriskdolibarr.mobilequickcreate.confirmRemoveRisk);
+    $(document).on('click', '.digirisk-mobile-confirm-cancel', window.digiriskdolibarr.mobilequickcreate.closeConfirmModal);
+    $(document).on('click', '.digirisk-mobile-confirm-delete', window.digiriskdolibarr.mobilequickcreate.removeRisk);
     $(document).on('click', '.digirisk-mobile-protection-add', window.digiriskdolibarr.mobilequickcreate.openProtectionModal);
     $(document).on('click', '.digirisk-mobile-protection-modal-close, .digirisk-mobile-protection-modal__overlay', window.digiriskdolibarr.mobilequickcreate.closeProtectionModal);
     $(document).on('click', '.digirisk-mobile-protection-option', window.digiriskdolibarr.mobilequickcreate.addProtection);
@@ -103,6 +124,29 @@ window.digiriskdolibarr.mobilequickcreate.event = function() {
     $(document).on('click', '.digirisk-mobile-cert-add', window.digiriskdolibarr.mobilequickcreate.addCertification);
     $(document).on('click', '.digirisk-mobile-cert-item-delete', window.digiriskdolibarr.mobilequickcreate.removeCertification);
     $(document).on('submit', '.digirisk-mobile-form', window.digiriskdolibarr.mobilequickcreate.submitForm);
+    $(document).on('click', '.digirisk-mobile-extsign__resend', window.digiriskdolibarr.mobilequickcreate.resendExtSignatureEmail);
+    $(document).on('input blur', '.digirisk-mobile-form input', window.digiriskdolibarr.mobilequickcreate.checkRealTimeValidity);
+};
+
+/**
+ * Handle real-time visual feedback on form fields (orange KO / green OK).
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.checkRealTimeValidity = function() {
+    var el = this;
+
+    if (el.value === '' && !el.required) {
+        $(el).removeClass('is-valid is-invalid');
+        return;
+    }
+    if (el.type === 'email' || el.pattern || el.required) {
+        if (el.checkValidity && el.checkValidity()) {
+            $(el).removeClass('is-invalid').addClass('is-valid');
+        } else if (el.checkValidity && !el.checkValidity()) {
+            $(el).removeClass('is-valid').addClass('is-invalid');
+        }
+    }
 };
 
 /**
@@ -134,7 +178,38 @@ window.digiriskdolibarr.mobilequickcreate.clearSignature = function() {
 };
 
 /**
- * Save the drawn signature for the current user (reusable across plans).
+ * Show the signature already saved, so it can be checked before it is reused.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.openSignaturePreview = function() {
+    $('#modal-signature-preview').addClass('modal-active');
+};
+
+/**
+ * Close the saved signature preview.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.closeSignaturePreview = function() {
+    $('#modal-signature-preview').removeClass('modal-active');
+};
+
+/**
+ * Draw a new signature over the saved one.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.editSignature = function() {
+    $('#modal-signature-preview').removeClass('modal-active');
+    $('.digirisk-mobile-signature-saved').addClass('hidden');
+    $('.digirisk-mobile-signature-draw').removeClass('hidden');
+    // The canvas had no size while it was hidden: it can only be sized now
+    window.digiriskdolibarr.mobilequickcreate.initCanvas();
+};
+
+/**
+ * Save the drawn signature for the current user (reusable across permits).
  *
  * @return {void}
  */
@@ -144,7 +219,7 @@ window.digiriskdolibarr.mobilequickcreate.saveSignature = function() {
     var status = $('.digirisk-mobile-signature-status');
 
     if (!pad || pad.isEmpty()) {
-        status.removeClass('success').addClass('error').text(form.data('empty-signature-label') || 'Signature vide');
+        status.removeClass('success').addClass('error').text(form.data('empty-signature-label') || '');
         return;
     }
 
@@ -161,7 +236,7 @@ window.digiriskdolibarr.mobilequickcreate.saveSignature = function() {
         success: function(resp) {
             if (resp && resp.success) {
                 form.attr('data-has-signature', '1');
-                $('.digirisk-mobile-signature-preview').attr('src', signature);
+                $('.digirisk-mobile-signature-preview-img').attr('src', signature);
                 $('.digirisk-mobile-signature-draw').addClass('hidden');
                 $('.digirisk-mobile-signature-saved').removeClass('hidden');
                 status.removeClass('error').addClass('success').text('');
@@ -187,7 +262,7 @@ window.digiriskdolibarr.mobilequickcreate.searchSiren = function() {
 
     // Either a 9 digit SIREN or a 14 digit SIRET.
     if (siren.length !== 9 && siren.length !== 14) {
-        result.removeClass('success').addClass('error').text(form.data('invalid-siren-label') || 'SIREN/SIRET invalide');
+        result.removeClass('success').addClass('error').text(form.data('invalid-siren-label') || '');
         return;
     }
 
@@ -222,9 +297,39 @@ window.digiriskdolibarr.mobilequickcreate.searchSiren = function() {
 };
 
 /**
+ * Fill the exterior company block from the third party picked in the list. Clearing the picker
+ * only drops the link to the existing company: what was typed stays, so the same fields can be
+ * used to describe a company to create.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.selectSociety = function() {
+    var form  = $('.digirisk-mobile-form');
+    var socid = parseInt($(this).val(), 10) || 0;
+
+    if (socid <= 0) {
+        window.digiriskdolibarr.mobilequickcreate.resetFoundCompany();
+        $('.digirisk-mobile-siren-result').removeClass('error success').text('');
+        return;
+    }
+
+    $.ajax({
+        url: form.data('siren-lookup-url') + '?socid=' + encodeURIComponent(socid),
+        type: 'GET',
+        dataType: 'json',
+        success: function(resp) {
+            if (!resp || !resp.success || !resp.found) {
+                return;
+            }
+            window.digiriskdolibarr.mobilequickcreate.fillFoundCompany(resp);
+        }
+    });
+};
+
+/**
  * Fill the exterior company block from a found third party and populate its contacts.
  *
- * @param {Object} resp Ajax response
+ * @param  {Object} resp Ajax response
  * @return {void}
  */
 window.digiriskdolibarr.mobilequickcreate.fillFoundCompany = function(resp) {
@@ -234,6 +339,17 @@ window.digiriskdolibarr.mobilequickcreate.fillFoundCompany = function(resp) {
     $('.digirisk-mobile-ext-society-name').val(resp.societe.name);
     if (resp.societe.email) {
         $('.digirisk-mobile-ext-society-email').val(resp.societe.email);
+    }
+    // L'adresse est celle du tiers resolu : elle n'ecrase pas une saisie en cours quand la fiche
+    // du tiers ne la renseigne pas
+    if (resp.societe.address) {
+        $('.digirisk-mobile-ext-society-address').val(resp.societe.address);
+    }
+    if (resp.societe.zip) {
+        $('.digirisk-mobile-ext-society-zip').val(resp.societe.zip);
+    }
+    if (resp.societe.town) {
+        $('.digirisk-mobile-ext-society-town').val(resp.societe.town);
     }
     // Show back the identifier the company actually has on file, SIRET first.
     if (resp.societe.siret || resp.societe.siren) {
@@ -282,10 +398,14 @@ window.digiriskdolibarr.mobilequickcreate.selectContact = function() {
     var id     = $(this).val();
 
     if (id) {
+        var contactEmail = option.data('email') || '';
+
         $('.digirisk-mobile-resp-contact-id').val(id);
         $('.digirisk-mobile-resp-lastname').val(option.data('lastname')).prop('readonly', true);
         $('.digirisk-mobile-resp-firstname').val(option.data('firstname')).prop('readonly', true);
-        $('.digirisk-mobile-resp-email').val(option.data('email')).prop('readonly', true);
+        // L'email est obligatoire : le verrouiller alors que la fiche du contact n'en a pas
+        // enfermerait l'utilisateur devant une erreur qu'il ne peut pas corriger
+        $('.digirisk-mobile-resp-email').val(contactEmail).prop('readonly', false);
     } else {
         $('.digirisk-mobile-resp-contact-id').val('');
         $('.digirisk-mobile-resp-lastname').val('').prop('readonly', false);
@@ -295,8 +415,8 @@ window.digiriskdolibarr.mobilequickcreate.selectContact = function() {
 };
 
 /**
- * Fire permit only: picking the parent prevention plan pre-fills the exterior company,
- * its responsible and the intervention period, so the same data is not typed twice.
+ * Picking the parent prevention plan pre-fills the exterior company, its responsible and the
+ * intervention period, so the same data is not typed twice.
  *
  * @return {void}
  */
@@ -343,13 +463,27 @@ window.digiriskdolibarr.mobilequickcreate.selectPreventionPlan = function() {
 };
 
 /**
+ * Fill the work schedules with the opening hours of the company, as a starting point.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.copyCompanyHours = function() {
+    var hours = $(this).data('company-hours') || {};
+
+    $.each(hours, function(day, value) {
+        var parts = String(value || '').trim().split(' ');
+        $('input[name="schedule_' + day + '_am"]').val(parts[0] || '');
+        $('input[name="schedule_' + day + '_pm"]').val(parts[1] || '');
+    });
+};
+
+/**
  * Maximum accepted span between the start and the end date, in days.
- * Comes from the form (one year for a prevention plan, one month for a fire permit).
  *
  * @return {number} Span in days
  */
 window.digiriskdolibarr.mobilequickcreate.getMaxSpanDays = function() {
-    return parseInt($('.digirisk-mobile-form').data('max-span-days'), 10) || 365;
+    return parseInt($('.digirisk-mobile-form').data('max-span-days'), 10) || 31;
 };
 
 /**
@@ -413,8 +547,8 @@ window.digiriskdolibarr.mobilequickcreate.checkDates = function() {
 };
 
 /**
- * Full date validation on submit: both dates required (says which one is missing),
- * end after start, at most one year. Highlights the offending field.
+ * Full date validation on submit: both dates required (says which one is missing), end after
+ * start, within the accepted span. Highlights the offending field.
  *
  * @return {boolean} True if valid
  */
@@ -463,7 +597,7 @@ window.digiriskdolibarr.mobilequickcreate.validateDatesForSubmit = function() {
 };
 
 /**
- * Open the risk picker modal.
+ * Open the type of work picker modal.
  *
  * @return {void}
  */
@@ -472,7 +606,7 @@ window.digiriskdolibarr.mobilequickcreate.openRiskModal = function() {
 };
 
 /**
- * Close the risk picker modal.
+ * Close the type of work picker modal.
  *
  * @return {void}
  */
@@ -481,7 +615,32 @@ window.digiriskdolibarr.mobilequickcreate.closeRiskModal = function() {
 };
 
 /**
- * Add the picked risk (danger category) to the selected list.
+ * Build a DOM fragment from one of the <template> elements printed by the form, with its
+ * index placeholders resolved. Keeps the JS rows identical to the server-side ones.
+ *
+ * @param  {string} templateClass Class of the template element
+ * @param  {Object} indexes       Placeholder name (without the underscores) => value
+ * @return {Object}               jQuery object of the built row
+ */
+window.digiriskdolibarr.mobilequickcreate.buildFromTemplate = function(templateClass, indexes) {
+    var markup = $('.' + templateClass).prop('innerHTML') || '';
+    $.each(indexes, function(name, value) {
+        markup = markup.split('__' + name + '__').join(value);
+    });
+    return $($.parseHTML($.trim(markup))).filter('div').first();
+};
+
+/**
+ * Show the "no type of work yet" hint only while the list is empty.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.refreshRiskEmptyState = function() {
+    $('.digirisk-mobile-risk-empty').toggleClass('hidden', $('.digirisk-mobile-risk-block').length > 0);
+};
+
+/**
+ * Add the picked type of work as a new block: description, equipment, photos and its protections.
  *
  * @return {void}
  */
@@ -489,9 +648,9 @@ window.digiriskdolibarr.mobilequickcreate.addRisk = function() {
     var option   = $(this);
     var position = String(option.data('position'));
 
-    // Avoid adding the same danger category twice.
+    // Avoid adding the same type of work twice.
     var exists = false;
-    $('.digirisk-mobile-risk-item').each(function() {
+    $('.digirisk-mobile-risk-block').each(function() {
         if (String($(this).attr('data-position')) === position) {
             exists = true;
         }
@@ -501,40 +660,65 @@ window.digiriskdolibarr.mobilequickcreate.addRisk = function() {
         return;
     }
 
-    var form           = $('.digirisk-mobile-form');
-    var placeholder    = form.data('risk-comment-label') || '';
-    // Only the fire permit tracks the equipment used for each type of work.
-    var equipmentLabel = form.data('risk-equipment-label') || '';
+    var index  = window.digiriskdolibarr.mobilequickcreate.riskIndex++;
+    var $block = window.digiriskdolibarr.mobilequickcreate.buildFromTemplate('digirisk-mobile-risk-block-template', { RISKINDEX: index });
 
-    var $row = $('<div class="digirisk-mobile-risk-item"></div>').attr('data-position', position);
-    $('<img class="digirisk-mobile-risk-item-photo" alt="">').attr('src', option.data('thumbnail')).attr('title', option.data('name')).appendTo($row);
-    $('<input type="hidden" name="risk_category[]">').val(position).appendTo($row);
-    $('<input type="text" name="risk_comment[]" class="digirisk-mobile-risk-item-comment">').attr('placeholder', placeholder).appendTo($row);
-    if (equipmentLabel) {
-        $('<input type="text" name="risk_equipment[]" class="digirisk-mobile-risk-item-equipment">').attr('placeholder', equipmentLabel).appendTo($row);
-    }
-    $('<button type="button" class="digirisk-mobile-risk-item-delete"><i class="fas fa-trash"></i></button>').appendTo($row);
+    $block.attr('data-position', position);
+    $block.find('.digirisk-mobile-risk-block__picto').attr('src', option.data('thumbnail')).attr('alt', option.data('name'));
+    $block.find('.digirisk-mobile-risk-block__name').text(option.data('name'));
+    $block.find('.digirisk-mobile-risk-block__category').val(position);
 
-    $('.digirisk-mobile-risk-list').append($row);
+    $('.digirisk-mobile-risk-list').append($block);
+    window.digiriskdolibarr.mobilequickcreate.refreshRiskEmptyState();
     window.digiriskdolibarr.mobilequickcreate.closeRiskModal();
 };
 
 /**
- * Remove a selected risk from the list.
+ * Ask before dropping a type of work: the block carries its photos and its protections, and there
+ * is no way back before the form is submitted.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.confirmRemoveRisk = function() {
+    var $block  = $(this).closest('.digirisk-mobile-risk-block');
+    var $modal  = $('.digirisk-mobile-confirm-modal');
+    var message = $('.digirisk-mobile-form').data('delete-risk-label') || '';
+
+    $modal.attr('data-risk-index', $block.attr('data-index'));
+    $modal.find('.digirisk-mobile-confirm-modal__body').text(message.replace('%s', $block.find('.digirisk-mobile-risk-block__name').text()));
+    $modal.removeClass('hidden');
+};
+
+/**
+ * Close the delete confirmation without touching the type of work.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.closeConfirmModal = function() {
+    $('.digirisk-mobile-confirm-modal').addClass('hidden').removeAttr('data-risk-index');
+};
+
+/**
+ * Remove the confirmed type of work block, with everything it holds.
  *
  * @return {void}
  */
 window.digiriskdolibarr.mobilequickcreate.removeRisk = function() {
-    $(this).closest('.digirisk-mobile-risk-item').remove();
+    var riskIndex = $('.digirisk-mobile-confirm-modal').attr('data-risk-index');
+
+    $('.digirisk-mobile-risk-block[data-index="' + riskIndex + '"]').remove();
+    window.digiriskdolibarr.mobilequickcreate.closeConfirmModal();
+    window.digiriskdolibarr.mobilequickcreate.refreshRiskEmptyState();
 };
 
 /**
- * Open the protection picker modal.
+ * Open the protection picker modal for the block the button belongs to.
  *
  * @return {void}
  */
 window.digiriskdolibarr.mobilequickcreate.openProtectionModal = function() {
-    $('.digirisk-mobile-protection-modal').removeClass('hidden');
+    var riskIndex = $(this).closest('.digirisk-mobile-risk-block').attr('data-index');
+    $('.digirisk-mobile-protection-modal').attr('data-risk-index', riskIndex).removeClass('hidden');
 };
 
 /**
@@ -543,21 +727,28 @@ window.digiriskdolibarr.mobilequickcreate.openProtectionModal = function() {
  * @return {void}
  */
 window.digiriskdolibarr.mobilequickcreate.closeProtectionModal = function() {
-    $('.digirisk-mobile-protection-modal').addClass('hidden');
+    $('.digirisk-mobile-protection-modal').addClass('hidden').removeAttr('data-risk-index');
 };
 
 /**
- * Add the picked protection (EPI) to the selected list, with a mandatory checkbox.
+ * Add the picked protection (EPI) to the type of work that opened the modal.
  *
  * @return {void}
  */
 window.digiriskdolibarr.mobilequickcreate.addProtection = function() {
-    var option   = $(this);
-    var position = String(option.data('position'));
+    var option    = $(this);
+    var position  = String(option.data('position'));
+    var riskIndex = $('.digirisk-mobile-protection-modal').attr('data-risk-index');
+    var $block    = $('.digirisk-mobile-risk-block[data-index="' + riskIndex + '"]');
 
-    // Avoid adding the same protection twice.
+    if (!$block.length) {
+        window.digiriskdolibarr.mobilequickcreate.closeProtectionModal();
+        return;
+    }
+
+    // Avoid adding the same protection twice on the same type of work.
     var exists = false;
-    $('.digirisk-mobile-protection-item').each(function() {
+    $block.find('.digirisk-mobile-protection-item').each(function() {
         if (String($(this).attr('data-position')) === position) {
             exists = true;
         }
@@ -567,29 +758,20 @@ window.digiriskdolibarr.mobilequickcreate.addProtection = function() {
         return;
     }
 
-    var form            = $('.digirisk-mobile-form');
-    var placeholder     = form.data('risk-comment-label') || '';
-    var mandatoryLabel  = form.data('mandatory-label') || '';
-    var index           = window.digiriskdolibarr.mobilequickcreate.protectionIndex++;
+    var index = parseInt($block.attr('data-protection-index'), 10) || 0;
+    $block.attr('data-protection-index', index + 1);
 
-    var $row = $('<div class="digirisk-mobile-protection-item"></div>').attr('data-position', position);
-    $('<img class="digirisk-mobile-protection-item-photo" alt="">').attr('src', option.data('thumbnail')).attr('title', option.data('name')).appendTo($row);
-    $('<input type="hidden" name="protection_position[' + index + ']">').val(position).appendTo($row);
-    $('<input type="text" name="protection_comment[' + index + ']" class="digirisk-mobile-protection-item-comment">').attr('placeholder', placeholder).appendTo($row);
+    var $row = window.digiriskdolibarr.mobilequickcreate.buildFromTemplate('digirisk-mobile-protection-row-template', { RISKINDEX: riskIndex, INDEX: index });
+    $row.attr('data-position', position);
+    $row.find('.digirisk-mobile-protection-item-photo').attr('src', option.data('thumbnail')).attr('title', option.data('name'));
+    $row.find('input[type="hidden"]').val(position);
 
-    var $mandatory = $('<label class="digirisk-mobile-protection-item-mandatory"></label>');
-    $('<input type="checkbox" value="1">').attr('name', 'protection_mandatory[' + index + ']').appendTo($mandatory);
-    $('<span></span>').text(mandatoryLabel).appendTo($mandatory);
-    $mandatory.appendTo($row);
-
-    $('<button type="button" class="digirisk-mobile-protection-item-delete"><i class="fas fa-trash"></i></button>').appendTo($row);
-
-    $('.digirisk-mobile-protection-list').append($row);
+    $block.find('.digirisk-mobile-protection-list').append($row);
     window.digiriskdolibarr.mobilequickcreate.closeProtectionModal();
 };
 
 /**
- * Remove a selected protection from the list.
+ * Remove a selected protection from its type of work.
  *
  * @return {void}
  */
@@ -675,6 +857,12 @@ window.digiriskdolibarr.mobilequickcreate.submitForm = function(event) {
         submitBtn.prop('disabled', false).removeClass('wpeo-loader button-disable').addClass('button-blue');
     };
 
+    if (form[0].checkValidity && !form[0].checkValidity()) {
+        form[0].reportValidity();
+        resetSubmit();
+        return;
+    }
+
     if (form.attr('data-has-signature') !== '1') {
         resetSubmit();
         $('.digirisk-mobile-signature-status').removeClass('success').addClass('error').text(form.data('need-signature-label') || '');
@@ -733,6 +921,119 @@ window.digiriskdolibarr.mobilequickcreate.showFormErrors = function(errors) {
     if (errorBox.offset()) {
         $('html, body').animate({ scrollTop: errorBox.offset().top - 80 }, 300);
     }
+};
+
+/**
+ * Send the signature link to the exterior company again from the success screen.
+ *
+ * The automatic email of the creation may have failed, or simply never reached its recipient: the
+ * button reports what happened instead of leaving the user guessing.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.resendExtSignatureEmail = function() {
+    var button = $(this);
+    var card   = button.closest('.digirisk-mobile-extsign');
+    var status = card.find('.digirisk-mobile-extsign__status');
+    var planId = card.data('plan-id');
+
+    if (button.hasClass('button-disable')) {
+        return;
+    }
+    button.addClass('button-disable');
+
+    $.ajax({
+        url: document.URL.split('#')[0] + (document.URL.indexOf('?') >= 0 ? '&' : '?') + 'action=resend_ext_signature_email&token=' + window.saturne.toolbox.getToken(),
+        type: 'POST',
+        data: { plan_id: planId },
+        dataType: 'json',
+        success: function(resp) {
+            button.removeClass('button-disable');
+            if (!resp) {
+                return;
+            }
+            status
+                .removeClass('digirisk-mobile-extsign__status--pending digirisk-mobile-extsign__status--sent digirisk-mobile-extsign__status--error')
+                .addClass(resp.success ? 'digirisk-mobile-extsign__status--sent' : 'digirisk-mobile-extsign__status--error')
+                .find('span').text(resp.message ? resp.message : 'KO');
+            status.find('i').attr('class', resp.success ? 'fas fa-paper-plane' : 'fas fa-exclamation-circle');
+        },
+        error: function(jqXHR) {
+            button.removeClass('button-disable');
+
+            var defaultError = 'KO (HTTP ' + jqXHR.status + ')';
+            // Un 200 sans JSON exploitable vient du serveur de mail : le dire plutot que le code HTTP
+            if (jqXHR.status === 200 && card.data('error-mail')) {
+                defaultError = card.data('error-mail');
+            }
+
+            status
+                .removeClass('digirisk-mobile-extsign__status--pending digirisk-mobile-extsign__status--sent digirisk-mobile-extsign__status--error')
+                .addClass('digirisk-mobile-extsign__status--error')
+                .find('span').text(defaultError);
+            status.find('i').attr('class', 'fas fa-exclamation-circle');
+        }
+    });
+};
+
+/**
+ * Watch the signature state of the permit shown by the success screen.
+ *
+ * La signature se donne le plus souvent ailleurs que sur cet ecran : telephone qui a scanne le QR
+ * code, lien du mail ouvert sur un autre appareil. Recharger au retour d'onglet ne suffit donc pas,
+ * la page restant visible pendant tout ce temps : on interroge l'etat et on ne recharge qu'au
+ * changement.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.startSignatureStateWatch = function() {
+    var card = $('.digirisk-mobile-extsign--firepermit');
+    var url  = card.data('signature-state-url');
+
+    if (!url || window.digiriskdolibarr.mobilequickcreate.signatureStateTimer !== null) {
+        return;
+    }
+
+    window.digiriskdolibarr.mobilequickcreate.signatureStateTimer = setInterval(window.digiriskdolibarr.mobilequickcreate.checkSignatureState, 15000);
+
+    $(document).on('visibilitychange', function() {
+        if (document.visibilityState === 'visible') {
+            window.digiriskdolibarr.mobilequickcreate.checkSignatureState();
+            if (window.digiriskdolibarr.mobilequickcreate.signatureStateTimer === null) {
+                window.digiriskdolibarr.mobilequickcreate.signatureStateTimer = setInterval(window.digiriskdolibarr.mobilequickcreate.checkSignatureState, 15000);
+            }
+        } else if (window.digiriskdolibarr.mobilequickcreate.signatureStateTimer !== null) {
+            // Inutile d'interroger le serveur pour un ecran que personne ne regarde
+            clearInterval(window.digiriskdolibarr.mobilequickcreate.signatureStateTimer);
+            window.digiriskdolibarr.mobilequickcreate.signatureStateTimer = null;
+        }
+    });
+};
+
+/**
+ * Reload the success screen once the signature state it was rendered with is out of date.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.checkSignatureState = function() {
+    var card = $('.digirisk-mobile-extsign--firepermit');
+    var url  = card.data('signature-state-url');
+
+    if (!url) {
+        return;
+    }
+
+    $.ajax({
+        url: url + '?id=' + encodeURIComponent(card.data('plan-id')),
+        type: 'GET',
+        dataType: 'json',
+        success: function(resp) {
+            if (resp && resp.success && resp.state && resp.state !== String(card.data('signature-state'))) {
+                location.reload();
+            }
+        }
+        // Hors ligne ou session expiree : on retentera au prochain tour
+    });
 };
 
 // Robust fallback: bind the mobile handlers on DOM ready, independently of the

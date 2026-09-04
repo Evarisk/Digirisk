@@ -137,38 +137,63 @@ function digiriskMobileParseDateTime(string $value): int
  * @param  User   $user           User performing the action
  * @param  int    $firePermitId   Parent fire permit id
  * @param  int    $fkElement      GP/UT the work takes place in
- * @param  array  $categories     Posted danger category positions
- * @param  array  $comments       Posted descriptions, keyed like $categories
- * @param  array  $equipments     Posted used equipments, keyed like $categories
+ * @param  array  $risks          Types of work, each ['category', 'description', 'used_equipment']
  * @param  object $refLineModule  Numbering module used to compute each line ref
  * @return void
  */
-function digiriskMobileCreateFirePermitLines(DoliDB $db, User $user, int $firePermitId, int $fkElement, $categories, $comments, $equipments, $refLineModule)
+function digiriskMobileCreateFirePermitLines(DoliDB $db, User $user, int $firePermitId, int $fkElement, array $risks, $refLineModule)
 {
     global $conf;
 
-    if (!is_array($categories) || empty($categories)) {
+    if (empty($risks)) {
         return;
     }
 
     require_once __DIR__ . '/../class/firepermit.class.php';
 
-    foreach ($categories as $index => $category) {
-        if ($category === '' || !is_numeric($category)) {
-            continue;
-        }
+    foreach ($risks as $riskEntry) {
         $line                 = new FirePermitLine($db);
         $line->ref            = $refLineModule->getNextValue($line);
         $line->entity         = $conf->entity;
         $line->date_creation  = $db->idate(dol_now());
         $line->status         = FirePermitLine::STATUS_VALIDATED;
-        $line->category       = (int) $category;
-        $line->description    = isset($comments[$index])   ? $comments[$index]   : '';
-        $line->used_equipment = isset($equipments[$index]) ? $equipments[$index] : '';
+        $line->category       = (int) $riskEntry['category'];
+        $line->description    = $riskEntry['description'];
+        $line->used_equipment = $riskEntry['used_equipment'];
         $line->fk_firepermit  = $firePermitId;
         $line->fk_element     = $fkElement;
         $line->create($user, true);
     }
+}
+
+/**
+ * Save the weekly schedules of an object created through a mobile interface.
+ *
+ * The Saturne schedules keep one line per day ("morning afternoon"), and an object only ever has a
+ * single active record: the existing one is updated rather than stacking a second.
+ *
+ * @param  DoliDB $db          Database handler
+ * @param  User   $user        User performing the action
+ * @param  string $elementType Object element (preventionplan, firepermit...)
+ * @param  int    $elementId   Object id
+ * @param  array  $schedules   Day name => schedule line
+ * @return int                 < 0 if KO, > 0 if OK
+ */
+function digiriskMobileSaveSchedules(DoliDB $db, User $user, string $elementType, int $elementId, array $schedules): int
+{
+    require_once __DIR__ . '/../../saturne/class/saturneschedules.class.php';
+
+    $saturneSchedules = new SaturneSchedules($db);
+    $saturneSchedules->fetch(0, '', ' AND element_type = "' . $db->escape($elementType) . '" AND element_id = ' . $elementId . ' AND status = 1');
+
+    $saturneSchedules->element_type = $elementType;
+    $saturneSchedules->element_id   = $elementId;
+    $saturneSchedules->status       = 1;
+    foreach ($schedules as $day => $value) {
+        $saturneSchedules->$day = $value;
+    }
+
+    return ($saturneSchedules->id > 0) ? $saturneSchedules->update($user) : $saturneSchedules->create($user);
 }
 
 /**
@@ -494,6 +519,109 @@ function digiriskGetDefaultCertificationOptions(): array
         'AMIANTE'           => 'Amiante (SS3/SS4)',
         'PONTIER'           => 'Pontier élingueur',
     ];
+}
+
+/**
+ * Icons of the mobile progress strip, keyed by step.
+ *
+ * Inline SVG rather than an icon font: the strip colours each icon with the state of its step, and
+ * the same drawings are shown by the creation form and by the success screen of both interfaces.
+ *
+ * @return array Step key => ['viewBox' => string, 'svg' => string]
+ */
+function digiriskMobileWorkflowIcons(): array
+{
+    return [
+        'created' => [
+            'viewBox' => '0 0 100 100',
+            'svg'     => '<path d="M30 15 H20 C14.5 15 10 19.5 10 25 V85 C10 90.5 14.5 95 20 95 H80 C85.5 95 90 90.5 90 85 V25 C90 19.5 85.5 15 80 15 H70" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><rect x="35" y="5" width="30" height="15" rx="5" fill="none" stroke="currentColor" stroke-width="8"/><circle cx="50" cy="15" r="3" fill="currentColor"/><line x1="25" y1="40" x2="75" y2="40" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="25" y1="55" x2="75" y2="55" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><line x1="25" y1="70" x2="50" y2="70" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><circle cx="75" cy="75" r="25" fill="#ffffff"/><circle cx="75" cy="75" r="20" fill="currentColor"/><path d="M65 75 L72 82 L85 65" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>',
+        ],
+        'user' => [
+            'viewBox' => '0 0 448 512',
+            'svg'     => '<path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm95.8 32.6L272 480l-32-136 32 56h-96l32-56-32 136-47.8-191.4C56.9 292 0 350.3 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-72.1-56.9-130.4-128.2-133.8z"/>',
+        ],
+        'company' => [
+            'viewBox' => '0 0 512 512',
+            'svg'     => '<path d="M480 288c0-80.25-49.28-148.92-119.19-177.62L320 192V80a16 16 0 0 0-16-16h-96a16 16 0 0 0-16 16v112l-40.81-81.62C81.28 139.08 32 207.75 32 288v64h448zm16 96H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h480a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/>',
+        ],
+        'lock' => [
+            'viewBox' => '0 0 24 24',
+            'svg'     => '<path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>',
+        ],
+        'archive' => [
+            'viewBox' => '0 0 24 24',
+            'svg'     => '<path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>',
+        ],
+    ];
+}
+
+/**
+ * Progress strip of the mobile interfaces: where the object stands, step by step.
+ *
+ * Rendered as a string rather than a template because the success screen composes it with the other
+ * blocks it hands to the shared success template. The creation form shows it compact, the success
+ * screen airier, but both draw the very same strip so one interface never drifts from the other.
+ *
+ * @param  array  $steps   Steps, each ['title', 'status', 'date', 'done', 'current', 'viewBox', 'svg']
+ * @param  string $refHtml Ready to print reference of the object, shown on the right of the title
+ * @param  bool   $compact True on the creation form, where the strip sits inside a card
+ * @return string          HTML of the strip
+ */
+function digiriskMobileRenderWorkflow(array $steps, string $refHtml = '', bool $compact = false): string
+{
+    global $langs;
+
+    $out  = '<div style="margin-bottom: ' . ($compact ? '10' : '20') . 'px; border-bottom: 1px dashed #eaeaea; padding-bottom: ' . ($compact ? '10' : '15') . 'px;">';
+    $out .= '<div class="digirisk-mobile-extsign__title" style="margin-bottom: ' . ($compact ? '10' : '25') . 'px; padding: 0 5px; display: flex; justify-content: space-between; align-items: center;">';
+    $out .= '<div style="color: #4a55d1; font-weight: bold; font-size: 1.1em; text-transform: uppercase;"><i class="fas fa-chart-line" style="margin-right: 5px;"></i> ' . $langs->trans('MobileProgress') . '</div>';
+    if (dol_strlen($refHtml)) {
+        $out .= '<div style="font-size: 0.9em;">' . $refHtml . '</div>';
+    }
+    $out .= '</div>';
+    $out .= '<div style="display: flex; justify-content: space-between; overflow-x: auto; padding-bottom: ' . ($compact ? '0' : '10') . 'px; margin: 0 5px;">';
+
+    foreach ($steps as $index => $step) {
+        // A step being played counts as reached: only what is still to do is shown in red
+        $isReached   = !empty($step['done']) || !empty($step['current']);
+        $colorCircle = $isReached ? '#347244' : '#c94236';
+        $bgColorBadg = $isReached ? '#e6f2e9' : '#fbeae9';
+        $textColor   = $isReached ? '#2d6a3c' : '#c33a2f';
+
+        $isLast = ($index === count($steps) - 1);
+
+        $out .= '<div style="display: flex; flex-direction: column; align-items: center; min-width: 90px; text-align: center; position: relative; flex: 1; padding: 0 2px;">';
+
+        $out .= '<div style="font-size: 0.7em; font-weight: bold; color: #333; margin-bottom: 10px; height: 28px; line-height: 1.2; display: flex; align-items: flex-end; justify-content: center;">';
+        $out .= '<span>' . $step['title'] . '</span>';
+        $out .= '</div>';
+
+        // Dashed connector, aligned with the middle of the circles
+        if (!$isLast) {
+            $out .= '<div style="position: absolute; top: 58px; left: 50%; width: 100%; height: 0px; border-top: 2px dashed #999; z-index: 1;"></div>';
+        }
+
+        $out .= '<div style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid ' . $colorCircle . '; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 2; margin-bottom: 10px;">';
+        // Stroked drawings take their colour from the text, filled ones from the fill attribute
+        $fillAttr = (strpos($step['svg'], 'stroke=') !== false) ? 'fill="none" style="color: ' . $colorCircle . ';"' : 'fill="' . $colorCircle . '"';
+        $out     .= '<svg viewBox="' . $step['viewBox'] . '" ' . $fillAttr . ' width="24px" height="24px">' . $step['svg'] . '</svg>';
+        $out     .= '</div>';
+
+        $statusText = $step['status'];
+        if (!empty($step['date'])) {
+            $statusText .= '<br>' . $step['date'];
+        }
+
+        $out .= '<div style="background: ' . $bgColorBadg . '; color: ' . $textColor . '; padding: 4px 6px; border-radius: 15px; font-size: 0.65em; font-weight: bold; display: inline-block; line-height: 1.2; text-align: center;">';
+        $out .= $statusText;
+        $out .= '</div>';
+
+        $out .= '</div>';
+    }
+
+    $out .= '</div>';
+    $out .= '</div>';
+
+    return $out;
 }
 
 /**

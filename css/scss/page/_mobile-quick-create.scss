@@ -652,6 +652,25 @@ body.digirisk-mobile-create {
       flex: 0 1 auto;
     }
 
+    /* Fire permit only: the equipment used takes the whole width under the description */
+    &__equipment {
+      flex: 1 1 100%;
+      min-width: 0;
+      box-sizing: border-box;
+      padding: 8px 10px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #1e293b;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+
+      &:focus {
+        outline: none;
+        border-color: #2b7de9;
+        box-shadow: 0 0 0 2px rgba(43, 125, 233, 0.2);
+      }
+    }
+
     &__section {
       margin-top: 8px;
       padding-top: 8px;
@@ -1456,6 +1475,203 @@ body.digirisk-mobile-create {
       color: #2b7de9;
       text-decoration: none;
     }
+  }
+
+
+  /* Champ isole d'un bloc, quand ce qui suit n'est pas de la meme nature (le motif avant le lieu) */
+  .digirisk-mobile-field--spaced {
+    margin-bottom: 15px;
+  }
+
+  /* En-tete d'une carte signataire : le titre a gauche, l'etat de la signature a droite */
+  .digirisk-mobile-extsign__title--split {
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .digirisk-mobile-extsign__heading {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 5px;
+  }
+
+  /* Deja signe : dit quand, sans prendre la place d'une action */
+  .digirisk-mobile-extsign__signed {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #2d6a3c;
+    background: #e6f2e9;
+    border-radius: 15px;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  /* Coordonnees du signataire : deux colonnes qui passent l'une sous l'autre sur un petit ecran */
+  .digirisk-mobile-extsign__line {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 13px;
+    color: #0f172a;
+
+    span {
+      color: #64748b;
+    }
+  }
+
+  /* Carte de l'entreprise utilisatrice dans le formulaire : le titre porte un separateur */
+  .digirisk-mobile-extsign--form {
+    margin-bottom: 10px;
+
+    .digirisk-mobile-extsign__title--split {
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eaeaea;
+    }
+
+    .digirisk-mobile-signature-draw {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eaeaea;
+    }
+  }
+
+  /* Signature deja enregistree : le badge, et le bouton qui l'affiche en grand */
+  .digirisk-mobile-signature-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #2d6a3c;
+    background: #e6f2e9;
+    border-radius: 15px;
+    text-transform: uppercase;
+  }
+
+  .digirisk-mobile-signature-show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    color: #2d6a3c;
+    background: #fff;
+    border: 1px solid #c3e6cb;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .digirisk-mobile-signature-preview-img {
+    max-width: 100%;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+
+  /* Horaires de travail : un tableau qui defile horizontalement plutot que de deborder */
+  .digirisk-mobile-schedules {
+    margin-top: 20px;
+
+    &__head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+
+      label {
+        margin: 0;
+      }
+    }
+
+    &__actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-size: 12px;
+
+      a {
+        color: #2b7de9;
+        text-decoration: none;
+      }
+    }
+
+    &__table {
+      margin-top: 10px;
+      overflow-x: auto;
+    }
+  }
+
+  .digirisk-mobile-schedules-copy {
+    padding: 4px 8px;
+    color: #2b7de9;
+    background: none;
+    border: 1px solid #2b7de9;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .digirisk-mobile-table {
+    width: 100%;
+    /* Sept jours et deux demi-journees ne tiennent pas dans un telephone : le tableau garde une
+       largeur lisible et c'est son conteneur qui defile */
+    min-width: 520px;
+    font-size: 12px;
+    text-align: center;
+    border-collapse: collapse;
+
+    th,
+    td {
+      padding: 6px 4px;
+      background: #fff;
+      border: 1px solid #ddd;
+    }
+
+    th,
+    &__head {
+      font-weight: 700;
+      background: #f4f5f9;
+    }
+
+    input {
+      width: 100%;
+      padding: 6px;
+      text-align: center;
+      background: transparent;
+      border: none;
+    }
+  }
+
+  /* Rappel du dernier mail parti, replie sous les actions */
+  .digirisk-mobile-extsign__mail {
+    margin-top: 20px;
+    font-size: 13px;
+    color: #475569;
+
+    &-body {
+      padding: 10px;
+      margin-top: 5px;
+      background: #fafafa;
+      border: 1px solid #ccc;
+    }
+  }
+
+  /* Action encore hors de portee : visible, pour dire qu'elle existe, mais inerte */
+  .digirisk-mobile-success__button--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
   }
 }
 

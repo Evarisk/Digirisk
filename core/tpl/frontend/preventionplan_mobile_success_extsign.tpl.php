@@ -35,7 +35,7 @@ $ppSignatureStateUrl = dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_
 
 $ppExtName = trim($ppExtSignatory->firstname . ' ' . $ppExtSignatory->lastname);
 ?>
-<div class="digirisk-mobile-card digirisk-mobile-extsign" data-plan-id="<?php print (int) $object->id; ?>" data-error-mail="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorMailServerNotConfigured')); ?>">
+<div class="digirisk-mobile-card digirisk-mobile-extsign digirisk-mobile-extsign--preventionplan" data-plan-id="<?php print (int) $object->id; ?>" data-error-mail="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorMailServerNotConfigured')); ?>">
     <div class="digirisk-mobile-extsign__title" style="display: flex; justify-content: space-between; align-items: center;">
         <div><i class="fas fa-hard-hat"></i> Entreprise Extérieure ( EE )</div>
         <?php if ($ppExtSigned) { ?>

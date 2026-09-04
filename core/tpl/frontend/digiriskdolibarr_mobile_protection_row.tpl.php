@@ -16,9 +16,9 @@
  */
 
 /**
- * \file    core/tpl/frontend/preventionplan_mobile_protection_row.tpl.php
+ * \file    core/tpl/frontend/digiriskdolibarr_mobile_protection_row.tpl.php
  * \ingroup digiriskdolibarr
- * \brief   One protection (EPI) row inside a risk block of the mobile interface.
+ * \brief   One protection (EPI) row inside a risk (or type of work) block of the mobile interfaces.
  *          Rendered server-side for the already selected protections, and once inside a <template>
  *          whose index placeholders the JavaScript replaces when a protection is added.
  *          A protection carried by a risk is always mandatory, hence no option to say otherwise.

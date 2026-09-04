@@ -16,15 +16,15 @@
  */
 
 /**
- * \file    core/tpl/frontend/preventionplan_mobile_risk_block.tpl.php
+ * \file    core/tpl/frontend/firepermit_mobile_worktype_block.tpl.php
  * \ingroup digiriskdolibarr
- * \brief   One risk block of the mobile interface: the danger category, its description, its photos
- *          and the protections (EPI) that apply to it.
- *          Rendered server-side for the already selected risks, and once inside a <template> whose
- *          index placeholders the JavaScript replaces when a risk is added.
+ * \brief   One type of work block of the mobile fire permit interface: the fire permit danger
+ *          category, its description, the equipment used, its photos and the protections (EPI)
+ *          that apply to it.
+ *          Rendered server-side for the already selected types of work, and once inside a <template>
+ *          whose index placeholders the JavaScript replaces when one is added.
  *          Expects: $langs, $blockIndex, $blockPosition, $blockName, $blockThumbnail,
- *                   $blockDescription, $blockCompanyEu, $blockCompanyEe, $blockUploadSubDir,
- *                   $blockProtections.
+ *                   $blockDescription, $blockEquipment, $blockUploadSubDir, $blockProtections.
  */
 
 global $langs;
@@ -35,31 +35,21 @@ global $langs;
         <span class="digirisk-mobile-risk-block__name"><?php print dol_escape_htmltag($blockName); ?></span>
         <input type="hidden" class="digirisk-mobile-risk-block__category" name="risk_category[<?php print $blockIndex; ?>]" value="<?php print dol_escape_htmltag($blockPosition); ?>">
 
-        <!-- Which company the risk concerns: user company (EU), exterior company (EE), or both -->
-        <div class="digirisk-mobile-risk-block__companies">
-            <label class="digirisk-mobile-risk-company" title="<?php print dol_escape_htmltag($langs->trans('MobilePPUserCompany')); ?>">
-                <input type="checkbox" name="risk_company_eu[<?php print $blockIndex; ?>]" value="1"<?php print !empty($blockCompanyEu) ? ' checked' : ''; ?>>
-                <span><?php print $langs->trans('MobilePPUserCompanyShort'); ?></span>
-            </label>
-            <label class="digirisk-mobile-risk-company" title="<?php print dol_escape_htmltag($langs->trans('MobilePPExteriorCompany')); ?>">
-                <input type="checkbox" name="risk_company_ee[<?php print $blockIndex; ?>]" value="1"<?php print !empty($blockCompanyEe) ? ' checked' : ''; ?>>
-                <span><?php print $langs->trans('MobilePPExteriorCompanyShort'); ?></span>
-            </label>
-        </div>
-
         <button type="button" class="digirisk-mobile-risk-block__delete" aria-label="<?php print dol_escape_htmltag($langs->trans('Delete')); ?>"><i class="fas fa-trash"></i></button>
     </div>
 
     <!-- Description and photos side by side, wrapping onto two lines on the narrowest screens -->
     <div class="digirisk-mobile-risk-block__main">
-        <textarea name="risk_comment[<?php print $blockIndex; ?>]" class="digirisk-mobile-risk-block__description" rows="2" placeholder="<?php print dol_escape_htmltag($langs->trans('MobilePPRiskDescriptionPlaceholder')); ?>"><?php print dol_escape_htmltag($blockDescription); ?></textarea>
+        <textarea name="risk_comment[<?php print $blockIndex; ?>]" class="digirisk-mobile-risk-block__description" rows="2" placeholder="<?php print dol_escape_htmltag($langs->trans('MobileFPWorkTypeDescriptionPlaceholder')); ?>"><?php print dol_escape_htmltag($blockDescription); ?></textarea>
         <div class="digirisk-mobile-risk-block__photos">
             <?php
             // Saturne media block: shoots or picks the photos and uploads them right away into the
-            // temporary directory of this risk block, so nothing is lost if the form is reloaded
-            print saturne_render_media_block('digiriskdolibarr', $blockUploadSubDir, 'risk-' . $blockIndex, 'digiriskdolibarr,preventionplan,write', ['show_photo' => true, 'show_audio' => false, 'show_file' => false]);
+            // temporary directory of this block, so nothing is lost if the form is reloaded
+            print saturne_render_media_block('digiriskdolibarr', $blockUploadSubDir, 'risk-' . $blockIndex, 'digiriskdolibarr,firepermit,write', ['show_photo' => true, 'show_audio' => false, 'show_file' => false]);
             ?>
         </div>
+        <!-- The equipment used is what makes the job a hot work: it belongs to the type of work -->
+        <input type="text" name="risk_equipment[<?php print $blockIndex; ?>]" class="digirisk-mobile-risk-block__equipment" placeholder="<?php print dol_escape_htmltag($langs->trans('UsedEquipment')); ?>" value="<?php print dol_escape_htmltag($blockEquipment); ?>">
     </div>
 
     <div class="digirisk-mobile-risk-block__section">

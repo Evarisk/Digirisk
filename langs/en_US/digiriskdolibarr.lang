@@ -407,3 +407,49 @@ TimeSpentDocumentPDFDescription = Time spent on a project, grouped by user
 
 # Risk list dashboard - issue #4388
 RisksNotAssessed                     = Risks not assessed
+
+# Mobile fire permit parity with the prevention plan - issue #5042
+MobileProgress = Progress
+MobileStepDone = DONE
+MobileStepInProgress = IN PROGRESS
+MobileStepTodo = TO DO
+MobileStepSignedOn = SIGNED ON
+MobilePPStepCreated = PP created
+MobileFPStepCreated = FP created
+MobileStepUserCompanyResponsible = User comp.
+MobileStepExteriorCompanyResponsible = Ext. comp.
+MobileStepLock = Lock
+MobileStepArchive = Archive
+MobileLock = Lock
+MobileResponsibleShort = Resp.
+MobileMailSentTo = Email sent to
+MobilePPMotif = Reason for the intervention
+MobilePPSchedules = Intervention schedules
+MobilePPConfigHours = Set your opening hours here
+MobilePPCopyCompanyHours = Copy the company opening hours
+FirePermitUserCompany = User company - UC
+FirePermitExteriorCompany = Exterior company - EC
+MobileFPMotif = Reason for the work
+MobileFPMotifPlaceholder = E.g. welding on framework
+MobileFPNoMotif = No reason given
+MobileFPSchedules = Work schedules
+MobileFPWorkTypeDescriptionPlaceholder = Describe the work on site
+MobileFPNoWorkTypeYet = No type of work added yet.
+MobileFPDeleteWorkTypeTitle = Remove the type of work
+MobileFPDeleteWorkTypeConfirm = "%s" will be removed from the permit, along with its description, its equipment, its photos and its protections.
+MobileFPNoTagAvailable = No fire permit tag is available.
+MobileFPErrorUpdatingPermit = Error while updating the fire permit.
+MobileFPErrorCreatingPermit = Error while creating the fire permit.
+MobileFPLockNeedsSignature = The permit must be signed before it can be locked.
+MobileFPSpreadAvailableOnceSignedAndLocked = Sharing will be available as soon as the permit is signed by the responsibles and locked.
+MobileFPDefaultDateStartToday = Start date = today
+MobileFPDefaultDuration = Default period duration (days)
+firepermit = Fire permit
+ErrorRecordIsLocked = This record is locked, it can no longer be edited.
+ExtSociety = Exterior company
+FirePermit = Fire permit
+SelectUser = Select a user
+MobilePPErrorMailServerNotConfigured = Your mail server is not configured, please contact your administrator.
+MobilePPExtSendEmail = Send the email
+MobilePPEmailTemplateExt = Email template for the exterior company responsible
+MobilePPEmailTemplateInt = Email template for the exterior company attendants
