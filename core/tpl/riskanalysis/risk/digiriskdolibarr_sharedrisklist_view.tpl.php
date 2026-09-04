@@ -67,19 +67,15 @@ $digiriskElementsOfEntity = $digiriskelement->getActiveDigiriskElements();
 $DUProject->fetch($riskType == 'risk' ? $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT);
 $extrafields->fetch_name_optionals_label($digiriskTask->table_element);
 
-$riskAssessmentList        = $riskAssessment->fetchAll('', '', 0, 0, array(), 'AND', 1);
 $riskAssessmentNextValue   = $refEvaluationMod->getNextValue($evaluation);
 $riskAssessmentTaskList    = $risk->getTasksWithFkRisk();
 $taskNextValue             = $refTaskMod->getNextValue('', $task);
-$usertmp->fetchAll();
-$usersList                 = $usertmp->users;
 $timeSpentSortedByTasks    = $digiriskTask->fetchAllTimeSpentAllUsers('AND fk_element > 0', 'element_datehour', 'DESC', 1);
 
-if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
-	foreach ($riskAssessmentList as $riskAssessmentSingle) {
-		$riskAssessmentsOrderedByRisk[$riskAssessmentSingle->fk_risk][$riskAssessmentSingle->id] = $riskAssessmentSingle;
-	}
-}
+// The list is paginated and both collections are only read by id, so they load their entries
+// on demand instead of instantiating every user and every risk assessment of the database
+$usersList                    = digirisk_get_user_list();
+$riskAssessmentsOrderedByRisk = digirisk_get_risk_assessments_by_risk();
 
 // Build and execute select
 // --------------------------------------------------------------------

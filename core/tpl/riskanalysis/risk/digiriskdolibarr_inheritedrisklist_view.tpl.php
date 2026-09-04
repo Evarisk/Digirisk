@@ -35,22 +35,17 @@
 
 		// Reuse the data already loaded by the main risk list when both are rendered on the same
 		// page (same variable names); only load what is missing so these full "load all" queries
-		// (users, riskassessments, tasks, time spent) are not run a second time.
-		if (!isset($riskAssessmentList))      $riskAssessmentList      = $riskAssessment->fetchAll();
+		// (tasks, time spent) are not run a second time.
 		if (!isset($riskAssessmentNextValue)) $riskAssessmentNextValue = $refEvaluationMod->getNextValue($evaluation);
 		if (!isset($riskAssessmentTaskList))  $riskAssessmentTaskList  = $risk->getTasksWithFkRisk();
 		if (!isset($taskNextValue))           $taskNextValue           = $refTaskMod->getNextValue('', $task);
-		if (!isset($usersList)) {
-			$usertmp->fetchAll();
-			$usersList = $usertmp->users;
-		}
 		if (!isset($timeSpentSortedByTasks))  $timeSpentSortedByTasks  = $digiriskTask->fetchAllTimeSpentAllUsers('AND fk_element > 0', 'element_datehour', 'DESC', 1);
 
-		if (!isset($riskAssessmentsOrderedByRisk) && is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
-			foreach ($riskAssessmentList as $riskAssessmentSingle) {
-				$riskAssessmentsOrderedByRisk[$riskAssessmentSingle->fk_risk][$riskAssessmentSingle->id] = $riskAssessmentSingle;
-			}
-		}
+		// The list is paginated and both collections are only read by id, so they load their
+		// entries on demand instead of instantiating every user and every risk assessment of
+		// the database; both are memoized per request, so the main list shares them
+		$usersList                    = digirisk_get_user_list();
+		$riskAssessmentsOrderedByRisk = digirisk_get_risk_assessments_by_risk();
 		// Build and execute select
 		// --------------------------------------------------------------------
 		if (!preg_match('/(evaluation)/', $sortfield)) {

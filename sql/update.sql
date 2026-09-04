@@ -282,3 +282,6 @@ ALTER TABLE llx_digiriskdolibarr_preventionplan ADD note_private text NULL AFTER
 
 -- 23.1.x - remove orphan const left by the deleted module_parts['tabs'] declaration
 DELETE FROM llx_const WHERE name = 'MAIN_MODULE_DIGIRISKDOLIBARR_TABS';
+
+-- 23.1.x - index used by the per-risk loading of risk assessments on the risk lists
+ALTER TABLE llx_digiriskdolibarr_riskassessment ADD INDEX idx_digiriskdolibarr_riskassessment_fk_risk (fk_risk);
