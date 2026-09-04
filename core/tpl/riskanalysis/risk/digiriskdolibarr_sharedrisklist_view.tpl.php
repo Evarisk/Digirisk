@@ -101,6 +101,8 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 	$sql                                                                                                                                          .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
 	$sql                                                                                                                                          .= " INNER JOIN " . MAIN_DB_PREFIX . 'element_element' . " as el on (r.rowid = el.fk_source)";
 	if (is_array($extrafields->attributes[$risk->table_element]['label']) && count($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . "_extrafields as ef on (r.rowid = ef.fk_object)";
+	// Every filter below is appended with AND: without this WHERE they would be attached to the extrafields LEFT JOIN ON clause and stop filtering anything
+	$sql .= " WHERE 1 = 1";
 
 	if ( ! $allRisks) {
 		$sql .= " AND el.fk_target = " . $id;
@@ -215,8 +217,9 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 	$sql 																																					  .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
 	if (isset($extrafields->attributes[$evaluation->table_element]) &&
         is_array($extrafields->attributes[$evaluation->table_element]['label']) && count($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $evaluation->table_element . "_extrafields as ef on (evaluation.rowid = ef.fk_object)";
-	//if ($evaluation->ismultientitymanaged == 1) $sql                                                                                                          .= " WHERE evaluation.entity IN (" . getEntity($evaluation->element) . ")";
-	else $sql                                                                                                                                                 .= " WHERE 1 = 1";
+	// The entity filter cannot apply here: risk assessments of shared risks belong to the entity that owns them
+	// Every filter below is appended with AND: without this WHERE they would be attached to the extrafields LEFT JOIN ON clause and stop filtering anything
+	$sql .= " WHERE 1 = 1";
 	$sql                                                                                                                                                      .= " AND evaluation.status = 1";
 
 	if ( ! $allRisks) {

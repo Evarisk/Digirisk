@@ -220,7 +220,7 @@ class DigiriskElement extends SaturneObject
         }
 
         $array['shared']['digiriskElements'] = [];
-        if ($moreParam['tmparray']['showSharedRisk_nocheck']) {
+        if (!empty($moreParam['tmparray']['showSharedRisk_nocheck'])) {
             $array['shared']['digiriskElements'] = $this->fetchDigiriskElementFlat(0, [], 'shared');
         }
 

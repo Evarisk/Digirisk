@@ -74,9 +74,8 @@ $sql                                                                            
 $sql                                                                                                                                          		  .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (t.fk_element = e.rowid)";
 $sql                                                                                                                                         		  .= " INNER JOIN " . MAIN_DB_PREFIX . 'element_element' . " as el on (t.rowid = el.fk_source)";
 if (is_array($extrafields->attributes[$risksign->table_element]['label'] ?? null) && count($extrafields->attributes[$risksign->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risksign->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
-//if ($risksign->ismultientitymanaged == 1) $sql                                                                                                        .= " WHERE t.entity IN (" . getEntity($risksign->element) . ")";
-//else $sql                                                                                                                                             .= " WHERE 1 = 1";
-//$sql                                                                                                                                                  .= " AND fk_element = " . $id;
+// Every filter below is appended with AND: without this WHERE they would be attached to the extrafields LEFT JOIN ON clause and stop filtering anything
+$sql .= " WHERE 1 = 1";
 if ( ! $allRisks) {
 	$sql .= " AND el.fk_target = " . $id;
 	$sql .= " AND el.sourcetype = 'digiriskdolibarr_risksign'";
