@@ -458,3 +458,10 @@ MobilePPEmailTemplateInt = Email template for the exterior company attendants
 SelectAllSharedRisksOfElement              = Select all the risks of this element
 SelectAllSharedRiskenvironmentalsOfElement = Select all the environmental risks of this element
 SelectAllSharedRiskSignsOfElement          = Select all the signages of this element
+
+# Risk assessment document archive errors - issue #3702
+GroupmentDocument                          = Groupment sheet
+WorkUnitDocument                           = Work unit sheet
+ErrorFailToFetchDigiriskElements           = Error: unable to fetch the groupments and work units to include in the ZIP archive
+ErrorNoDocumentModelFound                  = Error: no document model available for <b>%s</b>
+ErrorFailToGenerateDigiriskElementDocument = Error: generation of the <b>%s</b> document failed, it is missing from the ZIP archive

@@ -107,9 +107,20 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		return $jsonFormatted;
 	}
 
+    /**
+     * Generate a ZIP archive with the risk assessment document and all the groupment/workunit documents
+     *
+     * @param  array     $moreparams  More parameters (digiriskElement, uploadDir, user)
+     * @param  Translate $outputLangs Lang object to use for output
+     * @param  int       $hideDetails Do not show line details
+     * @param  int       $hideDesc    Do not show desc
+     * @param  int       $hideRef     Do not show ref
+     * @return int                    0 if archive generation is disabled, 1 if OK, -1 if KO
+     * @throws Exception
+     */
     public function generateArchiveWithDigiriskElementDocuments($moreparams, $outputLangs, $hideDetails, $hideDesc, $hideRef)
     {
-        global $user;
+        global $langs, $user;
 
         if (!getDolGlobalInt('DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS')) {
             return 0;
@@ -117,7 +128,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 
         $digiriskElements = $moreparams['digiriskElement']->fetchDigiriskElementFlat(0);
         if (!is_array($digiriskElements) || empty($digiriskElements)) {
-            $this->error = 'error1';
+            $this->error = $langs->trans('ErrorFailToFetchDigiriskElements');
             return -1;
         }
 
@@ -127,31 +138,32 @@ class RiskAssessmentDocument extends DigiriskDocuments
         $zipPath  = $uploadDir . '/' . $fileName;
         $result   = dol_mkdir($zipPath);
         if ($result < 0) {
-            $this->error = 'error2';
+            $this->error = $langs->trans('ErrorCanNotCreateDir', $zipPath);
             return -1;
         }
 
         $result = dol_copy($uploadDir . '/' . $this->last_main_doc, $zipPath . '/' . $this->last_main_doc);
         if ($result < 0) {
-            $this->error = 'error3';
+            $this->error = $langs->trans('ErrorFailToCopyFile', $uploadDir . '/' . $this->last_main_doc, $zipPath . '/' . $this->last_main_doc);
             return -1;
         }
 
         if (file_exists($uploadDir . '/' . $fileName . '.pdf')) {
             $result = dol_copy($uploadDir . '/' . $fileName . '.pdf', $zipPath . '/' . $fileName . '.pdf');
             if ($result < 0) {
-                $this->error = 'error3';
+                $this->error = $langs->trans('ErrorFailToCopyFile', $uploadDir . '/' . $fileName . '.pdf', $zipPath . '/' . $fileName . '.pdf');
                 return -1;
             }
         }
 
-        $digiriskElementObjects = ['groupment', 'workunit'];
+        $digiriskElementObjects        = ['groupment', 'workunit'];
+        $digiriskElementDocumentLabels = ['groupment' => 'GroupmentDocument', 'workunit' => 'WorkUnitDocument'];
         foreach ($digiriskElementObjects as $digiriskElementObject) {
             $digiriskElementDocumentPaths[$digiriskElementObject] = $moreparams['uploadDir'] . '/' . $digiriskElementObject . 'document';
 
             $modelLists[$digiriskElementObject] = saturne_get_list_of_models($this->db, $digiriskElementObject . 'document');
             if (!is_array($modelLists[$digiriskElementObject]) || empty($modelLists[$digiriskElementObject])) {
-                $this->error = 'error4';
+                $this->error = $langs->trans('ErrorNoDocumentModelFound', $langs->transnoentities($digiriskElementDocumentLabels[$digiriskElementObject]));
                 return -1;
             }
 
@@ -171,7 +183,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
             $digiriskElementDocumentZipPaths[$digiriskElementObject] = $zipPath . '/' . $digiriskElementObject . 'document';
             $result                                                  = dol_mkdir($digiriskElementDocumentZipPaths[$digiriskElementObject]);
             if ($result < 0) {
-                $this->error = 'error2';
+                $this->error = $langs->trans('ErrorCanNotCreateDir', $digiriskElementDocumentZipPaths[$digiriskElementObject]);
                 return -1;
             }
         }
@@ -187,14 +199,16 @@ class RiskAssessmentDocument extends DigiriskDocuments
 
             $result = $digiriskElementDocument->generateDocument($model[$digiriskElementSingle['object']->element_type], $outputLangs, $hideDetails, $hideDesc, $hideRef, $moreParams);
             if ($result < 0) {
-                $this->error = 'error5';
+                // Only the document object knows the underlying cause (numbering conflict, missing ODT template, ...)
+                $this->error  = $langs->trans('ErrorFailToGenerateDigiriskElementDocument', $digiriskElementSingle['object']->ref . ' - ' . $digiriskElementSingle['object']->label);
+                $this->errors = array_filter(array_merge([$digiriskElementDocument->error], (array) $digiriskElementDocument->errors));
                 return -1;
             }
 
             $digiriskElementDocumentPath = $digiriskElementDocumentPaths[$digiriskElementSingle['object']->element_type] . '/' . $digiriskElementSingle['object']->ref;
             $result                      = dol_copy($digiriskElementDocumentPath . '/' . $digiriskElementDocument->last_main_doc, $digiriskElementDocumentZipPaths[$digiriskElementSingle['object']->element_type] . '/' . $digiriskElementDocument->last_main_doc);
             if ($result < 0) {
-                $this->error = 'error3';
+                $this->error = $langs->trans('ErrorFailToCopyFile', $digiriskElementDocumentPath . '/' . $digiriskElementDocument->last_main_doc, $digiriskElementDocumentZipPaths[$digiriskElementSingle['object']->element_type] . '/' . $digiriskElementDocument->last_main_doc);
                 return -1;
             }
 
@@ -202,7 +216,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
             if (file_exists($digiriskElementDocumentPath . '/' . $fileName . '.pdf')) {
                 $result = dol_copy($digiriskElementDocumentPath . '/' . $fileName . '.pdf', $digiriskElementDocumentZipPaths[$digiriskElementSingle['object']->element_type] . '/' . $fileName . '.pdf');
                 if ($result < 0) {
-                    $this->error = 'error3';
+                    $this->error = $langs->trans('ErrorFailToCopyFile', $digiriskElementDocumentPath . '/' . $fileName . '.pdf', $digiriskElementDocumentZipPaths[$digiriskElementSingle['object']->element_type] . '/' . $fileName . '.pdf');
                     return -1;
                 }
             }
