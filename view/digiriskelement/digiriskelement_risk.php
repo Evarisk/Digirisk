@@ -232,7 +232,7 @@ if (empty($reshook)) {
  */
 
 $form    = new Form($db);
-$title   = $langs->trans(ucfirst($riskType) . 's');
+$title   = digirisk_trans_risk_type('', $riskType, 's');
 $helpUrl = 'FR:Module_Digirisk#.C3.89valuation_des_Risques';
 
 // classforhorizontalscrolloftabs constrains #id-right width so the wide risk list table
@@ -258,7 +258,7 @@ if ($sharedrisks) {
 
 		$allrisks = $risk->fetchAll('ASC', 'fk_element', 0, 0, array('customsql' => 'status > 0 AND type = "' . $riskType . '" AND entity NOT IN (' . $conf->entity . ') AND fk_element > 0'));
 		$formquestionimportsharedrisks = array(
-			'text' => '<i class="fas fa-circle-info"></i>' . $langs->trans('ConfirmImportShared' . ucfirst($riskType) . 's'),
+			'text' => '<i class="fas fa-circle-info"></i>' . digirisk_trans_risk_type('ConfirmImportShared', $riskType, 's'),
 		);
 
         $evaluation->ismultientitymanaged = 0;
@@ -358,7 +358,7 @@ if ($sharedrisks) {
 			}
 
 		}
-		$formconfirm .= digiriskformconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&risk_type=' . $riskType, $langs->trans('ImportShared' . ucfirst($riskType) . 's'), '', 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 800, 800);
+		$formconfirm .= digiriskformconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&risk_type=' . $riskType, digirisk_trans_risk_type('ImportShared', $riskType, 's'), '', 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 800, 800);
 	}
 
 	// Call Hook formConfirm

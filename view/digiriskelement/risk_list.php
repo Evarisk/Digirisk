@@ -242,7 +242,7 @@ if (empty($reshook)) {
 
 $form = new Form($db);
 
-$title    = $langs->trans(ucfirst($riskType) . 's');
+$title    = digirisk_trans_risk_type('', $riskType, 's');
 $helpUrl = 'FR:Module_Digirisk#.C3.89valuation_des_Risques';
 
 if (empty($noheader)) saturne_header(1,'', $title, $helpUrl);

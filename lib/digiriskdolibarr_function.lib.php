@@ -326,6 +326,30 @@ function flatten_tree($tree)
 }
 
 /**
+ * Translate a label built from a risk type, falling back on the generic risk label
+ *
+ * Risk types other than risk and riskenvironmental are brought by other modules and have no
+ * translation of their own here, the derived key would be printed raw
+ *
+ * @param  string $keyPrefix Key part before the risk type (DigiriskElementShared, ImportShared, Add, ...)
+ * @param  string $riskType  Risk type (risk, riskenvironmental or a type brought by another module)
+ * @param  string $keySuffix Key part after the risk type (sList, s, Title, ...)
+ * @return string            Translated label
+ */
+function digirisk_trans_risk_type(string $keyPrefix, string $riskType, string $keySuffix = ''): string
+{
+    global $langs;
+
+    $key   = $keyPrefix . ucfirst($riskType) . $keySuffix;
+    $label = $langs->trans($key);
+    if ($label != $key) {
+        return $label;
+    }
+
+    return $langs->trans($keyPrefix . 'Risk' . $keySuffix);
+}
+
+/**
  * Render the label of a GP/UT tree row, inline-editable when the user can write.
  *
  * Relies on the generic Saturne contentEditable mechanism (js/modules/contentEditable.js +
