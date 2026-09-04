@@ -204,7 +204,11 @@ class DigiriskElement extends SaturneObject
     /**
      * Load digirisk element infos
      *
-     * @param  array     $moreParam More param (tmparray)
+     * When a date range is given, only the elements created or modified inside it are counted:
+     * the audit report announces the GP/UT "added or modified" over the period, not the whole
+     * tree. The returned digiriskElements stay complete, the risk tables need them all — issue #4459
+     *
+     * @param  array     $moreParam More param (tmparray, dateStart, dateEnd)
      * @return array     $array     Array of current and shared digirisk elements
      * @throws Exception
      */
@@ -224,19 +228,48 @@ class DigiriskElement extends SaturneObject
             $array['shared']['digiriskElements'] = $this->fetchDigiriskElementFlat(0, [], 'shared');
         }
 
+        foreach (['current', 'shared'] as $entityScope) {
+            $array[$entityScope]['nbGroupment'] = 0;
+            $array[$entityScope]['nbWorkunit']  = 0;
+        }
+
         $digiriskElements = array_merge($array['current']['digiriskElements'], $array['shared']['digiriskElements']);
         foreach ($digiriskElements as $digiriskElement) {
+            if (!self::isInDateRange($digiriskElement['object'], $moreParam)) {
+                continue;
+            }
+
             $entity = ($digiriskElement['object']->entity == $conf->entity) ? 'current' : 'shared';
             if ($digiriskElement['object']->element_type == 'groupment') {
-                $array[$entity]['nbGroupment'] =
-                    ($array[$entity]['nbGroupment'] ?? 0) + 1;
+                $array[$entity]['nbGroupment']++;
             } else {
-                $array[$entity]['nbWorkunit'] =
-                    ($array[$entity]['nbWorkunit'] ?? 0) + 1;
+                $array[$entity]['nbWorkunit']++;
             }
         }
 
         return $array;
+    }
+
+    /**
+     * Tell whether an element was created or modified inside the requested date range
+     *
+     * @param  DigiriskElement $digiriskElement Element to test
+     * @param  array           $moreParam       More param (dateStart, dateEnd)
+     * @return bool                             True when no range is requested or when the element falls in it
+     */
+    protected static function isInDateRange(DigiriskElement $digiriskElement, array $moreParam): bool
+    {
+        if (empty($moreParam['dateStart']) || empty($moreParam['dateEnd'])) {
+            return true;
+        }
+
+        foreach ([$digiriskElement->date_creation, $digiriskElement->tms] as $date) {
+            if (!empty($date) && $date >= $moreParam['dateStart'] && $date <= $moreParam['dateEnd']) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
