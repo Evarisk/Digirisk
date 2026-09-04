@@ -1,0 +1,8 @@
+[main]
+host = https://app.transifex.com
+
+[o:evarisk:p:digirisk:r:digiriskdolibarr]
+file_filter = langs/<lang>/digiriskdolibarr.lang
+source_file = langs/fr_FR/digiriskdolibarr.lang
+source_lang = fr_FR
+type = MOZILLAPROPERTIES
