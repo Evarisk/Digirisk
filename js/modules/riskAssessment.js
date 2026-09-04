@@ -178,7 +178,7 @@ window.digiriskdolibarr.evaluation.createEvaluation = function ( event ) {
 			}
 		}),
 		processData: false,
-    contentType: 'application/json charset=utf-8',
+    contentType: 'application/json',
 		success: function( resp ) {
 
 			if ($(resp).find('.risk-evaluation-list-container-' + riskToAssign).length > 0) {
@@ -346,7 +346,7 @@ window.digiriskdolibarr.evaluation.saveEvaluation = function ( event ) {
         exposition: criteres['exposition'] ? criteres['exposition'] : (criteres['frequence'] ? criteres['frequence'] : 0)
 			}
 		}),
-    contentType: 'application/json charset=utf-8',
+    contentType: 'application/json',
     success: function ( resp ) {
 			$('#risk_evaluation_edit'+evaluationID).removeClass('modal-active')
 

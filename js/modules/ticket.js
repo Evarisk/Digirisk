@@ -297,7 +297,7 @@ window.digiriskdolibarr.ticket.addDashBoardTicketInfo = function() {
 			digiriskelementID: digiriskelementID,
 			catID: catID
 		}),
-    contentType: 'application/json charset=utf-8',
+    contentType: 'application/json',
 		success: function ( resp ) {
 			window.location.reload();
 		},
@@ -330,7 +330,7 @@ window.digiriskdolibarr.ticket.closeDashBoardTicketInfo = function() {
 			digiriskelementID: digiriskelementID,
 			catID: catID
 		}),
-		contentType: 'application/json charset=utf-8',
+		contentType: 'application/json',
 		success: function ( resp ) {
 			box.closest('.box-flex-item').fadeOut(400)
 			$('.add-widget-box').attr('style', '')
