@@ -81,7 +81,11 @@ list($listRows, $listTotal, $listTotalPages) = digiriskPwaFetchList('FirePermit'
     }
 
     return [
-        'url'        => dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_card.php', 1) . '?id=' . $record->id,
+        // Le parcours mobile va jusqu'au bout : un permis encore modifiable rouvre son formulaire,
+        // les autres leur ecran de suivi, plutot que de renvoyer vers la fiche Dolibarr
+        'url'        => ($record->status == FirePermit::STATUS_DRAFT)
+            ? dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_mobile_create.php', 1) . '?id=' . $record->id
+            : dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_mobile_create.php', 1) . '?created=' . $record->id,
         'editUrl'    => ($record->status == FirePermit::STATUS_DRAFT && $user->hasRight('digiriskdolibarr', 'firepermit', 'write'))
             ? dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_mobile_create.php', 1) . '?id=' . $record->id
             : '',

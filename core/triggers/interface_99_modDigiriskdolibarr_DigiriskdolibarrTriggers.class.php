@@ -114,10 +114,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
         $action = str_replace('@DIGIRISKDOLIBARR', '', $action);
 		$active = getDolGlobalInt('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_' . $action);
 
-        // Le document PDF d'un plan de prevention n'est pas un evenement d'agenda : sa regeneration
-        // est traitee avant le filtre ci-dessous, sinon elle dependrait du reglage des actions
-        // automatiques et la diffusion presenterait un document absent ou perime selon une option
-        // qui n'a rien a voir avec lui.
+        // Le document PDF d'un plan de prevention ou d'un permis de feu n'est pas un evenement
+        // d'agenda : sa regeneration est traitee avant le filtre ci-dessous, sinon elle dependrait
+        // du reglage des actions automatiques et la diffusion presenterait un document absent ou
+        // perime selon une option qui n'a rien a voir avec lui.
         if (isModEnabled('digiriskdolibarr')) {
             $this->refreshPreventionPlanDocumentOnTrigger($action, $object, $user, $langs);
         }
@@ -979,10 +979,29 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
     }
 
     /**
-     * Regenere le document d'un plan de prevention quand l'evenement recu l'a rendu obsolete.
+     * Regenere le document PDF d'un permis de feu et le remet a disposition de la diffusion.
      *
-     * Le PDF suit le plan et rien d'autre : creation, modification, changement d'etat et signatures.
-     * Une signature porte le plan dans fk_object, les autres evenements sont le plan lui-meme.
+     * Remplace la version precedente au lieu de s'empiler avec elle : la page publique affiche
+     * tous les fichiers partages, deux PDF y seraient illisibles.
+     *
+     * @param  int       $permitId Identifiant du permis de feu
+     * @param  User      $user     Utilisateur a l'origine de l'action
+     * @param  Translate $langs    Objet de traduction
+     * @return void
+     */
+    protected function refreshFirePermitDocument(int $permitId, User $user, Translate $langs)
+    {
+        dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_firepermit.lib.php');
+
+        digiriskRefreshFirePermitDocument($this->db, $permitId, $user, $langs);
+    }
+
+    /**
+     * Regenere le document d'un plan de prevention ou d'un permis de feu quand l'evenement recu l'a
+     * rendu obsolete.
+     *
+     * Le PDF suit l'objet et rien d'autre : creation, modification, changement d'etat et signatures.
+     * Une signature porte l'objet dans fk_object, les autres evenements sont l'objet lui-meme.
      *
      * @param  string    $action Nom du trigger, prefixe module deja retire
      * @param  object    $object Objet a l'origine du trigger
@@ -999,6 +1018,18 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
         if (in_array($action, $planTriggers) && $object->id > 0) {
             $this->refreshPreventionPlanDocument((int) $object->id, $user, $langs);
+
+            return;
+        }
+
+        // Le permis de feu se diffuse comme le plan de prevention : son document suit les memes etapes
+        $permitTriggers = [
+            'FIREPERMIT_CREATE', 'FIREPERMIT_MODIFY', 'FIREPERMIT_PENDINGSIGNATURE',
+            'FIREPERMIT_VALIDATE', 'FIREPERMIT_UNVALIDATE', 'FIREPERMIT_LOCK',
+        ];
+
+        if (in_array($action, $permitTriggers) && $object->id > 0) {
+            $this->refreshFirePermitDocument((int) $object->id, $user, $langs);
 
             return;
         }
@@ -1028,6 +1059,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
             if ($object->object_type === 'preventionplan') {
                 $this->refreshPreventionPlanDocument((int) $object->fk_object, $user, $langs);
+            } else {
+                $this->refreshFirePermitDocument((int) $object->fk_object, $user, $langs);
             }
         }
     }
