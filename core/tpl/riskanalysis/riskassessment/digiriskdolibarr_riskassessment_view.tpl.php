@@ -122,7 +122,7 @@ if (is_array($allRiskAssessment) && !empty($allRiskAssessment)) :
 								<div class="risk-evaluation-container risk-evaluation-ref-<?php echo $lastEvaluation->id ?>" value="<?php echo $lastEvaluation->ref ?>">
 									<div class="risk-evaluation-single">
 										<div class="risk-evaluation-cotation" data-scale="<?php echo $lastEvaluation->getEvaluationScale() ?>">
-											<span><?php echo ($lastEvaluation->method == 'standard' ? $defaultCotation[$lastEvaluation->cotation] ?: 0 : $lastEvaluation->cotation); ?></span>
+											<span><?php echo ($lastEvaluation->method == 'standard' ? $defaultCotation[$lastEvaluation->cotation] ?? 0 : $lastEvaluation->cotation); ?></span>
 										</div>
 										<div class="photo riskassessment-photo-<?php echo $lastEvaluation->id; ?>" style="margin:auto">
 											<?php
@@ -385,7 +385,7 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 						<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 							<div class="risk-evaluation-single">
 								<div class="risk-evaluation-cotation risk-evaluation-list" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastRiskAssessment->getEvaluationScale() ?>">
-									<span><?php echo ($lastRiskAssessment->method == 'standard' ? $defaultCotation[$lastRiskAssessment->cotation] ?: 0 : $lastRiskAssessment->cotation); ?></span>
+									<span><?php echo ($lastRiskAssessment->method == 'standard' ? $defaultCotation[$lastRiskAssessment->cotation] ?? 0 : $lastRiskAssessment->cotation); ?></span>
 								</div>
 								<div class="photo riskassessment-photo-<?php echo $lastRiskAssessment->id > 0 ? $lastRiskAssessment->id : 0 ; echo $risk->id > 0 ? ' risk-' . $risk->id : ' risk-new' ?>">
                                     <?php
