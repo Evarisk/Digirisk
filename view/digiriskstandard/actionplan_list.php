@@ -535,7 +535,8 @@ if ($action == 'removeTaskCategory' && !empty(GETPOSTINT('task_id'))) {
 }
 
 // Action to generate and download the PAPRIPACT in A3 landscape format
-if ($action == 'builddoc' && GETPOST('model', 'alpha') == 'papripact_a3_paysage_projectdocument' && $user->hasRight('projet', 'creer')) {
+// The model is the one set as default on the documents configuration page, PAPRIPACT when none is
+if ($action == 'builddoc' && GETPOST('model', 'alpha') == getDolGlobalString('DIGIRISKDOLIBARR_PROJECTDOCUMENT_DEFAULT_MODEL', 'papripact_a3_paysage_projectdocument') && $user->hasRight('projet', 'creer')) {
     require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
     require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/projectdocument.class.php';
 

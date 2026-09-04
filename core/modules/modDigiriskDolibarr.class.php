@@ -860,6 +860,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			// CONST PROJECT DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_PROJECTDOCUMENT_ADDON', 'chaine', 'mod_projectdocument_standard', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_PROJECTDOCUMENT_DEFAULT_MODEL', 'chaine', 'papripact_a3_paysage_projectdocument', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_PROJECTDOCUMENT_DISPLAY_RISKASSESSMENT_COLOR', 'integer', 1, '', 0, 'current'],
 
 			// GENERAL CONSTS

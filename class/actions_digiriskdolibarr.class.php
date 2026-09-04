@@ -777,7 +777,8 @@ class ActionsDigiriskdolibarr
 
             require __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
         } else if (strpos($parameters['context'], 'projectcard') !== false) {
-            if ($action == 'builddoc' && GETPOST('model') == 'papripact_a3_paysage_projectdocument') {
+            // The model is the one set as default on the documents configuration page, PAPRIPACT when none is
+            if ($action == 'builddoc' && GETPOST('model') == getDolGlobalString('DIGIRISKDOLIBARR_PROJECTDOCUMENT_DEFAULT_MODEL', 'papripact_a3_paysage_projectdocument')) {
                 require_once __DIR__ . '/digiriskdolibarrdocuments/projectdocument.class.php';
 
                 $document = new ProjectDocument($this->db);
