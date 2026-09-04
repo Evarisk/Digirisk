@@ -272,7 +272,9 @@ class RiskAssessmentDocument extends DigiriskDocuments
      */
     public function getGenerationDateInfos(array $moreParam = []): array
     {
-        global $langs;
+        global $conf, $langs;
+
+        $entity = (int) ($moreParam['entity'] ?? $conf->entity);
 
         $filter                  = ['customsql' => 't.type = "' . $this->element . '"' . ($moreParam['filter'] ?? '')];
         $riskAssessmentDocuments = $this->fetchAll('desc', 't.rowid', 1, 0, $filter);
@@ -302,8 +304,8 @@ class RiskAssessmentDocument extends DigiriskDocuments
             $array['delaygeneratedate'] = 'N/A';
         }
 
-        $array['moreContent']  = $this->showUrlOfLastGeneratedDocument($this->module, $this->element, 'odt', 'fontawesome_fa-file-word_far_#0D8AFF', $moreParam['entity'] ?? 1);
-        $array['moreContent'] .= $this->showUrlOfLastGeneratedDocument($this->module, $this->element, 'pdf', 'fontawesome_fa-file-pdf_far_#FB4B54', $moreParam['entity'] ?? 1);
+        $array['moreContent']  = $this->showUrlOfLastGeneratedDocument($this->module, $this->element, 'odt', 'fontawesome_fa-file-word_far_#0D8AFF', $entity);
+        $array['moreContent'] .= $this->showUrlOfLastGeneratedDocument($this->module, $this->element, 'pdf', 'fontawesome_fa-file-pdf_far_#FB4B54', $entity);
         return $array;
     }
 }
