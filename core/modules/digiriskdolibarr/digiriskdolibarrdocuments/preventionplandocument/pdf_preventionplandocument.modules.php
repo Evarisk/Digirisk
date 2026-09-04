@@ -258,7 +258,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         }
 
         // getNumLines ne sait pas mesurer du HTML : la hauteur est estimee sur le texte brut
-        $height = $pdf->getNumLines(dol_string_nohtmltag($html, 0), $this->contentWidth($pdf)) * $this->height;
+        $height = $pdf->getNumLines(saturne_flatten_wysiwyg_blocks($html, true), $this->contentWidth($pdf)) * $this->height;
         $this->checkPageBreak($pdf, $height);
 
         $pdf->SetFont('', '', $size);

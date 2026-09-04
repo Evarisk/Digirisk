@@ -28,6 +28,7 @@ require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 // Load Saturne libraries.
 require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
 require_once __DIR__ . '/../../saturne/class/saturneschedules.class.php';
+require_once __DIR__ . '/../../saturne/lib/dolibarr.lib.php';
 
 /**
  * Class for PreventionPlan
@@ -407,7 +408,7 @@ class PreventionPlan extends SaturneObject
         $ret .= $langs->transnoentities('CSSCTIntervention') . ' : ' . ($this->cssct_intervention ? $langs->transnoentities("Yes") : $langs->transnoentities("No")) . '<br>';
         $ret .= $langs->transnoentities('PriorVisit') . ' : ' . ($this->prior_visit_bool ? $langs->transnoentities("Yes") : $langs->transnoentities("No")) . '<br>';
         if ($this->prior_visit_bool) {
-            $ret .= $langs->transnoentities('PriorVisitText') . ' : ' . (!empty($this->prior_visit_text) ? strip_tags(str_replace(['</p>', '</li>'], '<br>', $this->prior_visit_text), '<br>') : 'N/A') . '<br>';
+            $ret .= $langs->transnoentities('PriorVisitText') . ' : ' . (!empty($this->prior_visit_text) ? dol_nl2br(saturne_flatten_wysiwyg_blocks($this->prior_visit_text, true)) : 'N/A') . '<br>';
             $ret .= (dol_strlen($this->prior_visit_date) > 0 ? $langs->transnoentities('PriorVisitDate') . ' : ' . dol_print_date($this->prior_visit_date, 'dayhoursec') . '<br>' : '');
         }
 
