@@ -488,7 +488,8 @@ class ActionsDigiriskdolibarr
 
                 $userGroupID = GETPOSTISSET('user_group') ? GETPOST('user_group') : getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP');
                 $userGroup->fetch($userGroupID);
-                $users = $userGroup->listUsersForGroup();
+                // Only enabled users can be assigned to a ticket, a disabled one has no business showing up in the list
+                $users = $userGroup->listUsersForGroup('u.statut > 0');
                 $users = array_map(fn($userTmp) => $userTmp->getFullName($langs), $users);
 
                 $out .= '<tr class="field_fk_user_assign"><td class="titlefieldmax45 wordbreak">';
@@ -540,7 +541,7 @@ class ActionsDigiriskdolibarr
                 if (GETPOST('action') == 'get_user_group') {
                     $userGroupID = GETPOST('user_group');
                     $userGroup->fetch($userGroupID);
-                    $users = $userGroup->listUsersForGroup();
+                    $users = $userGroup->listUsersForGroup('u.statut > 0');
                     $users = array_map(fn($userTmp) => $userTmp->getFullName($langs), $users);
 
                     echo '<input type="hidden" name="users_list" value="' . base64_encode(json_encode($users)) . '">';
