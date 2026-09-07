@@ -842,15 +842,15 @@ if ($action == 'resend_ext_signature_email' && $permissiontoadd) {
 
 $title    = mb_strtoupper($langs->transnoentities('firepermit'), 'UTF-8');
 $help_url = 'FR:Module_Digirisk';
-$moreJS   = saturne_asset_urls([
+$moreJS   = [
     '/custom/saturne/js/saturne.min.js',
     '/custom/digiriskdolibarr/js/signature-pad.min.js',
     '/custom/digiriskdolibarr/js/digiriskdolibarr.min.js',
-]);
-$moreCSS  = saturne_asset_urls([
+];
+$moreCSS  = [
     '/custom/saturne/css/saturne.min.css',
     '/custom/digiriskdolibarr/css/digiriskdolibarr.min.css',
-]);
+];
 
 $conf->dol_hide_topmenu         = 1;
 $conf->dol_hide_leftmenu        = 1;
