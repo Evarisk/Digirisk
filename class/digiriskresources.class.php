@@ -282,6 +282,31 @@ class DigiriskResources extends SaturneObject
 	}
 
     /**
+     * Fetch the single resource linked to an object, as an object.
+     *
+     * fetchResourcesFromObject() rend l'objet resolu pour une seule ligne, un tableau a deux
+     * niveaux pour plusieurs, l'entier 0 quand il n'y en a aucune et -1 sur erreur : tout
+     * appelant qui dereference son retour part en erreur fatale des que la ressource n'est pas
+     * renseignee. Cette methode rend toujours un objet ou null.
+     *
+     * @param  string       $ref    Resource reference (ExtSociety, LabourInspector, ...)
+     * @param  CommonObject $object Linked object
+     * @return object|null          Resolved resource, null when there is none
+     */
+    public function fetchSingleResourceFromObject(string $ref, $object)
+    {
+        $resource = $this->fetchResourcesFromObject($ref, $object);
+
+        if (is_array($resource)) {
+            // Le tableau est indexe par reference puis par identifiant de ressource
+            $resourcesForRef = $resource[$ref] ?? reset($resource);
+            $resource        = is_array($resourcesForRef) ? reset($resourcesForRef) : $resourcesForRef;
+        }
+
+        return is_object($resource) ? $resource : null;
+    }
+
+    /**
      * Fetch the identifiers linked to an object for one resource reference.
      *
      * fetchResourcesFromObject() renvoie tantot un objet, tantot un tableau, tantot un entier
