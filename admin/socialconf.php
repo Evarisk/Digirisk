@@ -126,7 +126,7 @@ $socialConsts    = array("DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_P
 $maxnumber = count($socialResources) + count($socialConsts);
 
 foreach ($socialConsts as $socialConst) {
-	if (dol_strlen($conf->global->$socialConst) > 0 && $conf->global->$socialConst != '--') {
+	if (dol_strlen(getDolGlobalString($socialConst)) > 0 && getDolGlobalString($socialConst) != '--') {
 		$counter += 1;
 	}
 }
@@ -149,8 +149,8 @@ $resources = new DigiriskResources($db);
 
 $allLinks = $resources->fetchDigiriskResources();
 
-$electionDateCSE = $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE;
-$electionDateDP  = $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE;
+$electionDateCSE = getDolGlobalString('DIGIRISKDOLIBARR_CSE_ELECTION_DATE');
+$electionDateDP  = getDolGlobalString('DIGIRISKDOLIBARR_DP_ELECTION_DATE');
 
 print '<span class="opacitymedium">' . $langs->trans("DigiriskMenu") . "</span><br>\n";
 print "<br>";
@@ -176,7 +176,7 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->tran
 // * Terms And Conditions - Modalités *
 
 print '<tr class="oddeven"><td><label for="modalites">' . $langs->trans("TermsAndConditions") . '</label></td><td>';
-$doleditor = new DolEditor('modalites', $conf->global->DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE ? $conf->global->DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE : '', '', 200, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('modalites', getDolGlobalString('DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE'), '', 200, 'dolibarr_details', '', false, true, getDolGlobalString('FCKEDITOR_ENABLE_SOCIETE'), ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
@@ -191,14 +191,14 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->tran
 // * Permanent - Permanentes *
 
 print '<tr class="oddeven"><td><label for="permanent">' . $langs->trans("PermanentDerogation") . '</label></td><td>';
-$doleditor = new DolEditor('permanent', $conf->global->DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT ? $conf->global->DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT : '', '', 200, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('permanent', getDolGlobalString('DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT'), '', 200, 'dolibarr_details', '', false, true, getDolGlobalString('FCKEDITOR_ENABLE_SOCIETE'), ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
 // * Permanent - Permanentes *
 
 print '<tr class="oddeven"><td><label for="occasional">' . $langs->trans("OccasionalDerogation") . '</label></td><td>';
-$doleditor = new DolEditor('occasional', $conf->global->DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL ? $conf->global->DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL : '', '', 200, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('occasional', getDolGlobalString('DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL'), '', 200, 'dolibarr_details', '', false, true, getDolGlobalString('FCKEDITOR_ENABLE_SOCIETE'), ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
@@ -207,11 +207,11 @@ print '</td></tr>';
 */
 
 print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("HarassmentOfficer") . '</th><th>' . $langs->trans("") . '</th></tr>' . "\n";
-$harassmentOfficer = $allLinks['HarassmentOfficer'];
+$harassmentOfficerIds = $allLinks['HarassmentOfficer']->id ?? [];
 print '<tr>';
 print '<td>' . $langs->trans("ActionOnUser") . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
-print $form->select_dolusers($harassmentOfficer->id, 'HarassmentOfficer', 1, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300');
+print $form->select_dolusers($harassmentOfficerIds, 'HarassmentOfficer', 1, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300');
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 print '</td></tr>';
 
@@ -220,11 +220,11 @@ print '</td></tr>';
 */
 
 print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("HarassmentOfficerCSE") . '</th><th>' . $langs->trans("") . '</th></tr>' . "\n";
-$harassmentOfficerCSE = $allLinks['HarassmentOfficerCSE'];
+$harassmentOfficerCSEIds = $allLinks['HarassmentOfficerCSE']->id ?? [];
 print '<tr>';
 print '<td>' . $langs->trans("ActionOnUser") . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
-print $form->select_dolusers($harassmentOfficerCSE->id, 'HarassmentOfficerCSE', 1, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300');
+print $form->select_dolusers($harassmentOfficerCSEIds, 'HarassmentOfficerCSE', 1, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300');
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 print '</td></tr>';
 
@@ -243,14 +243,14 @@ print '</td></tr>';
 // * ESC Titulars - Titulaires CSE *
 
 $userlist 	  = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', '', 0, 1);
-$titularsCse = $allLinks['TitularsCSE'];
+$titularsCseIds = $allLinks['TitularsCSE']->id ?? [];
 
 print '<tr>';
 print '<td>' . $form->editfieldkey('Titulars', 'TitularsCSE_id', '', $object, 0) . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
 
-print $form->multiselectarray('TitularsCSE', $userlist, $titularsCse->id, null, null, null, null, "300");
+print $form->multiselectarray('TitularsCSE', $userlist, $titularsCseIds, null, null, null, null, "300");
 
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 
@@ -259,13 +259,13 @@ print '</td></tr>';
 // * ESC Alternates - Suppléants CSE *
 
 $userlist       = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', '', 0, 1);
-$alternatesCse = $allLinks['AlternatesCSE'];
+$alternatesCseIds = $allLinks['AlternatesCSE']->id ?? [];
 
 print '<tr>';
 print '<td>' . $form->editfieldkey('Alternates', 'AlternatesCSE_id', '', $object, 0) . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-print $form->multiselectarray('AlternatesCSE', $userlist, $alternatesCse->id, null, null, null, null, "300");
+print $form->multiselectarray('AlternatesCSE', $userlist, $alternatesCseIds, null, null, null, null, "300");
 
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 
@@ -284,13 +284,13 @@ print $form->selectDate(strtotime($electionDateDP) ? $electionDateDP : -1, 'Elec
 // * Staff Representatives Titulars - Titulaires Délégués du Personnel *
 
 $userlist    = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', '', 0, 1);
-$titularsDp = $allLinks['TitularsDP'];
+$titularsDpIds = $allLinks['TitularsDP']->id ?? [];
 
 print '<tr>';
 print '<td>' . $form->editfieldkey('Titulars', 'TitularsDP_id', '', $object, 0) . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-print $form->multiselectarray('TitularsDP', $userlist, $titularsDp->id, null, null, null, null, "300");
+print $form->multiselectarray('TitularsDP', $userlist, $titularsDpIds, null, null, null, null, "300");
 
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 
@@ -299,13 +299,13 @@ print '</td></tr>';
 // * Staff Representatives Suppléants - Suppléants Délégués du Personnel *
 
 $userlist      = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', '', 0, 1);
-$alternatesDp = $allLinks['AlternatesDP'];
+$alternatesDpIds = $allLinks['AlternatesDP']->id ?? [];
 
 print '<tr>';
 print '<td>' . $form->editfieldkey('Alternates', 'AlternatesDP', '', $object, 0) . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-print $form->multiselectarray('AlternatesDP', $userlist, $alternatesDp->id, null, null, null, null, "300");
+print $form->multiselectarray('AlternatesDP', $userlist, $alternatesDpIds, null, null, null, null, "300");
 
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 
