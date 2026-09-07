@@ -1149,10 +1149,116 @@ class ActionsDigiriskdolibarr
 		// Joining would return one row per category link, and the record count of the list (a COUNT(*) built
 		// from this same request, with the GROUP BY stripped) would count those links instead of the tickets.
 
+        if (preg_match('/preventionplanlist/', $parameters['context'])) {
+            // Only join the active resource: setDigiriskResources keeps previous ones with status = 0, they would duplicate the object row
+            $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskresources as rs ON rs.ref = "ExtSociety" AND rs.object_type = "preventionplan" AND rs.object_id = t.rowid AND rs.status = 1';
+        }
+
         $this->resprints = $sql;
         return 0; // or return 1 to replace standard code
 	}
 
+    /**
+     * Overloading the printFieldListSelect function : replacing the parent's function with the one below
+     *
+     * @param  array        $parameters Hook metadata (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function printFieldListSelect(array $parameters, $object): int
+    {
+        $this->resprints = '';
+
+        if (preg_match('/preventionplanlist/', $parameters['context'])) {
+            // The external company of a prevention plan is a digirisk resource, not a column of its table :
+            // alias it as the generic list would alias a t.<key>, so the column can be sorted on
+            $this->resprints = ', rs.element_id as extsociety';
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the saturneSetVarsFromFetchObj function : replacing the parent's function with the one below
+     *
+     * @param  array  $parameters Hook metadata (context, etc...)
+     * @param  object $object     Current object
+     * @return int                0 < on error, 0 on success, 1 to replace standard code
+     * @throws Exception
+     */
+    public function saturneSetVarsFromFetchObj(array $parameters, object $object): int
+    {
+        global $conf;
+
+        if (preg_match('/preventionplanlist/', $parameters['context'])) {
+            // Load Saturne libraries
+            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+            $signatory = new SaturneSignature($this->db, 'digiriskdolibarr', $object->element);
+
+            // One query per row rather than one per attendant column : with an empty role, fetchSignatory()
+            // returns every signatory of the object indexed by role, which is exactly one entry per column
+            $signatories = $signatory->fetchSignatory('', $object->id, $object->element);
+
+            $conf->cache['preventionPlanSignatories'] = is_array($signatories) ? $signatories : [];
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the saturnePrintFieldListLoopObject function : replacing the parent's function with the one below
+     *
+     * @param  array  $parameters Hook metadata (context, etc...)
+     * @param  object $object     Current object
+     * @return int                0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function saturnePrintFieldListLoopObject(array $parameters, object $object): int
+    {
+        global $conf;
+
+        if (preg_match('/preventionplanlist/', $parameters['context'])) {
+            // Load Dolibarr libraries
+            require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+
+            $out = [];
+            $key = $parameters['key'];
+
+            if (in_array($key, ['date_start', 'date_end'])) {
+                // Both dates carry the hour the intervention starts and ends, which the generic date renderer drops
+                $out[$key] = dol_print_date($object->$key, 'dayhour', 'tzserver');
+            } elseif (!empty($conf->cache['preventionPlanSignatories'][$key])) {
+                // Attendant columns : one column per role of the dictionary, a role can hold several attendants
+                $links = [];
+                foreach ($conf->cache['preventionPlanSignatories'][$key] as $signatory) {
+                    $attendantId   = (int) $signatory->element_id;
+                    $attendantType = ($signatory->element_type == 'user' ? 'user' : 'socpeople');
+                    if ($attendantId <= 0) {
+                        continue;
+                    }
+
+                    // The same user or contact is usually signatory of several prevention plans : fetch it once per page
+                    if (!isset($conf->cache['preventionPlanAttendants'][$attendantType][$attendantId])) {
+                        $attendant = ($attendantType == 'user' ? new User($this->db) : new Contact($this->db));
+
+                        $conf->cache['preventionPlanAttendants'][$attendantType][$attendantId] = ($attendant->fetch($attendantId) > 0 ? $attendant : null);
+                    }
+
+                    $attendant = $conf->cache['preventionPlanAttendants'][$attendantType][$attendantId];
+                    if ($attendant instanceof CommonObject) {
+                        $links[] = $attendant->getNomUrl(1);
+                    }
+                }
+
+                $out[$key] = implode('<br>', $links);
+            }
+
+            $this->results = $out;
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
 
 	/**
 	 *  Overloading the printFieldListWhere function : replacing the parent's function with the one below
@@ -1163,6 +1269,19 @@ class ActionsDigiriskdolibarr
 	 */
 	public function printFieldListWhere($parameters, $object)
 	{
+        // The same instance carries the result of every hook method : a value left by printFieldListFrom
+        // would be appended to the WHERE clause of the request
+        $this->resprints = '';
+
+        if (preg_match('/preventionplanlist/', $parameters['context'])) {
+            // Filter on the external company, joined as rs by printFieldListFrom. The empty entry of the
+            // search select posts -1, so only a real third party id is turned into a criteria
+            $extSocietyId = (int) ($parameters['search']['extsociety'] ?? 0);
+            if ($extSocietyId > 0) {
+                $this->resprints = ' AND rs.element_id = ' . $extSocietyId;
+            }
+        }
+
 		if (preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context'])) {
 			$searchCategoryTicketSqlList = array();
 			$searchCategoryTicketList = GETPOST('search_category_ticket_list');

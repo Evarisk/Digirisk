@@ -722,7 +722,7 @@ $form        = new Form($db);
 $formproject = new FormProjets($db);
 
 $title       = $langs->trans("PreventionPlan");
-$titleCreate = $langs->trans("NewPreventionPlan");
+$titleCreate = $langs->trans("NewPreventionplan");
 $titleEdit   = $langs->trans("ModifyPreventionPlan");
 
 $helpUrl = 'FR:Module_Digirisk#DigiRisk_-_Plan_de_pr.C3.A9vention';
