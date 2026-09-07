@@ -1554,8 +1554,8 @@ class ActionsDigiriskdolibarr
 
             $digiriskResources = new DigiriskResources($this->db);
 
-            $extSociety  = $digiriskResources->fetchResourcesFromObject('ExtSociety', $object);
-            $moreHtmlRef = $langs->trans('ExtSociety') . ' : ' . $extSociety->getNomUrl(1);
+            $extSociety  = $digiriskResources->fetchSingleResourceFromObject('ExtSociety', $object);
+            $moreHtmlRef = $langs->trans('ExtSociety') . ' : ' . ($extSociety !== null ? $extSociety->getNomUrl(1) : $langs->trans('None'));
 
             $this->resprints = $moreHtmlRef;
         }

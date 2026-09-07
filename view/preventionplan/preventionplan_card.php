@@ -884,8 +884,16 @@ if (($id || $ref) && $action == 'edit') {
 
 	print dol_get_fiche_head();
 
+	// Sans ressource liee, fetchResourcesFromObject() rend l'entier 0 : le normaliser en tableau
+	// evite un avertissement a chaque lecture de cle ci-dessous
 	$objectResources   = $digiriskresources->fetchResourcesFromObject('', $object);
+	if (!is_array($objectResources)) {
+		$objectResources = [];
+	}
 	$objectSignatories = $signatory->fetchSignatory('', $object->id, 'preventionplan');
+	if (!is_array($objectSignatories)) {
+		$objectSignatories = [];
+	}
 
 	print '<table class="border centpercent tableforfieldedit  preventionplan-table">' . "\n";
 
@@ -915,7 +923,7 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td></tr>';
 
 	//Maitre d'oeuvre
-	$masterWorker  = is_array($objectSignatories['MasterWorker']) ? array_shift($objectSignatories['MasterWorker'])->element_id : '';
+	$masterWorker  = is_array($objectSignatories['MasterWorker'] ?? null) ? array_shift($objectSignatories['MasterWorker'])->element_id : '';
 	$userlist      = $form->select_dolusers($masterWorker, '', 1, null, 0, '', '', 0, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth100imp widthcentpercentminusxx maxwidth400', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MasterWorker', 'MasterWorker_id', '', $object, 0) . '</td>';
@@ -935,25 +943,26 @@ if (($id || $ref) && $action == 'edit') {
 	if ( ! empty($user->socid)) {
 		print $form->select_company($user->socid, 'ext_society', '', 1, 1, 0, $events, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	} else {
-		$extSocietyId = is_array($objectResources['ExtSociety']) ? array_shift($objectResources['ExtSociety'])->id : '';
+		$extSocietyId = is_array($objectResources['ExtSociety'] ?? null) ? array_shift($objectResources['ExtSociety'])->id : '';
 		print $form->select_company($extSocietyId, 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	}
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '</td></tr>';
-	$extSocietyResponsibleId = is_array($objectSignatories['ExtSocietyResponsible']) ? array_shift($objectSignatories['ExtSocietyResponsible'])->element_id : GETPOST('ext_society_responsible');
+	$extSocietyResponsibleId = is_array($objectSignatories['ExtSocietyResponsible'] ?? null) ? array_shift($objectSignatories['ExtSocietyResponsible'])->element_id : GETPOST('ext_society_responsible');
 
 	if ($extSocietyResponsibleId > 0) {
 		$contact->fetch($extSocietyResponsibleId);
 	}
 
 	//External responsible -- Responsable de la société extérieure
-	$extSociety = $digiriskresources->fetchResourcesFromObject('ExtSociety', $object);
+	$extSociety   = $digiriskresources->fetchSingleResourceFromObject('ExtSociety', $object);
+	$extSocietyId = $extSociety !== null ? $extSociety->id : 0;
 	print '<tr class="oddeven"><td class="fieldrequired minwidth400">';
 	$htmltext = img_picto('', 'address') . ' ' . $langs->trans("ExtSocietyResponsible");
 	print $htmltext;
 	print '</td><td>';
-	print $form->selectcontacts($extSociety->id, dol_strlen($contact->email) ? $extSocietyResponsibleId : -1, 'ext_society_responsible', '', 0, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
-    print '<a href="' . DOL_URL_ROOT . '/contact/card.php?action=create' . (empty($extSociety->id) ? '' : '&socid=' . $extSociety->id) .'&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create&ext_society='. (empty($extSociety->id) ? '' : $extSociety->id)) . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddContact") . '"></span></a>';
+	print $form->selectcontacts($extSocietyId, dol_strlen($contact->email) ? $extSocietyResponsibleId : -1, 'ext_society_responsible', '', 0, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+    print '<a href="' . DOL_URL_ROOT . '/contact/card.php?action=create' . (empty($extSocietyId) ? '' : '&socid=' . $extSocietyId) .'&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create&ext_society='. (empty($extSocietyId) ? '' : $extSocietyId)) . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddContact") . '"></span></a>';
     print '</td></tr>';
 
 	// CSSCT Intervention
@@ -986,10 +995,14 @@ if (($id || $ref) && $action == 'edit') {
 	$doleditor->Create();
 	print '</td></tr>';
 
-	if (is_array($objectResources['LabourInspector']) && $objectResources['LabourInspector'] > 0) {
+	// Les deux ressources ne sont pas toujours renseignees : les initialiser evite de lire une
+	// propriete sur une variable inexistante dans les selecteurs ci-dessous
+	$labourInspectorSociety   = null;
+	$labourInspector_assigned = null;
+	if (is_array($objectResources['LabourInspector'] ?? null) && !empty($objectResources['LabourInspector'])) {
 		$labourInspectorSociety = array_shift($objectResources['LabourInspector']);
 	}
-	if (is_array($objectResources['LabourInspectorAssigned']) && $objectResources['LabourInspectorAssigned'] > 0) {
+	if (is_array($objectResources['LabourInspectorAssigned'] ?? null) && !empty($objectResources['LabourInspectorAssigned'])) {
 		$labourInspector_assigned = array_shift($objectResources['LabourInspectorAssigned']);
 	}
 	//Labour inspector Society -- Entreprise Inspecteur du travail
@@ -999,20 +1012,24 @@ if (($id || $ref) && $action == 'edit') {
 	print '<td>';
 	$events    = array();
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labour_inspector_contact', 'params' => array('add-customer-contact' => 'disabled'));
-	print $form->select_company($labourInspectorSociety->id, 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+	print $form->select_company($labourInspectorSociety !== null ? $labourInspectorSociety->id : '', 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/admin/securityconf.php' . '" target="_blank">' . $langs->trans("ConfigureLabourInspector") . '</a>';
 	print '</td></tr>';
 
-	$labourInspectorContact = ! empty($digiriskresources->fetchResourcesFromObject('LabourInspectorAssigned', $object)) ? $digiriskresources->fetchResourcesFromObject('LabourInspectorAssigned', $object) : GETPOST('labour_inspector_contact');
+	// A defaut de ressource enregistree, le contact vient du formulaire : c'est un identifiant,
+	// pas un objet, d'ou la lecture de l'identifiant plutot que de la propriete
+	$labourInspectorContact   = $digiriskresources->fetchSingleResourceFromObject('LabourInspectorAssigned', $object);
+	$labourInspectorContactId = $labourInspectorContact !== null ? $labourInspectorContact->id : GETPOSTINT('labour_inspector_contact');
 
 	//Labour inspector -- Inspecteur du travail
-	$labourInspectorSociety = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
+	$labourInspectorSociety   = $digiriskresources->fetchSingleResourceFromObject('LabourInspector', $object);
+	$labourInspectorSocietyId = $labourInspectorSociety !== null ? $labourInspectorSociety->id : -1;
 	print '<tr><td class="fieldrequired minwidth400">';
 	$htmltext = img_picto('', 'address') . ' ' . $langs->trans("LabourInspector");
 	print $htmltext;
 	print '</td><td>';
-	print $form->selectcontacts($labourInspectorSociety->id, dol_strlen($contact->email) ? $labourInspectorContact->id : -1, 'labour_inspector_contact', '', 0, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+	print $form->selectcontacts($labourInspectorSocietyId, dol_strlen($contact->email) ? $labourInspectorContactId : -1, 'labour_inspector_contact', '', 0, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print '</td></tr>';
 
     // Tags-Categories
@@ -1104,8 +1121,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	saturne_get_fiche_head($object, 'card', $title);
 
     // External Society -- Société extérieure
-    $extSociety  = $digiriskresources->fetchResourcesFromObject('ExtSociety', $object);
-    $moreHtmlRef = $langs->trans('ExtSociety') . ' : ' . $extSociety->getNomUrl(1) . '<br>';
+    $extSociety  = $digiriskresources->fetchSingleResourceFromObject('ExtSociety', $object);
+    $moreHtmlRef = $langs->trans('ExtSociety') . ' : ' . ($extSociety !== null ? $extSociety->getNomUrl(1) : $langs->trans('None')) . '<br>';
 
 	if ($conf->browser->layout == 'phone') {
 		$onPhone = 1;
@@ -1187,8 +1204,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $langs->trans("LabourInspectorSociety");
 	print '</td>';
 	print '<td>';
-	$labourInspector = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
-	if ($labourInspector > 0) {
+	$labourInspector = $digiriskresources->fetchSingleResourceFromObject('LabourInspector', $object);
+	if ($labourInspector !== null) {
 		print $labourInspector->getNomUrl(1);
 	}
 	print '</td></tr>';
@@ -1198,8 +1215,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $langs->trans("LabourInspector");
 	print '</td>';
 	print '<td>';
-	$labourInspectorContact = $digiriskresources->fetchResourcesFromObject('LabourInspectorAssigned', $object);
-	if ($labourInspectorContact > 0) {
+	$labourInspectorContact = $digiriskresources->fetchSingleResourceFromObject('LabourInspectorAssigned', $object);
+	if ($labourInspectorContact !== null) {
 		print $labourInspectorContact->getNomUrl(1);
 	}
 	print '</td></tr>';
@@ -1873,7 +1890,7 @@ print '<input type="hidden" name="fk_element" value="0">';
         // Fill list of recipient with email inside <>.
         $liste = [];
 
-        $labourInspectorContact = $digiriskresources->fetchResourcesFromObject('LabourInspectorAssigned', $object);
+        $labourInspectorContact = $digiriskresources->fetchSingleResourceFromObject('LabourInspectorAssigned', $object);
 
         if (!empty($conf->global->MAIN_MAIL_ENABLED_USER_DEST_SELECT)) {
             $listeuser = [];
