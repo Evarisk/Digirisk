@@ -1240,27 +1240,22 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
                     print $item->ref;
                     print '</td>';
 
-                    $coldisplay++;
                     print '<td>';
                     print '<input type="number" name="workstop_days" class="minwidth150" min="0" value="' . $item->workstop_days . '">';
                     print '</td>';
 
-                    $coldisplay++;
                     print '<td>';
                     print $form->selectDate($item->date_start_workstop, 'datestart', 1, 1, 0, '', 1);
                     print '</td>';
 
-                    $coldisplay++;
                     print '<td>';
                     print $form->selectDate($item->date_end_workstop, 'dateend', 1, 1, 0, '', 1);
                     print '</td>';
 
-                    $coldisplay++;
                     print '<td>';
                     print '<input name="declarationLink" value="'. (GETPOST('declarationLink') ?: $item->declaration_link) .'">';
                     print '</td>';
 
-                    $coldisplay += $colspan;
                     print '<td class="center" colspan="' . $colspan . '">';
                     print '<input type="submit" class="button" value="' . $langs->trans('Save') . '" name="updateLine" id="updateLine">';
                     print ' &nbsp; <input type="submit" id ="cancelLine" class="button" name="cancelLine" value="' . $langs->trans("Cancel") . '">';
@@ -1273,33 +1268,27 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
                     print $item->ref;
                     print '</td>';
 
-                    $coldisplay++;
                     print '<td>';
                     print $item->workstop_days;
                     print '</td>';
 
-                    $coldisplay++;
                     print '<td>';
                     print dol_print_date($item->date_start_workstop, 'dayhour');
                     print '</td>';
 
-                    $coldisplay++;
                     print '<td>';
                     print dol_print_date($item->date_end_workstop, 'dayhour');
                     print '</td>';
 
-                    $coldisplay++;
                     print '<td>';
                     $is_link = dol_is_url($item->declaration_link);
                     print ($is_link ? '<a target="_blank" href="'. $item->declaration_link .'">' : '') . $item->declaration_link . ($is_link ? '</a>' : '') ;
                     print '</td>';
 
-                    $coldisplay += $colspan;
 
                     //Actions buttons
                     if ($object->status == Accident::STATUS_DRAFT) {
                         print '<td class="center">';
-                        $coldisplay++;
                         print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
                         print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '&amp;token=' . newToken() . '">';
                         print img_delete();
@@ -1328,27 +1317,22 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $objectline->getNextNumRef();
 			print '</td>';
 
-			$coldisplay++;
 			print '<td>';
 			print '<input type="number" name="workstop_days" class="minwidth150" min="0" value="">';
 			print '</td>';
 
-			$coldisplay++;
 			print '<td>';
 			print $form->selectDate(dol_now('tzuser'), 'datestart', 1, 1, 0, '', 1);
 			print '</td>';
 
-			$coldisplay++;
 			print '<td>';
 			print $form->selectDate(dol_now('tzuser'), 'dateend', 1, 1, 0, '', 1);
 			print '</td>';
 
-			$coldisplay++;
 			print '<td class="maxwidth100">';
 			print '<input name="declarationLink" id="declarationLink" value="'. GETPOST('declarationLink') . '">';
 			print '</td>';
 
-			$coldisplay += $colspan;
 			print '<td class="center" colspan="' . $colspan . '">';
 			print '<input type="submit" class="button" value="' . $langs->trans('Add') . '" name="addline" id="addline">';
 			print '</td>';
