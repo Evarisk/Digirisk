@@ -31,10 +31,12 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 }
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
+require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
 require_once __DIR__ . '/../../class/digiriskelement/workunit.class.php';
@@ -108,6 +110,16 @@ if (empty($reshook)) {
 			if (empty($object->id) && (($action != 'add' && $action != 'create') || $cancel)) $backtopage = $backurlforlist;
 			else $backtopage                                                                              = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php', 1) . '?id=' . ($object->id > 0 ? $object->id : '__ID__');
 		}
+	}
+
+	// Responsables de la prevention de l'element : enregistres avant l'inclusion ci-dessous, qui
+	// redirige des que l'objet est mis a jour. La creation ne les propose pas, l'element n'a pas
+	// encore d'identifiant auquel les rattacher
+	if ($action == 'update' && $object->id > 0 && $permissiontoadd && !$cancel) {
+		$digiriskResources = new DigiriskResources($db);
+		// setDigiriskResources concatene les identifiants dans son INSERT sans les quoter
+		$preventionOfficerIds = array_filter(array_map('intval', GETPOST('PreventionOfficer', 'array')));
+		$digiriskResources->setDigiriskResources($db, $user->id, 'PreventionOfficer', 'user', $preventionOfficerIds, $conf->entity, 'digiriskelement', $object->id);
 	}
 
 	// Action to add record
@@ -213,6 +225,7 @@ if ($action == 'create') {
 
 	unset($object->fields['ref']);
 	unset($object->fields['status']);
+	unset($object->fields['description']); // Saisie au WYSIWYG plus bas
 	unset($object->fields['element_type']);
 	unset($object->fields['fk_parent']);
 	unset($object->fields['last_main_doc']);
@@ -232,6 +245,13 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_add.tpl.php';
+
+	// La description est sortie des champs communs pour etre saisie au WYSIWYG comme partout
+	// ailleurs dans le module : elle est reprise telle quelle en tete du listing des risques
+	print '<tr><td><label for="description">' . $langs->trans('Description') . '</label></td><td>';
+	$doleditor = new DolEditor('description', GETPOST('description', 'restricthtml'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor->Create();
+	print '</td></tr>';
 
 	print '<input hidden class="flat" type="text" size="36" name="element_type" value="' . $element_type . '">';
 	print '<input hidden class="flat" type="text" size="36" name="fk_parent" value="' . $fkParent . '">';
@@ -270,6 +290,7 @@ if (($id || $ref) && $action == 'edit') {
 	print dol_get_fiche_head();
 
 	unset($object->fields['status']);
+	unset($object->fields['description']); // Saisie au WYSIWYG plus bas
 	unset($object->fields['element_type']);
 	unset($object->fields['fk_parent']);
 	unset($object->fields['last_main_doc']);
@@ -280,6 +301,23 @@ if (($id || $ref) && $action == 'edit') {
 
 	// Common attributes
 	include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_edit.tpl.php';
+
+	// La description est sortie des champs communs pour etre saisie au WYSIWYG comme partout
+	// ailleurs dans le module : elle est reprise telle quelle en tete du listing des risques
+	print '<tr><td><label for="description">' . $langs->trans('Description') . '</label></td><td>';
+	$doleditor = new DolEditor('description', GETPOSTISSET('description') ? GETPOST('description', 'restricthtml') : $object->description, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor->Create();
+	print '</td></tr>';
+
+	// * Prevention officers - Responsables de la prevention *
+
+	$digiriskResources    = new DigiriskResources($db);
+	$preventionOfficerIds = $digiriskResources->fetchResourcesIdsFromObject('PreventionOfficer', 'digiriskelement', $object->id);
+	$userList             = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', '', 0, 1);
+
+	print '<tr><td>' . $langs->trans('PreventionOfficers') . '</td><td>';
+	print img_picto('', 'user', 'class="pictofixedwidth"') . $form->multiselectarray('PreventionOfficer', $userList, $preventionOfficerIds, null, null, null, null, '300');
+	print '</td></tr>';
 
 	print '<tr><td>';
 	print $langs->trans("ShowInSelectOnPublicTicketInterface");
@@ -355,6 +393,22 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 
 	print '<tr><td class="titlefield tdtop">' . $langs->trans("Description") . '</td>';
 	print '<td>' . (dol_strlen($object->description) ? $object->description : '<span class="opacitymedium">&mdash;</span>') . '</td></tr>';
+
+	// * Prevention officers - Responsables de la prevention *
+
+	$digiriskResources    = new DigiriskResources($db);
+	$preventionOfficerIds = $digiriskResources->fetchResourcesIdsFromObject('PreventionOfficer', 'digiriskelement', $object->id);
+	$preventionOfficers   = [];
+	foreach ($preventionOfficerIds as $preventionOfficerId) {
+		// Un objet par ligne : un fetch en echec laisse l'objet sur les valeurs du precedent
+		$userTmp = new User($db);
+		if ($userTmp->fetch($preventionOfficerId) > 0) {
+			$preventionOfficers[] = $userTmp->getNomUrl(1);
+		}
+	}
+
+	print '<tr><td class="titlefield">' . $langs->trans('PreventionOfficers') . '</td>';
+	print '<td>' . (!empty($preventionOfficers) ? implode(', ', $preventionOfficers) : '<span class="opacitymedium">&mdash;</span>') . '</td></tr>';
 
 	print '<tr><td class="titlefield">';
 	print $langs->trans("ShowInSelectOnPublicTicketInterface");
