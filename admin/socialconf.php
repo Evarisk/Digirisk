@@ -131,7 +131,7 @@ foreach ($socialConsts as $socialConst) {
 	}
 }
 foreach ($socialResources as $socialResource) {
-	if ( ! empty($allLinks[$socialResource] && $allLinks[$socialResource]->id[0] > 0)) {
+	if (!empty($allLinks[$socialResource]->id[0])) {
 		$counter += 1;
 	}
 }
