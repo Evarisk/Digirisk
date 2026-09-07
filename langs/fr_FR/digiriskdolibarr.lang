@@ -1273,7 +1273,7 @@ HasNotBeenUnlinkSharedF            = n'a pas été déliée
 RiskSignSharedTooltip              = Cette option permet de partager les signalisations. <br> INFO : Si vous souhaitez pouvoir afficher les tâches, il faut activer l'option de partage des projets.
 ShowInheritedRiskSigns             = Signalisations héritées
 ShowInheritedRiskSignsDescription  = Afficher les signalisations héritées dans les documents et les listings
-DigiriskElementInheritedRiskSignsList Liste des signalisations héritées
+DigiriskElementInheritedRiskSignsList = Liste des signalisations héritées
 ConfirmImportSharedRiskSigns       = Veuillez choisir les signalisations partagées à importer
 RiskSignSharedWithEntityRefLabel   = Partage de la signalisation %s avec
 RiskSignUnlinkedFromEntityRefLabel = Dissociation de la signalisation %s avec
@@ -2229,6 +2229,8 @@ DangerCategory=Famille de risque
 SelectDangerCategory=Choisir une famille de risque
 DescribeRiskOnProduct=Decrire le risque sur ce produit...
 ConfirmDeleteProductRisk=Supprimer ce risque ?
+AddProductRisk=Ajouter un risque produit
+ClickToAddContent=Cliquer pour ajouter du contenu...
 AddProtection=Ajouter une protection
 
 SelectProtection=Choisir une protection EPI
