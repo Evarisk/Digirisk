@@ -103,6 +103,11 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	$resources->setDigiriskResources($db, $user->id,  'PoisonControlCenter',  'societe', $antipoisonId, $conf->entity);
 	$resources->setDigiriskResources($db, $user->id,  'Responsible',  'societe', $responsibleId, $conf->entity);
 
+	// Responsables de la prevention de l'etablissement : liste d'utilisateurs, vide autorise
+	// setDigiriskResources concatene les identifiants dans son INSERT sans les quoter : les caster
+	$preventionOfficerIds = array_filter(array_map('intval', GETPOST('PreventionOfficer', 'array')));
+	$resources->setDigiriskResources($db, $user->id, 'PreventionOfficer', 'user', $preventionOfficerIds, $conf->entity);
+
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION", GETPOST("emplacementCD", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION", GETPOST("description", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_GENERAL_MEANS", GETPOST("moyensgeneraux", 'none'), 'chaine', 0, '', $conf->entity);
@@ -132,7 +137,7 @@ saturne_header(0,'', $title, $helpUrl);
 
 $counter = 0;
 
-$securityResources = array("SAMU","Pompiers","Police","AllEmergencies","RightsDefender","PoisonControlCenter", "Responsible", "LabourDoctorSociety", "LabourDoctorContact", "LabourInspectorSociety", "LabourInspectorContact" );
+$securityResources = array("SAMU","Pompiers","Police","AllEmergencies","RightsDefender","PoisonControlCenter", "Responsible", "PreventionOfficer", "LabourDoctorSociety", "LabourDoctorContact", "LabourInspectorSociety", "LabourInspectorContact" );
 $securityConsts    = array("DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION", "DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION", "DIGIRISKDOLIBARR_GENERAL_MEANS", "DIGIRISKDOLIBARR_GENERAL_RULES", "DIGIRISKDOLIBARR_FIRST_AID", "DIGIRISKDOLIBARR_RULES_LOCATION", "DIGIRISKDOLIBARR_DUER_LOCATION", "DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION");
 $socialResources   = array("TitularsCSE", "AlternatesCSE", "TitularsDP", "AlternatesDP");
 
@@ -468,6 +473,24 @@ if ($responsibleResources->ref == 'Responsible' && $responsibleResources->id[0] 
 	}
 }
 
+print '</td></tr>';
+
+// * Prevention officers - Responsables de la prevention *
+// Ces utilisateurs sont ceux qui suivent le DUERP pour tout l'etablissement. Ils sont repris en
+// tete du listing des risques, sous le responsable de l'etablissement.
+
+$userList = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', '', 0, 1);
+// Sans filtre sur l'objet rattache, les responsables designes sur chaque groupement seraient
+// repris ici comme s'ils l'etaient pour tout l'etablissement
+$preventionOfficerIds = $resources->fetchResourcesIdsFromObject('PreventionOfficer', '', 0);
+
+print '<tr class="oddeven">';
+print '<td>' . $form->editfieldkey('PreventionOfficers', 'PreventionOfficer_id', '', $object, 0) . '</td>';
+print '<td>';
+print img_picto('', 'user', 'class="pictofixedwidth"') . $form->multiselectarray('PreventionOfficer', $userList, $preventionOfficerIds, null, null, null, null, '300');
+if (!GETPOSTISSET('backtopage')) {
+	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+}
 print '</td></tr>';
 
 // * Location of detailed instructions - Emplacement de la consigne détaillée *

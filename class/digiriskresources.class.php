@@ -281,6 +281,42 @@ class DigiriskResources extends SaturneObject
 		}
 	}
 
+    /**
+     * Fetch the identifiers linked to an object for one resource reference.
+     *
+     * fetchResourcesFromObject() renvoie tantot un objet, tantot un tableau, tantot un entier
+     * selon le nombre de lignes : cette methode rend toujours une liste d'identifiants.
+     *
+     * @param  string $ref        Resource reference (PreventionOfficer, ...)
+     * @param  string $objectType Linked object type (digiriskelement, ...)
+     * @param  int    $objectId   Linked object ID
+     * @return int[]              Element IDs, empty if none
+     */
+    public function fetchResourcesIdsFromObject(string $ref, string $objectType, int $objectId): array
+    {
+        $sql  = 'SELECT element_id FROM ' . MAIN_DB_PREFIX . $this->table_element;
+        $sql .= " WHERE ref = '" . $this->db->escape($ref) . "'";
+        $sql .= " AND object_type = '" . $this->db->escape($objectType) . "'";
+        $sql .= ' AND object_id = ' . $objectId;
+        $sql .= ' AND status = 1';
+        $sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $this->error    = $this->db->lasterror();
+            $this->errors[] = $this->error;
+            return [];
+        }
+
+        $ids = [];
+        while ($obj = $this->db->fetch_object($resql)) {
+            $ids[] = (int) $obj->element_id;
+        }
+        $this->db->free($resql);
+
+        return $ids;
+    }
+
 	/**
 	 * Fetch all resources in database
 	 *

@@ -2253,6 +2253,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		delDocumentModel('listingrisksaction_odt', 'listingrisksdocument');
         delDocumentModel('listingrisksdocument_odt', 'listingrisksdocument');
         delDocumentModel('listingrisksphoto_odt', 'listingrisksdocument');
+        delDocumentModel('listingrisksdocument', 'listingrisksdocument');
 		delDocumentModel('listingrisksenvironmentalaction_odt', 'listingrisksenvironmentaldocument');
 		delDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument');
 		delDocumentModel('auditreportdocument_odt', 'auditreportdocument');
@@ -2281,6 +2282,7 @@ class modDigiriskdolibarr extends DolibarrModules
         addDocumentModel('listingrisksdocument_odt', 'listingrisksdocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('listingrisksaction_odt', 'listingrisksdocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH');
         addDocumentModel('listingrisksphoto_odt', 'listingrisksdocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
+        addDocumentModel('listingrisksdocument', 'listingrisksdocument', $langs->transnoentities('ListingRisksDocumentPDF'));
         addDocumentModel('listingrisksenvironmentalaction_odt', 'listingrisksenvironmentaldocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSENVIRONMENTALACTION_ADDON_ODT_PATH');
 		addDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('auditreportdocument_odt', 'auditreportdocument', 'ODT templates', 'DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_ADDON_ODT_PATH');
