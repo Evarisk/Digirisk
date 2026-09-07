@@ -737,7 +737,7 @@ if ($action == 'create') {
 	//FK PREVENTION PLAN
 	print '<tr class="fieldrequired oddeven"><td>' . $langs->trans("PreventionPlanLinked") . '</td><td>';
 	print $preventionplan->select_preventionplan_list(GETPOST('fk_preventionplan'), 'fk_preventionplan', [], '1', 0, [], 0, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
-	print '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("NewPreventionPlan") . '"></span></a>';
+	print '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("NewPreventionplan") . '"></span></a>';
 	print '</td></tr>';
 
     // Categories
