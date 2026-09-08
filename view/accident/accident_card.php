@@ -47,7 +47,7 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
 global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $mysoc, $user;
 
 // Load translation files required by the page
-saturne_load_langs(['errors']);
+saturne_load_langs();
 
 // Get parameters
 $id                  = GETPOSTINT('id');
@@ -119,14 +119,6 @@ $permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
 
 saturne_check_access($permissiontoread, $object);
-
-// Un identifiant inconnu laisse l'objet vide : la page continuerait jusqu'a passer une propriete
-// nulle a une methode typee, et s'arreterait sur une erreur fatale
-if (($id > 0 || dol_strlen($ref)) && $object->id <= 0) {
-	setEventMessages($langs->trans('ErrorRecordNotFound'), null, 'errors');
-	header('Location: ' . dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1));
-	exit;
-}
 
 /*
  * Actions
