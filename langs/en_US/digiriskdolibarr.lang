@@ -537,3 +537,17 @@ RiskTrendNew             = ⊕ New
 RiskTrendUp              = ↗ Up (%s → %s)
 RiskTrendDown            = ↘ Down (%s → %s)
 RiskTrendStable          = Stable (%s)
+
+# Menu visibility
+RiskAssessmentDocument                          = Risk assessment document
+Environment                                     = Environment
+Accident                                        = Accident
+AccidentInvestigation                           = Accident investigation
+MenuVisibility                                  = Menu entries visibility
+RiskAssessmentDocumentMenuVisibilityDescription = When the option is disabled, the risk assessment document menu entries (occupational risks, PAPRIPACT and risk categories) are hidden.<br>The "Risk assessment document" configuration tab is hidden only if the environment is hidden too.
+EnvironmentMenuVisibilityDescription            = When the option is disabled, the environment menu entries (environmental risks and action plan) are hidden.<br>The "Risk assessment document" configuration tab is hidden only if the risk assessment document is hidden too.
+PreventionPlanMenuVisibilityDescription         = When the option is disabled, the prevention plan menu entries (and its categories) and its configuration tab are hidden.
+FirePermitMenuVisibilityDescription             = When the option is disabled, the fire permit menu entries (and its categories) and its configuration tab are hidden.
+AccidentMenuVisibilityDescription               = When the option is disabled, the accident menu entries (list and categories) are hidden.<br>The "Accident" configuration tab is hidden only if the accident investigations are hidden too.
+AccidentInvestigationMenuVisibilityDescription  = When the option is disabled, the accident investigation menu entry is hidden.<br>The "Accident" configuration tab is hidden only if the accidents are hidden too.
+ToolsMenuVisibilityDescription                  = When the option is disabled, the tools menu entry is hidden.
