@@ -49,7 +49,7 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-saturne_load_langs(['other']);
+saturne_load_langs(['errors', 'other']);
 
 // Get parameters
 $id                  = GETPOSTINT('id');
@@ -91,6 +91,14 @@ $permissiontoadd    = $user->rights->digiriskdolibarr->digiriskelement->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->digiriskelement->delete;
 
 saturne_check_access($permissiontoread, $object);
+
+// Un identifiant inconnu laisse l'objet vide : la page continuerait jusqu'a passer une propriete
+// nulle a une methode typee, et s'arreterait sur une erreur fatale
+if (($id > 0 || dol_strlen($ref)) && $object->id <= 0) {
+	setEventMessages($langs->trans('ErrorRecordNotFound'), null, 'errors');
+	header('Location: ' . dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=1', 1));
+	exit;
+}
 
 /*
  * Actions
