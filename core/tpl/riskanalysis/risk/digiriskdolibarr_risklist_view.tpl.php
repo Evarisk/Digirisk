@@ -807,6 +807,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                                 <?php print '<textarea class="evaluation-comment-textarea" name="evaluationComment' . $risk->id . '" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
                             </div>
                         </div>
+                    </div>
                     <?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) : ?>
                         <div class="riskassessment-task">
                             <div style="display: flex; align-items: center; margin-bottom: 5px;">
