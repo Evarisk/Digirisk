@@ -285,3 +285,6 @@ DELETE FROM llx_const WHERE name = 'MAIN_MODULE_DIGIRISKDOLIBARR_TABS';
 
 -- 23.1.x - index used by the per-risk loading of risk assessments on the risk lists
 ALTER TABLE llx_digiriskdolibarr_riskassessment ADD INDEX idx_digiriskdolibarr_riskassessment_fk_risk (fk_risk);
+
+-- 23.1.x - enable the prefill of the risk description with the danger category name on every entity
+UPDATE llx_const SET value = 1 WHERE name = 'DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL';
