@@ -741,7 +741,8 @@ if ($projectId > 0) {
 // criteria to the corrective actions of the year, not to the whole project.
 if (!empty($allTasks)) {
     $allTasks = array_values(array_filter($allTasks, function ($t) use ($actionPlanTaskYears, $actionPlanFilters) {
-        return ($actionPlanTaskYears[(int) $t->id] ?? 0) == (int) $actionPlanFilters['year'];
+        $taskYear = $actionPlanTaskYears[(int) $t->id] ?? ['year' => 0, 'progress' => 0];
+        return digiriskActionPlanTaskMatchesYear($taskYear['year'], $taskYear['progress'], (int) $actionPlanFilters['year']);
     }));
 }
 
@@ -1041,6 +1042,10 @@ foreach ($allTasks as $t) {
     // Budget
     $budget = property_exists($t, 'budget_amount') ? (float) $t->budget_amount : 0;
 
+    // Year the action is due in, and the one it was carried over from when it is a late one
+    $taskYear        = $actionPlanTaskYears[(int) $t->id] ?? ['year' => 0, 'progress' => 0];
+    $carriedOverFrom = digiriskActionPlanIsCarriedOver($taskYear['year'], $taskYear['progress'], (int) $actionPlanFilters['year']) ? $taskYear['year'] : 0;
+
     $tasksJson[] = [
         'id'                 => $t->id,
         'ref'                => $t->ref,
@@ -1054,6 +1059,7 @@ foreach ($allTasks as $t) {
         'duration_effective' => $t->duration_effective,
         'progress'           => (int) $t->progress,
         'status'             => (int) $t->fk_statut,
+        'carried_over_from'  => $carriedOverFrom,
         'risk_ref'           => $riskRef,
         'risk_id'            => $riskId,
         'risk_nomurl'        => $riskNomUrl,

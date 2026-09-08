@@ -85,11 +85,25 @@ function digiriskActionPlanGetTaskYear(int $dateEnd, int $dateStart = 0, int $da
 }
 
 /**
- * Return the calendar year of every corrective action of a project
+ * Return whether the late corrective actions are carried over to the running year
+ *
+ * Off by default: an action stays on the year it was due in, which is what a closed action
+ * plan is read against. Once on, an unfinished action of a past year also shows up on the
+ * running year so the year in progress holds everything left to do.
+ *
+ * @return bool True when the option is on
+ */
+function digiriskActionPlanCarriesOverLate(): bool
+{
+    return getDolGlobalInt('DIGIRISKDOLIBARR_ACTIONPLAN_CARRY_OVER_LATE') > 0;
+}
+
+/**
+ * Return the year and the progress of every corrective action of a project
  *
  * @param  DoliDB $db        Database handler
  * @param  int    $projectId Displayed project
- * @return array             [task id => year]
+ * @return array             [task id => ['year' => int, 'progress' => int]]
  */
 function digiriskActionPlanGetProjectTaskYears(DoliDB $db, int $projectId): array
 {
@@ -101,11 +115,11 @@ function digiriskActionPlanGetProjectTaskYears(DoliDB $db, int $projectId): arra
 }
 
 /**
- * Return the calendar year of the given corrective actions
+ * Return the year and the progress of the given corrective actions
  *
  * @param  DoliDB $db      Database handler
  * @param  array  $taskIDs Task ids
- * @return array           [task id => year]
+ * @return array           [task id => ['year' => int, 'progress' => int]]
  */
 function digiriskActionPlanGetTaskYears(DoliDB $db, array $taskIDs): array
 {
@@ -117,18 +131,19 @@ function digiriskActionPlanGetTaskYears(DoliDB $db, array $taskIDs): array
 }
 
 /**
- * Return the calendar year of the corrective actions matching a where clause
+ * Return the year and the progress of the corrective actions matching a where clause
  *
  * The three dates are read at once so a task is dated the same way whether it comes from the
- * screen, from an export or from the document.
+ * screen, from an export or from the document; the progress comes along, it is what tells a
+ * late action from a closed one.
  *
  * @param  DoliDB $db          Database handler
  * @param  string $whereClause Where clause on the task table, built from integers only
- * @return array               [task id => year]
+ * @return array               [task id => ['year' => int, 'progress' => int]]
  */
 function digiriskActionPlanFetchTaskYears(DoliDB $db, string $whereClause): array
 {
-    $sql = 'SELECT rowid, datee, dateo, datec FROM ' . MAIN_DB_PREFIX . 'projet_task WHERE ' . $whereClause;
+    $sql = 'SELECT rowid, datee, dateo, datec, progress FROM ' . MAIN_DB_PREFIX . 'projet_task WHERE ' . $whereClause;
 
     $resql = $db->query($sql);
     if (!$resql) {
@@ -138,7 +153,10 @@ function digiriskActionPlanFetchTaskYears(DoliDB $db, string $whereClause): arra
 
     $taskYears = [];
     while ($obj = $db->fetch_object($resql)) {
-        $taskYears[(int) $obj->rowid] = digiriskActionPlanGetTaskYear((int) $db->jdate($obj->datee), (int) $db->jdate($obj->dateo), (int) $db->jdate($obj->datec));
+        $taskYears[(int) $obj->rowid] = [
+            'year'     => digiriskActionPlanGetTaskYear((int) $db->jdate($obj->datee), (int) $db->jdate($obj->dateo), (int) $db->jdate($obj->datec)),
+            'progress' => (int) $obj->progress,
+        ];
     }
     $db->free($resql);
 
@@ -148,21 +166,60 @@ function digiriskActionPlanFetchTaskYears(DoliDB $db, string $whereClause): arra
 /**
  * Return the years holding corrective actions, most recent first
  *
- * @param  array $taskYears [task id => year] from digiriskActionPlanGetProjectTaskYears()
+ * An action is counted on the year it is due in, carried over or not: the history keeps the
+ * action plan of each year as it was written.
+ *
+ * @param  array $taskYears [task id => ['year', 'progress']] from digiriskActionPlanGetProjectTaskYears()
  * @return array            [year => number of corrective actions]
  */
 function digiriskActionPlanGetYearCounts(array $taskYears): array
 {
     $yearCounts = [];
-    foreach ($taskYears as $year) {
-        if ($year <= 0) {
+    foreach ($taskYears as $taskYear) {
+        if ($taskYear['year'] <= 0) {
             continue;
         }
-        $yearCounts[$year] = ($yearCounts[$year] ?? 0) + 1;
+        $yearCounts[$taskYear['year']] = ($yearCounts[$taskYear['year']] ?? 0) + 1;
     }
     krsort($yearCounts);
 
     return $yearCounts;
+}
+
+/**
+ * Return whether a corrective action is displayed by the tab of a year
+ *
+ * @param  int $taskYear      Year of the action, from digiriskActionPlanGetTaskYear()
+ * @param  int $progress      Progress percentage of the action
+ * @param  int $displayedYear Year of the tab
+ * @return bool               True when the action belongs to that year, carry over included
+ */
+function digiriskActionPlanTaskMatchesYear(int $taskYear, int $progress, int $displayedYear): bool
+{
+    if ($taskYear == $displayedYear) {
+        return true;
+    }
+
+    return digiriskActionPlanIsCarriedOver($taskYear, $progress, $displayedYear);
+}
+
+/**
+ * Return whether a corrective action is a late one carried over to the displayed year
+ *
+ * Only the running year receives them, a closed action plan is never rewritten by the actions
+ * of the years before it.
+ *
+ * @param  int $taskYear      Year of the action, from digiriskActionPlanGetTaskYear()
+ * @param  int $progress      Progress percentage of the action
+ * @param  int $displayedYear Year of the tab
+ * @return bool               True when the action is shown on a year later than its own
+ */
+function digiriskActionPlanIsCarriedOver(int $taskYear, int $progress, int $displayedYear): bool
+{
+    return digiriskActionPlanCarriesOverLate()
+        && $taskYear > 0 && $taskYear < $displayedYear
+        && $progress < 100
+        && $displayedYear == (int) dol_print_date(dol_now(), '%Y');
 }
 
 /**
@@ -521,7 +578,8 @@ function digiriskActionPlanFilterTasks(DoliDB $db, array $taskIDs, array $filter
     if (!empty($filters['year'])) {
         $taskYears   = digiriskActionPlanGetTaskYears($db, $keptTaskIDs);
         $keptTaskIDs = array_values(array_filter($keptTaskIDs, function ($taskID) use ($taskYears, $filters) {
-            return ($taskYears[$taskID] ?? 0) == (int) $filters['year'];
+            $taskYear = $taskYears[$taskID] ?? ['year' => 0, 'progress' => 0];
+            return digiriskActionPlanTaskMatchesYear($taskYear['year'], $taskYear['progress'], (int) $filters['year']);
         }));
     }
 

@@ -1780,6 +1780,11 @@ ActionPlanTabHistory               = PAPRIPACT des années précédentes
 ActionPlanHistoryYear              = Année du PAPRIPACT
 ActionPlanNoHistory                = Aucune action corrective sur les années précédentes
 ActionPlanYearRule                 = Une action corrective est rattachée à l'année civile de son échéance ; à défaut à celle de sa date de début, puis de sa date de création
+ActionPlanYearDisplay              = PAPRIPACT par année
+ActionPlanCarryOverLate            = Reporter les actions en retard
+ActionPlanCarryOverLateDesc        = Afficher aussi dans le PAPRIPACT de l'année en cours les actions correctives non terminées des années précédentes ; elles restent comptées dans le PAPRIPACT de leur année d'échéance
+ActionPlanCarriedOverFrom          = Retard %s
+ActionPlanCarriedOverHelp          = Action corrective non terminée, reportée d'une année précédente
 
 # ActionPlan — ActionComm Logging
 ActionPlanLogging                  = Plan d'Action — Historique des modifications

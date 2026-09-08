@@ -139,6 +139,28 @@ print '</table>';
 // Click on a tuto image to display it full size
 digiriskdolibarr_tuto_overlay();
 
+// Yearly action plan settings
+print '<br>';
+print load_fiche_titre('<i class="fas fa-calendar-alt"></i> ' . $langs->trans("ActionPlanYearDisplay"), '', '');
+print '<hr>';
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans("Name") . '</td>';
+print '<td>' . $langs->trans("Description") . '</td>';
+print '<td class="center">' . $langs->trans("Status") . '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ActionPlanCarryOverLate');
+print '</td><td>';
+print $langs->trans('ActionPlanCarryOverLateDesc');
+print '</td><td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_ACTIONPLAN_CARRY_OVER_LATE');
+print '</td></tr>';
+
+print '</table>';
+
 // Kanban display settings
 print '<br>';
 print load_fiche_titre('<i class="fas fa-th-large"></i> ' . $langs->trans("KanbanDisplay"), '', '');

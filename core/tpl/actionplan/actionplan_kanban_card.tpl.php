@@ -19,6 +19,13 @@
     <div class="kanban-card-header">
         <a href="<?= $t['url'] ?>" class="kanban-card-ref" target="_blank"><?= dol_escape_htmltag($t['ref']) ?></a>
 
+        <?php // A late action of a past year, shown here because the carry over option is on ?>
+        <?php if (!empty($t['carried_over_from'])) : ?>
+            <span class="kanban-card-carried" title="<?= dol_escape_htmltag($langs->trans('ActionPlanCarriedOverHelp')) ?>">
+                <i class="fas fa-history"></i> <?= $langs->trans('ActionPlanCarriedOverFrom', $t['carried_over_from']) ?>
+            </span>
+        <?php endif; ?>
+
         <span class="kanban-meta-item kanban-editable-meta" data-field="planned_workload" data-task-id="<?= $t['id'] ?>"
               data-raw="<?= $t['planned_workload'] > 0 ? round($t['planned_workload'] / 3600, 2) : 0 ?>"
               title="<?= dol_escape_htmltag($langs->trans('PlannedWorkload')) ?>">

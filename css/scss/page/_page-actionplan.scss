@@ -778,6 +778,22 @@
     }
 }
 
+/* Late action of a past year, displayed on the running year by the carry over option */
+.kanban-card-carried {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: #fdecea;
+    border: 1px solid #f5b7b1;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #c0392b;
+    white-space: nowrap;
+    cursor: help;
+}
+
 .kanban-card-risk {
     font-size: 10px;
     margin-left: auto;
