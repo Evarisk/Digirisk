@@ -77,20 +77,21 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             $riskAssessmentLevel        = explode('Risks', $moreParam['segmentName'])[1];
             // A cotation level with no risk used to be merged as one row full of "-". The four levels
             // share the same table, so up to four unreadable rows landed in the middle of the list.
-            // The row now names the level it stands for, and the columns that mean nothing here stay
-            // empty instead of showing a dash — issue #4459
+            // The row now names the level it stands for, and the columns that mean nothing here are
+            // blanked with a space: setTmpArrayVars() turns a truly empty value into "N/A", which is
+            // exactly the noise being complained about — issue #4459
             if (empty($digiriskElements) || empty($riskByRiskAssessmentLevels) || empty($riskByRiskAssessmentLevels[$riskAssessmentLevel])) {
                 $levelLabel = $outputLangs->transnoentities(static::RISK_ASSESSMENT_LEVEL_LABELS[$riskAssessmentLevel] ?? '');
 
-                $tmpArray['digiriskElementLabel']   = '';
+                $tmpArray['digiriskElementLabel']   = ' ';
                 $tmpArray['picto']                  = '';
-                $tmpArray['riskCategoryName']       = '';
-                $tmpArray['ref']                    = '';
-                $tmpArray['riskAssessmentCotation'] = '';
+                $tmpArray['riskCategoryName']       = ' ';
+                $tmpArray['ref']                    = ' ';
+                $tmpArray['riskAssessmentCotation'] = ' ';
                 $tmpArray['description']            = $outputLangs->transnoentities('NoRiskAtThisLevel', $levelLabel);
-                $tmpArray['riskAssessmentComment']  = '';
-                $tmpArray['riskTaskUncompleted']    = '';
-                $tmpArray['riskTaskCompleted']      = '';
+                $tmpArray['riskAssessmentComment']  = ' ';
+                $tmpArray['riskTaskUncompleted']    = ' ';
+                $tmpArray['riskTaskCompleted']      = ' ';
                 $tmpArray['riskAssessment_photo']   = '';
 
                 SaturneDocumentModel::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
