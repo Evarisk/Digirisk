@@ -491,7 +491,8 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Dependencies
 
 		$this->hidden                  = false;
-		$this->depends                 = ['modSaturne', 'modECM', 'modProjet', 'modSociete', 'modTicket', 'modCategorie', 'modFckeditor', 'modApi', 'modExport', 'modImport'];
+		// ECM, Agenda, Fckeditor et Categorie sont declares par Saturne et herites de lui
+		$this->depends                 = ['modSaturne', 'modProjet', 'modSociete', 'modTicket'];
 		$this->requiredby              = ['modDigiBoard'];
 		$this->conflictwith            = [];
 		$this->langfiles               = ["digiriskdolibarr@digiriskdolibarr"];
