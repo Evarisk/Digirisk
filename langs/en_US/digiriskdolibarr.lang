@@ -527,3 +527,13 @@ BlackRisk                          = Unacceptable risk
 
 # Audit report - issue #4459
 NoRiskAtThisLevel = No risk at this level (%s)
+Groupment                = Groupment
+WorkUnit                 = Work unit
+DigiriskElementAdded     = Added
+DigiriskElementModified  = Modified
+DigiriskElementDeleted   = Deleted
+NoDigiriskElementChange  = No groupment nor work unit changed over the period
+RiskTrendNew             = ⊕ New
+RiskTrendUp              = ↗ Up (%s → %s)
+RiskTrendDown            = ↘ Down (%s → %s)
+RiskTrendStable          = Stable (%s)

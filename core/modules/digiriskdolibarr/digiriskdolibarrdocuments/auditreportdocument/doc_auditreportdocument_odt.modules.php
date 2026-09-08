@@ -64,8 +64,9 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskDolibarrDocument
 
             $moreParam = $this->setDateRangeFilters($moreParam);
 
-            $moreParam['entity']           = 'current';
-            $moreParam['digiriskElements'] = $loadDigiriskElementInfos[$moreParam['entity']]['digiriskElements'];
+            $moreParam['entity']                 = 'current';
+            $moreParam['digiriskElements']       = $loadDigiriskElementInfos[$moreParam['entity']]['digiriskElements'];
+            $moreParam['digiriskElementChanges'] = $digiriskElement->loadDigiriskElementChanges($moreParam);
         }
 
         return parent::fillTagsLines($odfHandler, $outputLangs, $moreParam);
