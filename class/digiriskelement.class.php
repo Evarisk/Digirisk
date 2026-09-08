@@ -251,6 +251,71 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
+     * Load the GP/UT added, modified or deleted over a date range — issue #4459
+     *
+     * Deleted elements are read on purpose: an audit report is a historical trace, dropping the
+     * work units that disappeared during the period would hide precisely what the reader is
+     * looking for. They are soft deleted (status STATUS_TRASHED) so their row is still there.
+     *
+     * @param  array $moreParam More param (dateStart, dateEnd)
+     * @return array            Elements sorted by ref, each one as
+     *                          ['object' => DigiriskElement, 'state' => Added|Modified|Deleted, 'date' => timestamp]
+     * @throws Exception
+     */
+    public function loadDigiriskElementChanges(array $moreParam = []): array
+    {
+        global $conf;
+
+        if (empty($moreParam['dateStart']) || empty($moreParam['dateEnd'])) {
+            return [];
+        }
+
+        $startDate = $this->db->idate($moreParam['dateStart']);
+        $endDate   = $this->db->idate($moreParam['dateEnd']);
+
+        $statuses = [self::STATUS_VALIDATED, self::STATUS_TRASHED, self::STATUS_DELETED];
+
+        $filter  = 't.entity = ' . $conf->entity;
+        $filter .= ' AND t.status IN (' . implode(', ', $statuses) . ')';
+        $filter .= " AND (t.date_creation BETWEEN '" . $startDate . "' AND '" . $endDate . "'";
+        $filter .= " OR t.tms BETWEEN '" . $startDate . "' AND '" . $endDate . "')";
+
+        // The bin is a groupment like any other in database, it has nothing to do in an audit
+        $trashID = getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH');
+        if ($trashID > 0) {
+            $filter .= ' AND t.rowid != ' . $trashID;
+        }
+
+        $digiriskElements = $this->fetchAll('ASC', 'ref', 0, 0, ['customsql' => $filter]);
+        if (!is_array($digiriskElements) || empty($digiriskElements)) {
+            return [];
+        }
+
+        $changes = [];
+        foreach ($digiriskElements as $digiriskElement) {
+            $createdInRange = !empty($digiriskElement->date_creation)
+                && $digiriskElement->date_creation >= $moreParam['dateStart']
+                && $digiriskElement->date_creation <= $moreParam['dateEnd'];
+
+            if ($digiriskElement->status != self::STATUS_VALIDATED) {
+                $state = 'Deleted';
+            } elseif ($createdInRange) {
+                $state = 'Added';
+            } else {
+                $state = 'Modified';
+            }
+
+            // An element created during the period but touched again later would otherwise be
+            // dated after the audit window, which reads as an error in the report
+            $date = $state == 'Added' ? $digiriskElement->date_creation : $digiriskElement->tms;
+
+            $changes[] = ['object' => $digiriskElement, 'state' => $state, 'date' => $date];
+        }
+
+        return $changes;
+    }
+
+    /**
      * Tell whether an element was created or modified inside the requested date range
      *
      * @param  DigiriskElement $digiriskElement Element to test

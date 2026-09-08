@@ -2386,3 +2386,11 @@ NoRiskAssessed                     = Aucun risque évalué sur ce périmètre
 
 # Audit report - issue #4459
 NoRiskAtThisLevel = Aucun risque de ce niveau (%s)
+DigiriskElementAdded     = Ajouté
+DigiriskElementModified  = Modifié
+DigiriskElementDeleted   = Supprimé
+NoDigiriskElementChange  = Aucun groupement ni unité de travail modifié sur la période
+RiskTrendNew             = ⊕ Nouveau
+RiskTrendUp              = ↗ Hausse (%s → %s)
+RiskTrendDown            = ↘ Baisse (%s → %s)
+RiskTrendStable          = Stable (%s)

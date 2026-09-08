@@ -331,6 +331,52 @@ class Risk extends SaturneObject
     }
 
     /**
+     * Load the cotation each risk had before a given date — issue #4459
+     *
+     * Feeds the "risk going up or down" column of the audit report: comparing the cotation shown
+     * for the period with the one that stood just before it is the only way to tell an aggravation
+     * from an improvement. Everything is read in one query, a report walks hundreds of risks.
+     *
+     * date_riskassessment is optional in database, date_creation stands in when it is missing.
+     * Superseded assessments (status 0) are kept, they are precisely the history being looked up.
+     *
+     * @param  DoliDB $db         Database handler
+     * @param  array  $riskIds    Ids of the risks to look up
+     * @param  int    $beforeDate Timestamp the cotation is read before
+     * @return array              Cotation indexed by risk id, risks assessed for the first time are absent
+     */
+    public static function loadPreviousRiskAssessmentCotations(DoliDB $db, array $riskIds, int $beforeDate): array
+    {
+        $riskIds = array_filter(array_map('intval', $riskIds));
+        if (empty($riskIds) || empty($beforeDate)) {
+            return [];
+        }
+
+        $dateField = 'COALESCE(t.date_riskassessment, t.date_creation)';
+
+        $sql  = 'SELECT t.fk_risk, t.cotation FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_riskassessment AS t';
+        $sql .= ' WHERE t.fk_risk IN (' . $db->sanitize(implode(',', $riskIds)) . ')';
+        $sql .= ' AND t.status >= 0 AND t.cotation IS NOT NULL';
+        $sql .= ' AND ' . $dateField . " < '" . $db->idate($beforeDate) . "'";
+        // The last row read for a risk wins, so the assessment closest to the date is the one kept
+        $sql .= ' ORDER BY t.fk_risk ASC, ' . $dateField . ' ASC, t.rowid ASC';
+
+        $resql = $db->query($sql);
+        if (!$resql) {
+            dol_syslog(__METHOD__ . ' ' . $db->lasterror(), LOG_ERR);
+            return [];
+        }
+
+        $previousCotations = [];
+        while ($obj = $db->fetch_object($resql)) {
+            $previousCotations[(int) $obj->fk_risk] = (int) $obj->cotation;
+        }
+        $db->free($resql);
+
+        return $previousCotations;
+    }
+
+    /**
 	 * Load object in memory from the database
 	 *
 	 * @param int $parent_id Id parent object
