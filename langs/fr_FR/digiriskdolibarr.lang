@@ -2383,3 +2383,6 @@ ListingRisksCotationColumn         = Cot.
 ListingRisksRiskColumn             = Risque
 ListingRisksAssessmentColumn       = Informations sur l'évaluation
 NoRiskAssessed                     = Aucun risque évalué sur ce périmètre
+
+# Audit report - issue #4459
+NoRiskAtThisLevel = Aucun risque de ce niveau (%s)

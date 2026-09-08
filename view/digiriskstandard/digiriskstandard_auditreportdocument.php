@@ -146,7 +146,7 @@ if ($object->id > 0) {
     print '</tr>';
 
     // DateRange -- Plage de date
-    $firstDayOfTheYear = dol_get_first_day(date('Y)'));
+    $firstDayOfTheYear = dol_get_first_day((int) date('Y'));
     print '<tr class="oddeven"><td>' . $langs->trans("DateRange") . '</td>';
     print '<td>' . $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'datestart');
     print $langs->trans('At') . $form->selectDate(dol_now(), 'dateend');

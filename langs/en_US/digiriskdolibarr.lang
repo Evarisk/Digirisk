@@ -524,3 +524,6 @@ GreyRisk                           = Low risk
 OrangeRisk                         = Risk to be planned
 RedRisk                            = Risk to be handled
 BlackRisk                          = Unacceptable risk
+
+# Audit report - issue #4459
+NoRiskAtThisLevel = No risk at this level (%s)
