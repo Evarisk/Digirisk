@@ -32,7 +32,7 @@ $onPhone = $onPhone ?? ($conf->browser->layout == 'phone');
 					</div>
 				</div>
 				<div class="risk-evaluation-container <?php echo $lastEvaluation->method; ?>">
-					<div class="risk-evaluation-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+					<div class="risk-evaluation-header risk-evaluation-header-split">
                         <div class="risk-evaluation-header-left">
                             <?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
                                 <?php if ( $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD == 1 ) : ?>
