@@ -1775,6 +1775,11 @@ ActionPlanDisplayedProject         = Projet affiché
 ActionPlanChangeProject            = Changer de projet
 ActionPlanDefaultProject           = Document Unique (par défaut)
 ActionPlanNoProjectConfigured      = Aucun projet configuré
+ActionPlanTabCurrentYear           = PAPRIPACT %s
+ActionPlanTabHistory               = PAPRIPACT des années précédentes
+ActionPlanHistoryYear              = Année du PAPRIPACT
+ActionPlanNoHistory                = Aucune action corrective sur les années précédentes
+ActionPlanYearRule                 = Une action corrective est rattachée à l'année civile de son échéance ; à défaut à celle de sa date de début, puis de sa date de création
 
 # ActionPlan — ActionComm Logging
 ActionPlanLogging                  = Plan d'Action — Historique des modifications

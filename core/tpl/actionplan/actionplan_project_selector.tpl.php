@@ -21,12 +21,13 @@
  * \brief   Displayed project banner and project switcher for the action plan
  *
  * Variables expected from calling PHP:
- * - $project     Project     Currently displayed project (fetched, may be empty)
- * - $projectId   int         Currently displayed project ID
- * - $duProjectId int         Document Unique project ID (default project)
- * - $formproject FormProjets Dolibarr project form helper
- * - $view        string      Current view ('kanban' or 'gantt')
- * - $langs       Translate
+ * - $project           Project     Currently displayed project (fetched, may be empty)
+ * - $projectId         int         Currently displayed project ID
+ * - $duProjectId       int         Document Unique project ID (default project)
+ * - $actionPlanFilters array       Criteria from digiriskActionPlanGetFilters(), year resolved
+ * - $formproject       FormProjets Dolibarr project form helper
+ * - $view              string      Current view ('kanban' or 'gantt')
+ * - $langs             Translate
  */
 
 // Keep the menu highlighted after the switch (the selector reloads the page)
@@ -51,6 +52,9 @@ $menuId   = GETPOSTINT('idmenu');
     </div>
     <form class="app-project-form" method="GET" action="<?php echo $_SERVER['PHP_SELF']; ?>">
         <input type="hidden" name="view" value="<?php echo dol_escape_htmltag($view); ?>">
+        <?php // The other project opens on the same year, its own history may not hold it ?>
+        <input type="hidden" name="period" value="<?php echo dol_escape_htmltag($actionPlanFilters['period']); ?>">
+        <input type="hidden" name="year" value="<?php echo (int) $actionPlanFilters['year']; ?>">
         <?php if (!empty($menuMain)) : ?>
             <input type="hidden" name="mainmenu" value="<?php echo dol_escape_htmltag($menuMain); ?>">
         <?php endif; ?>

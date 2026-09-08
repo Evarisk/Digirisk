@@ -21,44 +21,207 @@
  * \brief   Library files with common functions for the action plan (PAPRIPACT)
  *
  * The Kanban, the Gantt and the CSV export display the same corrective actions, so the
- * GP/UT, risk level and tag criteria are resolved here once instead of in each consumer.
+ * displayed year and the GP/UT, risk level and tag criteria are resolved here once instead of
+ * in each consumer.
  */
 
 /**
  * Read the action plan filter criteria from the request
  *
+ * The displayed year comes from the tabs and not from the filter bar, so it survives a
+ * "remove filter". It is read here anyway so every consumer receives one single criteria set;
+ * digiriskActionPlanResolveYear() turns it into the year actually displayed.
+ *
  * @return array Filters: element (GP/UT id), element_children (include the sub elements),
- *               scale (risk level 1 to 4), tags (category ids)
+ *               scale (risk level 1 to 4), tags (category ids), period (current or history),
+ *               year (asked calendar year)
  */
 function digiriskActionPlanGetFilters(): array
 {
+    $scope = [
+        'period' => GETPOST('period', 'aZ09') == 'history' ? 'history' : 'current',
+        'year'   => GETPOSTINT('year'),
+    ];
+
     // "Remove filter" wins over any criterion still posted by the form
     if (GETPOST('button_removefilter', 'alpha') || GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha')) {
-        return ['element' => 0, 'element_children' => 1, 'scale' => 0, 'tags' => []];
+        return array_merge(['element' => 0, 'element_children' => 1, 'scale' => 0, 'tags' => []], $scope);
     }
 
     $tags = GETPOST('search_tags', 'array');
     $tags = is_array($tags) ? array_values(array_filter(array_map('intval', $tags))) : [];
 
-    return [
+    return array_merge([
         // The empty option of the GP/UT selector posts -1, it means "every GP/UT" like 0
         'element'          => max(0, GETPOSTINT('search_element')),
         // Sub elements are included by default: a GP is rarely interesting without its work units
         'element_children' => GETPOSTISSET('search_element_children') ? GETPOSTINT('search_element_children') : 1,
         'scale'            => GETPOSTINT('search_scale'),
         'tags'             => $tags,
-    ];
+    ], $scope);
 }
 
 /**
- * Return whether at least one action plan filter is active
+ * Return the calendar year a corrective action belongs to
+ *
+ * The CARSAT recommends the calendar year over the fiscal one, and an action belongs to the
+ * year it is due in: the due date wins, then the start date, then the creation date so an
+ * action carrying no date at all still shows up on the year it was written.
+ *
+ * @param  int $dateEnd      Due date of the corrective action
+ * @param  int $dateStart    Start date
+ * @param  int $dateCreation Creation date
+ * @return int               Calendar year, 0 when the action carries no date at all
+ */
+function digiriskActionPlanGetTaskYear(int $dateEnd, int $dateStart = 0, int $dateCreation = 0): int
+{
+    foreach ([$dateEnd, $dateStart, $dateCreation] as $date) {
+        if ($date > 0) {
+            return (int) dol_print_date($date, '%Y');
+        }
+    }
+
+    return 0;
+}
+
+/**
+ * Return the calendar year of every corrective action of a project
+ *
+ * @param  DoliDB $db        Database handler
+ * @param  int    $projectId Displayed project
+ * @return array             [task id => year]
+ */
+function digiriskActionPlanGetProjectTaskYears(DoliDB $db, int $projectId): array
+{
+    if ($projectId <= 0) {
+        return [];
+    }
+
+    return digiriskActionPlanFetchTaskYears($db, 'fk_projet = ' . $projectId);
+}
+
+/**
+ * Return the calendar year of the given corrective actions
+ *
+ * @param  DoliDB $db      Database handler
+ * @param  array  $taskIDs Task ids
+ * @return array           [task id => year]
+ */
+function digiriskActionPlanGetTaskYears(DoliDB $db, array $taskIDs): array
+{
+    if (empty($taskIDs)) {
+        return [];
+    }
+
+    return digiriskActionPlanFetchTaskYears($db, 'rowid IN (' . implode(',', array_map('intval', $taskIDs)) . ')');
+}
+
+/**
+ * Return the calendar year of the corrective actions matching a where clause
+ *
+ * The three dates are read at once so a task is dated the same way whether it comes from the
+ * screen, from an export or from the document.
+ *
+ * @param  DoliDB $db          Database handler
+ * @param  string $whereClause Where clause on the task table, built from integers only
+ * @return array               [task id => year]
+ */
+function digiriskActionPlanFetchTaskYears(DoliDB $db, string $whereClause): array
+{
+    $sql = 'SELECT rowid, datee, dateo, datec FROM ' . MAIN_DB_PREFIX . 'projet_task WHERE ' . $whereClause;
+
+    $resql = $db->query($sql);
+    if (!$resql) {
+        dol_syslog(__FUNCTION__ . ': ' . $db->lasterror(), LOG_ERR);
+        return [];
+    }
+
+    $taskYears = [];
+    while ($obj = $db->fetch_object($resql)) {
+        $taskYears[(int) $obj->rowid] = digiriskActionPlanGetTaskYear((int) $db->jdate($obj->datee), (int) $db->jdate($obj->dateo), (int) $db->jdate($obj->datec));
+    }
+    $db->free($resql);
+
+    return $taskYears;
+}
+
+/**
+ * Return the years holding corrective actions, most recent first
+ *
+ * @param  array $taskYears [task id => year] from digiriskActionPlanGetProjectTaskYears()
+ * @return array            [year => number of corrective actions]
+ */
+function digiriskActionPlanGetYearCounts(array $taskYears): array
+{
+    $yearCounts = [];
+    foreach ($taskYears as $year) {
+        if ($year <= 0) {
+            continue;
+        }
+        $yearCounts[$year] = ($yearCounts[$year] ?? 0) + 1;
+    }
+    krsort($yearCounts);
+
+    return $yearCounts;
+}
+
+/**
+ * Resolve the year displayed by the action plan tabs
+ *
+ * The current year tab always shows the running calendar year, empty or not. The history tab
+ * shows the asked year as long as it is a past year holding corrective actions, and falls back
+ * on the most recent past one; with no history at all it lands on last year, so the board is
+ * empty next to the "no history" message instead of showing every corrective action.
+ *
+ * @param  array $filters    Filters from digiriskActionPlanGetFilters()
+ * @param  array $yearCounts Years from digiriskActionPlanGetYearCounts()
+ * @return array             Filters carrying the displayed year
+ */
+function digiriskActionPlanResolveYear(array $filters, array $yearCounts): array
+{
+    $currentYear = (int) dol_print_date(dol_now(), '%Y');
+
+    if ($filters['period'] != 'history') {
+        $filters['year'] = $currentYear;
+
+        return $filters;
+    }
+
+    $pastYears = array_values(array_filter(array_keys($yearCounts), function ($year) use ($currentYear) {
+        return $year < $currentYear;
+    }));
+
+    if (empty($filters['year']) || !in_array((int) $filters['year'], $pastYears, true)) {
+        // Years are sorted from the most recent one, which is the last closed action plan
+        $filters['year'] = !empty($pastYears) ? $pastYears[0] : $currentYear - 1;
+    }
+
+    return $filters;
+}
+
+/**
+ * Return whether at least one filter bar criterion is active
+ *
+ * The displayed year is left out on purpose: it is the tab, not a filter, so it neither turns
+ * the count red nor raises the "remove filter" button.
  *
  * @param  array $filters Filters from digiriskActionPlanGetFilters()
- * @return bool           True if the task list is restricted
+ * @return bool           True if the filter bar restricts the task list
  */
 function digiriskActionPlanHasFilters(array $filters): bool
 {
     return !empty($filters['element']) || !empty($filters['scale']) || !empty($filters['tags']);
+}
+
+/**
+ * Return whether the task list is restricted, by the filter bar or by the displayed year
+ *
+ * @param  array $filters Filters from digiriskActionPlanGetFilters()
+ * @return bool           True if digiriskActionPlanFilterTasks() has something to drop
+ */
+function digiriskActionPlanHasCriteria(array $filters): bool
+{
+    return digiriskActionPlanHasFilters($filters) || !empty($filters['year']);
 }
 
 /**
@@ -69,11 +232,33 @@ function digiriskActionPlanHasFilters(array $filters): bool
  */
 function digiriskActionPlanFilterHiddenInputs(array $filters): string
 {
-    $out  = '<input type="hidden" name="search_element" value="' . (int) $filters['element'] . '">';
+    $out  = '<input type="hidden" name="period" value="' . dol_escape_htmltag($filters['period']) . '">';
+    $out .= '<input type="hidden" name="year" value="' . (int) $filters['year'] . '">';
+    $out .= '<input type="hidden" name="search_element" value="' . (int) $filters['element'] . '">';
     $out .= '<input type="hidden" name="search_element_children" value="' . (int) $filters['element_children'] . '">';
     $out .= '<input type="hidden" name="search_scale" value="' . (int) $filters['scale'] . '">';
     foreach ($filters['tags'] as $tagID) {
         $out .= '<input type="hidden" name="search_tags[]" value="' . (int) $tagID . '">';
+    }
+
+    return $out;
+}
+
+/**
+ * Return the filter bar criteria as url parameters, for the tab and year links
+ *
+ * The displayed year is left out: every link carrying these parameters sets its own one.
+ *
+ * @param  array  $filters Filters from digiriskActionPlanGetFilters()
+ * @return string          Url parameters, each one starting with an ampersand
+ */
+function digiriskActionPlanFilterUrlParams(array $filters): string
+{
+    $out  = '&search_element=' . (int) $filters['element'];
+    $out .= '&search_element_children=' . (int) $filters['element_children'];
+    $out .= '&search_scale=' . (int) $filters['scale'];
+    foreach ($filters['tags'] as $tagID) {
+        $out .= '&search_tags[]=' . (int) $tagID;
     }
 
     return $out;
@@ -315,7 +500,8 @@ function digiriskActionPlanGetTaskCategories(DoliDB $db, array $taskIDs): array
  * Keep only the tasks matching the GP/UT, risk level and tag criteria
  *
  * A task without linked risk carries neither GP/UT nor risk level, so it is dropped as soon
- * as one of those two criteria is set.
+ * as one of those two criteria is set. The displayed year comes first, it is the tab the other
+ * criteria refine.
  *
  * @param  DoliDB $db          Database handler
  * @param  array  $taskIDs     Task ids to filter
@@ -326,13 +512,20 @@ function digiriskActionPlanGetTaskCategories(DoliDB $db, array $taskIDs): array
  */
 function digiriskActionPlanFilterTasks(DoliDB $db, array $taskIDs, array $filters, array $elementTree = []): array
 {
-    if (empty($taskIDs) || !digiriskActionPlanHasFilters($filters)) {
+    if (empty($taskIDs) || !digiriskActionPlanHasCriteria($filters)) {
         return $taskIDs;
     }
 
     $keptTaskIDs = $taskIDs;
 
-    if (!empty($filters['element']) || !empty($filters['scale'])) {
+    if (!empty($filters['year'])) {
+        $taskYears   = digiriskActionPlanGetTaskYears($db, $keptTaskIDs);
+        $keptTaskIDs = array_values(array_filter($keptTaskIDs, function ($taskID) use ($taskYears, $filters) {
+            return ($taskYears[$taskID] ?? 0) == (int) $filters['year'];
+        }));
+    }
+
+    if (!empty($keptTaskIDs) && (!empty($filters['element']) || !empty($filters['scale']))) {
         $taskRisks = digiriskActionPlanGetTaskRisks($db, $keptTaskIDs);
         $riskIDs   = array_values(array_unique($taskRisks));
 

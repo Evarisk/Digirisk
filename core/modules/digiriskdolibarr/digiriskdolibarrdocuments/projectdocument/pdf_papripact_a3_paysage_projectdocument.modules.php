@@ -357,8 +357,8 @@ class pdf_papripact_a3_paysage_projectdocument
 
 				$object->lines = $tasksarray;
 
-				// The document follows the criteria applied on the action plan screen (GP/UT, risk level, tags)
-				if (!empty($moreParam['actionPlanFilters']) && digiriskActionPlanHasFilters($moreParam['actionPlanFilters'])) {
+				// The document follows the criteria applied on the action plan screen (displayed year, GP/UT, risk level, tags)
+				if (!empty($moreParam['actionPlanFilters']) && digiriskActionPlanHasCriteria($moreParam['actionPlanFilters'])) {
 					$keptTaskIDs   = digiriskActionPlanFilterTasks($this->db, array_map(function ($line) { return (int) $line->id; }, $object->lines), $moreParam['actionPlanFilters']);
 					$keptTaskMap   = array_flip($keptTaskIDs);
 					$object->lines = array_values(array_filter($object->lines, function ($line) use ($keptTaskMap) {
