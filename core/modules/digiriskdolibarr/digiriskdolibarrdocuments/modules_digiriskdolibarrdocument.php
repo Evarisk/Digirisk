@@ -101,7 +101,7 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             }
 
             foreach ($riskByRiskAssessmentLevels[$riskAssessmentLevel] as $risk) {
-                $digiriskElement = $digiriskElements[$risk->fk_element];
+                $digiriskElement = $digiriskElements[$risk->fk_element] ?? null;
                 if (empty($digiriskElement)) {
                     continue; // Skip if digirisk element not found (case of GP/UT fiche with spécific id)
                 }
@@ -623,6 +623,11 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                 $digiriskElements[$moreParam['object']->id]['object'] = $moreParam['object'];
                 $digiriskElements[$moreParam['object']->id]['depth']  = 0;
                 $moreParam['digiriskElements']                        = $digiriskElements;
+            }
+            // Inherited risks belong to ancestors a document scoped on one element does not know
+            // about; without their element the row renderer skips every one of them
+            if (!empty($loadRiskInfos['inheritedDigiriskElements'])) {
+                $moreParam['digiriskElements'] += $loadRiskInfos['inheritedDigiriskElements'];
             }
             // The trend column only makes sense against a period, and one query serves every row.
             // The ids are read from the objects: loadRiskInfos() merges the current and shared
