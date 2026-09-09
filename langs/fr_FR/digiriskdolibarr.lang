@@ -2418,3 +2418,16 @@ FirePermitMenuVisibilityDescription             = Si l'option est désactivée, 
 AccidentMenuVisibilityDescription               = Si l'option est désactivée, les entrées de menu des accidents (liste et catégories) sont masquées.<br>L'onglet de configuration « Accident » n'est masqué que si les enquêtes accident le sont également.
 AccidentInvestigationMenuVisibilityDescription  = Si l'option est désactivée, l'entrée de menu des enquêtes accident est masquée.<br>L'onglet de configuration « Accident » n'est masqué que si les accidents le sont également.
 ToolsMenuVisibilityDescription                  = Si l'option est désactivée, l'entrée de menu des outils est masquée.
+
+# RiskCard
+RiskCard = Carte du risque
+SubCategory = Sous-catégorie
+Evaluation = Cotation
+Gravity = Gravité
+Occurrence = Occurrence
+Exposition = Exposition
+Formation = Formation
+Protection = Protection
+NoRiskAssessmentYet = Aucune évaluation pour ce risque
+NoTaskYet = Aucune tâche pour ce risque
+NoDescription = Aucune description
