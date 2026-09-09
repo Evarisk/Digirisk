@@ -565,7 +565,7 @@ class ActionsDigiriskdolibarr
 						let mailContent = $('#message').html()
 						let digiriskElementRefAndLabel = <?php echo json_encode($digiriskelement->ref . ' - ' . $digiriskelement->label); ?>;
 						let digiriskElementId = <?php echo json_encode($digiriskelement->id); ?>;
-						let mailContentWithDigiriskElementLabel = mailContent.replace('__EXTRAFIELD_DIGIRISKDOLIBARR_TICKET_SERVICE_NAME__ ', digiriskElementRefAndLabel);
+						let mailContentWithDigiriskElementLabel = mailContent.replace('__EXTRAFIELD_DIGIRISKDOLIBARR_TICKET_SERVICE_NAME__', digiriskElementRefAndLabel);
 						$('#message').html(mailContentWithDigiriskElementLabel);
 					</script>
 					<?php
