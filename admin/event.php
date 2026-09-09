@@ -39,6 +39,8 @@ require_once __DIR__ . '/../lib/digiriskdolibarr.lib.php';
 
 saturne_check_access($user->admin);
 
+$permissiontowrite = saturne_check_admin_write_access();
+
 // Load translation files required by the page
 saturne_load_langs(['admin', 'other', 'agenda']);
 
@@ -87,6 +89,9 @@ if ($action == "save" && empty($cancel)) {
     }
 }
 
+// Actions set_mod, update_mask and the set_/del_ switch of the module constants
+require_once __DIR__ . '/../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
+
 /*
  * View
  */
@@ -127,7 +132,7 @@ print $langs->trans('AdvancedTriggersDescription', ucfirst($module));
 print '</td>';
 
 print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_ADVANCED_TRIGGER');
+print saturne_constant_onoff('DIGIRISKDOLIBARR_ADVANCED_TRIGGER', $permissiontowrite);
 print '</td>';
 print '</tr>';
 print '</table>';

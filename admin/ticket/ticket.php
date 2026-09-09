@@ -68,7 +68,8 @@ $value      = GETPOST('value', 'alpha');
 $pageY      = GETPOST('page_y', 'int');
 
 // Security check - Protection if external user
-$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
 /*
@@ -358,6 +359,9 @@ if ($action == 'set_multi_company_ticket_public_interface') {
     exit;
 }
 
+// Actions set_mod, update_mask and the set_/del_ switch of the module constants
+require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
+
 /*
  * View
  */
@@ -457,7 +461,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
     print digiriskdolibarr_tuto_image('ticket_sst', 'company_logo', $langs->transnoentities("TicketShowCompanyLogo"));
     print '</td>';
     print '<td class="center">';
-    print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO');
+    print saturne_constant_onoff('DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO', $permissiontowrite);
     print '</td>';
     print '<td class="center">';
     print '';
@@ -473,7 +477,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print digiriskdolibarr_tuto_image('ticket_sst', 'hide_ref', $langs->transnoentities("TicketDigiriskElementHideRef"));
 	print '</td>';
 	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_HIDE_REF');
+	print saturne_constant_onoff('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_HIDE_REF', $permissiontowrite);
 	print '</td>';
 	print '<td class="center">';
 	print '';
@@ -488,7 +492,8 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 		print '<tr class="oddeven"><td>' . $langs->transnoentities("ShowSelectorOnTicketPublicInterface") . '</td>';
 		print '<td class="center"></td>';
 		print '<td class="center">';
-		print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', [], 0);
+		// The constant is shared by every entity, so it keeps the ajax component and only asks for the zero instead of the deletion
+		print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', [], 0, 0, 0, 0, 2, 0, 1);
 		print '</a>';
 		print '</td>';
 		print '<td class="center">';
@@ -504,7 +509,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("SendEmailOnTicketSubmit") . '</td>';
 	print '<td class="center"></td>';
 	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT');
+	print saturne_constant_onoff('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT', $permissiontowrite);
 	print '</td>';
 	print '<td class="center">';
 	print '';

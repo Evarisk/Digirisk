@@ -50,7 +50,8 @@ $department = GETPOST('MeteoVigilanceDepartment', 'alpha');
 $cacheTtl   = GETPOSTINT('MeteoVigilanceCacheTTL');
 
 // Security check - Protection if external user
-$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
 /*
@@ -84,6 +85,9 @@ if ($action == 'refresh') {
     }
 }
 
+// Actions set_mod, update_mask and the set_/del_ switch of the module constants
+require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
+
 /*
  * View
  */
@@ -113,7 +117,7 @@ print '</tr>';
 
 print '<tr class="oddeven"><td><label>' . $langs->trans('MeteoVigilanceEnabled') . '</label></td>';
 print '<td>' . $langs->trans('MeteoVigilanceEnabledDescription') . '</td>';
-print '<td>' . ajax_constantonoff('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_ENABLED') . '</td></tr>';
+print '<td>' . saturne_constant_onoff('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_ENABLED', $permissiontowrite) . '</td></tr>';
 
 print '<tr class="oddeven"><td><label for="MeteoVigilanceApiKey">' . $langs->trans('MeteoVigilanceApiKey') . '</label></td>';
 print '<td>' . $langs->trans('MeteoVigilanceApiKeyDescription') . '</td>';
