@@ -593,3 +593,16 @@ ShowPatchNoteAgainDescription = When enabled, the release note of the current ve
 RiskCotation = Rating
 PreventionActions = Prevention actions
 AddingInProgress = Adding in progress...
+
+# RiskCard
+RiskCard = Risk card
+SubCategory = Sub-category
+Evaluation = Rating
+Gravity = Severity
+Occurrence = Occurrence
+Exposition = Exposure
+Formation = Training
+Protection = Protection
+NoRiskAssessmentYet = No assessment for this risk yet
+NoTaskYet = No task for this risk yet
+NoDescription = No description

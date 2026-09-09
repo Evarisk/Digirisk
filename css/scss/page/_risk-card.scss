@@ -1,0 +1,126 @@
+/* Risk card: the read page of a single risk, where its description and its whole assessment
+   history are shown in full, the list only having room for a truncated version of both. */
+/* Danger category of the risk, read under its ref: a risk carries no label, the family it belongs
+   to is what names it. The banner line is laid out on its own so the picto never drops below. */
+.risk-card-danger-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.risk-card-danger-category-pic {
+  width: 32px;
+  height: 32px;
+  flex: none;
+}
+
+.risk-card {
+  .risk-card-cotation-panel {
+    border: 1px solid $color__grey;
+    border-radius: 6px;
+    padding: 12px;
+    background: #fff;
+  }
+
+  .risk-card-cotation-panel-title {
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .risk-card-cotation-panel-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .risk-card-cotation-level {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .risk-card-cotation-meta {
+    margin-top: 4px;
+  }
+
+  .risk-card-counters {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .risk-card-counter {
+    flex: 1;
+    display: block;
+    padding: 10px 12px;
+    border: 1px solid $color__grey;
+    border-radius: 6px;
+    background: #fff;
+    text-align: center;
+    text-decoration: none;
+
+    &:hover {
+      border-color: $color__primary;
+    }
+  }
+
+  .risk-card-counter-value {
+    display: block;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .risk-card-counter-label {
+    display: block;
+  }
+}
+
+/* The description and the comments are read in full: they keep their line breaks and never
+   overflow the block they sit in, however long a word the field holds. */
+.risk-card-description {
+  padding: 10px 12px;
+  border: 1px solid $color__grey;
+  border-radius: 6px;
+  background: #fff;
+  white-space: normal;
+}
+
+/* Table / Gantt switch of the action plan block, sitting on the right of the section title. */
+.risk-card-taskview-switch {
+  display: inline-flex;
+  gap: 4px;
+
+  .risk-card-taskview {
+    padding: 3px 10px;
+    border: 1px solid $color__grey;
+    border-radius: 4px;
+    background: #fff;
+    text-decoration: none;
+
+    &:hover {
+      border-color: $color__primary;
+    }
+
+    &.active {
+      border-color: $color__primary;
+      background: $color__primary;
+      color: $color__primary-text;
+    }
+  }
+}
+
+/* Criteria of an advanced assessment, read next to the cotation they add up to. */
+.risk-card-criteria {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.risk-card-criterion {
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: $color__grey;
+  font-size: 11px;
+  white-space: nowrap;
+}

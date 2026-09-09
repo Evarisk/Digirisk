@@ -1592,7 +1592,7 @@ class Risk extends SaturneObject
         $label .= '<br><b>' . $langs->trans('Ref') . ' : </b> ' . $this->ref;
         $label .= '<br><b>' . $langs->transnoentities('Description') . ' : </b> ' . $this->description;
 
-        $url = dol_buildpath('/' . $this->module . '/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $this->fk_element;
+        $url = dol_buildpath('/' . $this->module . '/view/risk/risk_card.php', 1) . '?id=' . $this->id;
 
         if ($option != 'nolink') {
             // Add param to save lastsearch_values or not
