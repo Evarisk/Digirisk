@@ -234,6 +234,25 @@ class Risk extends SaturneObject
             $array['current']['riskByRiskAssessmentLevels']    = [];
         }
 
+        // ShowInheritedRisksInDocuments promises "Activez cette option pour les afficher dans les
+        // documents", and the element template says its risk table holds, depending on the
+        // settings, the risks of the unit, the inherited ones and the shared ones. The setting lost
+        // its last reader when this collection was standardised on loadRiskInfos() - issue #5120.
+        // Only for a document scoped on one element: the risk assessment document passes no element
+        // filter and already lists every risk of the entity.
+        $array['inheritedDigiriskElements'] = [];
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS') && ($moreParam['object'] ?? null) instanceof DigiriskElement) {
+            $inherited = $this->fetchInheritedRisks($moreParam, $join, $select, $moreSelects);
+            if (!empty($inherited['risks'])) {
+                // Both sides are keyed by risk id, so a risk reachable twice is kept once. The
+                // template states the table is sorted by descending cotation, which the union of
+                // two already sorted fetches would break
+                $array['current']['risks'] += $inherited['risks'];
+                uasort($array['current']['risks'], fn($first, $second) => $second->riskAssessmentCotation <=> $first->riskAssessmentCotation);
+                $array['inheritedDigiriskElements'] = $inherited['digiriskElements'];
+            }
+        }
+
         if (empty($moreParam['tmparray']['showSharedRisk_nocheck'])) {
             $array['shared']['risks']                         = [];
             $array['shared']['riskByCategories']              = [];
@@ -328,6 +347,68 @@ class Risk extends SaturneObject
         }
 
         return $array;
+    }
+
+    /**
+     * Fetch the risks every ancestor of an element carries
+     *
+     * "Inherited" is what the element card shows under ShowInheritedRisksInListings: declared
+     * higher in the tree and applying downwards. The parent chain is read from the validated
+     * elements, which one cached query already holds, so an unvalidated element ends the walk -
+     * its own risks are excluded by the status filter anyway, and those of its parents are then
+     * left out too.
+     *
+     * @param  array  $moreParam   More param (object/filterRisk/filterRiskDate)
+     * @param  string $join        Join on the owning element and the risk assessment
+     * @param  string $select      Extra columns the risk segments read
+     * @param  array  $moreSelects Names of those extra columns
+     * @return array               ['risks' => risks keyed by id, 'digiriskElements' => the ancestors they belong to]
+     * @throws Exception
+     */
+    private function fetchInheritedRisks(array $moreParam, string $join, string $select, array $moreSelects): array
+    {
+        global $conf;
+
+        $digiriskElement  = new DigiriskElement($this->db);
+        $digiriskElements = $digiriskElement->getActiveDigiriskElements('all');
+        if (!is_array($digiriskElements)) {
+            $digiriskElements = [];
+        }
+
+        $ancestorIds = [];
+        $parentId    = (int) $moreParam['object']->fk_parent;
+        // An id already seen means fk_parent forms a cycle: stop rather than loop forever
+        while ($parentId > 0 && !isset($ancestorIds[$parentId])) {
+            $ancestorIds[$parentId] = $parentId;
+            $parentId               = isset($digiriskElements[$parentId]) ? (int) $digiriskElements[$parentId]->fk_parent : 0;
+        }
+
+        if (empty($ancestorIds)) {
+            return ['risks' => [], 'digiriskElements' => []];
+        }
+
+        // The caller filter carries the element condition this fetch replaces. A date condition is
+        // passed apart, in filterRiskDate, and still applies
+        $filter = 't.status = ' . self::STATUS_VALIDATED
+            . ' AND d.status = ' . DigiriskElement::STATUS_VALIDATED
+            . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED
+            . ($moreParam['filterRiskDate'] ?? '')
+            . (!empty($moreParam['filterRisk']) ? $moreParam['filterRisk'] : ' AND t.type = \'risk\'')
+            . ' AND t.entity = ' . $conf->entity
+            . ' AND t.fk_element IN (' . implode(',', $ancestorIds) . ')';
+
+        $risks = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $filter], 'AND', false, false, false, $join, [], $select, $moreSelects);
+
+        // The row renderer names a risk's element from moreParam['digiriskElements']; a document
+        // scoped on one element only knows that one, and would skip every inherited row
+        $ancestorElements = [];
+        foreach ($ancestorIds as $ancestorId) {
+            if (isset($digiriskElements[$ancestorId])) {
+                $ancestorElements[$ancestorId] = ['object' => $digiriskElements[$ancestorId], 'depth' => 0];
+            }
+        }
+
+        return ['risks' => is_array($risks) ? $risks : [], 'digiriskElements' => $ancestorElements];
     }
 
     /**
