@@ -561,3 +561,32 @@ FirePermitMenuVisibilityDescription             = When the option is disabled, t
 AccidentMenuVisibilityDescription               = When the option is disabled, the accident menu entries (list and categories) are hidden.<br>The "Accident" configuration tab is hidden only if the accident investigations are hidden too.
 AccidentInvestigationMenuVisibilityDescription  = When the option is disabled, the accident investigation menu entry is hidden.<br>The "Accident" configuration tab is hidden only if the accidents are hidden too.
 ToolsMenuVisibilityDescription                  = When the option is disabled, the tools menu entry is hidden.
+
+# ===========================================================================
+# Setup page module advices — issue #5102
+# ===========================================================================
+UserApiWithoutApiModule = The USERAPI user and its API key exist but the REST API module is disabled: Digirisk routes will not answer and the mobile application will not be able to connect until it is enabled
+ExportImportModulesAdvice = Digirisk provides import (work units, risks, risk assessments) and export (tickets, categories) templates: enable the Imports and Exports modules to use them
+ConfigMyModules = Modules setup
+DigiriskData = Digirisk configurable data
+TutoImage = Image
+HowToSetupOtherModules = For more features in Digirisk, you can enable many modules (vendors, invoices, etc.) at this link:
+AvoidLogoProblems = To avoid any issue with logos in generated documents, please refer to these setup tips:
+LogoHelpLink = https://wiki.dolibarr.org/index.php?title=Premiers_paramétrages
+HowToSetupIHM = For more options on the Dolibarr display (background image setup, etc.), go to this link:
+ConfigIHM = Display setup
+HowToSharedElement = For more information about the shared elements setup, go to this link:
+HowToSharedElementLink = https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Configuration
+ConfigSharedElement = Shared elements setup (risks/risk signs)
+DigiriskManagement = Redirection after login
+DigiriskDescription = Redirect to the Digirisk welcome page by default instead of the Dolibarr one.
+UseCaptcha = Graphical code (CAPTCHA)
+UseCaptchaDescription = Use the graphical code (CAPTCHA) on the public interface pages
+AdvancedImport = Advanced import
+AdvancedImportDescription = Allows importing each element independently (tree structure, risks and risk signs)
+ManuelInputNBEmployees = Enter the number of employees manually
+ManuelInputNBEmployeesDescription = When enabled, you can enter the number of employees manually in the company setup.<br>Otherwise the number of employees is computed.<br>See the documentation for more information.
+ManuelInputNBWorkedHours = Enter the number of worked hours manually
+ManuelInputNBWorkedHoursDescription = When enabled, you can enter the number of worked hours manually in the company setup.<br>Otherwise the number of worked hours is computed.<br>See the documentation for more information.
+ShowPatchNoteAgain = Show the release note
+ShowPatchNoteAgainDescription = When enabled, the release note of the current version appears again on the Digirisk home page.<br>(Requires the "Show release notes from GitHub" option to be enabled to be visible.)

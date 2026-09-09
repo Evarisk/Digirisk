@@ -36,7 +36,8 @@ TutoImage = Image
 # Data - Donnée
 DigiriskdolibarrSetup       = Configuration du module Digirisk
 DigiriskdolibarrSetupPage        = Page de configuration du module Digirisk
-AgendaModuleRequired        = Pour assurer la traçabilité des actions dans Digirisk, assurez-vous que le module Agenda est bien activé
+UserApiWithoutApiModule     = L'utilisateur USERAPI et sa clé d'API existent mais le module API REST est désactivé : les routes Digirisk ne répondront pas et l'application mobile ne pourra pas se connecter tant qu'il n'est pas activé
+ExportImportModulesAdvice   = Digirisk fournit des modèles d'import (unités de travail, risques, évaluations des risques) et d'export (tickets, catégories) : activez les modules Imports et Exports pour les utiliser
 DigiriskDolibarrDescription = Digirisk pour Dolibarr
 HowToSetupOtherModules      = Pour plus de fonctionnalités sur Digirisk, vous pouvez activer de nombreux modules (Gestion des fournisseurs, des factures, etc.) sur ce lien :
 ConfigMyModules             = Configuration des modules
