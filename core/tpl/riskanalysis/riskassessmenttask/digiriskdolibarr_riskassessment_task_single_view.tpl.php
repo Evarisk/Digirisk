@@ -66,7 +66,7 @@
                         foreach ($taskExecutive as $executive) {
                             $userAuthor = $usersList[$executive['id'] ?: $user->id];
                             echo '<span class="riskassessment-task-author">';
-                            echo getNomUrlUser($userAuthor, getUserPhotoPicto($userAuthor));
+                            echo getNomUrlUser($userAuthor, -3);
                             echo '</span>';
                         }
                     } else {
@@ -77,7 +77,7 @@
                         foreach ($taskContributor as $contributor) {
                             $userAuthor = $usersList[$contributor['id'] ?: $user->id];
                             echo '<span class="riskassessment-task-author">';
-                            echo getNomUrlUser($userAuthor, getUserPhotoPicto($userAuthor));
+                            echo getNomUrlUser($userAuthor, -3);
                             echo '</span>';
                         }
                     } else {

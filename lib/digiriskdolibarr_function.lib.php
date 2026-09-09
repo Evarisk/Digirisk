@@ -566,30 +566,6 @@ function display_recurse_tree_organization($digiriskElementTree, $i = 1, $riskIn
 }
 
 /**
- * Return the picto mode to pass to getNomUrlUser() to display a user avatar
- *
- * The photo is only asked for when the file really exists : llx_user.photo can name a file that
- * is no longer on disk, and Form::showphoto() then falls back on a gravatar. Returning 0 in that
- * case keeps the initials, which stay readable and need no external request.
- *
- * @param  User $object User to display
- * @return int          -3 to show only the photo, 0 to show the initials
- */
-function getUserPhotoPicto(User $object)
-{
-	global $conf;
-
-	if (empty($object->photo)) {
-		return 0;
-	}
-
-	// Same path as the one Form::showphoto() builds for the mini size, so the test matches what will be rendered
-	$photoFile = $conf->user->dir_output . '/' . get_exdir(0, 0, 0, 0, $object, 'user') . 'photos/' . getImageFileNameForSize($object->photo, '_mini');
-
-	return is_file($photoFile) ? -3 : 0;
-}
-
-/**
 *  Return a link to the user card (with optionaly the picto)
 *  Use this->id,this->lastname, this->firstname
 *

@@ -81,7 +81,7 @@ print '<tr><td class="titlefield">' . $langs->trans('DateCreation') . '</td><td>
 print dol_print_date($object->date_creation, 'dayhour');
 if (!empty($usersList[$object->fk_user_creat])) {
     $userAuthor = $usersList[$object->fk_user_creat];
-    print ' &nbsp; ' . getNomUrlUser($userAuthor, getUserPhotoPicto($userAuthor));
+    print ' &nbsp; ' . getNomUrlUser($userAuthor, -3);
 }
 print '</td></tr>';
 
@@ -90,7 +90,7 @@ if (!empty($object->tms)) {
     print dol_print_date($object->tms, 'dayhour');
     if (!empty($usersList[$object->fk_user_modif])) {
         $userAuthor = $usersList[$object->fk_user_modif];
-        print ' &nbsp; ' . getNomUrlUser($userAuthor, getUserPhotoPicto($userAuthor));
+        print ' &nbsp; ' . getNomUrlUser($userAuthor, -3);
     }
     print '</td></tr>';
 }
@@ -121,7 +121,7 @@ if (is_object($lastRiskAssessment)) {
     print '<i class="fas fa-calendar-alt"></i> ' . dol_print_date((getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE') && !empty($lastRiskAssessment->date_riskassessment)) ? $lastRiskAssessment->date_riskassessment : $lastRiskAssessment->date_creation, 'day');
     if (!empty($usersList[$lastRiskAssessment->fk_user_creat])) {
         $userAuthor = $usersList[$lastRiskAssessment->fk_user_creat];
-        print ' &nbsp; ' . getNomUrlUser($userAuthor, getUserPhotoPicto($userAuthor));
+        print ' &nbsp; ' . getNomUrlUser($userAuthor, -3);
     }
     print '</div>';
     print '</div>';
@@ -192,7 +192,7 @@ if (!empty($riskAssessments)) {
 
         print '<td class="nowrap">' . dol_print_date((getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE') && !empty($riskAssessmentSingle->date_riskassessment)) ? $riskAssessmentSingle->date_riskassessment : $riskAssessmentSingle->date_creation, 'day') . '</td>';
 
-        print '<td class="nowrap">' . (!empty($usersList[$riskAssessmentSingle->fk_user_creat]) ? getNomUrlUser($usersList[$riskAssessmentSingle->fk_user_creat], getUserPhotoPicto($usersList[$riskAssessmentSingle->fk_user_creat])) : '') . '</td>';
+        print '<td class="nowrap">' . (!empty($usersList[$riskAssessmentSingle->fk_user_creat]) ? getNomUrlUser($usersList[$riskAssessmentSingle->fk_user_creat], -3) : '') . '</td>';
 
         // The comment is read in full here, the list truncates it to 120 characters
         print '<td class="wordbreak">' . (dol_strlen($riskAssessmentSingle->comment) > 0 ? dol_nl2br(dol_escape_htmltag($riskAssessmentSingle->comment)) : '') . '</td>';
