@@ -177,64 +177,6 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
     }
 
     /**
-     * Set digirisk elements segment — issue #4459
-     *
-     * Lists the GP/UT added, modified or deleted over the period. The synthesis only ever gave a
-     * count, which does not tell the reader which work unit moved, and the deleted ones vanished
-     * from the report entirely.
-     *
-     * @param Odf       $odfHandler  Object builder odf library
-     * @param Translate $outputLangs Lang object to use for output
-     * @param array     $moreParam   More param (digiriskElementChanges)
-     *
-     * @throws OdfException
-     * @throws Exception
-     */
-    protected static function setDigiriskElementsSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
-    {
-        $foundTagForLines = 1;
-        try {
-            $listLines = $odfHandler->setSegment('digiriskElements');
-        } catch (OdfExceptionSegmentNotFound $e) {
-            // We may arrive here if tags for lines not present into template
-            $foundTagForLines = 0;
-            $listLines        = '';
-            dol_syslog($e->getMessage());
-        }
-
-        if ($foundTagForLines) {
-            $digiriskElementChanges = $moreParam['digiriskElementChanges'] ?? [];
-            if (empty($digiriskElementChanges)) {
-                $tmpArray = [
-                    'digiriskElementRefLabel' => ' ',
-                    'digiriskElementType'     => ' ',
-                    'digiriskElementState'    => $outputLangs->transnoentities('NoDigiriskElementChange'),
-                    'digiriskElementDate'     => ' '
-                ];
-
-                static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
-                $odfHandler->mergeSegment($listLines);
-                return;
-            }
-
-            foreach ($digiriskElementChanges as $digiriskElementChange) {
-                $digiriskElement = $digiriskElementChange['object'];
-                $typeKey         = $digiriskElement->element_type == 'groupment' ? 'Groupment' : 'WorkUnit';
-
-                $tmpArray = [
-                    'digiriskElementRefLabel' => 'S' . $digiriskElement->entity . ' - ' . $digiriskElement->ref . ' - ' . $digiriskElement->label,
-                    'digiriskElementType'     => $outputLangs->transnoentities($typeKey),
-                    'digiriskElementState'    => $outputLangs->transnoentities('DigiriskElement' . $digiriskElementChange['state']),
-                    'digiriskElementDate'     => dol_print_date($digiriskElementChange['date'], 'day', 'tzuser')
-                ];
-
-                static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
-            }
-            $odfHandler->mergeSegment($listLines);
-        }
-    }
-
-    /**
      * Set risk tasks segment
      *
      * @param Translate $outputLangs Lang object to use for output
@@ -662,8 +604,6 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                     }
                 }
             }
-
-            static::setDigiriskElementsSegment($odfHandler, $outputLangs, $moreParam);
 
             $moreParam['riskSigns'] = $loadRiskSignInfos['riskSigns'];
             static::setRiskSignsSegment($odfHandler, $outputLangs, $moreParam);

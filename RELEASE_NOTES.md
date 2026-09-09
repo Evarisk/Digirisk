@@ -1,4 +1,4 @@
-# [Digirisk] [23.2.0] - Vigilance météo - Terrain sur mobile - PAPRIPACT par année
+# [Digirisk] [23.2.1] - Vigilance météo - Terrain sur mobile - PAPRIPACT par année
 
 Description : Cette version sort du bureau. Les plans de prévention et les permis de feu se créent et se signent depuis un téléphone, une application web progressive les regroupe, et un nouveau module de vigilance météo alerte l'établissement en cas d'épisode orange ou rouge. Côté pilotage, le PAPRIPACT s'organise par année avec report des actions en retard, et la carte ticket gagne un véritable fil de conversation.
 
@@ -49,6 +49,15 @@ Description : Cette version sort du bureau. Les plans de prévention et les perm
 
 ![Le tableau de bord des risques](https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/assets/release-23.2.0/.shots/23.2.0-tableau-bord-risques.png)
 
+### Fiche produit
+
+* Nouvelle **fiche d'instruction HSE** sur le produit : six chapitres — identification, sécurité, mode d'emploi simplifié, qualification et habilitation, hygiène et nettoyage, maintenance et contrôles — éditables directement dans l'onglet.
+* Chaque chapitre est **configurable** depuis la nouvelle page de configuration produit : libellé, icône, couleur et description par défaut.
+* Onglet **Risques et protections** du produit, avec sa table d'association et les catégories de danger.
+* Le **PDF produit** reprend dynamiquement les risques et protections, ainsi que l'image du produit.
+
+![L'onglet Fiche d'Instruction sur un produit](https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/assets/issue-5103/.shots/5103-onglet-fiche-instruction.png)
+
 ### Arborescence GP/UT
 
 * **Refonte du panneau de navigation** : glisser-déposer, renommage en ligne, ajout et suppression rapides.
@@ -82,6 +91,7 @@ Description : Cette version sort du bureau. Les plans de prévention et les perm
 * Identifiants convertis avec `GETPOSTINT` sur les plans de prévention et les permis de feu, pour éviter les `TypeError` de `fetch()` sur PHP 8.
 * Correction des erreurs de type à la création de ticket public, au chargement d'un objet sans identifiant, et des avertissements PHP 8 à la création de tâche.
 * Vrais messages d'erreur lors de la génération de l'archive ZIP du document unique.
+* **Correction d'une erreur fatale qui empêchait toute génération du document unique** : une méthode déclarée `protected` dans la classe parente des modèles de document et redéclarée `private` dans le modèle ODT du document unique rendait la classe inchargeable. La méthode a été déplacée dans le modèle du rapport d'audit, à qui elle appartient.
 
 ### Interface
 
@@ -95,4 +105,4 @@ Description : Cette version sort du bureau. Les plans de prévention et les perm
 * Le module s'appuie sur **Saturne 23.1.0**.
 * Les dépendances communes — ECM, Agenda, FCKeditor, Catégories — sont désormais déclarées par Saturne.
 
-## Comparaison des versions [23.1.0](https://github.com/Evarisk/Digirisk/compare/23.1.0...23.2.0) et 23.2.0
+## Comparaison des versions [23.1.0](https://github.com/Evarisk/Digirisk/compare/23.1.0...23.2.1) et 23.2.1
