@@ -35,6 +35,9 @@ global $conf, $db, $langs, $moduleNameLowerCase, $user;
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
+require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+
+require_once __DIR__ . '/../lib/digiriskdolibarr_entity_transfer.lib.php';
 require_once __DIR__ . '/../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../class/digiriskelement.class.php';
 require_once __DIR__ . '/../class/digiriskelement/groupment.class.php';
@@ -958,6 +961,174 @@ if ($action == 'repair_risk_assessment') {
     exit;
 }
 
+// Entity transfer: export the data of one entity, import a dump built by another install.
+// The engine lives in lib/digiriskdolibarr_entity_transfer.lib.php and is shared with
+// scripts/export_entity.php and scripts/import_entity.php.
+// An export is a full dump of the entity, users and their password hashes included, so it
+// is reserved to administrators, and the archives are stored outside the DigiRisk document
+// directory: everything under it is downloadable by anyone holding the module read right.
+$permissiontotransferentity = $user->admin;
+$entityExportDir            = $conf->admin->dir_output . '/digiriskdolibarr_entity_export';
+
+// Only a super administrator may look at an entity other than the one he is connected to
+$canChooseEntity = (isModEnabled('multicompany') && !empty($user->admin) && empty($user->entity) && $conf->entity == 1);
+
+if ($action == 'exportEntity' && $permissiontotransferentity) {
+    $exportScope    = GETPOST('exportScope', 'aZ09');
+    $sourceEntity   = ($canChooseEntity ? GETPOSTINT('exportEntity') : $conf->entity);
+    $sourceEntities = [$sourceEntity > 0 ? $sourceEntity : $conf->entity];
+
+    if ($canChooseEntity) {
+        foreach (explode(',', GETPOST('extraEntities', 'alphanohtml')) as $extraEntity) {
+            $extraEntity = (int) trim($extraEntity);
+            if ($extraEntity > 0 && !in_array($extraEntity, $sourceEntities, true)) {
+                $sourceEntities[] = $extraEntity;
+            }
+        }
+    }
+
+    $siblingModules  = digirisk_entity_transfer_sibling_modules($db);
+    $selectedModules = array_values(array_intersect($siblingModules, (array) GETPOST('exportModules', 'array')));
+
+    $exportName = 'entity_' . $sourceEntities[0] . '_' . dol_print_date(dol_now(), '%Y%m%d%H%M%S');
+
+    $export = digirisk_entity_transfer_export($db, [
+        'entities'          => $sourceEntities,
+        'target_entity'     => 1,
+        'scope'             => (in_array($exportScope, ['digirisk', 'core', 'full'], true) ? $exportScope : 'digirisk'),
+        'modules'           => $selectedModules,
+        'with_dictionaries' => (GETPOST('withDictionaries', 'alpha') ? 1 : 0),
+        'with_files'        => (GETPOST('withFiles', 'alpha') ? 1 : 0),
+        'purge'             => (GETPOST('withPurge', 'alpha') ? 1 : 0),
+        'output_dir'        => $entityExportDir . '/' . $exportName
+    ]);
+
+    if (!empty($export['errors'])) {
+        setEventMessages('', $export['errors'], 'errors');
+    }
+
+    if (!empty($export['sql_path'])) {
+        // The archive is what the administrator downloads, the working directory is only an intermediate
+        $zipResult = dol_compress_dir($export['dir'], $entityExportDir . '/' . $exportName . '.zip', 'zip');
+        if ($zipResult > 0) {
+            dol_delete_dir_recursive($export['dir']);
+            setEventMessages($langs->trans('EntityExportDone', $export['rows'], count(array_filter($export['counts']))), []);
+        } else {
+            setEventMessages($langs->trans('EntityExportArchiveFailed', $export['dir']), [], 'warnings');
+        }
+
+        if (!empty($export['skipped'])) {
+            setEventMessages($langs->trans('EntityExportSkippedTables', implode(', ', array_keys($export['skipped']))), [], 'warnings');
+        }
+    }
+
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+if ($action == 'downloadEntityExport' && $permissiontotransferentity) {
+    $exportFile = dol_sanitizeFileName(GETPOST('exportFile', 'alphanohtml'));
+    $exportPath = $entityExportDir . '/' . $exportFile;
+
+    // dol_sanitizeFileName() drops the directory separators, and the file must sit in the export directory
+    if (!empty($exportFile) && is_file($exportPath)) {
+        header('Content-Type: application/zip');
+        header('Content-Disposition: attachment; filename="' . $exportFile . '"');
+        header('Content-Length: ' . dol_filesize($exportPath));
+        header('Cache-Control: private, must-revalidate');
+        readfile($exportPath);
+        exit;
+    }
+
+    setEventMessages($langs->trans('EntityExportArchiveNotFound', $exportFile), [], 'errors');
+
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+if ($action == 'deleteEntityExport' && $permissiontotransferentity) {
+    $exportFile = dol_sanitizeFileName(GETPOST('exportFile', 'alphanohtml'));
+
+    if (!empty($exportFile) && is_file($entityExportDir . '/' . $exportFile)) {
+        dol_delete_file($entityExportDir . '/' . $exportFile);
+        setEventMessages($langs->trans('EntityExportArchiveDeleted', $exportFile), []);
+    }
+
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+if ($action == 'importEntity' && $permissiontotransferentity && getDolGlobalInt('MAIN_UPLOAD_DOC')) {
+    $importDir = $conf->admin->dir_temp . '/digiriskdolibarr_entity_import_' . dol_print_date(dol_now(), '%Y%m%d%H%M%S');
+    $errors    = [];
+
+    if (empty($_FILES['entityImportFile']['tmp_name'][0])) {
+        $errors[] = $langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('File'));
+    } elseif (!digirisk_entity_transfer_mkdir($importDir)) {
+        $errors[] = $langs->trans('ErrorFailedToCreateDir', $importDir);
+    } elseif (dol_add_file_process($importDir, 0, 0, 'entityImportFile', '', null, '', 0, null) < 0) {
+        $errors[] = $langs->trans('ErrorFailedToUploadFile');
+    }
+
+    $sqlFile  = '';
+    $manifest = [];
+
+    if (empty($errors)) {
+        $uploadedFiles = dol_dir_list($importDir, 'files', 0);
+        $uploadedFile  = (!empty($uploadedFiles) ? $uploadedFiles[0]['fullname'] : '');
+
+        if (preg_match('/\.zip$/i', $uploadedFile)) {
+            $uncompressed = dol_uncompress($uploadedFile, $importDir);
+            if (!empty($uncompressed['error'])) {
+                $errors[] = $uncompressed['error'];
+            }
+        }
+
+        // The dump may sit at the root of the archive or one level below, depending on how it was zipped
+        $manifestFiles = dol_dir_list($importDir, 'files', 1, 'manifest\.json$');
+        if (!empty($manifestFiles)) {
+            $manifest = json_decode(file_get_contents($manifestFiles[0]['fullname']), true);
+            if (is_array($manifest) && !empty($manifest['sql_file'])) {
+                $sqlFile = dirname($manifestFiles[0]['fullname']) . '/' . $manifest['sql_file'];
+            }
+        }
+
+        if (empty($sqlFile)) {
+            $sqlFiles = dol_dir_list($importDir, 'files', 1, '\.sql$');
+            $sqlFile  = (!empty($sqlFiles) ? $sqlFiles[0]['fullname'] : '');
+            $manifest = [];
+        }
+
+        if (empty($sqlFile) || !is_file($sqlFile)) {
+            $errors[] = $langs->trans('EntityImportNoDumpFound');
+        }
+    }
+
+    if (empty($errors)) {
+        $documentsDir = dirname($sqlFile) . '/documents';
+
+        $import = digirisk_entity_transfer_import($db, $sqlFile, [
+            'manifest'      => (is_array($manifest) ? $manifest : []),
+            'purge'         => (GETPOST('importPurge', 'alpha') ? 1 : 0),
+            'documents_dir' => (GETPOST('importWithFiles', 'alpha') && is_dir($documentsDir) ? $documentsDir : ''),
+            'target_entity' => $conf->entity
+        ]);
+
+        if ($import['errors'] > 0) {
+            setEventMessages($langs->trans('EntityImportFinishedWithErrors', $import['executed'], $import['errors']), array_slice($import['messages'], 0, 10), 'errors');
+        } else {
+            setEventMessages($langs->trans('EntityImportDone', $import['executed'], $import['documents']), []);
+        }
+    } else {
+        setEventMessages('', $errors, 'errors');
+    }
+
+    dol_delete_dir_recursive($importDir);
+
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
 /*
  * View
  */
@@ -1318,6 +1489,26 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
 
     print '</form>';
     print '</table>';
+
+    // Entity transfer block: variables prepared here, markup in the template
+    // Mode 1 is required, otherwise dol_dir_list() does not fill the size of the files
+    $entityExports   = ($permissiontotransferentity ? dol_dir_list($entityExportDir, 'files', 0, '\.zip$', '', 'date', SORT_DESC, 1) : []);
+    $siblingModules  = ($permissiontotransferentity ? digirisk_entity_transfer_sibling_modules($db) : []);
+    $defaultModules  = digirisk_entity_transfer_default_modules();
+    $entityList      = [];
+
+    // The entity list is only useful to a super administrator, the others stay on their own entity
+    if ($canChooseEntity) {
+        $resql = $db->query('SELECT rowid, label FROM ' . MAIN_DB_PREFIX . 'entity ORDER BY rowid');
+        if ($resql) {
+            while ($entityRow = $db->fetch_object($resql)) {
+                $entityList[(int) $entityRow->rowid] = $entityRow->label;
+            }
+            $db->free($resql);
+        }
+    }
+
+    require_once __DIR__ . '/../core/tpl/digiriskdolibarr_entity_transfer_view.tpl.php';
 }
 
 // End of page

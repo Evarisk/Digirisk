@@ -1663,6 +1663,41 @@ RiskSuccessfullyRepaired                     = Risques réparés avec succès
 RiskAssessmentSuccessfullyRepaired           = Évaluation réparées avec succès
 CorruptedCategoryOnRiskList                  = Liste des risques dont la catégorie est corrompue
 
+# Entity transfer - Transfert d'entite
+EntityTransfer                               = Transfert d'entité
+EntityTransferAdminOnly                      = Le transfert d'entité est réservé aux administrateurs : un export contient toute la base de l'entité, comptes utilisateurs compris.
+EntityToExportCurrentOnly                    = (entité de votre session ; seul un super administrateur peut en choisir une autre)
+EntityExportModules                          = Modules liés à inclure
+EntityExportModulesDescription               = Digirisk s'appuie sur d'autres modules (DoliLetter pour la diffusion des plans de prévention, DigiQuali pour les contrôles) : leurs tables ne sont pas prises par le périmètre Digirisk seul.
+EntityTransferDescription                    = Exporte les données d'une entité dans une archive rejouable sur un Dolibarr mono-entité (l'entité devient l'entité 1). Le module Digirisk doit être activé sur l'installation cible AVANT l'import : droits, menus, modèles de documents et répertoires sont créés par l'activation.
+EntityExport                                 = Export d'une entité
+EntityExportDescription                      = Génère une archive ZIP contenant le dump SQL, le manifeste et, en option, les documents de l'entité.
+EntityToExport                               = Entité à exporter
+ExtraEntities                                = Entités supplémentaires
+ExtraEntitiesDescription                     = Identifiants séparés par des virgules, pour les données partagées par Multicompany (utilisateurs, tiers)
+EntityExportScope                            = Périmètre
+EntityExportScopeDigirisk                    = Digirisk seul (tables Digirisk et Saturne)
+EntityExportScopeCore                        = Digirisk + socle (utilisateurs, tiers, projets, tickets, agenda, catégories, GED)
+EntityExportScopeFull                        = Entité complète (toute table portant une colonne entity)
+EntityExportWithFiles                        = Inclure les documents de l'entité
+EntityExportWithDictionaries                 = Inclure les dictionnaires Digirisk
+EntityExportWithPurge                        = Ajouter les DELETE de l'entité cible avant les INSERT
+EntityExportArchives                         = Archives générées
+NoEntityExportYet                            = Aucune archive générée pour le moment
+EntityExportArchiveDeleted                   = Archive %s supprimée
+EntityExportArchiveNotFound                  = Archive %s introuvable
+EntityExportDone                             = Export terminé : %s lignes dans %s tables
+EntityExportArchiveFailed                    = La création de l'archive ZIP a échoué, l'export reste disponible dans %s
+EntityExportSkippedTables                    = Tables non exportées car aucun filtre d'entité n'a pu être résolu : %s
+EntityImport                                 = Import d'une entité
+EntityImportDescription                      = Rejoue sur cette installation une archive ZIP (ou un fichier SQL) produite par l'export d'entité.
+EntityImportWarning                          = L'import écrit directement en base et conserve les identifiants d'origine : à réserver à une installation mono-entité vierge. Sauvegardez la base avant de lancer l'opération.
+EntityImportWithFiles                        = Copier également les documents contenus dans l'archive
+EntityImportPurge                            = Vider les tables de l'entité courante avant l'import
+EntityImportNoDumpFound                      = Aucun fichier SQL trouvé dans l'archive envoyée
+EntityImportDone                             = Import terminé : %s instructions exécutées, %s fichiers copiés
+EntityImportFinishedWithErrors               = Import terminé : %s instructions exécutées, %s erreur(s)
+
 # Clean - Nettoyer
 Clean                                          = Nettoyer
 CleanObject                                    = Nettoyer les données
