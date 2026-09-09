@@ -119,6 +119,12 @@ saturne_check_access($permissiontoread);
 // Displayed corrective actions criteria (GP/UT, risk level, tags) — shared by the Kanban, the Gantt and the exports
 $actionPlanFilters = digiriskActionPlanGetFilters();
 
+// Displayed year: the tabs split the running calendar year from the previous ones. The year of
+// every corrective action of the project is resolved once, it also feeds the history selector.
+$actionPlanTaskYears  = digiriskActionPlanGetProjectTaskYears($db, $projectId);
+$actionPlanYearCounts = digiriskActionPlanGetYearCounts($actionPlanTaskYears);
+$actionPlanFilters    = digiriskActionPlanResolveYear($actionPlanFilters, $actionPlanYearCounts);
+
 // Load ActionComm for event logging
 require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 
@@ -561,7 +567,7 @@ if ($action == 'builddoc' && GETPOST('model', 'alpha') == getDolGlobalString('DI
         setEventMessages($langs->trans('ErrorRecordNotFound'), [], 'errors');
     }
 
-    header('Location: ' . $_SERVER['PHP_SELF'] . '?view=kanban');
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?view=kanban&period=' . urlencode($actionPlanFilters['period']) . '&year=' . (int) $actionPlanFilters['year']);
     exit;
 }
 
@@ -623,7 +629,7 @@ if ($action == 'exportCsv' && $permissiontoread) {
     }
 
     $separator = getDolGlobalString('DIGIRISKDOLIBARR_KANBAN_CSV_SEPARATOR', ';');
-    $fileName  = 'papripact_' . dol_print_date(dol_now(), 'dayxcard') . '.csv';
+    $fileName  = 'papripact_' . (int) $actionPlanFilters['year'] . '_' . dol_print_date(dol_now(), 'dayxcard') . '.csv';
 
     header('Content-Type: text/csv; charset=UTF-8');
     header('Content-Disposition: attachment; filename="' . $fileName . '"');
@@ -730,10 +736,24 @@ if ($projectId > 0) {
     }
 }
 
+// Keep the corrective actions of the displayed year, the years are already resolved so the
+// board never queries them again. It comes before the count: the filter bar compares its
+// criteria to the corrective actions of the year, not to the whole project.
+if (!empty($allTasks)) {
+    $allTasks = array_values(array_filter($allTasks, function ($t) use ($actionPlanTaskYears, $actionPlanFilters) {
+        $taskYear = $actionPlanTaskYears[(int) $t->id] ?? ['year' => 0, 'progress' => 0];
+        return digiriskActionPlanTaskMatchesYear($taskYear['year'], $taskYear['progress'], (int) $actionPlanFilters['year']);
+    }));
+}
+
 // Apply the GP/UT, risk level and tag criteria before the enrichment queries below
 $unfilteredTaskCount = count($allTasks);
 if (digiriskActionPlanHasFilters($actionPlanFilters) && !empty($allTasks)) {
-    $keptTaskIds = digiriskActionPlanFilterTasks($db, array_map(function ($t) { return (int) $t->id; }, $allTasks), $actionPlanFilters, $elementTree);
+    // The year is already applied, dropping it spares the task dates query
+    $criteriaFilters         = $actionPlanFilters;
+    $criteriaFilters['year'] = 0;
+
+    $keptTaskIds = digiriskActionPlanFilterTasks($db, array_map(function ($t) { return (int) $t->id; }, $allTasks), $criteriaFilters, $elementTree);
     $keptTaskMap = array_flip($keptTaskIds);
     $allTasks    = array_values(array_filter($allTasks, function ($t) use ($keptTaskMap) {
         return isset($keptTaskMap[(int) $t->id]);
@@ -1022,6 +1042,10 @@ foreach ($allTasks as $t) {
     // Budget
     $budget = property_exists($t, 'budget_amount') ? (float) $t->budget_amount : 0;
 
+    // Year the action is due in, and the one it was carried over from when it is a late one
+    $taskYear        = $actionPlanTaskYears[(int) $t->id] ?? ['year' => 0, 'progress' => 0];
+    $carriedOverFrom = digiriskActionPlanIsCarriedOver($taskYear['year'], $taskYear['progress'], (int) $actionPlanFilters['year']) ? $taskYear['year'] : 0;
+
     $tasksJson[] = [
         'id'                 => $t->id,
         'ref'                => $t->ref,
@@ -1035,6 +1059,7 @@ foreach ($allTasks as $t) {
         'duration_effective' => $t->duration_effective,
         'progress'           => (int) $t->progress,
         'status'             => (int) $t->fk_statut,
+        'carried_over_from'  => $carriedOverFrom,
         'risk_ref'           => $riskRef,
         'risk_id'            => $riskId,
         'risk_nomurl'        => $riskNomUrl,
@@ -1064,19 +1089,51 @@ if ($globalTaskCount > 0) {
     $globalProgress = (int) round($progressSum / $globalTaskCount);
 }
 
-// Tab header
-$head = [];
-$head[0][0] = $_SERVER['PHP_SELF'] . '?view=kanban';
-$head[0][1] = '<i class="fas fa-columns pictofixedwidth"></i>' . $langs->trans('ActionPlanKanban');
-$head[0][2] = 'kanban';
+// Tab header: the action plan of the running calendar year, then the closed ones. The history
+// tab opens on the year already displayed, or on the most recent past one.
+$currentYear = (int) dol_print_date(dol_now(), '%Y');
+$historyYear = ($actionPlanFilters['period'] == 'history') ? (int) $actionPlanFilters['year'] : 0;
+if ($historyYear <= 0) {
+    foreach (array_keys($actionPlanYearCounts) as $yearWithTasks) {
+        if ($yearWithTasks < $currentYear) {
+            $historyYear = $yearWithTasks;
+            break;
+        }
+    }
+}
 
-print dol_get_fiche_head($head, $view, $title, -1, 'task');
+// The tabs keep the view, the displayed project, the filter bar criteria and the menu highlight
+$tabUrl = $_SERVER['PHP_SELF'] . '?view=' . urlencode($view) . '&projectid=' . $projectId . digiriskActionPlanFilterUrlParams($actionPlanFilters);
+if (GETPOST('mainmenu', 'aZ09')) {
+    $tabUrl .= '&mainmenu=' . urlencode(GETPOST('mainmenu', 'aZ09'));
+}
+if (GETPOST('leftmenu', 'aZ09')) {
+    $tabUrl .= '&leftmenu=' . urlencode(GETPOST('leftmenu', 'aZ09'));
+}
+if (GETPOSTINT('idmenu') > 0) {
+    $tabUrl .= '&idmenu=' . GETPOSTINT('idmenu');
+}
+
+$head = [];
+$head[0][0] = $tabUrl . '&period=current';
+$head[0][1] = '<i class="fas fa-calendar-day pictofixedwidth"></i>' . $langs->trans('ActionPlanTabCurrentYear', $currentYear);
+$head[0][2] = 'current';
+$head[1][0] = $tabUrl . '&period=history' . ($historyYear > 0 ? '&year=' . $historyYear : '');
+$head[1][1] = '<i class="fas fa-history pictofixedwidth"></i>' . $langs->trans('ActionPlanTabHistory');
+$head[1][2] = 'history';
+
+print dol_get_fiche_head($head, $actionPlanFilters['period'], $title, -1, 'task');
 
 // Top-right export toolbar (CSV / PAPRIPACT A3 PDF / Gantt PNG), shared by both views
 require __DIR__ . '/../../core/tpl/actionplan/actionplan_export_buttons.tpl.php';
 
 // Displayed project banner + project switcher, shared by both views
 require __DIR__ . '/../../core/tpl/actionplan/actionplan_project_selector.tpl.php';
+
+// Year of the displayed action plan, the current year tab has only one
+if ($actionPlanFilters['period'] == 'history') {
+    require __DIR__ . '/../../core/tpl/actionplan/actionplan_year_selector.tpl.php';
+}
 
 // GP/UT, risk level and tag criteria, shared by both views
 require __DIR__ . '/../../core/tpl/actionplan/actionplan_filters.tpl.php';

@@ -53,6 +53,9 @@ $hasFilters = digiriskActionPlanHasFilters($actionPlanFilters);
 <form class="actionplan-filter-bar" id="actionPlanFilterForm" method="GET" action="<?php echo $_SERVER['PHP_SELF']; ?>">
     <input type="hidden" name="view" value="<?php echo dol_escape_htmltag($view); ?>">
     <input type="hidden" name="projectid" value="<?php echo (int) $projectId; ?>">
+    <?php // Searching stays on the displayed year, the tabs are the only way to change it ?>
+    <input type="hidden" name="period" value="<?php echo dol_escape_htmltag($actionPlanFilters['period']); ?>">
+    <input type="hidden" name="year" value="<?php echo (int) $actionPlanFilters['year']; ?>">
     <?php if (!empty($menuMain)) : ?>
         <input type="hidden" name="mainmenu" value="<?php echo dol_escape_htmltag($menuMain); ?>">
     <?php endif; ?>
