@@ -296,7 +296,7 @@ class pdf_papripact_a3_paysage_projectdocument
             }
 
             if (file_exists($dir)) {
-                $societyName = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
+                $societyName = preg_replace('/\./', '_', getDolGlobalString('MAIN_INFO_SOCIETE_NOM'));
 
                 $date       = dol_print_date(dol_now(), 'dayxcard');
                 $newFileTmp = $date . (dol_strlen($object->ref) > 0 ? '_' . $object->ref : '') . '_' . $objectDocumentRef . '_' .  $societyName;
@@ -876,7 +876,7 @@ class pdf_papripact_a3_paysage_projectdocument
 		$pdf->SetXY($this->marge_gauche, $posy);
 
         // PAPRIPACT title
-        $pdf->Cell(0, 10, 'PAPRIPACT - ' . $conf->global->MAIN_INFO_SOCIETE_NOM . ' ' . dol_print_date($object->date_start, 'day', false, $outputLangs, true) . ' - ' . dol_print_date($object->date_end, 'day', false, $outputLangs, true), 0, 1, 'C');
+        $pdf->Cell(0, 10, 'PAPRIPACT - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM') . ' ' . dol_print_date($object->date_start, 'day', false, $outputLangs, true) . ' - ' . dol_print_date($object->date_end, 'day', false, $outputLangs, true), 0, 1, 'C');
         $pdf->Cell(0, 10, $langs->transnoentities('PapripactFullName'), 0, 1, 'C');
 		// Logo
 		$logo = $conf->mycompany->dir_output.'/logos/'.$mysoc->logo;

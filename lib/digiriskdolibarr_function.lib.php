@@ -175,7 +175,7 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 						<div class="society-header">
 							<a class="linkElement" href="<?php echo dol_buildpath('/custom/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=' . $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD, 1);?>">
 								<span class="icon fas fa-building fa-fw"></span>
-								<div class="title"><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></div>
+								<div class="title"><?php echo getDolGlobalString('MAIN_INFO_SOCIETE_NOM') ?></div>
 							</a>
                             <?php if ($user->rights->digiriskdolibarr->digiriskelement->write) : ?>
                                 <div class="add-container">

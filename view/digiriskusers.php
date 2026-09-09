@@ -806,7 +806,7 @@ if ($permissiontoadd) {
 						<div class="wpeo-table table-flex table-risk">
 							<div class="table-row user-row edit">
 								<input type="hidden" name="action" value="add" />
-								<input type="hidden" class="input-domain-mail" name="societyname" value="<?php echo preg_replace('/ /', '', $conf->global->MAIN_INFO_SOCIETE_NOM) . '.fr' ?>" />
+								<input type="hidden" class="input-domain-mail" name="societyname" value="<?php echo preg_replace('/ /', '', getDolGlobalString('MAIN_INFO_SOCIETE_NOM')) . '.fr' ?>" />
 								<div class="table-cell table-150">
 									<input type="text" id="lastname" placeholder="<?php echo $langs->trans('LastName'); ?>" name="lastname" value="<?php echo dol_escape_htmltag(GETPOST('lastname')); ?>" />
 								</div>

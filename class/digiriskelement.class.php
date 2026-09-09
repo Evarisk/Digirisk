@@ -369,7 +369,7 @@ class DigiriskElement extends SaturneObject
         $objectList = $this->fetchDigiriskElementFlat(0);
         $digiriskElementsData = [];
         if ($noroot == 0) {
-            $digiriskElementsData[0] = $langs->trans('Root') . ' : ' . $conf->global->MAIN_INFO_SOCIETE_NOM ;
+            $digiriskElementsData[0] = $langs->trans('Root') . ' : ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM') ;
         }
 
         if (is_array($objectList) && !empty($objectList)) {
@@ -754,7 +754,7 @@ class DigiriskElement extends SaturneObject
             $ret .= $langs->trans('ParentElement') . ' : ' .  $digiriskElement->ref . ' - ' . $digiriskElement->label . '<br/>';
         }
 
-        $ret .= $langs->trans('Standard') . ' : ' . $digiriskStandard->ref . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '<br/>';
+        $ret .= $langs->trans('Standard') . ' : ' . $digiriskStandard->ref . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM') . '<br/>';
         $ret .= $langs->trans('Photo') . ' : ' . (!empty($this->photo) ? $this->photo : 'N/A') . '<br>';
         $ret .= $langs->trans('ElementType') . ' : ' . $langs->trans($this->element_type) . '<br>';
         ($this->ranks != 0 ? $ret .= $langs->trans('Order') . ' : ' . $this->ranks . '<br>' : '');

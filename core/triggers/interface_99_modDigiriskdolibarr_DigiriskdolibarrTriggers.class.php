@@ -467,7 +467,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$substitutionarray = getCommonSubstitutionArray($langs, 0, null,$object);
 
 					$message = $langs->trans('Hello') . ',' . '<br><br>';
-					$message .= '<span style="color:#c55a11">' . $langs->trans('ANewTicketHasBeenSubmitted', $conf->global->MAIN_INFO_SOCIETE_NOM) . '.' . '</span><br><br>';
+					$message .= '<span style="color:#c55a11">' . $langs->trans('ANewTicketHasBeenSubmitted', getDolGlobalString('MAIN_INFO_SOCIETE_NOM')) . '.' . '</span><br><br>';
 					$message .= '<strong>' . $langs->trans('Service') . ' : ' . '</strong>';
 					$digiriskelement->fetch((int)$object->array_options['options_digiriskdolibarr_ticket_service']);
 					$message .= $digiriskelement->ref . ' - ' . $digiriskelement->label . '<br><br>';

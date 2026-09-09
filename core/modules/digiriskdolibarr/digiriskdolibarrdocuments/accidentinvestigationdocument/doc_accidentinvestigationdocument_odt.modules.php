@@ -241,7 +241,7 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTDigiriskDolibarrDoc
 			} else {
 				$element = new DigiriskStandard($this->db);
 				$element->fetch($accident->fk_standard);
-				$tmpArray['gp_ut'] = $element->ref . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+				$tmpArray['gp_ut'] = $element->ref . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
 			}
 		} else if ($accident->external_accident == 2) {
 			$societe = new Societe($this->db);
