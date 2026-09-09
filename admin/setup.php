@@ -54,7 +54,8 @@ $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
 
 // Security check - Protection if external user
-$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
 /*
@@ -98,6 +99,9 @@ if ($action == 'setMediaInfos') {
 		setEventMessages('MediaDimensionSetWithSuccess', []);
 	}
 }
+
+// Actions set_mod, update_mask and the set_/del_ switch of the module constants
+require_once __DIR__ . '/../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
 /*
  * View
@@ -179,7 +183,7 @@ foreach ($digiriskSettings as $constName => $transKeys) {
     }
     print '</td>';
     print '<td class="center">';
-    print ajax_constantonoff($constName);
+    print saturne_constant_onoff($constName, $permissiontowrite);
     print '</td>';
     print '</tr>';
 }
@@ -220,7 +224,8 @@ foreach ($digiriskMenuSettings as $constName => $transKeys) {
     print '</td>';
     print '<td class="center">';
     // Revert the switch: the constant holds the hidden state, the switch shows the visible one
-    print ajax_constantonoff($constName, [], null, 1);
+    // The reverted switch has no saturne_constant_onoff equivalent, so the zero instead of the deletion is asked here
+    print ajax_constantonoff($constName, [], null, 1, 0, 0, 2, 0, 1);
     print '</td>';
     print '</tr>';
 }

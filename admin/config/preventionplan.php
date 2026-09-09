@@ -60,7 +60,8 @@ if (isModEnabled('project')) {
 $form = new Form($db);
 
 // Security check - Protection if external user
-$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
 /*
@@ -270,22 +271,22 @@ print '</tr>';
 
 // Count
 print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATURE_COUNT">' . $langs->trans('MobilePPSpreadShowCount') . '</label></td>';
-print '<td class="center">' . ajax_constantonoff('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATURE_COUNT') . '</td>';
+print '<td class="center">' . saturne_constant_onoff('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATURE_COUNT', $permissiontowrite) . '</td>';
 print '</tr>';
 
 // Name
 print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_NAME">' . $langs->trans('MobilePPSpreadShowName') . '</label></td>';
-print '<td class="center">' . ajax_constantonoff('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_NAME') . '</td>';
+print '<td class="center">' . saturne_constant_onoff('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_NAME', $permissiontowrite) . '</td>';
 print '</tr>';
 
 // Contact
 print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_CONTACT">' . $langs->trans('MobilePPSpreadShowContact') . '</label></td>';
-print '<td class="center">' . ajax_constantonoff('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_CONTACT') . '</td>';
+print '<td class="center">' . saturne_constant_onoff('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_CONTACT', $permissiontowrite) . '</td>';
 print '</tr>';
 
 // Hide Public Note
 print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_SPREAD_HIDE_PUBLIC_NOTE">' . $langs->trans('MobilePPSpreadHidePublicNote') . '</label></td>';
-print '<td class="center">' . ajax_constantonoff('DIGIRISKDOLIBARR_SPREAD_HIDE_PUBLIC_NOTE') . '</td>';
+print '<td class="center">' . saturne_constant_onoff('DIGIRISKDOLIBARR_SPREAD_HIDE_PUBLIC_NOTE', $permissiontowrite) . '</td>';
 print '</tr>';
 
 print '</table>';
