@@ -165,6 +165,44 @@ print '</table>';
 // Click on a tuto image to display it full size
 digiriskdolibarr_tuto_overlay();
 
+print load_fiche_titre($langs->trans("MenuVisibility"), '', '');
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans("Name") . '</td>';
+print '<td>' . $langs->trans("Description") . '</td>';
+print '<td class="center">' . $langs->trans("Status") . '</td>';
+print '</tr>';
+
+// Each entry: constant => [label key, description key]
+// The constant stores the hidden state: an absent constant means the menu entries are shown, so an
+// installation upgraded without reactivating the module keeps every entry visible.
+// The environment constant is named after riskenvironmental on purpose: dol_eval() rejects the whole
+// menu condition as soon as it contains the _ENV substring, which DIGIRISKDOLIBARR_ENVIRONMENT_ has.
+$digiriskMenuSettings = [
+    'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_MENU_HIDDEN' => ['RiskAssessmentDocument', 'RiskAssessmentDocumentMenuVisibilityDescription'],
+    'DIGIRISKDOLIBARR_RISKENVIRONMENTAL_MENU_HIDDEN'      => ['Environment', 'EnvironmentMenuVisibilityDescription'],
+    'DIGIRISKDOLIBARR_PREVENTIONPLAN_MENU_HIDDEN'         => ['PreventionPlan', 'PreventionPlanMenuVisibilityDescription'],
+    'DIGIRISKDOLIBARR_FIREPERMIT_MENU_HIDDEN'             => ['FirePermit', 'FirePermitMenuVisibilityDescription'],
+    'DIGIRISKDOLIBARR_ACCIDENT_MENU_HIDDEN'               => ['Accident', 'AccidentMenuVisibilityDescription'],
+    'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_MENU_HIDDEN'  => ['AccidentInvestigation', 'AccidentInvestigationMenuVisibilityDescription'],
+    'DIGIRISKDOLIBARR_TOOLS_MENU_HIDDEN'                  => ['Tools', 'ToolsMenuVisibilityDescription'],
+];
+
+foreach ($digiriskMenuSettings as $constName => $transKeys) {
+    print '<tr class="oddeven"><td>';
+    print $langs->trans($transKeys[0]);
+    print '</td><td>';
+    print $langs->trans($transKeys[1]);
+    print '</td>';
+    print '<td class="center">';
+    // Revert the switch: the constant holds the hidden state, the switch shows the visible one
+    print ajax_constantonoff($constName, [], null, 1);
+    print '</td>';
+    print '</tr>';
+}
+print '</table>';
+
 print load_fiche_titre($langs->trans("MediaData"), '', '');
 
 print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '" name="media_data">';

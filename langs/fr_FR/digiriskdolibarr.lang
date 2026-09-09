@@ -2404,3 +2404,13 @@ RiskTrendNew             = ⊕ Nouveau
 RiskTrendUp              = ↗ Hausse (%s → %s)
 RiskTrendDown            = ↘ Baisse (%s → %s)
 RiskTrendStable          = Stable (%s)
+
+# Menu visibility
+MenuVisibility                                  = Visibilité des entrées de menu
+RiskAssessmentDocumentMenuVisibilityDescription = Si l'option est désactivée, les entrées de menu du document unique (risques professionnels, PAPRIPACT et catégories de risques) sont masquées.<br>L'onglet de configuration « Document unique » n'est masqué que si l'environnement l'est également.
+EnvironmentMenuVisibilityDescription            = Si l'option est désactivée, les entrées de menu de l'environnement (risques environnementaux et plan d'action) sont masquées.<br>L'onglet de configuration « Document unique » n'est masqué que si le document unique l'est également.
+PreventionPlanMenuVisibilityDescription         = Si l'option est désactivée, les entrées de menu du plan de prévention (et ses catégories) ainsi que son onglet de configuration sont masqués.
+FirePermitMenuVisibilityDescription             = Si l'option est désactivée, les entrées de menu du permis de feu (et ses catégories) ainsi que son onglet de configuration sont masqués.
+AccidentMenuVisibilityDescription               = Si l'option est désactivée, les entrées de menu des accidents (liste et catégories) sont masquées.<br>L'onglet de configuration « Accident » n'est masqué que si les enquêtes accident le sont également.
+AccidentInvestigationMenuVisibilityDescription  = Si l'option est désactivée, l'entrée de menu des enquêtes accident est masquée.<br>L'onglet de configuration « Accident » n'est masqué que si les accidents le sont également.
+ToolsMenuVisibilityDescription                  = Si l'option est désactivée, l'entrée de menu des outils est masquée.

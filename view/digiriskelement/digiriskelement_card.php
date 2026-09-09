@@ -90,7 +90,11 @@ $permissiontoread   = $user->rights->digiriskdolibarr->digiriskelement->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->digiriskelement->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->digiriskelement->delete;
 
-saturne_check_access($permissiontoread, $object);
+// Les elements n'ont pas de liste, ils se parcourent dans l'arborescence : c'est la que renvoie
+// un element introuvable, plutot que sur l'accueil du module
+$elementTreeUrl = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=1', 1);
+
+saturne_check_access($permissiontoread, $object, false, $elementTreeUrl);
 
 /*
  * Actions
