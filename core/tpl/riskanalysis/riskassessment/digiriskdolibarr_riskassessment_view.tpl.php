@@ -137,7 +137,7 @@ if (is_array($allRiskAssessment) && !empty($allRiskAssessment)) :
 												</span>
 												<span class="risk-evaluation-author">
 													<?php $userAuthor = $usersList[$lastEvaluation->fk_user_creat?:$user->id];
-													echo getNomUrlUser($userAuthor, -3); ?>
+													echo $userAuthor->getNomUrl(-1); ?>
 												</span>
 											</div>
 											<div class="risk-evaluation-comment">
@@ -401,7 +401,7 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 										</span>
 										<span class="risk-evaluation-author">
 											<?php $userAuthor = $usersList[$lastRiskAssessment->fk_user_creat?:$user->id];
-											echo getNomUrlUser($userAuthor, -3); ?>
+											echo $userAuthor->getNomUrl(-1); ?>
 										</span>
 									</div>
 									<div class="risk-evaluation-comment">

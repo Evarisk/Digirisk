@@ -21,7 +21,7 @@
 					</span>
 					<span class="risk-evaluation-author">
 						<?php $userAuthor = $usersList[$lastEvaluation->fk_user_creat?:$user->id];
-						echo getNomUrlUser($userAuthor, -3); ?>
+						echo $userAuthor->getNomUrl(-1); ?>
 					</span>
 				</div>
 				<div class="risk-evaluation-comment wordbreak">
