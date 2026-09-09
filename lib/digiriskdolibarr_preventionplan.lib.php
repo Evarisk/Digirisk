@@ -283,7 +283,7 @@ function digiriskSendPreventionPlanSignatureEmail(DoliDB $db, PreventionPlan $pl
             $userFullName = $user->getFullName($langs);
             $userEmail = $user->email;
             $userPhonePro = $user->office_phone;
-            $myCompanyName = $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $myCompanyName = getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
             $myCompanyFullAddress = trim($conf->global->MAIN_INFO_SOCIETE_ADDRESS . ' ' . $conf->global->MAIN_INFO_SOCIETE_ZIP . ' ' . $conf->global->MAIN_INFO_SOCIETE_TOWN);
 
             $subject = str_replace(

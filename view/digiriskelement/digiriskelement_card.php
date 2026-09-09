@@ -359,7 +359,7 @@ if (($id || $ref) && $action == 'edit') {
 }
 
 if ( ! $object->id) {
-	$object->ref    = $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$object->ref    = getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
 	$object->label  = $langs->trans('Society');
 	$object->entity = $conf->entity;
 	unset($object->fields['element_type']);

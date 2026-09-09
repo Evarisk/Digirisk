@@ -2347,25 +2347,25 @@ class modDigiriskdolibarr extends DolibarrModules
         $resources = new DigiriskResources($this->db);
 
         if (getDolGlobalInt('DIGIRISKDOLIBARR_THIRDPARTY_SET') == 0) {
-            $societe->name   = $langs->trans('SAMU') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->name   = $langs->trans('SAMU') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
             $societe->client = 0;
             $societe->phone  = '15';
             $societe->url    = '';
             $samuID          = $societe->create($user);
 
-            $societe->name   = $langs->trans('Pompiers') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->name   = $langs->trans('Pompiers') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
             $societe->client = 0;
             $societe->phone  = '18';
             $societe->url    = '';
             $pompiersID      = $societe->create($user);
 
-            $societe->name   = $langs->trans('Police') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->name   = $langs->trans('Police') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
             $societe->client = 0;
             $societe->phone  = '17';
             $societe->url    = '';
             $policeID        = $societe->create($user);
 
-            $societe->name   = $langs->trans('AllEmergencies') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->name   = $langs->trans('AllEmergencies') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
             $societe->client = 0;
             $societe->phone  = '112';
             $societe->url    = '';
@@ -2380,19 +2380,19 @@ class modDigiriskdolibarr extends DolibarrModules
         }
         if (getDolGlobalInt('DIGIRISKDOLIBARR_THIRDPARTY_SET') == 1) {
             //Install after 8.1.2
-            $societe->name     = $langs->trans('LabourInspectorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->name     = $langs->trans('LabourInspectorName') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
             $societe->client   = 0;
             $societe->phone    = '';
             $societe->url      = $langs->trans('UrlLabourInspector');
             $labourInspectorID = $societe->create($user);
 
-            $societe->name    = $langs->trans('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->name    = $langs->trans('RightsDefender') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
             $societe->client  = 0;
             $societe->phone   = '';
             $societe->url     = '';
             $rightsDefenderID = $societe->create($user);
 
-            $societe->name         = $langs->trans('PoisonControlCenter') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->name         = $langs->trans('PoisonControlCenter') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
             $societe->client       = 0;
             $societe->phone        = '';
             $societe->url          = '';
@@ -2405,7 +2405,7 @@ class modDigiriskdolibarr extends DolibarrModules
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 2, 'integer', 0, '', $conf->entity);
         }
         if (getDolGlobalInt('DIGIRISKDOLIBARR_THIRDPARTY_SET') == 2) {
-            $societe->name   = $langs->trans('LabourDoctorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->name   = $langs->trans('LabourDoctorName') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
             $societe->client = 0;
             $societe->phone  = '';
             $societe->url    = '';
@@ -2428,7 +2428,7 @@ class modDigiriskdolibarr extends DolibarrModules
             ];
 
             foreach ($poisonCenters as $city => $poisonCenter) {
-                $societe->name         = $langs->trans('PoisonControlCenter') . ' ' . $city . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+                $societe->name         = $langs->trans('PoisonControlCenter') . ' ' . $city . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
                 $societe->client       = 0;
                 $societe->phone        = $poisonCenter['phone'];
                 $societe->url          = '';
@@ -2470,37 +2470,37 @@ class modDigiriskdolibarr extends DolibarrModules
         if (getDolGlobalInt('DIGIRISKDOLIBARR_THIRDPARTY_UPDATED') == 0) {
             $labourInspectorID = $resources->fetchDigiriskResource('LabourInspectorSociety');
             $societe->fetch($labourInspectorID);
-            $societe->name = $langs->trans('LabourInspectorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->name = $langs->trans('LabourInspectorName') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
             $societe->update(0, $user);
 
             $policeID = $resources->fetchDigiriskResource('Police');
             $societe->fetch($policeID);
-            $societe->name = $langs->trans('Police') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->name = $langs->trans('Police') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
             $societe->update(0, $user);
 
             $samuID = $resources->fetchDigiriskResource('SAMU');
             $societe->fetch($samuID);
-            $societe->name = $langs->trans('SAMU') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->name = $langs->trans('SAMU') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
             $societe->update(0, $user);
 
             $pompiersID = $resources->fetchDigiriskResource('Pompiers');
             $societe->fetch($pompiersID);
-            $societe->name = $langs->trans('Pompiers') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->name = $langs->trans('Pompiers') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
             $societe->update(0, $user);
 
             $emergencyID = $resources->fetchDigiriskResource('AllEmergencies');
             $societe->fetch($emergencyID);
-            $societe->name = $langs->trans('AllEmergencies') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->name = $langs->trans('AllEmergencies') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
             $societe->update(0, $user);
 
             $rightsDefenderID = $resources->fetchDigiriskResource('RightsDefender');
             $societe->fetch($rightsDefenderID);
-            $societe->name = $langs->transnoentities('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->name = $langs->transnoentities('RightsDefender') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
             $societe->update(0, $user);
 
             $poisonControlCenterID = $resources->fetchDigiriskResource('PoisonControlCenter');
             $societe->fetch($poisonControlCenterID);
-            $societe->name = $langs->trans('PoisonControlCenter') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->name = $langs->trans('PoisonControlCenter') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
             $societe->update(0, $user);
 
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 1, 'integer', 0, '', $conf->entity);

@@ -127,7 +127,7 @@ if (!empty($results)) :
 ?>
     <div class="organization-page organization-tree">
         <div class="organization-header">
-            <h3 class='title' id='title0'><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></h3>
+            <h3 class='title' id='title0'><?php echo getDolGlobalString('MAIN_INFO_SOCIETE_NOM') ?></h3>
             <span class="unsaved-indicator"><i class="fas fa-exclamation-circle"></i> <?php echo $langs->trans('UnsavedChanges') ?></span>
         </div>
 
