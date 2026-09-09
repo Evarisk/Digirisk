@@ -323,7 +323,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 								<span class="riskassessment-task-reference" value="<?php echo $related_task->ref ?>"><?php echo $related_task->getNomUrl(0, 'withproject'); ?></span>
 								<span class="riskassessment-task-author">
 									<?php $userAuthor = $usersList[$related_task->fk_user_creat > 0 ? $related_task->fk_user_creat : $user->id];
-									echo getNomUrlUser($userAuthor, -3); ?>
+									echo $userAuthor->getNomUrl(-1); ?>
 								</span>
 								<span class="riskassessment-task-date">
 									<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->dateo))) ? $related_task->dateo : $related_task->datec)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->datee))) ? ' - ' . date('d/m/Y', $related_task->datee) : ''); ?>
@@ -493,7 +493,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 														<div class="table-cell table-padding-0 riskassessment-task-timespent-single">
 															<span class="riskassessment-task-timespent-author">
 																<?php $userAuthor = $usersList[$time_spent->timespent_fk_user?:$user->id];
-																echo getNomUrlUser($userAuthor, -3); ?>
+																echo $userAuthor->getNomUrl(-1); ?>
 															</span>
 															<span class="riskassessment-task-timespent-date">
 																<i class="fas fa-calendar-alt"></i> <?php echo dol_print_date($time_spent->timespent_datehour, 'dayhour'); ?>
