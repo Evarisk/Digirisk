@@ -69,7 +69,80 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskDolibarrDocument
             $moreParam['digiriskElementChanges'] = $digiriskElement->loadDigiriskElementChanges($moreParam);
         }
 
-        return parent::fillTagsLines($odfHandler, $outputLangs, $moreParam);
+        $result = parent::fillTagsLines($odfHandler, $outputLangs, $moreParam);
+        if ($result < 0) {
+            return $result;
+        }
+
+        try {
+            static::setDigiriskElementChangesSegment($odfHandler, $outputLangs, $moreParam);
+        } catch (OdfException $e) {
+            $this->error = $e->getMessage();
+            dol_syslog($this->error, LOG_WARNING);
+            return -1;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Set digirisk element changes segment
+     *
+     * Lists the GP/UT added, modified or deleted over the period. The synthesis only ever gave a
+     * count, which does not tell the reader which work unit moved, and the deleted ones vanished
+     * from the report entirely. The segment only exists in the audit report template, so the
+     * method lives here and not in the parent class where its name collided with the risk
+     * assessment document one.
+     *
+     * @param Odf       $odfHandler  Object builder odf library
+     * @param Translate $outputLangs Lang object to use for output
+     * @param array     $moreParam   More param (digiriskElementChanges)
+     *
+     * @throws OdfException
+     * @throws Exception
+     */
+    private static function setDigiriskElementChangesSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
+    {
+        $foundTagForLines = 1;
+        try {
+            $listLines = $odfHandler->setSegment('digiriskElements');
+        } catch (OdfExceptionSegmentNotFound $e) {
+            // We may arrive here if tags for lines not present into template
+            $foundTagForLines = 0;
+            $listLines        = '';
+            dol_syslog($e->getMessage());
+        }
+
+        if ($foundTagForLines) {
+            $digiriskElementChanges = $moreParam['digiriskElementChanges'] ?? [];
+            if (empty($digiriskElementChanges)) {
+                $tmpArray = [
+                    'digiriskElementRefLabel' => ' ',
+                    'digiriskElementType'     => ' ',
+                    'digiriskElementState'    => $outputLangs->transnoentities('NoDigiriskElementChange'),
+                    'digiriskElementDate'     => ' '
+                ];
+
+                static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                $odfHandler->mergeSegment($listLines);
+                return;
+            }
+
+            foreach ($digiriskElementChanges as $digiriskElementChange) {
+                $digiriskElement = $digiriskElementChange['object'];
+                $typeKey         = $digiriskElement->element_type == 'groupment' ? 'Groupment' : 'WorkUnit';
+
+                $tmpArray = [
+                    'digiriskElementRefLabel' => 'S' . $digiriskElement->entity . ' - ' . $digiriskElement->ref . ' - ' . $digiriskElement->label,
+                    'digiriskElementType'     => $outputLangs->transnoentities($typeKey),
+                    'digiriskElementState'    => $outputLangs->transnoentities('DigiriskElement' . $digiriskElementChange['state']),
+                    'digiriskElementDate'     => dol_print_date($digiriskElementChange['date'], 'day', 'tzuser')
+                ];
+
+                static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+            }
+            $odfHandler->mergeSegment($listLines);
+        }
     }
 
     /**
