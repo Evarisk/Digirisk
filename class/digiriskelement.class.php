@@ -202,6 +202,159 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
+     * Archive the element and all its descendants
+     *
+     * Archiving is not deleting: the element keeps its parent, its risks and its documents. It only
+     * leaves the active organization tree (every listing filters on STATUS_VALIDATED) to show up in
+     * the archive tab of its parent element.
+     *
+     * @param  User      $user      User that archives
+     * @param  int<0,1>  $noTrigger 0 = launch triggers after, 1 = disable triggers
+     * @return int<-1,1>            Return integer < 0 if KO, > 0 if OK
+     * @throws Exception
+     */
+    public function archive(User $user, int $noTrigger = 1): int
+    {
+        $this->db->begin();
+
+        // The whole subtree follows: a child left validated under an archived parent would be
+        // unreachable from the tree without ever showing up in an archive tab
+        foreach ($this->getDescendants() as $descendant) {
+            if ((int) $descendant->status !== self::STATUS_VALIDATED) {
+                continue;
+            }
+            if ($descendant->setArchived($user, $noTrigger) <= 0) {
+                $this->error  = $descendant->error;
+                $this->errors = $descendant->errors;
+                $this->db->rollback();
+                return -1;
+            }
+        }
+
+        if ($this->setArchived($user, $noTrigger) <= 0) {
+            $this->db->rollback();
+            return -1;
+        }
+
+        $this->db->commit();
+
+        return 1;
+    }
+
+    /**
+     * Restore the element and all its archived descendants
+     *
+     * @param  User      $user      User that unarchives
+     * @param  int<0,1>  $noTrigger 0 = launch triggers after, 1 = disable triggers
+     * @return int<-1,1>            Return integer < 0 if KO, > 0 if OK
+     * @throws Exception
+     */
+    public function unarchive(User $user, int $noTrigger = 1): int
+    {
+        $this->db->begin();
+
+        if ($this->setUnarchived($user, $noTrigger) <= 0) {
+            $this->db->rollback();
+            return -1;
+        }
+
+        foreach ($this->getDescendants() as $descendant) {
+            if ((int) $descendant->status !== self::STATUS_ARCHIVED) {
+                continue;
+            }
+            if ($descendant->setUnarchived($user, $noTrigger) <= 0) {
+                $this->error  = $descendant->error;
+                $this->errors = $descendant->errors;
+                $this->db->rollback();
+                return -1;
+            }
+        }
+
+        $this->db->commit();
+
+        return 1;
+    }
+
+    /**
+     * Return every descendant of the element, whatever its status
+     *
+     * @param  int                $depth Current recursion depth, guards against a corrupted fk_parent loop
+     * @return DigiriskElement[]         Descendants indexed by id
+     * @throws Exception
+     */
+    public function getDescendants(int $depth = 0): array
+    {
+        if ($this->id <= 0 || $depth > 20) {
+            return [];
+        }
+
+        $children = $this->fetchAll('', 'ranks', 0, 0, ['customsql' => 't.fk_parent = ' . (int) $this->id]);
+        if (!is_array($children) || empty($children)) {
+            return [];
+        }
+
+        $descendants = [];
+        foreach ($children as $child) {
+            $descendants[$child->id] = $child;
+            foreach ($child->getDescendants($depth + 1) as $descendantID => $descendant) {
+                $descendants[$descendantID] = $descendant;
+            }
+        }
+
+        return $descendants;
+    }
+
+    /**
+     * Return the direct children of the element that are archived
+     *
+     * Only direct children: an archived subtree shows up as its root, the rest of it lives in the
+     * archive tab of that root.
+     *
+     * @return DigiriskElement[] Archived children indexed by id
+     * @throws Exception
+     */
+    public function getArchivedChildren(): array
+    {
+        if ($this->id <= 0) {
+            return [];
+        }
+
+        $children = $this->fetchAll('', 'ranks', 0, 0, ['customsql' => 't.fk_parent = ' . (int) $this->id . ' AND t.status = ' . self::STATUS_ARCHIVED]);
+
+        return is_array($children) ? $children : [];
+    }
+
+    /**
+     * Return the archived risks of the element
+     *
+     * @param  string $riskType Risk type (risk, riskenvironmental), empty for all of them
+     * @return Risk[]           Archived risks indexed by id
+     * @throws Exception
+     */
+    public function getArchivedRisks(string $riskType = ''): array
+    {
+        if ($this->id <= 0) {
+            return [];
+        }
+
+        $risk  = new Risk($this->db);
+        $risks = $risk->fetchAll('', 'ref', 0, 0, ['customsql' => 't.fk_element = ' . (int) $this->id . ' AND t.status = ' . Risk::STATUS_ARCHIVED . (dol_strlen($riskType) > 0 ? ' AND t.type = \'' . $this->db->escape($riskType) . '\'' : '')]);
+
+        return is_array($risks) ? $risks : [];
+    }
+
+    /**
+     * Return how many archived items the element holds, for the tab badge
+     *
+     * @return int Number of archived risks and archived children
+     * @throws Exception
+     */
+    public function getArchiveCount(): int
+    {
+        return count($this->getArchivedRisks()) + count($this->getArchivedChildren());
+    }
+
+    /**
      * Load digirisk element infos
      *
      * When a date range is given, only the elements created or modified inside it are counted:
@@ -643,13 +796,17 @@ class DigiriskElement extends SaturneObject
             global $langs;
 
             $this->labelStatus[self::STATUS_VALIDATED]      = $langs->transnoentitiesnoconv('Validated');
+            $this->labelStatus[self::STATUS_ARCHIVED]       = $langs->transnoentitiesnoconv('Archived');
 
             $this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
+            $this->labelStatusShort[self::STATUS_ARCHIVED]  = $langs->transnoentitiesnoconv('Archived');
         }
 
         $statusType = 'status' . $status;
         if ($status == self::STATUS_VALIDATED) {
             $statusType = 'status4';
+        } elseif ($status == self::STATUS_ARCHIVED) {
+            $statusType = 'status8';
         }
 
         return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);

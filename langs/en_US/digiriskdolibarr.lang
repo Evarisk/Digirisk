@@ -606,3 +606,27 @@ Protection = Protection
 NoRiskAssessmentYet = No assessment for this risk yet
 NoTaskYet = No task for this risk yet
 NoDescription = No description
+
+# ===========================================================================
+# Archiving of risks and work units / groupments
+# ===========================================================================
+Archives = Archives
+Archive = Archive
+Unarchive = Unarchive
+ArchiveObject = Archive %s
+UnarchiveObject = Unarchive %s
+ConfirmArchiveDigiriskElement = Archiving is not deleting: the element leaves the organization tree but stays available in the Archives tab of its parent, with its risks and its documents. Sub elements are archived along with it. Do you want to continue?
+ConfirmUnarchiveDigiriskElement = The element and everything archived along with it will be restored to the organization tree. Do you want to continue?
+ArchiveNoticeDescription = Archived items are neither deleted nor editable: they leave the active lists and the organization tree, and can be restored at any time.
+ArchivedRisks = Archived risks
+ArchivedElements = Archived work units and groupments
+ArchivedContent = Archived content
+ArchiveDate = Archiving date
+NoArchivedRisk = No archived risk for this element
+NoArchivedElement = No archived work unit or groupment for this element
+NbOfSubElements = Sub elements
+NbOfArchivedRisks = Archived risks
+RisksArchived = %s risk(s) archived
+RiskUnarchived = Risk %s has been unarchived
+ElementArchived = %s has been archived
+ElementUnarchived = %s has been unarchived

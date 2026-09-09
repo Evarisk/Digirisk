@@ -158,6 +158,40 @@ if (empty($reshook)) {
 
     $object->element = 'digiriskelement';
 
+	// Archiving is not deleting: the element leaves the organization tree but stays reachable from
+	// the archive tab of its parent, with its risks and its documents
+	if ($action == 'confirm_archive' && GETPOST('confirm') == 'yes' && $permissiontoadd) {
+		$object->fetch($id);
+		$result = $object->archive($user);
+
+		if ($result > 0) {
+			setEventMessages($langs->trans('ElementArchived', $object->ref), null);
+			// Back to the archive tab of the parent, where the element has just landed
+			$backToArchive = $object->fk_parent > 0
+				? dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_archive.php', 1) . '?id=' . $object->fk_parent
+				: $backurlforlist;
+			header('Location: ' . $backToArchive);
+			exit;
+		} else {
+			dol_syslog($object->error, LOG_DEBUG);
+			setEventMessages($object->error, $object->errors, 'errors');
+		}
+	}
+
+	if ($action == 'confirm_unarchive' && GETPOST('confirm') == 'yes' && $permissiontoadd) {
+		$object->fetch($id);
+		$result = $object->unarchive($user);
+
+		if ($result > 0) {
+			setEventMessages($langs->trans('ElementUnarchived', $object->ref), null);
+			header('Location: ' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php', 1) . '?id=' . $object->id);
+			exit;
+		} else {
+			dol_syslog($object->error, LOG_DEBUG);
+			setEventMessages($object->error, $object->errors, 'errors');
+		}
+	}
+
 	if ($action == 'confirm_delete' && GETPOST("confirm") == "yes") {
 		$object->fetch($id);
 		$result = $object->delete($user);
@@ -373,6 +407,16 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('DeleteObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmDeleteObject'), 'confirm_delete', '', 0, 1);
 	}
 
+	// Confirmation to archive
+	if ($action == 'archive') {
+		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ArchiveObject', $object->ref), $langs->trans('ConfirmArchiveDigiriskElement'), 'confirm_archive', '', 'yes', 1);
+	}
+
+	// Confirmation to unarchive
+	if ($action == 'unarchive') {
+		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('UnarchiveObject', $object->ref), $langs->trans('ConfirmUnarchiveDigiriskElement'), 'confirm_unarchive', '', 'yes', 1);
+	}
+
 
 	print $formconfirm;
 	$res = $object->fetch_optionals();
@@ -463,6 +507,20 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit">' . $langs->trans("Modify") . '</a>' . "\n";
 			} else {
 				print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
+			}
+
+			// Archive / Unarchive : reversible, unlike the delete button next to it
+			$isArchivable = ! array_key_exists($object->id, $trashList) && $object->id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH && $object->fk_parent > 0;
+			if ($object->status == $object::STATUS_ARCHIVED) {
+				if ($permissiontoadd) {
+					print '<a class="butAction" id="actionButtonUnarchive" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=unarchive&token=' . newToken() . '">' . $langs->trans('Unarchive') . '</a>' . "\n";
+				} else {
+					print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans('NotEnoughPermissions')) . '">' . $langs->trans('Unarchive') . '</a>' . "\n";
+				}
+			} elseif ($permissiontoadd && $isArchivable) {
+				print '<a class="butAction" id="actionButtonArchive" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=archive&token=' . newToken() . '">' . $langs->trans('Archive') . '</a>' . "\n";
+			} else {
+				print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans('CanNotDoThis')) . '">' . $langs->trans('Archive') . '</a>' . "\n";
 			}
 
 			if ($permissiontodelete && ! array_key_exists($object->id, $trashList) && $object->id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {

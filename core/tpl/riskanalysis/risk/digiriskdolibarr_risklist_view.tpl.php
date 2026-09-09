@@ -365,6 +365,11 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
         $sql .= " AND e.entity IN (" . $conf->entity . ") ";
     }
     $sql .= ' AND r.type = "' . $riskType . '"';
+    // Archived risks live in the archive tab of the element, they are out of the active list
+    // unless the status filter explicitly asks for them
+    if ($search['status'] === '' || $search['status'] == -1) {
+        $sql .= ' AND r.status <> ' . Risk::STATUS_ARCHIVED;
+    }
 
     foreach ($search as $key => $val) {
         if ($key == 'status' && $search[$key] == -1) continue;
@@ -479,6 +484,11 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
         $sql .= " AND e.entity IN (" . $conf->entity . ")";
     }
     $sql .= ' AND r.type = "' . $riskType . '"';
+    // Archived risks live in the archive tab of the element, they are out of the active list
+    // unless the status filter explicitly asks for them
+    if ($search['status'] === '' || $search['status'] == -1) {
+        $sql .= ' AND r.status <> ' . Risk::STATUS_ARCHIVED;
+    }
 
     foreach ($search as $key => $val) {
         if ($key == 'status' && $search[$key] == -1) continue;
@@ -575,6 +585,9 @@ include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 
 // List of mass actions available
 $arrayofmassactions = [];
+if ($permissiontoadd) {
+    $arrayofmassactions['archive'] = '<span class="fa fa-archive paddingrightonly"></span>' . $langs->trans('Archive');
+}
 if ($permissiontodelete) {
     $arrayofmassactions['predelete'] = '<span class="fa fa-trash paddingrightonly"></span>' . $langs->trans("Delete");
 }

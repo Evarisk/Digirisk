@@ -86,6 +86,13 @@ function digiriskelement_prepare_head(DigiriskElement $object): array
         $head[$h][2] = 'elementInformations';
         $h++;
 
+        // Archived risks and archived sub elements of the current element
+        $archiveCount = $object->getArchiveCount();
+        $head[$h][0]  = dol_buildpath('digiriskdolibarr/view/digiriskelement/digiriskelement_archive.php', 1) . '?id=' . $object->id;
+        $head[$h][1]  = ($conf->browser->layout == 'classic' ? '<i class="fas fa-archive pictofixedwidth"></i>' . $langs->trans('Archives') : '<i class="fas fa-archive"></i>') . ($archiveCount > 0 ? '<span class="badge marginleftonlyshort">' . $archiveCount . '</span>' : '');
+        $head[$h][2]  = 'elementArchive';
+        $h++;
+
         if ($object->element_type == 'groupment') {
             $head[$h][0] = dol_buildpath('digiriskdolibarr/view/digiriskelement/digiriskelement_listingrisksdocument.php', 1) . '?id=' . $object->id;
             $head[$h][1] = $conf->browser->layout == 'classic' ? '<i class="fas fa-list pictofixedwidth"></i>' . $langs->trans('ListingRisksDocument') : '<i class="fas fa-list"></i>';

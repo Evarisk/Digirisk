@@ -2431,3 +2431,27 @@ Protection = Protection
 NoRiskAssessmentYet = Aucune évaluation pour ce risque
 NoTaskYet = Aucune tâche pour ce risque
 NoDescription = Aucune description
+
+# ===========================================================================
+# Archivage des risques et des unités de travail / groupements
+# ===========================================================================
+Archives = Archives
+Archive = Archiver
+Unarchive = Désarchiver
+ArchiveObject = Archiver %s
+UnarchiveObject = Désarchiver %s
+ConfirmArchiveDigiriskElement = L'archivage n'est pas une suppression : l'élément quitte l'arborescence mais reste consultable dans l'onglet Archives de son parent, avec ses risques et ses documents. Les sous-éléments sont archivés avec lui. Voulez-vous continuer ?
+ConfirmUnarchiveDigiriskElement = L'élément et tout ce qui a été archivé avec lui vont retrouver leur place dans l'arborescence. Voulez-vous continuer ?
+ArchiveNoticeDescription = Les éléments archivés ne sont ni supprimés ni modifiables : ils sortent des listes et de l'arborescence actives, et peuvent être restaurés à tout moment.
+ArchivedRisks = Risques archivés
+ArchivedElements = Unités de travail et groupements archivés
+ArchivedContent = Contenu archivé
+ArchiveDate = Date d'archivage
+NoArchivedRisk = Aucun risque archivé pour cet élément
+NoArchivedElement = Aucune unité de travail ni groupement archivé pour cet élément
+NbOfSubElements = Sous-éléments
+NbOfArchivedRisks = Risques archivés
+RisksArchived = %s risque(s) archivé(s)
+RiskUnarchived = Le risque %s a été désarchivé
+ElementArchived = %s a été archivé
+ElementUnarchived = %s a été désarchivé
