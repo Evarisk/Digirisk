@@ -613,14 +613,14 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
         <div class="wpeo-modal modal-risk-0 modal-risk" id="risk_add<?php echo $object->id ?>" value="new">
             <div class="modal-container wpeo-modal-event">
                 <!-- Modal-Header -->
-                <div class="modal-header" style="align-items: center; display: flex;">
-                    <h2 class="modal-title" style="flex: 1;"><?php print digirisk_trans_risk_type('Add', $riskType, 'Title') . ' ' . $refRiskMod->getNextValue($risk); ?></h2>
+                <div class="modal-header">
+                    <h2 class="modal-title"><?php print digirisk_trans_risk_type('Add', $riskType, 'Title') . ' ' . $refRiskMod->getNextValue($risk); ?></h2>
                     <?php if ($permissiontoadd) : ?>
-                        <div class="risk-create wpeo-button button-primary button-disable modal-close" style="margin-right: 15px; margin-bottom: 0;">
+                        <div class="risk-create wpeo-button button-primary button-disable modal-close modal-header-action">
                             <span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
                         </div>
                     <?php else : ?>
-                        <div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" style="margin-right: 15px; margin-bottom: 0;">
+                        <div class="wpeo-button button-grey wpeo-tooltip-event modal-header-action" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
                             <span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
                         </div>
                     <?php endif;?>
@@ -684,7 +684,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                         </div><hr>
                     <?php endif; ?>
                     <div class="risk-evaluation-container standard">
-                        <div class="risk-evaluation-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                        <div class="risk-evaluation-header risk-evaluation-header-split">
                             <div class="risk-evaluation-header-left">
                                 <?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
                                     <div class="wpeo-button evaluation-standard select-evaluation-method selected button-blue button-radius-2">
@@ -723,7 +723,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                                                 <div class="element-linked-medias-list">
                                                     <?php
                                                     $relativepath = 'digiriskdolibarr/medias/thumbs';
-                                                    print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0', 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0');
+                                                    print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0', 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0', null, 'photo', 1, 1, 0, 0, '', 1, ['hideNoPhoto' => 1]);
                                                     ?>
                                                 </div>
                                             </td>
@@ -810,39 +810,39 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                     </div>
                     <?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) : ?>
                         <div class="riskassessment-task">
-                            <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                                <span class="section-title" style="margin-bottom: 0; margin-right: 15px; white-space: nowrap;"><?php echo $langs->trans('Task'); ?></span>
-                                <input type="text" class="widthcentpercent" name="label" value="" placeholder="<?php echo dol_escape_htmltag($langs->trans('Label')); ?>" style="flex-grow: 1; height: 30px; box-sizing: border-box; padding-left: 10px;">
+                            <div class="riskassessment-task-header">
+                                <span class="section-title"><?php echo $langs->trans('Task'); ?></span>
+                                <input type="text" class="widthcentpercent" name="label" value="" placeholder="<?php echo dol_escape_htmltag($langs->trans('Label')); ?>">
                             </div>
-                            <div class="wpeo-gridlayout grid-4" style="margin-top: 5px; align-items: center;">
+                            <div class="riskassessment-task-fields wpeo-gridlayout grid-4">
                                 <div>
-                                    <div style="position: relative;">
-                                        <i class="far fa-calendar-plus fa-fw" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #888;"></i>
-                                        <?php print '<input type="datetime-local" id="RiskassessmentTaskDateStartModalRisk" class="widthcentpercent" name="RiskassessmentTaskDateStartModalRisk" style="height: 30px; box-sizing: border-box; padding-left: 30px;" value="' . dol_print_date(dol_now('tzuser'), '%Y-%m-%dT%H:%M:%S') . '">'; ?>
+                                    <div class="riskassessment-task-field has-icon">
+                                        <i class="far fa-calendar-plus fa-fw riskassessment-task-field-icon"></i>
+                                        <?php print '<input type="datetime-local" id="RiskassessmentTaskDateStartModalRisk" class="widthcentpercent" name="RiskassessmentTaskDateStartModalRisk" value="' . dol_print_date(dol_now('tzuser'), '%Y-%m-%dT%H:%M:%S') . '">'; ?>
                                         <?php print '<input type="hidden" id="RiskassessmentTaskDateStartModalRiskhour" name="RiskassessmentTaskDateStartModalRiskhour" value="' . dol_print_date(dol_now('tzuser'), '%H') . '">'; ?>
                                         <?php print '<input type="hidden" id="RiskassessmentTaskDateStartModalRiskmin" name="RiskassessmentTaskDateStartModalRiskmin" value="' . dol_print_date(dol_now('tzuser'), '%M') . '">'; ?>
                                     </div>
                                 </div>
                                 <div>
-                                    <div style="position: relative;">
-                                        <i class="far fa-calendar-check fa-fw" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #888;"></i>
-                                        <?php print '<input type="datetime-local" id="RiskassessmentTaskDateEndModalRisk" class="widthcentpercent" name="RiskassessmentTaskDateEndModalRisk" style="height: 30px; box-sizing: border-box; padding-left: 30px;">'; ?>
+                                    <div class="riskassessment-task-field has-icon">
+                                        <i class="far fa-calendar-check fa-fw riskassessment-task-field-icon"></i>
+                                        <?php print '<input type="datetime-local" id="RiskassessmentTaskDateEndModalRisk" class="widthcentpercent" name="RiskassessmentTaskDateEndModalRisk">'; ?>
                                         <?php print '<input type="hidden" id="RiskassessmentTaskDateEndModalRiskhour" name="RiskassessmentTaskDateEndModalRiskhour" value="">'; ?>
                                         <?php print '<input type="hidden" id="RiskassessmentTaskDateEndModalRiskmin" name="RiskassessmentTaskDateEndModalRiskmin" value="">'; ?>
                                     </div>
                                 </div>
                                 <div>
-                                    <div style="display: flex; align-items: center; gap: 5px; height: 30px;">
-                                        <i class="fas fa-user-tie fa-fw" style="color: #888;"></i>
-                                        <div style="flex-grow: 1; min-width: 0;">
+                                    <div class="riskassessment-task-executive">
+                                        <i class="fas fa-user-tie fa-fw riskassessment-task-field-icon"></i>
+                                        <div class="riskassessment-task-executive-select">
                                             <?php print saturne_select_users('executive_id', 0, $langs->trans('Responsible'), 'executiveSelect widthcentpercent'); ?>
                                         </div>
                                     </div>
                                 </div>
                                 <div>
-                                    <div style="position: relative;">
-                                        <input type="text" class="riskassessment-task-budget widthcentpercent" name="budget" value="" placeholder="<?php echo dol_escape_htmltag($langs->trans('Budget')); ?>" style="height: 30px; box-sizing: border-box; padding-left: 10px; padding-right: 20px;">
-                                        <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-weight: bold;">&euro;</span>
+                                    <div class="riskassessment-task-field">
+                                        <input type="text" class="riskassessment-task-budget widthcentpercent" name="budget" value="" placeholder="<?php echo dol_escape_htmltag($langs->trans('Budget')); ?>">
+                                        <span class="riskassessment-task-budget-currency">&euro;</span>
                                     </div>
                                 </div>
                             </div>
