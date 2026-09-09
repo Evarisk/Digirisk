@@ -68,6 +68,14 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
       vertical-align: sub;
       text-align: center;
 
+      // La photo remplit la pastille : overflow + border-radius du parent la découpent en rond
+      img {
+        display: block;
+        width: 25px;
+        height: 25px;
+        object-fit: cover;
+      }
+
       a {
         color: #fff !important;
       }
