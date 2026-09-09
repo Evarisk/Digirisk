@@ -117,7 +117,30 @@ print load_fiche_titre($langs->trans($title), $linkback, 'title_setup');
 $head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'settings', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
 
-print '<div style="text-indent: 3em"><br>' . '<i class="fas fa-2x fa-calendar-alt" style="padding: 10px"></i>   ' . $langs->trans("AgendaModuleRequired") . '<br></div>';
+// L'assistant de configuration cree un utilisateur USERAPI et sa cle d'API sans dependre du module API REST :
+// tant que celui-ci est eteint, les routes ne repondent pas et l'application mobile ne peut pas se connecter.
+// Compter les utilisateurs plutot que fetch() par login : l'assistant a pu creer un USERAPI par entite et fetch()
+// refuse alors de trancher (USERDUPLICATEFOUND). La constante DIGIRISKDOLIBARR_USERAPI_SET n'est pas fiable non plus,
+// des lignes vides par entite masquent la valeur posee sur l'entite 0.
+if (!isModEnabled('api')) {
+	$sql  = 'SELECT COUNT(u.rowid) AS nb FROM ' . MAIN_DB_PREFIX . 'user AS u';
+	$sql .= " WHERE u.login = 'USERAPI' AND u.api_key IS NOT NULL AND u.api_key != ''";
+	$sql .= ' AND u.entity IN (0, ' . ((int) $conf->entity) . ')';
+
+	$resqlUserApi = $db->query($sql);
+	if ($resqlUserApi) {
+		$objUserApi = $db->fetch_object($resqlUserApi);
+		if ($objUserApi->nb > 0) {
+			print '<div style="text-indent: 3em"><br>' . '<i class="fas fa-2x fa-plug" style="padding: 10px"></i>  ' . $langs->trans("UserApiWithoutApiModule") . '  ' . '<a href="../../../admin/modules.php">' . $langs->trans('ConfigMyModules') . '</a>' . '<br></div>';
+		}
+		$db->free($resqlUserApi);
+	} else {
+		dol_syslog('digiriskdolibarr setup USERAPI check ' . $db->lasterror(), LOG_ERR);
+	}
+}
+if (!isModEnabled('export') || !isModEnabled('import')) {
+	print '<div style="text-indent: 3em"><br>' . '<i class="fas fa-2x fa-file-export" style="padding: 10px"></i>  ' . $langs->trans("ExportImportModulesAdvice") . '  ' . '<a href="../../../admin/modules.php">' . $langs->trans('ConfigMyModules') . '</a>' . '<br></div>';
+}
 print '<div style="text-indent: 3em"><br>' . '<i class="fas fa-2x fa-tools" style="padding: 10px"></i>  ' . $langs->trans("HowToSetupOtherModules") . '  ' . '<a href=' . '"../../../admin/modules.php">' . $langs->trans('ConfigMyModules') . '</a>' . '<br></div>';
 print '<div style="text-indent: 3em"><br>' . '<i class="fas fa-2x fa-file-alt" style="padding: 10px"></i>  ' . $langs->trans("AvoidLogoProblems") . '  ' . '<a href="' . $langs->trans('LogoHelpLink') . '">' . $langs->trans('LogoHelpLink') . '</a>' . '<br></div>';
 print '<div style="text-indent: 3em"><br>' . '<i class="fab fa-2x fa-css3-alt" style="padding: 10px"></i>  ' . $langs->trans("HowToSetupIHM") . '  ' . '<a href=' . '"../../../admin/ihm.php">' . $langs->trans('ConfigIHM') . '</a>' . '<br></div>';

@@ -551,3 +551,10 @@ FirePermitMenuVisibilityDescription             = When the option is disabled, t
 AccidentMenuVisibilityDescription               = When the option is disabled, the accident menu entries (list and categories) are hidden.<br>The "Accident" configuration tab is hidden only if the accident investigations are hidden too.
 AccidentInvestigationMenuVisibilityDescription  = When the option is disabled, the accident investigation menu entry is hidden.<br>The "Accident" configuration tab is hidden only if the accidents are hidden too.
 ToolsMenuVisibilityDescription                  = When the option is disabled, the tools menu entry is hidden.
+
+# ===========================================================================
+# Setup page module advices — issue #5102
+# ===========================================================================
+UserApiWithoutApiModule = The USERAPI user and its API key exist but the REST API module is disabled: Digirisk routes will not answer and the mobile application will not be able to connect until it is enabled
+ExportImportModulesAdvice = Digirisk provides import (work units, risks, risk assessments) and export (tickets, categories) templates: enable the Imports and Exports modules to use them
+ConfigMyModules = Modules setup
