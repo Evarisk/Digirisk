@@ -1566,10 +1566,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
         // Define output language
         $outputlangs = $langs;
         $newlang     = '';
-        if ($conf->global->MAIN_MULTILANGS && empty($newlang) && ! empty($_REQUEST['lang_id'])) {
+        if (getDolGlobalInt('MAIN_MULTILANGS') && empty($newlang) && ! empty($_REQUEST['lang_id'])) {
             $newlang = $_REQUEST['lang_id'];
         }
-        if ($conf->global->MAIN_MULTILANGS && empty($newlang)) {
+        if (getDolGlobalInt('MAIN_MULTILANGS') && empty($newlang)) {
             $newlang = $object->thirdparty->default_lang;
         }
 
