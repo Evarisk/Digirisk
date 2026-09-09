@@ -590,3 +590,6 @@ ManuelInputNBWorkedHours = Enter the number of worked hours manually
 ManuelInputNBWorkedHoursDescription = When enabled, you can enter the number of worked hours manually in the company setup.<br>Otherwise the number of worked hours is computed.<br>See the documentation for more information.
 ShowPatchNoteAgain = Show the release note
 ShowPatchNoteAgainDescription = When enabled, the release note of the current version appears again on the Digirisk home page.<br>(Requires the "Show release notes from GitHub" option to be enabled to be visible.)
+RiskCotation = Rating
+PreventionActions = Prevention actions
+AddingInProgress = Adding in progress...

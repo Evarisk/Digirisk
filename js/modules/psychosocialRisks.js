@@ -49,16 +49,21 @@ window.digiriskdolibarr.psychosocialRisks.event = function() {
  * @return {void}
  */
 window.digiriskdolibarr.psychosocialRisks.toggleAddButton = function() {
+  let submitButton  = $('#submit_selected_psychosocial_risks');
   let selectedRisks = $('.select-psychosocial-risk:checked').length;
+
   if (selectedRisks > 0) {
-    $('#submit_selected_psychosocial_risks').removeAttr('disabled').css('opacity', '1');
-    //add class button-disabled
-    $('#submit_selected_psychosocial_risks').removeClass('button-grey');
+    submitButton.removeAttr('disabled').removeClass('button-grey');
   } else {
-    $('#submit_selected_psychosocial_risks').attr('disabled', 'disabled').css('opacity', '0.6');
-    //add class button-grey
-    $('#submit_selected_psychosocial_risks').addClass('button-grey');
+    submitButton.attr('disabled', 'disabled').addClass('button-grey');
   }
+
+  submitButton.find('.psychosocial-selected-count').text(selectedRisks);
+
+  // Estomper les lignes décochées pour montrer d'un coup d'oeil ce qui sera créé
+  $('.select-psychosocial-risk').each(function() {
+    $(this).closest('.psychosocial-risk-row').toggleClass('psychosocial-risk-row-unselected', !$(this).is(':checked'));
+  });
 
   // Mettre à jour l'état de la case "tout sélectionner"
   window.digiriskdolibarr.psychosocialRisks.updateSelectAllState();
@@ -96,13 +101,13 @@ window.digiriskdolibarr.psychosocialRisks.updateSelectAllState = function() {
 
   if (selectedRisks === totalRisks && totalRisks > 0) {
     selectAllCheckbox.prop('checked', true);
-    selectAllCheckbox.prop('', false);
+    selectAllCheckbox.prop('indeterminate', false);
   } else if (selectedRisks === 0) {
     selectAllCheckbox.prop('checked', false);
-    selectAllCheckbox.prop('', false);
+    selectAllCheckbox.prop('indeterminate', false);
   } else {
     selectAllCheckbox.prop('checked', false);
-    selectAllCheckbox.prop('', true);
+    selectAllCheckbox.prop('indeterminate', true);
   }
 };
 
@@ -168,26 +173,25 @@ window.digiriskdolibarr.psychosocialRisks.submitSelectedRisks = function(e) {
   e.preventDefault();
 
   let button = $(this);
-  let originalText = button.find('span').html();
+  let label = button.find('.psychosocial-submit-label');
+  let originalText = label.html();
 
-  button.attr('disabled', 'disabled').css('opacity', '0.6');
-  button.find('span').html('<i class="fas fa-spinner fa-spin"></i> Ajout en cours...');
+  // L'attribut disabled ne bloque pas le clic sur un div : sans cette garde un second clic
+  // pendant l'envoi créerait les risques une deuxième fois.
+  if (button.attr('disabled')) {
+    return;
+  }
+
+  button.attr('disabled', 'disabled').addClass('button-grey');
+  label.html('<i class="fas fa-spinner fa-spin"></i> ' + button.data('loading-label'));
 
   let selectedRisks = window.digiriskdolibarr.psychosocialRisks.collectSelectedRisksData();
 
   if (selectedRisks.length === 0) {
-    button.removeAttr('disabled').css('opacity', '1');
-    button.find('span').html(originalText);
+    button.removeAttr('disabled').removeClass('button-grey');
+    label.html(originalText);
     return;
   }
 
-  console.log('Données envoyées:', selectedRisks);
-
-  window.digiriskdolibarr.risk_table_common.submitRisks(
-    selectedRisks,
-    function(response, index) {
-    },
-    function(xhr, status, error, index) {
-    }
-  );
+  window.digiriskdolibarr.risk_table_common.submitRisks(selectedRisks);
 };

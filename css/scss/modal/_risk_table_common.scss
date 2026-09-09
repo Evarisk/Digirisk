@@ -1,5 +1,4 @@
 .risk-table-common,
-.psychosocial-risk-table,
 .risque-table {
   width: 100%;
   border-collapse: collapse;
@@ -75,8 +74,7 @@
   }
 }
 
-.risk-row-common,
-.psychosocial-risk-row {
+.risk-row-common {
   &:hover {
     background-color: #f8f9fa;
   }
@@ -96,20 +94,17 @@
   }
 }
 
-.risk-content-common,
-.psychosocial-risk-content {
+.risk-content-common {
   max-height: 60vh;
   overflow-y: auto;
 }
 
-.risk-wrapper-common,
-.psychosocial-risk-wrapper {
+.risk-wrapper-common {
   padding: 10px;
 }
 
 
-.select-risk,
-.select-psychosocial-risk {
+.select-risk {
   cursor: pointer;
   transform: scale(1.2);
   margin: 0 auto;
@@ -140,12 +135,5 @@
 
   &:not(:disabled) {
     opacity: 1;
-  }
-}
-
-.psychosocial-risk-table {
-  .selected-cotation {
-    border: 3px solid #000000;
-    box-shadow: none;
   }
 }
