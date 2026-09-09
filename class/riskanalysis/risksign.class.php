@@ -122,7 +122,13 @@ class RiskSign extends SaturneObject
     /**
      * Load risk sign infos
      *
-     * @param  array     $moreParam More param (filter)
+     * ShowInheritedRiskSigns and ShowSharedRiskSigns are described as acting on "les documents et
+     * les listings", but they only ever reached the element card: a work unit document listed the
+     * risk signs of that single element while its own template announces the three sources - issue
+     * #4731. They are honoured here, and only for a document scoped on one element: the risk
+     * assessment document passes no element filter and already lists every risk sign of the entity.
+     *
+     * @param  array     $moreParam More param (filter/object)
      * @return array     $array     Array of risk signs
      * @throws Exception
      */
@@ -130,20 +136,102 @@ class RiskSign extends SaturneObject
     {
         $array = [];
 
-        //@todo: missing shared and inherited risksigns
+        $select      = ', d.ref AS digiriskElementRef, d.entity AS digiriskElementEntity, d.label AS digiriskElementLabel';
+        $moreSelects = ['digiriskElementRef', 'digiriskElementEntity', 'digiriskElementLabel'];
+        $join        = ' INNER JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement AS d ON d.rowid = t.fk_element';
+        $status      = 'd.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND t.status = ' . self::STATUS_VALIDATED;
 
-        $select             = ', d.ref AS digiriskElementRef, d.entity AS digiriskElementEntity, d.label AS digiriskElementLabel';
-        $moreSelects        = ['digiriskElementRef', 'digiriskElementEntity', 'digiriskElementLabel'];
-        $join               = ' INNER JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement AS d ON d.rowid = t.fk_element';
-        $filter             = 'd.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND t.status = ' . self::STATUS_VALIDATED . ($moreParam['filter'] ?? '');
-        $array['riskSigns'] = saturne_fetch_all_object_type('RiskSign', '', '', 0, 0, ['customsql' => $filter], 'AND', false, false, false, $join, [], $select, $moreSelects);
-        if (!is_array($array['riskSigns']) || empty($array['riskSigns'])) {
-            $array['riskSigns'] = [];
+        $riskSigns = saturne_fetch_all_object_type('RiskSign', '', '', 0, 0, ['customsql' => $status . ($moreParam['filter'] ?? '')], 'AND', false, false, false, $join, [], $select, $moreSelects);
+        if (!is_array($riskSigns)) {
+            $riskSigns = [];
         }
 
-        $array['nbRiskSigns'] = count($array['riskSigns']);
+        $object = $moreParam['object'] ?? null;
+        if ($object instanceof DigiriskElement && $object->id > 0) {
+            // Both helpers key their result by risk sign id, so the union renders a risk sign
+            // reachable twice - inherited and shared - only once
+            if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS')) {
+                $riskSigns += self::fetchInheritedRiskSigns($object, $status, $join, $select, $moreSelects);
+            }
+            if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS')) {
+                $riskSigns += self::fetchSharedRiskSigns($object, $status, $join, $select, $moreSelects);
+            }
+        }
+
+        $array['riskSigns']   = $riskSigns;
+        $array['nbRiskSigns'] = count($riskSigns);
 
         return $array;
+    }
+
+    /**
+     * Fetch the risk signs every ancestor of an element carries
+     *
+     * "Inherited" is what the element card shows under the same setting: declared higher in the
+     * tree and applying downwards. The parent chain is read from the validated elements, which one
+     * cached query already holds, so an unvalidated element ends the walk - its own risk signs are
+     * excluded by the status filter anyway, and those of its parents are then left out too.
+     *
+     * @param  DigiriskElement $object      Element the document is generated for
+     * @param  string          $status      Status conditions shared with the caller
+     * @param  string          $join        Join naming the element a risk sign belongs to
+     * @param  string          $select      Extra columns the risk sign segment reads
+     * @param  array           $moreSelects Names of those extra columns
+     * @return array                        Risk signs keyed by id
+     * @throws Exception
+     */
+    private static function fetchInheritedRiskSigns(DigiriskElement $object, string $status, string $join, string $select, array $moreSelects): array
+    {
+        global $db;
+
+        $digiriskElement  = new DigiriskElement($db);
+        $digiriskElements = $digiriskElement->getActiveDigiriskElements('all');
+        if (!is_array($digiriskElements)) {
+            $digiriskElements = [];
+        }
+
+        $ancestorIds = [];
+        $parentId    = (int) $object->fk_parent;
+        // An id already seen means fk_parent forms a cycle: stop rather than loop forever
+        while ($parentId > 0 && !isset($ancestorIds[$parentId])) {
+            $ancestorIds[$parentId] = $parentId;
+            $parentId               = isset($digiriskElements[$parentId]) ? (int) $digiriskElements[$parentId]->fk_parent : 0;
+        }
+
+        if (empty($ancestorIds)) {
+            return [];
+        }
+
+        $filter    = $status . ' AND t.fk_element IN (' . implode(',', $ancestorIds) . ')';
+        $riskSigns = saturne_fetch_all_object_type('RiskSign', '', '', 0, 0, ['customsql' => $filter], 'AND', false, false, false, $join, [], $select, $moreSelects);
+
+        return is_array($riskSigns) ? $riskSigns : [];
+    }
+
+    /**
+     * Fetch the risk signs other entities share with an element
+     *
+     * The link is the one the element card reads: an element_element row from the risk sign to the
+     * element. The owning element stays joined on fk_element so the segment names the entity the
+     * risk sign really belongs to, which is what its "S<entity>" prefix is for.
+     *
+     * @param  DigiriskElement $object      Element the document is generated for
+     * @param  string          $status      Status conditions shared with the caller
+     * @param  string          $join        Join naming the element a risk sign belongs to
+     * @param  string          $select      Extra columns the risk sign segment reads
+     * @param  array           $moreSelects Names of those extra columns
+     * @return array                        Risk signs keyed by id
+     * @throws Exception
+     */
+    private static function fetchSharedRiskSigns(DigiriskElement $object, string $status, string $join, string $select, array $moreSelects): array
+    {
+        $sharedJoin  = ' INNER JOIN ' . MAIN_DB_PREFIX . 'element_element AS ee ON (ee.fk_source = t.rowid AND ee.sourcetype = \'digiriskdolibarr_risksign\' AND ee.targettype = \'digiriskdolibarr_digiriskelement\')';
+        $sharedJoin .= $join;
+
+        $filter    = $status . ' AND ee.fk_target = ' . (int) $object->id;
+        $riskSigns = saturne_fetch_all_object_type('RiskSign', '', '', 0, 0, ['customsql' => $filter], 'AND', false, false, false, $sharedJoin, [], $select, $moreSelects);
+
+        return is_array($riskSigns) ? $riskSigns : [];
     }
 
 	/**
