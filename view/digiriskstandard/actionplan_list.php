@@ -32,7 +32,9 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 
 // Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.formprojet.class.php';
 
 // Load Saturne libraries
 require_once __DIR__ . '/../../../saturne/class/task/saturnetask.class.php';
@@ -40,6 +42,7 @@ require_once __DIR__ . '/../../../saturne/class/task/saturnetask.class.php';
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_actionplan.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 
 // Global variables definitions
@@ -57,19 +60,70 @@ if (empty($view) || !in_array($view, ['gantt', 'kanban'])) {
 }
 
 // Initialize technical objects
-$object  = new DigiriskStandard($db);
-$task    = new SaturneTask($db);
-$risk    = new Risk($db);
+$object      = new DigiriskStandard($db);
+$task        = new SaturneTask($db);
+$risk        = new Risk($db);
+$project     = new Project($db);
+$form        = new Form($db);
+$formproject = new FormProjets($db);
 
 $hookmanager->initHooks(['actionplanlist', 'globalcard']);
 
 // Load object
 $object->fetch(0, '', ' AND t.entity = ' . $conf->entity);
-$projectId = getDolGlobalInt('DIGIRISKDOLIBARR_DU_PROJECT');
+
+// Displayed project — the Document Unique project stays the default, but the user
+// can switch to any other project he is allowed to read. The last choice is kept in
+// an entity-scoped cookie so coming back on the page reopens the same project.
+$duProjectId       = getDolGlobalInt('DIGIRISKDOLIBARR_DU_PROJECT');
+$projectCookieName = 'digiriskdolibarr_actionplan_project_' . $conf->entity;
+$askedProjectId    = GETPOSTINT('projectid');
+$isExplicitChoice  = ($askedProjectId > 0);
+
+if (!$isExplicitChoice && !empty($_COOKIE[$projectCookieName])) {
+    $askedProjectId = (int) $_COOKIE[$projectCookieName];
+}
+
+// The Document Unique project is always allowed (historical behaviour of this page),
+// any other one must be visible from the current entity and readable by the user
+$allowedEntities = array_map('intval', explode(',', getEntity('project')));
+if ($askedProjectId > 0 && $project->fetch($askedProjectId) > 0
+    && ($askedProjectId == $duProjectId
+        || (in_array((int) $project->entity, $allowedEntities, true) && $project->restrictedProjectArea($user, 'read') > 0))) {
+    $projectId = $askedProjectId;
+} else {
+    // Deleted, forbidden or not configured project — fall back on the Document Unique
+    $project   = new Project($db);
+    $projectId = $duProjectId;
+    if ($projectId > 0) {
+        $project->fetch($projectId);
+    }
+}
+
+// Persist the choice for the next visits (kept in sync when the stored value is stale)
+if ($projectId > 0 && ($isExplicitChoice || (int) ($_COOKIE[$projectCookieName] ?? 0) != $projectId)) {
+    setcookie($projectCookieName, (string) $projectId, [
+        'expires'  => dol_now() + 365 * 24 * 3600,
+        'path'     => '/',
+        'secure'   => !empty($_SERVER['HTTPS']),
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+    $_COOKIE[$projectCookieName] = (string) $projectId;
+}
 
 // Security check
 $permissiontoread = $user->hasRight('digiriskdolibarr', 'riskassessmentdocument', 'read');
 saturne_check_access($permissiontoread);
+
+// Displayed corrective actions criteria (GP/UT, risk level, tags) — shared by the Kanban, the Gantt and the exports
+$actionPlanFilters = digiriskActionPlanGetFilters();
+
+// Displayed year: the tabs split the running calendar year from the previous ones. The year of
+// every corrective action of the project is resolved once, it also feeds the history selector.
+$actionPlanTaskYears  = digiriskActionPlanGetProjectTaskYears($db, $projectId);
+$actionPlanYearCounts = digiriskActionPlanGetYearCounts($actionPlanTaskYears);
+$actionPlanFilters    = digiriskActionPlanResolveYear($actionPlanFilters, $actionPlanYearCounts);
 
 // Load ActionComm for event logging
 require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
@@ -486,6 +540,137 @@ if ($action == 'removeTaskCategory' && !empty(GETPOSTINT('task_id'))) {
     exit;
 }
 
+// Action to generate and download the PAPRIPACT in A3 landscape format
+// The model is the one set as default on the documents configuration page, PAPRIPACT when none is
+if ($action == 'builddoc' && GETPOST('model', 'alpha') == getDolGlobalString('DIGIRISKDOLIBARR_PROJECTDOCUMENT_DEFAULT_MODEL', 'papripact_a3_paysage_projectdocument') && $user->hasRight('projet', 'creer')) {
+    require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+    require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/projectdocument.class.php';
+
+    $project = new Project($db);
+    if ($projectId > 0 && $project->fetch($projectId) > 0) {
+        // documents_action.tpl.php expects these variables
+        $object          = $project;
+        $document        = new ProjectDocument($db);
+        $permissiontoadd = 1;
+        $moreParams      = ['modulePart' => 'project', 'actionPlanFilters' => $actionPlanFilters];
+        $shouldRedirect  = false;
+
+        require __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
+
+        if (!empty($document->last_main_doc)) {
+            $downloadUrl = DOL_URL_ROOT . '/document.php?modulepart=project&file=' . urlencode($project->ref . '/' . $document->last_main_doc) . '&entity=' . $conf->entity;
+            header('Location: ' . $downloadUrl);
+            exit;
+        }
+        // On failure documents_action.tpl.php has already queued the error messages
+    } else {
+        setEventMessages($langs->trans('ErrorRecordNotFound'), [], 'errors');
+    }
+
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?view=kanban&period=' . urlencode($actionPlanFilters['period']) . '&year=' . (int) $actionPlanFilters['year']);
+    exit;
+}
+
+// Action to export the action plan (PAPRIPACT) corrective actions as a CSV file
+if ($action == 'exportCsv' && $permissiontoread) {
+    $exportTasks = ($projectId > 0) ? $task->getTasksArray(0, 0, $projectId) : [];
+    if (!is_array($exportTasks)) {
+        $exportTasks = [];
+    }
+
+    $exportTaskIds = array_map(function ($t) { return (int) $t->id; }, $exportTasks);
+
+    // The export follows the criteria applied on screen (GP/UT, risk level, tags)
+    $exportElementTree = digiriskActionPlanGetElementTree($db);
+    $exportKeptTaskIds = digiriskActionPlanFilterTasks($db, $exportTaskIds, $actionPlanFilters, $exportElementTree);
+    if (count($exportKeptTaskIds) != count($exportTaskIds)) {
+        $exportKeptTaskMap = array_flip($exportKeptTaskIds);
+        $exportTasks       = array_values(array_filter($exportTasks, function ($t) use ($exportKeptTaskMap) {
+            return isset($exportKeptTaskMap[(int) $t->id]);
+        }));
+        $exportTaskIds     = $exportKeptTaskIds;
+    }
+
+    // Linked risk ref and GP/UT carrying it, per task
+    $exportRiskRef = [];
+    $exportElement = [];
+    if (!empty($exportTaskIds)) {
+        $sql  = "SELECT te.fk_object, r.ref, r.fk_element FROM " . MAIN_DB_PREFIX . "projet_task_extrafields as te";
+        $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "digiriskdolibarr_risk as r ON r.rowid = te.fk_risk";
+        $sql .= " WHERE te.fk_risk > 0 AND te.fk_object IN (" . implode(',', $exportTaskIds) . ")";
+        $resql = $db->query($sql);
+        if ($resql) {
+            while ($obj = $db->fetch_object($resql)) {
+                $exportRiskRef[(int) $obj->fk_object] = $obj->ref;
+                $exportElementInfo = $exportElementTree['flat'][(int) $obj->fk_element] ?? [];
+                if (!empty($exportElementInfo)) {
+                    $exportElement[(int) $obj->fk_object] = $exportElementInfo['ref'] . ' - ' . $exportElementInfo['label'];
+                }
+            }
+            $db->free($resql);
+        }
+    }
+
+    // Responsible (TASKEXECUTIVE) per task
+    $exportResponsible = [];
+    if (!empty($exportTaskIds)) {
+        $sql  = "SELECT ec.element_id, u.firstname, u.lastname FROM " . MAIN_DB_PREFIX . "element_contact as ec";
+        $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "c_type_contact as tc ON ec.fk_c_type_contact = tc.rowid";
+        $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "user as u ON ec.fk_socpeople = u.rowid";
+        $sql .= " WHERE ec.element_id IN (" . implode(',', $exportTaskIds) . ")";
+        $sql .= " AND tc.element = 'project_task' AND tc.source = 'internal' AND tc.code = 'TASKEXECUTIVE'";
+        $resql = $db->query($sql);
+        if ($resql) {
+            while ($obj = $db->fetch_object($resql)) {
+                $exportResponsible[(int) $obj->element_id][] = trim($obj->firstname . ' ' . $obj->lastname);
+            }
+            $db->free($resql);
+        }
+    }
+
+    $separator = getDolGlobalString('DIGIRISKDOLIBARR_KANBAN_CSV_SEPARATOR', ';');
+    $fileName  = 'papripact_' . (int) $actionPlanFilters['year'] . '_' . dol_print_date(dol_now(), 'dayxcard') . '.csv';
+
+    header('Content-Type: text/csv; charset=UTF-8');
+    header('Content-Disposition: attachment; filename="' . $fileName . '"');
+
+    $output = fopen('php://output', 'w');
+    // UTF-8 BOM so Excel reads accented characters correctly
+    fwrite($output, "\xEF\xBB\xBF");
+
+    fputcsv($output, [
+        $langs->transnoentities('Ref'),
+        $langs->transnoentities('Label'),
+        $langs->transnoentities('DateStart'),
+        $langs->transnoentities('DateEnd'),
+        $langs->transnoentities('PlannedWorkload'),
+        $langs->transnoentities('Budget'),
+        $langs->transnoentities('Progress'),
+        $langs->transnoentities('LinkedRisk'),
+        $langs->transnoentities('ActionPlanElement'),
+        $langs->transnoentities('Responsible'),
+    ], $separator);
+
+    foreach ($exportTasks as $t) {
+        $budget = property_exists($t, 'budget_amount') ? (float) $t->budget_amount : 0;
+        fputcsv($output, [
+            $t->ref,
+            $t->label,
+            $t->date_start ? dol_print_date($t->date_start, 'day') : '',
+            $t->date_end ? dol_print_date($t->date_end, 'day') : '',
+            $t->planned_workload > 0 ? convertSecondToTime($t->planned_workload, 'allhourmin') : '',
+            $budget > 0 ? $budget : '',
+            (int) $t->progress . '%',
+            $exportRiskRef[$t->id] ?? '',
+            $exportElement[$t->id] ?? '',
+            isset($exportResponsible[$t->id]) ? implode(', ', $exportResponsible[$t->id]) : '',
+        ], $separator);
+    }
+    fclose($output);
+    $db->close();
+    exit;
+}
+
 /*
  * View
  */
@@ -539,6 +724,9 @@ if ($resContacts) {
     $db->free($resContacts);
 }
 
+// GP/UT tree of the entity: feeds the filter selector and the GP/UT shown on each card
+$elementTree = digiriskActionPlanGetElementTree($db);
+
 // Fetch all tasks for the DU project
 $allTasks = [];
 if ($projectId > 0) {
@@ -548,97 +736,176 @@ if ($projectId > 0) {
     }
 }
 
-// Fetch risk links (fk_risk => tasks) and load last evaluation data
+// Keep the corrective actions of the displayed year, the years are already resolved so the
+// board never queries them again. It comes before the count: the filter bar compares its
+// criteria to the corrective actions of the year, not to the whole project.
+if (!empty($allTasks)) {
+    $allTasks = array_values(array_filter($allTasks, function ($t) use ($actionPlanTaskYears, $actionPlanFilters) {
+        $taskYear = $actionPlanTaskYears[(int) $t->id] ?? ['year' => 0, 'progress' => 0];
+        return digiriskActionPlanTaskMatchesYear($taskYear['year'], $taskYear['progress'], (int) $actionPlanFilters['year']);
+    }));
+}
+
+// Apply the GP/UT, risk level and tag criteria before the enrichment queries below
+$unfilteredTaskCount = count($allTasks);
+if (digiriskActionPlanHasFilters($actionPlanFilters) && !empty($allTasks)) {
+    // The year is already applied, dropping it spares the task dates query
+    $criteriaFilters         = $actionPlanFilters;
+    $criteriaFilters['year'] = 0;
+
+    $keptTaskIds = digiriskActionPlanFilterTasks($db, array_map(function ($t) { return (int) $t->id; }, $allTasks), $criteriaFilters, $elementTree);
+    $keptTaskMap = array_flip($keptTaskIds);
+    $allTasks    = array_values(array_filter($allTasks, function ($t) use ($keptTaskMap) {
+        return isset($keptTaskMap[(int) $t->id]);
+    }));
+}
+
+// Fetch risk links (fk_risk => tasks) — scoped to current project tasks only
 $taskRiskMap = [];
 $riskObjects = [];
-$riskData    = []; // enriched data for template
+$riskData    = [];
 require_once __DIR__ . '/../../class/riskanalysis/riskassessment.class.php';
 if (!empty($allTasks)) {
-    $sql = "SELECT fk_object, fk_risk FROM " . MAIN_DB_PREFIX . "projet_task_extrafields WHERE fk_risk > 0";
+    $taskIds = array_map(function ($t) { return (int) $t->id; }, $allTasks);
+    $sql  = "SELECT fk_object, fk_risk FROM " . MAIN_DB_PREFIX . "projet_task_extrafields";
+    $sql .= " WHERE fk_risk > 0 AND fk_object IN (" . implode(',', $taskIds) . ")";
     $resql = $db->query($sql);
     if ($resql) {
         while ($obj = $db->fetch_object($resql)) {
-            $taskRiskMap[$obj->fk_object] = $obj->fk_risk;
-            if (!isset($riskObjects[$obj->fk_risk])) {
-                $riskObj = new Risk($db);
-                $riskObj->fetch($obj->fk_risk);
-                $riskObjects[$obj->fk_risk] = $riskObj;
-
-                // Load last validated risk assessment
-                $riskAssessment = new RiskAssessment($db);
-                $raList = $riskAssessment->fetchAll('DESC', 'date_creation', 1, 0, ['customsql' => 'fk_risk = ' . (int)$obj->fk_risk . ' AND status = ' . RiskAssessment::STATUS_VALIDATED]);
-                $lastRA = (is_array($raList) && !empty($raList)) ? reset($raList) : null;
-
-                // Determine cotation color
-                $cotation = $lastRA ? (int)$lastRA->cotation : 0;
-                if ($cotation >= 80)     { $cotColor = '#2b2b2b'; }
-                elseif ($cotation >= 51) { $cotColor = '#e05353'; }
-                elseif ($cotation >= 48) { $cotColor = '#e9ad4f'; }
-                else                     { $cotColor = '#ececec'; }
-
-                // Category name
-                $dangerCatName = $riskObj->getDangerCategoryName($riskObj, $riskObj->type ?: 'risk');
-                if ($dangerCatName == -1) $dangerCatName = '';
-
-                // Evaluation photo URL (served via viewimage.php)
-                $raPhotoUrl = '';
-                if ($lastRA) {
-                    $raDir = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastRA->ref;
-                    if (is_dir($raDir)) {
-                        // Look for image files (not in thumbs)
-                        $raFiles = scandir($raDir);
-                        foreach ($raFiles as $raFile) {
-                            if ($raFile == '.' || $raFile == '..' || $raFile == 'thumbs') continue;
-                            if (preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $raFile)) {
-                                // Build thumb URL for smaller display
-                                $thumbName = preg_replace('/(\.\w+)$/', '_small$1', $raFile);
-                                $thumbPath = $raDir . '/thumbs/' . $thumbName;
-                                if (file_exists($thumbPath)) {
-                                    $raPhotoUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('riskassessment/' . $lastRA->ref . '/thumbs/' . $thumbName);
-                                } else {
-                                    $raPhotoUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('riskassessment/' . $lastRA->ref . '/' . $raFile);
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                // Evaluator
-                $raUserInitials = '';
-                if ($lastRA && $lastRA->fk_user_creat > 0) {
-                    $raUser = new User($db);
-                    if ($raUser->fetch($lastRA->fk_user_creat) > 0) {
-                        $raUserInitials = strtoupper(mb_substr($raUser->firstname, 0, 1) . mb_substr($raUser->lastname, 0, 1));
-                    }
-                }
-
-                $riskData[$obj->fk_risk] = [
-                    'ref'            => $riskObj->ref,
-                    'fk_element'     => $riskObj->fk_element,
-                    'description'    => $riskObj->description,
-                    'category_name'  => $dangerCatName,
-                    'cotation'       => $cotation,
-                    'cotation_color' => $cotColor,
-                    'ra_ref'         => $lastRA ? $lastRA->ref : '',
-                    'ra_date'        => $lastRA && $lastRA->date_creation ? dol_print_date($lastRA->date_creation, 'day') : '',
-                    'ra_comment'     => $lastRA ? $lastRA->comment : '',
-                    'ra_photo_url'   => $raPhotoUrl,
-                    'ra_user'        => $raUserInitials,
-                ];
-            }
+            $taskRiskMap[(int) $obj->fk_object] = (int) $obj->fk_risk;
         }
         $db->free($resql);
     }
 }
 
-// Fetch categories/tags for tasks
+if (!empty($taskRiskMap)) {
+    $riskIds = array_unique(array_values($taskRiskMap));
+
+    // Batch load all risks — single query via ORM
+    $riskLoader  = new Risk($db);
+    $riskObjects = $riskLoader->fetchAll('', '', 0, 0, ['customsql' => 't.rowid IN (' . implode(',', $riskIds) . ')']);
+    if (!is_array($riskObjects)) {
+        $riskObjects = [];
+    }
+
+    // Batch load latest validated risk assessment per risk — single query via ORM
+    $riskAssessmentLoader = new RiskAssessment($db);
+    $allValidatedRA       = $riskAssessmentLoader->fetchAll('DESC', 'date_creation', 0, 0, [
+        'customsql' => 'fk_risk IN (' . implode(',', $riskIds) . ') AND status = ' . RiskAssessment::STATUS_VALIDATED,
+    ]);
+    $latestRAByRisk = [];
+    if (is_array($allValidatedRA)) {
+        foreach ($allValidatedRA as $ra) {
+            if (!isset($latestRAByRisk[$ra->fk_risk])) {
+                $latestRAByRisk[$ra->fk_risk] = $ra;
+            }
+        }
+    }
+
+    // Batch load assessor user initials — single query
+    $assessorIds    = array_unique(array_filter(array_map(function ($ra) { return (int) $ra->fk_user_creat; }, $latestRAByRisk)));
+    $assessorInitials = [];
+    if (!empty($assessorIds)) {
+        $sqlAssessors = "SELECT rowid, firstname, lastname FROM " . MAIN_DB_PREFIX . "user WHERE rowid IN (" . implode(',', $assessorIds) . ")";
+        $resAssessors = $db->query($sqlAssessors);
+        if ($resAssessors) {
+            while ($objU = $db->fetch_object($resAssessors)) {
+                $assessorInitials[(int) $objU->rowid] = strtoupper(mb_substr($objU->firstname, 0, 1) . mb_substr($objU->lastname, 0, 1));
+            }
+            $db->free($resAssessors);
+        }
+    }
+
+    // Build riskData map
+    foreach ($riskIds as $riskId) {
+        if (!isset($riskObjects[$riskId])) {
+            continue;
+        }
+        $riskObj = $riskObjects[$riskId];
+        $lastRA  = $latestRAByRisk[$riskId] ?? null;
+
+        $cotation = $lastRA ? (int) $lastRA->cotation : 0;
+        if ($cotation >= 80) {
+            $cotColor = '#2b2b2b';
+        } elseif ($cotation >= 51) {
+            $cotColor = '#e05353';
+        } elseif ($cotation >= 48) {
+            $cotColor = '#e9ad4f';
+        } else {
+            $cotColor = '#ececec';
+        }
+
+        $dangerCatName = $riskObj->getDangerCategoryName($riskObj, $riskObj->type ?: 'risk');
+        if ($dangerCatName == -1) {
+            $dangerCatName = '';
+        }
+
+        $raPhotoUrl = '';
+        if ($lastRA) {
+            $raDir = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastRA->ref;
+            if (is_dir($raDir)) {
+                $raFiles = scandir($raDir);
+                foreach ($raFiles as $raFile) {
+                    if ($raFile == '.' || $raFile == '..' || $raFile == 'thumbs') {
+                        continue;
+                    }
+                    if (preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $raFile)) {
+                        $thumbName = preg_replace('/(\.\w+)$/', '_small$1', $raFile);
+                        $thumbPath = $raDir . '/thumbs/' . $thumbName;
+                        if (file_exists($thumbPath)) {
+                            $raPhotoUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('riskassessment/' . $lastRA->ref . '/thumbs/' . $thumbName);
+                        } else {
+                            $raPhotoUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('riskassessment/' . $lastRA->ref . '/' . $raFile);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        // GP/UT carrying the risk — a risk always sits on a digirisk element, but that element
+        // may have been trashed since, in which case the tree does not expose it any more
+        $elementInfo = $elementTree['flat'][(int) $riskObj->fk_element] ?? [];
+
+        $riskData[$riskId] = [
+            'ref'            => $riskObj->ref,
+            'fk_element'     => $riskObj->fk_element,
+            'element_ref'    => $elementInfo['ref'] ?? '',
+            'element_label'  => $elementInfo['label'] ?? '',
+            'element_type'   => $elementInfo['type'] ?? '',
+            'description'    => $riskObj->description,
+            'category_name'  => $dangerCatName,
+            'cotation'       => $cotation,
+            'cotation_color' => $cotColor,
+            'ra_ref'         => $lastRA ? $lastRA->ref : '',
+            'ra_date'        => $lastRA && $lastRA->date_creation ? dol_print_date($lastRA->date_creation, 'day') : '',
+            'ra_comment'     => $lastRA ? $lastRA->comment : '',
+            'ra_photo_url'   => $raPhotoUrl,
+            'ra_user'        => $lastRA && $lastRA->fk_user_creat > 0 ? ($assessorInitials[$lastRA->fk_user_creat] ?? '') : '',
+        ];
+    }
+}
+
+// Fetch categories/tags for tasks (single batch query instead of N+1)
 $taskCategories = [];
 $categorie = new Categorie($db);
-foreach ($allTasks as $t) {
-    $cats = $categorie->containing($t->id, 'project_task');
-    if (is_array($cats) && !empty($cats)) {
-        $taskCategories[$t->id] = $cats;
+if (!empty($allTasks)) {
+    $taskIds     = array_map(function ($t) { return (int) $t->id; }, $allTasks);
+    $sqlTaskCats  = "SELECT ct.fk_project_task, c.rowid, c.label, c.color";
+    $sqlTaskCats .= " FROM " . MAIN_DB_PREFIX . "categorie_project_task as ct";
+    $sqlTaskCats .= " INNER JOIN " . MAIN_DB_PREFIX . "categorie as c ON ct.fk_categorie = c.rowid";
+    $sqlTaskCats .= " WHERE ct.fk_project_task IN (" . implode(',', $taskIds) . ")";
+    $sqlTaskCats .= " AND c.entity IN (" . getEntity('category') . ")";
+    $resTaskCats = $db->query($sqlTaskCats);
+    if ($resTaskCats) {
+        while ($objCat = $db->fetch_object($resTaskCats)) {
+            $catObj        = new Categorie($db);
+            $catObj->id    = (int) $objCat->rowid;
+            $catObj->label = $objCat->label;
+            $catObj->color = $objCat->color;
+            $taskCategories[(int) $objCat->fk_project_task][] = $catObj;
+        }
+        $db->free($resTaskCats);
     }
 }
 
@@ -655,12 +922,61 @@ if ($resCats) {
     $db->free($resCats);
 }
 
-// Kanban column thresholds (configurable)
-$kanbanThresholds = [
-    'draft_max'   => getDolGlobalInt('DIGIRISKDOLIBARR_KANBAN_DRAFT_MAX', 0),
-    'progress_max' => getDolGlobalInt('DIGIRISKDOLIBARR_KANBAN_PROGRESS_MAX', 80),
-    'control_max'  => getDolGlobalInt('DIGIRISKDOLIBARR_KANBAN_CONTROL_MAX', 99),
-];
+// Kanban columns: percentage thresholds of the configuration, or the column dictionary
+$kanbanColumns = digiriskActionPlanGetKanbanColumns($db);
+
+// Batch file counts for all tasks (single query instead of N+1)
+$taskFileCounts = [];
+if (!empty($allTasks)) {
+    $taskIds       = array_map(function ($t) { return (int) $t->id; }, $allTasks);
+    $sqlFileCounts  = "SELECT src_object_id, COUNT(*) as nb FROM " . MAIN_DB_PREFIX . "ecm_files";
+    $sqlFileCounts .= " WHERE src_object_type = 'projet_task' AND src_object_id IN (" . implode(',', $taskIds) . ")";
+    $sqlFileCounts .= " GROUP BY src_object_id";
+    $resFileCounts = $db->query($sqlFileCounts);
+    if ($resFileCounts) {
+        while ($objFC = $db->fetch_object($resFileCounts)) {
+            $taskFileCounts[(int) $objFC->src_object_id] = (int) $objFC->nb;
+        }
+        $db->free($resFileCounts);
+    }
+}
+
+// Batch load all task contacts (internal users + external contacts) — 2 queries instead of 2 per task (N+1)
+$taskContactsInternal = [];
+$taskContactsExternal = [];
+if (!empty($allTasks)) {
+    $taskIds = array_map(function ($t) { return (int) $t->id; }, $allTasks);
+
+    // Internal contacts (users)
+    $sqlCInt  = "SELECT ec.element_id, ec.fk_socpeople as id, tc.code, u.firstname, u.lastname, u.photo";
+    $sqlCInt .= " FROM " . MAIN_DB_PREFIX . "element_contact as ec";
+    $sqlCInt .= " INNER JOIN " . MAIN_DB_PREFIX . "c_type_contact as tc ON ec.fk_c_type_contact = tc.rowid";
+    $sqlCInt .= " INNER JOIN " . MAIN_DB_PREFIX . "user as u ON ec.fk_socpeople = u.rowid";
+    $sqlCInt .= " WHERE ec.element_id IN (" . implode(',', $taskIds) . ")";
+    $sqlCInt .= " AND tc.element = 'project_task' AND tc.source = 'internal' AND tc.active = 1";
+    $resCInt = $db->query($sqlCInt);
+    if ($resCInt) {
+        while ($objC = $db->fetch_object($resCInt)) {
+            $taskContactsInternal[(int) $objC->element_id][] = $objC;
+        }
+        $db->free($resCInt);
+    }
+
+    // External contacts (socpeople)
+    $sqlCExt  = "SELECT ec.element_id, ec.fk_socpeople as id, tc.code, sp.firstname, sp.lastname";
+    $sqlCExt .= " FROM " . MAIN_DB_PREFIX . "element_contact as ec";
+    $sqlCExt .= " INNER JOIN " . MAIN_DB_PREFIX . "c_type_contact as tc ON ec.fk_c_type_contact = tc.rowid";
+    $sqlCExt .= " INNER JOIN " . MAIN_DB_PREFIX . "socpeople as sp ON ec.fk_socpeople = sp.rowid";
+    $sqlCExt .= " WHERE ec.element_id IN (" . implode(',', $taskIds) . ")";
+    $sqlCExt .= " AND tc.element = 'project_task' AND tc.source = 'external' AND tc.active = 1";
+    $resCExt = $db->query($sqlCExt);
+    if ($resCExt) {
+        while ($objC = $db->fetch_object($resCExt)) {
+            $taskContactsExternal[(int) $objC->element_id][] = $objC;
+        }
+        $db->free($resCExt);
+    }
+}
 
 // Prepare enriched data for templates
 $tasksJson = [];
@@ -684,62 +1000,51 @@ foreach ($allTasks as $t) {
         }
     }
 
-    // Contacts: responsible (TASKEXECUTIVE) and associated people
-    $taskObj = new SaturneTask($db);
-    $taskObj->fetch($t->id);
-    $contactsInternal = $taskObj->liste_contact(-1, 'internal');
-    $contactsExternal = $taskObj->liste_contact(-1, 'external');
+    // Contacts: responsible (TASKEXECUTIVE) and associated people (pre-fetched in batch above)
+    $contactsInternal = $taskContactsInternal[$t->id] ?? [];
+    $contactsExternal = $taskContactsExternal[$t->id] ?? [];
 
     $responsible   = [];
     $contributors  = [];
-    if (is_array($contactsInternal)) {
-        foreach ($contactsInternal as $c) {
-            // Build photo URL
-            $photoUrl = '';
-            $userTmp = new User($db);
-            if ($userTmp->fetch($c['id']) > 0 && !empty($userTmp->photo)) {
-                $photoUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . $conf->entity . '&file=' . urlencode($userTmp->id . '/thumbs/' . preg_replace('/(\.\w+)$/', '_mini$1', $userTmp->photo));
-            }
-            $contactInfo = [
-                'id'       => $c['id'],
-                'fullname' => trim($c['firstname'] . ' ' . $c['lastname']),
-                'initials' => strtoupper(mb_substr($c['firstname'], 0, 1) . mb_substr($c['lastname'], 0, 1)),
-                'photo'    => $photoUrl,
-            ];
-            // TASKEXECUTIVE = responsable de la tâche
-            if ($c['code'] == 'TASKEXECUTIVE') {
-                $responsible[] = $contactInfo;
-            } else {
-                $contributors[] = $contactInfo;
-            }
+    foreach ($contactsInternal as $c) {
+        $photoUrl = '';
+        if (!empty($c->photo)) {
+            $photoUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . $conf->entity . '&file=' . urlencode($c->id . '/thumbs/' . preg_replace('/(\.\w+)$/', '_mini$1', $c->photo));
+        }
+        $contactInfo = [
+            'id'       => (int) $c->id,
+            'fullname' => trim($c->firstname . ' ' . $c->lastname),
+            'initials' => strtoupper(mb_substr($c->firstname, 0, 1) . mb_substr($c->lastname, 0, 1)),
+            'photo'    => $photoUrl,
+        ];
+        // TASKEXECUTIVE = responsable de la tâche
+        if ($c->code == 'TASKEXECUTIVE') {
+            $responsible[] = $contactInfo;
+        } else {
+            $contributors[] = $contactInfo;
         }
     }
-    if (is_array($contactsExternal)) {
-        foreach ($contactsExternal as $c) {
-            $contactInfo = [
-                'id'       => $c['id'],
-                'fullname' => trim($c['firstname'] . ' ' . $c['lastname']),
-                'initials' => strtoupper(mb_substr($c['firstname'], 0, 1) . mb_substr($c['lastname'], 0, 1)),
-                'photo'    => '',
-            ];
-            if ($c['code'] == 'TASKCONTRIBUTOR') {
-                $contributors[] = $contactInfo;
-            }
+    foreach ($contactsExternal as $c) {
+        $contactInfo = [
+            'id'       => (int) $c->id,
+            'fullname' => trim($c->firstname . ' ' . $c->lastname),
+            'initials' => strtoupper(mb_substr($c->firstname, 0, 1) . mb_substr($c->lastname, 0, 1)),
+            'photo'    => '',
+        ];
+        if ($c->code == 'TASKCONTRIBUTOR') {
+            $contributors[] = $contactInfo;
         }
     }
 
-    // File count
-    $fileCount = 0;
-    $sqlFiles  = "SELECT COUNT(*) as nb FROM " . MAIN_DB_PREFIX . "ecm_files WHERE src_object_type = 'projet_task' AND src_object_id = " . ((int) $t->id);
-    $resFiles  = $db->query($sqlFiles);
-    if ($resFiles) {
-        $objFiles  = $db->fetch_object($resFiles);
-        $fileCount = (int) $objFiles->nb;
-        $db->free($resFiles);
-    }
+    // File count (pre-fetched in batch above)
+    $fileCount = $taskFileCounts[$t->id] ?? 0;
 
     // Budget
     $budget = property_exists($t, 'budget_amount') ? (float) $t->budget_amount : 0;
+
+    // Year the action is due in, and the one it was carried over from when it is a late one
+    $taskYear        = $actionPlanTaskYears[(int) $t->id] ?? ['year' => 0, 'progress' => 0];
+    $carriedOverFrom = digiriskActionPlanIsCarriedOver($taskYear['year'], $taskYear['progress'], (int) $actionPlanFilters['year']) ? $taskYear['year'] : 0;
 
     $tasksJson[] = [
         'id'                 => $t->id,
@@ -754,10 +1059,15 @@ foreach ($allTasks as $t) {
         'duration_effective' => $t->duration_effective,
         'progress'           => (int) $t->progress,
         'status'             => (int) $t->fk_statut,
+        'carried_over_from'  => $carriedOverFrom,
         'risk_ref'           => $riskRef,
         'risk_id'            => $riskId,
         'risk_nomurl'        => $riskNomUrl,
         'risk_data'          => isset($riskData[$riskId]) ? $riskData[$riskId] : [],
+        'element_id'         => (int) ($riskData[$riskId]['fk_element'] ?? 0),
+        'element_ref'        => $riskData[$riskId]['element_ref'] ?? '',
+        'element_label'      => $riskData[$riskId]['element_label'] ?? '',
+        'element_type'       => $riskData[$riskId]['element_type'] ?? '',
         'categories'         => $cats,
         'responsible'        => $responsible,
         'contributors'       => $contributors,
@@ -768,13 +1078,65 @@ foreach ($allTasks as $t) {
     ];
 }
 
-// Tab header
-$head = [];
-$head[0][0] = $_SERVER['PHP_SELF'] . '?view=kanban';
-$head[0][1] = '<i class="fas fa-columns pictofixedwidth"></i>' . $langs->trans('ActionPlanKanban');
-$head[0][2] = 'kanban';
+// Compute global PAPRIPACT progress: average of all corrective action progress percentages
+$globalProgress  = 0;
+$globalTaskCount = count($tasksJson);
+if ($globalTaskCount > 0) {
+    $progressSum = 0;
+    foreach ($tasksJson as $t) {
+        $progressSum += $t['progress'];
+    }
+    $globalProgress = (int) round($progressSum / $globalTaskCount);
+}
 
-print dol_get_fiche_head($head, $view, $title, -1, 'task');
+// Tab header: the action plan of the running calendar year, then the closed ones. The history
+// tab opens on the year already displayed, or on the most recent past one.
+$currentYear = (int) dol_print_date(dol_now(), '%Y');
+$historyYear = ($actionPlanFilters['period'] == 'history') ? (int) $actionPlanFilters['year'] : 0;
+if ($historyYear <= 0) {
+    foreach (array_keys($actionPlanYearCounts) as $yearWithTasks) {
+        if ($yearWithTasks < $currentYear) {
+            $historyYear = $yearWithTasks;
+            break;
+        }
+    }
+}
+
+// The tabs keep the view, the displayed project, the filter bar criteria and the menu highlight
+$tabUrl = $_SERVER['PHP_SELF'] . '?view=' . urlencode($view) . '&projectid=' . $projectId . digiriskActionPlanFilterUrlParams($actionPlanFilters);
+if (GETPOST('mainmenu', 'aZ09')) {
+    $tabUrl .= '&mainmenu=' . urlencode(GETPOST('mainmenu', 'aZ09'));
+}
+if (GETPOST('leftmenu', 'aZ09')) {
+    $tabUrl .= '&leftmenu=' . urlencode(GETPOST('leftmenu', 'aZ09'));
+}
+if (GETPOSTINT('idmenu') > 0) {
+    $tabUrl .= '&idmenu=' . GETPOSTINT('idmenu');
+}
+
+$head = [];
+$head[0][0] = $tabUrl . '&period=current';
+$head[0][1] = '<i class="fas fa-calendar-day pictofixedwidth"></i>' . $langs->trans('ActionPlanTabCurrentYear', $currentYear);
+$head[0][2] = 'current';
+$head[1][0] = $tabUrl . '&period=history' . ($historyYear > 0 ? '&year=' . $historyYear : '');
+$head[1][1] = '<i class="fas fa-history pictofixedwidth"></i>' . $langs->trans('ActionPlanTabHistory');
+$head[1][2] = 'history';
+
+print dol_get_fiche_head($head, $actionPlanFilters['period'], $title, -1, 'task');
+
+// Top-right export toolbar (CSV / PAPRIPACT A3 PDF / Gantt PNG), shared by both views
+require __DIR__ . '/../../core/tpl/actionplan/actionplan_export_buttons.tpl.php';
+
+// Displayed project banner + project switcher, shared by both views
+require __DIR__ . '/../../core/tpl/actionplan/actionplan_project_selector.tpl.php';
+
+// Year of the displayed action plan, the current year tab has only one
+if ($actionPlanFilters['period'] == 'history') {
+    require __DIR__ . '/../../core/tpl/actionplan/actionplan_year_selector.tpl.php';
+}
+
+// GP/UT, risk level and tag criteria, shared by both views
+require __DIR__ . '/../../core/tpl/actionplan/actionplan_filters.tpl.php';
 
 // Include appropriate TPL
 if ($view === 'kanban') {

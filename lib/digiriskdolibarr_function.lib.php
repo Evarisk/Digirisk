@@ -22,6 +22,103 @@
  */
 
 /**
+ * Process the GP/UT organization actions (reorder, quick create, delete).
+ * Renaming a label is not handled here: it goes through the generic Saturne contentEditable
+ * endpoint (core/ajax/saturne_update_field.php), see digirisk_element_label().
+ * Shared by the left navigation panel (digirisk_header, rendered on every digirisk page)
+ * and the standalone organization page. Must run before any HTML output: AJAX actions
+ * answer JSON and form actions redirect, both ending with exit().
+ *
+ * @return void
+ */
+function digirisk_organization_actions()
+{
+    global $conf, $db, $langs, $user;
+
+    $action = GETPOST('action', 'aZ09');
+    if (!in_array($action, ['saveOrganization', 'quickCreateElement', 'deleteElement'])) {
+        return;
+    }
+
+    require_once __DIR__ . '/../class/digiriskelement.class.php';
+
+    if ($action == 'saveOrganization' && $user->rights->digiriskdolibarr->digiriskelement->write) {
+        $arrayIds       = preg_split('/,/', GETPOST('ids'));
+        $arrayParentIds = preg_split('/,/', GETPOST('parent_ids'));
+
+        if (!empty($arrayIds)) {
+            foreach ($arrayIds as $position => $elementId) {
+                $digiriskelement = new DigiriskElement($db);
+                $digiriskelement->fetch((int) $elementId);
+                $digiriskelement->ranks     = $position + 1;
+                $digiriskelement->fk_parent = $arrayParentIds[$position];
+                $digiriskelement->update($user);
+            }
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'success']);
+        exit;
+    }
+
+    if ($action == 'quickCreateElement') {
+        $elementType  = GETPOST('element_type', 'alpha');
+        $fkParent     = GETPOSTINT('fk_parent');
+        $label        = trim(GETPOST('label', 'alphanohtml'));
+        $description  = trim(GETPOST('description', 'restricthtml'));
+        $showInSelect = GETPOSTINT('show_in_selector');
+
+        if (!empty($label) && $fkParent > 0 && in_array($elementType, ['groupment', 'workunit']) && $user->rights->digiriskdolibarr->digiriskelement->write) {
+            $digiriskelement                   = new DigiriskElement($db);
+            $digiriskelement->element_type     = $elementType;
+            $digiriskelement->label            = $label;
+            $digiriskelement->description      = $description;
+            $digiriskelement->fk_parent        = $fkParent;
+            $digiriskelement->show_in_selector = $showInSelect;
+            $digiriskelement->entity           = $conf->entity;
+            $digiriskelement->status           = 1;
+
+            $result = $digiriskelement->create($user);
+
+            if ($result > 0) {
+                setEventMessages($langs->trans('ObjectCreated', $digiriskelement->ref), null, 'mesgs');
+            } else {
+                setEventMessages($digiriskelement->error, $digiriskelement->errors, 'errors');
+            }
+        } else {
+            setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Label')), null, 'errors');
+        }
+
+        header('Location: ' . $_SERVER['PHP_SELF'] . '?mainmenu=' . GETPOST('mainmenu', 'alpha') . '&leftmenu=' . GETPOST('leftmenu', 'alpha'));
+        exit;
+    }
+
+    if ($action == 'deleteElement') {
+        $deleteId = GETPOSTINT('deleteid');
+
+        if ($deleteId > 0 && $user->rights->digiriskdolibarr->digiriskelement->delete) {
+            $digiriskelement = new DigiriskElement($db);
+            $result          = $digiriskelement->fetch($deleteId);
+
+            if ($result > 0) {
+                if ($digiriskelement->delete($user) > 0) {
+                    setEventMessages($langs->trans('RecordDeleted'), null, 'mesgs');
+                } else {
+                    setEventMessages($digiriskelement->error, $digiriskelement->errors, 'errors');
+                }
+            } else {
+                setEventMessages($langs->trans('ErrorRecordNotFound'), null, 'errors');
+            }
+        } else {
+            setEventMessages($langs->trans('NotEnoughPermissions'), null, 'errors');
+        }
+
+        header('Location: ' . $_SERVER['PHP_SELF'] . '?mainmenu=' . GETPOST('mainmenu', 'alpha') . '&leftmenu=' . GETPOST('leftmenu', 'alpha'));
+        exit;
+    }
+}
+
+/**
  *	Show HTML header HTML + BODY + Top menu + left menu + DIV
  *
 * @param 	string 	$title				HTML title
@@ -40,6 +137,9 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 {
 	global $conf, $langs, $db, $user, $moduleNameLowerCase;
 
+	// Process GP/UT organization actions (drag & drop save, quick add, delete) before any HTML output
+	digirisk_organization_actions();
+
 	require_once __DIR__ . '/../class/digiriskelement/groupment.class.php';
 	require_once __DIR__ . '/../class/digiriskelement/workunit.class.php';
 
@@ -54,11 +154,9 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 
 	//Body navigation digirisk
 	$object = new DigiriskElement($db);
-	if ($conf->global->DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT) {
-		$objects = $object->fetchAll('',  'ranks');
-	} else {
-		$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 't.status > 0 AND t.entity IN ('. $conf->entity .')'));
-	}
+	// The organization panel never lists trashed/deleted elements (status < 0), regardless of DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT,
+	// nor the archived ones, which live in the archive tab of their parent element
+	$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 't.status > 0 AND t.status <> ' . DigiriskElement::STATUS_ARCHIVED . ' AND t.entity IN ('. $conf->entity .')'));
 
 	$digiriskElementTree = array();
 	if (!is_array($objects) && $objects<0) {
@@ -74,11 +172,11 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 			<div class="side-nav-responsive"><i class="fas fa-bars"></i> <?php echo "Navigation UT/GP"; ?></div>
 			<div id="id-left">
 				<div class="digirisk-wrap wpeo-wrap">
-					<div class="navigation-container">
+					<div class="navigation-container organization-tree">
 						<div class="society-header">
 							<a class="linkElement" href="<?php echo dol_buildpath('/custom/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=' . $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD, 1);?>">
 								<span class="icon fas fa-building fa-fw"></span>
-								<div class="title"><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></div>
+								<div class="title"><?php echo getDolGlobalString('MAIN_INFO_SOCIETE_NOM') ?></div>
 							</a>
                             <?php if ($user->rights->digiriskdolibarr->digiriskelement->write) : ?>
                                 <div class="add-container">
@@ -107,7 +205,7 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 							</div>
 						<?php endif; ?>
 
-						<ul class="workunit-list">
+						<ul class="workunit-list space space-0 first-space" id="space0" value="0">
 							<script>
 								if (localStorage.maximized == 'false') {
 									$('#id-left').attr('style', 'display:none !important')
@@ -130,7 +228,10 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 								});
 
 								<?php
-								$idToFetch = GETPOSTINT('id') ?: GETPOSTINT('fromid');
+								// "id" only maps to a digiriskelement on the element/accident pages; on other
+								// pages (e.g. the standard card) it refers to a different object, so don't use it
+								// to expand the tree branch of the element that happens to share that id.
+								$idToFetch = (strpos($_SERVER['PHP_SELF'], 'digiriskelement') !== false || strpos($_SERVER['PHP_SELF'], 'accident') !== false) ? (GETPOSTINT('id') ?: GETPOSTINT('fromid')) : 0;
 								if ($idToFetch > 0) {
 									$object->fetch($idToFetch);
 								}
@@ -169,6 +270,9 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 			</div>
 		</div>
 	<?php
+	// Organization tree dialogs + JS config (shared with the standalone organization page)
+	require __DIR__ . '/../core/tpl/digiriskelement/digiriskelement_organization_tree.tpl.php';
+
 	// main area
 	if ($replacemainareaby) {
 		print $replacemainareaby;
@@ -223,98 +327,163 @@ function flatten_tree($tree)
 }
 
 /**
- *	Display Recursive tree process
+ * Translate a label built from a risk type, falling back on the generic risk label
+ *
+ * Risk types other than risk and riskenvironmental are brought by other modules and have no
+ * translation of their own here, the derived key would be printed raw
+ *
+ * @param  string $keyPrefix Key part before the risk type (DigiriskElementShared, ImportShared, Add, ...)
+ * @param  string $riskType  Risk type (risk, riskenvironmental or a type brought by another module)
+ * @param  string $keySuffix Key part after the risk type (sList, s, Title, ...)
+ * @return string            Translated label
+ */
+function digirisk_trans_risk_type(string $keyPrefix, string $riskType, string $keySuffix = ''): string
+{
+    global $langs;
+
+    $key   = $keyPrefix . ucfirst($riskType) . $keySuffix;
+    $label = $langs->trans($key);
+    if ($label != $key) {
+        return $label;
+    }
+
+    return $langs->trans($keyPrefix . 'Risk' . $keySuffix);
+}
+
+/**
+ * Render the label of a GP/UT tree row, inline-editable when the user can write.
+ *
+ * Relies on the generic Saturne contentEditable mechanism (js/modules/contentEditable.js +
+ * core/ajax/saturne_update_field.php), the same one used by the banner and the lists, so the
+ * save path, the feedback and the permission checks are identical everywhere.
+ *
+ * The editable node is an inner span, not the <h3> itself: the title grows to fill the row
+ * (flex-grow) so its box would drag the hover outline and the ✓ feedback icon away from the
+ * text, up against the risk badges.
+ *
+ * @param  DigiriskElement $object    Element of the row
+ * @param  string          $moreClass Extra CSS classes appended to the tag
+ * @return string                     HTML of the label
+ */
+function digirisk_element_label(DigiriskElement $object, string $moreClass = ''): string
+{
+    global $langs, $user;
+
+    $class = trim('title element-label ' . $moreClass);
+    $label = dol_escape_htmltag($object->label);
+
+    if (empty($user->rights->digiriskdolibarr->digiriskelement->write)) {
+        return '<h3 class="' . $class . '">' . $label . '</h3>';
+    }
+
+    return '<h3 class="' . $class . '"><span class="contenteditable" contenteditable="true" role="textbox"'
+        . ' aria-label="' . dol_escape_htmltag($langs->trans('Label')) . '"'
+        . ' data-field="label"'
+        . ' data-id="' . ((int) $object->id) . '"'
+        . ' data-element="' . dol_escape_htmltag($object->element . '@' . $object->module) . '"'
+        . ' data-type="text"'
+        . ' data-error="' . dol_escape_htmltag($langs->trans('ErrorSaving')) . '">' . $label . '</span></h3>';
+}
+
+/**
+ *	Display Recursive tree process for the left GP/UT navigation panel.
+ *  Keeps the navigation hooks (.unit / #unit / #menu / data-object-id / .sub-list / .toggled)
+ *  used by saturneElement.js and adds the organization interactions: drag & drop reorder,
+ *  inline rename, quick add, delete and risk cotation badges.
  *
  * @param	array $digiriskElementTree Global Digirisk Element list after recursive process
+ * @param	array $riskInfos           Risk cotations indexed by element id (Risk::loadRiskInfos)
+ * @param	int   $i                   Current depth
  * @return	void
  */
-function display_recurse_tree($digiriskElementTree)
+function display_recurse_tree($digiriskElementTree, $i = 1)
 {
-	include_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+    include_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
-	global $conf, $langs, $user, $moduleNameLowerCase;
+    global $conf, $langs, $user, $moduleNameLowerCase;
 
-	$numberingModules = [
-		'digiriskelement/groupment' => $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON,
-		'digiriskelement/workunit' => $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON,
-	];
+    $numberingModules = [
+        'digiriskelement/groupment' => $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON,
+        'digiriskelement/workunit'  => $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON,
+    ];
 
-	list($modGroupment, $modWorkUnit) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
+    list($modGroupment, $modWorkUnit) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
 
-	if ($user->rights->digiriskdolibarr->digiriskelement->read) {
-		if ( ! empty($digiriskElementTree)) {
-            $riskType = GETPOSTISSET('risk_type') && !empty(GETPOST('risk_type')) ? GETPOST('risk_type') : 'risk';
-			foreach ($digiriskElementTree as $element) { ?>
-				<?php if ($element['object']->id == $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) : ?>
-				<hr>
-				<?php endif; ?>
-			<li class="unit type-<?php echo $element['object']->element_type; ?>" id="unit<?php  echo $element['object']->id; ?>" data-object-id="<?php  echo $element['object']->id; ?>">
-				<div class="unit-container">
-					<?php if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
-					<div class="toggle-unit">
-						<i class="toggle-icon fas fa-chevron-right" id="menu<?php echo $element['object']->id;?>"></i>
-					</div>
-					<?php } else { ?>
-					<div class="spacer"></div>
-					<?php }
-					print '<span class="open-media-gallery add-media modal-open photo digirisk-element-photo-'. $element['object']->id .'" value="0">';
-					print '<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="'. $element['object']->id .'" data-from-type="'. $element['object']->element_type .'" data-from-subtype="photo" data-from-subdir="" data-photo-class="digirisk-element-photo-'. $element['object']->id .'"/>';
-					print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $element['object']->element_type . '/' . $element['object']->ref, 'small', 1, 0, 0, 0, 50, 50, 1, 0, 0, $element['object']->element_type . '/' . $element['object']->ref, $element['object'], 'photo', 0, 0, 0, 1, 'cursorpointer');
-					print '</span>';
-					?>
-					<div class="title" id="scores" value="<?php echo $element['object']->id ?>">
-						<?php
-						if ($user->rights->digiriskdolibarr->risk->read) : ?>
-							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="<?php echo dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php?id=' . $element['object']->id . '&risk_type=' . $riskType, 1);?>">
-								<span class="title-container">
-									<span class="ref"><?php echo $element['object']->ref; ?></span>
-									<span class="name"><?php echo dol_trunc($element['object']->label, 20); ?></span>
-								</span>
-							</a>
-						<?php else : ?>
-							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="<?php echo dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?id=' . $element['object']->id, 1);?>">
-								<span class="title-container">
-									<span class="ref"><?php echo $element['object']->ref; ?></span>
-									<span class="name"><?php echo dol_trunc($element['object']->label, 20); ?></span>
-								</span>
-							</a>
-						<?php endif; ?>
-					</div>
-						<?php if ($user->rights->digiriskdolibarr->digiriskelement->write) : ?>
-							<?php if ($element['object']->element_type == 'groupment') : ?>
-							<div class="add-container">
-								<a id="newGroupment" href="<?php echo dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=' . $element['object']->id, 1);?>">
-									<div
-										class="wpeo-button button-secondary button-square-40 wpeo-tooltip-event"
-										data-direction="bottom" data-color="light"
-										aria-label="<?php echo $langs->trans('NewGroupment'); ?>">
-										<strong><?php echo $modGroupment->prefix; ?></strong>
-										<span class="button-add animated fas fa-plus-circle"></span>
-									</div>
-								</a>
-								<a id="newWorkunit" href="<?php echo dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=' . $element['object']->id, 1);?>">
-									<div
-										class="wpeo-button button-square-40 wpeo-tooltip-event"
-										data-direction="bottom" data-color="light"
-										aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>">
-										<strong><?php echo $modWorkUnit->prefix; ?></strong>
-										<span class="button-add animated fas fa-plus-circle"></span>
-									</div>
-								</a>
-							</div>
-							<?php endif; ?>
-						<?php endif; ?>
-				</div>
-				<ul class="sub-list"><?php display_recurse_tree($element['children']) ?></ul>
-			</li>
-				<?php if ($element['object']->id == $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) : ?>
-				<hr>
-				<?php endif; ?>
-			<?php }
-		}
-	} else {
-		print $langs->trans('YouDontHaveTheRightToSeeThis');
-	}
+    if (!$user->rights->digiriskdolibarr->digiriskelement->read) {
+        print $langs->trans('YouDontHaveTheRightToSeeThis');
+        return;
+    }
+
+    if (empty($digiriskElementTree)) {
+        return;
+    }
+
+    $riskType = GETPOSTISSET('risk_type') && !empty(GETPOST('risk_type')) ? GETPOST('risk_type') : 'risk';
+
+    foreach ($digiriskElementTree as $element) {
+        $obj         = $element['object'];
+        $type        = $obj->element_type;
+        $hasChildren = ($type == 'groupment' && count($element['children']) > 0);
+        $isTrash     = ($obj->id == $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
+
+        $navLink = $user->rights->digiriskdolibarr->risk->read
+            ? dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php?id=' . $obj->id . '&risk_type=' . $riskType, 1)
+            : dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?id=' . $obj->id, 1);
+        ?>
+        <?php if ($isTrash) : ?>
+        <hr>
+        <?php endif; ?>
+        <li class="unit route ui-sortable-handle type-<?php echo $type; ?> level-<?php echo $i; ?>" id="unit<?php echo $obj->id; ?>" data-object-id="<?php echo $obj->id; ?>" data-route-id="<?php echo $obj->id; ?>" value="<?php echo $i; ?>">
+            <div class="unit-container row-container <?php echo $type; ?>">
+                <?php if ($user->rights->digiriskdolibarr->digiriskelement->write && !$isTrash) : ?>
+                <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                <?php endif; ?>
+
+                <?php if ($type == 'groupment' && $hasChildren) : ?>
+                <div class="toggle-unit chevron">
+                    <i class="toggle-icon fas fa-chevron-right" id="menu<?php echo $obj->id; ?>"></i>
+                </div>
+                <?php elseif ($type == 'groupment') : ?>
+                <div class="chevron"><i class="fas fa-chevron-right chevron-empty"></i></div>
+                <?php else : ?>
+                <div class="spacer"></div>
+                <?php endif; ?>
+
+                <span class="open-media-gallery add-media modal-open photo-container digirisk-element-photo-<?php echo $obj->id; ?>" value="0">
+                    <input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="<?php echo $obj->id; ?>" data-from-type="<?php echo $type; ?>" data-from-subtype="photo" data-from-subdir="" data-photo-class="digirisk-element-photo-<?php echo $obj->id; ?>"/>
+                    <?php
+                    $mediaOutput = saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $type . '/' . $obj->ref, 'small', 1, 0, 0, 0, 40, 40, 1, 1, 0, $type . '/' . $obj->ref, $obj, 'photo', 0, 0, 1, 1, 'cursorpointer');
+                    if (strpos($mediaOutput, 'nophoto.png') !== false) {
+                        print '<svg class="nophoto-placeholder" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="40" height="40" rx="6" fill="#f0f0f0"/><path d="M20 16a3 3 0 100 6 3 3 0 000-6z" fill="#bbb"/><path d="M14 13h3l1.5-2h3l1.5 2h3a2 2 0 012 2v10a2 2 0 01-2 2H14a2 2 0 01-2-2V15a2 2 0 012-2z" stroke="#bbb" stroke-width="1.5" fill="none"/></svg>';
+                    } else {
+                        print $mediaOutput;
+                    }
+                    ?>
+                </span>
+
+                <div class="ref-badge <?php echo $type; ?>-badge">
+                    <a id="slider" class="linkElement id<?php echo $obj->id; ?>" value="<?php echo $obj->id; ?>" href="<?php echo $navLink; ?>"><?php echo $obj->ref; ?></a>
+                </div>
+
+                <?php echo digirisk_element_label($obj, 'name'); ?>
+
+                <div class="actions">
+                    <?php if ($user->rights->digiriskdolibarr->digiriskelement->write && $type == 'groupment' && !$isTrash) : ?>
+                    <div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event quick-add-btn" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>" data-parent-id="<?php echo $obj->id; ?>" data-parent-ref="<?php echo $obj->ref; ?>" data-parent-label="<?php echo dol_escape_htmltag($obj->label); ?>" data-type="groupment"><strong><?php echo $modGroupment->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
+                    <div class="wpeo-button button-square-40 wpeo-tooltip-event quick-add-btn" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>" data-parent-id="<?php echo $obj->id; ?>" data-parent-ref="<?php echo $obj->ref; ?>" data-parent-label="<?php echo dol_escape_htmltag($obj->label); ?>" data-type="workunit"><strong><?php echo $modWorkUnit->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
+                    <?php endif; ?>
+                    <?php if ($user->rights->digiriskdolibarr->digiriskelement->delete && !$isTrash) : ?>
+                    <div class="wpeo-button button-square-40 button-red wpeo-tooltip-event delete-element-btn" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('Delete'); ?>" data-id="<?php echo $obj->id; ?>" data-ref="<?php echo $obj->ref; ?>"><i class="fas fa-trash"></i></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <ul class="sub-list space space-<?php echo $i; ?> ui-sortable <?php echo $type; ?>" id="space<?php echo $obj->id; ?>" value="<?php echo $i; ?>"><?php display_recurse_tree($element['children'], $i + 1); ?></ul>
+        </li>
+        <?php if ($isTrash) : ?>
+        <hr>
+        <?php endif; ?>
+        <?php
+    }
 }
 
 /**
@@ -357,7 +526,7 @@ function display_recurse_tree_organization($digiriskElementTree, $i = 1, $riskIn
 
                         <div class="photo-container">
                             <?php
-                            $mediaOutput = saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $obj->element_type . '/' . $obj->ref, 'small', 1, 0, 0, 0, 40, 40, 1, 0, 0, $obj->element_type . '/' . $obj->ref, $obj, 'photo', 0, 0, 0, 1, 'cursorpointer');
+                            $mediaOutput = saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $obj->element_type . '/' . $obj->ref, 'small', 1, 0, 0, 0, 40, 40, 1, 1, 0, $obj->element_type . '/' . $obj->ref, $obj, 'photo', 0, 0, 1, 1, 'cursorpointer');
                             if (strpos($mediaOutput, 'nophoto.png') !== false) {
                                 print '<svg class="nophoto-placeholder" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="40" height="40" rx="6" fill="#f0f0f0"/><path d="M20 16a3 3 0 100 6 3 3 0 000-6z" fill="#bbb"/><path d="M14 13h3l1.5-2h3l1.5 2h3a2 2 0 012 2v10a2 2 0 01-2 2H14a2 2 0 01-2-2V15a2 2 0 012-2z" stroke="#bbb" stroke-width="1.5" fill="none"/></svg>';
                             } else {
@@ -370,8 +539,8 @@ function display_recurse_tree_organization($digiriskElementTree, $i = 1, $riskIn
                             <a href="<?php echo dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php', 1) . '?id=' . $obj->id ?>"><?php echo $obj->ref; ?></a>
                         </div>
                         
-                        <h3 class="title element-label"><?php echo $obj->label; ?></h3>
-                        
+                        <?php echo digirisk_element_label($obj); ?>
+
                         <div class="risk-badges">
                             <?php foreach(array(4 => 'black', 3 => 'red', 2 => 'orange', 1 => 'grey') as $scale => $colorClass) { ?>
                             <span class="badge <?php echo $colorClass ?><?php echo (empty($counts[$scale]) ? ' empty' : '') ?>"><?php echo $counts[$scale] ?></span>
@@ -556,6 +725,36 @@ function getNomUrlUser(User $object, $withpictoimg = 0, $option = '', $infologin
 	else $result             .= $hookmanager->resPrint;
 
 	return $result;
+}
+
+/**
+ * Return a ticket reference as a clickable getNomUrl link for the public ticket interface.
+ *
+ * The public pages are NOLOGIN, so $user is never loaded from the session. We detect an active
+ * back-office session through $_SESSION['dol_login'] and only render a link when that user is
+ * connected and holds the ticket read permission, otherwise we keep the bold reference.
+ *
+ * @param  Ticket $ticket Ticket object, already fetched
+ * @return string         getNomUrl link if connected with read access, '<b>ref</b>' otherwise
+ */
+function getNomUrlTicketPublic(Ticket $ticket): string
+{
+	global $db;
+
+	$display = '<b>' . $ticket->ref . '</b>';
+	if (!empty($_SESSION['dol_login'])) {
+		$connectedUser = new User($db);
+		if ($connectedUser->fetch(0, $_SESSION['dol_login']) > 0) {
+			// fetch() does not populate rights, so hasRight() would always return 0 without this
+			$connectedUser->loadRights('ticket');
+			if ($connectedUser->hasRight('ticket', 'read')) {
+				// Tooltip disabled: the public interface does not load Dolibarr tooltip CSS/JS
+				$display = $ticket->getNomUrl(1, '', 1);
+			}
+		}
+	}
+
+	return $display;
 }
 
 /**
@@ -2348,7 +2547,7 @@ function digiriskformconfirm($page, $title, $question, $action, $formquestion = 
 					$more .= '</div></div>'."\n";
 				} elseif ($input['type'] == 'checkbox') {
 					$more .= '<div class="tagtr">';
-					$more .= '<div class="tagtd'.(empty($input['tdclass']) ? '' : (' '.$input['tdclass'])).'">'.$input['label'].' </div><div class="tagtd">';
+					$more .= '<div class="tagtd'.(empty($input['tdclass']) ? '' : (' '.$input['tdclass'])).'">'.(empty($input['label']) ? '' : $input['label']).' </div><div class="tagtd">';
 					$more .= '<input type="checkbox" class="flat'.$morecss.'" id="'.dol_escape_htmltag($input['name']).'" name="'.dol_escape_htmltag($input['name']).'"'.$moreattr;
 					if (!is_bool($input['value']) && $input['value'] != 'false' && $input['value'] != '0' && $input['value'] != '') {
 						$more .= ' checked';
@@ -2616,4 +2815,103 @@ function digiriskformconfirm($page, $title, $question, $action, $formquestion = 
 	}
 
 	return $formconfirm;
+}
+
+/**
+ * Get the date range criteria of a Dolibarr list
+ *
+ * The bounds are the ones of the list search form, so a graph bar and the list it opens hold the same records
+ *
+ * @param  string $prefix Name of the list date filter, without its bound suffix ('search_date', 'search_accident_date')
+ * @param  int    $start  Timestamp of the first day of the range, 0 for no lower bound
+ * @param  int    $end    Timestamp of the last day of the range, 0 for no upper bound
+ * @return string         Search criteria, empty when the range is unbounded
+ */
+function digirisk_get_date_range_filter(string $prefix, int $start = 0, int $end = 0): string
+{
+    $filter = [];
+    foreach (['start' => $start, 'end' => $end] as $bound => $timestamp) {
+        if (empty($timestamp)) {
+            continue;
+        }
+
+        $date     = dol_getdate($timestamp);
+        $filter[] = $prefix . '_' . $bound . 'day=' . $date['mday'];
+        $filter[] = $prefix . '_' . $bound . 'month=' . $date['mon'];
+        $filter[] = $prefix . '_' . $bound . 'year=' . $date['year'];
+    }
+
+    return implode('&', $filter);
+}
+
+/**
+ * Get the collection giving the author of a risk assessment, a task or a time spent line
+ *
+ * Risk lists only display the few users their rows reference, but used to load them with
+ * User::fetchAll(), which issues a fetch() and a fetch_optionals() per user of the whole
+ * database (two queries each). The collection returned here loads a user the first time
+ * its id is read and keeps the array syntax of the templates.
+ *
+ * @return DigiriskLazyMap Collection of User objects, keyed by user id
+ */
+function digirisk_get_user_list(): DigiriskLazyMap
+{
+    global $db;
+
+    require_once __DIR__ . '/../class/digirisklazymap.class.php';
+
+    static $userList = null;
+    if ($userList === null) {
+        $userList = new DigiriskLazyMap(function ($userId) use ($db) {
+            $userAuthor = new User($db);
+
+            // A row may reference a user that no longer exists; the callers type-hint User,
+            // so hand them an empty object rather than null
+            if ($userId > 0) {
+                $userAuthor->fetch($userId);
+            }
+
+            return $userAuthor;
+        });
+    }
+
+    return $userList;
+}
+
+/**
+ * Get the collection giving the risk assessments of a risk
+ *
+ * Risk lists are paginated and read this collection by risk id, but used to build it from a
+ * RiskAssessment::fetchAll() with neither limit nor entity filter, so every risk assessment
+ * of every entity was instantiated on each page. The collection returned here queries the
+ * assessments of a risk the first time that risk is read.
+ *
+ * @return DigiriskLazyMap Collection of arrays of RiskAssessment objects, keyed by risk id
+ */
+function digirisk_get_risk_assessments_by_risk(): DigiriskLazyMap
+{
+    global $db;
+
+    require_once __DIR__ . '/../class/digirisklazymap.class.php';
+    require_once __DIR__ . '/../class/riskanalysis/riskassessment.class.php';
+
+    static $riskAssessmentsByRisk = null;
+    if ($riskAssessmentsByRisk === null) {
+        $riskAssessmentsByRisk = new DigiriskLazyMap(function ($riskId) use ($db) {
+            if ($riskId <= 0) {
+                return [];
+            }
+
+            // Shared risks belong to other entities, so keep the entity filter off as the
+            // preloading it replaces did
+            $riskAssessment = new RiskAssessment($db);
+            $riskAssessment->ismultientitymanaged = 0;
+
+            $riskAssessments = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 't.fk_risk = ' . (int) $riskId]);
+
+            return is_array($riskAssessments) ? $riskAssessments : [];
+        });
+    }
+
+    return $riskAssessmentsByRisk;
 }

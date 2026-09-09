@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '23.1.0';
+		$this->version     = '23.2.0';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -114,9 +114,17 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
         $action = str_replace('@DIGIRISKDOLIBARR', '', $action);
 		$active = getDolGlobalInt('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_' . $action);
 
+        // Le document PDF d'un plan de prevention ou d'un permis de feu n'est pas un evenement
+        // d'agenda : sa regeneration est traitee avant le filtre ci-dessous, sinon elle dependrait
+        // du reglage des actions automatiques et la diffusion presenterait un document absent ou
+        // perime selon une option qui n'a rien a voir avec lui.
+        if (isModEnabled('digiriskdolibarr')) {
+            $this->refreshPreventionPlanDocumentOnTrigger($action, $object, $user, $langs);
+        }
+
         // Allowed triggers are a list of trigger from other module that should activate this file
 		if (!isModEnabled('digiriskdolibarr') || !$active) {
-			$allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE', 'TICKET_PUBLIC_INTERFACE_CREATE', 'TICKET_SIGN'];
+			$allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE', 'TICKET_PUBLIC_INTERFACE_CREATE', 'TICKET_SIGN', 'SATURNE_SIGNATURE_SIGN', 'SATURNE_SIGNATURE_SIGN_PUBLIC', 'PRODUCT_CREATE'];
             if (!in_array($action, $allowedTriggers)) {
                 return 0;  // If module is not enabled or trigger is deactivated, we do nothing
             }
@@ -156,6 +164,39 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		}
 
         switch ($action) {
+            case 'PRODUCT_CREATE' :
+                $fieldsToDefault = [
+                    'digirisk_identification' => 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_IDENTIFICATION',
+                    'digirisk_security'       => 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_SECURITY',
+                    'digirisk_usermanual'     => 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_USERMANUAL',
+                    'digirisk_qualification'  => 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_QUALIFICATION',
+                    'digirisk_hygiene'        => 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_HYGIENE',
+                    'digirisk_maintenance'    => 'DIGIRISKDOLIBARR_PRODUCT_DEFAULT_MAINTENANCE'
+                ];
+                $hasUpdates = false;
+                if (!isset($object->array_options)) {
+                    $object->array_options = [];
+                }
+                $updates = [];
+                foreach ($fieldsToDefault as $field => $const) {
+                    $val = trim($object->array_options['options_' . $field] ?? '');
+                    if ($val === '') {
+                        $def = trim(getDolGlobalString($const));
+                        if ($def !== '') {
+                            $object->array_options['options_' . $field] = $def;
+                            $updates[] = $field . " = '" . $this->db->escape($def) . "'";
+                            $hasUpdates = true;
+                        }
+                    }
+                }
+                if ($hasUpdates) {
+                    $sql = "UPDATE " . MAIN_DB_PREFIX . "product_extrafields SET ";
+                    $sql .= implode(', ', $updates);
+                    $sql .= " WHERE fk_object = " . ((int) $object->id);
+                    $this->db->query($sql);
+                }
+                break;
+
 			case 'COMPANY_DELETE' :
 				require_once __DIR__ . '/../../class/preventionplan.class.php';
 				require_once __DIR__ . '/../../class/firepermit.class.php';
@@ -234,6 +275,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
             case 'RISKASSESSMENTDOCUMENT_GENERATE' :
             case 'TICKETDOCUMENT_GENERATE' :
             case 'WORKUNITDOCUMENT_GENERATE' :
+
+                // Enquete accident : le document doit etre lisible par les personnes de la
+                // diffusion, qui n'ont pas de compte. On le rattache a l'enquete elle-meme et on
+                // lui pose une cle de partage, sinon la page publique ne peut ni le trouver ni le servir.
+                if ($action == 'ACCIDENTINVESTIGATIONDOCUMENT_GENERATE') {
+                    $this->shareGeneratedDocument($object, 'digiriskdolibarr_accident_investigation', $user);
+                }
 
                 if ($object->parent_type == 'groupment' || $object->parent_type == 'workunit' || preg_match('/listingrisks/', $object->parent_type)) {
                     $object->parent_type = 'digiriskelement';
@@ -401,7 +449,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'TICKET_CREATE' :
-				if (getDolGlobalInt('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT')) {
+				// Only send this notification for tickets submitted through the DigiRisk public interface.
+				// TICKET_CREATE is fired by Dolibarr core on every ticket creation (back-office, API, ...),
+				// but the email content below is built solely from public-interface extrafields.
+				if (getDolGlobalInt('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT') && !empty($object->context['digiriskdolibarrpublicinterface'])) {
 					// envoi du mail avec les infos de l'objet aux adresses mail configurées
 					// envoi du mail avec une trad puis avec un model
 
@@ -416,7 +467,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$substitutionarray = getCommonSubstitutionArray($langs, 0, null,$object);
 
 					$message = $langs->trans('Hello') . ',' . '<br><br>';
-					$message .= '<span style="color:#c55a11">' . $langs->trans('ANewTicketHasBeenSubmitted', $conf->global->MAIN_INFO_SOCIETE_NOM) . '.' . '</span><br><br>';
+					$message .= '<span style="color:#c55a11">' . $langs->trans('ANewTicketHasBeenSubmitted', getDolGlobalString('MAIN_INFO_SOCIETE_NOM')) . '.' . '</span><br><br>';
 					$message .= '<strong>' . $langs->trans('Service') . ' : ' . '</strong>';
 					$digiriskelement->fetch((int)$object->array_options['options_digiriskdolibarr_ticket_service']);
 					$message .= $digiriskelement->ref . ' - ' . $digiriskelement->label . '<br><br>';
@@ -908,4 +959,150 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 //		}
 		return 0;
 	}
+
+    /**
+     * Regenere le document PDF d'un plan de prevention et le remet a disposition de la diffusion.
+     *
+     * Remplace la version precedente au lieu de s'empiler avec elle : la page publique affiche
+     * tous les fichiers partages, deux PDF y seraient illisibles.
+     *
+     * @param  int       $planId Identifiant du plan de prevention
+     * @param  User      $user   Utilisateur a l'origine de l'action
+     * @param  Translate $langs  Objet de traduction
+     * @return void
+     */
+    protected function refreshPreventionPlanDocument(int $planId, User $user, Translate $langs)
+    {
+        dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_preventionplan.lib.php');
+
+        digiriskRefreshPreventionPlanDocument($this->db, $planId, $user, $langs);
+    }
+
+    /**
+     * Regenere le document PDF d'un permis de feu et le remet a disposition de la diffusion.
+     *
+     * Remplace la version precedente au lieu de s'empiler avec elle : la page publique affiche
+     * tous les fichiers partages, deux PDF y seraient illisibles.
+     *
+     * @param  int       $permitId Identifiant du permis de feu
+     * @param  User      $user     Utilisateur a l'origine de l'action
+     * @param  Translate $langs    Objet de traduction
+     * @return void
+     */
+    protected function refreshFirePermitDocument(int $permitId, User $user, Translate $langs)
+    {
+        dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_firepermit.lib.php');
+
+        digiriskRefreshFirePermitDocument($this->db, $permitId, $user, $langs);
+    }
+
+    /**
+     * Regenere le document d'un plan de prevention ou d'un permis de feu quand l'evenement recu l'a
+     * rendu obsolete.
+     *
+     * Le PDF suit l'objet et rien d'autre : creation, modification, changement d'etat et signatures.
+     * Une signature porte l'objet dans fk_object, les autres evenements sont l'objet lui-meme.
+     *
+     * @param  string    $action Nom du trigger, prefixe module deja retire
+     * @param  object    $object Objet a l'origine du trigger
+     * @param  User      $user   Utilisateur a l'origine de l'action
+     * @param  Translate $langs  Objet de traduction
+     * @return void
+     */
+    protected function refreshPreventionPlanDocumentOnTrigger(string $action, $object, User $user, Translate $langs)
+    {
+        $planTriggers = [
+            'PREVENTIONPLAN_CREATE', 'PREVENTIONPLAN_MODIFY', 'PREVENTIONPLAN_PENDINGSIGNATURE',
+            'PREVENTIONPLAN_VALIDATE', 'PREVENTIONPLAN_UNVALIDATE', 'PREVENTIONPLAN_LOCK',
+        ];
+
+        if (in_array($action, $planTriggers) && $object->id > 0) {
+            $this->refreshPreventionPlanDocument((int) $object->id, $user, $langs);
+
+            return;
+        }
+
+        // Le permis de feu se diffuse comme le plan de prevention : son document suit les memes etapes
+        $permitTriggers = [
+            'FIREPERMIT_CREATE', 'FIREPERMIT_MODIFY', 'FIREPERMIT_PENDINGSIGNATURE',
+            'FIREPERMIT_VALIDATE', 'FIREPERMIT_UNVALIDATE', 'FIREPERMIT_LOCK',
+        ];
+
+        if (in_array($action, $permitTriggers) && $object->id > 0) {
+            $this->refreshFirePermitDocument((int) $object->id, $user, $langs);
+
+            return;
+        }
+
+        // Une signature change le document : sans regeneration, la diffusion continue de presenter
+        // une version datee a des gens qui n'ont aucun moyen de s'en apercevoir.
+        $signatureTriggers = ['SATURNE_SIGNATURE_SIGN', 'SATURNE_SIGNATURE_SIGN_PUBLIC', 'SATURNE_SIGNATURE_PENDING_SIGNATURE'];
+        if (in_array($action, $signatureTriggers) && isset($object->object_type) && in_array($object->object_type, ['preventionplan', 'firepermit']) && $object->fk_object > 0) {
+            require_once DOL_DOCUMENT_ROOT . '/custom/saturne/class/saturnesignature.class.php';
+            $signatory = new SaturneSignature($this->db);
+            
+            // Check if all signatures are collected
+            if ($signatory->checkSignatoriesSignatures((int) $object->fk_object, $object->object_type) === 1) {
+                if ($object->object_type === 'preventionplan') {
+                    require_once __DIR__ . '/../../class/preventionplan.class.php';
+                    $docToLock = new PreventionPlan($this->db);
+                } else {
+                    require_once __DIR__ . '/../../class/firepermit.class.php';
+                    $docToLock = new FirePermit($this->db);
+                }
+                
+                if ($docToLock->fetch((int) $object->fk_object) > 0 && $docToLock->status == $docToLock::STATUS_VALIDATED) {
+                    // Auto-lock the document. This will fire PREVENTIONPLAN_LOCK or FIREPERMIT_LOCK.
+                    $docToLock->setLocked($user, false);
+                }
+            }
+
+            if ($object->object_type === 'preventionplan') {
+                $this->refreshPreventionPlanDocument((int) $object->fk_object, $user, $langs);
+            } else {
+                $this->refreshFirePermitDocument((int) $object->fk_object, $user, $langs);
+            }
+        }
+    }
+
+    /**
+     * Rattache le dernier document genere a son objet parent et lui pose une cle de partage.
+     *
+     * La generation indexe le fichier sur le document Saturne (src_object_type =
+     * saturne_object_documents). La page publique de diffusion, elle, cherche les fichiers de
+     * l'objet metier et ne sert que ceux qui portent une cle de partage : sans ce recalage le
+     * document reste invisible pour les personnes diffusees.
+     *
+     * @param  SaturneDocuments $document     Document genere
+     * @param  string           $tableElement Table de l'objet metier a rattacher
+     * @param  User             $user         Utilisateur a l'origine de l'action
+     * @return int                            < 0 si KO, 1 si OK
+     */
+    protected function shareGeneratedDocument($document, string $tableElement, User $user): int
+    {
+        if (empty($document->last_main_doc) || empty($document->parent_id)) {
+            return -1;
+        }
+
+        // last_main_doc ne porte que le nom du fichier et le repertoire est celui de l'objet
+        // parent, pas du document : on retrouve la ligne indexee par son nom de fichier
+        return $this->shareGeneratedFile(basename($document->last_main_doc), $tableElement, (int) $document->parent_id, $user);
+    }
+
+    /**
+     * Recale un fichier indexe sur l'objet metier voulu et lui pose une cle de partage.
+     *
+     * @param  string $fileName     Nom du fichier indexe
+     * @param  string $tableElement Table de l'objet metier a rattacher
+     * @param  int    $objectId     Identifiant de l'objet metier
+     * @param  User   $user         Utilisateur a l'origine de l'action
+     * @param  bool   $favorite     Marquer le fichier comme mis en avant sur la diffusion
+     * @return int                  < 0 si KO, 1 si OK
+     */
+    protected function shareGeneratedFile(string $fileName, string $tableElement, int $objectId, User $user, bool $favorite = false): int
+    {
+        dol_include_once('/digiriskdolibarr/lib/digiriskdolibarr_preventionplan.lib.php');
+
+        return digiriskShareGeneratedFile($this->db, $fileName, $tableElement, $objectId, $user, $favorite);
+    }
 }

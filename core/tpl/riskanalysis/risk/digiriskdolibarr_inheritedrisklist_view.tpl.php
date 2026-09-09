@@ -33,19 +33,19 @@
 		$DUProject->fetch($riskType == 'risk' ? $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT);
 		$extrafields->fetch_name_optionals_label($digiriskTask->table_element);
 
-		$riskAssessmentList        = $riskAssessment->fetchAll();
-		$riskAssessmentNextValue   = $refEvaluationMod->getNextValue($evaluation);
-		$riskAssessmentTaskList    = $risk->getTasksWithFkRisk();
-		$taskNextValue             = $refTaskMod->getNextValue('', $task);
-		$usertmp->fetchAll();
-		$usersList                 = $usertmp->users;
-		$timeSpentSortedByTasks    = $digiriskTask->fetchAllTimeSpentAllUsers('AND fk_element > 0', 'element_datehour', 'DESC', 1);
+		// Reuse the data already loaded by the main risk list when both are rendered on the same
+		// page (same variable names); only load what is missing so these full "load all" queries
+		// (tasks, time spent) are not run a second time.
+		if (!isset($riskAssessmentNextValue)) $riskAssessmentNextValue = $refEvaluationMod->getNextValue($evaluation);
+		if (!isset($riskAssessmentTaskList))  $riskAssessmentTaskList  = $risk->getTasksWithFkRisk();
+		if (!isset($taskNextValue))           $taskNextValue           = $refTaskMod->getNextValue('', $task);
+		if (!isset($timeSpentSortedByTasks))  $timeSpentSortedByTasks  = $digiriskTask->fetchAllTimeSpentAllUsers('AND fk_element > 0', 'element_datehour', 'DESC', 1);
 
-		if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
-			foreach ($riskAssessmentList as $riskAssessmentSingle) {
-				$riskAssessmentsOrderedByRisk[$riskAssessmentSingle->fk_risk][$riskAssessmentSingle->id] = $riskAssessmentSingle;
-			}
-		}
+		// The list is paginated and both collections are only read by id, so they load their
+		// entries on demand instead of instantiating every user and every risk assessment of
+		// the database; both are memoized per request, so the main list shares them
+		$usersList                    = digirisk_get_user_list();
+		$riskAssessmentsOrderedByRisk = digirisk_get_risk_assessments_by_risk();
 		// Build and execute select
 		// --------------------------------------------------------------------
 		if (!preg_match('/(evaluation)/', $sortfield)) {
@@ -64,7 +64,7 @@
 			$sql = preg_replace('/,\s*$/', '', $sql);
 			$sql .= " FROM " . MAIN_DB_PREFIX . $risk->table_element . " as r";
 			$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
-			if (is_array($extrafields->attributes[$risk->table_element]['label']) && count($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . "_extrafields as ef on (r.rowid = ef.fk_object)";
+			if (!empty($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . "_extrafields as ef on (r.rowid = ef.fk_object)";
 			if ($risk->ismultientitymanaged == 1) $sql .= " WHERE r.entity IN (" . getEntity($risk->element) . ")";
 			else $sql .= " WHERE 1 = 1";
 			if (!$allRisks) {
@@ -115,7 +115,7 @@
 					}
 				}
 			}
-			if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
+			if ($search_all) $sql .= $risk->getSearchAllSqlFilter($fieldstosearchall, $search_all);
 			// Add where from extra fields
 			include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
 			// Add where from hooks
@@ -153,8 +153,9 @@
 				$num = $db->num_rows($resql);
 			}
 
-			// Direct jump if only one record found
-			if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && !$page) {
+			// Direct jump if only one record found, out of reach once the page header has been printed : the redirect
+			// would only raise a "headers already sent" warning and leave the list truncated
+			if ($num == 1 && !headers_sent() && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && !$page) {
 				$obj = $db->fetch_object($resql);
 				$id = $obj->rowid;
 				header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $id);
@@ -177,7 +178,7 @@
 			$sql .= " FROM " . MAIN_DB_PREFIX . $evaluation->table_element . " as evaluation";
 			$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . " as r on (evaluation.fk_risk = r.rowid)";
 			$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
-			if (is_array($extrafields->attributes[$evaluation->table_element]['label']) && count($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $evaluation->table_element . "_extrafields as ef on (evaluation.rowid = ef.fk_object)";
+			if (!empty($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $evaluation->table_element . "_extrafields as ef on (evaluation.rowid = ef.fk_object)";
 			if ($evaluation->ismultientitymanaged == 1) $sql .= " WHERE evaluation.entity IN (" . getEntity($evaluation->element) . ")";
 			else $sql .= " WHERE 1 = 1";
 			$sql .= " AND evaluation.status = 1";
@@ -210,8 +211,8 @@
 
 			foreach ($search as $key => $val) {
 				if ($key == 'status' && $search[$key] == -1) continue;
-				$mode_search = (($evaluation->isInt($evaluation->fields[$key]) || $evaluation->isFloat($evaluation->fields[$key])) ? 1 : 0);
-				if (strpos($evaluation->fields[$key]['type'], 'integer:') === 0) {
+				$mode_search = (($risk->isInt($risk->fields[$key]) || $risk->isFloat($risk->fields[$key])) ? 1 : 0);
+				if (strpos($risk->fields[$key]['type'], 'integer:') === 0) {
 					if ($search[$key] == '-1') $search[$key] = '';
 					$mode_search = 2;
 				}
@@ -229,7 +230,7 @@
 					}
 				}
 			}
-			if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
+			if ($search_all) $sql .= $risk->getSearchAllSqlFilter($fieldstosearchall, $search_all);
 			// Add where from extra fields
 			include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
 			// Add where from hooks
@@ -267,8 +268,9 @@
 				$num = $db->num_rows($resql);
 			}
 
-			// Direct jump if only one record found
-			if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && !$page) {
+			// Direct jump if only one record found, out of reach once the page header has been printed : the redirect
+			// would only raise a "headers already sent" warning and leave the list truncated
+			if ($num == 1 && !headers_sent() && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && !$page) {
 				$obj = $db->fetch_object($resql);
 				$id = $obj->rowid;
 				header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $id);
@@ -297,7 +299,7 @@
 	$arrayofmassactions = [];
     $massactionbutton   = $form->selectMassAction('', $arrayofmassactions);
 
-	$title = $langs->trans('DigiriskElementInherited' . ucfirst($riskType) . 'sList');
+	$title = digirisk_trans_risk_type('DigiriskElementInherited', $riskType, 'sList');
 	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr_color.png@digiriskdolibarr', 0, '', '', $limit, 0, 0, 1);
 
 	include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
@@ -344,13 +346,13 @@
 		if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
 		if ( ! empty($arrayfields['r.' . $key]['checked'])) {
 			print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
-			if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
+			if (!empty($val['arrayofkeyval']) && is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], (isset($search[$key]) ? $search[$key] : ''), $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 			elseif (strpos($val['type'], 'integer:') === 0) {
 				print $risk->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 			} elseif ($key == 'fk_element') {
 				print $digiriskelement->selectDigiriskElementList($search['fk_element'], 'search_fk_element', [], 1, 0, array(), 0, 0, 'minwidth100 maxwidth300', 0, false, 1);
 			} elseif ($key == 'category') { ?>
-				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
+				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 					<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
 					<?php if (dol_strlen(dol_escape_htmltag($search[$key])) == 0) : ?>
 						<div class="dropdown-toggle dropdown-add-button button-cotation">
@@ -374,7 +376,7 @@
 						endif; ?>
 					</ul>
 				</div>
-			<?php } elseif ( ! preg_match('/^(date|timestamp)/', $val['type']) && $key != 'category') print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
+			<?php } elseif ( ! preg_match('/^(date|timestamp)/', $val['type']) && $key != 'category') print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag(isset($search[$key]) ? $search[$key] : '') . '">';
 			print '</td>';
 		}
 	}
@@ -437,8 +439,9 @@
 	// --------------------------------------------------------------------
 
 	// contenu
-	$i          = 0;
-	$totalarray = array();
+	$i                       = 0;
+	$totalarray              = array();
+	$totalarray['nbfield']   = 0;
 
 	while ($i < ($limit ? min($num, $limit) : $num)) {
 		$obj = $db->fetch_object($resql);
@@ -476,7 +479,7 @@
 					</div>
 					<?php
 				} elseif ($key == 'ref') {
-					print $risk->getNomUrl(1, 'nolink');
+					print $risk->getNomUrl(1);
 				} elseif ($key == 'description') {
 					if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 ) {
 						print $langs->trans('RiskDescriptionNotActivated');

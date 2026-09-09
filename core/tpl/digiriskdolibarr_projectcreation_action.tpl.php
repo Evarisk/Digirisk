@@ -122,11 +122,11 @@ $numberingModules  = ['project' => $conf->global->PROJECT_ADDON];
 list ($projectRef) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
 
 //Check projet
-if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && $conf->global->DIGIRISKDOLIBARR_DU_PROJECT_BACKWARD_COMPATIBILITY == 0) {
+if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && empty($conf->global->DIGIRISKDOLIBARR_DU_PROJECT_BACKWARD_COMPATIBILITY)) {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 	//Backward compatibility
 	if ($project->title == $langs->trans('RiskAssessmentDocument')) {
-		$project->title       = $langs->trans('RiskAssessmentDocument') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+		$project->title       = $langs->trans('RiskAssessmentDocument') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
 		$project->description = $langs->trans('RiskAssessmentDocumentDescription');
 		$project->update($user);
 	}
@@ -140,7 +140,7 @@ if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && $conf->global->DIGIRISKDOL
 
 if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) {
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
-	$project->title       = $langs->trans('RiskAssessmentDocument') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$project->title       = $langs->trans('RiskAssessmentDocument') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
 	$project->description = $langs->trans('RiskAssessmentDocumentDescription');
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(), '%Y');
@@ -178,11 +178,11 @@ if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) 
 	header("Location: " . $_SERVER['PHP_SELF']);
 }
 
-if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0 && $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT_BACKWARD_COMPATIBILITY == 0 ) {
+if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0 && empty($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT_BACKWARD_COMPATIBILITY)) {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT);
 	//Backward compatibility
 	if ($project->title == $langs->trans('PreventionPlan')) {
-		$project->title = $langs->trans('PreventionPlan') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+		$project->title = $langs->trans('PreventionPlan') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
 		$project->update($user);
 	}
 
@@ -196,7 +196,7 @@ if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0 && $conf->global-
 
 if ( $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT == 0 || $project->statut == 2 ) {
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
-	$project->title       = $langs->trans('PreventionPlan') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$project->title       = $langs->trans('PreventionPlan') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
 	$project->description = $langs->transnoentities('PreventionPlanDescription');
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(), '%Y');
@@ -222,7 +222,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT == 0 || $project->st
 
 if ( $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT == 0 || $project->statut == 2 ) {
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
-	$project->title       = $langs->trans('FirePermit') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$project->title       = $langs->trans('FirePermit') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
 	$project->description = $langs->trans('FirePermitDescription');
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(), '%Y');
@@ -248,7 +248,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT == 0 || $project->statut
 
 if ( $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT == 0 || $project->statut == 2 ) {
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
-	$project->title       = $langs->trans('Accident') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$project->title       = $langs->trans('Accident') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
 	$project->description = $langs->trans('AccidentDescription');
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(), '%Y');
@@ -274,7 +274,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT == 0 || $project->statut =
 
 if ( $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT == 0 || $project->statut == 2 ) {
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
-	$project->title       = $langs->trans('Ticket') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$project->title       = $langs->trans('Ticket') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
 	$project->description = $langs->trans('TicketDescription');
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(), '%Y');
@@ -300,7 +300,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT == 0 || $project->statut == 
 
 if ( $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT == 0 || $project->statut == 2 ) {
     $project->ref         = $projectRef->getNextValue($third_party, $project);
-    $project->title       = $langs->trans('Environment') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+    $project->title       = $langs->trans('Environment') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
     $project->description = $langs->trans('EnvironmentDescription');
     $project->date_c      = dol_now();
     $currentYear          = dol_print_date(dol_now(), '%Y');
@@ -362,7 +362,7 @@ if (!dolibarr_get_const($db, 'DIGIRISKDOLIBARR_USERAPI_SET', 0)) {
 
 if (getDolGlobalInt('DIGIRISKDOLIBARR_READERGROUP_SET') == 0) {
     $userGroup->entity = $conf->entity;
-    $userGroup->name   = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskReaderGroup');
+    $userGroup->name   = getDolGlobalString('MAIN_INFO_SOCIETE_NOM') . ' - ' . $langs->trans('DigiriskReaderGroup');
     $userGroup->note   = $langs->trans('DigiriskReaderGroupDescription');
 
     $userGroupID = $userGroup->create($user);
@@ -415,7 +415,7 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_READERGROUP_UPDATED') >= 0 && getDolGlobal
                 $readerGroupConf = 4;
                 break;
             case 1 :
-                $userGroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskReaderGroup');
+                $userGroup->name = getDolGlobalString('MAIN_INFO_SOCIETE_NOM') . ' - ' . $langs->trans('DigiriskReaderGroup');
                 $userGroup->note = $langs->trans('DigiriskReaderGroupDescription');
                 $userGroup->update($user);
 
@@ -428,7 +428,7 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_READERGROUP_UPDATED') >= 0 && getDolGlobal
 
 if (getDolGlobalInt('DIGIRISKDOLIBARR_USERGROUP_SET') == 0) {
     $userGroup->entity = $conf->entity;
-    $userGroup->name   = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskUserGroup');
+    $userGroup->name   = getDolGlobalString('MAIN_INFO_SOCIETE_NOM') . ' - ' . $langs->trans('DigiriskUserGroup');
     $userGroup->note   = $langs->trans('DigiriskUserGroupDescription');
 
     $userGroupID = $userGroup->create($user);
@@ -507,7 +507,7 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_USERGROUP_UPDATED') >= 0 && getDolGlobalIn
                 $userGroupConf = 5;
                 break;
             case 1 :
-                $userGroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskUserGroup');
+                $userGroup->name = getDolGlobalString('MAIN_INFO_SOCIETE_NOM') . ' - ' . $langs->trans('DigiriskUserGroup');
                 $userGroup->note = $langs->trans('DigiriskUserGroupDescription');
                 $userGroup->update($user);
 
@@ -520,7 +520,7 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_USERGROUP_UPDATED') >= 0 && getDolGlobalIn
 
 if (getDolGlobalInt('DIGIRISKDOLIBARR_ADMINUSERGROUP_SET') == 0) {
     $userGroup->entity = $conf->entity;
-    $userGroup->name   = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskAdminUserGroup');
+    $userGroup->name   = getDolGlobalString('MAIN_INFO_SOCIETE_NOM') . ' - ' . $langs->trans('DigiriskAdminUserGroup');
     $userGroup->note   = $langs->trans('DigiriskAdminUserGroupDescription');
 
     $userGroupID = $userGroup->create($user);
@@ -543,7 +543,7 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED') >= 0 && getDolGlo
                 $adminUserGroupConf = 6;
                 break;
             case 1:
-                $userGroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskAdminUserGroup');
+                $userGroup->name = getDolGlobalString('MAIN_INFO_SOCIETE_NOM') . ' - ' . $langs->trans('DigiriskAdminUserGroup');
                 $userGroup->note = $langs->trans('DigiriskAdminUserGroupDescription');
                 $userGroup->update($user);
 
@@ -911,7 +911,7 @@ if ($conf->global->DIGIRISKDOLIBARR_ENCODE_BACKWARD_COMPATIBILITY == 0) {
 	$resources = new DigiriskResources($db);
 	$rights_defenderID = $resources->fetchDigiriskResource('RightsDefender');
 	$societe->fetch($rights_defenderID);
-	$societe->name = $langs->transnoentities('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$societe->name = $langs->transnoentities('RightsDefender') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
 	$societe->update(0, $user);
 
 	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';

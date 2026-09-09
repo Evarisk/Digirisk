@@ -24,12 +24,37 @@
 
 .wpeo-modal[class*="modal-risksign"] .modal-container .risksign-content {
   display: flex;
+  // Ancre de la liste de pictogrammes : le panneau se cale sur la largeur du bloc plutot
+  // que sur celle du bouton qui l'ouvre.
+  position: relative;
   padding-bottom: 1em;
   margin-bottom: 1em;
   border-bottom: 1px solid rgba(0,0,0,0.2);
 
   .risksign-category {
     margin-right: 1.5em;
+
+    .wpeo-dropdown {
+      position: static;
+    }
+    // La grille prend toute la largeur de la modale au lieu des 360px du dropdown, et se
+    // borne en hauteur pour ne pas deborder sous le pied de la modale.
+    .saturne-dropdown-content {
+      top: 100%;
+      left: 0;
+      right: 0;
+      width: auto;
+      max-height: 300px;
+      overflow-y: auto;
+      grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+      grid-gap: 0.3em;
+
+      // Le padding du dropdown mangeait un quart de la cellule : l'espacement passe par la
+      // gouttiere de la grille, le pictogramme occupe toute sa case.
+      .dropdown-item {
+        padding: 0;
+      }
+    }
   }
   .risksign-description {
     flex-grow: 1;

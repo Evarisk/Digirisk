@@ -718,8 +718,8 @@ switch ($action) {
                 // $addLabel=1 (last arg) appends " - <label>" to the ref so users see "GP1 - Siège Evarisk".
                 $display = '';
                 $newId = (int) $valueToStore;
-                if ($newId > 0 && file_exists(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php')) {
-                    require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php';
+                if ($newId > 0) {
+                    dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
                     $de = new DigiriskElement($db);
                     if ($de->fetch($newId) > 0) {
                         $display = $de->getNomUrl(1, '', 0, '', -1, 1);

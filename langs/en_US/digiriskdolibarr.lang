@@ -1,0 +1,632 @@
+CurativeAction                           = Curative actions
+CorrectiveAction                         = Corrective actions
+PreventiveAction                         = Preventive actions
+DigiriskActionType                       = Digirisk action type
+Actions                                  = Actions
+ActionsTab                               = Actions
+CurativeActions                          = Curative actions
+PreventiveActions                        = Preventive actions
+TotalPlannedBudget                       = Planned budget
+AccidentInvestigationDocumentPDF         = EA-A4-PORTRAIT
+PreventionPlanDocumentPDF                = PP-A4-PORTRAIT
+PreventionPlanDocumentPDFDescription     = Generate the prevention plan as a PDF
+AccidentInvestigationDocumentPDFDescription = Generate the accident investigation as a PDF
+AccidentInvestigationDocumentGeneratedAt = Generated on
+CorrectiveActions                        = Corrective actions
+AddCurativeAction                        = Add a curative action
+AddCorrectiveAction                      = Add a corrective action
+InvestigationNotValidatedYet             = Please validate the accident investigation first to create actions
+ActionLabel                              = Action label
+ActionDeadline                           = Deadline
+ActionAssignedTo                         = Assigned to
+ActionProgress                           = Progress
+MarkAsDone                               = Mark as done
+XActionsOfY                              = %s / %s done
+NoActionsYet                             = No actions yet
+ActionAdded                              = Action has been created
+ActionClosed                             = Action has been closed
+ActionsAreProjectTasks                   = Actions are Dolibarr project sub-tasks
+SeeProjectTasksView                      = See parent task
+OpenTask                                 = Open task
+
+# MeteoVigilance - Météo-France weather warnings
+MeteoVigilance = Météo-France weather warning
+MeteoVigilancePanelTitle = %s warning
+MeteoVigilanceAdvice2 = Be alert
+MeteoVigilanceAdvice3 = Be very vigilant
+MeteoVigilanceAdvice4 = Take action
+MeteoVigilanceUpdatedAt = Updated %s
+MeteoVigilanceEnabled = Enable weather warnings
+MeteoVigilanceEnabledDescription = Show the Météo-France weather warning widget on the dashboard (and the alert banner for orange/red warnings).
+MeteoVigilanceLevel = Warning level
+MeteoVigilanceActivePhenomena = Active phenomena
+MeteoVigilanceNoAlert = No particular warning
+MeteoVigilanceSource = Source
+MeteoVigilanceSeeOnMeteoFrance = View on vigilance.meteofrance.fr
+MeteoVigilanceNotConfigured = Météo-France API key not configured — click to configure
+MeteoVigilanceUnknownDepartment = Company department could not be determined
+MeteoVigilanceUnavailable = Warning data temporarily unavailable
+MeteoVigilanceBannerTitle = %s warning in effect for department %s
+MeteoVigilanceLevel1 = Green
+MeteoVigilanceLevel2 = Yellow
+MeteoVigilanceLevel3 = Orange
+MeteoVigilanceLevel4 = Red
+MeteoVigilancePhenomenon1 = Strong wind
+MeteoVigilancePhenomenon2 = Rain-flood
+MeteoVigilancePhenomenon3 = Thunderstorms
+MeteoVigilancePhenomenon4 = Floods
+MeteoVigilancePhenomenon5 = Snow-ice
+MeteoVigilancePhenomenon6 = Heatwave
+MeteoVigilancePhenomenon7 = Extreme cold
+MeteoVigilancePhenomenon8 = Avalanches
+MeteoVigilancePhenomenon9 = Coastal flooding
+MeteoVigilanceSetup = Weather warning configuration
+MeteoVigilanceApiKey = Météo-France API key
+MeteoVigilanceApiKeyDescription = API key from the Météo-France portal (create an account and a "Bulletin Vigilance" application on <a href="https://portail-api.meteofrance.fr" target="_blank">portail-api.meteofrance.fr</a> to generate the key).
+MeteoVigilanceDepartment = Department code (override)
+MeteoVigilanceDepartmentDescription = Leave empty to auto-detect the department from the company address. Otherwise enter a code (e.g. 35, 2A).
+MeteoVigilanceCacheTTL = Cache duration (seconds)
+MeteoVigilanceCacheTTLDescription = How long API data is cached before a new call (default 3600).
+MeteoVigilanceSettings = Weather warning configuration
+MeteoVigilanceRefreshNow = Refresh now
+MeteoVigilanceRefreshed = Data refreshed: %s warning for department %s
+
+# Ticket conversation system
+Conversation = Conversation
+PublicMessage = Public message
+ConvTo = To
+ConvCc = Cc
+PrivateMessage = Private message
+OriginalMessage = Original message
+SentByMail = Sent by email
+NoMessageYet = No message yet
+BeFirstToReply = Be the first to reply
+JustNow = just now
+Quote = Quote
+
+SaveNote = Save note
+
+AddRecipient = Add recipient
+NoRecipientFound = No recipient found
+
+AddFile = Add file
+NAttachedFiles = %s attached file(s)
+
+MentionAgents = Mention agents
+YouWereMentionedOnTicket = You were mentioned on ticket %s
+YouWereMentionedOnTicketBody = %s mentioned you on ticket %s:
+ConfirmDeleteMessage = Delete this message?
+
+Mentioned = Mentioned
+
+# Mobile prevention plan quick creation
+MobileQuickCreation = Mobile quick creation
+MobilePPInteriorCompany = User company (interior)
+MobilePPResponsibleAutoSign = Responsible (signs automatically)
+MobilePPSignatureSaved = Saved signature
+MobilePPEditSignature = Edit signature
+MobilePPDrawSignatureHint = Draw your signature below then save it. It will be reused for your next plans.
+MobilePPClearSignature = Clear
+MobilePPSaveSignature = Save my signature
+MobilePPExteriorCompany = Exterior company
+MobileSirenOrSiret = SIREN / SIRET
+MobileSirenOrSiretPlaceholder = 9 or 14 digits
+MobilePPResponsibleToSign = Responsible to sign
+MobilePPChooseExistingContact = Choose an existing contact
+MobilePPNewContact = New contact
+MobilePPEmailForSignatureHelp = This email will receive the signature request.
+MobilePPPeriod = Intervention period
+MobilePPMaxOneYearHint = One year maximum between start and end dates.
+MobilePPSubmit = Create prevention plan
+MobilePPErrorNoSignature = You must save your signature before creating the plan.
+MobilePPErrorEmptySignature = The signature is empty.
+MobilePPErrorInvalidSiren = Invalid SIREN or SIRET (9 or 14 digits expected).
+MobilePPErrorEndBeforeStart = The end date must be after the start date.
+MobilePPErrorMaxOneYear = The duration cannot exceed one year.
+MobilePPErrorDatesRequired = Please fill in the start date and the end date.
+MobilePPErrorStartRequired = The start date is missing.
+MobilePPErrorEndRequired = The end date is missing.
+MobilePPErrorNoProject = No default prevention plan project is configured.
+MobilePPCompanyFound = Company found:
+MobilePPCompanyNotFound = No company found in database: a new one will be created.
+MobilePPWarningEmailNotSent = The plan was created but the signature email could not be sent.
+MobilePPWarningEmailNotConfigured = The plan was created but email is not configured: signature request not sent.
+MobilePPCreated = Prevention plan %s created.
+MobilePPUpdated = Prevention plan %s updated.
+MobilePPSignatureEmailSubject = Signature request for prevention plan %s
+MobilePPSignatureEmailContent = Hello,<br><br>You are invited to sign the prevention plan for %s.<br><br><a href="%s">Click here to sign</a><br><br>Best regards.
+MobilePPSuccessTitle = Prevention plan created
+MobilePPSuccessText = The interior responsible signed automatically. A signature request has been sent to the exterior company.
+MobilePPViewPlan = View plan
+MobilePPCreateAnother = Create another plan
+MobileSuccessInteriorSigned = Interior responsible: signed
+MobileSuccessExteriorNotified = Exterior company: signature request sent
+MobileSuccessExteriorNotSigned = Exterior company: signature still to collect
+MobileSuccessExteriorNotNotified = Exterior company: signature request not sent
+MobileSuccessExteriorSigned = Exterior company: signed
+MobileSuccessDocumentGenerated = Plan document generated
+MobilePPWarningEmailNotSentDetail = The signature email could not be sent: %s
+MobilePPWarningNoRecipientEmail = no valid email address for the exterior responsible
+MobilePPSignatureEmailSentTo = Signature request sent to %s
+MobilePPExtSignatureTitle = Exterior company signature
+MobilePPExtEmailSentOn = Request sent to %s on %s
+MobilePPExtEmailNotSent = Signature request not sent: share the link or have them sign now
+MobilePPExtAlreadySigned = Signed on %s
+MobilePPExtSignNow = Sign now
+MobilePPExtResendEmail = Send the email again
+MobilePPNoTagAvailable = No prevention plan tag is available.
+MobilePPCreateTag = Create a tag
+MobileSpreadShareTitle = Share the spread
+MobileSpreadShareText = Have the people involved scan this code. With no account and no login, they fill in their details, upload their documents and sign.
+MobileSpreadOpen = Open the spread
+MobilePPRisks = Risks
+MobilePPAddRisk = Add a risk
+MobilePPRiskModalTitle = Choose a risk
+MobilePPRiskComment = Comment
+MobilePPRiskDescriptionPlaceholder = Describe the risk on site
+MobilePPNoRiskYet = No risk added yet.
+MobilePPDeleteRiskTitle = Delete the risk
+MobilePPDeleteRiskConfirm = "%s" will be removed from the plan, along with its description, its photos and its protections.
+MobilePPUserCompany = User company
+MobilePPUserCompanyShort = EU
+MobilePPConcernedCompanies = Concerns
+MobilePPExteriorCompanyShort = EE
+MobilePPPriorFormalities = Prior formalities
+MobilePPPriorVisitDone = Prior joint inspection done
+MobilePPPriorVisitTextPlaceholder = What was observed during the inspection
+MobileRiskCompanies = Companies concerned by the risks (mobile)
+CertificationDictionary = Certifications and qualifications
+MobilePPChooseExistingCompany = Choose an existing third party
+MobilePPOrFillManually = or fill in the details
+MobilePPProtections = Protections
+MobilePPAddProtection = Add a protection
+MobilePPProtectionModalTitle = Choose a protection
+MobilePPMandatory = Mandatory
+MobileProtections = Protections (mobile)
+MobilePPCertifications = Required certifications
+MobilePPAddCertification = Add a certification
+MobileCertifications = Certifications (mobile)
+MobilePPUploadCertPhoto = Upload a photo
+MobilePPErrorCreatingThirdparty = Error creating the third party.
+MobilePPErrorCreatingContact = Error creating the contact.
+MobilePPErrorUpdatingPlan = Error updating the prevention plan.
+MobilePPErrorCreatingPlan = Error creating the prevention plan.
+MobileSuccessViewDocument = View the document
+MobilePPDefaultsTitle = Default values (Mobile creation)
+MobilePPDefaultDateStartToday = Start date = today
+MobilePPDefaultDuration = Default period duration (days)
+MobilePPEmailAutoSend = Automatically send signature email on creation
+
+# Mobile fire permit quick creation
+MobileFPPreventionPlanHelp = The exterior company and the period of the selected plan are reused automatically.
+MobileFPPeriod = Location and work period
+MobileFPMaxOneMonthHint = One month maximum between the start and the end of the work.
+MobileFPErrorMaxOneMonth = The duration cannot exceed one month.
+MobileFPErrorNoProject = No default fire permit project is configured.
+MobileFPWorkTypes = Types of work
+MobileFPAddWorkType = Add a type of work
+MobileFPWorkTypeModalTitle = Choose a type of work
+MobileFPSubmit = Create fire permit
+MobileFPCreated = Fire permit %s created.
+MobileFPUpdated = Fire permit %s updated.
+MobileFPSignatureEmailSubject = Signature request for fire permit %s
+MobileFPSignatureEmailContent = Hello,<br><br>You are invited to sign the fire permit for %s.<br><br><a href="%s">Click here to sign</a><br><br>Best regards.
+MobileFPSuccessTitle = Fire permit created
+MobileFPViewPermit = View permit
+MobileFPCreateAnother = Create another permit
+
+# Digirisk PWA
+PwaApplication = Application
+PwaNavHome = Home
+PwaNavPreventionPlans = Plans
+PwaNavFirePermits = Permits
+PwaNavMenu = Menu
+PwaNavFavoritesHint = Favorites shown at the bottom (max %s)
+PwaNavAddFavorite = Add to favorites
+PwaNavRemoveFavorite = Remove from favorites
+PwaHello = Hello %s
+PwaResultCount = %s result(s)
+AllStatus = All statuses
+
+# Libelles metier utilises par l'interface mobile, jusqu'ici traduits en francais seulement
+PreventionPlan = Prevention plan
+PreventionPlanLinked = Linked prevention plan
+ExtSocietyResponsible = Exterior company manager
+CSSCTIntervention = CSSCT intervention
+PriorVisitDate = Joint prior inspection date
+PriorVisitText = Inspection note
+UsedEquipment = Equipment used
+PwaTilePreventionPlanInProgress = Plans in progress
+PwaTilePreventionPlanToSign = Plans to sign
+PwaTileFirePermitInProgress = Permits in progress
+PwaTileFirePermitToSign = Permits to sign
+
+# Task mass actions
+MassValidateTasks = Validate tasks
+MassChangeTasksProject = Change project
+ConfirmMassValidateTasksQuestion = Are you sure you want to validate the %s selected task(s)? Only draft tasks will be validated.
+ConfirmMassChangeTasksProjectQuestion = Are you sure you want to attach the %s selected task(s) to the chosen project?
+MassValidateTasksSuccess = %s task(s) validated out of %s selected
+MassChangeTasksProjectSuccess = %s task(s) attached to project %s
+
+# Missing Saturne module
+SaturneModuleMissing = The Saturne module is required by Digirisk. Download it for free on the Dolistore (https://dolistore.com/en/modules/1906-Saturne.html) and install it before enabling Digirisk.
+
+# Ticket - modification traceability - issue #4885
+TicketLogModifications = Modification traceability
+TicketLogModificationsDesc = Create an event for every edit made from the ticket card (subject, message, registers, assignee, third party, project, progress, status, tasks, documents)
+TicketMessageEdited = Message edited
+TicketMessageDeleted = Message deleted
+TicketTaskCreated = Task created: %s
+TicketDocumentGenerated = Document generated
+TicketFileDeleted = File deleted
+
+# Plan de prevention PDF
+PreventionPlanLegalNotice = The prevention plan is a mandatory document preventing the risks caused by several companies working on the same site, as per article R4512-7 of the French labour code.
+PreventionPlanUserCompany = User company - EU
+PreventionPlanExteriorCompany = Exterior company - EE
+PreventionPlanUserCompanyResponsible = User company responsible (EU)
+PreventionPlanExteriorCompanyResponsible = Exterior company responsible (EE)
+EmergencyNumbers = Emergency numbers
+Firefighters = Firefighters
+AnyEmergency = Any emergency
+FirstAid = First aid
+PriorVisitIntro = The user company carried out a prior joint inspection on %s. During this visit the following points were presented by the user company:
+PriorVisitCheckList = Work places|Installations found there|Equipment made available to the exterior companies|Delimit the intervention area of the exterior companies|Mark the zones that may be dangerous for workers|Indicate the traffic lanes for workers, vehicles and machines of the exterior companies|Define the access ways to the premises used by the exterior companies
+PriorVisitComments = The following comments were recorded:
+InterventionPeriodSentence = This plan starts on %s and ends on %s. Interventions will take place at the following times:
+RiskAnalysis = Analysis of actions, risks and prevention means
+RiskAnalysisIntro = You planned %s intervention(s) for this prevention plan: below are the planned actions, the risks involved and the prevention means.
+PreventionPlanAttendants = Attendants: exterior company (EE) and subcontractors
+Morning = Morning
+Afternoon = Afternoon
+Signatures = Signatures
+SignaturePending = Pending
+PreventionPlanRiskPhotos = Risk photos
+InterventionPeriodOnly = This plan starts on %s and ends on %s.
+
+DigiRisk=DigiRisk
+DigiriskIdentification=IDENTIFICATION & CHARACTERISTICS
+DigiriskSecurity=SECURITY
+DigiriskUserManual=SIMPLIFIED USER MANUAL
+DigiriskQualification=QUALIFICATION & ENABLEMENT
+DigiriskHygiene=HYGIENE & CLEANING
+DigiriskMaintenance=MAINTENANCE & CHECKS
+ClickToAddContent=Click to add content...
+
+AddProductRisk=Add product risk
+NewProductRisk=New product risk
+DangerCategory=Risk category
+SelectDangerCategory=Select a risk category
+DescribeRiskOnProduct=Describe the risk on this product...
+ConfirmDeleteProductRisk=Delete this risk?
+AddProtection=Add a protection
+
+SelectProtection=Select a protection (PPE)
+TechnicalSheet=Technical Sheet
+DigiriskRisks=RISKS & PROTECTIONS
+MobileSuccessInteriorSignedOn=Interior responsible (EU) : Signed on %s
+
+MobilePPErrorInvalidEmail = Please respect the email format.
+MobilePPErrorInvalidPhone = Please respect the phone format.
+MobileSuccessExteriorPendingSignature = Exterior Company Responsible (EE) : Pending signature
+
+# ===========================================================================
+# Action plan filters — issue #4907 (GP/UT, risk level, tags)
+# ===========================================================================
+ActionPlanElement                    = GP/WU
+ActionPlanFilterElementChildren      = With the sub elements
+ActionPlanFilterElementChildrenHelp  = Include the corrective actions of the GP/WU below the selected one
+ActionPlanFilterScale                = Risk level
+ActionPlanFilterAllScales            = All levels
+ActionPlanFilterTags                 = Tags
+ActionPlanFilterCount                = %s corrective action(s) displayed out of %s
+ActionPlanDictionaries               = Kanban lists
+ActionPlanDictionariesDesc           = Manage the values offered in the action plan and Kanban lists
+ActionPlanTagDictionary              = Corrective action tags
+ActionPlanTagDictionaryDesc          = Tags (task categories) offered on the cards and in the action plan Kanban filter
+ActionPlanTicketDictionaries         = Ticket Kanban dictionaries
+ActionPlanTicketDictionariesDesc     = Types, groups and severities making up the ticket Kanban columns
+ActionPlanManageDictionary           = Manage
+
+# ===========================================================================
+# Action plan Kanban columns dictionary — issue #5017
+# ===========================================================================
+ActionPlanColumnDictionary           = Action plan Kanban columns
+ActionPlanColumnDictionaryDesc       = Columns displayed on the PAPRIPACT Kanban when the dictionary mode is on: label, progress range, colour and icon
+KanbanColumnSource                   = Column source
+KanbanColumnSourceDesc               = Split the Kanban with the percentage thresholds below (historical behaviour) or with the column dictionary
+KanbanColumnSourceThresholds         = Percentage thresholds (default)
+KanbanColumnSourceDictionary         = Column dictionary
+ActionPlanColumnProgressHelp         = Progress bounds covered by the column, from 0 to 100
+ActionPlanColumnColorHelp            = Hexadecimal colour of the column, for instance #3085d6
+ActionPlanColumnPictoHelp            = Font Awesome icon name, for instance fa-check
+Progress_min                         = Min. progress
+Progress_max                         = Max. progress
+Picto                                = Icon
+
+# ===========================================================================
+# Action plan — Kanban, Gantt, project selector and logs — issue #4751
+# ===========================================================================
+ActionPlanView                       = Action plan
+ActionPlanKanban                     = Kanban
+ActionPlanDisplayedProject           = Displayed project
+ActionPlanChangeProject              = Change project
+ActionPlanDefaultProject             = Risk assessment document (default)
+ActionPlanNoProjectConfigured        = No project configured
+ActionPlanTabCurrentYear             = PAPRIPACT %s
+ActionPlanTabHistory                 = Previous years PAPRIPACT
+ActionPlanHistoryYear                = PAPRIPACT year
+ActionPlanNoHistory                  = No corrective action on the previous years
+ActionPlanYearRule                   = A corrective action belongs to the calendar year of its due date, else of its start date, else of its creation date
+ActionPlanYearDisplay                = Yearly PAPRIPACT
+ActionPlanCarryOverLate              = Carry over the late corrective actions
+ActionPlanCarryOverLateDesc          = Also display the unfinished corrective actions of the previous years on the running year PAPRIPACT; they stay counted on the PAPRIPACT of their due year
+ActionPlanCarriedOverFrom            = Late %s
+ActionPlanCarriedOverHelp            = Unfinished corrective action, carried over from a previous year
+ActionPlanGlobalProgress             = Overall PAPRIPACT progress
+ActionPlanGlobalProgressInfo         = Average progress of %s corrective action(s)
+ActionPlanExportA3                   = Download the PAPRIPACT as an A3 landscape PDF
+ActionPlanExportCsv                  = Download the PAPRIPACT as a CSV file
+ActionPlanExportGantt                = Download the Gantt chart as a PNG image
+ColumnDraft                          = Draft
+ColumnInProgress                     = In progress
+ColumnInControl                      = To be checked
+ColumnDone                           = Done
+ColumnWidth                          = Width
+ColumnGap                            = Spacing
+KanbanLoadMore                       = Show more (%s)
+LinkedRisk                           = Linked risk
+Responsible                          = Responsible
+PreventionOfficers                   = Prevention officers
+PreventionOfficer                    = Prevention officer
+Unassigned                           = Unassigned
+AddCategory                          = Add a category
+ExternalContacts                     = External contacts
+RemoveContact                        = Remove the contact
+ActionPlanLogLabel                   = Label change
+ActionPlanLogWorkload                = Workload change
+ActionPlanLogBudget                  = Budget change
+ActionPlanLogProgress                = Progress change
+ActionPlanLogTag                     = Tag change
+ActionPlanLogContributorAdd          = Contributor added
+ActionPlanLogContributorRemove       = Contributor removed
+ActionPlanTaskLabelChanged           = Label changed: "%s" → "%s"
+ActionPlanTaskWorkloadChanged        = Workload changed: %s → %s
+ActionPlanTaskBudgetChanged          = Budget changed: %s → %s
+ActionPlanTaskProgressChanged        = Progress changed: %s%% → %s%%
+ActionPlanTaskTagAdded               = Tag added: %s
+ActionPlanTaskTagRemoved             = Tag removed: ID %s
+ActionPlanTaskContributorAdded       = Contributor added: %s
+ActionPlanTaskContributorRemoved     = Contributor removed: ID %s
+
+# Ticket categories printed in documents - issue #3677
+TicketDocumentsConfig                = Ticket documents
+TicketCategoriesInDocuments          = Categories displayed in documents
+TicketCategoriesInDocumentsSetting   = This option restricts the ticket categories displayed in the ticket list of documents (Single Document, groupment sheet, etc.). When no category is selected, all of them are displayed
+TicketCategoriesInDocumentsSet       = Categories displayed in documents have been set
+
+# Time spent report
+GenerateTimeSpentReport = Generate time spent report (PDF)
+TimeSpentReport = Time spent report
+TimeSpentReportUsersHelp = Leave empty to include every user who booked time on this project.
+TimeSpentReportSummary = Summary by user
+TimeSpentReportGrandTotal = Grand total
+TimeSpentReportGeneratedAt = Generated on
+TimeSpentReportWholePeriod = Since the beginning of the project
+TimeSpentReportNoData = No time spent matches the selected users and period.
+TimeSpentDocumentPDFDescription = Time spent on a project, grouped by user
+
+# Risk list dashboard - issue #4388
+RisksNotAssessed                     = Risks not assessed
+
+# Mobile fire permit parity with the prevention plan - issue #5042
+MobileProgress = Progress
+MobileStepDone = DONE
+MobileStepInProgress = IN PROGRESS
+MobileStepTodo = TO DO
+MobileStepSignedOn = SIGNED ON
+MobilePPStepCreated = PP created
+MobileFPStepCreated = FP created
+MobileStepUserCompanyResponsible = User comp.
+MobileStepExteriorCompanyResponsible = Ext. comp.
+MobileStepLock = Lock
+MobileStepArchive = Archive
+MobileLock = Lock
+MobileResponsibleShort = Resp.
+MobileMailSentTo = Email sent to
+MobilePPMotif = Reason for the intervention
+MobilePPSchedules = Intervention schedules
+MobilePPConfigHours = Set your opening hours here
+MobilePPCopyCompanyHours = Copy the company opening hours
+FirePermitUserCompany = User company - UC
+FirePermitExteriorCompany = Exterior company - EC
+MobileFPMotif = Reason for the work
+MobileFPMotifPlaceholder = E.g. welding on framework
+MobileFPNoMotif = No reason given
+MobileFPSchedules = Work schedules
+MobileFPWorkTypeDescriptionPlaceholder = Describe the work on site
+MobileFPNoWorkTypeYet = No type of work added yet.
+MobileFPDeleteWorkTypeTitle = Remove the type of work
+MobileFPDeleteWorkTypeConfirm = "%s" will be removed from the permit, along with its description, its equipment, its photos and its protections.
+MobileFPNoTagAvailable = No fire permit tag is available.
+MobileFPErrorUpdatingPermit = Error while updating the fire permit.
+MobileFPErrorCreatingPermit = Error while creating the fire permit.
+MobileFPLockNeedsSignature = The permit must be signed before it can be locked.
+MobileFPSpreadAvailableOnceSignedAndLocked = Sharing will be available as soon as the permit is signed by the responsibles and locked.
+MobileFPDefaultDateStartToday = Start date = today
+MobileFPDefaultDuration = Default period duration (days)
+firepermit = Fire permit
+ErrorRecordIsLocked = This record is locked, it can no longer be edited.
+ExtSociety = Exterior company
+FirePermit = Fire permit
+SelectUser = Select a user
+MobilePPErrorMailServerNotConfigured = Your mail server is not configured, please contact your administrator.
+MobilePPExtSendEmail = Send the email
+MobilePPEmailTemplateExt = Email template for the exterior company responsible
+MobilePPEmailTemplateInt = Email template for the exterior company attendants
+
+# Shared risks/signages import modal - issue #4615
+SelectAllSharedRisksOfElement              = Select all the risks of this element
+SelectAllSharedRiskenvironmentalsOfElement = Select all the environmental risks of this element
+SelectAllSharedRiskSignsOfElement          = Select all the signages of this element
+
+# Risk assessment document archive errors - issue #3702
+GroupmentDocument                          = Groupment sheet
+WorkUnitDocument                           = Work unit sheet
+ErrorFailToFetchDigiriskElements           = Error: unable to fetch the groupments and work units to include in the ZIP archive
+ErrorNoDocumentModelFound                  = Error: no document model available for <b>%s</b>
+ErrorFailToGenerateDigiriskElementDocument = Error: generation of the <b>%s</b> document failed, it is missing from the ZIP archive
+
+#
+# ListingRisksDocument PDF - Risk listing as a PDF
+#
+
+ListingRisksDocumentPDF            = Risk listing PDF
+ListingRisksDocumentPDFDescription = Risk listing as a native PDF, opening on the mini single risk assessment document of the element
+ListingRisksDocumentPDFTitle       = Single risk assessment document
+ListingRisksEstablishment          = Establishment
+ListingRisksCoverContent           = Content
+ListingRisksCoverHierarchy         = Hierarchy
+ListingRisksCoverDuerpFollowUp     = Risk assessment follow-up
+ListingRisksCoverEmergencyNumbers  = Emergency numbers
+ListingRisksCoverReportIncident    = Report an accident or an issue
+ListingRisksCoverRegisters         = Occupational health and safety registers
+ListingRisksCoverIllustration      = Illustration picture
+NoPreventionOfficerAssigned        = No prevention officer assigned
+NoEmergencyNumberConfigured        = No emergency number configured
+NoResponsibleAssigned              = No responsible assigned
+ListingRisksLegalTitle             = Legal framework
+RiskDefinitionTitle                = Definition of a risk
+RiskDefinitionText                 = Risk: exposure of a person to a danger. Taking a risk means exposing oneself to a danger and assuming the consequences.
+DangerDefinitionTitle              = Definition of a danger
+DangerDefinitionText               = Danger: anything that threatens the safety or the life of a person, or that may compromise a situation or an activity.
+SingleDocumentTitle                = The single risk assessment document
+SingleDocumentText                 = The single risk assessment document is ruled by articles R4121-1 to R4121-4 of the French labour code. The general prevention principles set the order in which risks must be dealt with.
+PreventionPrinciplesTitle          = General prevention principles - Article L4121-2
+PreventionPrinciplesIntro          = The employer implements the measures of article L. 4121-1 on the basis of the following general prevention principles:
+PreventionPrinciple1               = Avoid risks.
+PreventionPrinciple2               = Assess the risks that cannot be avoided.
+PreventionPrinciple3               = Fight risks at their source.
+PreventionPrinciple4               = Adapt the work to the individual, especially regarding workstation design, the choice of work equipment and of working and production methods, so as to limit monotonous and machine-paced work and reduce its effects on health.
+PreventionPrinciple5               = Take account of the state of the art.
+PreventionPrinciple6               = Replace what is dangerous by what is not, or by what is less dangerous.
+PreventionPrinciple7               = Plan prevention as a coherent whole covering technology, work organisation, working conditions, social relationships and the influence of ambient factors, including risks related to moral and sexual harassment and to sexist behaviour.
+PreventionPrinciple8               = Give collective protective measures priority over individual ones.
+PreventionPrinciple9               = Give workers appropriate instructions.
+ListingRisksCotationMethodTitle    = Rating calculation method
+ListingRisksCotationMethodText     = The rating of a risk is a mark from 0 to 100 given during its assessment. The risk level shown in the listing derives directly from it, according to the grid below.
+ListingRisksCotationLevel          = Level
+ListingRisksCotationRange          = Rating
+ListingRisksCotationMeaning        = Meaning
+ListingRisksCotationAction         = What to do
+ListingRisksCotationAction1        = Keep the existing prevention measures in place.
+ListingRisksCotationAction2        = Add an action to the annual prevention programme.
+ListingRisksCotationAction3        = Start a prevention action in the short term.
+ListingRisksCotationAction4        = Act immediately, the exposure must stop.
+ListingRisksListTitle              = Risk list
+ListingRisksActionPlan             = Actions of the annual prevention programme
+ListingRisksCotationColumn         = Rating
+ListingRisksRiskColumn             = Risk
+ListingRisksAssessmentColumn       = Assessment details
+NoRiskAssessed                     = No risk assessed on this perimeter
+GreyRisk                           = Low risk
+OrangeRisk                         = Risk to be planned
+RedRisk                            = Risk to be handled
+BlackRisk                          = Unacceptable risk
+
+# Audit report - issue #4459
+NoRiskAtThisLevel = No risk at this level (%s)
+Groupment                = Groupment
+WorkUnit                 = Work unit
+DigiriskElementAdded     = Added
+DigiriskElementModified  = Modified
+DigiriskElementDeleted   = Deleted
+NoDigiriskElementChange  = No groupment nor work unit changed over the period
+RiskTrendNew             = ⊕ New
+RiskTrendUp              = ↗ Up (%s → %s)
+RiskTrendDown            = ↘ Down (%s → %s)
+RiskTrendStable          = Stable (%s)
+
+# Menu visibility
+RiskAssessmentDocument                          = Risk assessment document
+Environment                                     = Environment
+Accident                                        = Accident
+AccidentInvestigation                           = Accident investigation
+MenuVisibility                                  = Menu entries visibility
+RiskAssessmentDocumentMenuVisibilityDescription = When the option is disabled, the risk assessment document menu entries (occupational risks, PAPRIPACT and risk categories) are hidden.<br>The "Risk assessment document" configuration tab is hidden only if the environment is hidden too.
+EnvironmentMenuVisibilityDescription            = When the option is disabled, the environment menu entries (environmental risks and action plan) are hidden.<br>The "Risk assessment document" configuration tab is hidden only if the risk assessment document is hidden too.
+PreventionPlanMenuVisibilityDescription         = When the option is disabled, the prevention plan menu entries (and its categories) and its configuration tab are hidden.
+FirePermitMenuVisibilityDescription             = When the option is disabled, the fire permit menu entries (and its categories) and its configuration tab are hidden.
+AccidentMenuVisibilityDescription               = When the option is disabled, the accident menu entries (list and categories) are hidden.<br>The "Accident" configuration tab is hidden only if the accident investigations are hidden too.
+AccidentInvestigationMenuVisibilityDescription  = When the option is disabled, the accident investigation menu entry is hidden.<br>The "Accident" configuration tab is hidden only if the accidents are hidden too.
+ToolsMenuVisibilityDescription                  = When the option is disabled, the tools menu entry is hidden.
+
+# ===========================================================================
+# Setup page module advices — issue #5102
+# ===========================================================================
+UserApiWithoutApiModule = The USERAPI user and its API key exist but the REST API module is disabled: Digirisk routes will not answer and the mobile application will not be able to connect until it is enabled
+ExportImportModulesAdvice = Digirisk provides import (work units, risks, risk assessments) and export (tickets, categories) templates: enable the Imports and Exports modules to use them
+ConfigMyModules = Modules setup
+DigiriskData = Digirisk configurable data
+TutoImage = Image
+HowToSetupOtherModules = For more features in Digirisk, you can enable many modules (vendors, invoices, etc.) at this link:
+AvoidLogoProblems = To avoid any issue with logos in generated documents, please refer to these setup tips:
+LogoHelpLink = https://wiki.dolibarr.org/index.php?title=Premiers_paramétrages
+HowToSetupIHM = For more options on the Dolibarr display (background image setup, etc.), go to this link:
+ConfigIHM = Display setup
+HowToSharedElement = For more information about the shared elements setup, go to this link:
+HowToSharedElementLink = https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Configuration
+ConfigSharedElement = Shared elements setup (risks/risk signs)
+DigiriskManagement = Redirection after login
+DigiriskDescription = Redirect to the Digirisk welcome page by default instead of the Dolibarr one.
+UseCaptcha = Graphical code (CAPTCHA)
+UseCaptchaDescription = Use the graphical code (CAPTCHA) on the public interface pages
+AdvancedImport = Advanced import
+AdvancedImportDescription = Allows importing each element independently (tree structure, risks and risk signs)
+ManuelInputNBEmployees = Enter the number of employees manually
+ManuelInputNBEmployeesDescription = When enabled, you can enter the number of employees manually in the company setup.<br>Otherwise the number of employees is computed.<br>See the documentation for more information.
+ManuelInputNBWorkedHours = Enter the number of worked hours manually
+ManuelInputNBWorkedHoursDescription = When enabled, you can enter the number of worked hours manually in the company setup.<br>Otherwise the number of worked hours is computed.<br>See the documentation for more information.
+ShowPatchNoteAgain = Show the release note
+ShowPatchNoteAgainDescription = When enabled, the release note of the current version appears again on the Digirisk home page.<br>(Requires the "Show release notes from GitHub" option to be enabled to be visible.)
+RiskCotation = Rating
+PreventionActions = Prevention actions
+AddingInProgress = Adding in progress...
+
+# RiskCard
+RiskCard = Risk card
+SubCategory = Sub-category
+Evaluation = Rating
+Gravity = Severity
+Occurrence = Occurrence
+Exposition = Exposure
+Formation = Training
+Protection = Protection
+NoRiskAssessmentYet = No assessment for this risk yet
+NoTaskYet = No task for this risk yet
+NoDescription = No description
+
+# ===========================================================================
+# Archiving of risks and work units / groupments
+# ===========================================================================
+Archives = Archives
+Archive = Archive
+Unarchive = Unarchive
+ArchiveObject = Archive %s
+UnarchiveObject = Unarchive %s
+ConfirmArchiveDigiriskElement = Archiving is not deleting: the element leaves the organization tree but stays available in the Archives tab of its parent, with its risks and its documents. Sub elements are archived along with it. Do you want to continue?
+ConfirmUnarchiveDigiriskElement = The element and everything archived along with it will be restored to the organization tree. Do you want to continue?
+ArchiveNoticeDescription = Archiving is not deleting: archived items leave the active lists and the organization tree, but keep their risks and their documents and can be restored at any time.
+ArchivedRisks = Archived risks
+ArchivedElements = Archived work units and groupments
+ArchivedContent = Archived content
+ArchiveDate = Archiving date
+NoArchivedElement = No archived work unit or groupment for this element
+NbOfSubElements = Sub elements
+NbOfArchivedRisks = Archived risks
+RisksArchived = %s risk(s) archived
+RisksUnarchived = %s risk(s) unarchived
+ElementArchived = %s has been archived
+ElementUnarchived = %s has been unarchived
+ArchivedElementIsReadOnly = This element is archived: unarchive it to make changes

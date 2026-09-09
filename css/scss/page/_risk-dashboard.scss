@@ -1,0 +1,103 @@
+/** Risk list dashboard: number of risks by level of the cotation scale, shown above the risk list.
+    Each tile filters the list on its own level (see digiriskdolibarr_riskdashboard_view.tpl.php) */
+.risk-dashboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+
+  &__tile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px 6px 6px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fff;
+    color: $color__text-main;
+    text-decoration: none;
+    transition: all 0.2s ease-out;
+
+    &:hover {
+      border-color: $color__primary;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    &.selected {
+      border-color: $color__primary;
+      box-shadow: 0 0 0 2px $color__primary;
+    }
+  }
+
+  &__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    height: 38px;
+    padding: 0 8px;
+    border-radius: 6px;
+    background: $color__grey;
+    color: rgba(0, 0, 0, 0.8);
+    font-size: 18px;
+    font-weight: 700;
+
+    &[data-scale="total"] {
+      background: $color__primary;
+      color: $color__primary-text;
+    }
+
+    &[data-scale="1"] {
+      background: $color__grey;
+    }
+
+    &[data-scale="2"] {
+      background: $color__yellow;
+      color: #fff;
+    }
+
+    &[data-scale="3"] {
+      background: $color__red;
+      color: #fff;
+    }
+
+    &[data-scale="4"] {
+      background: $color__dark;
+      color: #fff;
+    }
+
+    &[data-scale="notassessed"] {
+      background: #fff;
+      border: 1px dashed #b0b0b0;
+    }
+  }
+
+  &__label {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /** The environmental risks have their own color, as everywhere else in the module */
+  &--riskenvironmental &__count[data-scale="total"] {
+    background: $color__riskenvironmental;
+  }
+
+  @media screen and (max-width: $media__small) {
+    gap: 6px;
+
+    &__tile {
+      flex: 1 1 auto;
+      padding: 4px 8px 4px 4px;
+    }
+
+    &__count {
+      min-width: 34px;
+      height: 30px;
+      font-size: 15px;
+    }
+
+    &__label {
+      font-size: 11px;
+    }
+  }
+}

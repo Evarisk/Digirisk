@@ -384,7 +384,7 @@ if ( ! $result) {
 
 $num = $db->num_rows($result);
 
-if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $sall) {
+if ($num == 1 && !headers_sent() && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $sall) {
 	$obj = $db->fetch_object($resql);
 	$id  = $obj->rowid;
 	header("Location: " . DOL_URL_ROOT . '/user/card.php?id=' . $id);
@@ -806,7 +806,7 @@ if ($permissiontoadd) {
 						<div class="wpeo-table table-flex table-risk">
 							<div class="table-row user-row edit">
 								<input type="hidden" name="action" value="add" />
-								<input type="hidden" class="input-domain-mail" name="societyname" value="<?php echo preg_replace('/ /', '', $conf->global->MAIN_INFO_SOCIETE_NOM) . '.fr' ?>" />
+								<input type="hidden" class="input-domain-mail" name="societyname" value="<?php echo preg_replace('/ /', '', getDolGlobalString('MAIN_INFO_SOCIETE_NOM')) . '.fr' ?>" />
 								<div class="table-cell table-150">
 									<input type="text" id="lastname" placeholder="<?php echo $langs->trans('LastName'); ?>" name="lastname" value="<?php echo dol_escape_htmltag(GETPOST('lastname')); ?>" />
 								</div>

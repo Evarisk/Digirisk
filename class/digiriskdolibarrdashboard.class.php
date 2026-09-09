@@ -59,7 +59,8 @@ class DigiriskDolibarrDashboard
             ['type' => 'DigiriskElement',        'classPath' => '/digiriskelement.class.php'],
             ['type' => 'SaturneTask',            'classPath' => '/../../saturne/class/task/saturnetask.class.php'],
             ['type' => 'TicketDashboard',        'classPath' => '/ticketdashboard.class.php'],
-            ['type' => 'TicketStatsDashboard',   'classPath' => '/ticketstatsdashboard.class.php']
+            ['type' => 'TicketStatsDashboard',   'classPath' => '/ticketstatsdashboard.class.php'],
+            ['type' => 'MeteoVigilance',         'classPath' => '/meteovigilance.class.php']
         ];
         foreach ($dashboardDatas as $dashboardData) {
             require_once __DIR__ . $dashboardData['classPath'];
@@ -114,6 +115,19 @@ class DigiriskDolibarrDashboard
         }
 
         return $data;
+    }
+
+    /**
+     * Get the ticket list URL a graph bar links to
+     *
+     * The Digirisk left menu is kept selected so the list opens in the same navigation context as the dashboard.
+     *
+     * @param  string $searchFilter Search criteria of the native ticket list, already url encoded
+     * @return string               Ticket list URL
+     */
+    protected function getTicketListUrl(string $searchFilter): string
+    {
+        return DOL_URL_ROOT . '/ticket/list.php?mainmenu=ticket&leftmenu=digiriskticketlist&' . $searchFilter;
     }
 
     //@todo a bouger dans Saturne

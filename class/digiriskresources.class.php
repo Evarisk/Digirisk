@@ -281,6 +281,67 @@ class DigiriskResources extends SaturneObject
 		}
 	}
 
+    /**
+     * Fetch the single resource linked to an object, as an object.
+     *
+     * fetchResourcesFromObject() rend l'objet resolu pour une seule ligne, un tableau a deux
+     * niveaux pour plusieurs, l'entier 0 quand il n'y en a aucune et -1 sur erreur : tout
+     * appelant qui dereference son retour part en erreur fatale des que la ressource n'est pas
+     * renseignee. Cette methode rend toujours un objet ou null.
+     *
+     * @param  string       $ref    Resource reference (ExtSociety, LabourInspector, ...)
+     * @param  CommonObject $object Linked object
+     * @return object|null          Resolved resource, null when there is none
+     */
+    public function fetchSingleResourceFromObject(string $ref, $object)
+    {
+        $resource = $this->fetchResourcesFromObject($ref, $object);
+
+        if (is_array($resource)) {
+            // Le tableau est indexe par reference puis par identifiant de ressource
+            $resourcesForRef = $resource[$ref] ?? reset($resource);
+            $resource        = is_array($resourcesForRef) ? reset($resourcesForRef) : $resourcesForRef;
+        }
+
+        return is_object($resource) ? $resource : null;
+    }
+
+    /**
+     * Fetch the identifiers linked to an object for one resource reference.
+     *
+     * fetchResourcesFromObject() renvoie tantot un objet, tantot un tableau, tantot un entier
+     * selon le nombre de lignes : cette methode rend toujours une liste d'identifiants.
+     *
+     * @param  string $ref        Resource reference (PreventionOfficer, ...)
+     * @param  string $objectType Linked object type (digiriskelement, ...)
+     * @param  int    $objectId   Linked object ID
+     * @return int[]              Element IDs, empty if none
+     */
+    public function fetchResourcesIdsFromObject(string $ref, string $objectType, int $objectId): array
+    {
+        $sql  = 'SELECT element_id FROM ' . MAIN_DB_PREFIX . $this->table_element;
+        $sql .= " WHERE ref = '" . $this->db->escape($ref) . "'";
+        $sql .= " AND object_type = '" . $this->db->escape($objectType) . "'";
+        $sql .= ' AND object_id = ' . $objectId;
+        $sql .= ' AND status = 1';
+        $sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $this->error    = $this->db->lasterror();
+            $this->errors[] = $this->error;
+            return [];
+        }
+
+        $ids = [];
+        while ($obj = $this->db->fetch_object($resql)) {
+            $ids[] = (int) $obj->element_id;
+        }
+        $this->db->free($resql);
+
+        return $ids;
+    }
+
 	/**
 	 * Fetch all resources in database
 	 *

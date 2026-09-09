@@ -25,6 +25,9 @@
 require_once __DIR__ . '/../digiriskdocuments.class.php';
 require_once __DIR__ . '/../digiriskresources.class.php';
 
+// Load Saturne libraries
+require_once __DIR__ . '/../../../saturne/lib/dolibarr.lib.php';
+
 /**
  * Class for PreventionPlanDocument
  */
@@ -118,7 +121,7 @@ class PreventionPlanDocument extends DigiriskDocuments
 			$json['PreventionPlan']['police_number'] = $societe->phone;
 		}
 
-		if ($maitreoeuvre->id > 0) {
+		if (!empty($maitreoeuvre->id) && $maitreoeuvre->id > 0) {
 			$json['PreventionPlan']['maitre_oeuvre'] = array();
 			$json['PreventionPlan']['maitre_oeuvre']['user_id']        = $maitreoeuvre->id;
 			$json['PreventionPlan']['maitre_oeuvre']['phone']          = $maitreoeuvre->phone;
@@ -138,7 +141,7 @@ class PreventionPlanDocument extends DigiriskDocuments
         $json['PreventionPlan']['society_inside']['postal']  = $mysoc->zip;
         $json['PreventionPlan']['society_inside']['town']    = $mysoc->town;
 
-		if ($extsociety->id > 0) {
+		if (!empty($extsociety->id) && $extsociety->id > 0) {
 			$json['PreventionPlan']['society_outside'] = array();
 			$json['PreventionPlan']['society_outside']['id']      = $extsociety->id;
 			$json['PreventionPlan']['society_outside']['name']    = $extsociety->name;
@@ -148,7 +151,7 @@ class PreventionPlanDocument extends DigiriskDocuments
 			$json['PreventionPlan']['society_outside']['town']    = $extsociety->town;
 		}
 
-		if ($extsocietyresponsible->id > 0) {
+		if (!empty($extsocietyresponsible->id) && $extsocietyresponsible->id > 0) {
 			$json['PreventionPlan']['responsable_exterieur'] = array();
 			$json['PreventionPlan']['responsable_exterieur']['id']             = $extsocietyresponsible->id;
 			$json['PreventionPlan']['responsable_exterieur']['firstname']      = $extsocietyresponsible->firstname;
@@ -172,7 +175,7 @@ class PreventionPlanDocument extends DigiriskDocuments
 			}
 		}
 
-		if ($labourinspector->id > 0) {
+		if (!empty($labourinspector->id) && $labourinspector->id > 0) {
 			$json['PreventionPlan']['labour_inspector'] = array();
 			$json['PreventionPlan']['labour_inspector']['id']      = $extsociety->id;
 			$json['PreventionPlan']['labour_inspector']['name']    = $extsociety->name;
@@ -182,7 +185,7 @@ class PreventionPlanDocument extends DigiriskDocuments
 			$json['PreventionPlan']['labour_inspector']['town']    = $extsociety->town;
 		}
 
-		if ($labourinspectorcontact->id > 0) {
+		if (!empty($labourinspectorcontact->id) && $labourinspectorcontact->id > 0) {
 			$json['PreventionPlan']['labour_inspector_contact'] = array();
 			$json['PreventionPlan']['labour_inspector_contact']['id']        = $extsocietyresponsible->id;
 			$json['PreventionPlan']['labour_inspector_contact']['firstname'] = $extsocietyresponsible->firstname;
@@ -202,7 +205,7 @@ class PreventionPlanDocument extends DigiriskDocuments
 		$json['PreventionPlan']['date']['end']        = $preventionplan->date_end;
 		$json['PreventionPlan']['cssct_intervention'] = $preventionplan->cssct_intervention;
 		$json['PreventionPlan']['prior_visit_bool']   = $preventionplan->prior_visit_bool;
-		$json['PreventionPlan']['prior_visit_text']   = $preventionplan->prior_visit_text;
+		$json['PreventionPlan']['prior_visit_text']   = saturne_flatten_wysiwyg_blocks($preventionplan->prior_visit_text, true);
 		$json['PreventionPlan']['prior_visit_date']   = $preventionplan->prior_visit_date;
 
 		$morewhere = ' AND element_id = ' . $preventionplan->id;
@@ -219,20 +222,23 @@ class PreventionPlanDocument extends DigiriskDocuments
 		$opening_hours_saturday  = explode(' ', $saturneSchedules->saturday);
 		$opening_hours_sunday    = explode(' ', $saturneSchedules->sunday);
 
-		$json['PreventionPlan']['lundi_matin']    = $opening_hours_monday[0];
-		$json['PreventionPlan']['lundi_aprem']    = $opening_hours_monday[1];
-		$json['PreventionPlan']['mardi_matin']    = $opening_hours_tuesday[0];
-		$json['PreventionPlan']['mardi_aprem']    = $opening_hours_tuesday[1];
-		$json['PreventionPlan']['mercredi_matin'] = $opening_hours_wednesday[0];
-		$json['PreventionPlan']['mercredi_aprem'] = $opening_hours_wednesday[1];
-		$json['PreventionPlan']['jeudi_matin']    = $opening_hours_thursday[0];
-		$json['PreventionPlan']['jeudi_aprem']    = $opening_hours_thursday[1];
-		$json['PreventionPlan']['vendredi_matin'] = $opening_hours_friday[0];
-		$json['PreventionPlan']['vendredi_aprem'] = $opening_hours_friday[1];
-		$json['PreventionPlan']['samedi_matin']   = $opening_hours_saturday[0];
-		$json['PreventionPlan']['samedi_aprem']   = $opening_hours_saturday[1];
-		$json['PreventionPlan']['dimanche_matin'] = $opening_hours_sunday[0];
-		$json['PreventionPlan']['dimanche_aprem'] = $opening_hours_sunday[1];
+		// Un jour sans horaire de l'apres-midi n'a qu'une moitie a exploser : le document se genere
+		// maintenant a chaque enregistrement du plan, un avertissement PHP par jour incomplet
+		// finirait dans la page ou dans la reponse JSON de l'interface mobile
+		$json['PreventionPlan']['lundi_matin']    = $opening_hours_monday[0]    ?? '';
+		$json['PreventionPlan']['lundi_aprem']    = $opening_hours_monday[1]    ?? '';
+		$json['PreventionPlan']['mardi_matin']    = $opening_hours_tuesday[0]   ?? '';
+		$json['PreventionPlan']['mardi_aprem']    = $opening_hours_tuesday[1]   ?? '';
+		$json['PreventionPlan']['mercredi_matin'] = $opening_hours_wednesday[0] ?? '';
+		$json['PreventionPlan']['mercredi_aprem'] = $opening_hours_wednesday[1] ?? '';
+		$json['PreventionPlan']['jeudi_matin']    = $opening_hours_thursday[0]  ?? '';
+		$json['PreventionPlan']['jeudi_aprem']    = $opening_hours_thursday[1]  ?? '';
+		$json['PreventionPlan']['vendredi_matin'] = $opening_hours_friday[0]    ?? '';
+		$json['PreventionPlan']['vendredi_aprem'] = $opening_hours_friday[1]    ?? '';
+		$json['PreventionPlan']['samedi_matin']   = $opening_hours_saturday[0]  ?? '';
+		$json['PreventionPlan']['samedi_aprem']   = $opening_hours_saturday[1]  ?? '';
+		$json['PreventionPlan']['dimanche_matin'] = $opening_hours_sunday[0]    ?? '';
+		$json['PreventionPlan']['dimanche_aprem'] = $opening_hours_sunday[1]    ?? '';
 
 		if (!empty($preventionplanlines) && $preventionplanlines > 0) {
 			foreach ($preventionplanlines as $line) {

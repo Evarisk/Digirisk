@@ -89,7 +89,7 @@ window.digiriskdolibarr.accident.removeFile = function( event ) {
 		url: document.URL + '&action=removefile&filetodelete=' + filetodelete + '&objectlineid=' + objectlineid + '&token=' + token + subActionPost,
 		type: "POST",
 		processData: false,
-    contentType: 'application/json charset=utf-8',
+    contentType: 'application/json',
 		success: function ( resp ) {
 			$('#sendFileForm' + objectlineid).html($(resp).find('#fileLinkedTable' + objectlineid))
 		},

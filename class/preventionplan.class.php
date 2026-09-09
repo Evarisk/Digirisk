@@ -28,6 +28,7 @@ require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 // Load Saturne libraries.
 require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
 require_once __DIR__ . '/../../saturne/class/saturneschedules.class.php';
+require_once __DIR__ . '/../../saturne/lib/dolibarr.lib.php';
 
 /**
  * Class for PreventionPlan
@@ -58,7 +59,7 @@ class PreventionPlan extends SaturneObject
 	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
-	public string $picto = 'fontawesome_fa-info_fas_#d35968';
+	public string $picto = 'fontawesome_fa-clipboard-check_fas_#d35968';
 
 	/**
 	 * @var PreventionPlanLine[]     Array of subtable lines
@@ -86,9 +87,11 @@ class PreventionPlan extends SaturneObject
         'date_start'           => ['type' => 'date',         'label' => 'DateStart',         'enabled' => 1, 'position' => 70,  'notnull' => 0, 'visible' => 1],
         'date_end'             => ['type' => 'date',         'label' => 'DateEnd',           'enabled' => 1, 'position' => 80,  'notnull' => 0, 'visible' => 1],
         'prior_visit_bool'     => ['type' => 'boolean',      'label' => 'PriorVisit',        'enabled' => 1, 'position' => 90,  'notnull' => 0, 'visible' => 3],
-        'prior_visit_text'     => ['type' => 'text',         'label' => 'PriorVisitText',    'enabled' => 1, 'position' => 100, 'notnull' => 0, 'visible' => 3],
+        'prior_visit_text'     => ['type' => 'html',         'label' => 'PriorVisitText',    'enabled' => 1, 'position' => 100, 'notnull' => 0, 'visible' => 3],
         'prior_visit_date'     => ['type' => 'datetime',     'label' => 'PriorVisitDate',    'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => 3],
         'cssct_intervention'   => ['type' => 'boolean',      'label' => 'CSSCTIntervention', 'enabled' => 1, 'position' => 120, 'notnull' => 0, 'visible' => 3],
+        'note_public'          => ['type' => 'html',         'label' => 'NotePublic',        'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => 0],
+        'note_private'         => ['type' => 'html',         'label' => 'NotePrivate',       'enabled' => 1, 'position' => 135, 'notnull' => 0, 'visible' => 0],
         'fk_user_creat'        => ['type' => 'integer:User:user/class/user.class.php',           'label' => 'UserAuthor', 'picto' => 'user',    'enabled' => 1,                         'position' => 140, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
         'fk_user_modif'        => ['type' => 'integer:User:user/class/user.class.php',           'label' => 'UserModif',  'picto' => 'user',    'enabled' => 1,                         'position' => 150, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
         'fk_project'           => ['type' => 'integer:Project:projet/class/project.class.php:1', 'label' => 'Project',    'picto' => 'project', 'enabled' => '$conf->project->enabled', 'position' => 85,  'notnull' => 1, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'projet.rowid'],
@@ -181,9 +184,10 @@ class PreventionPlan extends SaturneObject
         unset($object->import_key);
 
         // Clear fields
+        // Date creation must be set before ref: numbering modules build the YYMM part of the ref from it
+        $object->date_creation = dol_now();
         $object->ref           = $refPreventionPlanMod->getNextValue($object);
         $object->label         = $options['clone_label'];
-        $object->date_creation = dol_now();
         $object->status        = self::STATUS_DRAFT;
 
         // Create clone
@@ -226,6 +230,8 @@ class PreventionPlan extends SaturneObject
             if (!empty($options['preventionplan_risk'])) {
                 if (is_array($preventionplandets) && !empty($preventionplandets)) {
                     foreach ($preventionplandets as $line) {
+                        // Date creation must be reset before ref: it is kept from the cloned line otherwise
+                        $line->date_creation     = dol_now();
                         $line->ref               = $refPreventionPlanDetMod->getNextValue($line);
                         $line->fk_preventionplan = $preventionPlanID;
                         $line->create($user, 1);
@@ -342,7 +348,7 @@ class PreventionPlan extends SaturneObject
 	{
 		global $form;
 
-		if (dol_strlen($filter['customsql'])) {
+		if (dol_strlen($filter['customsql'] ?? '')) {
 			$filter['customsql'] .= ' AND t.rowid != ' . ($this->id ?? 0);
 		}
 		$objectList = saturne_fetch_all_object_type('preventionplan', '', '', $limit, 0, $filter);
@@ -402,7 +408,7 @@ class PreventionPlan extends SaturneObject
         $ret .= $langs->transnoentities('CSSCTIntervention') . ' : ' . ($this->cssct_intervention ? $langs->transnoentities("Yes") : $langs->transnoentities("No")) . '<br>';
         $ret .= $langs->transnoentities('PriorVisit') . ' : ' . ($this->prior_visit_bool ? $langs->transnoentities("Yes") : $langs->transnoentities("No")) . '<br>';
         if ($this->prior_visit_bool) {
-            $ret .= $langs->transnoentities('PriorVisitText') . ' : ' . (!empty($this->prior_visit_text) ? $this->prior_visit_text : 'N/A') . '<br>';
+            $ret .= $langs->transnoentities('PriorVisitText') . ' : ' . (!empty($this->prior_visit_text) ? dol_nl2br(saturne_flatten_wysiwyg_blocks($this->prior_visit_text, true)) : 'N/A') . '<br>';
             $ret .= (dol_strlen($this->prior_visit_date) > 0 ? $langs->transnoentities('PriorVisitDate') . ' : ' . dol_print_date($this->prior_visit_date, 'dayhoursec') . '<br>' : '');
         }
 

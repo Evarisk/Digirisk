@@ -30,6 +30,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 require_once __DIR__ . '/../../../../../../saturne/class/saturneschedules.class.php';
+require_once __DIR__ . '/../../../../../../saturne/lib/dolibarr.lib.php';
 
 require_once __DIR__ . '/../../../../../class/evaluator.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
@@ -183,7 +184,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 				$k         = 3;
 				foreach ($extsocietyintervenants as $line) {
 					if ($line->status == 5) {
-						if (($moreParam['specimen'] == 0 && $object->status >= $object::STATUS_LOCKED)) {
+						if ($object->status >= $object::STATUS_LOCKED) {
 							$encoded_image = explode(",", $line->signature)[1];
 							$decoded_image = base64_decode($encoded_image);
 							file_put_contents($tempdir . "signature" . $k . ".png", $decoded_image);
@@ -198,8 +199,8 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 					}
 					$tmpArray['name']     = $line->firstname;
 					$tmpArray['lastname'] = $line->lastname;
-					$tmpArray['phone']    = $line->phone;
-					$tmpArray['mail']     = $line->email;
+					$tmpArray['phone']    = $line->phone ?? '';
+					$tmpArray['mail']     = $line->email ?? '';
 					$tmpArray['status']   = $line->getLibStatut(1);
 
 					$k++;
@@ -207,7 +208,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 					$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
 
 
-					if (($moreParam['specimen'] == 0 && $object->status >= $object::STATUS_LOCKED)) {
+					if ($object->status >= $object::STATUS_LOCKED) {
 						dol_delete_file($tempdir . "signature" . $k . ".png");
 					}
 				}
@@ -274,17 +275,17 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         $tmpArray['titre_prevention']             = $object->ref;
         $tmpArray['raison_du_plan_de_prevention'] = $object->label;
 
-        $tmpArray['pompier_number']   = $arrayData['pompier_number'];
-        $tmpArray['samu_number']      = $arrayData['samu_number'];
-        $tmpArray['emergency_number'] = $arrayData['emergency_number'];
-        $tmpArray['police_number']    = $arrayData['police_number'];
+        $tmpArray['pompier_number']   = $arrayData['pompier_number'] ?? '';
+        $tmpArray['samu_number']      = $arrayData['samu_number'] ?? '';
+        $tmpArray['emergency_number'] = $arrayData['emergency_number'] ?? '';
+        $tmpArray['police_number']    = $arrayData['police_number'] ?? '';
 
-        $tmpArray['moyen_generaux_mis_disposition'] = $arrayData['moyen_generaux_mis_disposition'];
-        $tmpArray['consigne_generale']              = $arrayData['consigne_generale'];
-        $tmpArray['premiers_secours']               = $arrayData['premiers_secours'];
+        $tmpArray['moyen_generaux_mis_disposition'] = $arrayData['moyen_generaux_mis_disposition'] ?? '';
+        $tmpArray['consigne_generale']              = $arrayData['consigne_generale'] ?? '';
+        $tmpArray['premiers_secours']               = $arrayData['premiers_secours'] ?? '';
 
         $tmpArray['prior_visit_date'] = dol_print_date($object->prior_visit_date, 'dayhour');
-        $tmpArray['prior_visit_text'] = $object->prior_visit_text;
+        $tmpArray['prior_visit_text'] = saturne_flatten_wysiwyg_blocks($object->prior_visit_text);
 
         $tmpArray['date_start_intervention_PPP'] = dol_print_date($object->date_start, 'dayhour');
         $tmpArray['date_end_intervention_PPP']   = dol_print_date($object->date_end, 'dayhour');
@@ -303,20 +304,20 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         $opening_hours_saturday  = explode(' ', $saturneSchedules->saturday);
         $opening_hours_sunday    = explode(' ', $saturneSchedules->sunday);
 
-        $tmpArray['lundi_matin']    = $opening_hours_monday[0];
-        $tmpArray['lundi_aprem']    = $opening_hours_monday[1];
-        $tmpArray['mardi_matin']    = $opening_hours_tuesday[0];
-        $tmpArray['mardi_aprem']    = $opening_hours_tuesday[1];
-        $tmpArray['mercredi_matin'] = $opening_hours_wednesday[0];
-        $tmpArray['mercredi_aprem'] = $opening_hours_wednesday[1];
-        $tmpArray['jeudi_matin']    = $opening_hours_thursday[0];
-        $tmpArray['jeudi_aprem']    = $opening_hours_thursday[1];
-        $tmpArray['vendredi_matin'] = $opening_hours_friday[0];
-        $tmpArray['vendredi_aprem'] = $opening_hours_friday[1];
-        $tmpArray['samedi_matin']   = $opening_hours_saturday[0];
-        $tmpArray['samedi_aprem']   = $opening_hours_saturday[1];
-        $tmpArray['dimanche_matin'] = $opening_hours_sunday[0];
-        $tmpArray['dimanche_aprem'] = $opening_hours_sunday[1];
+        $tmpArray['lundi_matin']    = $opening_hours_monday[0] ?? '';
+        $tmpArray['lundi_aprem']    = $opening_hours_monday[1] ?? '';
+        $tmpArray['mardi_matin']    = $opening_hours_tuesday[0] ?? '';
+        $tmpArray['mardi_aprem']    = $opening_hours_tuesday[1] ?? '';
+        $tmpArray['mercredi_matin'] = $opening_hours_wednesday[0] ?? '';
+        $tmpArray['mercredi_aprem'] = $opening_hours_wednesday[1] ?? '';
+        $tmpArray['jeudi_matin']    = $opening_hours_thursday[0] ?? '';
+        $tmpArray['jeudi_aprem']    = $opening_hours_thursday[1] ?? '';
+        $tmpArray['vendredi_matin'] = $opening_hours_friday[0] ?? '';
+        $tmpArray['vendredi_aprem'] = $opening_hours_friday[1] ?? '';
+        $tmpArray['samedi_matin']   = $opening_hours_saturday[0] ?? '';
+        $tmpArray['samedi_aprem']   = $opening_hours_saturday[1] ?? '';
+        $tmpArray['dimanche_matin'] = $opening_hours_sunday[0] ?? '';
+        $tmpArray['dimanche_aprem'] = $opening_hours_sunday[1] ?? '';
 
         if (is_array($object->lines) && !empty($object->lines)) {
             $tmpArray['interventions_info'] = count($object->lines) . ' ' . $langs->trans('PreventionPlanLine');
@@ -325,28 +326,28 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         }
 
         // Information internal society
-        $intSociety = $arrayData['society_inside'];
+        $intSociety = $arrayData['society_inside'] ?? null;
         if (!empty($intSociety) && $intSociety > 0) {
-            $tmpArray['society_title']    = $intSociety->name;
-            $tmpArray['society_siret_id'] = $intSociety->siret;
-            $tmpArray['society_address']  = $intSociety->address;
-            $tmpArray['society_postcode'] = $intSociety->postal;
-            $tmpArray['society_town']     = $intSociety->town;
-            $tmpArray['society_mail']     = $intSociety->email;
-            $tmpArray['society_phone']    = $intSociety->phone;
+            $tmpArray['society_title']    = $intSociety->name ?? '';
+            $tmpArray['society_siret_id'] = $intSociety->siret ?? '';
+            $tmpArray['society_address']  = $intSociety->address ?? '';
+            $tmpArray['society_postcode'] = $intSociety->postal ?? '';
+            $tmpArray['society_town']     = $intSociety->town ?? '';
+            $tmpArray['society_mail']     = $intSociety->email ?? '';
+            $tmpArray['society_phone']    = $intSociety->phone ?? '';
         }
 
         // Information external society
-        $extSociety = $arrayData['society_outside'];
+        $extSociety = $arrayData['society_outside'] ?? null;
         if (!empty($extSociety) && $extSociety > 0) {
-            $tmpArray['society_outside_title']    = $extSociety->name;
-            $tmpArray['society_outside_siret_id'] = $extSociety->siret;
-            $tmpArray['society_outside_address']  = $extSociety->address;
-            $tmpArray['society_outside_postcode'] = $extSociety->postal;
-            $tmpArray['society_outside_town']     = $extSociety->town;
+            $tmpArray['society_outside_title']    = $extSociety->name ?? '';
+            $tmpArray['society_outside_siret_id'] = $extSociety->siret ?? '';
+            $tmpArray['society_outside_address']  = $extSociety->address ?? '';
+            $tmpArray['society_outside_postcode'] = $extSociety->postal ?? '';
+            $tmpArray['society_outside_town']     = $extSociety->town ?? '';
         }
 
-        $extSocietyIntervenants = (array) $arrayData['intervenant_exterieur'];
+        $extSocietyIntervenants = (array) ($arrayData['intervenant_exterieur'] ?? []);
         if (!empty($extSocietyIntervenants)) {
             $tmpArray['intervenants_info'] = count($extSocietyIntervenants);
         } else {
@@ -356,12 +357,12 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         $tempDir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1] . '/temp/';
 
         // MasterWorker
-        $masterWorker = $arrayData['maitre_oeuvre'];
+        $masterWorker = $arrayData['maitre_oeuvre'] ?? null;
         if (!empty($masterWorker) && $masterWorker > 0) {
             $tmpArray['maitre_oeuvre_lname']          = strtoupper($masterWorker->lastname);
             $tmpArray['maitre_oeuvre_fname']          = ucfirst($masterWorker->firstname);
-            $tmpArray['maitre_oeuvre_email']          = $masterWorker->email;
-            $tmpArray['maitre_oeuvre_phone']          = $masterWorker->phone;
+            $tmpArray['maitre_oeuvre_email']          = $masterWorker->email ?? '';
+            $tmpArray['maitre_oeuvre_phone']          = $masterWorker->phone ?? '';
             $tmpArray['maitre_oeuvre_signature_date'] = dol_print_date($masterWorker->signature_date > 0 ? $masterWorker->signature_date : dol_now(), 'dayhour', 'tzuser');
         } else {
             $tmpArray['maitre_oeuvre_lname']          = '';
@@ -372,14 +373,10 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         }
 
         if (dol_strlen($masterWorker->signature) > 0 && $masterWorker->signature != $langs->transnoentities('FileGenerated')) {
-            if ($moreParam['specimen'] == 0 || ($moreParam['specimen'] == 1 && $conf->global->DIGIRISKDOLIBARR_SHOW_SIGNATURE_SPECIMEN == 1)) {
-                $encodedImage = explode(',', $masterWorker->signature)[1];
-                $decodedImage = base64_decode($encodedImage);
-                file_put_contents($tempDir . 'signature.png', $decodedImage);
-                $tmpArray['maitre_oeuvre_signature'] = $tempDir . 'signature.png';
-            } else {
-                $tmpArray['maitre_oeuvre_signature'] = '';
-            }
+            $encodedImage = explode(',', $masterWorker->signature)[1];
+            $decodedImage = base64_decode($encodedImage);
+            file_put_contents($tempDir . 'signature.png', $decodedImage);
+            $tmpArray['maitre_oeuvre_signature'] = $tempDir . 'signature.png';
         } elseif ($masterWorker->attendance == $signatory::ATTENDANCE_ABSENT) {
             $tmpArray['maitre_oeuvre_signature'] = $langs->trans('Absent');
         }  else {
@@ -387,12 +384,12 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         }
 
         // External society responsible
-        $extSocietyResponsible = $arrayData['responsable_exterieur'];
+        $extSocietyResponsible = $arrayData['responsable_exterieur'] ?? null;
         if (!empty($extSocietyResponsible) && $extSocietyResponsible > 0) {
             $tmpArray['intervenant_exterieur_lname']          = strtoupper($extSocietyResponsible->lastname);
             $tmpArray['intervenant_exterieur_fname']          = ucfirst($extSocietyResponsible->firstname);
-            $tmpArray['intervenant_exterieur_email']          = $extSocietyResponsible->email;
-            $tmpArray['intervenant_exterieur_phone']          = $extSocietyResponsible->phone;
+            $tmpArray['intervenant_exterieur_email']          = $extSocietyResponsible->email ?? '';
+            $tmpArray['intervenant_exterieur_phone']          = $extSocietyResponsible->phone ?? '';
             $tmpArray['intervenant_exterieur_signature_date'] = dol_print_date($extSocietyResponsible->signature_date > 0 ? $extSocietyResponsible->signature_date : dol_now(), 'dayhour', 'tzuser');
         } else {
             $tmpArray['intervenant_exterieur_lname']          = '';
@@ -403,14 +400,10 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         }
 
         if (dol_strlen($extSocietyResponsible->signature) > 0 && $extSocietyResponsible->signature != $langs->transnoentities('FileGenerated')) {
-            if ($moreParam['specimen'] == 0 || ($moreParam['specimen'] == 1 && $conf->global->DIGIRISKDOLIBARR_SHOW_SIGNATURE_SPECIMEN == 1)) {
-                $encodedImage = explode(',', $extSocietyResponsible->signature)[1];
-                $decodedImage = base64_decode($encodedImage);
-                file_put_contents($tempDir . 'signature2.png', $decodedImage);
-                $tmpArray['intervenant_exterieur_signature'] = $tempDir . 'signature2.png';
-            } else {
-                $tmpArray['intervenant_exterieur_signature'] = '';
-            }
+            $encodedImage = explode(',', $extSocietyResponsible->signature)[1];
+            $decodedImage = base64_decode($encodedImage);
+            file_put_contents($tempDir . 'signature2.png', $decodedImage);
+            $tmpArray['intervenant_exterieur_signature'] = $tempDir . 'signature2.png';
         } elseif ($extSocietyResponsible->attendance == $signatory::ATTENDANCE_ABSENT) {
             $tmpArray['intervenant_exterieur_signature'] = $langs->trans('Absent');
         }  else {

@@ -73,6 +73,8 @@ $sortorder      = GETPOST('sortorder', 'alpha');
 $sharedrisks    = GETPOST('sharedrisks', 'int') ? GETPOST('sharedrisks', 'int') : $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS;
 $inheritedrisks = GETPOST('inheritedrisks', 'int') ? GETPOST('inheritedrisks', 'int') : $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_LISTINGS;
 $riskType       = GETPOSTISSET('risk_type') ? GETPOST('risk_type') : 'risk';
+// Level of the cotation scale the last assessment of the risk must fall in, 0 for all of them
+$searchCotation = GETPOSTINT('search_cotation');
 $page           = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
 $page           = is_numeric($page) ? $page : 0;
 $page           = $page == -1 ? 0 : $page;
@@ -111,7 +113,7 @@ $search_array_options = $extrafields->getOptionalsFromPost($risk->table_element,
 // Default sort order (if not yet defined by previous GETPOST)
 if ( ! $sortfield) $sortfield = $conf->global->DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION ? "evaluation.cotation" : "r." . key($risk->fields);; // Set here default search field. By default 1st field in definition.
 if ( ! $sortorder) $sortorder         = $conf->global->DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION ? "DESC" : "ASC" ;
-if ( ! $evalsortfield) $evalsortfield = "evaluation." . key($evaluation->fields);
+if (!isset($evalsortfield) || !$evalsortfield) $evalsortfield = "evaluation." . key($evaluation->fields);
 
 $offset   = $limit * $page;
 $pageprev = $page - 1;
@@ -121,7 +123,7 @@ $pagenext = $page + 1;
 $search_all = GETPOST('search_all', 'alphanohtml') ? trim(GETPOST('search_all', 'alphanohtml')) : trim(GETPOST('sall', 'alphanohtml'));
 $search     = array();
 foreach ($risk->fields as $key => $val) {
-	if (GETPOST('search_' . $key, 'alpha') !== '') $search[$key] = GETPOST('search_' . $key, 'alpha');
+	$search[$key] = (GETPOST('search_' . $key, 'alpha') !== '') ? GETPOST('search_' . $key, 'alpha') : '';
 
 	if ($key == 'fk_element' && $contextpage == 'sharedrisk') {
 		$search[$key] = GETPOST('search_' . $key . '_sharedrisk', 'alpha');
@@ -131,7 +133,11 @@ foreach ($risk->fields as $key => $val) {
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array();
 foreach ($risk->fields as $key => $val) {
-	if ($val['searchall']) $fieldstosearchall['r.' . $key] = $val['label'];
+	if (!empty($val['searchall'])) $fieldstosearchall['r.' . $key] = $val['label'];
+}
+// A risk is also brought back by the ref of one of its assessments, see Risk::getSearchAllSqlFilter()
+foreach ($evaluation->fields as $key => $val) {
+	if (!empty($val['searchall'])) $fieldstosearchall['ra.' . $key] = 'RiskAssessment';
 }
 
 // Definition of fields for list
@@ -148,7 +154,7 @@ foreach ($risk->fields as $key => $val) {
             'checked'     => (($visible < 0) ? 0 : 1),
             'enabled'     => ($visible != 3 && dol_eval($val['enabled'], 1)),
             'position'    => $val['position'],
-            'help'        => $val['help']
+            'help'        => $val['help'] ?? ''
         ];
     }
 }
@@ -162,7 +168,7 @@ foreach ($evaluation->fields as $key => $val) {
             'checked'     => (($visible < 0) ? 0 : 1),
             'enabled'     => ($visible != 3 && dol_eval($val['enabled'], 1)),
             'position'    => $val['position'],
-            'help'        => $val['help']
+            'help'        => $val['help'] ?? ''
         ];
     }
 }
@@ -207,6 +213,7 @@ if (empty($reshook)) {
 		}
 		$toselect             = '';
 		$search_array_options = array();
+		$searchCotation       = 0;
 	}
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')
 		|| GETPOST('button_search_x', 'alpha') || GETPOST('button_search.x', 'alpha') || GETPOST('button_search', 'alpha')) {
@@ -225,10 +232,12 @@ if (empty($reshook)) {
  */
 
 $form    = new Form($db);
-$title   = $langs->trans(ucfirst($riskType) . 's');
+$title   = digirisk_trans_risk_type('', $riskType, 's');
 $helpUrl = 'FR:Module_Digirisk#.C3.89valuation_des_Risques';
 
-digirisk_header($title, $helpUrl);
+// classforhorizontalscrolloftabs constrains #id-right width so the wide risk list table
+// scrolls inside its own .div-table-responsive instead of widening the whole page
+digirisk_header($title, $helpUrl, [], [], '', 'classforhorizontalscrolloftabs');
 
 if ($conf->browser->layout == 'phone') {
     $onPhone = 1;
@@ -249,7 +258,7 @@ if ($sharedrisks) {
 
 		$allrisks = $risk->fetchAll('ASC', 'fk_element', 0, 0, array('customsql' => 'status > 0 AND type = "' . $riskType . '" AND entity NOT IN (' . $conf->entity . ') AND fk_element > 0'));
 		$formquestionimportsharedrisks = array(
-			'text' => '<i class="fas fa-circle-info"></i>' . $langs->trans('ConfirmImportShared' . ucfirst($riskType) . 's'),
+			'text' => '<i class="fas fa-circle-info"></i>' . digirisk_trans_risk_type('ConfirmImportShared', $riskType, 's'),
 		);
 
         $evaluation->ismultientitymanaged = 0;
@@ -264,9 +273,16 @@ if ($sharedrisks) {
 
 		$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' =>'select_all_shared_elements', 'value' => 0);
 
-		$previousDigiriskElement = 0;
+		// Les lignes sont d'abord regroupées par élément partagé, puis rendues : la case
+		// « tout sélectionner » d'un élément n'a de sens qu'à partir de deux risques encore
+		// importables, et ce décompte n'est connu qu'une fois l'élément entièrement parcouru
+		$rowsByElement       = [];
+		$importableByElement = [];
+		$headerByElement     = [];
 		foreach ($allrisks as $key => $risks) {
-			$digiriskelementtmp = $alldigiriskelement[$risks->fk_element];
+			// Un risque partagé peut pointer sur un élément mis à la corbeille : il est absent
+			// de la liste des éléments actifs, la ligne est alors simplement ignorée
+			$digiriskelementtmp = $alldigiriskelement[$risks->fk_element] ?? null;
 
 			if(is_object($digiriskelementtmp)) {
 				$digiriskelementtmp->element = 'digiriskdolibarr';
@@ -314,7 +330,7 @@ if ($sharedrisks) {
 					$pathToThumb  = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/');
 					$nophoto      = DOL_URL_ROOT.'/public/theme/common/nophoto.png';
 
-					$importValue .= '<div class="risk-evaluation-photo risk-evaluation-photo-'. ($lastEvaluation->id > 0 ? $lastEvaluation->id : 0) .  ($risk->id > 0 ? ' risk-' . $risk->id : ' risk-new') .' open-medias-linked" style="margin-right: 0.5em">';
+					$importValue .= '<div class="risk-evaluation-photo risk-evaluation-photo-'. ($lastEvaluation->id > 0 ? $lastEvaluation->id : 0) .  ($risk->id > 0 ? ' risk-' . $risk->id : ' risk-new') .' open-medias-linked">';
 					$importValue .= '<span class="risk-evaluation-photo-single">';
 					$importValue .= '<input class="filepath-to-riskassessment filepath-to-riskassessment-'.( $risk->id > 0 ? $risk->id : 'new') .'" type="hidden" value="'. $pathToThumb .'">';
 					$importValue .=	'<input class="filename" type="hidden" value="">';
@@ -333,21 +349,38 @@ if ($sharedrisks) {
 					$importValue .=  '</span>';
 					$importValue .= '</div>';
 
-					if ($alreadyImported == 0 && $previousDigiriskElement != $digiriskelementtmp->id) {
-						$importValue .= '<input type="checkbox" id="select_all_shared_elements_by_digiriskelement" name="' . $digiriskelementtmp->id . '" value="0">';
-					}
-					$previousDigiriskElement = $digiriskelementtmp->id;
+					$headerByElement[$digiriskelementtmp->id] = '<span class="importsharedrisk-ref">' . $digiriskelementtmp->ref . '</span>'
+						. '<span>' . dol_trunc($digiriskelementtmp->label, 48) . '</span>';
 
 					if ($alreadyImported > 0) {
-						$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'morecss' => 'importsharedelement-digiriskelement-'.$digiriskelementtmp->id, 'name' => $risks->id, 'label' => $importValue . '<span class="importsharedrisk imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
+						$rowsByElement[$digiriskelementtmp->id][] = array('type' => 'checkbox', 'morecss' => 'importsharedelement-digiriskelement-'.$digiriskelementtmp->id, 'name' => $risks->id, 'label' => $importValue . '<span class="importsharedrisk imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
 					} else {
-						$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'morecss' => 'importsharedelement-digiriskelement-'.$digiriskelementtmp->id, 'name' => $risks->id, 'label' => $importValue, 'value' => 0);
+						$importableByElement[$digiriskelementtmp->id] = ($importableByElement[$digiriskelementtmp->id] ?? 0) + 1;
+						$rowsByElement[$digiriskelementtmp->id][] = array('type' => 'checkbox', 'morecss' => 'importsharedelement-digiriskelement-'.$digiriskelementtmp->id, 'name' => $risks->id, 'label' => $importValue, 'value' => 0);
 					}
 				}
 			}
 
 		}
-		$formconfirm .= digiriskformconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&risk_type=' . $riskType, $langs->trans('ImportShared' . ucfirst($riskType) . 's'), '', 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 800, 800);
+
+		foreach ($rowsByElement as $digiriskElementId => $digiriskElementRows) {
+			// La case de groupe est une ligne à part entière, libellée : collée à la case du
+			// risque elle était prise pour la case de sélection de la ligne (#4615). Le type
+			// 'other' la garde hors de $formquestion : seules les cases de risque sont postées
+			if (($importableByElement[$digiriskElementId] ?? 0) > 1) {
+				$formquestionimportsharedrisks[] = array(
+					'type'    => 'other',
+					'tdclass' => 'importsharedrisk-group',
+					'label'   => '<div class="importsharedrisk importsharedrisk-group-label">' . $headerByElement[$digiriskElementId] . '</div>'
+						. '<span class="importsharedrisk-group-hint">' . digirisk_trans_risk_type('SelectAllShared', $riskType, 'sOfElement') . '</span>',
+					'value'   => '<input type="checkbox" class="flat select-all-shared-elements-by-digiriskelement" id="select_all_shared_elements_by_digiriskelement_' . $digiriskElementId . '" name="select_all_shared_elements_by_digiriskelement_' . $digiriskElementId . '" data-digiriskelement-id="' . $digiriskElementId . '">'
+				);
+			}
+			foreach ($digiriskElementRows as $digiriskElementRow) {
+				$formquestionimportsharedrisks[] = $digiriskElementRow;
+			}
+		}
+		$formconfirm .= digiriskformconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&risk_type=' . $riskType, digirisk_trans_risk_type('ImportShared', $riskType, 's'), '', 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 800, 800);
 	}
 
 	// Call Hook formConfirm
@@ -372,10 +405,8 @@ if ($object->id > 0) {
     saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true, $moreParams);
 
 	// Buttons for actions
+	// The "import shared risks" action moved next to the "add risk" buttons (icon + tooltip) in the risk list view
 	print '<div class="tabsAction" >';
-	if ($permissiontoadd && !empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
-		print '<span class="butAction" id="actionButtonImportSharedRisks" title="" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&risk_type=' . $riskType . '&action=import_shared_risks' . '">' . $langs->trans('ImportShared' . ucfirst($riskType) . 's') . '</span>';
-	}
 	print '</div>';
 
 	if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKS == 1) {

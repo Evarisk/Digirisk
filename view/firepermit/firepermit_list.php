@@ -200,6 +200,9 @@ if (empty($reshook)) {
  */
 
 $title    = $langs->trans("FirePermitList");
+if (!isModEnabled('doliletter')) {
+	$title .= ' <span class="error" style="font-size: 0.8em; font-weight: normal; margin-left: 20px;">' . $langs->trans('MobilePPDoliletterNotInstalled') . '</span>';
+}
 $helpUrl = 'FR:Module_Digirisk#DigiRisk_-_Permis_de_feu';
 
 saturne_header(1, "", $title, $helpUrl);
@@ -216,7 +219,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
 $newcardbutton = '';
 if ($permissiontoadd) {
-	$newcardbutton .= dolGetButtonTitle($langs->trans('NewFirePermit'), '', 'fa fa-plus-circle', DOL_URL_ROOT . '/custom/digiriskdolibarr/view/firepermit/firepermit_card.php?action=create');
+	$newcardbutton .= dolGetButtonTitle($langs->trans('NewFirePermit'), '', 'fa fa-plus-circle', DOL_URL_ROOT . '/custom/digiriskdolibarr/view/firepermit/firepermit_mobile_create.php');
 }
 
 print '<form method="POST" id="searchFormList" action="' . $_SERVER["PHP_SELF"] . '">';
@@ -301,8 +304,9 @@ if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit
 	$num = $db->num_rows($resql);
 }
 
-	// Direct jump if only one record found
-if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
+// Direct jump if only one record found, out of reach once the page header has been printed : the redirect
+// would only raise a "headers already sent" warning and leave the list truncated
+if ($num == 1 && !headers_sent() && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
 	$obj = $db->fetch_object($resql);
 	$id  = $obj->rowid;
 	header("Location: " . dol_buildpath('/digiriskdolibarr/view/firepermit/firepermit_card.php', 1) . '?id=' . $id);
@@ -474,12 +478,15 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 						$element = $signatory->fetchSignatory('MasterWorker', $object->id, 'firepermit');
 						if (is_array($element)) {
 							$element = array_shift($element);
-							$usertmp->fetch($element->element_id);
-							print $usertmp->getNomUrl(1);
+							// array_shift() rend null quand la liste est vide : le signataire peut manquer
+							if (is_object($element)) {
+								$usertmp->fetch($element->element_id);
+								print $usertmp->getNomUrl(1);
+							}
 						}
 					} elseif ($resource['label'] == 'ExtSociety') {
-						$extSociety = $digiriskresources->fetchResourcesFromObject('ExtSociety', $object);
-						if ($extSociety > 0) {
+						$extSociety = $digiriskresources->fetchSingleResourceFromObject('ExtSociety', $object);
+						if ($extSociety !== null) {
 							print $extSociety->getNomUrl(1);
 						}
 					}
@@ -487,8 +494,11 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 						$element = $signatory->fetchSignatory('ExtSocietyResponsible', $object->id, 'firepermit');
 						if (is_array($element)) {
 							$element = array_shift($element);
-							$contact->fetch($element->element_id);
-							print $contact->getNomUrl(1);
+							// array_shift() rend null quand la liste est vide : le signataire peut manquer
+							if (is_object($element)) {
+								$contact->fetch($element->element_id);
+								print $contact->getNomUrl(1);
+							}
 						}
 					}
 					if ($resource['label'] == 'ExtSocietyAttendant') {

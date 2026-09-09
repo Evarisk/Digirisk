@@ -194,7 +194,10 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
 
             foreach ($orderedDigiriskElements as $orderedDigiriskElementId => $orderedDigiriskElement) {
                 $tmpArray['digiriskElementLabel']         = 'S' . $orderedDigiriskElement['object']->entity . ' - ' . $orderedDigiriskElement['object']->ref . ' - ' . $orderedDigiriskElement['object']->label;
-                $tmpArray['description']                  = $orderedDigiriskElement['object']->description;
+                // The description is filled with the WYSIWYG editor and the ODT library only keeps
+                // inline tags: closing block tags become spaces so paragraphs and list items are
+                // not glued together in the document.
+                $tmpArray['description']                  = str_replace(['</p>', '</li>'], ' ', $orderedDigiriskElement['object']->description);
                 $tmpArray['totalRiskAssessmentCotations'] = $riskByRiskAssessmentCotations[$orderedDigiriskElementId]['totalRiskAssessmentCotations'] ?: 0;
                 foreach ($riskAssessmentCotationTypes as $i => $riskAssessmentCotationType) {
                     $tmpArray['nb' . $riskAssessmentCotationType] = $riskByRiskAssessmentCotations[$orderedDigiriskElementId][$i] ?? 0;
@@ -301,6 +304,10 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
                 $tmpArray[$entityTag . $totalNbRiskByRiskAssessmentCotationType[$riskAssessmentCotationType]['tmpArrayName']] = $totalNbRiskByRiskAssessmentCotationType[$riskAssessmentCotationType]['value'] ?: 0; // Total number by cotation type
             }
 
+            // Drop the segment-only picto left by the loop above: at document level it would register the
+            // last category image a second time and duplicate its entry in the ODT manifest (invalid ODF)
+            unset($tmpArray['picto']);
+
             static::setTmpArrayVars($tmpArray, $odfHandler, $outputLangs, false);
         }
     }
@@ -403,6 +410,10 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
             foreach ($riskAssessmentCotationTypes as $riskAssessmentCotationType) {
                 $tmpArray[$entityTag . $totalNbRiskByRiskAssessmentCotationType[$riskAssessmentCotationType]['tmpArrayName']] = $totalNbRiskByRiskAssessmentCotationType[$riskAssessmentCotationType]['value'] ?: 0; // Total number by cotation type
             }
+
+            // Drop the segment-only picto left by the loop above: at document level it would register the
+            // last category image a second time and duplicate its entry in the ODT manifest (invalid ODF)
+            unset($tmpArray['picto']);
 
             static::setTmpArrayVars($tmpArray, $odfHandler, $outputLangs, false);
         }
@@ -578,6 +589,32 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
     }
 
     /**
+     * Keep the shared digirisk elements carrying a risk shared with the current entity, and their parents
+     *
+     * @param  array $sharedDigiriskElements Flat shared digirisk elements (element ID => ['object' => DigiriskElement, 'depth' => int])
+     * @param  array $sharedRisks            Risks of the other entities linked to a digirisk element of the current entity
+     * @return array                         Filtered flat digirisk elements, in their original order
+     */
+    private static function filterSharedDigiriskElements(array $sharedDigiriskElements, array $sharedRisks): array
+    {
+        if (empty($sharedDigiriskElements) || empty($sharedRisks)) {
+            return [];
+        }
+
+        $sharedDigiriskElementIDs = [];
+        foreach ($sharedRisks as $sharedRisk) {
+            // Parents are kept too, otherwise the shared organisation is printed with holes in its tree
+            $digiriskElementID = $sharedRisk->fk_element;
+            while ($digiriskElementID > 0 && isset($sharedDigiriskElements[$digiriskElementID]) && !isset($sharedDigiriskElementIDs[$digiriskElementID])) {
+                $sharedDigiriskElementIDs[$digiriskElementID] = $digiriskElementID;
+                $digiriskElementID                            = $sharedDigiriskElements[$digiriskElementID]['object']->fk_parent;
+            }
+        }
+
+        return array_intersect_key($sharedDigiriskElements, $sharedDigiriskElementIDs);
+    }
+
+    /**
      * Fill all odt tags for segments lines
      *
      * @param  Odf       $odfHandler  Object builder odf library
@@ -604,9 +641,10 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
             $moreParam['digiriskElements'] = $loadDigiriskElementInfos[$moreParam['entity']]['digiriskElements'];
             static::setRiskAssessmentDocumentByEntity($odfHandler, $outputLangs, $moreParam, $loadRiskAssessmentDocumentInfos);
 
-            if ($moreParam['tmparray']['showSharedRisk_nocheck']) {
+            if (!empty($moreParam['tmparray']['showSharedRisk_nocheck'])) {
                 $moreParam['entity']           = 'shared';
-                $moreParam['digiriskElements'] = $loadDigiriskElementInfos[$moreParam['entity']]['digiriskElements'];
+                // Sharing digirisk elements between entities makes every element of the other entities visible, only those carrying a shared risk belong to this document
+                $moreParam['digiriskElements'] = static::filterSharedDigiriskElements($loadDigiriskElementInfos[$moreParam['entity']]['digiriskElements'], $loadRiskAssessmentDocumentInfos[$moreParam['entity']]['risks']);
                 static::setRiskAssessmentDocumentByEntity($odfHandler, $outputLangs, $moreParam, $loadRiskAssessmentDocumentInfos);
             }
 

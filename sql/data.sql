@@ -916,3 +916,30 @@ INSERT INTO llx_c_digiriskdolibarr_action_trigger (rowid, entity, elementtype, r
 
 -- 10.0.0
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (rowid, entity, elementtype, ref, label, description, active, position) VALUES (79, 0, 'listingrisksenvironmentalaction@digiriskdolibarr', 'LISTINGRISKSENVIRONMENTALACTION_GENERATE', 'ListingRisksEnvironmentalActionGenerated', 'Executed when a listing risks environmental action is generated', 1, 82);
+
+-- Required certifications of the mobile prevention plan interface
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (1,  0, 'CACES_R482',        'CACES R482 - Engins de chantier',       '', 1, 10);
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (2,  0, 'CACES_R483',        'CACES R483 - Grues mobiles',            '', 1, 20);
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (3,  0, 'CACES_R484',        'CACES R484 - Ponts roulants',           '', 1, 30);
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (4,  0, 'CACES_R485',        'CACES R485 - Gerbeurs',                 '', 1, 40);
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (5,  0, 'CACES_R486',        'CACES R486 - Nacelles (PEMP)',          '', 1, 50);
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (6,  0, 'CACES_R489',        'CACES R489 - Chariots élévateurs',      '', 1, 60);
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (7,  0, 'CACES_R490',        'CACES R490 - Grues de chargement',      '', 1, 70);
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (8,  0, 'PERMIS_B',          'Permis B',                              '', 1, 80);
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (9,  0, 'PERMIS_C',          'Permis C',                              '', 1, 90);
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (10, 0, 'PERMIS_CE',         'Permis CE',                             '', 1, 100);
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (11, 0, 'PERMIS_D',          'Permis D',                              '', 1, 110);
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (12, 0, 'HABILITATION_ELEC', 'Habilitation électrique',               '', 1, 120);
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (13, 0, 'AIPR',              'AIPR',                                  '', 1, 130);
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (14, 0, 'SST',               'Sauveteur secouriste du travail (SST)', '', 1, 140);
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (15, 0, 'TRAVAIL_HAUTEUR',   'Travail en hauteur',                    '', 1, 150);
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (16, 0, 'ECHAFAUDAGE',       'Montage/démontage échafaudage',         '', 1, 160);
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (17, 0, 'ATEX',              'ATEX',                                  '', 1, 170);
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (18, 0, 'AMIANTE',           'Amiante (SS3/SS4)',                     '', 1, 180);
+INSERT INTO llx_c_digiriskdolibarr_certification (rowid, entity, ref, label, description, active, position) VALUES (19, 0, 'PONTIER',           'Pontier élingueur',                     '', 1, 190);
+
+-- Default Kanban columns of the action plan (PAPRIPACT), mirroring the historical percentage thresholds
+INSERT INTO llx_c_digiriskdolibarr_actionplan_column (rowid, entity, ref, label, description, progress_min, progress_max, color, picto, active, position) VALUES (1, 0, 'DRAFT',    'ColumnDraft',      '', 0,  0,   '#999999', 'fa-pencil-alt', 1, 10);
+INSERT INTO llx_c_digiriskdolibarr_actionplan_column (rowid, entity, ref, label, description, progress_min, progress_max, color, picto, active, position) VALUES (2, 0, 'PROGRESS', 'ColumnInProgress', '', 1,  80,  '#e9ad4f', 'fa-play',       1, 20);
+INSERT INTO llx_c_digiriskdolibarr_actionplan_column (rowid, entity, ref, label, description, progress_min, progress_max, color, picto, active, position) VALUES (3, 0, 'CONTROL',  'ColumnInControl',  '', 81, 99,  '#3085d6', 'fa-search',     1, 30);
+INSERT INTO llx_c_digiriskdolibarr_actionplan_column (rowid, entity, ref, label, description, progress_min, progress_max, color, picto, active, position) VALUES (4, 0, 'DONE',     'ColumnDone',       '', 100, 100, '#47e58e', 'fa-check',     1, 40);

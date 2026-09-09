@@ -68,7 +68,8 @@ $value      = GETPOST('value', 'alpha');
 $pageY      = GETPOST('page_y', 'int');
 
 // Security check - Protection if external user
-$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
 /*
@@ -265,6 +266,12 @@ if ($action == 'setMainCategory') {
 	setEventMessages($langs->transnoentities('MainCategorySet'), array());
 }
 
+if ($action == 'setTicketCategoriesInDocuments') {
+	$documentCategories = GETPOST('documentCategories', 'array');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_DOCUMENT_CATEGORIES', implode(',', array_map('intval', $documentCategories)), 'chaine', 0, '', $conf->entity);
+	setEventMessages($langs->transnoentities('TicketCategoriesInDocumentsSet'), array());
+}
+
 if ($action == 'setParentCategoryLabel') {
 	$label = GETPOST('parentCategoryLabel');
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL', $label, 'chaine', 0, '', $conf->entity);
@@ -351,6 +358,9 @@ if ($action == 'set_multi_company_ticket_public_interface') {
     header('Location: ' . $_SERVER['PHP_SELF'] . '?page_y=' . $pageY);
     exit;
 }
+
+// Actions set_mod, update_mask and the set_/del_ switch of the module constants
+require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
 /*
  * View
@@ -439,6 +449,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print '<table class="noborder centpercent">';
 	print '<tr class="liste_titre">';
 	print '<td>' . $langs->transnoentities("Parameters") . '</td>';
+	print '<td class="center">' . $langs->transnoentities("TutoImage") . '</td>';
 	print '<td class="center">' . $langs->transnoentities("Status") . '</td>';
 	print '<td class="center">' . $langs->transnoentities("Action") . '</td>';
 	print '<td class="center">' . $langs->transnoentities("ShortInfo") . '</td>';
@@ -447,7 +458,10 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
     // Show logo for company
     print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketShowCompanyLogo") . '</td>';
     print '<td class="center">';
-    print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO');
+    print digiriskdolibarr_tuto_image('ticket_sst', 'company_logo', $langs->transnoentities("TicketShowCompanyLogo"));
+    print '</td>';
+    print '<td class="center">';
+    print saturne_constant_onoff('DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO', $permissiontowrite);
     print '</td>';
     print '<td class="center">';
     print '';
@@ -457,23 +471,13 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
     print '</td>';
     print '</tr>';
 
-	// Show logo for company
-	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketShowCompanyLogo") . '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO');
-	print '</td>';
-	print '<td class="center">';
-	print '';
-	print '</td>';
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->transnoentities("TicketShowCompanyLogoHelp"));
-	print '</td>';
-	print '</tr>';
-
 	// GP/UT Hide ref
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketDigiriskElementHideRef") . '</td>';
 	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_HIDE_REF');
+	print digiriskdolibarr_tuto_image('ticket_sst', 'hide_ref', $langs->transnoentities("TicketDigiriskElementHideRef"));
+	print '</td>';
+	print '<td class="center">';
+	print saturne_constant_onoff('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_HIDE_REF', $permissiontowrite);
 	print '</td>';
 	print '<td class="center">';
 	print '';
@@ -486,8 +490,10 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	if (isModEnabled('multicompany')) {
 		//Page de sélection de l'entité
 		print '<tr class="oddeven"><td>' . $langs->transnoentities("ShowSelectorOnTicketPublicInterface") . '</td>';
+		print '<td class="center"></td>';
 		print '<td class="center">';
-		print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', [], 0);
+		// The constant is shared by every entity, so it keeps the ajax component and only asks for the zero instead of the deletion
+		print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', [], 0, 0, 0, 0, 2, 0, 1);
 		print '</a>';
 		print '</td>';
 		print '<td class="center">';
@@ -501,8 +507,9 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 
 	//Envoi d'emails automatique
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("SendEmailOnTicketSubmit") . '</td>';
+	print '<td class="center"></td>';
 	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT');
+	print saturne_constant_onoff('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT', $permissiontowrite);
 	print '</td>';
 	print '<td class="center">';
 	print '';
@@ -520,6 +527,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
     print '<input type="hidden" name="page_y">';
 
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("SendEmailTo") . '</td>';
+	print '<td class="center"></td>';
 	print '<td class="center">';
 	print '<input name="emails" id="emails" value="' . $conf->global->DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO . '">';
 	print '</td>';
@@ -533,6 +541,9 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print '</form>';
 
 	print '</div>';
+
+	// Click on a tuto image to display it full size
+	digiriskdolibarr_tuto_overlay();
 
     // Multi company ticket public interface config
     print load_fiche_titre($langs->transnoentities('MultiCompanyTicketPublicInterfaceConfig'), '', '');
@@ -880,6 +891,45 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print '</div>';
 	print '<span class="opacitymedium">' . $langs->transnoentities("TicketPublicInterfaceConfigDocumentation") . '</span> : <a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#DigiRisk_-_Registre_de_s.C3.A9curit.C3.A9_et_Tickets" target="_blank" >' . $langs->transnoentities('DigiriskDocumentation') . '</a>';
 }
+
+print load_fiche_titre($langs->transnoentities("TicketDocumentsConfig"), '', '');
+
+print '<div class="div-table-responsive-no-min">';
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->transnoentities("Parameters") . '</td>';
+print '<td class="center">' . $langs->transnoentities("Value") . '</td>';
+print '<td class="center">' . $langs->transnoentities("Action") . '</td>';
+print '<td class="center">' . $langs->transnoentities("ShortInfo") . '</td>';
+print '</tr>';
+
+// Set ticket categories printed in documents
+print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="setTicketCategoriesInDocuments">';
+print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+print '<input type="hidden" name="page_y">';
+
+$ticketCategories            = $form->select_all_categories(Categorie::TYPE_TICKET, null, 'parent', null, null, 1);
+$ticketCategoriesInDocuments = array_filter(explode(',', getDolGlobalString('DIGIRISKDOLIBARR_TICKET_DOCUMENT_CATEGORIES')));
+
+print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketCategoriesInDocuments") . '</td>';
+print '<td class="center">';
+print img_picto('', 'category', 'class="pictofixedwidth"') . $form->multiselectarray('documentCategories', $ticketCategories, $ticketCategoriesInDocuments, 0, 0, 'minwidth200 maxwidth400');
+print '</td>';
+
+print '<td class="center">';
+print '<input type="submit" class="button reposition" value="' . $langs->transnoentities('Save') . '">';
+print '</td>';
+
+print '<td class="center">';
+print $form->textwithpicto('', $langs->transnoentities("TicketCategoriesInDocumentsSetting"));
+print '</td>';
+print '</tr>';
+print '</form>';
+
+print '</table>';
+print '</div>';
 
 print load_fiche_titre($langs->transnoentities("TicketStatistics"), '', '');
 

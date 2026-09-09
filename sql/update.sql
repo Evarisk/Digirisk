@@ -248,3 +248,43 @@ UPDATE llx_element_element SET targettype = 'digiriskdolibarr_digiriskelement' W
 ALTER TABLE llx_digiriskdolibarr_risk ADD `sub_category` VARCHAR(255) NULL DEFAULT NULL AFTER `category`;
 
 ALTER TABLE llx_digiriskdolibarr_digiriskelement CHANGE import_key import_key VARCHAR(14) NULL DEFAULT NULL;
+
+-- 21.x - digirisk_action_type migration
+-- Migrate T1 subtasks -> curative (1)
+UPDATE llx_projet_task_extrafields ef
+INNER JOIN llx_projet_task t ON t.rowid = ef.fk_object
+SET ef.digirisk_action_type = 1
+WHERE t.label LIKE '% - T1 - %'
+  AND (ef.digirisk_action_type IS NULL OR ef.digirisk_action_type = 0);
+
+-- Migrate T2 subtasks -> corrective (2)
+UPDATE llx_projet_task_extrafields ef
+INNER JOIN llx_projet_task t ON t.rowid = ef.fk_object
+SET ef.digirisk_action_type = 2
+WHERE t.label LIKE '% - T2 - %'
+  AND (ef.digirisk_action_type IS NULL OR ef.digirisk_action_type = 0);
+
+-- Create missing extrafields rows
+INSERT IGNORE INTO llx_projet_task_extrafields (fk_object, digirisk_action_type)
+SELECT t.rowid,
+  CASE
+    WHEN t.label LIKE '% - T1 - %' THEN 1
+    WHEN t.label LIKE '% - T2 - %' THEN 2
+  END
+FROM llx_projet_task t
+LEFT JOIN llx_projet_task_extrafields ef ON ef.fk_object = t.rowid
+WHERE ef.fk_object IS NULL
+  AND (t.label LIKE '% - T1 - %' OR t.label LIKE '% - T2 - %');
+
+-- 23.1.x - prevention plan public/private notes
+ALTER TABLE llx_digiriskdolibarr_preventionplan ADD note_public text NULL AFTER cssct_intervention;
+ALTER TABLE llx_digiriskdolibarr_preventionplan ADD note_private text NULL AFTER note_public;
+
+-- 23.1.x - remove orphan const left by the deleted module_parts['tabs'] declaration
+DELETE FROM llx_const WHERE name = 'MAIN_MODULE_DIGIRISKDOLIBARR_TABS';
+
+-- 23.1.x - index used by the per-risk loading of risk assessments on the risk lists
+ALTER TABLE llx_digiriskdolibarr_riskassessment ADD INDEX idx_digiriskdolibarr_riskassessment_fk_risk (fk_risk);
+
+-- 23.1.x - enable the prefill of the risk description with the danger category name on every entity
+UPDATE llx_const SET value = 1 WHERE name = 'DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL';

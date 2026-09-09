@@ -52,6 +52,7 @@ $moreParams = [
     'LoadSaturneTask'            => 1,
     'LoadRisk'                   => 1,
     'LoadTicketDashboard'        => 1,
+    'LoadMeteoVigilance'         => 1,
     'specialModuleNameLowerCase' => 'digirisk'
 ];
 

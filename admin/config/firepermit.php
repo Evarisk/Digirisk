@@ -91,6 +91,36 @@ if ($action == 'setMaitreOeuvre') {
 	}
 }
 
+if ($action == 'setMobileDefaults' && !GETPOST('cancel', 'alpha')) {
+	// Un permis de feu couvre des travaux courts : la duree proposee reste dans le mois accepte
+	$defaultDuration = GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_DURATION');
+	if ($defaultDuration < 1) {
+		$defaultDuration = 1;
+	}
+	if ($defaultDuration > 31) {
+		$defaultDuration = 31;
+	}
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_DURATION', $defaultDuration, 'integer', 0, '', $conf->entity);
+
+	$defaultStartToday = GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_DATE_START_TODAY');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_DATE_START_TODAY', $defaultStartToday ? 1 : 0, 'integer', 0, '', $conf->entity);
+
+	$defaultEmailAutoSend = GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_AUTO_SEND');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_AUTO_SEND', $defaultEmailAutoSend ? 1 : 0, 'integer', 0, '', $conf->entity);
+
+	$emailTemplateExt = GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_EXT');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_EXT', $emailTemplateExt, 'integer', 0, '', $conf->entity);
+
+	$emailTemplateInt = GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_INT');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_INT', $emailTemplateInt, 'integer', 0, '', $conf->entity);
+
+	setEventMessages($langs->trans('SetupSaved'), null, 'mesgs');
+	if (!$error) {
+		header('Location: ' . $_SERVER['PHP_SELF']);
+		exit;
+	}
+}
+
 /*
  * View
  */
@@ -166,6 +196,64 @@ print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' .
 print '</td>';
 print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 print '</td></tr>';
+
+print '</table>';
+print '</form>';
+
+// --- Mobile creation defaults ---
+print load_fiche_titre($langs->trans('MobilePPDefaultsTitle'), '', '');
+
+$defaultDuration      = getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_DURATION', 1);
+$defaultStartToday    = getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_DATE_START_TODAY', 1);
+$defaultEmailAutoSend = getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_AUTO_SEND', 0);
+$emailTemplateExt     = getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_EXT', 0);
+$emailTemplateInt     = getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_INT', 0);
+
+// Fetch email templates
+$emailTemplatesList = ['0' => ''];
+$sql = "SELECT rowid, label FROM " . MAIN_DB_PREFIX . "c_email_templates WHERE type_template = 'firepermit' AND active = 1 ORDER BY position ASC, label ASC";
+$resql = $db->query($sql);
+if ($resql) {
+	while ($obj = $db->fetch_object($resql)) {
+		$emailTemplatesList[$obj->rowid] = $obj->label;
+	}
+}
+
+print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '" name="mobile_defaults_form">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="setMobileDefaults">';
+print '<table class="noborder centpercent editmode">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans('Option') . '</td>';
+print '<td>' . $langs->trans('DefaultValue') . '</td>';
+print '<td>' . $langs->trans('Action') . '</td>';
+print '</tr>';
+
+// Default start date = today
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_DATE_START_TODAY">' . $langs->trans('MobileFPDefaultDateStartToday') . '</label></td>';
+print '<td><input type="checkbox" name="DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_DATE_START_TODAY" id="DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_DATE_START_TODAY" value="1"' . ($defaultStartToday ? ' checked' : '') . '> ' . $langs->trans('Yes') . '</td>';
+print '<td rowspan="5"><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '"></td>';
+print '</tr>';
+
+// Default duration in days
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_DURATION">' . $langs->trans('MobileFPDefaultDuration') . '</label></td>';
+print '<td><input type="number" name="DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_DURATION" id="DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_DURATION" value="' . $defaultDuration . '" min="1" max="31" class="flat minwidth100"> ' . $langs->trans('Days') . '</td>';
+print '</tr>';
+
+// Email Template Ext
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_EXT">' . $langs->trans('MobilePPEmailTemplateExt') . '</label></td>';
+print '<td>' . $form->selectarray('DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_EXT', $emailTemplatesList, $emailTemplateExt, 0, 0, 0, '', 1) . '</td>';
+print '</tr>';
+
+// Auto-send signature email on mobile creation
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_AUTO_SEND">' . $langs->trans('MobilePPEmailAutoSend') . '</label></td>';
+print '<td><input type="checkbox" name="DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_AUTO_SEND" id="DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_AUTO_SEND" value="1"' . ($defaultEmailAutoSend ? ' checked' : '') . '> ' . $langs->trans('Yes') . '</td>';
+print '</tr>';
+
+// Email Template Int
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_INT">' . $langs->trans('MobilePPEmailTemplateInt') . '</label></td>';
+print '<td>' . $form->selectarray('DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_TEMPLATE_INT', $emailTemplatesList, $emailTemplateInt, 0, 0, 0, '', 1) . '</td>';
+print '</tr>';
 
 print '</table>';
 print '</form>';

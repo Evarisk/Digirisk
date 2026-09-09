@@ -1,0 +1,740 @@
+// Ticket card (issue #4443) — light, modern restyle layered over the native
+// Dolibarr ticket card. Fully scoped to .digirisk-ticket-card so it never leaks
+// to other pages. Self-contained variables (no dependency on global colors).
+
+$dtc-radius:      12px;
+$dtc-shadow:      0 1px 3px rgba(17, 24, 39, 0.06), 0 1px 2px rgba(17, 24, 39, 0.04);
+$dtc-shadow-hov:  0 6px 18px rgba(17, 24, 39, 0.10);
+$dtc-blue:        #2b6cb0;
+$dtc-grey:        #6b7280;
+$dtc-bg:          #f6f8fb;
+$dtc-border:      #e5e7eb;
+$dtc-hairline:    #f1f3f5;
+$dtc-title:       #111827;
+
+.digirisk-ticket-card {
+
+    // ---- Two-column layout with a real gap (override native float) ----
+    .fichecenter {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: flex-start;
+        margin-top: 8px;
+    }
+    .fichecenter > .fichehalfleft,
+    .fichecenter > .fichehalfright {
+        float: none;
+        width: auto;
+        flex: 1 1 380px;
+        min-width: 0;
+    }
+    .underbanner { display: none; } // decorative native separator, not needed here
+
+    // ---- Section cards (tableforfield) ----
+    table.tableforfield {
+        background: #fff;
+        border: 1px solid $dtc-border;
+        border-radius: $dtc-radius;
+        box-shadow: $dtc-shadow;
+        border-collapse: separate;
+        border-spacing: 0;
+        // No overflow:hidden here — it would clip the tag dropdown that overflows the card.
+        // Rounded top corners are handled directly on the header cell below.
+        margin: 0 0 10px 0;
+        transition: box-shadow .18s ease;
+
+        &:hover { box-shadow: $dtc-shadow-hov; }
+
+        // Section header row — the TD stays a table-cell so colspan and the
+        // full-width background are preserved; an inner flex wrapper (.dtc-head)
+        // handles vertical centering and the left title / right edit layout.
+        tr.liste_titre > td {
+            background: $dtc-bg;
+            border-top-left-radius: $dtc-radius;
+            border-top-right-radius: $dtc-radius;
+            border-bottom: 1px solid $dtc-border;
+            padding: 0;
+            vertical-align: middle;
+
+            > .dtc-head {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 7px 12px;
+                font-weight: 700;
+                font-size: 0.92em;
+                letter-spacing: .01em;
+                color: $dtc-title;
+
+                img { vertical-align: middle; }
+                img.pictoModule { height: 20px; width: auto; }
+
+                .dtc-head-edit {
+                    margin-left: auto;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    font-weight: 400;
+                    flex: 0 0 auto;
+                }
+
+                // Inline (on-the-fly) editable subject, shown on the same line as the label
+                .dtc-head-label { flex: 0 0 auto; }
+                .dtc-subject {
+                    flex: 1 1 auto;
+                    min-width: 0;
+                    font-weight: 400;
+                }
+                .dtc-subject-value {
+                    cursor: text;
+                    padding: 1px 5px;
+                    border-radius: 5px;
+                    transition: background .15s ease;
+                }
+                .dtc-subject:hover .dtc-subject-value { background: rgba(43, 108, 176, .10); }
+                .dtc-subject-input {
+                    width: 100%;
+                    box-sizing: border-box;
+                    font: inherit;
+                    font-weight: 400;
+                    padding: 3px 7px;
+                    border: 1px solid $dtc-blue;
+                    border-radius: 6px;
+                    outline: none;
+                }
+            }
+        }
+
+        // Body cells — vertical-align middle so labels line up with their values
+        // (avatars / pictos are taller than the label text).
+        > tbody > tr > td {
+            padding: 5px 12px;
+            border-top: 1px solid $dtc-hairline;
+            vertical-align: middle;
+            line-height: 1.35;
+        }
+        > tbody > tr.liste_titre + tr > td,
+        > tbody > tr:first-child > td { border-top: 0; }
+
+        // Field labels
+        td.titlefield,
+        td.titlefieldmiddle,
+        td.dtc-reg-label {
+            color: $dtc-grey;
+            font-weight: 500;
+        }
+
+        // Per-field picto (#4885) — fixed width so every label text starts on the same column.
+        .dtc-field-picto {
+            display: inline-block;
+            width: 16px;
+            margin-right: 6px;
+            text-align: center;
+            color: $dtc-blue;
+            opacity: .75;
+            flex: 0 0 auto;
+        }
+        // .dtc-head is a flex row with its own gap — the margin would double the spacing.
+        .dtc-head .dtc-field-picto { margin-right: 0; }
+
+        // Nested helper tables (label + edit pencil) stay transparent
+        table.nobordernopadding,
+        table.nobordernopadding > tbody > tr > td {
+            background: none;
+            border: 0;
+            padding: 0;
+            box-shadow: none;
+        }
+        table.nobordernopadding td.none,
+        table.nobordernopadding td.nowrap { color: $dtc-grey; font-weight: 500; }
+    }
+
+    // ---- Registres table: locked column widths (#4885) ----
+    // Widths live on the <colgroup>, not on nth-child: the first row of the table is the
+    // colspan=4 section header, so with table-layout:fixed the browser would size the columns
+    // from that single cell (four equal columns) and the label/value pairs would drift apart.
+    // <col> widths take precedence and also survive the colspan=3 rows at the bottom.
+    table.dtc-registres-table {
+        table-layout: fixed;
+        width: 100%;
+
+        > colgroup > col.dtc-reg-col-label { width: 22%; }
+        > colgroup > col.dtc-reg-col-value { width: 28%; }
+
+        // Labels stay on one line so the value column always starts at the same offset.
+        > tbody > tr > td.dtc-reg-label {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        // Value cells must clip overflowing content (long combobox etc.)
+        > tbody > tr > td:not(.dtc-reg-label) {
+            overflow: hidden;
+        }
+
+        // GP/UT select and its Select2 wrapper — never exceed the column width
+        select.dtc-direct-select {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        .select2-container {
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+    }
+
+    // Edit pencils: discreet, highlight on hover
+    a.editfielda {
+        color: $dtc-grey;
+        opacity: .5;
+        transition: opacity .15s ease, color .15s ease;
+        &:hover { opacity: 1; color: $dtc-blue; }
+    }
+
+    // ---- Linked tasks table ----
+    table.noborder {
+        background: #fff;
+        border: 1px solid $dtc-border;
+        border-radius: $dtc-radius;
+        box-shadow: $dtc-shadow;
+        border-collapse: separate;
+        border-spacing: 0;
+        overflow: hidden;
+        margin: 0 0 18px 0;
+
+        tr.liste_titre th {
+            background: $dtc-bg;
+            border-bottom: 1px solid $dtc-border;
+            padding: 6px 10px;
+            font-size: 0.78em;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: $dtc-grey;
+        }
+        td {
+            padding: 5px 10px;
+            border-top: 1px solid $dtc-hairline;
+        }
+        tr:hover td { background: #fafbfc; }
+    }
+
+    // ---- Classification tags ----
+    // Uses the exact kanban tag markup (kanban-card-tags / kanban-tag / kanban-add-tag-btn /
+    // kanban-tag-dropdown / kanban-tag-option), so styling comes from the global kanban rules
+    // in _page-actionplan.scss — identical look to the ticket kanban.
+    // Cap the dropdown height and scroll instead of growing sky-high with many categories.
+    .kanban-tag-dropdown {
+        max-height: 240px;
+        overflow-y: auto;
+    }
+
+    // ---- Inline edit (assignee / progress) — click the value, no pencil ----
+    .dtc-assignee-editor { display: inline-block; }
+    .dtc-editable {
+        cursor: pointer;
+        border-radius: 5px;
+        padding: 1px 5px;
+        transition: background .15s ease;
+
+        &:hover { background: rgba(43, 108, 176, .10); }
+    }
+    .dtc-progress-value {
+        display: inline-block;
+        min-width: 1.4em;
+        text-align: center;
+
+        &[contenteditable]:focus {
+            outline: none;
+            background: #fff;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, .35);
+            border-radius: 5px;
+        }
+    }
+
+    // ---- Inline edit badges (thirdparty / project in the banner) — reedcrm-style ----
+    // Badge chrome: module logo + a dedicated navigation icon + the editable name
+    // (dashed underline, click to reveal a searchable select) + (thirdparty only) a
+    // ticket-history icon.
+    .dtc-inline-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #f8fbff;
+        border: 1px solid $dtc-border;
+        border-radius: 6px;
+        padding: 3px 8px 3px 6px;
+        vertical-align: middle;
+        font-weight: 500;
+        font-size: 0.9em;
+        color: $dtc-grey;
+        margin: 2px 0;
+
+        a { text-decoration: none; }
+
+        .dtc-badge-logo {
+            height: 16px;
+            width: 16px;
+            object-fit: contain;
+            border-right: 1px solid $dtc-border;
+            padding-right: 6px;
+        }
+        .dtc-badge-nav,
+        .dtc-badge-history {
+            color: #64748b;
+            display: inline-flex;
+            align-items: center;
+            transition: color .15s ease;
+
+            &:hover { color: $dtc-blue; }
+        }
+        .dtc-badge-name {
+            color: $dtc-title;
+            max-width: 260px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            &.dtc-inline-edit {
+                cursor: pointer;
+                border-bottom: 1px dashed #cbd5e0;
+                line-height: 1;
+                padding-bottom: 1px;
+                transition: color .2s ease;
+
+                &:hover { color: $dtc-blue; }
+            }
+            &.is-empty {
+                color: #94a3b8;
+                font-style: italic;
+            }
+        }
+        .dtc-inline-selector { display: inline-flex; }
+        select.dtc-inline-select { min-width: 200px; }
+        .select2-container { vertical-align: middle; }
+    }
+
+    // ---- Inline edit (extrafields) ----
+    .dtc-inline-editable {
+        cursor: pointer;
+        border-bottom: 1px dashed #d1d5db;
+        display: inline-block;
+        transition: border-color .15s ease, color .15s ease;
+        padding-bottom: 1px;
+        min-width: 20px;
+
+        &:hover {
+            border-bottom-color: $dtc-blue;
+        }
+
+        &.is-empty {
+            font-style: italic;
+            color: #9ca3af;
+        }
+    }
+
+    .edit-message-on-click {
+        border: 1px dashed transparent;
+        padding: 4px;
+        border-radius: 4px;
+        transition: border-color .15s ease, background .15s ease;
+
+        &:hover {
+            border-color: $dtc-blue;
+            background: rgba(43, 108, 176, .05);
+        }
+    }
+
+    // ---- Status action buttons (native .butAction.butStatus) → pills ----
+    .navBarForStatus .butAction.butStatus {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 3px 0 3px 6px;
+        padding: 5px 12px;
+        border: 1px solid $dtc-border;
+        border-radius: 999px;
+        background: #fff;
+        color: $dtc-title;
+        font-weight: 600;
+        box-shadow: $dtc-shadow;
+        text-transform: none;
+        transition: transform .15s ease, box-shadow .15s ease, background .15s ease, color .15s ease, border-color .15s ease;
+
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: $dtc-shadow-hov;
+            background: $dtc-blue;
+            color: #fff;
+            border-color: $dtc-blue;
+        }
+    }
+
+    // Keep list bullets tidy inside the Accidents section
+    ul.nomargin { margin: 0; padding-left: 18px; }
+
+    // ---- Conversation (ticket conversation system) — V2 unified timeline ----
+    .dtc-conversation {
+        background: #fff;
+        border: 1px solid $dtc-border;
+        border-radius: $dtc-radius;
+        box-shadow: $dtc-shadow;
+        margin: 12px 0 18px;
+        overflow: hidden;
+    }
+    .dtc-conversation__head {
+        background: $dtc-bg;
+        border-bottom: 1px solid $dtc-border;
+        padding: 9px 14px;
+        font-weight: 700;
+        font-size: 0.95em;
+        color: $dtc-title;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .dtc-thread {
+        list-style: none;
+        margin: 0;
+        padding: 12px 14px;
+        max-height: 640px;
+        overflow-y: auto;
+    }
+    .dtc-thread__daysep {
+        text-align: center;
+        font-size: 0.72em;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: #9aa3b0;
+        margin: 12px 0 8px;
+        position: relative;
+
+        span { background: #fff; padding: 0 10px; position: relative; z-index: 1; }
+        &:before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: $dtc-border; }
+    }
+    .dtc-event {
+        text-align: center;
+        font-size: 0.78em;
+        color: #64748b;
+        margin: 8px 0;
+    }
+    .dtc-msg {
+        display: flex;
+        gap: 10px;
+        margin: 10px 0;
+        align-items: flex-start;
+    }
+    .dtc-msg__avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: $dtc-blue;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        object-fit: cover;
+        overflow: hidden;
+    }
+    .dtc-msg__card {
+        flex: 1;
+        min-width: 0;
+        border: 1px solid $dtc-border;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #fff;
+    }
+    .dtc-msg__head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding: 6px 12px;
+        font-size: 0.85em;
+        border-bottom: 1px solid $dtc-hairline;
+    }
+    .dtc-msg__author { font-weight: 700; color: $dtc-title; }
+    .dtc-msg__type {
+        font-size: 0.92em;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .dtc-msg__time { margin-left: auto; color: #9aa3b0; font-size: 0.9em; }
+
+    .dtc-msg--initial  .dtc-msg__head { background: #e8ecfb; .dtc-msg__type { color: #3730a3; } }
+    .dtc-msg--internal .dtc-msg__head { background: #f5f0ff; .dtc-msg__type { color: #6d28d9; } }
+    .dtc-msg--public   .dtc-msg__head { background: #eef5ff; .dtc-msg__type { color: #1d4ed8; } }
+
+    .dtc-msg__to {
+        padding: 5px 12px 0;
+        font-size: 0.8em;
+        color: $dtc-grey;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        align-items: center;
+    }
+    .dtc-pill { background: #eef2f7; border-radius: 20px; padding: 1px 8px; color: #334155; }
+    .dtc-msg__mentions i { color: #b7791f; }
+    .dtc-msg__subject { padding: 5px 12px 0; font-weight: 600; color: $dtc-title; }
+    .dtc-msg__body {
+        padding: 7px 12px 9px;
+        line-height: 1.5;
+        word-break: break-word;
+
+        p:last-child { margin-bottom: 0; }
+    }
+    .dtc-msg__sent {
+        padding: 0 12px 8px;
+        font-size: 0.8em;
+        font-weight: 600;
+        color: #059669;
+    }
+    .dtc-msg__actions {
+        display: flex;
+        gap: 4px;
+        justify-content: flex-end;
+        padding: 4px 8px 6px;
+        opacity: 0;
+        transition: opacity .15s ease;
+    }
+    .dtc-msg:hover .dtc-msg__actions { opacity: 1; }
+    .dtc-msg__act {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        color: $dtc-grey;
+        padding: 3px 6px;
+        border-radius: 5px;
+
+        &:hover { background: $dtc-bg; color: $dtc-blue; }
+        &--danger:hover { color: #dc2626; }
+    }
+    .dtc-thread__empty {
+        text-align: center;
+        color: #9aa3b0;
+        padding: 24px 12px;
+
+        i { font-size: 28px; display: block; margin-bottom: 8px; opacity: .5; }
+    }
+
+    // ---- Conversation composer ----
+    .dtc-composer {
+        border-top: 1px solid $dtc-border;
+        padding: 12px 14px;
+        transition: background .15s ease;
+
+        &.dtc-composer--internal { background: #fffdf5; }
+        &.dtc-composer--public   { background: #f7fbff; }
+    }
+    .dtc-composer__switch {
+        display: inline-flex;
+        border: 1px solid $dtc-border;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+    .dtc-composer__tab {
+        border: none;
+        background: #fff;
+        cursor: pointer;
+        padding: 6px 12px;
+        font-size: 0.85em;
+        font-weight: 600;
+        color: $dtc-grey;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+
+        &.is-active { color: #fff; background: $dtc-blue; }
+    }
+    .dtc-composer--internal .dtc-composer__tab.is-active { background: #b7791f; }
+    .dtc-composer__foot {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    .dtc-composer__send {
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        padding: 7px 16px;
+        font-size: 0.9em;
+        font-weight: 600;
+        color: #fff;
+        background: $dtc-blue;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+
+        &:disabled { opacity: .6; cursor: default; }
+    }
+    .dtc-composer--internal .dtc-composer__send { background: #b7791f; }
+    .dtc-composer__hint kbd {
+        background: #eef2f7;
+        border: 1px solid $dtc-border;
+        border-radius: 4px;
+        padding: 0 4px;
+        font-size: 0.85em;
+    }
+
+    // ---- Composer: recipients (chips) + subject + template ----
+    .dtc-recipients {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 5px;
+        padding: 5px 0;
+        border-bottom: 1px solid $dtc-hairline;
+    }
+    .dtc-recipients__label {
+        color: $dtc-grey;
+        font-weight: 600;
+        font-size: 0.85em;
+        min-width: 24px;
+    }
+    .dtc-chip {
+        background: #eef2f7;
+        border: 1px solid #dbe2ea;
+        border-radius: 20px;
+        padding: 1px 4px 1px 9px;
+        font-size: 0.82em;
+        color: #334155;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+
+        button {
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #94a3b8;
+            font-size: 1.1em;
+            line-height: 1;
+            padding: 0 2px;
+
+            &:hover { color: #dc2626; }
+        }
+    }
+    .dtc-chip-input {
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 0.85em;
+        flex: 1;
+        min-width: 120px;
+        padding: 3px;
+    }
+    .dtc-composer__subject {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid $dtc-border;
+        border-radius: 6px;
+        padding: 5px 8px;
+        margin: 8px 0 4px;
+        font-size: 0.9em;
+    }
+    .dtc-model-select {
+        border: 1px solid $dtc-border;
+        border-radius: 6px;
+        padding: 3px 6px;
+        font-size: 0.82em;
+        margin-bottom: 4px;
+    }
+
+    // ---- Composer: attachments ----
+    .dtc-composer__attach {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 8px;
+    }
+    .dtc-attach-btn {
+        border: 1px dashed $dtc-border;
+        background: #fff;
+        border-radius: 6px;
+        cursor: pointer;
+        padding: 4px 10px;
+        font-size: 0.82em;
+        color: $dtc-grey;
+
+        &:hover { color: $dtc-blue; border-color: $dtc-blue; }
+    }
+    .dtc-file {
+        background: #eef2f7;
+        border-radius: 6px;
+        padding: 2px 4px 2px 8px;
+        font-size: 0.8em;
+        color: #475569;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+
+        button { border: none; background: none; cursor: pointer; color: #94a3b8; font-size: 1.1em; line-height: 1; padding: 0 2px; }
+    }
+    .dtc-composer--dragover { outline: 2px dashed $dtc-blue; outline-offset: -4px; }
+    .dtc-msg__files {
+        display: inline-block;
+        padding: 0 12px 8px;
+        font-size: 0.8em;
+        font-weight: 600;
+        color: $dtc-blue;
+        text-decoration: none;
+
+        &:hover { text-decoration: underline; }
+    }
+
+    // ---- Message inline edit + mentions + quote ----
+    .dtc-edit-area {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid $dtc-blue;
+        border-radius: 6px;
+        padding: 6px 8px;
+        font: inherit;
+        min-height: 60px;
+    }
+    .dtc-edit-actions { display: flex; gap: 6px; margin-top: 4px; }
+    .dtc-edit-save,
+    .dtc-edit-cancel {
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        padding: 3px 10px;
+        font-size: 0.85em;
+    }
+    .dtc-edit-save { background: $dtc-blue; color: #fff; }
+    .dtc-edit-cancel { background: #eef2f7; color: $dtc-grey; }
+    .dtc-composer__mentions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 0;
+        border-bottom: 1px solid $dtc-hairline;
+
+        .dtc-mention-select { min-width: 200px; }
+    }
+    .dtc-msg__body blockquote {
+        border-left: 3px solid $dtc-border;
+        margin: 4px 0;
+        padding: 2px 10px;
+        color: $dtc-grey;
+        font-style: italic;
+    }
+}
+
+// ---- Responsive: stack the two columns ----
+@media (max-width: 900px) {
+    .digirisk-ticket-card .fichecenter > .fichehalfleft,
+    .digirisk-ticket-card .fichecenter > .fichehalfright {
+        flex: 1 1 100%;
+    }
+}

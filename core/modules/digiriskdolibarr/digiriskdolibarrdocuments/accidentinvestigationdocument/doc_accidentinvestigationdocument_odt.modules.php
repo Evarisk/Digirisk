@@ -28,6 +28,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../../../../saturne/class/saturnesignature.class.php';
+require_once __DIR__ . '/../../../../../../saturne/lib/dolibarr.lib.php';
 
 // Load DigiriskDolibarr libraries.
 require_once __DIR__ . '/../../../../../class/digiriskstandard.class.php';
@@ -240,14 +241,14 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTDigiriskDolibarrDoc
 			} else {
 				$element = new DigiriskStandard($this->db);
 				$element->fetch($accident->fk_standard);
-				$tmpArray['gp_ut'] = $element->ref . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+				$tmpArray['gp_ut'] = $element->ref . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
 			}
 		} else if ($accident->external_accident == 2) {
 			$societe = new Societe($this->db);
 			$societe->fetch($accident->fk_soc);
 			$tmpArray['gp_ut'] = $societe->name;
 		} else {
-			$tmpArray['gp_ut'] = $accident->accident_location;
+			$tmpArray['gp_ut'] = saturne_flatten_wysiwyg_blocks($accident->accident_location);
 		}
 
 		$tmpArray['victim_skills']        = $object->victim_skills;

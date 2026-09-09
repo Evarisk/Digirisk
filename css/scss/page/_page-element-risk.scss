@@ -1,0 +1,66 @@
+/** Risk page banner: cotation counts replacing the native status (moreHtmlStatus hook) */
+.banner-risk-badges {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  max-width: 100%;
+  font-size: 12px;
+
+  .banner-risk-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    color: #333;
+    font-weight: 600;
+
+    .brb-count {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
+      border-radius: 5px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    &.black .brb-count  { background: #2b2b2b; }
+    &.red .brb-count    { background: #e05353; }
+    &.orange .brb-count { background: #e9ad4f; }
+    &.grey .brb-count   { background: #b0b0b0; }
+
+    &.empty {
+      opacity: 0.5;
+    }
+  }
+}
+
+/** Element banner: render the ref as a badge (same look as the GP/UT tree), colored by element type.
+    Scoped to the banner-element-* class (added by saturne_banner_tab only for elements with a subtype),
+    so it never affects other modules' banners. */
+.arearef[class*="banner-element-"] {
+  .banner-ref-sep {
+    display: none; /* the badge uses its own right margin instead of a " - " separator */
+  }
+
+  .refid > span.valignmiddle:first-child {
+    display: inline-block;
+    padding: 4px 8px;
+    margin-right: 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #fff;
+    background: #263c5c; /* default / groupment */
+  }
+}
+
+.arearef.banner-element-workunit .refid > span.valignmiddle:first-child {
+  background: #0d8aff;
+}

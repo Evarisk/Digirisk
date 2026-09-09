@@ -5,14 +5,18 @@
  * \brief   Gantt chart template for action plan tasks
  *
  * Variables expected from calling PHP:
- * - $tasksJson   array  Task data (enriched)
- * - $langs       Translate
- * - $projectId   int    DU project ID
+ * - $tasksJson     array  Task data (enriched)
+ * - $kanbanColumns array  Columns of the action plan scale, from digiriskActionPlanGetKanbanColumns()
+ * - $langs         Translate
+ * - $projectId     int    Displayed project ID
  */
 
 // Create clean data for Gantt JS (without HTML fields like risk_nomurl)
 $ganttData = [];
 foreach ($tasksJson as $t) {
+    // A bar wears the colour of the column its progress falls in, so both views share the same scale
+    $taskColumn = digiriskActionPlanGetColumnForProgress($kanbanColumns, (int) $t['progress']);
+
     $ganttData[] = [
         'id'         => $t['id'],
         'ref'        => $t['ref'],
@@ -22,6 +26,7 @@ foreach ($tasksJson as $t) {
         'progress'   => $t['progress'],
         'risk_ref'   => $t['risk_ref'],
         'url'        => $t['url'],
+        'color'      => !empty($taskColumn) ? $taskColumn['color'] : '',
     ];
 }
 ?>
@@ -29,7 +34,9 @@ foreach ($tasksJson as $t) {
 <!-- JSON data for Gantt JS -->
 <script type="application/json" id="gantt-data"><?= json_encode($ganttData) ?></script>
 
-<div class="gantt-container">
+<div class="gantt-container"
+     data-autoexport="<?= GETPOST('export', 'aZ09') == 'png' ? 'png' : '' ?>"
+     data-html2canvas-url="<?= DOL_URL_ROOT ?>/custom/digiriskdolibarr/js/lib/html2canvas.min.js">
     <?php if (empty($tasksJson)) : ?>
         <div class="gantt-empty">
             <i class="fas fa-tasks" style="font-size: 48px; opacity: 0.3;"></i>

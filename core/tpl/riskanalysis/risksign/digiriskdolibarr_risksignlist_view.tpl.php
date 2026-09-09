@@ -78,7 +78,7 @@ $reshook                                                                        
 $sql                                                                                                                                                  .= preg_replace('/^,/', '', $hookmanager->resPrint);
 $sql                                                                                                                                                   = preg_replace('/,\s*$/', '', $sql);
 $sql                                                                                                                                                  .= " FROM " . MAIN_DB_PREFIX . $risksign->table_element . " as t";
-if (is_array($extrafields->attributes[$risksign->table_element]['label']) && count($extrafields->attributes[$risksign->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risksign->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
+if (is_array($extrafields->attributes[$risksign->table_element]['label'] ?? null) && count($extrafields->attributes[$risksign->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risksign->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
 if ($risksign->ismultientitymanaged == 1) $sql                                                                                                        .= " WHERE t.entity IN (" . getEntity($risksign->element) . ")";
 else $sql                                                                                                                                             .= " WHERE 1 = 1";
 $sql                                                                                                                                                  .= " AND fk_element = " . $id;
@@ -87,7 +87,7 @@ $sql                                                                            
 foreach ($search as $key => $val) {
 	if ($key == 'status' && $search[$key] == -1) continue;
 	$mode_search = (($risksign->isInt($risksign->fields[$key]) || $risksign->isFloat($risksign->fields[$key])) ? 1 : 0);
-	if (strpos($risksign->fields[$key]['type'], 'integer:') === 0) {
+	if (strpos($risksign->fields[$key]['type'] ?? '', 'integer:') === 0) {
 		if ($search[$key] == '-1') $search[$key] = '';
 		$mode_search                             = 2;
 	}
@@ -127,8 +127,9 @@ if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit
 	$num = $db->num_rows($resql);
 }
 
-// Direct jump if only one record found
-if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
+// Direct jump if only one record found, out of reach once the page header has been printed : the redirect
+// would only raise a "headers already sent" warning and leave the list truncated
+if ($num == 1 && !headers_sent() && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
 	$obj = $db->fetch_object($resql);
 	$id  = $obj->rowid;
 	header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risksign.php', 1) . '?id=' . $id);
@@ -256,13 +257,13 @@ foreach ($risksign->fields as $key => $val) {
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
 	if ( ! empty($arrayfields['t.' . $key]['checked'])) {
 		print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
-		if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
-		elseif (strpos($val['type'], 'integer:') === 0) {
+		if (is_array($val['arrayofkeyval'] ?? null)) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'] ?? 0, 0, 0, '', 1, 0, 0, '', 'maxwidth75');
+		elseif (strpos($val['type'] ?? '', 'integer:') === 0) {
 			print $risksign->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 		} elseif ($key == 'category') { ?>
-			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
-				<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
-				<?php if (dol_strlen(dol_escape_htmltag($search[$key])) == 0) : ?>
+			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+				<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key] ?? '') ?>" />
+				<?php if (dol_strlen(dol_escape_htmltag($search[$key] ?? '')) == 0) : ?>
 					<div class="dropdown-toggle dropdown-add-button">
 						<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-map-signs button-icon"></i></span>
 						<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
@@ -284,7 +285,7 @@ foreach ($risksign->fields as $key => $val) {
 					endif; ?>
 				</ul>
 			</div>
-		<?php } elseif ( ! preg_match('/^(date|timestamp)/', $val['type']) && $key != 'category') print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
+		<?php } elseif ( ! preg_match('/^(date|timestamp)/', $val['type'] ?? '') && $key != 'category') print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key] ?? '') . '">';
 		print '</td>';
 	}
 }
@@ -332,7 +333,7 @@ print '</tr>' . "\n";
 
 // contenu
 $i          = 0;
-$totalarray = array();
+$totalarray = array('nbfield' => 0, 'val' => array(), 'pos' => array());
 
 while ($i < ($limit ? min($num, $limit) : $num)) {
 	$obj = $db->fetch_object($resql);

@@ -785,22 +785,20 @@ if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
                     $firstServiceId = (int) (is_string($serviceId) ? strtok((string) $serviceId, ',') : $serviceId);
                     $serviceDisplay = '';
                     $serviceOptions = [['id' => 0, 'label' => '— ' . $langs->transnoentities('NoneSelected') . ' —']];
-                    if (file_exists(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php')) {
-                        require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php';
-                        $de = new DigiriskElement($db);
-                        if ($firstServiceId > 0 && $de->fetch($firstServiceId) > 0) {
-                            // 6th arg ($addLabel=1) appends " - <label>" after the ref.
-                            $serviceDisplay = $de->getNomUrl(1, '', 0, '', -1, 1);
-                        }
-                        $allElements = $de->fetchAll('ASC', 't.ref', 0, 0, ['customsql' => 't.status > 0 AND t.entity IN (' . getEntity('digiriskdolibarr_digiriskelement') . ')']);
-                        if (is_array($allElements)) {
-                            foreach ($allElements as $el) {
-                                $label = trim(($el->ref ? $el->ref . ' — ' : '') . ($el->label ?? ''));
-                                if ($label === '') {
-                                    $label = '#' . (int) $el->id;
-                                }
-                                $serviceOptions[] = ['id' => (int) $el->id, 'label' => $label];
+                    dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
+                    $de = new DigiriskElement($db);
+                    if ($firstServiceId > 0 && $de->fetch($firstServiceId) > 0) {
+                        // 6th arg ($addLabel=1) appends " - <label>" after the ref.
+                        $serviceDisplay = $de->getNomUrl(1, '', 0, '', -1, 1);
+                    }
+                    $allElements = $de->fetchAll('ASC', 't.ref', 0, 0, ['customsql' => 't.status > 0 AND t.entity IN (' . getEntity('digiriskdolibarr_digiriskelement') . ')']);
+                    if (is_array($allElements)) {
+                        foreach ($allElements as $el) {
+                            $label = trim(($el->ref ? $el->ref . ' — ' : '') . ($el->label ?? ''));
+                            if ($label === '') {
+                                $label = '#' . (int) $el->id;
                             }
+                            $serviceOptions[] = ['id' => (int) $el->id, 'label' => $label];
                         }
                     }
                     $renderField('options_digiriskdolibarr_ticket_service', 'select', 'GP/UT',
@@ -883,7 +881,7 @@ if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
                 <h3 class="tac-section__title"><i class="fas fa-envelope-open-text"></i> <?php print $langs->trans('InitialMessage'); ?></h3>
                 <?php $sectionControls('initial_message'); ?>
                 <div class="tac-grid tac-grid--single">
-                    <?php $renderField('message', 'longtext', 'InitialMessage',
+                    <?php $renderField('message', 'readonly', 'InitialMessage',
                         $object->message ?? '',
                         !empty($object->message) ? dolPrintHTML($object->message) : ''); ?>
                 </div>
