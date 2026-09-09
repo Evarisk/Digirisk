@@ -64,7 +64,7 @@ $fk_parent           = GETPOST('fk_parent', 'int');
 $fromiduser          = GETPOST('fromiduser', 'int'); //element id
 $accident_type       = GETPOST('accident_type');
 $external_accident   = GETPOST('external_accident');
-$accident_location   = GETPOST('accident_location');
+$accident_location   = GETPOST('accident_location', 'restricthtml');
 $fk_soc              = GETPOST('fk_soc');
 $fkTicket            = GETPOSTISSET('fk_ticket') ? GETPOST('fk_ticket', 'int') : 0;
 
@@ -158,10 +158,10 @@ if (empty($reshook)) {
 		$user_employer_id   = GETPOST('fk_user_employer');
 		$digiriskelement_id = GETPOST('fk_element');
 		$label              = GETPOST('label');
-		$description        = GETPOST('description');
+		$description        = GETPOST('description', 'restricthtml');
 		$accident_type      = GETPOST('accident_type');
 		$external_accident  = GETPOST('external_accident');
-		$accident_location  = GETPOST('accident_location');
+		$accident_location  = GETPOST('accident_location', 'restricthtml');
         $extSocietyId       = GETPOST('fk_soc');
 
         // Initialize object accident
@@ -259,7 +259,7 @@ if (empty($reshook)) {
 		$description        = GETPOST('description', 'restricthtml');
 		$accident_type      = GETPOST('accident_type');
 		$external_accident  = GETPOST('external_accident');
-		$accident_location  = GETPOST('accident_location');
+		$accident_location  = GETPOST('accident_location', 'restricthtml');
         $extSocietyId       = GETPOST('fk_soc');
 		$user_victim_id	    = GETPOST('fk_user_victim');
 
@@ -690,7 +690,7 @@ if ($action == 'create') {
 
 	//AccidentLocation -- lieu de l'accident
 	print '<tr class="accident_location_field" ' . (GETPOST('external_accident') == 3 ? '' : 'style="display:none"') . '><td class="minwidth300">' . $langs->trans("AccidentLocation") . '</td><td>';
-	$doleditor = new DolEditor('accident_location', GETPOST('accident_location'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor = new DolEditor('accident_location', GETPOST('accident_location', 'restricthtml'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
 
@@ -702,7 +702,7 @@ if ($action == 'create') {
 
 	//Description -- Description
 	print '<tr class="content_field"><td><label for="content">' . $langs->trans("Description") . '</label></td><td>';
-	$doleditor = new DolEditor('description', GETPOST('description'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor = new DolEditor('description', GETPOST('description', 'restricthtml'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
 
@@ -714,7 +714,7 @@ if ($action == 'create') {
   // Categories
   if (!empty($conf->categorie->enabled)) {
       print '<tr><td>'.$langs->trans("Categories").'</td><td>';
-      $categoryArborescence = $form->select_all_categories('accident', '', 'parent', 64, 0, 1);
+      $categoryArborescence = $form->select_all_categories('digiriskaccident', '', 'parent', 64, 0, 1);
       print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, GETPOST('categories', 'array'), '', 0, 'maxwidth300 widthcentpercentminusx');
       print '<a class="butActionNew" href="' . DOL_URL_ROOT . '/categories/index.php?type=accident&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans('AddCategories') . '"></span></a>';
       print "</td></tr>";
@@ -831,7 +831,7 @@ if (($id || $ref) && $action == 'edit') {
   // Tags-Categories
   if ($conf->categorie->enabled) {
       print '<tr><td>'.$langs->trans("Categories").'</td><td>';
-      $categoryArborescence = $form->select_all_categories('accident', '', 'parent', 64, 0, 1);
+      $categoryArborescence = $form->select_all_categories('digiriskaccident', '', 'parent', 64, 0, 1);
       $c = new Categorie($db);
       $cats = $c->containing($object->id, 'accident');
       $arrayselected = array();
@@ -1046,7 +1046,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $thirdparty->getNomUrl(1);
 			break;
 		case 3:
-			print $object->accident_location;
+			print dolPrintHTML($object->accident_location);
 			break;
 	}
 	print '</td></tr>';
@@ -1056,7 +1056,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $form->textwithpicto($langs->trans("Description"), $langs->trans("GaugeCounter"), 1, 'info');
 	print '</td>';
 	print '<td>';
-	print $object->description;
+	print dolPrintHTML($object->description);
 	print '</td></tr>';
 
     print '</table>';
@@ -1240,27 +1240,22 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
                     print $item->ref;
                     print '</td>';
 
-                    $coldisplay++;
                     print '<td>';
                     print '<input type="number" name="workstop_days" class="minwidth150" min="0" value="' . $item->workstop_days . '">';
                     print '</td>';
 
-                    $coldisplay++;
                     print '<td>';
                     print $form->selectDate($item->date_start_workstop, 'datestart', 1, 1, 0, '', 1);
                     print '</td>';
 
-                    $coldisplay++;
                     print '<td>';
                     print $form->selectDate($item->date_end_workstop, 'dateend', 1, 1, 0, '', 1);
                     print '</td>';
 
-                    $coldisplay++;
                     print '<td>';
                     print '<input name="declarationLink" value="'. (GETPOST('declarationLink') ?: $item->declaration_link) .'">';
                     print '</td>';
 
-                    $coldisplay += $colspan;
                     print '<td class="center" colspan="' . $colspan . '">';
                     print '<input type="submit" class="button" value="' . $langs->trans('Save') . '" name="updateLine" id="updateLine">';
                     print ' &nbsp; <input type="submit" id ="cancelLine" class="button" name="cancelLine" value="' . $langs->trans("Cancel") . '">';
@@ -1273,33 +1268,27 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
                     print $item->ref;
                     print '</td>';
 
-                    $coldisplay++;
                     print '<td>';
                     print $item->workstop_days;
                     print '</td>';
 
-                    $coldisplay++;
                     print '<td>';
                     print dol_print_date($item->date_start_workstop, 'dayhour');
                     print '</td>';
 
-                    $coldisplay++;
                     print '<td>';
                     print dol_print_date($item->date_end_workstop, 'dayhour');
                     print '</td>';
 
-                    $coldisplay++;
                     print '<td>';
                     $is_link = dol_is_url($item->declaration_link);
                     print ($is_link ? '<a target="_blank" href="'. $item->declaration_link .'">' : '') . $item->declaration_link . ($is_link ? '</a>' : '') ;
                     print '</td>';
 
-                    $coldisplay += $colspan;
 
                     //Actions buttons
                     if ($object->status == Accident::STATUS_DRAFT) {
                         print '<td class="center">';
-                        $coldisplay++;
                         print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
                         print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '&amp;token=' . newToken() . '">';
                         print img_delete();
@@ -1328,27 +1317,22 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $objectline->getNextNumRef();
 			print '</td>';
 
-			$coldisplay++;
 			print '<td>';
 			print '<input type="number" name="workstop_days" class="minwidth150" min="0" value="">';
 			print '</td>';
 
-			$coldisplay++;
 			print '<td>';
 			print $form->selectDate(dol_now('tzuser'), 'datestart', 1, 1, 0, '', 1);
 			print '</td>';
 
-			$coldisplay++;
 			print '<td>';
 			print $form->selectDate(dol_now('tzuser'), 'dateend', 1, 1, 0, '', 1);
 			print '</td>';
 
-			$coldisplay++;
 			print '<td class="maxwidth100">';
 			print '<input name="declarationLink" id="declarationLink" value="'. GETPOST('declarationLink') . '">';
 			print '</td>';
 
-			$coldisplay += $colspan;
 			print '<td class="center" colspan="' . $colspan . '">';
 			print '<input type="submit" class="button" value="' . $langs->trans('Add') . '" name="addline" id="addline">';
 			print '</td>';

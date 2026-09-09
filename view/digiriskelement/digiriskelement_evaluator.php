@@ -177,7 +177,13 @@ if (empty($reshook)) {
 		$duration    = $data['duration'];
 		$date        = $data['date'];
 		$job         = $data['job'];
-		$evaluatorID = $data['evaluatorID'];
+		$evaluatorID = (int) ($data['evaluatorID'] ?? 0);
+
+		// Sans utilisateur valide l'évaluateur serait créé avec fk_user = 0 et afficherait la mauvaise personne dans la liste
+		if ($evaluatorID <= 0) {
+			$error++;
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentities('UserAssigned')), null, 'errors');
+		}
 
 		$usertmp->fetch($evaluatorID);
 
@@ -430,8 +436,9 @@ if ($object->id > 0 || $fromid > 0) {
 
 		$num = $db->num_rows($resql);
 	}
-	// Direct jump if only one record found
-	if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
+	// Direct jump if only one record found, out of reach once the page header has been printed : the redirect
+	// would only raise a "headers already sent" warning and leave the list truncated
+	if ($num == 1 && !headers_sent() && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
 		$obj = $db->fetch_object($resql);
 		$id  = $obj->rowid;
 		header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php', 1) . '?id=' . $id);
@@ -677,11 +684,13 @@ if ($object->id > 0 || $fromid > 0) {
 				} elseif ($key == 'duration') {
 					print '<td>' . $evaluator->$key . ' min';
 				} elseif ($key == 'fk_user') {
-					$user->fetch($evaluator->$key);
-					print '<td>' . $user->getNomUrl(1);
+					// Objet dédié et neuf à chaque ligne : fetch() laisse l'objet intact quand il échoue, la ligne
+					// afficherait alors l'utilisateur de la ligne précédente (ou l'utilisateur connecté pour la première)
+					$userAssigned = new User($db);
+					print '<td>' . ($userAssigned->fetch($evaluator->$key) > 0 ? $userAssigned->getNomUrl(1) : '');
 				} elseif ($key == 'fk_parent') {
-					$object->fetch($evaluator->fk_parent);
-					print '<td>' . $object->getNomUrl(1, 'blank', 0, '', -1, 1);
+					$parentElement = new DigiriskElement($db);
+					print '<td>' . ($parentElement->fetch($evaluator->fk_parent) > 0 ? $parentElement->getNomUrl(1, 'blank', 0, '', -1, 1) : '');
 				} else {
 					print '<td>' . $evaluator->$key;
 				}

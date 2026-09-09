@@ -54,7 +54,8 @@ $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
 
 // Security check - Protection if external user
-$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
 /*
@@ -99,6 +100,9 @@ if ($action == 'setMediaInfos') {
 	}
 }
 
+// Actions set_mod, update_mask and the set_/del_ switch of the module constants
+require_once __DIR__ . '/../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
+
 /*
  * View
  */
@@ -117,7 +121,30 @@ print load_fiche_titre($langs->trans($title), $linkback, 'title_setup');
 $head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'settings', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
 
-print '<div style="text-indent: 3em"><br>' . '<i class="fas fa-2x fa-calendar-alt" style="padding: 10px"></i>   ' . $langs->trans("AgendaModuleRequired") . '<br></div>';
+// L'assistant de configuration cree un utilisateur USERAPI et sa cle d'API sans dependre du module API REST :
+// tant que celui-ci est eteint, les routes ne repondent pas et l'application mobile ne peut pas se connecter.
+// Compter les utilisateurs plutot que fetch() par login : l'assistant a pu creer un USERAPI par entite et fetch()
+// refuse alors de trancher (USERDUPLICATEFOUND). La constante DIGIRISKDOLIBARR_USERAPI_SET n'est pas fiable non plus,
+// des lignes vides par entite masquent la valeur posee sur l'entite 0.
+if (!isModEnabled('api')) {
+	$sql  = 'SELECT COUNT(u.rowid) AS nb FROM ' . MAIN_DB_PREFIX . 'user AS u';
+	$sql .= " WHERE u.login = 'USERAPI' AND u.api_key IS NOT NULL AND u.api_key != ''";
+	$sql .= ' AND u.entity IN (0, ' . ((int) $conf->entity) . ')';
+
+	$resqlUserApi = $db->query($sql);
+	if ($resqlUserApi) {
+		$objUserApi = $db->fetch_object($resqlUserApi);
+		if ($objUserApi->nb > 0) {
+			print '<div style="text-indent: 3em"><br>' . '<i class="fas fa-2x fa-plug" style="padding: 10px"></i>  ' . $langs->trans("UserApiWithoutApiModule") . '  ' . '<a href="../../../admin/modules.php">' . $langs->trans('ConfigMyModules') . '</a>' . '<br></div>';
+		}
+		$db->free($resqlUserApi);
+	} else {
+		dol_syslog('digiriskdolibarr setup USERAPI check ' . $db->lasterror(), LOG_ERR);
+	}
+}
+if (!isModEnabled('export') || !isModEnabled('import')) {
+	print '<div style="text-indent: 3em"><br>' . '<i class="fas fa-2x fa-file-export" style="padding: 10px"></i>  ' . $langs->trans("ExportImportModulesAdvice") . '  ' . '<a href="../../../admin/modules.php">' . $langs->trans('ConfigMyModules') . '</a>' . '<br></div>';
+}
 print '<div style="text-indent: 3em"><br>' . '<i class="fas fa-2x fa-tools" style="padding: 10px"></i>  ' . $langs->trans("HowToSetupOtherModules") . '  ' . '<a href=' . '"../../../admin/modules.php">' . $langs->trans('ConfigMyModules') . '</a>' . '<br></div>';
 print '<div style="text-indent: 3em"><br>' . '<i class="fas fa-2x fa-file-alt" style="padding: 10px"></i>  ' . $langs->trans("AvoidLogoProblems") . '  ' . '<a href="' . $langs->trans('LogoHelpLink') . '">' . $langs->trans('LogoHelpLink') . '</a>' . '<br></div>';
 print '<div style="text-indent: 3em"><br>' . '<i class="fab fa-2x fa-css3-alt" style="padding: 10px"></i>  ' . $langs->trans("HowToSetupIHM") . '  ' . '<a href=' . '"../../../admin/ihm.php">' . $langs->trans('ConfigIHM') . '</a>' . '<br></div>';
@@ -129,63 +156,79 @@ print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
 print '<td>' . $langs->trans("Name") . '</td>';
 print '<td>' . $langs->trans("Description") . '</td>';
+print '<td class="center">' . $langs->trans("TutoImage") . '</td>';
 print '<td class="center">' . $langs->trans("Status") . '</td>';
 print '</tr>';
 
-print '<tr class="oddeven"><td>';
-print $langs->trans('DigiriskManagement');
-print '</td><td>';
-print $langs->trans('DigiriskDescription');
-print '</td>';
+// Each entry: constant => [label key, description key, tuto image name in img/config_tuto/setup/]
+// The captcha has no tuto image: it only shows on the public pages once enabled.
+$digiriskSettings = [
+    'DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION'    => ['DigiriskManagement', 'DigiriskDescription', 'redirect'],
+    'DIGIRISKDOLIBARR_USE_CAPTCHA'                  => ['UseCaptcha', 'UseCaptchaDescription', ''],
+    'DIGIRISKDOLIBARR_TOOLS_ADVANCED_IMPORT'        => ['AdvancedImport', 'AdvancedImportDescription', 'advanced_import'],
+    'DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES'    => ['ManuelInputNBEmployees', 'ManuelInputNBEmployeesDescription', 'nb_employees'],
+    'DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS' => ['ManuelInputNBWorkedHours', 'ManuelInputNBWorkedHoursDescription', 'nb_worked_hours'],
+    'DIGIRISKDOLIBARR_SHOW_PATCH_NOTE'              => ['ShowPatchNoteAgain', 'ShowPatchNoteAgainDescription', 'patch_note'],
+];
 
-print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION');
-print '</td>';
+foreach ($digiriskSettings as $constName => $transKeys) {
+    print '<tr class="oddeven"><td>';
+    print $langs->trans($transKeys[0]);
+    print '</td><td>';
+    print $langs->trans($transKeys[1]);
+    print '</td>';
+    print '<td class="center">';
+    if (!empty($transKeys[2])) {
+        print digiriskdolibarr_tuto_image('setup', $transKeys[2], $langs->trans($transKeys[0]));
+    }
+    print '</td>';
+    print '<td class="center">';
+    print saturne_constant_onoff($constName, $permissiontowrite);
+    print '</td>';
+    print '</tr>';
+}
+print '</table>';
+
+// Click on a tuto image to display it full size
+digiriskdolibarr_tuto_overlay();
+
+print load_fiche_titre($langs->trans("MenuVisibility"), '', '');
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans("Name") . '</td>';
+print '<td>' . $langs->trans("Description") . '</td>';
+print '<td class="center">' . $langs->trans("Status") . '</td>';
 print '</tr>';
 
-//Use captcha
-print '<tr class="oddeven"><td>';
-print  $langs->trans("UseCaptcha");
-print '</td><td>';
-print $langs->trans('UseCaptchaDescription');
-print '</td>';
-print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_USE_CAPTCHA');
-print '</td>';
-print '</tr>';
+// Each entry: constant => [label key, description key]
+// The constant stores the hidden state: an absent constant means the menu entries are shown, so an
+// installation upgraded without reactivating the module keeps every entry visible.
+// The environment constant is named after riskenvironmental on purpose: dol_eval() rejects the whole
+// menu condition as soon as it contains the _ENV substring, which DIGIRISKDOLIBARR_ENVIRONMENT_ has.
+$digiriskMenuSettings = [
+    'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_MENU_HIDDEN' => ['RiskAssessmentDocument', 'RiskAssessmentDocumentMenuVisibilityDescription'],
+    'DIGIRISKDOLIBARR_RISKENVIRONMENTAL_MENU_HIDDEN'      => ['Environment', 'EnvironmentMenuVisibilityDescription'],
+    'DIGIRISKDOLIBARR_PREVENTIONPLAN_MENU_HIDDEN'         => ['PreventionPlan', 'PreventionPlanMenuVisibilityDescription'],
+    'DIGIRISKDOLIBARR_FIREPERMIT_MENU_HIDDEN'             => ['FirePermit', 'FirePermitMenuVisibilityDescription'],
+    'DIGIRISKDOLIBARR_ACCIDENT_MENU_HIDDEN'               => ['Accident', 'AccidentMenuVisibilityDescription'],
+    'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_MENU_HIDDEN'  => ['AccidentInvestigation', 'AccidentInvestigationMenuVisibilityDescription'],
+    'DIGIRISKDOLIBARR_TOOLS_MENU_HIDDEN'                  => ['Tools', 'ToolsMenuVisibilityDescription'],
+];
 
-// Advanced Import
-print '<tr class="oddeven"><td>';
-print  $langs->trans("AdvancedImport");
-print '</td><td>';
-print $langs->trans('AdvancedImportDescription');
-print '</td>';
-print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_TOOLS_ADVANCED_IMPORT');
-print '</td>';
-print '</tr>';
-
-// Manuel input number employees
-print '<tr class="oddeven"><td>';
-print  $langs->trans("ManuelInputNBEmployees");
-print '</td><td>';
-print $langs->trans('ManuelInputNBEmployeesDescription');
-print '</td>';
-print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES');
-print '</td>';
-print '</tr>';
-
-// Manuel input number worked hours
-print '<tr class="oddeven"><td>';
-print  $langs->trans("ManuelInputNBWorkedHours");
-print '</td><td>';
-print $langs->trans('ManuelInputNBWorkedHoursDescription');
-print '</td>';
-print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS');
-print '</td>';
-print '</tr>';
+foreach ($digiriskMenuSettings as $constName => $transKeys) {
+    print '<tr class="oddeven"><td>';
+    print $langs->trans($transKeys[0]);
+    print '</td><td>';
+    print $langs->trans($transKeys[1]);
+    print '</td>';
+    print '<td class="center">';
+    // Revert the switch: the constant holds the hidden state, the switch shows the visible one
+    // The reverted switch has no saturne_constant_onoff equivalent, so the zero instead of the deletion is asked here
+    print ajax_constantonoff($constName, [], null, 1, 0, 0, 2, 0, 1);
+    print '</td>';
+    print '</tr>';
+}
 print '</table>';
 
 print load_fiche_titre($langs->trans("MediaData"), '', '');

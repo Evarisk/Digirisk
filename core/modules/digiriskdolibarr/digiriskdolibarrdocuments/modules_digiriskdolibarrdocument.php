@@ -27,6 +27,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 
 // Load Saturne libraries
 require_once __DIR__ . '/../../../../../saturne/core/modules/saturne/modules_saturne.php';
+require_once __DIR__ . '/../../../../../saturne/lib/dolibarr.lib.php';
 
 /**
  * Parent class for documents models
@@ -37,6 +38,16 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
      * @var string Module
      */
     public string $module = 'digiriskdolibarr';
+
+    /**
+     * @var array Lang key of each risk assessment level, indexed by evaluation scale
+     */
+    public const RISK_ASSESSMENT_LEVEL_LABELS = [
+        1 => 'GreyRisk',
+        2 => 'OrangeRisk',
+        3 => 'RedRisk',
+        4 => 'BlackRisk'
+    ];
 
     /**
      * Set risk by risk assessment levels segment
@@ -64,17 +75,25 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             $digiriskElements           = $moreParam['digiriskElements'];
             $riskByRiskAssessmentLevels = $moreParam['riskByRiskAssessmentLevels'];
             $riskAssessmentLevel        = explode('Risks', $moreParam['segmentName'])[1];
+            // A cotation level with no risk used to be merged as one row full of "-". The four levels
+            // share the same table, so up to four unreadable rows landed in the middle of the list.
+            // The row now names the level it stands for, and the columns that mean nothing here are
+            // blanked with a space: setTmpArrayVars() turns a truly empty value into "N/A", which is
+            // exactly the noise being complained about — issue #4459
             if (empty($digiriskElements) || empty($riskByRiskAssessmentLevels) || empty($riskByRiskAssessmentLevels[$riskAssessmentLevel])) {
-                $tmpArray['digiriskElementLabel']   = '';
+                $levelLabel = $outputLangs->transnoentities(static::RISK_ASSESSMENT_LEVEL_LABELS[$riskAssessmentLevel] ?? '');
+
+                $tmpArray['digiriskElementLabel']   = ' ';
                 $tmpArray['picto']                  = '';
-                $tmpArray['riskCategoryName']       = '-';
-                $tmpArray['ref']                    = '-';
-                $tmpArray['riskAssessmentCotation'] = '-';
-                $tmpArray['description']            = '-';
-                $tmpArray['riskAssessmentComment']  = '-';
-                $tmpArray['riskTaskUncompleted']    = '-';
-                $tmpArray['riskTaskCompleted']      = '-';
-                $tmpArray['riskAssessment_photo']   = '-';
+                $tmpArray['riskCategoryName']       = ' ';
+                $tmpArray['ref']                    = ' ';
+                $tmpArray['riskAssessmentCotation'] = ' ';
+                $tmpArray['description']            = $outputLangs->transnoentities('NoRiskAtThisLevel', $levelLabel);
+                $tmpArray['riskAssessmentComment']  = ' ';
+                $tmpArray['riskAssessmentTrend']    = ' ';
+                $tmpArray['riskTaskUncompleted']    = ' ';
+                $tmpArray['riskTaskCompleted']      = ' ';
+                $tmpArray['riskAssessment_photo']   = '';
 
                 SaturneDocumentModel::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
                 $odfHandler->mergeSegment($listLines);
@@ -82,7 +101,7 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             }
 
             foreach ($riskByRiskAssessmentLevels[$riskAssessmentLevel] as $risk) {
-                $digiriskElement = $digiriskElements[$risk->fk_element];
+                $digiriskElement = $digiriskElements[$risk->fk_element] ?? null;
                 if (empty($digiriskElement)) {
                     continue; // Skip if digirisk element not found (case of GP/UT fiche with spécific id)
                 }
@@ -100,6 +119,7 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                     $tmpArray['riskAssessmentComment'] = dol_print_date((getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE') && !empty($risk->riskAssessmentDate) ? $risk->riskAssessmentDate : $risk->riskAssessmentDateCreation), 'dayreduceformat') . ': ';
                 }
                 $tmpArray['riskAssessmentComment'] = $risk->riskAssessmentComment ?: '';
+                $tmpArray['riskAssessmentTrend']   = static::setRiskAssessmentTrendTag($outputLangs, $risk, $moreParam);
 
                 $moreParam['riskId']             = $risk->id;
                 $riskTask                        = static::setRiskTasksTag($outputLangs, $moreParam);
@@ -116,6 +136,99 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                 }
 
                 SaturneDocumentModel::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+            }
+            $odfHandler->mergeSegment($listLines);
+        }
+    }
+
+    /**
+     * Build the "risk going up or down" tag of a risk row — issue #4459
+     *
+     * Only filled when the document was asked for a date range and the previous cotations were
+     * loaded beforehand: outside the audit report there is no earlier state to compare with, and
+     * the tag stays empty rather than claiming a risk is new.
+     *
+     * @param  Translate $outputLangs Lang object to use for output
+     * @param  object    $risk        Risk carrying the cotation shown on the row
+     * @param  array     $moreParam   More param (previousRiskAssessmentCotations)
+     * @return string                 Translated trend, empty when nothing can be compared
+     */
+    protected static function setRiskAssessmentTrendTag(Translate $outputLangs, $risk, array $moreParam): string
+    {
+        if (!isset($moreParam['previousRiskAssessmentCotations'])) {
+            return '';
+        }
+
+        $currentCotation = (int) $risk->riskAssessmentCotation;
+        if (!array_key_exists($risk->id, $moreParam['previousRiskAssessmentCotations'])) {
+            return $outputLangs->transnoentities('RiskTrendNew');
+        }
+
+        $previousCotation = (int) $moreParam['previousRiskAssessmentCotations'][$risk->id];
+        if ($currentCotation > $previousCotation) {
+            $trendKey = 'RiskTrendUp';
+        } elseif ($currentCotation < $previousCotation) {
+            $trendKey = 'RiskTrendDown';
+        } else {
+            $trendKey = 'RiskTrendStable';
+        }
+
+        return $outputLangs->transnoentities($trendKey, $previousCotation, $currentCotation);
+    }
+
+    /**
+     * Set digirisk elements segment — issue #4459
+     *
+     * Lists the GP/UT added, modified or deleted over the period. The synthesis only ever gave a
+     * count, which does not tell the reader which work unit moved, and the deleted ones vanished
+     * from the report entirely.
+     *
+     * @param Odf       $odfHandler  Object builder odf library
+     * @param Translate $outputLangs Lang object to use for output
+     * @param array     $moreParam   More param (digiriskElementChanges)
+     *
+     * @throws OdfException
+     * @throws Exception
+     */
+    protected static function setDigiriskElementsSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
+    {
+        $foundTagForLines = 1;
+        try {
+            $listLines = $odfHandler->setSegment('digiriskElements');
+        } catch (OdfExceptionSegmentNotFound $e) {
+            // We may arrive here if tags for lines not present into template
+            $foundTagForLines = 0;
+            $listLines        = '';
+            dol_syslog($e->getMessage());
+        }
+
+        if ($foundTagForLines) {
+            $digiriskElementChanges = $moreParam['digiriskElementChanges'] ?? [];
+            if (empty($digiriskElementChanges)) {
+                $tmpArray = [
+                    'digiriskElementRefLabel' => ' ',
+                    'digiriskElementType'     => ' ',
+                    'digiriskElementState'    => $outputLangs->transnoentities('NoDigiriskElementChange'),
+                    'digiriskElementDate'     => ' '
+                ];
+
+                static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                $odfHandler->mergeSegment($listLines);
+                return;
+            }
+
+            foreach ($digiriskElementChanges as $digiriskElementChange) {
+                $digiriskElement = $digiriskElementChange['object'];
+                $typeKey         = $digiriskElement->element_type == 'groupment' ? 'Groupment' : 'WorkUnit';
+
+                $tmpArray = [
+                    'digiriskElementRefLabel' => 'S' . $digiriskElement->entity . ' - ' . $digiriskElement->ref . ' - ' . $digiriskElement->label,
+                    'digiriskElementType'     => $outputLangs->transnoentities($typeKey),
+                    'digiriskElementState'    => $outputLangs->transnoentities('DigiriskElement' . $digiriskElementChange['state']),
+                    'digiriskElementDate'     => dol_print_date($digiriskElementChange['date'], 'day', 'tzuser')
+                ];
+
+                static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
             }
             $odfHandler->mergeSegment($listLines);
         }
@@ -264,11 +377,11 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             $riskSigns = $moreParam['riskSigns'];
             if (empty($riskSigns)) {
                 $tmpArray = [
-                    'nomElement'                => '',
+                    'nomElement'                => ' ',
                     'recommandation_photo'      => '',
-                    'identifiantRecommandation' => '',
-                    'recommandationName'        => '',
-                    'recommandationComment'     => '',
+                    'identifiantRecommandation' => ' ',
+                    'recommandationName'        => ' ',
+                    'recommandationComment'     => ' ',
                 ];
 
                 static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
@@ -317,13 +430,13 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             $evaluators = $moreParam['evaluators'];
             if (empty($evaluators)) {
                 $tmpArray = [
-                    'nomElement'                 => '',
-                    'idUtilisateur'              => '',
-                    'dateAffectationUtilisateur' => '',
-                    'dureeEntretien'             => '',
-                    'nomUtilisateur'             => '',
-                    'prenomUtilisateur'          => '',
-                    'travailUtilisateur'         => '',
+                    'nomElement'                 => ' ',
+                    'idUtilisateur'              => ' ',
+                    'dateAffectationUtilisateur' => ' ',
+                    'dureeEntretien'             => ' ',
+                    'nomUtilisateur'             => ' ',
+                    'prenomUtilisateur'          => ' ',
+                    'travailUtilisateur'         => ' ',
                 ];
 
                 static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
@@ -374,10 +487,10 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             $accidents = $moreParam['accidents'];
             if (empty($accidents)) {
                 $tmpArray = [
-                    'identifiantAccident'  => '',
-                    'AccidentName'         => '',
-                    'AccidentWorkStopDays' => '',
-                    'AccidentComment'      => '',
+                    'identifiantAccident'  => ' ',
+                    'AccidentName'         => ' ',
+                    'AccidentWorkStopDays' => ' ',
+                    'AccidentComment'      => ' ',
                 ];
 
                 static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
@@ -390,7 +503,7 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                     'identifiantAccident'  => $accident->ref,
                     'AccidentName'         => $accident->label,
                     'AccidentWorkStopDays' => $accident->nbAccidentWorkStop,
-                    'AccidentComment'      => $accident->description,
+                    'AccidentComment'      => saturne_flatten_wysiwyg_blocks($accident->description),
                 ];
 
                 static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
@@ -425,14 +538,14 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             $tickets = $moreParam['tickets'];
             if (empty($tickets)) {
                 $tmpArray = [
-                    'refticket'                 => '',
-                    'categories'                => '',
-                    'creation_date'             => '',
-                    'subject'                   => '',
-                    'message'                   => '',
-                    'progress'                  => '',
-                    'digiriskelement_ref_label' => '',
-                    'status'                    => '',
+                    'refticket'                 => ' ',
+                    'categories'                => ' ',
+                    'creation_date'             => ' ',
+                    'subject'                   => ' ',
+                    'message'                   => ' ',
+                    'progress'                  => ' ',
+                    'digiriskelement_ref_label' => ' ',
+                    'status'                    => ' ',
                 ];
 
                 static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
@@ -445,8 +558,17 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
 
             $category = new Categorie($this->db);
 
+            // Only the ticket categories picked in the module setup are printed, all of them when the setup is empty
+            $allowedCategoryIds = array_filter(array_map('intval', explode(',', getDolGlobalString('DIGIRISKDOLIBARR_TICKET_DOCUMENT_CATEGORIES'))));
+
             foreach ($tickets as $ticket) {
                 $categories = $category->containing($ticket->id, Categorie::TYPE_TICKET);
+                if (!is_array($categories)) {
+                    $categories = [];
+                }
+                if (!empty($allowedCategoryIds)) {
+                    $categories = array_filter($categories, fn($cat) => in_array((int) $cat->id, $allowedCategoryIds, true));
+                }
 
                 $tmpArray = [
                     'refticket'                 => $ticket->ref,
@@ -455,7 +577,7 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                     'subject'                   => $ticket->subject,
                     'message'                   => $ticket->message,
                     'progress'                  => ($ticket->progress ?: 0) . ' %',
-                    'digiriskelement_ref_label' => $ticket->digiriskElementRef . ' - ' . $ticket->digiriskElementLabel,
+                    'digiriskelement_ref_label' => $ticket->digiriskElementRefLabel ?? '',
                     'status'                    => $ticket->getLibStatut()
                 ];
 
@@ -502,6 +624,21 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                 $digiriskElements[$moreParam['object']->id]['depth']  = 0;
                 $moreParam['digiriskElements']                        = $digiriskElements;
             }
+            // Inherited risks belong to ancestors a document scoped on one element does not know
+            // about; without their element the row renderer skips every one of them
+            if (!empty($loadRiskInfos['inheritedDigiriskElements'])) {
+                $moreParam['digiriskElements'] += $loadRiskInfos['inheritedDigiriskElements'];
+            }
+            // The trend column only makes sense against a period, and one query serves every row.
+            // The ids are read from the objects: loadRiskInfos() merges the current and shared
+            // risks with array_merge(), which renumbers the keys from zero
+            if (!empty($moreParam['dateStart'])) {
+                $riskIds   = array_map(fn($riskSingle) => $riskSingle->id, $loadRiskInfos['risks']);
+                $dateStart = (int) $moreParam['dateStart'];
+
+                $moreParam['previousRiskAssessmentCotations'] = Risk::loadPreviousRiskAssessmentCotations($this->db, $riskIds, $dateStart);
+            }
+
             $moreParam['entity']                     = 'current';
             $moreParam['riskTasks']                  = $loadRiskInfos['current']['riskTasks'];
             $moreParam['riskByRiskAssessmentLevels'] = $loadRiskInfos['current']['riskByRiskAssessmentLevels'];
@@ -509,6 +646,24 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                 $moreParam['segmentName'] = $moreParam['entity'] . 'Risks' . $i;
                 static::setRiskByRiskAssessmentLevelsSegment($odfHandler, $outputLangs, $moreParam);
             }
+
+            // Opt-in: render inherited/children and shared risks in their own dedicated tables
+            // (segments inheritedRisks1..4 and sharedRisks1..4). Missing segments are skipped silently.
+            if (!empty($moreParam['includeInheritedAndShared'])) {
+                $ownDigiriskElements = $moreParam['digiriskElements'];
+                $inheritedAndShared  = $risk->getInheritedAndSharedRiskLevels($moreParam);
+
+                foreach (['inherited', 'shared'] as $bucket) {
+                    $moreParam['riskByRiskAssessmentLevels'] = $inheritedAndShared[$bucket]['riskByRiskAssessmentLevels'];
+                    $moreParam['digiriskElements']           = $ownDigiriskElements + $inheritedAndShared[$bucket]['digiriskElements'];
+                    for ($i = 4; $i >= 1; $i--) {
+                        $moreParam['segmentName'] = $bucket . 'Risks' . $i;
+                        static::setRiskByRiskAssessmentLevelsSegment($odfHandler, $outputLangs, $moreParam);
+                    }
+                }
+            }
+
+            static::setDigiriskElementsSegment($odfHandler, $outputLangs, $moreParam);
 
             $moreParam['riskSigns'] = $loadRiskSignInfos['riskSigns'];
             static::setRiskSignsSegment($odfHandler, $outputLangs, $moreParam);

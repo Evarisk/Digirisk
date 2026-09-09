@@ -1,64 +1,98 @@
-# [Digirisk] [23.1.0] - Nouvelle carte ticket & Kanban du plan d'action
+# [Digirisk] [23.2.0] - Vigilance météo - Terrain sur mobile - PAPRIPACT par année
 
-Description : Cette version apporte deux gros chantiers d'interface — une nouvelle carte ticket entièrement éditable en ligne (style « tap-to-edit ») avec fil de discussion, et un Kanban / Gantt pour le plan d'action PAPRIPACT — ainsi qu'une refonte de la page d'organisation et un suivi d'activité (ActionComm) sur les tâches.
+Description : Cette version sort du bureau. Les plans de prévention et les permis de feu se créent et se signent depuis un téléphone, une application web progressive les regroupe, et un nouveau module de vigilance météo alerte l'établissement en cas d'épisode orange ou rouge. Côté pilotage, le PAPRIPACT s'organise par année avec report des actions en retard, et la carte ticket gagne un véritable fil de conversation.
 
 ## Nouvelles fonctionnalités et innovations
 
-### Nouvelle carte ticket
+### Vigilance météo
 
-* Carte ticket repensée avec édition en ligne « tap-to-edit » : sujet, sévérité, statut, GP/UT, projet, tags… modifiables directement sans recharger la page.
-* Fil de discussion des messages intégré (réponse en ligne, citation, édition/suppression, envoi par mail, Ctrl+Entrée pour envoyer) avec éditeur WYSIWYG Dolibarr (CKEditor).
-* Section fichiers compacte avec aperçu en miniatures et lightbox, suppression intégrée.
-* Personnalisation du layout par utilisateur : densité (compact / cozy / spacious), largeurs des blocs, masquer/déplacer/redimensionner les sections, le tout persisté.
-* Picker Kanban à 4 onglets et drawer de création rapide d'un ticket depuis le Kanban.
-
-<!-- 📸 Ajouter une screenshot ici -->
-
-### Kanban & Gantt du plan d'action (PAPRIPACT)
-
-* Vues Kanban et Gantt du plan d'action du Document Unique, le Kanban devenant la vue par défaut.
-* Cartes enrichies : responsables et contributeurs (avatars/initiales), tags avec gestion en ligne, dates de début/fin éditables, charge et budget, badge de cotation du risque avec tooltip détaillé.
-* Édition en ligne (libellé, progression avec slider, dates) et drag & drop entre colonnes.
-* Page d'administration dédiée pour régler la largeur/l'espacement des colonnes et activer les options de journalisation.
+* Nouveau **suivi de la vigilance Météo-France** : lecture du flux DPVigilance, résolution du département de l'établissement et mise en cache avec durée de vie réglable.
+* **Carte de vigilance sur le tableau de bord** : panneau coloré, pastille par phénomène, et bouton de rafraîchissement manuel.
+* **Bandeau d'alerte orange ou rouge** affiché en haut des pages via un hook, pour que personne ne passe à côté.
+* Page de configuration dédiée — clé d'API, département, durée du cache — et activation par un simple interrupteur.
 
 <!-- 📸 Ajouter une screenshot ici -->
 
-### Refonte de la page d'organisation
+### Le terrain sur mobile
 
-* Hiérarchie GP/UT modernisée : enregistrement automatique, suppression en ligne via dialogue, badges de risques et boutons d'ajout rapide.
+* **Création et mise à jour d'un plan de prévention depuis un téléphone**, avec adresse de l'entreprise extérieure, champs obligatoires du responsable, et **signature de l'entreprise extérieure directement sur l'appareil**.
+* **Même parcours pour le permis de feu**, aligné sur celui du plan de prévention.
+* **Application web progressive** listant et créant les deux objets, avec un écran de réussite offrant le lien de diffusion et son QR code.
+* Les droits utilisés sont ceux des objets eux-mêmes (`preventionplan/write`, `firepermit/write`) plutôt que des droits dédiés, et l'en-tête affiche le logo carré, le nom de la société et un avatar cliquable.
 
 <!-- 📸 Ajouter une screenshot ici -->
 
----
+### PAPRIPACT par année
 
-## Améliorations & corrections
+* **Onglets « année en cours » et « années précédentes »** sur le plan d'action.
+* **Report des actions en retard** sur l'année en cours, en option.
+* **Barre de progression globale** au-dessus du Kanban, et **exports CSV et A3** depuis la vue.
+* **Filtres par GP/UT, niveau de risque et tags**, et **colonnes du Kanban pilotées par un dictionnaire** plutôt que codées en dur.
+* Chargement des cartes **colonne par colonne** et réglages d'affichage exposés dans la configuration.
 
-### Suivi d'activité (ActionComm)
-
-* Journalisation ActionComm sur les modifications de tâches du plan d'action, avec 9 réglages activables et journalisation des erreurs via `dol_syslog`.
-* Audit ActionComm sur les tickets, gestion des statuts 7/9 et limite du nombre de tickets fermés affichés.
+![Le PAPRIPACT par annee, avec ses filtres, sa barre de progression et son Kanban](https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/assets/release-23.2.0/.shots/23.2.0-papripact-annees.png)
 
 ### Tickets
 
-* Affichage du ref + label pour les GP/UT, projet (`fk_project`) dans la section Identification, badge d'historique client.
-* Corrections : dates affichées dans le fuseau de l'utilisateur, valeurs d'extrafields masquées à cause d'un préfixe de clé, entités HTML rendues littéralement dans les réponses AJAX et les libellés de listes déroulantes.
-* `printFieldListValue` ne provoque plus de fatale lorsque le service est vide (#4729).
+* **Fil de conversation sur la carte** : notes et messages publics, envoi d'email, pièces jointes, édition, suppression, citation et mentions `@`.
+* **Boîte de fichiers joints** en colonne gauche, fondée sur le widget natif de Dolibarr — génération, liste, aperçu et suppression.
+* **Édition en ligne du tiers et du projet** directement dans le bandeau, et sélecteur d'assigné avec recherche sur la carte Kanban.
+* **Toute modification faite depuis la carte est journalisée** comme événement d'agenda.
+* **Statistiques de pilotage** avec graphes cliquables, catégories de tickets affichées dans les documents, et entrée dédiée dans le menu Digirisk.
 
-### ODT
+### Risques
 
-* Suppression des tirets de profondeur en trop dans le libellé d'élément lors des générations ODT (#4763).
+* **Carte de lecture complète du risque**, et **tableau de bord des risques** sur la page des risques professionnels.
+* **Compteurs de cotation dans le bandeau**, description de l'élément éditable en ligne, et élément parent affiché comme lien.
+* **Refonte du front de la modale des risques psychosociaux**, et préremplissage de la description activé d'office.
+* **Archivage des risques et des GP/UT** plutôt que suppression.
 
-### Documentation
+![Le tableau de bord des risques](https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/assets/release-23.2.0/.shots/23.2.0-tableau-bord-risques.png)
 
-* Adaptation des instructions IA Saturne et de la philosophie d'architecture (#4733).
+### Arborescence GP/UT
 
-## Comparaison des versions [23.0.0](https://github.com/Evarisk/Digirisk/compare/23.0.0...23.1.0) et 23.1.0
+* **Refonte du panneau de navigation** : glisser-déposer, renommage en ligne, ajout et suppression rapides.
+* **Éditeur enrichi sur la description** des GP/UT.
+* Un élément introuvable renvoie désormais vers l'arborescence au lieu d'une erreur.
 
-* [#4443] [Ticket] feat: nouvelle carte ticket éditable en ligne, fil de discussion et personnalisation du layout [`#4755`](https://github.com/Evarisk/Digirisk/pull/4755) [`#4756`](https://github.com/Evarisk/Digirisk/pull/4756) [`#4760`](https://github.com/Evarisk/Digirisk/pull/4760)
-* [#4738] [ActionPlan] feat: Kanban & Gantt du plan d'action PAPRIPACT
-* [#4744] [ActionPlan] feat: ActionComm sur les tâches + page admin de configuration
-* [#4753] [Ticket] feat: Kanban ticket (picker, audit, limite tickets fermés, page admin) [`#4758`](https://github.com/Evarisk/Digirisk/pull/4758) [`#4759`](https://github.com/Evarisk/Digirisk/pull/4759)
-* [#4735] [Organization] rework: refonte de la hiérarchie GP/UT (auto-save, suppression en ligne, badges risques, ajout rapide)
-* [#4763] [ODT] fix: remove extra depth hyphens in element label [`#4764`](https://github.com/Evarisk/Digirisk/pull/4764)
-* [#4733] [Docs] feat: adapt Saturne AI instructions and architecture philosophy
-* [#4729] [Ticket] fix: prevent fatal in printFieldListValue when service is empty [`#4730`](https://github.com/Evarisk/Digirisk/pull/4730)
+### Documents
+
+* **Listing des risques en PDF** avec mini document unique, et **fiche « tous les risques »** regroupant les risques propres, hérités et partagés.
+* **Fiches des risques hérités et partagés** sur la fiche d'un GP/UT.
+* **Rapport de temps passé par utilisateur et par période** en PDF.
+* Le modèle du PAPRIPACT se choisit **depuis la configuration des documents** au lieu d'être figé.
+* Le rapport d'audit liste les **GP/UT modifiés et l'évolution des risques**.
+
+### Administration et recherche
+
+* **Masquer les entrées de menu objet par objet** depuis la configuration.
+* **Images de tutoriel** sur les pages de réglages, conseils sur l'API REST et les modules d'export/import.
+* Les objets Digirisk apparaissent dans la **recherche globale** de Dolibarr.
+
+## Améliorations & corrections
+
+### Performance
+
+* Suppression des requêtes N+1 sur le Kanban du plan d'action, et regroupement des requêtes de contacts de tâches.
+* Chargement des cartes du Kanban à la demande, colonne par colonne.
+
+### Robustesse et PHP 8
+
+* Plus d'erreur fatale sur la liste des modules quand Saturne est absent.
+* Identifiants convertis avec `GETPOSTINT` sur les plans de prévention et les permis de feu, pour éviter les `TypeError` de `fetch()` sur PHP 8.
+* Correction des erreurs de type à la création de ticket public, au chargement d'un objet sans identifiant, et des avertissements PHP 8 à la création de tâche.
+* Vrais messages d'erreur lors de la génération de l'archive ZIP du document unique.
+
+### Interface
+
+* Jauge d'avancement de la configuration de nouveau visible lorsque l'affichage des erreurs est actif.
+* Styles de la modale d'ajout de risque sortis du gabarit et passés en SCSS.
+* La carte laisse Saturne traiter le cas de l'enregistrement introuvable, au lieu de dupliquer la garde.
+
+### Socle et compatibilité
+
+* La compatibilité annoncée est resserrée sur **Dolibarr 23**.
+* Le module s'appuie sur **Saturne 23.1.0**.
+* Les dépendances communes — ECM, Agenda, FCKeditor, Catégories — sont désormais déclarées par Saturne.
+
+## Comparaison des versions [23.1.0](https://github.com/Evarisk/Digirisk/compare/23.1.0...23.2.0) et 23.2.0

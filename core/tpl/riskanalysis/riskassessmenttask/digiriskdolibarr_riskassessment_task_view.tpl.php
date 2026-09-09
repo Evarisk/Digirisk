@@ -77,7 +77,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 				}
 				if ($nb_of_tasks_in_progress == 0) : ?>
 					<div class="riskassessment-task-container riskassessment-no-task">
-						<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>" value="<?php echo $related_task->id ?>">
+						<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>" value="<?php echo $related_task->id ?? 0 ?>">
 							<div class="riskassessment-task-single riskassessment-task-single-<?php echo $risk->id ?>">
 								<div class="riskassessment-task-content">
 									<div class="riskassessment-task-data" style="justify-content: center;">
@@ -119,7 +119,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 		<?php else : ?>
 			<div class="riskassessment-task-listing-wrapper riskassessment-task-listing-wrapper-<?php echo $risk->id ?>">
 				<div class="riskassessment-task-container riskassessment-no-task">
-					<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>" value="<?php echo $related_task->id ?>">
+					<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>" value="0">
 						<div class="riskassessment-task-single riskassessment-task-single-<?php echo $risk->id ?>">
 							<div class="riskassessment-task-content">
 								<div class="riskassessment-task-data" style="justify-content: center;">
@@ -174,7 +174,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
                                 <div>
                                     <div class="flex flex-row items-center justify-center">
                                         <i class="fas fa-user-tie 100" style="margin-right: 1em;"></i>
-                                        <?php print $form->select_dolusers(0, 'executive_id', 1, null, 0, '', 0, '', 0, 'minwidth200', '', 0, '', 'executiveSelect'); ?>
+                                        <?php print saturne_select_users('executive_id', 0, 1, 'executiveSelect minwidth200'); ?>
                                     </div>
                                 </div>
                             </div>
@@ -323,7 +323,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 								<span class="riskassessment-task-reference" value="<?php echo $related_task->ref ?>"><?php echo $related_task->getNomUrl(0, 'withproject'); ?></span>
 								<span class="riskassessment-task-author">
 									<?php $userAuthor = $usersList[$related_task->fk_user_creat > 0 ? $related_task->fk_user_creat : $user->id];
-									echo getNomUrlUser($userAuthor); ?>
+									echo $userAuthor->getNomUrl(-1); ?>
 								</span>
 								<span class="riskassessment-task-date">
 									<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->dateo))) ? $related_task->dateo : $related_task->datec)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->datee))) ? ' - ' . date('d/m/Y', $related_task->datee) : ''); ?>
@@ -370,7 +370,12 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 							<div class="flex flex-row items-center" style="margin-top: 1em;">
 								<i class="fas fa-user-tie" style="margin-right: 1em;"></i>
 								<?php
-								$contactsIntern     = $related_task->liste_contact(-1, 'internal');
+								// Reuse the per-task contacts already loaded by the task fragment (falls back to a direct fetch).
+									if (isset($taskContactsCache[$related_task->id])) {
+										$contactsIntern = $taskContactsCache[$related_task->id];
+									} else {
+										$contactsIntern = $related_task->liste_contact(-1, 'internal');
+									}
 								$currentExecutiveId = '';
 								if (!empty($contactsIntern)) {
 									foreach ($contactsIntern as $contact) {
@@ -380,7 +385,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 										}
 									}
 								}
-								print $form->select_dolusers($currentExecutiveId, 'executive_id_edit' . $related_task->id, 1, null, 0, '', 0, '', 0, 'minwidth200', '', 0, '', 'executiveSelectEdit');
+								print saturne_select_users('executive_id_edit' . $related_task->id, $currentExecutiveId, 1, 'executiveSelectEdit minwidth200');
 								?>
 							</div>
 						</div>
@@ -488,7 +493,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 														<div class="table-cell table-padding-0 riskassessment-task-timespent-single">
 															<span class="riskassessment-task-timespent-author">
 																<?php $userAuthor = $usersList[$time_spent->timespent_fk_user?:$user->id];
-																echo getNomUrlUser($userAuthor); ?>
+																echo $userAuthor->getNomUrl(-1); ?>
 															</span>
 															<span class="riskassessment-task-timespent-date">
 																<i class="fas fa-calendar-alt"></i> <?php echo dol_print_date($time_spent->timespent_datehour, 'dayhour'); ?>

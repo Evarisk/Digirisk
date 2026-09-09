@@ -231,6 +231,9 @@ if (empty($reshook)) {
 
 
 $title   = $langs->trans("PreventionPlanList");
+if (!isModEnabled('doliletter')) {
+	$title .= ' <span class="error" style="font-size: 0.8em; font-weight: normal; margin-left: 20px;">' . $langs->trans('MobilePPDoliletterNotInstalled') . '</span>';
+}
 $helpUrl = 'FR:Module_Digirisk#DigiRisk_-_Plan_de_pr.C3.A9vention';
 
 saturne_header(0, '', $title, $helpUrl);
@@ -247,7 +250,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
 $newcardbutton = '';
 if ($permissiontoadd) {
-	$newcardbutton .= dolGetButtonTitle($langs->trans('NewPreventionPlan'), '', 'fa fa-plus-circle', DOL_URL_ROOT . '/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?action=create');
+	$newcardbutton .= dolGetButtonTitle($langs->trans('NewPreventionPlan'), '', 'fa fa-plus-circle', DOL_URL_ROOT . '/custom/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php');
 }
 
 print '<form method="POST" id="searchFormList" action="' . $_SERVER["PHP_SELF"] . '">';
@@ -282,7 +285,8 @@ $sql       .= " FROM " . MAIN_DB_PREFIX . $object->table_element . " as t";
 
 if (isset($extrafields->attributes[$object->table_element]['label']) &&
     is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $object->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
-$sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskresources as rs ON rs.ref = "ExtSociety" AND rs.object_type = "preventionplan" AND rs.object_id = t.rowid';
+// Only join the active resource: setDigiriskResources keeps previous ones with status = 0, they would duplicate the object row
+$sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskresources as rs ON rs.ref = "ExtSociety" AND rs.object_type = "preventionplan" AND rs.object_id = t.rowid AND rs.status = 1';
 
 if ($object->ismultientitymanaged == 1) $sql                                                                                                      .= " WHERE t.entity IN (" . getEntity($object->element) . ")";
 else $sql                                                                                                                                         .= " WHERE 1 = 1";
@@ -341,8 +345,9 @@ if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit
 	$num = $db->num_rows($resql);
 }
 
-	// Direct jump if only one record found
-if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
+// Direct jump if only one record found, out of reach once the page header has been printed : the redirect
+// would only raise a "headers already sent" warning and leave the list truncated
+if ($num == 1 && !headers_sent() && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
 	$obj = $db->fetch_object($resql);
 	$id  = $obj->rowid;
 	header("Location: " . dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_card.php', 1) . '?id=' . $id);
@@ -446,7 +451,8 @@ foreach ($object->fields as $key => $val) {
                 } else {
                     $disablesort = 1;
                 }
-                print getTitleFieldOfList($resource['label'], 0, $_SERVER['PHP_SELF'], $resource['sortfield'], '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : ''), $disablesort) . "\n";
+                $resourceSortfield = !empty($resource['sortfield']) ? $resource['sortfield'] : '';
+                print getTitleFieldOfList($resource['label'], 0, $_SERVER['PHP_SELF'], $resourceSortfield, '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : ''), $disablesort) . "\n";
 			}
 		}
 	}
@@ -520,12 +526,15 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 						$element = $signatory->fetchSignatory('MasterWorker', $object->id, 'preventionplan');
 						if (is_array($element) && !empty($element)) {
 							$element = array_shift($element);
-							$usertmp->fetch($element->element_id);
-							print $usertmp->getNomUrl(1);
+							// array_shift() rend null quand la liste est vide : le signataire peut manquer
+							if (is_object($element)) {
+								$usertmp->fetch($element->element_id);
+								print $usertmp->getNomUrl(1);
+							}
 						}
 					} elseif ($resource['label'] == 'ExtSociety') {
-						$extSociety = $digiriskresources->fetchResourcesFromObject('ExtSociety', $object);
-						if ($extSociety > 0) {
+						$extSociety = $digiriskresources->fetchSingleResourceFromObject('ExtSociety', $object);
+						if ($extSociety !== null) {
 							print $extSociety->getNomUrl(1);
 						}
 					}
@@ -533,8 +542,11 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 						$element = $signatory->fetchSignatory('ExtSocietyResponsible', $object->id, 'preventionplan');
 						if (is_array($element) && !empty($element)) {
 							$element = array_shift($element);
-							$contact->fetch($element->element_id);
-							print $contact->getNomUrl(1);
+							// array_shift() rend null quand la liste est vide : le signataire peut manquer
+							if (is_object($element)) {
+								$contact->fetch($element->element_id);
+								print $contact->getNomUrl(1);
+							}
 						}
 					}
 					if ($resource['label'] == 'ExtSocietyAttendant') {

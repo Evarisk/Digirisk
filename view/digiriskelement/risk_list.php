@@ -70,6 +70,8 @@ $limit       = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_
 $sortfield   = GETPOST('sortfield', 'alpha');
 $sortorder   = GETPOST('sortorder', 'alpha');
 $riskType    = GETPOSTISSET('risk_type') ? GETPOST('risk_type') : 'risk';
+// Level of the cotation scale the last assessment of the risk must fall in, 0 for all of them
+$searchCotation = GETPOSTINT('search_cotation');
 $page        = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
 $page        = is_numeric($page) ? $page : 0;
 $page        = $page == -1 ? 0 : $page;
@@ -126,7 +128,7 @@ $pagenext = $page + 1;
 $search_all = GETPOST('search_all', 'alphanohtml') ? trim(GETPOST('search_all', 'alphanohtml')) : trim(GETPOST('sall', 'alphanohtml'));
 $search     = array();
 foreach ($risk->fields as $key => $val) {
-	if (GETPOST('search_' . $key, 'alpha') !== '') $search[$key] = GETPOST('search_' . $key, 'alpha');
+	$search[$key] = (GETPOST('search_' . $key, 'alpha') !== '') ? GETPOST('search_' . $key, 'alpha') : '';
 	if ($key == 'fk_element' && $contextpage == 'sharedrisk') {
 		$search[$key] = GETPOST('search_' . $key . '_sharedrisk', 'alpha');
 	}
@@ -136,6 +138,10 @@ foreach ($risk->fields as $key => $val) {
 $fieldstosearchall = array();
 foreach ($risk->fields as $key => $val) {
 	if (!empty($val['searchall'])) $fieldstosearchall['r.' . $key] = $val['label'];
+}
+// A risk is also brought back by the ref of one of its assessments, see Risk::getSearchAllSqlFilter()
+foreach ($evaluation->fields as $key => $val) {
+	if (!empty($val['searchall'])) $fieldstosearchall['ra.' . $key] = 'RiskAssessment';
 }
 
 // Definition of array of fields for columns
@@ -216,6 +222,7 @@ if (empty($reshook)) {
 		$toselect              = '';
 		$search_array_options  = [];
         $search_category_array = [];
+        $searchCotation        = 0;
 	}
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')
 		|| GETPOST('button_search_x', 'alpha') || GETPOST('button_search.x', 'alpha') || GETPOST('button_search', 'alpha')) {
@@ -235,15 +242,21 @@ if (empty($reshook)) {
 
 $form = new Form($db);
 
-$title    = $langs->trans(ucfirst($riskType) . 's');
+$title    = digirisk_trans_risk_type('', $riskType, 's');
 $helpUrl = 'FR:Module_Digirisk#.C3.89valuation_des_Risques';
 
-saturne_header(1,'', $title, $helpUrl);
+if (empty($noheader)) saturne_header(1,'', $title, $helpUrl);
 
 // Object card
 // ------------------------------------------------------------
 $allRisks = 1;
 if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_RISKS)) {
+    // A dashboard full of zeros teaches nothing on a document unique without any risk of that type yet
+    $riskCountsByCotationLevel = $risk->getRiskCountsByCotationLevel($riskType);
+    if ($riskCountsByCotationLevel['total'] > 0) {
+        require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_riskdashboard_view.tpl.php';
+    }
+
 	$contextpage = 'risklist';
 	require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risklist_view.tpl.php';
 }
@@ -261,5 +274,7 @@ if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
 <?php
 
 // End of page
-llxFooter();
-$db->close();
+if (empty($nofooter)) {
+    llxFooter();
+    $db->close();
+}

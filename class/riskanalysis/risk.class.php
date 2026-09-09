@@ -63,6 +63,12 @@ class Risk extends SaturneObject
     public const STATUS_LOCKED    = 2;
     public const STATUS_ARCHIVED  = 3;
 
+    /**
+     * @var int Pseudo level of the cotation scale gathering the risks without any validated assessment.
+     *          Negative so it never collides with a real level, -1 being the empty value of the list filter.
+     */
+    public const COTATION_NOT_ASSESSED = -2;
+
 	/**
 	 * @var string String with name of icon for risk. Must be the part after the 'object_' into object_risk.png
 	 */
@@ -110,8 +116,17 @@ class Risk extends SaturneObject
 	public $fk_projet;
 	public $lastEvaluation;
 	public $appliedOn;
+	public $riskAssessmentRef;
+	public $riskAssessmentDateCreation;
+	public $riskAssessmentCotation;
+	public $riskAssessmentDate;
 
     private $cotations = [];
+
+    /**
+     * @var string Type of risk the dashboard is filtered on, read by the graphs to link to the matching list
+     */
+    protected string $dashboardRiskType = 'risk';
 
 	/**
 	 * Constructor
@@ -175,7 +190,11 @@ class Risk extends SaturneObject
     /**
      * Load risk infos
      *
-     * @param  array     $moreParam More param (tmparray/filterRisk)
+     * filterRiskDate replaces the generic filter when the caller needs a condition on the
+     * riskassessment table too: the shared filter only knows the "t" alias, and a risk
+     * re-evaluated over the period never has its own date_creation nor tms touched — issue #4459
+     *
+     * @param  array     $moreParam More param (tmparray/filterRisk/filterRiskDate)
      * @return array     $array     Array of risks (current and shared)
      * @throws Exception
      */
@@ -200,7 +219,8 @@ class Risk extends SaturneObject
         $sharedJoin .= ' INNER JOIN ' . $this->db->prefix() . $this->module . '_digiriskelement AS d ON (d.rowid = ee.fk_target AND d.entity = ' . $conf->entity . ')';
         $sharedJoin .= ' INNER JOIN ' . $this->db->prefix() . $this->module . '_riskassessment AS ra ON t.rowid = ra.fk_risk';
 
-        $filter        = 't.status = ' . Risk::STATUS_VALIDATED . ' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED .  ($moreParam['filter'] ?? '') . (!empty($moreParam['filterRisk']) ? $moreParam['filterRisk'] : ' AND t.type = \'risk\'');
+        $dateFilter    = $moreParam['filterRiskDate'] ?? ($moreParam['filter'] ?? '');
+        $filter        = 't.status = ' . Risk::STATUS_VALIDATED . ' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED .  $dateFilter . (!empty($moreParam['filterRisk']) ? $moreParam['filterRisk'] : ' AND t.type = \'risk\'');
         $currentFilter = $filter . ' AND t.entity = ' . $conf->entity;
 
         $array['riskByEntities']   = [];
@@ -214,6 +234,25 @@ class Risk extends SaturneObject
             $array['current']['riskByRiskAssessmentLevels']    = [];
         }
 
+        // ShowInheritedRisksInDocuments promises "Activez cette option pour les afficher dans les
+        // documents", and the element template says its risk table holds, depending on the
+        // settings, the risks of the unit, the inherited ones and the shared ones. The setting lost
+        // its last reader when this collection was standardised on loadRiskInfos() - issue #5120.
+        // Only for a document scoped on one element: the risk assessment document passes no element
+        // filter and already lists every risk of the entity.
+        $array['inheritedDigiriskElements'] = [];
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS') && ($moreParam['object'] ?? null) instanceof DigiriskElement) {
+            $inherited = $this->fetchInheritedRisks($moreParam, $join, $select, $moreSelects);
+            if (!empty($inherited['risks'])) {
+                // Both sides are keyed by risk id, so a risk reachable twice is kept once. The
+                // template states the table is sorted by descending cotation, which the union of
+                // two already sorted fetches would break
+                $array['current']['risks'] += $inherited['risks'];
+                uasort($array['current']['risks'], fn($first, $second) => $second->riskAssessmentCotation <=> $first->riskAssessmentCotation);
+                $array['inheritedDigiriskElements'] = $inherited['digiriskElements'];
+            }
+        }
+
         if (empty($moreParam['tmparray']['showSharedRisk_nocheck'])) {
             $array['shared']['risks']                         = [];
             $array['shared']['riskByCategories']              = [];
@@ -223,7 +262,7 @@ class Risk extends SaturneObject
             $array['shared']['riskByRiskAssessmentLevels']    = [];
         }
 
-        if (isset($moreParam['tmparray']['showSharedRisk_nocheck']) && $moreParam['tmparray']['showSharedRisk_nocheck'] === true) {
+        if (!empty($moreParam['tmparray']['showSharedRisk_nocheck'])) {
             $array['shared']['risks'] = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $filter], 'AND', false, true, false, $sharedJoin, [], $sharedSelect, $sharedMoreSelects);
             if (!is_array($array['shared']['risks']) || empty($array['shared']['risks'])) {
                 $array['shared']['risks']                         = [];
@@ -254,17 +293,17 @@ class Risk extends SaturneObject
             $array[$entity]['riskByRiskAssessmentCotations'][$fkElement][$scale]
                 = $array[$entity]['riskByRiskAssessmentCotations'][$fkElement][$scale] ?? 0;
 
-            $array[$entity]['riskByCategories'][$risk->category][$scale]
-                = $array[$entity]['riskByCategories'][$risk->category][$scale] ?? 0;
+            $array[$entity]['riskByCategories'][$risk->category ?? ''][$scale]
+                = $array[$entity]['riskByCategories'][$risk->category ?? ''][$scale] ?? 0;
 
-            $array[$entity]['riskBySubCategories'][$risk->sub_category][$scale]
-                = $array[$entity]['riskBySubCategories'][$risk->sub_category][$scale] ?? 0;
+            $array[$entity]['riskBySubCategories'][$risk->sub_category ?? ''][$scale]
+                = $array[$entity]['riskBySubCategories'][$risk->sub_category ?? ''][$scale] ?? 0;
 
-            $array['riskByEntities'][$risk->entity]['nbTotalRisks']
-                = $array['riskByEntities'][$risk->entity]['nbTotalRisks'] ?? 0;
+            $array['riskByEntities'][$risk->entity ?? '']['nbTotalRisks']
+                = $array['riskByEntities'][$risk->entity ?? '']['nbTotalRisks'] ?? 0;
 
-            $array['riskByEntities'][$risk->entity][$scale]
-                = $array['riskByEntities'][$risk->entity][$scale] ?? 0;
+            $array['riskByEntities'][$risk->entity ?? ''][$scale]
+                = $array['riskByEntities'][$risk->entity ?? ''][$scale] ?? 0;
 
             $nbTotalRisks[$entity] = $nbTotalRisks[$entity] ?? 0;
 
@@ -274,7 +313,7 @@ class Risk extends SaturneObject
             if ($risk->sub_category >= 0) {
                 $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$risk->sub_category][$risk->riskAssessmentDate] = $riskAssessment->cotation;
             }
-            $array[$entity]['riskByCategories'][$risk->category][$scale]++;
+            $array[$entity]['riskByCategories'][$risk->category ?? ''][$scale]++;
             $array[$entity]['riskBySubCategories'][$risk->sub_category][$scale]++;
             $array['riskByEntities'][$risk->entity]['nbTotalRisks']++;
             $array['riskByEntities'][$risk->entity][$scale]++;
@@ -311,6 +350,114 @@ class Risk extends SaturneObject
     }
 
     /**
+     * Fetch the risks every ancestor of an element carries
+     *
+     * "Inherited" is what the element card shows under ShowInheritedRisksInListings: declared
+     * higher in the tree and applying downwards. The parent chain is read from the validated
+     * elements, which one cached query already holds, so an unvalidated element ends the walk -
+     * its own risks are excluded by the status filter anyway, and those of its parents are then
+     * left out too.
+     *
+     * @param  array  $moreParam   More param (object/filterRisk/filterRiskDate)
+     * @param  string $join        Join on the owning element and the risk assessment
+     * @param  string $select      Extra columns the risk segments read
+     * @param  array  $moreSelects Names of those extra columns
+     * @return array               ['risks' => risks keyed by id, 'digiriskElements' => the ancestors they belong to]
+     * @throws Exception
+     */
+    private function fetchInheritedRisks(array $moreParam, string $join, string $select, array $moreSelects): array
+    {
+        global $conf;
+
+        $digiriskElement  = new DigiriskElement($this->db);
+        $digiriskElements = $digiriskElement->getActiveDigiriskElements('all');
+        if (!is_array($digiriskElements)) {
+            $digiriskElements = [];
+        }
+
+        $ancestorIds = [];
+        $parentId    = (int) $moreParam['object']->fk_parent;
+        // An id already seen means fk_parent forms a cycle: stop rather than loop forever
+        while ($parentId > 0 && !isset($ancestorIds[$parentId])) {
+            $ancestorIds[$parentId] = $parentId;
+            $parentId               = isset($digiriskElements[$parentId]) ? (int) $digiriskElements[$parentId]->fk_parent : 0;
+        }
+
+        if (empty($ancestorIds)) {
+            return ['risks' => [], 'digiriskElements' => []];
+        }
+
+        // The caller filter carries the element condition this fetch replaces. A date condition is
+        // passed apart, in filterRiskDate, and still applies
+        $filter = 't.status = ' . self::STATUS_VALIDATED
+            . ' AND d.status = ' . DigiriskElement::STATUS_VALIDATED
+            . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED
+            . ($moreParam['filterRiskDate'] ?? '')
+            . (!empty($moreParam['filterRisk']) ? $moreParam['filterRisk'] : ' AND t.type = \'risk\'')
+            . ' AND t.entity = ' . $conf->entity
+            . ' AND t.fk_element IN (' . implode(',', $ancestorIds) . ')';
+
+        $risks = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $filter], 'AND', false, false, false, $join, [], $select, $moreSelects);
+
+        // The row renderer names a risk's element from moreParam['digiriskElements']; a document
+        // scoped on one element only knows that one, and would skip every inherited row
+        $ancestorElements = [];
+        foreach ($ancestorIds as $ancestorId) {
+            if (isset($digiriskElements[$ancestorId])) {
+                $ancestorElements[$ancestorId] = ['object' => $digiriskElements[$ancestorId], 'depth' => 0];
+            }
+        }
+
+        return ['risks' => is_array($risks) ? $risks : [], 'digiriskElements' => $ancestorElements];
+    }
+
+    /**
+     * Load the cotation each risk had before a given date — issue #4459
+     *
+     * Feeds the "risk going up or down" column of the audit report: comparing the cotation shown
+     * for the period with the one that stood just before it is the only way to tell an aggravation
+     * from an improvement. Everything is read in one query, a report walks hundreds of risks.
+     *
+     * date_riskassessment is optional in database, date_creation stands in when it is missing.
+     * Superseded assessments (status 0) are kept, they are precisely the history being looked up.
+     *
+     * @param  DoliDB $db         Database handler
+     * @param  array  $riskIds    Ids of the risks to look up
+     * @param  int    $beforeDate Timestamp the cotation is read before
+     * @return array              Cotation indexed by risk id, risks assessed for the first time are absent
+     */
+    public static function loadPreviousRiskAssessmentCotations(DoliDB $db, array $riskIds, int $beforeDate): array
+    {
+        $riskIds = array_filter(array_map('intval', $riskIds));
+        if (empty($riskIds) || empty($beforeDate)) {
+            return [];
+        }
+
+        $dateField = 'COALESCE(t.date_riskassessment, t.date_creation)';
+
+        $sql  = 'SELECT t.fk_risk, t.cotation FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_riskassessment AS t';
+        $sql .= ' WHERE t.fk_risk IN (' . $db->sanitize(implode(',', $riskIds)) . ')';
+        $sql .= ' AND t.status >= 0 AND t.cotation IS NOT NULL';
+        $sql .= ' AND ' . $dateField . " < '" . $db->idate($beforeDate) . "'";
+        // The last row read for a risk wins, so the assessment closest to the date is the one kept
+        $sql .= ' ORDER BY t.fk_risk ASC, ' . $dateField . ' ASC, t.rowid ASC';
+
+        $resql = $db->query($sql);
+        if (!$resql) {
+            dol_syslog(__METHOD__ . ' ' . $db->lasterror(), LOG_ERR);
+            return [];
+        }
+
+        $previousCotations = [];
+        while ($obj = $db->fetch_object($resql)) {
+            $previousCotations[(int) $obj->fk_risk] = (int) $obj->cotation;
+        }
+        $db->free($resql);
+
+        return $previousCotations;
+    }
+
+    /**
 	 * Load object in memory from the database
 	 *
 	 * @param int $parent_id Id parent object
@@ -323,8 +470,6 @@ class Risk extends SaturneObject
 	 */
 	public function fetchRisksOrderedByCotation($parent_id, $get_children_data = false, $get_parents_data = false, $get_shared_data = false, $moreParams = [])
 	{
-        global $conf;
-
 		$object         = new DigiriskElement($this->db);
 		$risk           = new Risk($this->db);
         $riskAssessment = new RiskAssessment($this->db);
@@ -345,11 +490,22 @@ class Risk extends SaturneObject
 			}
 		}
 
+		$risksOrderedByDigiriskElement = [];
+
+		// Entity management is disabled above when shared risks are requested, so $riskList holds the risks of every entity of the database
+		// Only the risks carried by a digirisk element visible from the current entity belong to this listing
+		$visibleDigiriskElements = is_array($objects) ? $objects : [];
+		if ($get_shared_data && is_array($activeDigiriskElements)) {
+			$visibleDigiriskElements += $activeDigiriskElements;
+		}
+
 		if (is_array($riskList) && !empty($riskList)) {
 			foreach ($riskList as $riskSingle) {
-				$riskSingle->lastEvaluation                               = $riskAssessmentsOrderedByRisk[$riskSingle->id];
-				$riskSingle->appliedOn                                    = $riskSingle->fk_element;
-				$risksOrderedByDigiriskElement[$riskSingle->fk_element][] = $riskSingle;
+				$riskSingle->lastEvaluation = $riskAssessmentsOrderedByRisk[$riskSingle->id] ?? null;
+				$riskSingle->appliedOn      = $riskSingle->fk_element;
+				if (isset($visibleDigiriskElements[$riskSingle->fk_element])) {
+					$risksOrderedByDigiriskElement[$riskSingle->fk_element][] = $riskSingle;
+				}
 			}
 		}
 		$risks = [];
@@ -388,12 +544,10 @@ class Risk extends SaturneObject
 				// RISKS parent children.
 				if ( !empty($children_ids)) {
 					foreach ($children_ids as $child_id) {
-						if (is_array($risksOrderedByDigiriskElement[$child_id]) && !empty($risksOrderedByDigiriskElement[$child_id])) {
-                            foreach ($risksOrderedByDigiriskElement[$child_id] as $riskOfChildDigiriskElement) {
-                                if ($riskOfChildDigiriskElement->entity == $conf->entity) {
-                                    $risks[] = $riskOfChildDigiriskElement;
-                                }
-                            }
+						// The entity scope is already applied when $risksOrderedByDigiriskElement is built
+						// Filtering again on $risk->entity dropped every children risk on a mono entity install, where the entity field is unset from $fields
+						if (!empty($risksOrderedByDigiriskElement[$child_id]) && is_array($risksOrderedByDigiriskElement[$child_id])) {
+							$risks = array_merge($risks, $risksOrderedByDigiriskElement[$child_id]);
 						}
 					}
 				}
@@ -453,7 +607,7 @@ class Risk extends SaturneObject
 							foreach ($digiriskElementOfEntity->linkedObjectsIds['digiriskdolibarr_risk'] as $sharedRiskId) {
                                 $sharedRisk         = $riskList[$sharedRiskId];
                                 $sharedParentActive = array_search($sharedRisk->fk_element, array_column($activeDigiriskElements, 'id'));
-								if (is_object($sharedRisk) && $sharedParentActive > 0 && !in_array($sharedRisk->id, $inserted)) {
+								if (is_object($sharedRisk) && $sharedParentActive !== false && !in_array($sharedRisk->id, $inserted)) {
                                     $clonedRisk              = clone $sharedRisk;
                                     $clonedRisk->appliedOn   = $digiriskElementOfEntity->id;
                                     $clonedRisk->origin_type = 'shared';
@@ -472,7 +626,7 @@ class Risk extends SaturneObject
 						foreach ($parentElement->linkedObjectsIds['digiriskdolibarr_risk'] as $sharedRiskId) {
 							$sharedRisk         = $riskList[$sharedRiskId];
                             $sharedParentActive = array_search($sharedRisk->fk_element, array_column($activeDigiriskElements, 'id'));
-                            if (is_object($sharedRisk)  && $sharedParentActive > 0 && !in_array($sharedRisk->id, $inserted)) {
+                            if (is_object($sharedRisk)  && $sharedParentActive !== false && !in_array($sharedRisk->id, $inserted)) {
                                 $clonedRisk              = clone $sharedRisk;
                                 $clonedRisk->appliedOn   = $parent_id;
                                 $clonedRisk->origin_type = 'shared';
@@ -495,6 +649,80 @@ class Risk extends SaturneObject
 			return -1;
 		}
 	}
+
+    /**
+     * Build risk levels (1 to 4) for an element, split in two buckets:
+     *  - 'inherited': inherited (parent tree) + children (descendants) risks of the same entity;
+     *  - 'shared':    shared (multi-entity linked) risks from other entities.
+     * Own risks are excluded: they are already handled by loadRiskInfos() with the element filter.
+     *
+     * @param  array     $moreParam More param (object)
+     * @return array                ['inherited' => ['riskByRiskAssessmentLevels' => array, 'digiriskElements' => array],
+     *                                'shared'    => ['riskByRiskAssessmentLevels' => array, 'digiriskElements' => array]]
+     * @throws Exception
+     */
+    public function getInheritedAndSharedRiskLevels(array $moreParam): array
+    {
+        $result = [
+            'inherited' => ['riskByRiskAssessmentLevels' => [], 'digiriskElements' => []],
+            'shared'    => ['riskByRiskAssessmentLevels' => [], 'digiriskElements' => []],
+        ];
+
+        $object = $moreParam['object'] ?? null;
+        if (!is_object($object) || $object->id <= 0) {
+            return $result;
+        }
+
+        // Own + children (descendants) + inherited (ancestors) + shared (multi-entity linked) risks for this element.
+        $fetchParam = ['filterRisk' => '', 'filterRiskAssessment' => ''];
+        $risks      = $this->fetchRisksOrderedByCotation($object->id, true, true, true, $fetchParam);
+        if (!is_array($risks) || empty($risks)) {
+            return $result;
+        }
+
+        $digiriskElement = new DigiriskElement($this->db);
+        $riskAssessment  = new RiskAssessment($this->db);
+
+        $currentElements = $digiriskElement->getActiveDigiriskElements();
+        $sharedElements  = $digiriskElement->getActiveDigiriskElements('shared');
+        $allElements     = (is_array($currentElements) ? $currentElements : []) + (is_array($sharedElements) ? $sharedElements : []);
+
+        foreach ($risks as $riskSingle) {
+            $isShared = (isset($riskSingle->origin_type) && $riskSingle->origin_type === 'shared');
+
+            // Skip own risks: they are already rendered by the base "current" segment.
+            if (!$isShared && $riskSingle->fk_element == $object->id) {
+                continue;
+            }
+
+            $lastEvaluation = $riskSingle->lastEvaluation;
+            if (!is_object($lastEvaluation)) {
+                continue;
+            }
+
+            // Flatten the risk assessment fields expected by setRiskByRiskAssessmentLevelsSegment().
+            $riskSingle->riskAssessmentRef          = $lastEvaluation->ref;
+            $riskSingle->riskAssessmentCotation     = $lastEvaluation->cotation;
+            $riskSingle->riskAssessmentDate         = $lastEvaluation->date_riskassessment;
+            $riskSingle->riskAssessmentDateCreation = $lastEvaluation->date_creation;
+            $riskSingle->riskAssessmentComment      = $lastEvaluation->comment;
+            $riskSingle->riskAssessmentPhoto        = $lastEvaluation->photo;
+
+            $riskAssessment->cotation = $lastEvaluation->cotation;
+            $scale                    = $riskAssessment->getEvaluationScale();
+
+            $bucket = $isShared ? 'shared' : 'inherited';
+
+            $result[$bucket]['riskByRiskAssessmentLevels'][$scale][] = $riskSingle;
+
+            $fkElement = $riskSingle->fk_element;
+            if (!isset($result[$bucket]['digiriskElements'][$fkElement]) && isset($allElements[$fkElement])) {
+                $result[$bucket]['digiriskElements'][$fkElement] = ['object' => $allElements[$fkElement], 'depth' => 0];
+            }
+        }
+
+        return $result;
+    }
 
     /**
      * Get risk categories from the JSON file
@@ -905,6 +1133,9 @@ class Risk extends SaturneObject
 
         $riskType = !empty($dashboardConfig->filters->riskType) ? $dashboardConfig->filters->riskType : 'risk';
 
+        // Kept for the graphs: the lists they open show the type of risk the dashboard is filtered on
+        $this->dashboardRiskType = $riskType;
+
         $dangerCategories                         = static::getDangerCategories($riskType);
         $riskByDangerCategoriesAndRiskAssessments = $this->getRiskByDangerCategoriesAndRiskAssessments($dangerCategories, $riskType);
 
@@ -942,6 +1173,184 @@ class Risk extends SaturneObject
     }
 
     /**
+     * Get the levels of the cotation scale
+     *
+     * @return array Label, color and bounds of each level, indexed by level
+     */
+    public function getCotations(): array
+    {
+        return $this->cotations;
+    }
+
+    /**
+     * Get the risk list URL a graph part links to
+     *
+     * The graphs count the validated risks only, so the list they open leaves the other ones out.
+     *
+     * @param  array  $filters Criteria of the risk list, each one already url encoded
+     * @return string          Risk list URL
+     */
+    protected function getRiskListUrl(array $filters = []): string
+    {
+        $filters[] = 'risk_type=' . $this->dashboardRiskType;
+        $filters[] = 'search_status=' . self::STATUS_VALIDATED;
+
+        return dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '?' . implode('&', array_filter($filters));
+    }
+
+    /**
+     * Get the SQL criteria restricting a risk list to the risks assessed at a given level of the cotation scale
+     *
+     * A risk is assessed as many times as it is reviewed, and only its last validated assessment tells where it
+     * stands today: that is the one the dashboard graph counts, so the criteria reads the same one.
+     *
+     * @param  int    $cotationLevel Level of the cotation scale, from 1 (grey) to 4 (black),
+     *                               or COTATION_NOT_ASSESSED for the risks still to assess
+     * @return string                SQL criteria, empty when the level is not one of the scale
+     */
+    public function getCotationSqlFilter(int $cotationLevel): string
+    {
+        if ($cotationLevel != self::COTATION_NOT_ASSESSED && empty($this->cotations[$cotationLevel])) {
+            return '';
+        }
+
+        $riskAssessmentTable = MAIN_DB_PREFIX . (new RiskAssessment($this->db))->table_element;
+
+        if ($cotationLevel == self::COTATION_NOT_ASSESSED) {
+            // A risk still to assess is one the levels of the scale leave out: its last validated assessment
+            // is missing, or carries no cotation at all
+            $operator       = 'NOT IN';
+            $cotationFilter = ' WHERE lastra.cotation IS NOT NULL';
+        } else {
+            $operator = 'IN';
+
+            // The highest level has no upper bound, a cotation computed with the advanced method can exceed its end
+            $cotationFilter = ' WHERE lastra.cotation >= ' . (int) $this->cotations[$cotationLevel]['start'];
+            if (isset($this->cotations[$cotationLevel + 1])) {
+                $cotationFilter .= ' AND lastra.cotation <= ' . (int) $this->cotations[$cotationLevel]['end'];
+            }
+        }
+
+        // The last validated assessment of every risk is picked in one pass: correlating that subquery to each
+        // risk costs a full scan of the assessments per risk, seconds long on a base of a few thousand risks
+        return ' AND r.rowid ' . $operator . ' (SELECT lastid.fk_risk'
+             . ' FROM (SELECT ra.fk_risk as fk_risk, MAX(ra.rowid) as rowid FROM ' . $riskAssessmentTable . ' as ra'
+             . ' WHERE ra.status = ' . RiskAssessment::STATUS_VALIDATED . ' GROUP BY ra.fk_risk) as lastid'
+             . ' INNER JOIN ' . $riskAssessmentTable . ' as lastra ON lastra.rowid = lastid.rowid'
+             . $cotationFilter . ')';
+    }
+
+    /**
+     * Get the SQL criteria of the "search in all" of a risk list
+     *
+     * The refs of the assessments (RA...) are looked up as well: an assessment has no list of its own, so a
+     * search made on its ref has to bring back the risk it belongs to instead of nothing.
+     *
+     * @param  array  $fieldsToSearchAll Fields to search into, keyed by their name prefixed with their table alias,
+     *                                   "ra." standing for the assessments of the risk
+     * @param  string $searchAll         Searched value
+     * @return string                    SQL criteria, empty when there is nothing to search into
+     */
+    public function getSearchAllSqlFilter(array $fieldsToSearchAll, string $searchAll): string
+    {
+        $riskFields       = [];
+        $assessmentFields = [];
+        foreach (array_keys($fieldsToSearchAll) as $field) {
+            if (strpos($field, 'ra.') === 0) {
+                $assessmentFields[] = $field;
+            } else {
+                $riskFields[] = $field;
+            }
+        }
+
+        $criterias = [];
+        if (!empty($riskFields)) {
+            $criterias[] = natural_search($riskFields, $searchAll, 0, 1);
+        }
+        if (!empty($assessmentFields)) {
+            $riskAssessmentTable = MAIN_DB_PREFIX . (new RiskAssessment($this->db))->table_element;
+
+            $criterias[] = 'r.rowid IN (SELECT ra.fk_risk FROM ' . $riskAssessmentTable . ' as ra'
+                         . ' WHERE ' . natural_search($assessmentFields, $searchAll, 0, 1) . ')';
+        }
+
+        return empty($criterias) ? '' : ' AND (' . implode(' OR ', $criterias) . ')';
+    }
+
+    /**
+     * Get the level of the cotation scale a cotation falls in
+     *
+     * @param  float $cotation Cotation of a risk assessment
+     * @return int             Level of the scale, from 1 (grey) to 4 (black)
+     */
+    public function getCotationLevel(float $cotation): int
+    {
+        $level = (int) array_key_first($this->cotations);
+        foreach ($this->cotations as $cotationLevel => $cotationScale) {
+            if ($cotation >= $cotationScale['start']) {
+                $level = $cotationLevel;
+            }
+        }
+
+        return $level;
+    }
+
+    /**
+     * Get the number of risks by level of the cotation scale, for the dashboard of the risk list
+     *
+     * Counts the risks the list shows when no filter is set: the ones of the current entity attached to an
+     * active element. A risk is placed on the level of its last validated assessment, the one
+     * getCotationSqlFilter() reads, so each count matches the number of rows the list shows once filtered
+     * on that level.
+     *
+     * @param  string $riskType Type of risk ('risk' or 'riskenvironmental')
+     * @return array            Number of risks, by level of the scale plus 'total' and COTATION_NOT_ASSESSED
+     */
+    public function getRiskCountsByCotationLevel(string $riskType = 'risk'): array
+    {
+        global $conf;
+
+        $counts = ['total' => 0, self::COTATION_NOT_ASSESSED => 0];
+        foreach (array_keys($this->cotations) as $cotationLevel) {
+            $counts[$cotationLevel] = 0;
+        }
+
+        $riskAssessmentTable = MAIN_DB_PREFIX . (new RiskAssessment($this->db))->table_element;
+        $elementTable        = MAIN_DB_PREFIX . (new DigiriskElement($this->db))->table_element;
+
+        $sql  = 'SELECT lastra.cotation as cotation, COUNT(r.rowid) as nb';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as r';
+        $sql .= ' INNER JOIN ' . $elementTable . ' as e ON e.rowid = r.fk_element';
+        $sql .= ' AND e.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND e.entity = ' . (int) $conf->entity;
+        // The last assessment of every risk is picked in one pass: correlating that subquery to each risk
+        // costs a full scan of the assessments per risk, seconds long on a document unique of a few thousand
+        $sql .= ' LEFT JOIN (SELECT ra.fk_risk as fk_risk, MAX(ra.rowid) as rowid FROM ' . $riskAssessmentTable . ' as ra';
+        $sql .= ' WHERE ra.status = ' . RiskAssessment::STATUS_VALIDATED . ' GROUP BY ra.fk_risk) as lastid ON lastid.fk_risk = r.rowid';
+        $sql .= ' LEFT JOIN ' . $riskAssessmentTable . ' as lastra ON lastra.rowid = lastid.rowid';
+        $sql .= ' WHERE r.entity IN (' . getEntity($this->element) . ')';
+        $sql .= " AND r.type = '" . $this->db->escape($riskType) . "'";
+        $sql .= ' GROUP BY lastra.cotation';
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . implode(',', $this->errors), LOG_ERR);
+
+            return $counts;
+        }
+
+        while ($obj = $this->db->fetch_object($resql)) {
+            $cotationLevel = isset($obj->cotation) ? $this->getCotationLevel((float) $obj->cotation) : self::COTATION_NOT_ASSESSED;
+
+            $counts[$cotationLevel] += (int) $obj->nb;
+            $counts['total']        += (int) $obj->nb;
+        }
+        $this->db->free($resql);
+
+        return $counts;
+    }
+
+    /**
      * Get risks by cotation
      *
      * @param array $riskByDangerCategoriesAndRiskAssessments Risk by danger categories and risk assessments
@@ -965,7 +1374,14 @@ class Risk extends SaturneObject
         $array['dataset']    = 1;
         $array['labels']     = $this->cotations;
 
-        $array['data'] = $riskByDangerCategoriesAndRiskAssessments['nbRiskByCotations'];
+        $array['data'] = $riskByDangerCategoriesAndRiskAssessments['nbRiskByCotations'] ?? [];
+
+        $links = [];
+        foreach (array_keys($array['data']) as $cotationLevel) {
+            $links[] = $this->getRiskListUrl(['search_cotation=' . $cotationLevel]);
+        }
+
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['links' => $links]);
 
         return $array;
     }
@@ -995,12 +1411,17 @@ class Risk extends SaturneObject
         $array['moreCSS']    = 'grid-2';
         $array['labels']     = $this->cotations;
 
+        // One series per level of the cotation scale, so each series carries the links of its own level
+        $datasetLinks = [];
         foreach ($dangerCategories as $dangerCategory) {
             $array['data'][$dangerCategory['position']][0] = $dangerCategory['name'];
             for ($i = 1; $i <= 4; $i++) {
                 $array['data'][$dangerCategory['position']]['y_combined_' . $array['labels'][$i]['label']] = !empty($riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk']) ? $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['riskAssessments'][$i] / $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'] : 0;
+                $datasetLinks[$i - 1][] = $this->getRiskListUrl(['search_category=' . $dangerCategory['position'], 'search_cotation=' . $i]);
             }
         }
+
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['datasetLinks' => $datasetLinks]);
 
         return $array;
     }
@@ -1038,10 +1459,14 @@ class Risk extends SaturneObject
             ]
         ];
 
+        $links = [];
         foreach ($dangerCategories as $dangerCategory) {
             $array['data'][$dangerCategory['position']][] = $dangerCategory['name'];
-            $array['data'][$dangerCategory['position']][] = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'];
+            $array['data'][$dangerCategory['position']][] = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'] ?? 0;
+            $links[]                                     = $this->getRiskListUrl(['search_category=' . $dangerCategory['position']]);
         }
+
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['links' => $links]);
 
         return $array;
     }
@@ -1089,11 +1514,13 @@ class Risk extends SaturneObject
             $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['value']    = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'];
             $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['value']   .= ($percentage > 0 ? ' (' . $percentage . ' %)' : '');
             $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['morecss']  = 'risk-evaluation-cotation';
-            $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['moreAttr'] = 'style="line-height: 0; border-radius: 0; background-color: #A1467EAA; color: #FFF;"';
+            $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['moreAttr'] = 'style="line-height: normal; height: auto; border-radius: 0; background-color: #A1467EAA; color: #FFF;"';
 
-            $arrayRiskLists[$dangerCategory['position']]['Ref']['value']    = '<img src="' . dol_buildpath('digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png', 1) . '" class="photo" alt="' . $dangerCategory['name'] . '" title="' . $dangerCategory['name'] . '" loading="lazy" width="24px" height="24px" />';
-            $arrayRiskLists[$dangerCategory['position']]['Ref']['value']   .= $dangerCategory['name'];
-            $arrayRiskLists[$dangerCategory['position']]['Ref']['moreAttr'] = 'style="display: flex; align-items: center; max-width: 100%; gap: 5px;"';
+            // Le conteneur flex est un div interne : un td en display: flex sort du flux table-cell et son contenu déborde sur les lignes voisines quand il passe sur plusieurs lignes (mobile)
+            $arrayRiskLists[$dangerCategory['position']]['Ref']['value']  = '<div style="display: flex; align-items: center; max-width: 100%; gap: 5px;">';
+            $arrayRiskLists[$dangerCategory['position']]['Ref']['value'] .= '<img src="' . dol_buildpath('digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png', 1) . '" class="photo" alt="' . $dangerCategory['name'] . '" title="' . $dangerCategory['name'] . '" loading="lazy" width="24px" height="24px" />';
+            $arrayRiskLists[$dangerCategory['position']]['Ref']['value'] .= '<span>' . $dangerCategory['name'] . '</span>';
+            $arrayRiskLists[$dangerCategory['position']]['Ref']['value'] .= '</div>';
 
             for ($i = 1; $i <= 4; $i++) {
                 $array['labels'][$i] = $this->cotations[$i]['label'];
@@ -1105,13 +1532,13 @@ class Risk extends SaturneObject
                 $totalNbRiskAssessments[$i]                                 += $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['riskAssessments'][$i];
                 $arrayRiskLists[$dangerCategory['position']][$i]['value']   .= ($percentage > 0 ? ' (' . $percentage . ' %)' : '');
                 $arrayRiskLists[$dangerCategory['position']][$i]['morecss']  = 'risk-evaluation-cotation';
-                $arrayRiskLists[$dangerCategory['position']][$i]['moreAttr'] = 'data-scale = ' . $i . ' style="line-height: 0; border-radius: 0;"';
+                $arrayRiskLists[$dangerCategory['position']][$i]['moreAttr'] = 'data-scale = ' . $i . ' style="line-height: normal; height: auto; border-radius: 0;"';
             }
         }
 
         $arrayRiskLists[23]['numberOfRisks']['value']    = '<span class="badge badge-info">' . $riskByDangerCategoriesAndRiskAssessments['totalRisks'] . '</span>';
         $arrayRiskLists[23]['numberOfRisks']['morecss']  = 'risk-evaluation-cotation';
-        $arrayRiskLists[23]['numberOfRisks']['moreAttr'] = 'style="line-height: 0; border-radius: 0; background-color: #A1467EAA; color: #FFF;"';
+        $arrayRiskLists[23]['numberOfRisks']['moreAttr'] = 'style="line-height: normal; height: auto; border-radius: 0; background-color: #A1467EAA; color: #FFF;"';
         $arrayRiskLists[23]['numberOfRisks']['value']   .= ' (' . round($totalPercentages) . ' %)';
 
         $arrayRiskLists[23]['Ref']['value']              = $langs->transnoentities('Total');
@@ -1120,7 +1547,7 @@ class Risk extends SaturneObject
         for ($i = 1; $i <= 4; $i++) {
             $arrayRiskLists[23][$i]['value']    = $totalNbRiskAssessments[$i] . ' (' . round($totalPercentagesRiskAssessment[$i]) . ' %)';
             $arrayRiskLists[23][$i]['morecss']  = 'risk-evaluation-cotation';
-            $arrayRiskLists[23][$i]['moreAttr'] = 'data-scale = ' . $i . ' style="line-height: 0; border-radius: 0;"';
+            $arrayRiskLists[23][$i]['moreAttr'] = 'data-scale = ' . $i . ' style="line-height: normal; height: auto; border-radius: 0;"';
         }
 
         $array['data'] = $arrayRiskLists;
@@ -1246,7 +1673,7 @@ class Risk extends SaturneObject
         $label .= '<br><b>' . $langs->trans('Ref') . ' : </b> ' . $this->ref;
         $label .= '<br><b>' . $langs->transnoentities('Description') . ' : </b> ' . $this->description;
 
-        $url = dol_buildpath('/' . $this->module . '/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $this->fk_element;
+        $url = dol_buildpath('/' . $this->module . '/view/risk/risk_card.php', 1) . '?id=' . $this->id;
 
         if ($option != 'nolink') {
             // Add param to save lastsearch_values or not

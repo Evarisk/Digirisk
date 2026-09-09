@@ -111,10 +111,10 @@ if (empty($reshook)) {
 	if ($action == 'update' && $permissiontoadd) {
 		// Get parameters
 		$relative_location                    = GETPOST('relative_location');
-		$victim_activity                      = GETPOST('victim_activity');
-		$accident_nature                      = GETPOST('accident_nature');
-		$accident_object                      = GETPOST('accident_object');
-		$accident_nature_doubt                = GETPOST('accident_nature_doubt');
+		$victim_activity                      = GETPOST('victim_activity', 'restricthtml');
+		$accident_nature                      = GETPOST('accident_nature', 'restricthtml');
+		$accident_object                      = GETPOST('accident_object', 'restricthtml');
+		$accident_nature_doubt                = GETPOST('accident_nature_doubt', 'restricthtml');
 		$accident_nature_doubt_link           = GETPOST('accident_nature_doubt_link');
 		$victim_transported_to                = GETPOST('victim_transported_to');
 		$collateral_victim                    = GETPOST('collateral_victim');

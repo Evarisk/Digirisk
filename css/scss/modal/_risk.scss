@@ -1,3 +1,48 @@
+.wpeo-modal[class*="modal-risk"] .modal-container .modal-header {
+  align-items: center;
+
+  .wpeo-button {
+    margin-bottom: 0;
+  }
+  /** The title takes the free space so the actions stay against the close icon */
+  .modal-title {
+    flex: 1;
+  }
+  .modal-header-action {
+    margin-right: 15px;
+  }
+}
+
+/** Two-column evaluation header: method switch on the left, medias on the right */
+.wpeo-modal[class*="modal-risk"] .modal-container .risk-evaluation-header-split {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/** The add modal hugs its content: a risk form is far shorter than the 560px of the generic
+    modal, which left a large empty area under the task section. Same treatment as the
+    evaluation modals, and only the content scrolls when the advanced method grid is taller
+    than the window. */
+.risk-add-modal .modal-container {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  max-height: calc(100% - 4em);
+
+  .modal-header {
+    height: auto;
+    flex: 0 0 auto;
+  }
+  /** min-height: 0 lets the flex item shrink below its content so its own overflow-y takes over */
+  .modal-content {
+    height: auto;
+    min-height: 0;
+    flex: 1 1 auto;
+  }
+}
+
 .wpeo-modal[class*="modal-risk"] .modal-container {
   .title {
     display: block;
@@ -40,14 +85,40 @@
 
     textarea {
       width: 100%;
+      height: 48px !important;
+      min-height: 48px !important;
+      max-height: 48px !important;
+      box-sizing: border-box !important;
+      padding: 4px 8px !important;
+      line-height: 1.3 !important;
+      resize: vertical;
     }
+  }
+}
+
+/** Medias linked to a risk / a risk assessment
+    The media action buttons overflow their container (top: -10px / bottom: -10px), so stacked medias
+    cover each other and steal their neighbour clicks: keep them spaced on a wrapping row */
+.element-linked-medias {
+  .add-medias td {
+    vertical-align: top;
+    // Dolibarr underlines the cells of every table nested in a .noborder list, and the modal is
+    // printed inside the risk list: that rule drew a stray line under the upload buttons.
+    border-bottom: 0 !important;
+  }
+
+  .element-linked-medias-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 24px 16px;
+    max-width: 200px;
   }
 }
 
 .wpeo-modal[class*="modal-risk"] .modal-container .risk-evaluation-container {
   padding-bottom: 1em;
   margin-bottom: 1em;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 
   .risk-evaluation-header {
     margin-bottom: 1em;
@@ -73,6 +144,13 @@
 
       textarea {
         width: 100%;
+        height: 48px !important;
+        min-height: 48px !important;
+        max-height: 48px !important;
+        box-sizing: border-box !important;
+        padding: 4px 8px !important;
+        line-height: 1.3 !important;
+        resize: vertical;
       }
     }
   }
@@ -88,6 +166,89 @@
     .risk-evaluation-photo {
       margin-right: 1em;
     }
+  }
+}
+
+.wpeo-modal[class*="modal-risk"] .modal-container .riskassessment-task {
+  padding-top: 1em;
+  margin-top: 1em;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+
+  /** Section title and task label share a single line */
+  .riskassessment-task-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+
+    .section-title {
+      margin-bottom: 0;
+      margin-right: 15px;
+      white-space: nowrap;
+    }
+    input {
+      flex-grow: 1;
+      height: 30px;
+      box-sizing: border-box;
+      padding-left: 10px;
+    }
+  }
+
+  .riskassessment-task-fields {
+    margin-top: 5px;
+    align-items: center;
+  }
+
+  /** Dates and budget: the wrapper anchors the icon and the currency laid over the field */
+  .riskassessment-task-field {
+    position: relative;
+
+    input {
+      height: 30px;
+      box-sizing: border-box;
+      padding-left: 10px;
+    }
+    /** Leave room for the icon standing inside the field */
+    &.has-icon input {
+      padding-left: 30px;
+    }
+  }
+
+  .riskassessment-task-field-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+  }
+
+  .riskassessment-task-executive {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 30px;
+
+    /** Here the icon sits next to the select, not over it */
+    .riskassessment-task-field-icon {
+      position: static;
+      transform: none;
+    }
+    /** min-width: 0 keeps the select from pushing its grid column wider than its share */
+    .riskassessment-task-executive-select {
+      flex-grow: 1;
+      min-width: 0;
+    }
+  }
+
+  .riskassessment-task-budget {
+    padding-right: 20px;
+  }
+
+  .riskassessment-task-budget-currency {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: bold;
   }
 }
 

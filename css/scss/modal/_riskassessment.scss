@@ -1,6 +1,104 @@
+/** Add / edit evaluation modals share the same layout.
+    The container hugs its content: the simple method no longer leaves a large empty area above the
+    footer, and only the content scrolls when the advanced method grid is taller than the window. */
 .risk-evaluation-add-modal, .risk-evaluation-edit-modal {
   .modal-container {
-    max-height: 750px;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    max-height: calc(100% - 4em);
+
+    .modal-header, .modal-footer {
+      height: auto;
+      flex: 0 0 auto;
+    }
+    /** min-height: 0 lets the flex item shrink below its content so its own overflow-y takes over */
+    .modal-content {
+      height: auto;
+      min-height: 0;
+      flex: 1 1 auto;
+    }
+  }
+
+  /** Method switch (simple / advanced) and its help icon on the same baseline */
+  .risk-evaluation-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    .fa-info-circle {
+      margin-left: 0.75em;
+    }
+  }
+
+  /** The cotation labels ("81-100") are as wide as the 50px square that holds them, so they touched
+      both of its edges: equal columns sized on the longest label give every chip some breathing room */
+  .cotation-listing {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+
+    .risk-evaluation-cotation {
+      width: auto;
+      margin: 0;
+    }
+  }
+
+  /** saturne_show_medias_linked() falls back to nophoto.png: next to the two upload buttons that
+      placeholder reads as a third, disabled one */
+  .element-linked-medias-list img[src*="nophoto"],
+  .last-risk-assessment .photo img[src*="nophoto"] {
+    display: none;
+  }
+
+  /** Reminder of the evaluation being replaced: read-only, so it is set apart from the form above */
+  .last-risk-assessment {
+    padding: 1em;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.03);
+
+    h2 {
+      margin: 0 0 0.8em;
+      font-size: 16px;
+    }
+  }
+
+  .wpeo-modal[class*="modal-risk"] .modal-container .risk-evaluation-container {
+    .risk-evaluation-content-wrapper {
+      gap: 1.5em;
+      align-items: flex-start;
+
+      /** Below the tablet breakpoint the two columns squeeze the cotation chips into a single
+          column: stack the comment under them instead */
+      @media ( max-width: $media__medium ) {
+        flex-wrap: wrap;
+
+        .risk-evaluation-content, .risk-evaluation-comment {
+          width: 100%;
+        }
+
+        /** saturne collapses every .wpeo-gridlayout to one column below this breakpoint (with
+            !important): a four step scale reads better as a compact wrapping row */
+        .cotation-listing {
+          display: flex;
+          flex-wrap: wrap;
+        }
+      }
+
+      .cotation-standard {
+        margin-right: 0;
+      }
+      .risk-evaluation-comment {
+        margin-left: 0;
+
+        /** A one line field next to a 50px high cotation row looks unfinished: align both columns */
+        textarea {
+          height: 50px !important;
+          min-height: 50px !important;
+        }
+      }
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-    <?php
+<?php
     /* Copyright (C) 2026 EVARISK <technique@evarisk.com>
      *
      * This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,9 @@
      * \ingroup digiquali
      * \brief   File of class to generate control document pdf
      */
+
+    // Load Dolibarr libraries
+    require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
     // Load Saturne libraries
     require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
@@ -446,6 +449,7 @@
             $userTmp->fetch($object->fk_user_assign);
             $digiriskElement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
             $categories = $category->containing($object->id, Categorie::TYPE_TICKET);
+            $allCategories = '';
             if (!empty($categories)) {
                 $index = 0;
                 foreach ($categories as $cat) {

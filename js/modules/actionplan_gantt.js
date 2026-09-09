@@ -11,6 +11,7 @@ window.digiriskdolibarr.actionplanGantt = {};
 window.digiriskdolibarr.actionplanGantt.init = function() {
     window.digiriskdolibarr.actionplanGantt.event();
     window.digiriskdolibarr.actionplanGantt.render();
+    window.digiriskdolibarr.actionplanGantt.maybeAutoExport();
 };
 
 /**
@@ -155,6 +156,24 @@ window.digiriskdolibarr.actionplanGantt.renderHeader = function(startDate, endDa
 };
 
 /**
+ * Turn the colour of a column into the translucent background of a bar
+ *
+ * @param  {string} color Hexadecimal colour of the column, empty when the column carries none
+ * @return {string}       rgba() colour, empty string when the colour cannot be read
+ */
+window.digiriskdolibarr.actionplanGantt.softColor = function(color) {
+    if (!/^#[0-9a-f]{6}$/i.test(color || '')) {
+        return '';
+    }
+
+    var red   = parseInt(color.substr(1, 2), 16);
+    var green = parseInt(color.substr(3, 2), 16);
+    var blue  = parseInt(color.substr(5, 2), 16);
+
+    return 'rgba(' + red + ', ' + green + ', ' + blue + ', 0.25)';
+};
+
+/**
  * Render task bars in the timeline
  *
  * @param {Array}  tasks     Task data array
@@ -200,17 +219,23 @@ window.digiriskdolibarr.actionplanGantt.renderBars = function(tasks, startDate, 
         var right = Math.ceil((taskEnd - startDate) / (24 * 60 * 60 * 1000)) * dayWidth;
         var width = Math.max(right - left, dayWidth); // At least 1 day width
 
-        var colorClass = 'gantt-bar-red';
-        if (task.progress >= 100) {
-            colorClass = 'gantt-bar-green';
-        } else if (task.progress > 0) {
-            colorClass = 'gantt-bar-yellow';
+        // Colour of the column the progress falls in, so the Gantt follows the configured scale
+        var softColor  = window.digiriskdolibarr.actionplanGantt.softColor(task.color);
+        var colorClass = '';
+        var barStyle   = 'left:' + left + 'px;width:' + width + 'px';
+
+        if (softColor) {
+            barStyle += ';background:' + softColor + ';border:1px solid ' + task.color;
+        } else {
+            // No colour on the column (or an unreadable one): keep the historical three-tone bars
+            colorClass = task.progress >= 100 ? 'gantt-bar-green' : (task.progress > 0 ? 'gantt-bar-yellow' : 'gantt-bar-red');
         }
 
         var progressWidth = Math.round(width * task.progress / 100);
+        var progressStyle = 'width:' + progressWidth + 'px' + (softColor ? ';background:' + task.color : '');
 
-        var barHtml = '<div class="gantt-bar ' + colorClass + '" style="left:' + left + 'px;width:' + width + 'px">';
-        barHtml += '<div class="gantt-bar-progress" style="width:' + progressWidth + 'px"></div>';
+        var barHtml = '<div class="gantt-bar ' + colorClass + '" style="' + barStyle + '">';
+        barHtml += '<div class="gantt-bar-progress" style="' + progressStyle + '"></div>';
         barHtml += '<span class="gantt-bar-label">' + task.progress + '%</span>';
         barHtml += '<div class="gantt-tooltip">';
         barHtml += '<strong>' + task.ref + '</strong> — ' + task.label + '<br>';
@@ -228,5 +253,79 @@ window.digiriskdolibarr.actionplanGantt.renderBars = function(tasks, startDate, 
         barHtml += '</div>';
 
         $row.append(barHtml);
+    });
+};
+
+/**
+ * Trigger a PNG export of the Gantt chart when the page was opened with ?export=png
+ * (the toolbar "Gantt" button links to the Gantt view with that flag)
+ */
+window.digiriskdolibarr.actionplanGantt.maybeAutoExport = function() {
+    var $container = $('.gantt-container');
+    if ($container.data('autoexport') !== 'png' || $('.gantt-chart').length === 0) {
+        return;
+    }
+
+    // Drop the export flag from the URL so a manual refresh does not re-export
+    if (window.history && window.history.replaceState) {
+        var search   = window.location.search.replace(/([&?])export=png(&|$)/, '$1').replace(/[&?]$/, '');
+        var cleanUrl = window.location.pathname + search + window.location.hash;
+        window.history.replaceState({}, document.title, cleanUrl);
+    }
+
+    if (typeof window.html2canvas === 'function') {
+        window.digiriskdolibarr.actionplanGantt.exportToPng();
+        return;
+    }
+
+    var libUrl = $container.data('html2canvas-url');
+    if (libUrl) {
+        $.getScript(libUrl).done(function() {
+            window.digiriskdolibarr.actionplanGantt.exportToPng();
+        });
+    }
+};
+
+/**
+ * Capture the full Gantt chart (including the horizontally scrolled timeline) and download it as PNG
+ */
+window.digiriskdolibarr.actionplanGantt.exportToPng = function() {
+    var chart = $('.gantt-chart').get(0);
+    if (typeof window.html2canvas !== 'function' || !chart) {
+        return;
+    }
+
+    var $wrapper         = $('.gantt-timeline-wrapper');
+    var body             = $('.gantt-timeline-body').get(0);
+    var originalOverflow = $wrapper.css('overflow');
+    var originalWidth    = $wrapper.css('width');
+
+    // Expand the scrollable timeline so the whole chart fits in the capture
+    $wrapper.css('overflow', 'visible');
+    if (body && body.scrollWidth > 0) {
+        $wrapper.css('width', body.scrollWidth + 'px');
+    }
+
+    var restore = function() {
+        $wrapper.css('overflow', originalOverflow);
+        $wrapper.css('width', originalWidth);
+    };
+
+    window.html2canvas(chart, {
+        backgroundColor: '#ffffff',
+        scale:           1,
+        useCORS:         true,
+        windowWidth:     chart.scrollWidth,
+        windowHeight:    chart.scrollHeight
+    }).then(function(canvas) {
+        restore();
+        var link      = document.createElement('a');
+        link.download = 'papripact_gantt.png';
+        link.href     = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }).catch(function() {
+        restore();
     });
 };

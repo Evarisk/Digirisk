@@ -298,13 +298,13 @@ if (isModEnabled('project')) {
 	$langs->load("projects");
 	print '<tr class="oddeven"><td><label for="DUProject">' . $langs->trans("DUProject") . '</label></td><td>';
 	$formproject->select_projects(-1,  $conf->global->DIGIRISKDOLIBARR_DU_PROJECT, 'DUProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
-	print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?socid=' . $soc->id . '&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create&socid=' . $soc->id) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
+	print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"]) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
 	print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 	print '</td></tr>';
 
     print '<tr class="oddeven"><td><label for="EnvironmentProject">' . $langs->trans("EnvironmentProject") . '</label></td><td>';
     $formproject->select_projects(-1,  $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT, 'EnvironmentProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
-    print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?socid=' . $soc->id . '&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create&socid=' . $soc->id) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
+    print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"]) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
     print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
     print '</td></tr>';
 

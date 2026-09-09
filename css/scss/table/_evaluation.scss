@@ -54,22 +54,23 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
     width: 100%;
 
     .risk-evaluation-author {
-      display: inline-block;
-      width: 25px;
-      min-width: 25px;
-      height: 25px;
-      line-height: 25px;
-      background: rgba(0,0,0,0.5);
-      overflow: hidden;
-      text-transform: uppercase;
-      font-size: 14px;
-      font-weight: 600;
-      border-radius: 50%;
-      vertical-align: sub;
-      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      vertical-align: middle;
 
+      // Le lien natif enveloppe l'avatar et le nom : sans flex ici, les deux se coupent en fin de ligne
       a {
-        color: #fff !important;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      // Avatar rond a gauche du nom, rendu par User::getNomUrl(-1)
+      img {
+        display: block;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        object-fit: cover;
       }
     }
   }

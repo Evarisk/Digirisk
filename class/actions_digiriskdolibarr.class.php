@@ -73,41 +73,111 @@ class ActionsDigiriskdolibarr
         $error = 0; // Error counter
 
         if (strpos($parameters['context'], 'category') !== false) {
-            $tags = [
-                'accident' => [
+            $this->results = [
+                'digiriskaccident' => [
                     'id'        => 436302001,
-                    'code'      => 'accident',
+                    'code'      => 'digiriskaccident',
                     'obj_class' => 'Accident',
                     'obj_table' => 'digiriskdolibarr_accident',
+                    'label'     => 'Accident',
                 ],
-                'preventionplan' => [
+                'digiriskpreventionplan' => [
                     'id'        => 436302002,
-                    'code'      => 'preventionplan',
+                    'code'      => 'digiriskpreventionplan',
                     'obj_class' => 'PreventionPlan',
                     'obj_table' => 'digiriskdolibarr_preventionplan',
+                    'label'     => 'PreventionPlan',
                 ],
-                'firepermit' => [
+                'digiriskfirepermit' => [
                     'id'        => 436302003,
-                    'code'      => 'firepermit',
+                    'code'      => 'digiriskfirepermit',
                     'obj_class' => 'FirePermit',
                     'obj_table' => 'digiriskdolibarr_firepermit',
+                    'label'     => 'FirePermit',
                 ],
-                'risk' => [
+                'digiriskrisk' => [
                     'id'        => 436302004,
-                    'code'      => 'risk',
+                    'code'      => 'digiriskrisk',
                     'obj_class' => 'Risk',
                     'obj_table' => 'digiriskdolibarr_risk',
+                    'label'     => 'Risk',
                 ],
             ];
+            
+            return 0; // 0 means array_merge_recursive with existing results
         }
 
-        if (!$error) {
-            $this->results = $tags;
-            return 0; // or return 1 to replace standard code
-        } else {
-            $this->errors[] = 'Error message';
-            return -1;
+        return $error;
+    }
+
+    /**
+     * Overwrites properties for getElementProperties
+     *
+     * @param array $parameters
+     * @param Object $object
+     * @param string $action
+     * @param HookManager $hookmanager
+     * @return int
+     */
+    public function getElementProperties($parameters, &$object, &$action, $hookmanager)
+    {
+        if (in_array('elementproperties', explode(':', $parameters['context']))) {
+            $elementType = $parameters['elementType'];
+            
+            $map = [
+                'digiriskaccident' => ['classfile' => 'accident', 'classname' => 'Accident', 'classpath' => 'custom/digiriskdolibarr/class'],
+                'digiriskpreventionplan' => ['classfile' => 'preventionplan', 'classname' => 'PreventionPlan', 'classpath' => 'custom/digiriskdolibarr/class'],
+                'digiriskfirepermit' => ['classfile' => 'firepermit', 'classname' => 'FirePermit', 'classpath' => 'custom/digiriskdolibarr/class'],
+                'digiriskrisk' => ['classfile' => 'risk', 'classname' => 'Risk', 'classpath' => 'custom/digiriskdolibarr/class/riskanalysis']
+            ];
+
+            if (isset($map[$elementType])) {
+                $this->results = array(
+                    'module' => 'digiriskdolibarr',
+                    'classfile' => $map[$elementType]['classfile'],
+                    'classname' => $map[$elementType]['classname'],
+                    'classpath' => $map[$elementType]['classpath'],
+                    'element' => $elementType,
+                    'subelement' => $elementType,
+                    'table_element' => 'digiriskdolibarr_' . $map[$elementType]['classfile']
+                );
+                return 1; // Return 1 to replace standard code entirely
+            }
         }
+        return 0;
+    }
+
+    /**
+     * Overloading the saturneIndex hook: print a weather vigilance banner on the Digirisk dashboard.
+     *
+     * @param  array        $parameters Hook metadata (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @return int                      0 to let Dolibarr continue
+     */
+    public function saturneIndex($parameters, &$object)
+    {
+        if (strpos($parameters['context'], 'digiriskdolibarrindex') === false) {
+            return 0;
+        }
+
+        // Feature disabled in the module configuration (off by default): no banner.
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_ENABLED')) {
+            return 0;
+        }
+
+        require_once __DIR__ . '/meteovigilance.class.php';
+
+        $meteoVigilance = new MeteoVigilance($this->db);
+        $vigilance      = $meteoVigilance->fetchVigilance();
+        if (is_array($vigilance) && (int) $vigilance['level'] >= 3) {
+            global $langs;
+            $departmentCode = $meteoVigilance->getDepartmentCode();
+            ob_start();
+            require __DIR__ . '/../core/tpl/meteovigilance/banner.tpl.php';
+            $this->resprints = ob_get_clean();
+        }
+
+        return 0;
     }
 
     /**
@@ -118,7 +188,8 @@ class ActionsDigiriskdolibarr
      */
     public function addHtmlHeader(array $parameters): int
     {
-        if (strpos($parameters['context'], 'ticketcard') !== false) {
+        // La modale du suivi de temps s'appuie sur la librairie Saturne, absente des pages natives
+        if (preg_match('/ticketcard|projecttasktime/', $parameters['context'])) {
             $resourcesRequired = [
                 'css' => '/custom/saturne/css/saturne.min.css',
                 'js'  => '/custom/saturne/js/saturne.min.js'
@@ -139,7 +210,17 @@ class ActionsDigiriskdolibarr
             </script>
             <?php
 
-            $this->resprints = '<link rel="manifest" href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/manifest.json.php' . '" />';
+            // The internal application (prevention plans and fire permits) declares its own manifest,
+            // so it installs separately from the public ticket declaration app.
+            $manifestFile = 'manifest.json.php';
+            foreach (['/view/frontend/', 'preventionplan_mobile_create.php', 'firepermit_mobile_create.php'] as $pwaPath) {
+                if (strpos($_SERVER['PHP_SELF'], $pwaPath) !== false) {
+                    $manifestFile = 'manifest_pwa.json.php';
+                    break;
+                }
+            }
+
+            $this->resprints = '<link rel="manifest" href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/' . $manifestFile . '" />';
         }
 
         return 0; // or return 1 to replace standard code
@@ -161,16 +242,16 @@ class ActionsDigiriskdolibarr
 			?>
 			<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>
 			<?php
-			if ($conf->global->MAIN_INFO_SOCIETE_COUNTRY == '1:FR:France') {
+			if (getDolGlobalString('MAIN_INFO_SOCIETE_COUNTRY') == '1:FR:France') {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 				$form      = new Form($db);
                 $pictopath = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
                 $pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
-				$idcc_form = digirisk_select_dictionary('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE, 1, '', '', 'minwidth100');
-				$pee_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PEE_ENABLED" '. ($conf->global->DIGIRISKDOLIBARR_PEE_ENABLED ? 'checked' : '') .'>';
-				$perco_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PERCO_ENABLED" '. ($conf->global->DIGIRISKDOLIBARR_PERCO_ENABLED ? 'checked' : '') .'>';
-				$nbemployees_input = '<input type="number" name="DIGIRISKDOLIBARR_NB_EMPLOYEES" class="minwidth200" value="' . $conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES . '"' . ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES ? '' : 'disabled') . '>';
-				$nbworkedhours_input = '<input type="number" name="DIGIRISKDOLIBARR_NB_WORKED_HOURS" class="minwidth200" value="' . $conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS . '"' . ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS ? '' : 'disabled') . '>';
+				$idcc_form = digirisk_select_dictionary('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', getDolGlobalString('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE'), 1, '', '', 'minwidth100');
+				$pee_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PEE_ENABLED" '. (getDolGlobalInt('DIGIRISKDOLIBARR_PEE_ENABLED') ? 'checked' : '') .'>';
+				$perco_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PERCO_ENABLED" '. (getDolGlobalInt('DIGIRISKDOLIBARR_PERCO_ENABLED') ? 'checked' : '') .'>';
+				$nbemployees_input = '<input type="number" name="DIGIRISKDOLIBARR_NB_EMPLOYEES" class="minwidth200" value="' . getDolGlobalString('DIGIRISKDOLIBARR_NB_EMPLOYEES') . '"' . (getDolGlobalInt('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES') ? '' : 'disabled') . '>';
+				$nbworkedhours_input = '<input type="number" name="DIGIRISKDOLIBARR_NB_WORKED_HOURS" class="minwidth200" value="' . getDolGlobalString('DIGIRISKDOLIBARR_NB_WORKED_HOURS') . '"' . (getDolGlobalInt('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS') ? '' : 'disabled') . '>';
 				?>
 				<script>
 					let collectiveAgreementDictionary = $('<tr class="oddeven"><td><label for="selectidcc_id"><?php print $pictoDigirisk . $form->textwithpicto($langs->trans('IDCC'), $langs->trans('IDCCTooltip'));?></label></td>');
@@ -200,6 +281,54 @@ class ActionsDigiriskdolibarr
 				<?php
 				print ajax_combobox('selectDIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE');
 			}
+		} else if (preg_match('/product\/admin\/product\.php$/', $_SERVER['PHP_SELF'])) {
+            $iconPath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
+            $title = '<img src="' . $iconPath . '" style="height:18px; width:18px; vertical-align:middle; margin-right:5px; margin-bottom:2px;"> Paramètres du pdf pour les produit : FI_DigiRisk (Fiche d\'Instruction)';
+            $titleHtml = load_fiche_titre($title, '', '');
+            
+            $valMode = getDolGlobalString('DIGIRISK_PDF_PHOTO_HEIGHT_MODE', 'photo');
+            $optText = '<option value="text"' . ($valMode=='text'?' selected':'') . '>Adapté au texte (cadre de gauche)</option>';
+            $optPhoto = '<option value="photo"' . ($valMode=='photo'?' selected':'') . '>Adapté à la photo (limite max)</option>';
+
+            $html = '<br>';
+            $html .= '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
+            $html .= '<input type="hidden" name="token" value="'.newToken().'">';
+            $html .= '<input type="hidden" name="action" value="setModuleOptions">';
+            $html .= $titleHtml;
+            $html .= '<div class="div-table-responsive-no-min">';
+            $html .= '<table class="noborder centpercent">';
+            $html .= '<tr class="liste_titre"><td>Paramètres FI_DigiRisk</td><td class="right" width="300">Valeur</td></tr>';
+            
+            $fields = [
+                'DIGIRISK_PDF_BORDER_THICKNESS' => ['label' => 'Épaisseur du liseret (mm)', 'default' => '0.5'],
+                'DIGIRISK_PDF_BORDER_RADIUS' => ['label' => 'Arrondi du liseret (mm)', 'default' => '2'],
+                'DIGIRISK_PDF_EQUIP_LEFT_RATIO' => ['label' => 'Ratio colonne Identification (%)', 'default' => '66'],
+                'DIGIRISK_PDF_PHOTO_MAX_WIDTH' => ['label' => 'Largeur max. photo équipement (mm)', 'default' => '80'],
+                'DIGIRISK_PDF_PHOTO_MAX_HEIGHT' => ['label' => 'Hauteur max. photo équipement (mm)', 'default' => '80']
+            ];
+            $i = 100;
+            foreach($fields as $k => $v) {
+                $val = dol_escape_htmltag(getDolGlobalString($k, $v['default']));
+                $btn = '<input type="submit" class="button button-edit" name="modify" value="'.$langs->trans("Modify").'">';
+                $html .= '<tr class="oddeven"><td>'.$v['label'].'</td><td class="right nowraponall"><input type="hidden" name="param'.$i.'" value="'.$k.'"><input type="text" name="value'.$i.'" value="'.$val.'" class="flat minwidth175"> '.$btn.'</td></tr>';
+                $i++;
+            }
+            
+            $btn = '<input type="submit" class="button button-edit" name="modify" value="'.$langs->trans("Modify").'">';
+            $html .= '<tr class="oddeven"><td>Mode de hauteur (Photo équipement)</td><td class="right nowraponall"><input type="hidden" name="param'.$i.'" value="DIGIRISK_PDF_PHOTO_HEIGHT_MODE"><select name="value'.$i.'" class="flat minwidth175">'.$optText.$optPhoto.'</select> '.$btn.'</td></tr>';
+            
+            $html .= '</table></div></form><br>';
+            
+            ?>
+            <script>
+                $(document).ready(function() {
+                    var modelsTable = $('table.noborder').eq(1).parent('.div-table-responsive-no-min');
+                    if (modelsTable.length) {
+                        modelsTable.after(<?php echo json_encode($html); ?>);
+                    }
+                });
+            </script>
+            <?php
 		} else if (preg_match('/\bticketcard\b/', $parameters['context'])) {
             if (GETPOST('action') != 'create') {
 
@@ -230,7 +359,8 @@ class ActionsDigiriskdolibarr
                     }
                 }
 
-                $fieldLinkedAccidents  = '<tr class="trextrafields_collapse_2"><td class="titlefield">'.$langs->trans('AccidentsLinked').'</td>';
+                $pictoDigirisk = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
+                $fieldLinkedAccidents  = '<tr class="trextrafields_collapse_2"><td class="titlefield">' . $pictoDigirisk . $langs->trans('AccidentsLinked').'</td>';
                 $fieldLinkedAccidents .= '<td id="ticket_extras_digiriskdolibarr_ticket_accident_'. $object->id .'" class="valuefield ticket_extras_digiriskdolibarr_ticket_accident wordbreak">';
                 $fieldLinkedAccidents .= $linkedAccidentList;
                 $fieldLinkedAccidents .= '</td>';
@@ -241,15 +371,17 @@ class ActionsDigiriskdolibarr
                 </script>
                 <?php
 
-                $digiriskelement    = new DigiriskElement($db);
-                $res = $digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
-                if ($res > 0) {
-                    $outDigiriskElement = $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
-                    ?>
-                    <script>
-                        jQuery('td[id*="digiriskdolibarr_ticket_service"]').html('<?= $outDigiriskElement ?>');
-                    </script>
-                    <?php
+                if (!empty($object->array_options['options_digiriskdolibarr_ticket_service'])) {
+                    $digiriskelement    = new DigiriskElement($db);
+                    $res = $digiriskelement->fetch((int)$object->array_options['options_digiriskdolibarr_ticket_service']);
+                    if ($res > 0) {
+                        $outDigiriskElement = $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
+                        ?>
+                        <script>
+                            jQuery('td[id*="digiriskdolibarr_ticket_service"]').html('<?= $outDigiriskElement ?>');
+                        </script>
+                        <?php
+                    }
                 }
 
                 // Collect ticket category IDs including their ancestors (getListForItem returns the full hierarchy)
@@ -286,7 +418,8 @@ class ActionsDigiriskdolibarr
 
                     $object->fetch_optionals();
 
-                    $signatureTab  = '<tr class="trextrafields_collapse_2"><td class="titlefield"><span class="fas fa-edit paddingrightonly" style=""></span>' . $langs->trans('ValidateText').'</td>';
+                    $pictoDigirisk2 = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
+                    $signatureTab  = '<tr class="trextrafields_collapse_2"><td class="titlefield">' . $pictoDigirisk2 . '<span class="fas fa-edit paddingrightonly" style=""></span>' . $langs->trans('ValidateText').'</td>';
                     $signatureTab .= '<td id="ticket_extras_digiriskdolibarr_ticket_signature_'. $object->id .'" class="valuefield ticket_extras_digiriskdolibarr_ticket_signature wordbreak">';
                     $signatureTab .= $object->array_options['options_digiriskdolibarr_condition_message'] ?? '';
                     if ($signature && !empty($signature->signature)) {
@@ -295,7 +428,7 @@ class ActionsDigiriskdolibarr
                     $signatureTab .= '</td>';
                     $signatureTab .= '</tr>';
 
-                    $signatureTab .= '<tr class="trextrafields_collapse_2"><td class="titlefield">' . $langs->trans('RegisterSigned') .'</td>';
+                    $signatureTab .= '<tr class="trextrafields_collapse_2"><td class="titlefield">' . $pictoDigirisk2 . $langs->trans('RegisterSigned') .'</td>';
                     $signatureTab .= '<td id="ticket_extras_digiriskdolibarr_ticket_signature_ok_'. $object->id .'" class="valuefield ticket_extras_digiriskdolibarr_ticket_signature_ok wordbreak">';
                     $signatureTab .= '<input type="checkbox"' . ($signature && !empty($signature->signature) ? ' checked' : '') . ' disabled>';
                     $signatureTab .= '</td>';
@@ -314,7 +447,7 @@ class ActionsDigiriskdolibarr
 				$object->fetch(GETPOSTINT('id'),'',GETPOST('track_id'));
 				require_once __DIR__ . '/digiriskelement.class.php';
 				$digiriskelement = new DigiriskElement($db);
-				$selectDigiriskElement = $digiriskelement->selectDigiriskElementList($object->array_options['options_digiriskdolibarr_ticket_service'], 'options_digiriskdolibarr_ticket_service', ['customsql' => ' t.status > 0'], 1, 0, array(), 0, 0, 'minwidth100 maxwidth300', 0, false, 1);
+				$selectDigiriskElement = $digiriskelement->selectDigiriskElementList($object->array_options['options_digiriskdolibarr_ticket_service'], 'options_digiriskdolibarr_ticket_service', ['customsql' => ' t.status > 0 AND t.status <> ' . DigiriskElement::STATUS_ARCHIVED], 1, 0, array(), 0, 0, 'minwidth100 maxwidth300', 0, false, 1);
                 ?>
 				<script>
 					jQuery('#options_digiriskdolibarr_ticket_service').remove()
@@ -355,7 +488,8 @@ class ActionsDigiriskdolibarr
 
                 $userGroupID = GETPOSTISSET('user_group') ? GETPOST('user_group') : getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP');
                 $userGroup->fetch($userGroupID);
-                $users = $userGroup->listUsersForGroup();
+                // Only enabled users can be assigned to a ticket, a disabled one has no business showing up in the list
+                $users = $userGroup->listUsersForGroup('u.statut > 0');
                 $users = array_map(fn($userTmp) => $userTmp->getFullName($langs), $users);
 
                 $out .= '<tr class="field_fk_user_assign"><td class="titlefieldmax45 wordbreak">';
@@ -407,7 +541,7 @@ class ActionsDigiriskdolibarr
                 if (GETPOST('action') == 'get_user_group') {
                     $userGroupID = GETPOST('user_group');
                     $userGroup->fetch($userGroupID);
-                    $users = $userGroup->listUsersForGroup();
+                    $users = $userGroup->listUsersForGroup('u.statut > 0');
                     $users = array_map(fn($userTmp) => $userTmp->getFullName($langs), $users);
 
                     echo '<input type="hidden" name="users_list" value="' . base64_encode(json_encode($users)) . '">';
@@ -431,7 +565,7 @@ class ActionsDigiriskdolibarr
 						let mailContent = $('#message').html()
 						let digiriskElementRefAndLabel = <?php echo json_encode($digiriskelement->ref . ' - ' . $digiriskelement->label); ?>;
 						let digiriskElementId = <?php echo json_encode($digiriskelement->id); ?>;
-						let mailContentWithDigiriskElementLabel = mailContent.replace('__EXTRAFIELD_DIGIRISKDOLIBARR_TICKET_SERVICE_NAME__ ', digiriskElementRefAndLabel);
+						let mailContentWithDigiriskElementLabel = mailContent.replace('__EXTRAFIELD_DIGIRISKDOLIBARR_TICKET_SERVICE_NAME__', digiriskElementRefAndLabel);
 						$('#message').html(mailContentWithDigiriskElementLabel);
 					</script>
 					<?php
@@ -468,15 +602,17 @@ class ActionsDigiriskdolibarr
 				require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
                 require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
 
-				$task    = new SaturneTask($db);
-				$project = new Project($db);
+				$task        = new SaturneTask($db);
+				$project     = new Project($db);
+				$extrafields = new ExtraFields($db);
 
 				if (preg_match('/projectcard|projectcontactcard|projecttaskcard|projecttaskscard|projecttasktime|projectOverview/', $parameters['context']) || (strpos($parameters['context'], 'category') !== false && preg_match('/contacttpl/', $parameters['context']))) {
                     if (strpos($parameters['context'], 'projecttaskcard') !== false && !GETPOSTISSET('withproject')) {
                         return 0;
                     } else {
-                        if (preg_match('/projectcard|projectcontactcard|projecttaskscard/', $parameters['context'])) {
-                            $projectId = GETPOST('id');
+                        if (preg_match('/projectcard|projectcontactcard|projecttaskscard|projectOverview/', $parameters['context'])) {
+                            $project->fetch(GETPOSTINT('id'), GETPOST('ref', 'alpha'));
+                            $projectId = $project->id;
                         } else if (GETPOSTISSET('projectid') || GETPOSTISSET('ref')) {
                             $project->fetch( GETPOST('projectid'), GETPOST('ref'));
                             $projectId = $project->id;
@@ -484,25 +620,32 @@ class ActionsDigiriskdolibarr
                             $task->fetch(GETPOST('id'));
                             $projectId = $task->fk_project;
                         }
+
+                        // Sans projet identifié, getTasksArray() agrégerait les tâches de toute l'instance
+                        if ($projectId <= 0) {
+                            return 0;
+                        }
+
                         $allTasks = $task->getTasksArray(null, null, $projectId, 0, 0, '', '-1', '', 0, 0, $extrafields);
+                        $totalConsumedTime       = 0;
+                        $totatConsumedTimeAmount = 0;
+                        $nbTasks                 = 0;
+                        $totalProgress           = 0;
+                        $totalTasksBudget        = 0;
                         if (is_array($allTasks) && !empty($allTasks)) {
                             $nbTasks = count($allTasks);
                             foreach ($allTasks as $taskSingle) {
-                                $filter       = ' AND fk_element = ' . $taskSingle->id;
-                                $allTimespent = $task->fetchAllTimeSpentAllUsers($filter);
-                                foreach ($allTimespent as $timespent) {
-                                    $totatConsumedTimeAmount += convertSecondToTime($timespent->timespent_duration, 'allhourmin') * $timespent->timespent_thm;
-                                }
-                                $totalConsumedTime += $taskSingle->duration;
-                                $totalProgress     += $taskSingle->progress;
-                                $totalTasksBudget  += $taskSingle->budget_amount;
+                                $totalConsumedTime += (float) $taskSingle->duration_effective;
+                                $totalProgress     += (float) $taskSingle->progress;
+                                $totalTasksBudget  += (float) $taskSingle->budget_amount;
                             }
-                        } else {
-                            $totalConsumedTime       = 0;
-                            $totatConsumedTimeAmount = 0;
-                            $nbTasks                 = 0;
-                            $totalProgress           = 0;
-                            $totalTasksBudget        = 0;
+                        }
+
+                        $allTimespent = $task->fetchAllTimeSpentAllUsers(' AND project_id = ' . ((int) $projectId));
+                        if (is_array($allTimespent)) {
+                            foreach ($allTimespent as $timespent) {
+                                $totatConsumedTimeAmount += ((float) $timespent->timespent_duration / 3600) * (float) $timespent->timespent_thm;
+                            }
                         }
                         $outTotatConsumedTime       = '<tr><td>' . $langs->trans('TotalConsumedTime') . '</td><td>' . convertSecondToTime($totalConsumedTime, 'allhourmin') . '</td></tr>';
                         $outTotatConsumedTimeAmount = '<tr><td>' . $langs->trans('TotalConsumedTimeAmount') . '</td><td>' . price($totatConsumedTimeAmount, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>';
@@ -634,7 +777,8 @@ class ActionsDigiriskdolibarr
 
             require __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
         } else if (strpos($parameters['context'], 'projectcard') !== false) {
-            if ($action == 'builddoc' && GETPOST('model') == 'papripact_a3_paysage_projectdocument') {
+            // The model is the one set as default on the documents configuration page, PAPRIPACT when none is
+            if ($action == 'builddoc' && GETPOST('model') == getDolGlobalString('DIGIRISKDOLIBARR_PROJECTDOCUMENT_DEFAULT_MODEL', 'papripact_a3_paysage_projectdocument')) {
                 require_once __DIR__ . '/digiriskdolibarrdocuments/projectdocument.class.php';
 
                 $document = new ProjectDocument($this->db);
@@ -642,6 +786,38 @@ class ActionsDigiriskdolibarr
                 $moduleNameLowerCase      = 'digiriskdolibarr';
                 $permissiontoadd          = $user->rights->projet->creer;
                 $moreParams['modulePart'] = 'project';
+
+                require __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
+            }
+        } else if (strpos($parameters['context'], 'projecttasktime') !== false) {
+            if ($action == 'builddoc' && GETPOST('model', 'alpha') == 'timespent_projectdocument') {
+                require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+                require_once __DIR__ . '/digiriskdolibarrdocuments/projectdocument.class.php';
+
+                // time.php ne charge pas errors, d'ou les messages d'echec du modele affiches en
+                // clair (ErrorCanNotCreateDir, ErrorRecordNotFound) sans ce chargement
+                $langs->loadLangs(['errors', 'digiriskdolibarr@digiriskdolibarr']);
+
+                // doActions passe avant que la page n'ait charge le projet : le formulaire de la
+                // modale porte son id
+                $project = new Project($this->db);
+                if ($project->fetch(GETPOSTINT('projectid')) <= 0) {
+                    setEventMessages($langs->trans('ErrorRecordNotFound'), [], 'errors');
+                    return 0;
+                }
+
+                // documents_action.tpl.php travaille sur $object : ici le projet, pas la tache
+                $object = $project;
+
+                $document        = new ProjectDocument($this->db);
+                $permissiontoadd = $user->hasRight('projet', 'lire');
+
+                $moreParams = [
+                    'modulePart'         => 'project',
+                    'timeSpentUserIds'   => GETPOST('timespent_users', 'array:int'),
+                    'timeSpentDateStart' => dol_mktime(0, 0, 0, GETPOSTINT('timespent_date_startmonth'), GETPOSTINT('timespent_date_startday'), GETPOSTINT('timespent_date_startyear')),
+                    'timeSpentDateEnd'   => dol_mktime(23, 59, 59, GETPOSTINT('timespent_date_endmonth'), GETPOSTINT('timespent_date_endday'), GETPOSTINT('timespent_date_endyear'))
+                ];
 
                 require __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
             }
@@ -670,6 +846,137 @@ class ActionsDigiriskdolibarr
             return -1;
 		}
 	}
+
+    /**
+     * Overloading the formConfirm function : replacing the parent's function with the one below.
+     *
+     * Pose sur l'onglet Temps consomme d'un projet le bouton et la modale de generation du suivi
+     * de temps en PDF. Ce hook est le seul point de la page qui soit hors du formulaire de la
+     * liste : la modale y porte donc son propre formulaire, sans imbrication.
+     *
+     * @param  array  $parameters Hook metadata (context, etc...)
+     * @param  object $object     The object to process
+     * @return int                < 0 on error, 0 on success, 1 to replace standard code
+     */
+    public function formConfirm(array $parameters, $object): int
+    {
+        global $db, $form, $langs, $user;
+
+        if (strpos($parameters['context'], 'projecttasktime') === false) {
+            return 0;
+        }
+
+        $project = $parameters['projectstatic'] ?? null;
+        if (!is_object($project) || $project->id <= 0 || !$user->hasRight('projet', 'lire')) {
+            return 0;
+        }
+
+        // Le document couvre tout le projet : ne le proposer que sur l'onglet Temps consomme du
+        // projet, pas sur celui d'une tache ou il promettrait le temps de la seule tache affichee
+        if (GETPOSTINT('projectid') <= 0 && !GETPOST('project_ref', 'alpha')) {
+            return 0;
+        }
+
+        $langs->loadLangs(['projects', 'digiriskdolibarr@digiriskdolibarr']);
+
+        // Ne proposer que les personnes qui ont reellement saisi du temps sur ce projet : une
+        // liste de tous les utilisateurs n'aurait aucun rapport avec le contenu du document
+        $userIds = [];
+        $sql     = 'SELECT DISTINCT et.fk_user';
+        $sql    .= ' FROM ' . MAIN_DB_PREFIX . 'element_time as et';
+        $sql    .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'projet_task as pt ON pt.rowid = et.fk_element';
+        $sql    .= " WHERE et.elementtype = 'task'";
+        $sql    .= ' AND pt.fk_projet = ' . (int) $project->id;
+        $sql    .= ' AND et.fk_user > 0';
+
+        $resql = $db->query($sql);
+        if ($resql) {
+            while ($obj = $db->fetch_object($resql)) {
+                $userIds[] = (int) $obj->fk_user;
+            }
+            $db->free($resql);
+        }
+
+        if (empty($userIds)) {
+            return 0;
+        }
+
+        if (!is_object($form)) {
+            require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
+            $form = new Form($db);
+        }
+
+        // Periode par defaut : le mois en cours, le cas le plus courant d'un releve de temps
+        $now       = dol_getdate(dol_now());
+        $dateStart = dol_mktime(0, 0, 0, GETPOSTINT('timespent_date_startmonth'), GETPOSTINT('timespent_date_startday'), GETPOSTINT('timespent_date_startyear'));
+        $dateEnd   = dol_mktime(0, 0, 0, GETPOSTINT('timespent_date_endmonth'), GETPOSTINT('timespent_date_endday'), GETPOSTINT('timespent_date_endyear'));
+        if (empty($dateStart)) {
+            $dateStart = dol_get_first_day($now['year'], $now['mon']);
+        }
+        if (empty($dateEnd)) {
+            $dateEnd = dol_get_last_day($now['year'], $now['mon']);
+        }
+
+        $selectedUsers = GETPOST('timespent_users', 'array:int');
+        $formUrl       = $_SERVER['PHP_SELF'] . '?projectid=' . $project->id . (!empty($parameters['withproject']) ? '&withproject=1' : '');
+
+        $out  = '<div class="tabsAction">';
+        $out .= '<span class="butAction modal-open">';
+        $out .= '<input type="hidden" class="modal-options" data-modal-to-open="digirisk-timespent-report-modal">';
+        $out .= '<i class="fas fa-file-pdf paddingright"></i>' . $langs->trans('GenerateTimeSpentReport');
+        $out .= '</span>';
+        $out .= '</div>';
+
+        // Le formulaire enveloppe la modale plutot que d'etre pose dedans : la mise en page de
+        // .modal-container repose sur ses descendants directs
+        $out .= '<form method="POST" action="' . $formUrl . '">';
+        $out .= '<input type="hidden" name="token" value="' . newToken() . '">';
+        $out .= '<input type="hidden" name="action" value="builddoc">';
+        $out .= '<input type="hidden" name="model" value="timespent_projectdocument">';
+        $out .= '<input type="hidden" name="projectid" value="' . $project->id . '">';
+        $out .= '<input type="hidden" name="withproject" value="' . (!empty($parameters['withproject']) ? 1 : 0) . '">';
+
+        $out .= '<div class="wpeo-modal modal-flex" id="digirisk-timespent-report-modal">';
+        $out .= '<div class="modal-container wpeo-modal-event">';
+
+        $out .= '<div class="modal-header">';
+        $out .= '<h2 class="modal-title">' . $langs->trans('GenerateTimeSpentReport') . '</h2>';
+        $out .= '<div class="modal-close"><i class="fas fa-times"></i></div>';
+        $out .= '</div>';
+
+        $out .= '<div class="modal-content">';
+        $out .= '<table class="border centpercent">';
+
+        $out .= '<tr><td class="titlefieldcreate">' . $langs->trans('Users') . '</td><td>';
+        // select_dolusers n'honore $include que sous forme de tableau : une chaine ne filtre rien
+        $out .= $form->select_dolusers($selectedUsers, 'timespent_users', 0, null, 0, $userIds, '', 0, 0, 0, '', 0, '', 'minwidth300 maxwidth500 widthcentpercentminusx', 0, 0, true);
+        $out .= '<div class="opacitymedium">' . $langs->trans('TimeSpentReportUsersHelp') . '</div>';
+        $out .= '</td></tr>';
+
+        $out .= '<tr><td>' . $langs->trans('DateStart') . '</td><td>';
+        $out .= $form->selectDate($dateStart, 'timespent_date_start', 0, 0, 1, '', 1, 0);
+        $out .= '</td></tr>';
+
+        $out .= '<tr><td>' . $langs->trans('DateEnd') . '</td><td>';
+        $out .= $form->selectDate($dateEnd, 'timespent_date_end', 0, 0, 1, '', 1, 0);
+        $out .= '</td></tr>';
+
+        $out .= '</table>';
+        $out .= '</div>';
+
+        $out .= '<div class="modal-footer">';
+        $out .= '<div class="wpeo-button button-grey modal-close"><span>' . $langs->trans('Cancel') . '</span></div>';
+        $out .= '<button type="submit" class="wpeo-button button-blue"><span>' . $langs->trans('Generate') . '</span></button>';
+        $out .= '</div>';
+
+        $out .= '</div>';
+        $out .= '</div>';
+        $out .= '</form>';
+
+        $this->resprints = $out;
+
+        return 0; // or return 1 to replace standard code
+    }
 
     /**
      * Overloading the addMoreActionsButtons function : replacing the parent's function with the one below
@@ -804,6 +1111,28 @@ class ActionsDigiriskdolibarr
     }
 
     /**
+     * Overloading the viewDictionaryFieldlist function : replacing the parent's function with the one below
+     *
+     * The Kanban column dictionary stores a translation key as label, so a column keeps its meaning in
+     * every language. The generic dictionary page prints that key as is: translate it on the row it is
+     * about to render, a label renamed by the admin coming back unchanged from trans().
+     *
+     * @param  array  $parameters Hook metadata (context, tabname, etc...)
+     * @param  object $object     Dictionary line about to be displayed
+     * @return int                0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function viewDictionaryFieldlist(array $parameters, $object): int
+    {
+        global $langs;
+
+        if (($parameters['tabname'] ?? '') == MAIN_DB_PREFIX . 'c_digiriskdolibarr_actionplan_column' && !empty($object->label)) {
+            $object->label = $langs->trans($object->label);
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
 	 *  Overloading the printFieldListFrom function : replacing the parent's function with the one below
 	 *
 	 * @param Hook $parameters metadatas (context, etc...)
@@ -816,12 +1145,9 @@ class ActionsDigiriskdolibarr
 
         $sql = '';
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if (preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context'])) {	    // do something only for the context 'somecontext1' or 'somecontext2'
-			$searchCategoryTicketList = GETPOST('search_category_ticket_list');
-			if (!empty($searchCategoryTicketList)) {
-				$sql = ' LEFT JOIN '.MAIN_DB_PREFIX."categorie_ticket as ct ON t.rowid = ct.fk_ticket"; // We'll need this table joined to the select in order to filter by categ
-			}
-		}
+		// No join on categorie_ticket: the category filter is built with subqueries in printFieldListWhere().
+		// Joining would return one row per category link, and the record count of the list (a COUNT(*) built
+		// from this same request, with the GROUP BY stripped) would count those links instead of the tickets.
 
         $this->resprints = $sql;
         return 0; // or return 1 to replace standard code
@@ -844,7 +1170,7 @@ class ActionsDigiriskdolibarr
 			if (is_array($searchCategoryTicketList) && !empty($searchCategoryTicketList)) {
 				foreach ($searchCategoryTicketList as $searchCategoryTicket) {
 					if (intval($searchCategoryTicket) == -2) {
-						$searchCategoryTicketSqlList[] = "ct.fk_categorie IS NULL";
+						$searchCategoryTicketSqlList[] = "t.rowid NOT IN (SELECT fk_ticket FROM " . MAIN_DB_PREFIX . "categorie_ticket)";
 					} elseif (intval($searchCategoryTicket) > 0) {
 						$searchCategoryTicketSqlList[] = "t.rowid IN (SELECT fk_ticket FROM " . MAIN_DB_PREFIX . "categorie_ticket WHERE fk_categorie = " . ((int)$searchCategoryTicket) . ")";
 					}
@@ -854,15 +1180,14 @@ class ActionsDigiriskdolibarr
 				}
 			} else {
 				if (!empty($searchCategoryTicketList) && $searchCategoryTicketList > 0) {
-					$sql = " AND ct.fk_categorie = ".((int) $searchCategoryTicketList);
+					$sql = " AND t.rowid IN (SELECT fk_ticket FROM " . MAIN_DB_PREFIX . "categorie_ticket WHERE fk_categorie = " . ((int) $searchCategoryTicketList) . ")";
 				}
 				if ($searchCategoryTicketList == -2) {
-					$sql = " AND ct.fk_categorie IS NULL";
+					$sql = " AND t.rowid NOT IN (SELECT fk_ticket FROM " . MAIN_DB_PREFIX . "categorie_ticket)";
 				}
 			}
-			if (!empty($searchCategoryTicketList)) {
-				$sql .= " GROUP BY t.rowid";
-			}
+			// No GROUP BY: the subqueries above never duplicate a ticket, and a GROUP BY here would be
+			// stripped from the COUNT(*) request of the list, giving a wrong number of records and phantom pages.
 
             $this->resprints = $sql;
 		}
@@ -965,8 +1290,8 @@ class ActionsDigiriskdolibarr
         if (strpos($parameters['context'], 'ticketcard') !== false) {
             $picto = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
             foreach ($extrafields->attributes['ticket']['label'] as $key => $value) {
-                if (strpos($key, 'digiriskdolibarr_ticket') === false) {
-                    continue; // Goes to the next element if ‘digiriskdolibarr_ticket’ is not found
+                if (strpos($key, 'digiriskdolibarr_') === false) {
+                    continue; // Goes to the next element if 'digiriskdolibarr_' is not found
                 }
                 $extrafields->attributes['ticket']['label'][$key] = $picto . $langs->transnoentities($value);
             }
@@ -997,14 +1322,220 @@ class ActionsDigiriskdolibarr
         if (strpos($parameters['context'], 'ticketlist') !== false) {
             $picto = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
             foreach ($extrafields->attributes['ticket']['label'] as $key => $value) {
-                if (strpos($key, 'digiriskdolibarr_ticket') === false) {
-                    continue; // Goes to the next element if ‘digiriskdolibarr_ticket’ is not found
+                if (strpos($key, 'digiriskdolibarr_') === false) {
+                    continue; // Goes to the next element if 'digiriskdolibarr_' is not found
                 }
                 $extrafields->attributes['ticket']['label'][$key] = $picto . $langs->transnoentities($value);
             }
         }
 
         return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the addMoreMassActions function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function addMoreMassActions(array $parameters): int
+    {
+        global $langs, $user;
+
+        if (preg_match('/tasklist|projecttaskscard/', $parameters['context']) && $user->hasRight('projet', 'creer')) {
+            // Hook runs on a Dolibarr core page, module lang files are not loaded there
+            $langs->load('digiriskdolibarr@digiriskdolibarr');
+
+            $arrayOfMassActions = [
+                'prevalidatetasks'      => '<span class="fas fa-check paddingrightonly"></span>' . $langs->trans('MassValidateTasks'),
+                'prechangeprojecttasks' => '<span class="fas fa-random paddingrightonly"></span>' . $langs->trans('MassChangeTasksProject')
+            ];
+
+            $out = '';
+            foreach ($arrayOfMassActions as $code => $label) {
+                $out .= '<option value="' . $code . '" data-html="' . dol_escape_htmltag($label) . '">' . $label . '</option>';
+            }
+
+            $this->resprints = $out;
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the doPreMassActions function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, massaction, toselect, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     * @throws Exception
+     */
+    public function doPreMassActions(array $parameters): int
+    {
+        global $form, $langs, $user;
+
+        if (!preg_match('/tasklist|projecttaskscard/', $parameters['context']) || !$user->hasRight('projet', 'creer')) {
+            return 0;
+        }
+
+        $langs->load('digiriskdolibarr@digiriskdolibarr');
+
+        $nbSelected = is_array($parameters['toselect']) ? count($parameters['toselect']) : 0;
+
+        if ($parameters['massaction'] == 'prevalidatetasks') {
+            $this->resprints = $form->formconfirm($_SERVER['PHP_SELF'], $langs->trans('MassValidateTasks'), $langs->trans('ConfirmMassValidateTasksQuestion', $nbSelected), 'digirisk_validate_tasks', null, 'yes', 0, 200, 500, 1);
+        }
+
+        if ($parameters['massaction'] == 'prechangeprojecttasks') {
+            require_once DOL_DOCUMENT_ROOT . '/core/class/html.formprojet.class.php';
+
+            $formProject  = new FormProjets($this->db);
+            $formQuestion = [
+                [
+                    'type'  => 'other',
+                    'name'  => 'digiriskdolibarr_fk_project',
+                    'label' => $langs->trans('Project'),
+                    'value' => $formProject->select_projects(-1, GETPOSTINT('digiriskdolibarr_fk_project'), 'digiriskdolibarr_fk_project', 0, 0, 1, 1, 0, 0, 0, '', 1, 0, 'minwidth300')
+                ]
+            ];
+
+            $this->resprints = $form->formconfirm($_SERVER['PHP_SELF'], $langs->trans('MassChangeTasksProject'), $langs->trans('ConfirmMassChangeTasksProjectQuestion', $nbSelected), 'digirisk_change_project_tasks', $formQuestion, 'yes', 0, 250, 500, 1);
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the doMassActions function : replacing the parent's function with the one below
+     *
+     * @param  array  $parameters Hook metadata (context, toselect, etc...)
+     * @param  object $object     Current object
+     * @param  string $action     Current action
+     * @return int                0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function doMassActions(array $parameters, $object, $action): int
+    {
+        global $langs, $user;
+
+        if (!preg_match('/tasklist|projecttaskscard/', $parameters['context']) || !$user->hasRight('projet', 'creer')) {
+            return 0;
+        }
+
+        if (!in_array($action, ['digirisk_validate_tasks', 'digirisk_change_project_tasks']) || GETPOST('confirm', 'alpha') != 'yes') {
+            return 0;
+        }
+
+        $langs->load('digiriskdolibarr@digiriskdolibarr');
+
+        $taskIds = array_filter(array_map('intval', (array) $parameters['toselect']));
+        if (empty($taskIds)) {
+            $this->errors[] = $langs->trans('ErrorSelectAtLeastOne');
+            return -1;
+        }
+
+        require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+
+        if ($action == 'digirisk_validate_tasks') {
+            $nbValidated = 0;
+            foreach ($taskIds as $taskId) {
+                $task = new Task($this->db);
+                // Only a draft task can be validated, same rule as the task card
+                if ($task->fetch($taskId) <= 0 || $task->status != Task::STATUS_DRAFT) {
+                    continue;
+                }
+
+                // An explicit trigger code is needed, triggers parse it and warn on the empty one Dolibarr sends by default
+                if ($task->setStatusCommon($user, Task::STATUS_VALIDATED, 0, 'TASK_VALIDATE') < 0) {
+                    $this->errors[] = $task->errorsToString();
+                    return -1;
+                }
+
+                $nbValidated++;
+            }
+
+            setEventMessages($langs->trans('MassValidateTasksSuccess', $nbValidated, count($taskIds)), []);
+
+            return 0;
+        }
+
+        $projectId = GETPOSTINT('digiriskdolibarr_fk_project');
+        if ($projectId <= 0) {
+            $this->errors[] = $langs->trans('ErrorFieldRequired', $langs->transnoentities('Project'));
+            return -1;
+        }
+
+        require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+
+        $targetProject = new Project($this->db);
+        if ($targetProject->fetch($projectId) <= 0) {
+            $this->errors[] = $langs->trans('ErrorRecordNotFound');
+            return -1;
+        }
+
+        $sourceProjects = [];
+        $nbMoved        = 0;
+        foreach ($taskIds as $taskId) {
+            $task = new Task($this->db);
+            if ($task->fetch($taskId) <= 0 || $task->fk_project == $projectId) {
+                continue;
+            }
+
+            $sourceProjectId = (int) $task->fk_project;
+            if (!isset($sourceProjects[$sourceProjectId])) {
+                $sourceProject                    = new Project($this->db);
+                $sourceProjects[$sourceProjectId] = $sourceProject->fetch($sourceProjectId) > 0 ? $sourceProject->ref : '';
+            }
+
+            // A parent task left behind in the previous project would break the task hierarchy
+            if ($task->fk_task_parent > 0 && !in_array((int) $task->fk_task_parent, $taskIds)) {
+                $task->fk_task_parent = 0;
+            }
+
+            $task->fk_project = $projectId;
+            if ($task->update($user) <= 0) {
+                $this->errors[] = $task->errorsToString();
+                return -1;
+            }
+
+            $this->moveTaskDocuments($task, $sourceProjects[$sourceProjectId], $targetProject->ref);
+
+            $nbMoved++;
+        }
+
+        setEventMessages($langs->trans('MassChangeTasksProjectSuccess', $nbMoved, $targetProject->getNomUrl(1)), []);
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Move the document directory of a task that has just been attached to another project.
+     * Task files are stored under <project_ref>/<task_ref>, so they have to follow the task.
+     *
+     * @param  Task   $task             Task that has been moved
+     * @param  string $sourceProjectRef Ref of the project the task was attached to
+     * @param  string $targetProjectRef Ref of the project the task is now attached to
+     * @return void
+     */
+    protected function moveTaskDocuments(Task $task, string $sourceProjectRef, string $targetProjectRef): void
+    {
+        global $conf;
+
+        if (empty($sourceProjectRef) || empty($targetProjectRef)) {
+            return;
+        }
+
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+
+        $entity    = !empty($task->entity) ? (int) $task->entity : (int) $conf->entity;
+        $rootDir   = $conf->project->multidir_output[$entity] ?? $conf->project->dir_output;
+        $sourceDir = $rootDir . '/' . dol_sanitizeFileName($sourceProjectRef) . '/' . dol_sanitizeFileName($task->ref);
+        if (!is_dir($sourceDir)) {
+            return;
+        }
+
+        $targetDir = $rootDir . '/' . dol_sanitizeFileName($targetProjectRef) . '/' . dol_sanitizeFileName($task->ref);
+
+        dol_mkdir(dirname($targetDir));
+        dol_move_dir($sourceDir, $targetDir);
     }
 
     /**
@@ -1023,8 +1554,8 @@ class ActionsDigiriskdolibarr
 
             $digiriskResources = new DigiriskResources($this->db);
 
-            $extSociety  = $digiriskResources->fetchResourcesFromObject('ExtSociety', $object);
-            $moreHtmlRef = $langs->trans('ExtSociety') . ' : ' . $extSociety->getNomUrl(1);
+            $extSociety  = $digiriskResources->fetchSingleResourceFromObject('ExtSociety', $object);
+            $moreHtmlRef = $langs->trans('ExtSociety') . ' : ' . ($extSociety !== null ? $extSociety->getNomUrl(1) : $langs->trans('None'));
 
             $this->resprints = $moreHtmlRef;
         }
@@ -1064,6 +1595,57 @@ class ActionsDigiriskdolibarr
         }
 
         return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the moreHtmlStatus function : on the risk page, replace the banner status by the risk cotation counts (black/red/orange/grey) of the current element.
+     *
+     * @param  array        $parameters Hook metadatas (context, morehtmlstatus, etc...).
+     * @param  CommonObject $object     Current object.
+     * @return int                      0 to keep the standard status, 1 to replace it.
+     */
+    public function moreHtmlStatus(array $parameters, $object): int
+    {
+        if (strpos($parameters['context'], 'riskcard') === false || !is_a($object, 'DigiriskElement')) {
+            return 0;
+        }
+
+        global $langs;
+
+        require_once __DIR__ . '/riskanalysis/risk.class.php';
+
+        $riskType = GETPOST('risk_type', 'aZ09');
+        if (empty($riskType)) {
+            $riskType = 'risk';
+        }
+
+        // Count only this element's risks of the current type (lightweight filtered fetch)
+        $risk      = new Risk($this->db);
+        $riskInfos = $risk->loadRiskInfos([
+            'filter'     => ' AND t.fk_element = ' . (int) $object->id,
+            'filterRisk' => ' AND t.type = \'' . $this->db->escape($riskType) . '\''
+        ]);
+        $counts = $riskInfos['current']['riskByRiskAssessmentCotations'][$object->id] ?? [];
+
+        // Cotation scale: 4 = black, 3 = red, 2 = orange, 1 = grey
+        $cotations = [
+            4 => ['class' => 'black',  'label' => 'BlackRisk'],
+            3 => ['class' => 'red',    'label' => 'RedRisk'],
+            2 => ['class' => 'orange', 'label' => 'OrangeRisk'],
+            1 => ['class' => 'grey',   'label' => 'GreyRisk'],
+        ];
+        $out = '<div class="banner-risk-badges">';
+        foreach ($cotations as $scale => $info) {
+            $count = (int) ($counts[$scale] ?? 0);
+            // Short label to keep the badge compact in the banner (e.g. "Risque inacceptable" -> "Inacceptable")
+            $label = dol_ucfirst(preg_replace('/^risque\s+/i', '', $langs->trans($info['label'])));
+            $out  .= '<span class="banner-risk-badge ' . $info['class'] . ($count ? '' : ' empty') . '"><span class="brb-count">' . $count . '</span>' . dol_escape_htmltag($label) . '</span>';
+        }
+        $out .= '</div>';
+
+        $this->resprints = $out;
+
+        return 1;
     }
 
 	/**
@@ -1120,6 +1702,10 @@ class ActionsDigiriskdolibarr
 				'documentType' => 'listingrisksaction',
 				'picto'        => 'fontawesome_fa-exclamation_fas_#d35968'
 			],
+            'ListingRisksEnvironmentalDocument' => [
+                'documentType' => 'listingrisksenvironmentaldocument',
+                'picto'        => 'fontawesome_fa-leaf_fas_#d35968'
+            ],
             'ListingRisksEnvironmentalAction' => [
                 'documentType' => 'listingrisksenvironmentalaction',
                 'picto'        => 'fontawesome_fa-exclamation_fas_#d35968'
@@ -1164,7 +1750,7 @@ class ActionsDigiriskdolibarr
 				'documentType' => 'project',
                 'className'    => 'projectdocument',
 				'picto'        => 'project'
-			],
+			]
 
 		];
 
@@ -1245,6 +1831,61 @@ class ActionsDigiriskdolibarr
 	}
 
     /**
+     * Overloading the addSearchEntry function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function addSearchEntry(array $parameters): int
+    {
+        global $langs, $user;
+
+        if (strpos($parameters['context'], 'searchform') === false || !$user->hasRight('digiriskdolibarr', 'lire')) {
+            return 0;
+        }
+
+        // The search box is built before the module lang file is loaded, the labels would come out as their key
+        $langs->load('digiriskdolibarr@digiriskdolibarr');
+
+        // Lists opened from the search box, keyed by the right they need : picto, label and path of the list
+        $lists = [
+            'risk'                  => ['exclamation-triangle', 'Riskprofessionals',     'view/digiriskelement/risk_list.php?risk_type=risk'],
+            'riskenvironmental'     => ['leaf',                 'Riskenvironmentals',    'view/digiriskelement/risk_list.php?risk_type=riskenvironmental'],
+            'preventionplan'        => ['info',                 'PreventionPlan',        'view/preventionplan/preventionplan_list.php'],
+            'firepermit'            => ['fire-alt',             'FirePermit',            'view/firepermit/firepermit_list.php'],
+            'accident'              => ['user-injured',         'Accident',              'view/accident/accident_list.php'],
+            'accidentinvestigation' => ['search',               'AccidentInvestigation', 'view/accidentinvestigation/accidentinvestigation_list.php']
+        ];
+
+        $moduleNum     = 436302;
+        $position      = 0;
+        $searchEntries = [];
+        foreach ($lists as $rightName => $list) {
+            if (!$user->hasRight('digiriskdolibarr', $rightName, 'read')) {
+                continue;
+            }
+
+            list($picto, $langKey, $listPath) = $list;
+
+            $position += 10;
+            $picto     = 'fontawesome_fa-' . $picto . '_fas_#d35968';
+            $url       = dol_buildpath('custom/digiriskdolibarr/' . $listPath, 1) . (strpos($listPath, '?') !== false ? '&' : '?') . 'mainmenu=digiriskdolibarr';
+
+            $searchEntries['searchinto' . $rightName] = [
+                'position' => $moduleNum . sprintf('%02d', $position),
+                'img'      => $picto,
+                'label'    => $langs->trans($langKey),
+                'text'     => img_picto('', $picto, 'class="pictofixedwidth"') . $langs->trans($langKey),
+                'url'      => $url . (!empty($parameters['search_boxvalue']) ? '&search_all=' . urlencode($parameters['search_boxvalue']) : '')
+            ];
+        }
+
+        $this->results = $searchEntries;
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
      * Overloading the saturneExtendGetObjectsMetadata function : replacing the parent's function with the one below
      *
      * @param  array $parameters Hook metadata (context, etc...)
@@ -1294,6 +1935,11 @@ class ActionsDigiriskdolibarr
             $objectsMetadata['digiriskdolibarr_' . $objectName]['class_path'] = 'custom/digiriskdolibarr/class/riskanalysis/' . $objectName . '.class.php';
             $objectsMetadata['digiriskdolibarr_' . $objectName]['lib_path']   = 'custom/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php';
         }
+        // La table de l'enquete accident ne suit pas la regle de nommage des autres objets : sans
+        // cette correction, la metadonnee pointe une table inexistante et plus rien ne matche
+        // (les fichiers lies, donc la diffusion, cherchent sur src_object_type = table_element)
+        $objectsMetadata['digiriskdolibarr_accidentinvestigation']['table_element'] = 'digiriskdolibarr_accident_investigation';
+
         $objectsMetadata['digiriskdolibarr_digiriskelement']['create_url'] = 'custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0';
 
         $objectsMetadata['digiriskdolibarr_evaluator']['create_url'] = '';
@@ -1346,6 +1992,8 @@ class ActionsDigiriskdolibarr
                 return 0;
             }
 
+            require_once __DIR__ . '/digiriskelement.class.php';
+
             $digiriskelement = new DigiriskElement($db);
             $res = $digiriskelement->fetch($serviceId);
             if ($res > 0) {
@@ -1358,4 +2006,5 @@ class ActionsDigiriskdolibarr
             }
         }
     }
+
 }

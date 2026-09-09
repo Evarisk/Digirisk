@@ -162,7 +162,8 @@ window.digiriskdolibarr.risk.createRisk = function ( event ) {
 	let dateEnd   = elementTask.find('#RiskassessmentTaskDateEndModalRisk').val();
 	let hourEnd   = elementTask.find('#RiskassessmentTaskDateEndModalRiskhour').val();
 	let minEnd    = elementTask.find('#RiskassessmentTaskDateEndModalRiskmin').val();
-	let budget    = elementTask.find('.riskassessment-task-budget').val()
+	let budget    = elementTask.find('.riskassessment-task-budget').val();
+	let executiveId = elementTask.find('select[name="executive_id"]').val();
 
 	//Loader
 	window.saturne.loader.display($('.fichecenter.risklist'));
@@ -186,6 +187,7 @@ window.digiriskdolibarr.risk.createRisk = function ( event ) {
 			hourEnd: hourEnd,
 			minEnd: minEnd,
 			budget: budget,
+			executiveId: executiveId,
       categories: categories,
 			criteres: {
 				gravite: criteres['gravite'] ? criteres['gravite'] : 0,
@@ -196,7 +198,7 @@ window.digiriskdolibarr.risk.createRisk = function ( event ) {
 			}
 		}),
 		processData: false,
-    contentType: 'application/json charset=utf-8',
+    contentType: 'application/json',
 		success: function ( resp ) {
 			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 
@@ -271,7 +273,7 @@ window.digiriskdolibarr.risk.saveRisk = function ( event ) {
 			newParent: newParent,
       categories: categories
 		}),
-    contentType: 'application/json charset=utf-8',
+    contentType: 'application/json',
 		success: function ( resp ) {
 			$('.wpeo-loader').removeClass('wpeo-loader');
 			let actionContainerSuccess = $('.messageSuccessRiskEdit');
@@ -337,7 +339,7 @@ window.digiriskdolibarr.risk.unlinkSharedRisk = function ( event ) {
 		data: JSON.stringify({
 			riskID: riskId,
 		}),
-    contentType: 'application/json charset=utf-8',
+    contentType: 'application/json',
 		success: function ( resp ) {
 			//refresh shared risk list form
 			$('.confirmquestions').html($(resp).find('.confirmquestions').children())

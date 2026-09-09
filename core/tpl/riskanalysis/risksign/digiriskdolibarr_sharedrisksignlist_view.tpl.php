@@ -73,10 +73,9 @@ $sql                                                                            
 $sql                                                                                                                                                  .= " FROM " . MAIN_DB_PREFIX . $risksign->table_element . " as t";
 $sql                                                                                                                                          		  .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (t.fk_element = e.rowid)";
 $sql                                                                                                                                         		  .= " INNER JOIN " . MAIN_DB_PREFIX . 'element_element' . " as el on (t.rowid = el.fk_source)";
-if (is_array($extrafields->attributes[$risksign->table_element]['label']) && count($extrafields->attributes[$risksign->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risksign->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
-//if ($risksign->ismultientitymanaged == 1) $sql                                                                                                        .= " WHERE t.entity IN (" . getEntity($risksign->element) . ")";
-//else $sql                                                                                                                                             .= " WHERE 1 = 1";
-//$sql                                                                                                                                                  .= " AND fk_element = " . $id;
+if (is_array($extrafields->attributes[$risksign->table_element]['label'] ?? null) && count($extrafields->attributes[$risksign->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risksign->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
+// Every filter below is appended with AND: without this WHERE they would be attached to the extrafields LEFT JOIN ON clause and stop filtering anything
+$sql .= " WHERE 1 = 1";
 if ( ! $allRisks) {
 	$sql .= " AND el.fk_target = " . $id;
 	$sql .= " AND el.sourcetype = 'digiriskdolibarr_risksign'";
@@ -108,7 +107,7 @@ $search['fk_element_shared'] = GETPOST('search_fk_element_shared');
 foreach ($search as $key => $val) {
 	if ($key == 'status' && $search[$key] == -1) continue;
 	$mode_search = (($risksign->isInt($risksign->fields[$key]) || $risksign->isFloat($risksign->fields[$key])) ? 1 : 0);
-	if (strpos($risksign->fields[$key]['type'], 'integer:') === 0) {
+	if (strpos($risksign->fields[$key]['type'] ?? '', 'integer:') === 0) {
 		if ($search[$key] == '-1') $search[$key] = '';
 		$mode_search                             = 2;
 	}
@@ -170,8 +169,9 @@ if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit
 	$num = $db->num_rows($resql);
 }
 
-// Direct jump if only one record found
-if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
+// Direct jump if only one record found, out of reach once the page header has been printed : the redirect
+// would only raise a "headers already sent" warning and leave the list truncated
+if ($num == 1 && !headers_sent() && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
 	$obj = $db->fetch_object($resql);
 	$id  = $obj->rowid;
 	header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risksign.php', 1) . '?id=' . $id);
@@ -252,17 +252,17 @@ foreach ($risksign->fields as $key => $val) {
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
 	if ( ! empty($arrayfields['t.' . $key]['checked'])) {
 		print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
-		if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
-		elseif (strpos($val['type'], 'integer:') === 0) {
+		if (is_array($val['arrayofkeyval'] ?? null)) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'] ?? 0, 0, 0, '', 1, 0, 0, '', 'maxwidth75');
+		elseif (strpos($val['type'] ?? '', 'integer:') === 0) {
 			print $risksign->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 		} elseif ($key == 'entity') {
 			print select_entity_list($search['entity'], 'search_entity', 'e.rowid NOT IN (' . $conf->entity . ')');
 		} elseif ($key == 'fk_element') {
 			print $digiriskelement->selectDigiriskElementList($search['fk_element_shared'], 'search_fk_element_shared', ['customsql' => 's.entity NOT IN (' . $conf->entity . ')'], 1, 0, array(), 0, 0, 'minwidth100 maxwidth300', 0, false, 1, $contextpage, false);
 		} elseif ($key == 'category') { ?>
-			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
-				<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
-				<?php if (dol_strlen(dol_escape_htmltag($search[$key])) == 0) : ?>
+			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
+				<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key] ?? '') ?>" />
+				<?php if (dol_strlen(dol_escape_htmltag($search[$key] ?? '')) == 0) : ?>
 					<div class="dropdown-toggle dropdown-add-button">
 						<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-map-signs button-icon"></i></span>
 						<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
@@ -284,7 +284,7 @@ foreach ($risksign->fields as $key => $val) {
 					endif; ?>
 				</ul>
 			</div>
-		<?php } elseif ( ! preg_match('/^(date|timestamp)/', $val['type']) && $key != 'category') print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
+		<?php } elseif ( ! preg_match('/^(date|timestamp)/', $val['type'] ?? '') && $key != 'category') print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key] ?? '') . '">';
 		print '</td>';
 	}
 }
@@ -332,7 +332,7 @@ print '</tr>' . "\n";
 
 // contenu
 $i          = 0;
-$totalarray = array();
+$totalarray = array('nbfield' => 0, 'val' => array(), 'pos' => array());
 
 while ($i < ($limit ? min($num, $limit) : $num)) {
 	$obj = $db->fetch_object($resql);

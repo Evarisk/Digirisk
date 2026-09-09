@@ -85,12 +85,55 @@ window.digiriskdolibarr.ticket.event = function() {
   $(document).on( 'keyup', '#email', window.digiriskdolibarr.ticket.checkValidEmail);
   $(document).on( 'keyup', '#options_digiriskdolibarr_ticket_phone', window.digiriskdolibarr.ticket.checkValidPhone);
 
+  // Ticket card (issue #4443) — inline (on-the-fly) editing
+  $(document).on( 'click',   '.digirisk-ticket-card .dtc-subject-value', window.digiriskdolibarr.ticket.editSubjectInline);
+  $(document).on( 'keydown', '.digirisk-ticket-card .dtc-subject-input', window.digiriskdolibarr.ticket.subjectInputKeydown);
+  $(document).on( 'blur',    '.digirisk-ticket-card .dtc-subject-input', window.digiriskdolibarr.ticket.saveSubjectInline);
+  $(document).on( 'click',   '.digirisk-ticket-card .kanban-add-tag-btn', window.digiriskdolibarr.ticket.toggleTagDropdown);
+  $(document).on( 'click',   '.digirisk-ticket-card .kanban-tag-option', window.digiriskdolibarr.ticket.addCategoryInline);
+  $(document).on( 'click',   '.digirisk-ticket-card .kanban-tag-remove', window.digiriskdolibarr.ticket.removeCategoryInline);
+  $(document).on( 'click',   '.digirisk-ticket-card .kanban-tag-dropdown', function(event) { event.stopPropagation(); });
+  $(document).on( 'click',   window.digiriskdolibarr.ticket.closeTagDropdowns);
+  $(document).on( 'click',   '.digirisk-ticket-card .dtc-assignee-value', window.digiriskdolibarr.ticket.editAssigneeInline);
+  $(document).on( 'change',  '.digirisk-ticket-card .dtc-assignee-select', window.digiriskdolibarr.ticket.saveAssigneeInline);
+  $(document).on( 'blur',    '.digirisk-ticket-card .dtc-assignee-select', window.digiriskdolibarr.ticket.closeAssigneeInline);
+  $(document).on( 'click',   '.digirisk-ticket-card .dtc-thirdparty-name.dtc-inline-edit', window.digiriskdolibarr.ticket.editThirdpartyInline);
+  $(document).on( 'click',   '.digirisk-ticket-card .dtc-project-name.dtc-inline-edit',    window.digiriskdolibarr.ticket.editProjectInline);
+  $(document).on( 'focus',   '.digirisk-ticket-card .dtc-progress-value[contenteditable]', window.digiriskdolibarr.ticket.progressFocus);
+  $(document).on( 'keydown', '.digirisk-ticket-card .dtc-progress-value[contenteditable]', window.digiriskdolibarr.ticket.progressKeydown);
+  $(document).on( 'blur',    '.digirisk-ticket-card .dtc-progress-value[contenteditable]', window.digiriskdolibarr.ticket.saveProgressInline);
+  $(document).on( 'click',   '.edit-message-on-click', function() { window.location.href = $(this).data('edit-url'); });
+  $(document).on( 'click',   '.digirisk-ticket-card .dtc-extrafield-value', window.digiriskdolibarr.ticket.editExtrafieldInline);
+  // Keyboard navigation: Enter/Space on a tabbable extrafield span triggers inline edit
+  $(document).on( 'keydown', '.digirisk-ticket-card .dtc-extrafield-value[tabindex]', function(e) {
+    if (e.key === 'Enter' || e.key === ' ' || e.keyCode === 13 || e.keyCode === 32) {
+      e.preventDefault();
+      $(this).trigger('click');
+    }
+  });
+
+  // Ticket card (issue #4885) — Tab / Shift+Tab walks the inline-editable fields and opens the
+  // next one straight in edit mode, both from a resting field and from inside an open editor.
+  $(document).on( 'keydown', '.digirisk-ticket-card .dtc-tabfield', window.digiriskdolibarr.ticket.tabFieldKeydown);
+  $(document).on( 'keydown', '.digirisk-ticket-card .dtc-extrafield-input,'
+                           + '.digirisk-ticket-card .dtc-subject-input,'
+                           + '.digirisk-ticket-card .dtc-assignee-select', window.digiriskdolibarr.ticket.tabEditorKeydown);
+  $(document).on( 'keydown', '.digirisk-ticket-card .select2-selection', window.digiriskdolibarr.ticket.tabSelect2Keydown);
+
   $(document).on( 'change', '.param-table input, .param-table select, .param-table textarea', window.digiriskdolibarr.ticket.handleParamChange);
-  CKEDITOR.on('instanceReady', function(e) {
-	CKEDITOR.instances[e.editor.name].on('change', function() {
-		window.digiriskdolibarr.ticket.handleParamChange.call(this.container.$)
-	});
- });
+  $(document).on( 'change', '.param-table input[type="checkbox"][id$="_visible"]', window.digiriskdolibarr.ticket.handleVisibleChange);
+  // CKEDITOR is only loaded on pages with a rich-text editor. Guard the global
+  // so this handler never throws "CKEDITOR is not defined" — an uncaught error
+  // here aborts the whole digiriskdolibarr init chain (no try/catch in the
+  // auto-init loop), leaving later modules (e.g. the ticket kanban picker)
+  // unwired.
+  if (typeof CKEDITOR !== 'undefined') {
+    CKEDITOR.on('instanceReady', function(e) {
+      CKEDITOR.instances[e.editor.name].on('change', function() {
+        window.digiriskdolibarr.ticket.handleParamChange.call(this.container.$);
+      });
+    });
+  }
 };
 
 /**
@@ -254,7 +297,7 @@ window.digiriskdolibarr.ticket.addDashBoardTicketInfo = function() {
 			digiriskelementID: digiriskelementID,
 			catID: catID
 		}),
-    contentType: 'application/json charset=utf-8',
+    contentType: 'application/json',
 		success: function ( resp ) {
 			window.location.reload();
 		},
@@ -287,7 +330,7 @@ window.digiriskdolibarr.ticket.closeDashBoardTicketInfo = function() {
 			digiriskelementID: digiriskelementID,
 			catID: catID
 		}),
-		contentType: 'application/json charset=utf-8',
+		contentType: 'application/json',
 		success: function ( resp ) {
 			box.closest('.box-flex-item').fadeOut(400)
 			$('.add-widget-box').attr('style', '')
@@ -346,3 +389,910 @@ window.digiriskdolibarr.ticket.handleParamChange = function() {
 	var $btn = $('.' + $table.data('btn'));
 	$btn.prop('disabled', false);
 };
+
+/**
+ * Ticket category config (#3627) — keep the "Required" checkbox coherent with its "Visible" one:
+ * a field hidden from the public interface can not be required on it, so unchecking "Visible"
+ * clears and locks "Required", and checking it back unlocks it.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.handleVisibleChange = function() {
+	var $required = $('#' + $(this).attr('id').replace(/_visible$/, '_required'));
+	if (!$required.length || $required.data('inherited')) {
+		return;
+	}
+	if ($(this).prop('checked')) {
+		$required.prop('disabled', false);
+	} else {
+		$required.prop('checked', false).prop('disabled', true);
+	}
+};
+
+/**
+ * Ticket card (#4443) — start inline edit of the subject.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Click event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.editSubjectInline = function(event) {
+  event.preventDefault();
+  var $wrap = $(this).closest('.dtc-head').find('.dtc-subject');
+  if (!$wrap.length || $wrap.find('.dtc-subject-input').length) {
+    return;
+  }
+  var current = String($wrap.attr('data-value') || '');
+  var $input  = $('<input type="text" class="dtc-subject-input" autocomplete="new-password" />').val(current);
+  $wrap.html($input);
+  $input.trigger('focus').trigger('select');
+};
+
+/**
+ * Ticket card (#4443) — Enter saves, Escape cancels the subject edit.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Keydown event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.subjectInputKeydown = function(event) {
+  if (event.key === 'Enter' || event.keyCode === 13) {
+    event.preventDefault();
+    $(this).trigger('blur');
+  } else if (event.key === 'Escape' || event.keyCode === 27) {
+    var $wrap = $(this).closest('.dtc-subject');
+    $(this).data('done', true);
+    window.digiriskdolibarr.ticket.renderSubject($wrap, String($wrap.attr('data-value') || ''));
+  }
+};
+
+/**
+ * Ticket card (#4443) — save the subject on the fly (AJAX), no page reload.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.saveSubjectInline = function() {
+  var $input = $(this);
+  var $wrap  = $input.closest('.dtc-subject');
+  if ($input.data('done')) {
+    return;
+  }
+  $input.data('done', true);
+  var newValue = $input.val().trim();
+  var oldValue = String($wrap.attr('data-value') || '');
+  if (newValue === '' || newValue === oldValue) {
+    window.digiriskdolibarr.ticket.renderSubject($wrap, oldValue);
+    return;
+  }
+  var token = window.saturne.toolbox.getToken();
+  var sep   = window.saturne.toolbox.getQuerySeparator(document.URL);
+  $.ajax({
+    url: document.URL + sep + 'action=setsubject_ajax&token=' + token,
+    type: 'POST',
+    data: { subject: newValue },
+    dataType: 'json',
+    success: function(resp) {
+      var saved = (resp && resp.subject != null) ? resp.subject : newValue;
+      $wrap.attr('data-value', saved);
+      window.digiriskdolibarr.ticket.renderSubject($wrap, saved);
+    },
+    error: function() {
+      window.digiriskdolibarr.ticket.renderSubject($wrap, oldValue);
+    }
+  });
+};
+
+/**
+ * Ticket card (#4443) — render the subject value span.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {jQuery} $wrap Subject wrapper.
+ * @param  {string} value Subject value.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.renderSubject = function($wrap, value) {
+  var text = (value && value.length) ? $('<div>').text(value).html() : '';
+  // Keep dtc-tabfield/tabindex: the subject is the first link of the Tab chain (#4885).
+  $wrap.html('<span class="dtc-subject-value dtc-tabfield" tabindex="0">' + text + '</span>');
+};
+
+/**
+ * Ticket card (#4443) — toggle the "add tag" dropdown (same UX as the ticket kanban).
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Click event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.toggleTagDropdown = function(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  var $dropdown = $(this).siblings('.kanban-tag-dropdown');
+  $('.digirisk-ticket-card .kanban-tag-dropdown').not($dropdown).removeClass('visible');
+  $dropdown.toggleClass('visible');
+};
+
+/**
+ * Ticket card (#4443) — close any open tag dropdown (outside click).
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.closeTagDropdowns = function() {
+  $('.digirisk-ticket-card .kanban-tag-dropdown.visible').removeClass('visible');
+};
+
+/**
+ * Ticket card (#4443) — add a category on the fly (same endpoint/behaviour as the kanban).
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Click event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.addCategoryInline = function(event) {
+  event.stopPropagation();
+  var $opt = $(this);
+  if ($opt.hasClass('assigned')) {
+    return;
+  }
+  var $dropdown = $opt.closest('.kanban-tag-dropdown');
+  var $tagsRow  = $opt.closest('.kanban-card-tags');
+  var catId     = $opt.data('value');
+  $dropdown.removeClass('visible');
+  $.ajax({
+    url: $tagsRow.data('tag-url') + '?action=addTicketCategory&ticket_id=' + $tagsRow.data('ticket-id') + '&cat_id=' + catId + '&token=' + window.saturne.toolbox.getToken(),
+    type: 'POST',
+    dataType: 'json',
+    success: function(response) {
+      if (!response || !response.success) {
+        return;
+      }
+      var bgColor = response.color ? '#' + response.color : '#8c8c8c';
+      var $tag = $('<span class="kanban-tag" data-cat-id="' + response.id + '" style="background:' + bgColor + '">'
+        + $('<div>').text(response.label).html()
+        + '<span class="kanban-tag-remove" title="&times;">&times;</span></span>');
+      $tagsRow.find('.kanban-tag-dropdown-wrapper').before($tag);
+      $opt.addClass('assigned').append('<i class="fas fa-check" style="margin-left:auto;font-size:9px;color:#28a745"></i>');
+    }
+  });
+};
+
+/**
+ * Ticket card (#4443) — remove a category on the fly (same endpoint/behaviour as the kanban).
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Click event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.removeCategoryInline = function(event) {
+  event.stopPropagation();
+  var $tag     = $(this).closest('.kanban-tag');
+  var $tagsRow = $tag.closest('.kanban-card-tags');
+  var catId    = $tag.data('cat-id');
+  $tag.css('opacity', '0.4');
+  $.ajax({
+    url: $tagsRow.data('tag-url') + '?action=removeTicketCategory&ticket_id=' + $tagsRow.data('ticket-id') + '&cat_id=' + catId + '&token=' + window.saturne.toolbox.getToken(),
+    type: 'POST',
+    dataType: 'json',
+    success: function(response) {
+      if (!response || !response.success) {
+        $tag.css('opacity', '1');
+        return;
+      }
+      $tag.slideUp(150, function() {
+        $(this).remove();
+        $tagsRow.find('.kanban-tag-option[data-value="' + catId + '"]').removeClass('assigned').find('.fa-check').remove();
+      });
+    },
+    error: function() {
+      $tag.css('opacity', '1');
+    }
+  });
+};
+
+/**
+ * Ticket card (#4443) — reveal the assignee select for on-the-fly editing.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Click event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.editAssigneeInline = function(event) {
+  event.preventDefault();
+  var $cell = $(this).closest('.dtc-assignee');
+  if ($cell.find('.dtc-assignee-editor').is(':visible')) {
+    return;
+  }
+  $cell.find('.dtc-assignee-value').hide();
+  $cell.find('.dtc-assignee-editor').show();
+  $cell.find('.dtc-assignee-select').trigger('focus');
+};
+
+/**
+ * Ticket card (#4443) — save the assignee on the fly (same endpoint as the kanban).
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.saveAssigneeInline = function() {
+  var $sel   = $(this);
+  var $cell  = $sel.closest('.dtc-assignee');
+  var userId = parseInt($sel.val(), 10) || 0;
+  $.ajax({
+    url: $cell.data('assign-url') + '?action=setassignee_ajax&id=' + $cell.data('ticket-id') + '&user_id=' + userId + '&token=' + window.saturne.toolbox.getToken(),
+    type: 'POST',
+    dataType: 'json',
+    success: function(resp) {
+      if (resp && resp.nomurl) {
+        $cell.find('.dtc-assignee-value').html(resp.nomurl).show();
+      } else {
+        $cell.find('.dtc-assignee-value').show();
+      }
+      $cell.find('.dtc-assignee-editor').hide();
+    },
+    error: function() {
+      $cell.find('.dtc-assignee-value').show();
+      $cell.find('.dtc-assignee-editor').hide();
+    }
+  });
+};
+
+/**
+ * Ticket card (#4443) — close the assignee editor on blur (no selection made).
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.closeAssigneeInline = function() {
+  var $cell = $(this).closest('.dtc-assignee');
+  window.setTimeout(function() {
+    if ($cell.find('.dtc-assignee-editor').is(':visible')) {
+      $cell.find('.dtc-assignee-editor').hide();
+      $cell.find('.dtc-assignee-value').show();
+    }
+  }, 200);
+};
+
+/**
+ * Ticket card — init (or re-open) the select2 of an inline badge editor.
+ * The plain <select> is select2-ified on first reveal so the dropdown is searchable;
+ * width is forced because it was built inside a display:none wrapper.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {jQuery} $sel The <select> element to enhance.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.initInlineSelect2 = function($sel) {
+  if (!$.fn.select2) {
+    $sel.trigger('focus');
+    return;
+  }
+  if (!$sel.hasClass('select2-hidden-accessible')) {
+    $sel.select2({ width: '240px', dropdownAutoWidth: true, dropdownParent: $(document.body) });
+  } else {
+    var $container = $sel.next('.select2-container');
+    if ($container.length) {
+      $container.css('width', '240px');
+    }
+  }
+  $sel.select2('open');
+};
+
+/**
+ * Ticket card — flash a badge value green after a successful inline save.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {jQuery} $el Element to flash.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.flashInline = function($el) {
+  $el.css('color', '#2ecc71');
+  window.setTimeout(function() { $el.css('color', ''); }, 1200);
+};
+
+/**
+ * Ticket card — reveal a badge inline editor (hide the name, show the searchable select),
+ * wire the save on change and the revert on close-without-change.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {jQuery}   $cell     The badge wrapper (.dtc-thirdparty / .dtc-project).
+ * @param  {string}   nameSel   Selector of the editable name inside the cell.
+ * @param  {string}   wrapSel   Selector of the hidden selector wrapper inside the cell.
+ * @param  {Function} saveFn    Save callback, called with ($cell, $sel).
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.revealInlineBadge = function($cell, nameSel, wrapSel, saveFn) {
+  var $name = $cell.find(nameSel);
+  var $wrap = $cell.find(wrapSel);
+  if ($wrap.is(':visible')) {
+    return;
+  }
+  $name.hide();
+  $wrap.show();
+  var $sel = $wrap.find('select');
+  window.digiriskdolibarr.ticket.initInlineSelect2($sel);
+  $sel.off('change.dtcInline').on('change.dtcInline', function() {
+    saveFn($cell, $sel);
+  });
+  $sel.off('select2:close.dtcInline').on('select2:close.dtcInline', function() {
+    window.setTimeout(function() {
+      if ($wrap.is(':visible')) {
+        $wrap.hide();
+        $name.show();
+      }
+    }, 150);
+  });
+};
+
+/**
+ * Ticket card — start editing the thirdparty badge.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Click event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.editThirdpartyInline = function(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  window.digiriskdolibarr.ticket.revealInlineBadge($(this).closest('.dtc-thirdparty'), '.dtc-thirdparty-name', '.dtc-thirdparty-selector', window.digiriskdolibarr.ticket.saveThirdpartyInline);
+};
+
+/**
+ * Ticket card — save the thirdparty on the fly (AJAX) and rebuild the badge in place.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {jQuery} $cell The thirdparty badge wrapper.
+ * @param  {jQuery} $sel  The thirdparty <select>.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.saveThirdpartyInline = function($cell, $sel) {
+  var $name = $cell.find('.dtc-thirdparty-name');
+  var $wrap = $cell.find('.dtc-thirdparty-selector');
+  var $nav  = $cell.find('.dtc-badge-nav');
+  var $hist = $cell.find('.dtc-badge-history');
+  var emptyLabel = $cell.data('empty-label') || '';
+  var socId = parseInt($sel.val(), 10);
+  if (isNaN(socId) || socId < 0) {
+    socId = 0;
+  }
+  if ($.fn.select2 && $sel.hasClass('select2-hidden-accessible')) {
+    $sel.select2('close');
+  }
+  $wrap.hide();
+  $name.show();
+  $.ajax({
+    url: $cell.data('url') + '?action=setthirdparty_ajax&id=' + $cell.data('ticket-id') + '&socid=' + socId + '&token=' + window.saturne.toolbox.getToken(),
+    type: 'POST',
+    dataType: 'json',
+    success: function(resp) {
+      if (!resp || !resp.success) {
+        return;
+      }
+      if (resp.id > 0) {
+        $name.text(resp.name).attr('href', resp.cardurl).removeClass('is-empty');
+        $nav.attr('href', resp.cardurl).show();
+        $hist.attr('href', resp.historyurl).show();
+      } else {
+        $name.text(emptyLabel).attr('href', '#').addClass('is-empty');
+        $nav.hide();
+        $hist.hide();
+      }
+      window.digiriskdolibarr.ticket.flashInline($name);
+    }
+  });
+};
+
+/**
+ * Ticket card — start editing the project badge.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Click event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.editProjectInline = function(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  window.digiriskdolibarr.ticket.revealInlineBadge($(this).closest('.dtc-project'), '.dtc-project-name', '.dtc-project-selector', window.digiriskdolibarr.ticket.saveProjectInline);
+};
+
+/**
+ * Ticket card — save the project on the fly (AJAX) and rebuild the badge in place.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {jQuery} $cell The project badge wrapper.
+ * @param  {jQuery} $sel  The project <select>.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.saveProjectInline = function($cell, $sel) {
+  var $name = $cell.find('.dtc-project-name');
+  var $wrap = $cell.find('.dtc-project-selector');
+  var $nav  = $cell.find('.dtc-badge-nav');
+  var emptyLabel = $cell.data('empty-label') || '';
+  var projectId = parseInt($sel.val(), 10);
+  if (isNaN(projectId) || projectId < 0) {
+    projectId = 0;
+  }
+  if ($.fn.select2 && $sel.hasClass('select2-hidden-accessible')) {
+    $sel.select2('close');
+  }
+  $wrap.hide();
+  $name.show();
+  $.ajax({
+    url: $cell.data('url') + '?action=setproject_ajax&id=' + $cell.data('ticket-id') + '&projectid=' + projectId + '&token=' + window.saturne.toolbox.getToken(),
+    type: 'POST',
+    dataType: 'json',
+    success: function(resp) {
+      if (!resp || !resp.success) {
+        return;
+      }
+      if (resp.id > 0) {
+        $name.text(resp.name).attr('href', resp.cardurl).removeClass('is-empty');
+        $nav.attr('href', resp.cardurl).show();
+      } else {
+        $name.text(emptyLabel).attr('href', '#').addClass('is-empty');
+        $nav.hide();
+      }
+      window.digiriskdolibarr.ticket.flashInline($name);
+    }
+  });
+};
+
+/**
+ * Ticket card (#4443) — select the whole progress value when it gains focus.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.progressFocus = function() {
+  var el = this;
+  window.setTimeout(function() {
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }, 0);
+};
+
+/**
+ * Ticket card (#4443) — Enter validates the progress (triggers blur), no line break.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Keydown event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.progressKeydown = function(event) {
+  if (event.key === 'Enter' || event.keyCode === 13) {
+    event.preventDefault();
+    $(this).trigger('blur');
+  }
+};
+
+/**
+ * Ticket card (#4443) — save the progress on the fly from the contenteditable value.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.saveProgressInline = function() {
+  var $val     = $(this);
+  var $cell    = $val.closest('.dtc-progress');
+  var oldValue = parseInt($cell.attr('data-value'), 10) || 0;
+  var newValue = parseInt(($val.text() || '').replace(/[^0-9]/g, ''), 10);
+  if (isNaN(newValue)) {
+    newValue = oldValue;
+  }
+  newValue = Math.max(0, Math.min(100, newValue));
+  $val.text(newValue);
+  if (newValue === oldValue) {
+    return;
+  }
+  var action = $cell.data('action') || 'setprogress_ajax';
+  // On a task row "id" carries the task id, so the ticket to trace the change on (#4885) travels apart.
+  var logTicketId = $cell.data('log-ticket-id');
+  $.ajax({
+    url: $cell.data('progress-url') + '?action=' + action + '&id=' + $cell.data('ticket-id')
+       + (logTicketId ? '&ticket_id=' + logTicketId : '')
+       + '&token=' + window.saturne.toolbox.getToken(),
+    type: 'POST',
+    data: { progress: newValue },
+    dataType: 'json',
+    success: function(resp) {
+      var val = (resp && resp.progress != null) ? resp.progress : newValue;
+      $cell.attr('data-value', val);
+      $val.text(val);
+    },
+    error: function() {
+      $val.text(oldValue);
+    }
+  });
+};
+
+/**
+ * Ticket card (#4883) — inline (on-the-fly) editing for extrafields
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Click event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.editExtrafieldInline = function(event) {
+  event.preventDefault();
+  var $span = $(this);
+  if ($span.data('editing')) return;
+  $span.data('editing', true);
+
+  var type = $span.data('type') || 'text';
+  var rawValue = $span.data('raw');
+  if (typeof rawValue === 'undefined') rawValue = '';
+
+  var $input;
+  if (type === 'textarea') {
+    $input = $('<textarea class="dtc-extrafield-input" style="width:100%; min-height:80px; outline:none; transition: border-color 0.2s;" autocomplete="off"></textarea>');
+  } else if (type === 'select') {
+    $input = $('<select class="dtc-extrafield-input" style="width:100%; outline:none; transition: border-color 0.2s;"></select>');
+    var optionsObj = $span.data('options');
+    if (typeof optionsObj === 'string') {
+      try { optionsObj = JSON.parse(optionsObj); } catch(e) {}
+    }
+    if (typeof optionsObj === 'object' && optionsObj !== null) {
+      $.each(optionsObj, function(val, text) {
+        var $opt = $('<option></option>').attr('value', val).text(text);
+        if (val == rawValue) $opt.prop('selected', true);
+        $input.append($opt);
+      });
+    }
+  } else {
+    $input = $('<input type="' + type + '" class="dtc-extrafield-input" style="width:100%; outline:none; transition: border-color 0.2s;" autocomplete="off">');
+  }
+  
+  if (type !== 'select') {
+    $input.val(rawValue);
+  }
+  $span.hide().after($input);
+  $input.trigger('focus');
+
+  var saveFunc = function() {
+    var newValue = $input.val();
+    if (newValue === rawValue) {
+      $input.remove();
+      $span.show();
+      $span.data('editing', false);
+      return;
+    }
+    
+    var field = $span.data('field');
+    var token = window.saturne.toolbox.getToken();
+    var sep = window.saturne.toolbox.getQuerySeparator(document.URL);
+    
+    $input.prop('disabled', true);
+    // Visual feedback: green border during save
+    $input.css({'border-color': '#10b981', 'box-shadow': '0 0 0 1px #10b981'});
+    
+    $.ajax({
+      url: document.URL + sep + 'action=setextrafield_ajax&token=' + token,
+      type: 'POST',
+      data: { field: field, value: newValue },
+      dataType: 'json',
+      success: function(resp) {
+        $input.remove();
+        $span.data('raw', newValue);
+        
+        var displayValue = newValue;
+        if (type === 'select') {
+          displayValue = $input.find('option[value="' + newValue + '"]').text() || newValue;
+        }
+
+        if (type === 'textarea') {
+          $span.html(displayValue.replace(/\n/g, '<br>'));
+        } else {
+          $span.text(displayValue);
+        }
+        
+        if (newValue === '') {
+          var placeholder = $span.data('placeholder') || 'Non défini';
+          $span.html(placeholder).addClass('is-empty');
+        } else {
+          $span.removeClass('is-empty');
+        }
+        $span.show();
+        $span.data('editing', false);
+
+        // Flash green on the span after saving
+        $span.css({'border-bottom-color': '#10b981', 'color': '#10b981'});
+        setTimeout(function() {
+            $span.css({'border-bottom-color': '', 'color': ''});
+        }, 1200);
+      },
+      error: function() {
+        $input.remove();
+        $span.show();
+        $span.data('editing', false);
+        $.jnotify('Erreur lors de la sauvegarde', 'error');
+      }
+    });
+  };
+
+  if (type === 'select') {
+    $input.on('change blur', saveFunc);
+  } else {
+    $input.on('blur', saveFunc);
+    if (type !== 'textarea') {
+      $input.on('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          $input.trigger('blur');
+        }
+      });
+    }
+  }
+};
+
+/**
+ * Ticket card (#4885) — every inline-editable field of the card, in DOM order.
+ *
+ * Not filtered on :visible: a field being edited is hidden behind its own editor, and it still
+ * has to count as a step of the chain.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @return {jQuery} The .dtc-tabfield elements.
+ */
+window.digiriskdolibarr.ticket.getTabFields = function() {
+  return $('.digirisk-ticket-card').find('.dtc-tabfield');
+};
+
+/**
+ * Ticket card (#4885) — find the field just before/after a node in document order.
+ *
+ * The node is compared by DOM position rather than by index, because an open editor may have
+ * replaced its own field in the DOM (the subject is rebuilt from scratch on save).
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Element} node Reference node (a field or the editor rendered in its place).
+ * @param  {number}  step 1 for Tab, -1 for Shift+Tab.
+ * @return {Element|null} The neighbouring field, null when the chain ends.
+ */
+window.digiriskdolibarr.ticket.findAdjacentField = function(node, step) {
+  var target = null;
+  window.digiriskdolibarr.ticket.getTabFields().each(function() {
+    if (this === node || $.contains(this, node) || $.contains(node, this)) {
+      return true;
+    }
+    // 4 = Node.DOCUMENT_POSITION_FOLLOWING — "this" comes after "node" in the document.
+    var isAfter = (node.compareDocumentPosition(this) & 4) !== 0;
+    if (step > 0) {
+      if (isAfter && target === null) {
+        target = this;
+        return false;
+      }
+      return true;
+    }
+    // Backwards: the last field still placed before the node is the previous one.
+    if (!isAfter) {
+      target = this;
+    }
+    return true;
+  });
+
+  return target;
+};
+
+/**
+ * Ticket card (#4885) — give focus to a field and open its editor when it has one.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {jQuery} $field Field to open.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.openTabField = function($field) {
+  // Select2 hides the original <select> behind its own focusable box.
+  if ($field.is('select')) {
+    var $container = $field.next('.select2-container');
+    if ($container.length) {
+      $container.find('.select2-selection').trigger('focus');
+    } else {
+      $field.trigger('focus');
+    }
+    return;
+  }
+
+  $field.trigger('focus');
+  // contenteditable cells (progress) are edited in place — focusing is already editing.
+  if ($field.is('[contenteditable]')) {
+    return;
+  }
+  $field.trigger('click');
+};
+
+/**
+ * Ticket card (#4885) — Tab pressed on a resting field: jump to the neighbouring one.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Keydown event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.tabFieldKeydown = function(event) {
+  if (event.key !== 'Tab' && event.keyCode !== 9) {
+    return;
+  }
+  var step   = event.shiftKey ? -1 : 1;
+  var target = window.digiriskdolibarr.ticket.findAdjacentField(this, step);
+  if (!target) {
+    return; // end of the chain: let the browser move on to the rest of the page
+  }
+  event.preventDefault();
+  // A contenteditable field is its own editor: blur it so the value is saved before moving.
+  if ($(this).is('[contenteditable]')) {
+    $(this).trigger('blur');
+  }
+  window.digiriskdolibarr.ticket.openTabField($(target));
+};
+
+/**
+ * Ticket card (#4885) — Tab pressed inside an open editor: commit, then open the neighbour.
+ *
+ * The target is resolved before the blur, because committing an unchanged value removes the
+ * editor synchronously and a detached node can no longer be positioned in the document.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Keydown event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.tabEditorKeydown = function(event) {
+  if (event.key !== 'Tab' && event.keyCode !== 9) {
+    return;
+  }
+  event.preventDefault();
+  var step   = event.shiftKey ? -1 : 1;
+  var target = window.digiriskdolibarr.ticket.findAdjacentField(this, step);
+  $(this).trigger('blur');
+  if (target) {
+    window.digiriskdolibarr.ticket.openTabField($(target));
+  }
+};
+
+/**
+ * Ticket card (#4885) — Tab pressed on a Select2 box (GP/UT): keep the chain going.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Keydown event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.tabSelect2Keydown = function(event) {
+  if (event.key !== 'Tab' && event.keyCode !== 9) {
+    return;
+  }
+  var $select = $(this).closest('.select2-container').prev('.dtc-tabfield');
+  if (!$select.length) {
+    return;
+  }
+  var target = window.digiriskdolibarr.ticket.findAdjacentField($select.get(0), event.shiftKey ? -1 : 1);
+  if (!target) {
+    return;
+  }
+  event.preventDefault();
+  window.digiriskdolibarr.ticket.openTabField($(target));
+};
+
+// Direct select handler
+$(document).on('change', '.dtc-direct-select', function() {
+  var $select = $(this);
+  var field = $select.data('field');
+  var newValue = $select.val();
+  var token = window.saturne.toolbox.getToken();
+  var sep = window.saturne.toolbox.getQuerySeparator(document.URL);
+  
+  $select.prop('disabled', true);
+  $select.css({'border-color': '#10b981', 'box-shadow': '0 0 0 1px #10b981'});
+  
+  $.ajax({
+    url: document.URL + sep + 'action=setextrafield_ajax&token=' + token,
+    type: 'POST',
+    data: { field: field, value: newValue },
+    dataType: 'json',
+    success: function() {
+      $select.prop('disabled', false);
+      $select.css({'border-color': '#10b981', 'box-shadow': ''});
+      setTimeout(function() {
+          $select.css({'border-color': '', 'box-shadow': ''});
+      }, 1200);
+    },
+    error: function() {
+      $select.prop('disabled', false);
+      $select.css({'border-color': '', 'box-shadow': ''});
+      $.jnotify('Erreur lors de la sauvegarde', 'error');
+    }
+  });
+});
+
+
+$(function() {
+  if (!$.fn.select2) { return; }
+
+  $('.dtc-direct-select').each(function() {
+    var $sel = $(this);
+
+    // Capture the currently selected value BEFORE rebuilding with Select2
+    var selectedId = $sel.val();
+
+    // Build data array from <option> elements preserving HTML (&nbsp; indentation)
+    var data = [];
+    $sel.find('option').each(function() {
+      data.push({ id: $(this).val(), text: $(this).html() });
+    });
+
+    $sel.select2({
+      width: '100%',
+      dropdownAutoWidth: true,
+      data: data,
+      // Allow raw HTML in option text (for &nbsp; indentation)
+      escapeMarkup: function(m) { return m; },
+      templateResult: function(d) { return d.text; },
+      templateSelection: function(d) { return d.text; }
+    });
+
+    // Restore the selected value (Select2 data[] doesn't propagate the selection)
+    if (selectedId !== null && selectedId !== '') {
+      $sel.val(selectedId).trigger('change');
+    }
+  });
+});
+

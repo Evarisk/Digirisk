@@ -1,0 +1,865 @@
+/* Mobile prevention plan quick-creation interface (view/preventionplan/preventionplan_mobile_create.php) */
+
+body.preventionplan-mobile-create {
+  padding: 0 !important;
+  padding-top: 52px !important;
+  margin: 0 !important;
+  background: #f1f5f9;
+
+  #id-container,
+  #id-right,
+  .fiche {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Fixed top header.
+     Selectors are prefixed with #id-top so they outrank the Dolibarr theme rules on that ID,
+     which would otherwise impose their own background and (blue) text colours. */
+  #id-top.digirisk-pwa-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 52px;
+    width: 100%;
+    margin: 0;
+    padding: 0 12px;
+    background: #ffffff;
+    border-bottom: 2px solid #2b7de9;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+    .digirisk-pwa-header__brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .digirisk-pwa-header__logo {
+      max-height: 32px;
+      max-width: 100px;
+      object-fit: contain;
+    }
+
+    .digirisk-pwa-header__title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1e293b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .digirisk-pwa-header__user {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #475569;
+      font-size: 12px;
+
+      i {
+        font-size: 20px;
+        color: #475569;
+      }
+    }
+
+    .digirisk-pwa-header__username {
+      color: #475569;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 110px;
+    }
+  }
+
+  .pwa-container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  /* Server-side validation errors (AJAX submit) */
+  .digirisk-mobile-form-errors {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    color: #b91c1c;
+    font-size: 13px;
+
+    ul {
+      margin: 0;
+      padding-left: 18px;
+      list-style: disc;
+    }
+  }
+
+  /* Cards */
+  .digirisk-mobile-card {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    padding: 10px 12px;
+    margin-bottom: 10px;
+
+    &__title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #e2e8f0;
+
+      i {
+        color: #2b7de9;
+      }
+    }
+  }
+
+  .digirisk-mobile-subtitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin: 8px 0 4px;
+  }
+
+  /* Fields */
+  .digirisk-mobile-field {
+    margin-bottom: 8px;
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 2px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="date"],
+    select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 10px;
+      font-size: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      background: #ffffff;
+      color: #1e293b;
+
+      &:focus {
+        outline: none;
+        border-color: #2b7de9;
+        box-shadow: 0 0 0 2px rgba(43, 125, 233, 0.2);
+      }
+
+      &[readonly] {
+        background: #f1f5f9;
+        color: #64748b;
+      }
+    }
+  }
+
+  /* Two-column rows to reduce vertical scrolling */
+  .digirisk-mobile-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+
+    .digirisk-mobile-field {
+      flex: 1;
+      min-width: 0;
+      margin-bottom: 0;
+    }
+  }
+
+  .digirisk-mobile-static {
+    padding: 8px 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    background: #f8fafc;
+    border-radius: 7px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .digirisk-mobile-help {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+
+  /* Signature */
+  .digirisk-mobile-signature {
+    margin-top: 0;
+  }
+
+  .digirisk-mobile-signature-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #16a34a;
+    margin-bottom: 4px;
+  }
+
+  .digirisk-mobile-signature-preview {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    max-height: 60px;
+    border: 1px solid #e2e8f0;
+    border-radius: 7px;
+    background: #ffffff;
+  }
+
+  .digirisk-mobile-signature-hint {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 4px;
+  }
+
+  .digirisk-mobile-signature-canvas {
+    display: block;
+    width: 100%;
+    height: 100px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 7px;
+    background: #ffffff;
+    touch-action: none;
+  }
+
+  .digirisk-mobile-signature-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .digirisk-mobile-signature-status {
+    font-size: 12px;
+
+    &:not(:empty) {
+      margin-top: 4px;
+    }
+
+    &.error {
+      color: #dc2626;
+    }
+
+    &.success {
+      color: #16a34a;
+    }
+  }
+
+  /* SIREN */
+  .digirisk-mobile-siren-row {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+
+    .digirisk-mobile-siren-input {
+      flex: 1;
+    }
+
+    .digirisk-mobile-siren-search {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      width: 36px;
+      height: auto;
+      min-height: 0;
+      padding: 0;
+      font-size: 13px;
+      line-height: 1;
+    }
+  }
+
+  .digirisk-mobile-siren-result {
+    font-size: 12px;
+    margin: 4px 0;
+
+    &.error {
+      color: #dc2626;
+    }
+
+    &.success {
+      color: #16a34a;
+    }
+  }
+
+  /* Dates */
+  .digirisk-mobile-date-error {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #dc2626;
+  }
+
+  /* Highlight a field that failed validation */
+  .digirisk-mobile-field-error {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.15);
+  }
+
+  /* Risks */
+  .digirisk-mobile-risk-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+  }
+
+  .digirisk-mobile-risk-list {
+    margin-top: 8px;
+  }
+
+  .digirisk-mobile-risk-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid #f1f5f9;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .digirisk-mobile-risk-item-photo {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+  }
+
+  .digirisk-mobile-risk-item-comment {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    font-size: 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    color: #1e293b;
+
+    &:focus {
+      outline: none;
+      border-color: #2b7de9;
+      box-shadow: 0 0 0 2px rgba(43, 125, 233, 0.2);
+    }
+  }
+
+  .digirisk-mobile-risk-item-delete {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 7px;
+    background: #fee2e2;
+    color: #dc2626;
+    cursor: pointer;
+  }
+
+  /* Risk picker modal */
+  .digirisk-mobile-risk-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+
+    &.hidden {
+      display: none;
+    }
+
+    &__overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+    }
+
+    &__dialog {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 520px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    }
+
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #1e293b;
+      border-bottom: 1px solid #e2e8f0;
+
+      button {
+        border: none;
+        background: transparent;
+        color: #64748b;
+        font-size: 18px;
+        cursor: pointer;
+      }
+    }
+
+    &__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 12px;
+      overflow-y: auto;
+    }
+  }
+
+  .digirisk-mobile-risk-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+
+    &:hover,
+    &:active {
+      border-color: #2b7de9;
+      background: #f0f7ff;
+    }
+
+    img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }
+
+    span {
+      font-size: 10px;
+      line-height: 1.2;
+      color: #475569;
+    }
+  }
+
+  /* Protections (EPI) — same look as the risk list/modal, plus a mandatory checkbox */
+  .digirisk-mobile-protection-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+  }
+
+  .digirisk-mobile-protection-list {
+    margin-top: 8px;
+  }
+
+  .digirisk-mobile-protection-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid #f1f5f9;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .digirisk-mobile-protection-item-photo {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+  }
+
+  .digirisk-mobile-protection-item-comment {
+    flex: 1;
+    min-width: 120px;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    font-size: 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    color: #1e293b;
+
+    &:focus {
+      outline: none;
+      border-color: #2b7de9;
+      box-shadow: 0 0 0 2px rgba(43, 125, 233, 0.2);
+    }
+  }
+
+  .digirisk-mobile-protection-item-mandatory {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+
+    input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+    }
+  }
+
+  .digirisk-mobile-protection-item-delete {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 7px;
+    background: #fee2e2;
+    color: #dc2626;
+    cursor: pointer;
+  }
+
+  .digirisk-mobile-protection-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+
+    &.hidden {
+      display: none;
+    }
+
+    &__overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+    }
+  }
+
+  .digirisk-mobile-protection-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+
+    &:hover,
+    &:active {
+      border-color: #2b7de9;
+      background: #f0f7ff;
+    }
+
+    img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }
+
+    span {
+      font-size: 10px;
+      line-height: 1.2;
+      color: #475569;
+    }
+  }
+
+  /* Required certifications: one select2 picker + Add, then a simple list */
+  .digirisk-mobile-cert-picker-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    // select2 container fills the remaining width
+    .select2-container {
+      flex: 1;
+      min-width: 0;
+    }
+
+    // the visible select2 box: match the Add button height and vertically center the text
+    .select2-container--default .select2-selection--single {
+      height: 38px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+      line-height: 1.2;
+      padding-left: 10px;
+      color: #1e293b;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+      height: 36px;
+    }
+
+    // raw select fallback when select2 is not available
+    select.digirisk-mobile-cert-picker {
+      flex: 1;
+      min-width: 0;
+      box-sizing: border-box;
+      height: 38px;
+      padding: 0 10px;
+      font-size: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      color: #1e293b;
+    }
+  }
+
+  .digirisk-mobile-cert-add {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-sizing: border-box;
+    height: 38px;
+    min-height: 0;
+    padding: 0 14px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .digirisk-mobile-cert-list {
+    margin-top: 10px;
+  }
+
+  .digirisk-mobile-cert-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .digirisk-mobile-cert-item-label {
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  .digirisk-mobile-cert-item-mandatory {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+
+    input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+    }
+  }
+
+  .digirisk-mobile-cert-item-delete {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 7px;
+    background: #fee2e2;
+    color: #dc2626;
+    cursor: pointer;
+  }
+
+  /* Submit */
+  .digirisk-mobile-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 9px;
+    cursor: pointer;
+  }
+
+  /* Success screen */
+  .digirisk-mobile-success {
+    text-align: center;
+
+    &__icon {
+      font-size: 48px;
+      color: #16a34a;
+    }
+
+    &__title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 10px 0 4px;
+    }
+
+    &__ref {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2b7de9;
+      margin-bottom: 10px;
+    }
+
+    &__text {
+      font-size: 13px;
+      color: #475569;
+      margin-bottom: 14px;
+    }
+
+    &__actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+  }
+}
+
+/* Read-only protections (EPI) display on the prevention plan card (desktop, not scoped to the mobile body) */
+.preventionplan-protections-view {
+  margin: 12px 0;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+
+    i {
+      color: #2b7de9;
+    }
+  }
+
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 220px;
+    padding: 8px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fff;
+
+    img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
+  }
+
+  &__name {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  &__comment {
+    font-size: 12px;
+    color: #64748b;
+  }
+}
+
+/* Risk list title icon on the prevention plan card (matches the protections block icon) */
+.digirisk-risk-title-icon {
+  color: #2b7de9;
+  margin-right: 4px;
+}
+
+/* Risk cell on the prevention plan card: danger picto + its name */
+.cell-risk-view {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+
+  &__pic {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+  }
+
+  &__name {
+    font-size: 11px;
+    line-height: 1.2;
+    color: #475569;
+    max-width: 130px;
+  }
+}

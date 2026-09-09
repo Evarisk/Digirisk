@@ -122,7 +122,7 @@ if (is_array($allRiskAssessment) && !empty($allRiskAssessment)) :
 								<div class="risk-evaluation-container risk-evaluation-ref-<?php echo $lastEvaluation->id ?>" value="<?php echo $lastEvaluation->ref ?>">
 									<div class="risk-evaluation-single">
 										<div class="risk-evaluation-cotation" data-scale="<?php echo $lastEvaluation->getEvaluationScale() ?>">
-											<span><?php echo ($lastEvaluation->method == 'standard' ? $defaultCotation[$lastEvaluation->cotation] ?: 0 : $lastEvaluation->cotation); ?></span>
+											<span><?php echo ($lastEvaluation->method == 'standard' ? $defaultCotation[$lastEvaluation->cotation] ?? 0 : $lastEvaluation->cotation); ?></span>
 										</div>
 										<div class="photo riskassessment-photo-<?php echo $lastEvaluation->id; ?>" style="margin:auto">
 											<?php
@@ -137,7 +137,7 @@ if (is_array($allRiskAssessment) && !empty($allRiskAssessment)) :
 												</span>
 												<span class="risk-evaluation-author">
 													<?php $userAuthor = $usersList[$lastEvaluation->fk_user_creat?:$user->id];
-													echo getNomUrlUser($userAuthor); ?>
+													echo $userAuthor->getNomUrl(-1); ?>
 												</span>
 											</div>
 											<div class="risk-evaluation-comment">
@@ -347,7 +347,7 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 					<?php endif; ?>
                     <div class="riskassessment-medias linked-medias riskassessment-from-riskassessment-create-<?php echo $risk->id ?>">
                         <div class="element-linked-medias element-linked-medias-0 risk-<?php echo $risk->id ?>">
-                            <div class="medias section-title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
+                            <div class="medias section-title"><i class="fas fa-images"></i> <?php echo $langs->trans('Medias'); ?></div>
                             <table class="add-medias">
                                 <tr>
                                     <td>
@@ -366,10 +366,12 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
                                         </div>
                                     </td>
                                     <td>
-                                        <?php
-                                        $relativepath = 'digiriskdolibarr/medias/thumbs';
-                                        print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/' . $risk->ref, 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0/' . $risk->ref);
-                                        ?>
+                                        <div class="element-linked-medias-list">
+                                            <?php
+                                            $relativepath = 'digiriskdolibarr/medias/thumbs';
+                                            print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/' . $risk->ref, 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0/' . $risk->ref);
+                                            ?>
+                                        </div>
                                     </td>
                                 </tr>
                             </table>
@@ -377,13 +379,13 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
                     </div>
 				</div>
 				<!-- RISK EVALUATION SINGLE -->
-				<?php if ( ! empty($lastRiskAssessment) && $lastRiskAssessment > 0) : ?>
+				<?php if ( ! empty($lastRiskAssessment) && $lastRiskAssessment->id > 0) : ?>
 					<div class="risk-evaluation-container last-risk-assessment risk-evaluation-container-<?php echo $lastRiskAssessment->id ?>">
 						<h2><?php echo $langs->trans('LastRiskAssessment') . ' ' . $risk->ref; ?></h2>
 						<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 							<div class="risk-evaluation-single">
 								<div class="risk-evaluation-cotation risk-evaluation-list" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastRiskAssessment->getEvaluationScale() ?>">
-									<span><?php echo ($lastRiskAssessment->method == 'standard' ? $defaultCotation[$lastRiskAssessment->cotation] ?: 0 : $lastRiskAssessment->cotation); ?></span>
+									<span><?php echo ($lastRiskAssessment->method == 'standard' ? $defaultCotation[$lastRiskAssessment->cotation] ?? 0 : $lastRiskAssessment->cotation); ?></span>
 								</div>
 								<div class="photo riskassessment-photo-<?php echo $lastRiskAssessment->id > 0 ? $lastRiskAssessment->id : 0 ; echo $risk->id > 0 ? ' risk-' . $risk->id : ' risk-new' ?>">
                                     <?php
@@ -399,7 +401,7 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 										</span>
 										<span class="risk-evaluation-author">
 											<?php $userAuthor = $usersList[$lastRiskAssessment->fk_user_creat?:$user->id];
-											echo getNomUrlUser($userAuthor); ?>
+											echo $userAuthor->getNomUrl(-1); ?>
 										</span>
 									</div>
 									<div class="risk-evaluation-comment">
@@ -413,6 +415,9 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 			</div>
 			<!-- Modal-Footer -->
 			<div class="modal-footer">
+				<div class="wpeo-button button-grey modal-close">
+					<span><?php echo $langs->trans('CloseModal'); ?></span>
+				</div>
 				<?php if ($permissiontoadd) : ?>
 					<div class="risk-evaluation-create wpeo-button button-blue button-disable modal-close"value="<?php echo $risk->id ?>">
 						<i class="fas fa-plus"></i> <span style="color: #fff"><?php echo $langs->trans('Add'); ?></span>

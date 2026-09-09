@@ -34,6 +34,456 @@
 }
 
 /* =============================================
+ * EXPORT TOOLBAR (CSV / A3 PDF / Gantt PNG)
+ * ============================================= */
+
+.actionplan-export-toolbar {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    /* Pull the toolbar up to sit on the tab row, top-right */
+    margin-top: -56px;
+    margin-bottom: 18px;
+}
+
+.ap-export-form {
+    margin: 0;
+    display: inline-flex;
+}
+
+.ap-export-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    background: #fff;
+    color: #444;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s;
+
+    i {
+        font-size: 14px;
+    }
+
+    &:hover {
+        background: #f5f5f5;
+        border-color: #b0b0b0;
+        color: #1a1a1a;
+        text-decoration: none;
+    }
+}
+
+/* On narrow screens, drop the toolbar below the tabs to avoid overlap */
+@media (max-width: 767px) {
+    .actionplan-export-toolbar {
+        margin-top: 8px;
+        flex-wrap: wrap;
+    }
+}
+
+/* =============================================
+ * DISPLAYED PROJECT BAR (info + switcher)
+ * ============================================= */
+
+.actionplan-project-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 10px 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.app-project-current {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 13px;
+    color: #333;
+
+    > i {
+        color: #3085d6;
+        font-size: 15px;
+    }
+
+    a {
+        font-weight: 700;
+    }
+}
+
+.app-project-caption {
+    color: #888;
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+.app-project-title {
+    font-weight: 600;
+}
+
+.app-project-badge {
+    background: #eef4fc;
+    color: #3085d6;
+    border: 1px solid #cfe0f5;
+    border-radius: 12px;
+    padding: 2px 10px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.app-project-none {
+    color: #e05353;
+    font-weight: 600;
+}
+
+.app-project-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+
+    label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #666;
+        white-space: nowrap;
+
+        i {
+            color: #999;
+            margin-right: 3px;
+        }
+    }
+}
+
+@media (max-width: 767px) {
+    .actionplan-project-bar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+/* =============================================
+ * ACTION PLAN YEAR BAR (HISTORY TAB)
+ * ============================================= */
+
+.actionplan-year-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 10px 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.ayb-caption {
+    color: #888;
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    cursor: help;
+
+    i {
+        color: #3085d6;
+        margin-right: 3px;
+    }
+}
+
+.ayb-years {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.ayb-year {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid #d0d0d0;
+    border-radius: 12px;
+    padding: 3px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #444 !important;
+    transition: background 0.2s ease, color 0.2s ease;
+
+    &:hover {
+        border-color: #3085d6;
+        text-decoration: none;
+    }
+
+    &.selected {
+        background: #3085d6;
+        border-color: #3085d6;
+        color: #fff !important;
+    }
+}
+
+.ayb-count {
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    padding: 0 6px;
+    font-size: 11px;
+    font-weight: 700;
+
+    .selected & {
+        background: rgba(255, 255, 255, 0.25);
+    }
+}
+
+.ayb-none {
+    font-size: 12px;
+    color: #888;
+    font-style: italic;
+}
+
+/* =============================================
+ * ACTION PLAN FILTERS (GP/UT, RISK LEVEL, TAGS)
+ * ============================================= */
+
+.actionplan-filter-bar {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 10px 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+
+    .apf-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .apf-row-tags {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px dashed #e8e8e8;
+    }
+
+    label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #666;
+        white-space: nowrap;
+        margin: 0;
+
+        i {
+            color: #999;
+            margin-right: 3px;
+        }
+    }
+
+    select {
+        max-width: 300px;
+    }
+}
+
+.apf-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.apf-children-toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.apf-scale-dots {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.apf-scale-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+
+    &.selected {
+        box-shadow: 0 0 0 2px #3085d6;
+    }
+}
+
+.apf-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.apf-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #444;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+        background: #f5f8ff;
+        border-color: #3085d6;
+        color: #3085d6;
+    }
+}
+
+.apf-btn-reset:hover {
+    background: #fdf3f3;
+    border-color: #e05353;
+    color: #e05353;
+}
+
+.apf-count {
+    font-size: 12px;
+    color: #888;
+    white-space: nowrap;
+
+    i {
+        margin-right: 3px;
+    }
+
+    &.filtered {
+        color: #3085d6;
+        font-weight: 600;
+    }
+}
+
+.apf-tags {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: 96px;
+    overflow-y: auto;
+}
+
+.apf-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid #d0d0d0;
+    border-radius: 12px;
+    padding: 2px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #444;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+
+    input {
+        display: none;
+    }
+
+    &.selected {
+        color: #fff;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+
+        .apf-tag-dot {
+            background: #fff !important;
+        }
+    }
+}
+
+.apf-tag-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* GP/UT of the linked risk, shown on each Kanban card */
+.kanban-card-element {
+    margin-bottom: 8px;
+}
+
+.kanban-element-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 100%;
+    background: #eef4fc;
+    border: 1px solid #cfe0f5;
+    border-radius: 10px;
+    padding: 1px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #263c5c;
+
+    &:hover {
+        background: #dfeafb;
+    }
+
+    i {
+        font-size: 9px;
+        opacity: 0.7;
+    }
+}
+
+.kanban-element-ref {
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.kanban-element-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.kanban-element-workunit {
+    background: #eaf4ff;
+    border-color: #c6e0ff;
+    color: #0d8aff;
+}
+
+@media (max-width: 767px) {
+    .actionplan-filter-bar {
+        .apf-row {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+    }
+
+    .apf-actions {
+        margin-left: 0;
+    }
+}
+
+/* =============================================
  * KANBAN SETTINGS
  * ============================================= */
 
@@ -117,6 +567,62 @@
 }
 
 /* =============================================
+ * GLOBAL PROGRESS (PAPRIPACT)
+ * ============================================= */
+
+.actionplan-global-progress {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.apgp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.apgp-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+
+    i {
+        margin-right: 6px;
+        color: #3085d6;
+    }
+}
+
+.apgp-percent {
+    font-size: 20px;
+    font-weight: 800;
+    color: #333;
+}
+
+.apgp-bar {
+    height: 14px;
+    background: #e9ecef;
+    border-radius: 7px;
+    overflow: hidden;
+}
+
+.apgp-fill {
+    height: 100%;
+    border-radius: 7px;
+    transition: width 0.4s ease;
+}
+
+.apgp-subtitle {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #888;
+}
+
+/* =============================================
  * KANBAN BOARD
  * ============================================= */
 
@@ -178,6 +684,30 @@
     color: #aaa;
     font-size: 13px;
     font-style: italic;
+}
+
+.kanban-load-more {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    padding: 8px 12px;
+    border: 1px dashed #c4c4c4;
+    border-radius: 8px;
+    background: #fafafa;
+    color: #555;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+
+    i {
+        margin-right: 4px;
+    }
+
+    &:hover {
+        background: #f0f0f0;
+        border-color: #999;
+    }
 }
 
 /* Cards */
@@ -246,6 +776,22 @@
     &:hover {
         text-decoration: underline;
     }
+}
+
+/* Late action of a past year, displayed on the running year by the carry over option */
+.kanban-card-carried {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: #fdecea;
+    border: 1px solid #f5b7b1;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #c0392b;
+    white-space: nowrap;
+    cursor: help;
 }
 
 .kanban-card-risk {
@@ -623,7 +1169,8 @@
     }
 }
 
-.kanban-contributor-dropdown {
+.kanban-contributor-dropdown,
+.kanban-responsible-dropdown {
     display: none;
     position: absolute;
     top: 100%;
@@ -643,7 +1190,8 @@
     }
 }
 
-.kanban-contributor-search {
+.kanban-contributor-search,
+.kanban-responsible-search {
     width: 100%;
     padding: 6px 10px;
     border: none;
@@ -657,7 +1205,8 @@
     }
 }
 
-.kanban-contributor-options {
+.kanban-contributor-options,
+.kanban-responsible-options {
     max-height: 200px;
     overflow-y: auto;
 }
@@ -671,7 +1220,8 @@
     letter-spacing: 0.5px;
 }
 
-.kanban-contributor-option {
+.kanban-contributor-option,
+.kanban-responsible-option {
     padding: 5px 10px;
     font-size: 11px;
     cursor: pointer;
@@ -950,11 +1500,6 @@
     height: 100%;
     border-radius: 4px;
     transition: width 0.05s linear;
-
-    &.progress-grey   { background: #999999; }
-    &.progress-yellow { background: #e9ad4f; }
-    &.progress-blue   { background: #3085d6; }
-    &.progress-green  { background: #47e58e; }
 }
 
 .kanban-progress-text {

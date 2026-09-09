@@ -246,6 +246,26 @@ function renderDimKanban($columns, $colTickets, $dim, $allUsers, $allCats, $allS
     <?php endif; ?>
 
 
+    <!-- Tag filter, applied client side on every board at once -->
+    <?php if (!empty($pickerAllCategories)) : ?>
+        <div class="tac-picker-tagfilter" id="tacPickerTagFilter">
+            <span class="tac-picker-tagfilter__label"><i class="fas fa-tags"></i> <?= $langs->trans('ActionPlanFilterTags') ?></span>
+            <div class="tac-picker-tagfilter__chips">
+                <?php foreach ($pickerAllCategories as $pickerCategory) :
+                    $chipColor = !empty($pickerCategory['color']) ? '#' . dol_escape_htmltag($pickerCategory['color']) : '#8c8c8c';
+                ?>
+                    <button type="button" class="tac-picker-tagfilter__chip" data-cat-id="<?= (int) $pickerCategory['id'] ?>" style="border-color: <?= $chipColor ?>">
+                        <span class="tac-picker-tagfilter__dot" style="background: <?= $chipColor ?>"></span>
+                        <?= dol_escape_htmltag($pickerCategory['label']) ?>
+                    </button>
+                <?php endforeach; ?>
+            </div>
+            <button type="button" class="tac-picker-tagfilter__reset" id="tacPickerTagFilterReset">
+                <i class="fas fa-eraser"></i> <?= $langs->trans('RemoveFilter') ?>
+            </button>
+        </div>
+    <?php endif; ?>
+
     <!-- Tab navigation -->
     <div class="tac-dim-tabs" id="tacDimTabs">
         <button class="tac-dim-tab active" data-dim="status">

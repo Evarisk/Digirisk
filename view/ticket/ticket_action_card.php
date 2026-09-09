@@ -43,6 +43,7 @@ require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
 
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $user;
@@ -73,33 +74,25 @@ saturne_check_access($permissionToRead);
 
 /**
  * Create an ActionComm audit event for a ticket kanban modification.
- * Only fires when the given config constant is enabled (non-zero).
  *
- * @param DoliDB $db         Database connection
- * @param User   $user       Current user
- * @param Ticket $ticket     The modified ticket
- * @param string $constName  Config constant controlling whether this event is logged
- * @param string $label      Short event label
- * @param string $note       Detailed private note
+ * Fires when the per-field kanban constant is enabled, or when the global ticket traceability
+ * option (#4885) is on — the kanban and the card then share the same history.
+ *
+ * @param  DoliDB $db        Database connection
+ * @param  User   $user      Current user
+ * @param  Ticket $ticket    The modified ticket
+ * @param  string $constName Config constant controlling whether this event is logged
+ * @param  string $label     Short event label
+ * @param  string $note      Detailed private note
  * @return void
  */
 function createTicketKanbanEvent($db, $user, $ticket, $constName, $label, $note)
 {
-    if (empty(getDolGlobalInt($constName))) {
+    if (empty(getDolGlobalInt($constName)) && empty(getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_LOG_MODIFICATIONS', 1))) {
         return;
     }
 
-    $actioncomm               = new ActionComm($db);
-    $actioncomm->type_code    = 'AC_OTH_AUTO';
-    $actioncomm->code         = 'AC_OTH_AUTO';
-    $actioncomm->label        = $label;
-    $actioncomm->note_private = $note;
-    $actioncomm->fk_element   = $ticket->id;
-    $actioncomm->elementtype  = 'ticket';
-    $actioncomm->userownerid  = $user->id;
-    $actioncomm->datep        = dol_now();
-    $actioncomm->percentage   = -1;
-    $actioncomm->create($user);
+    digiriskdolibarr_ticket_log_event($ticket, $label, $note);
 }
 
 /*
@@ -427,7 +420,7 @@ if ($action == 'createTicket' && $permissionToWrite) {
             }
         }
 
-        $detailUrl = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_action_card.php', 1) . '?id=' . $newId;
+        $detailUrl = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . $newId;
         print json_encode(['success' => 1, 'id' => $newId, 'ref' => $newTicket->ref, 'url' => $detailUrl]);
     } else {
         $errMsg = $newTicket->error ?: implode(', ', $newTicket->errors ?: []);
@@ -559,7 +552,7 @@ if ($object->id <= 0) {
                 }
             }
 
-            $detailUrl = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_action_card.php', 1) . '?id=' . (int) $row->rowid;
+            $detailUrl = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $row->rowid;
 
             $sevCode  = strtoupper((string) ($row->severity_code ?: ''));
             $sevTrans = $sevCode !== '' ? $langs->trans('TicketSeverityShort' . $sevCode) : '';
@@ -612,7 +605,7 @@ if ($object->id <= 0) {
                     }
                 }
 
-                $detailUrl = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_action_card.php', 1) . '?id=' . (int) $row->rowid;
+                $detailUrl = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $row->rowid;
                 $sevCode   = strtoupper((string) ($row->severity_code ?: ''));
                 $sevTrans  = $sevCode !== '' ? $langs->trans('TicketSeverityShort' . $sevCode) : '';
                 if ($sevTrans === 'TicketSeverityShort' . $sevCode) {
@@ -764,9 +757,14 @@ if ($object->id <= 0) {
         'BLOCKING' => '#dc3545',
     ];
 
+    // "Undefined" sits first (leftmost). Columns are ordered by the dictionary
+    // position (pos) so severity rises from least to most critical left→right,
+    // leaving the most critical (BLOCKING) on the right. Issue #4858.
+    $pickerSeverityColumns['__none__'] = ['label' => $langs->trans('Undefined'), 'icon' => 'fa-exclamation-triangle', 'color' => '#adb5bd'];
+
     $sqlSevs = 'SELECT code, label FROM ' . MAIN_DB_PREFIX . 'c_ticket_severity'
         . ' WHERE active = 1 AND entity IN (' . getEntity('c_ticket_severity') . ')'
-        . ' ORDER BY code';
+        . ' ORDER BY pos';
     $resSevs = $db->query($sqlSevs);
     if ($resSevs) {
         while ($r = $db->fetch_object($resSevs)) {
@@ -783,7 +781,6 @@ if ($object->id <= 0) {
         }
         $db->free($resSevs);
     }
-    $pickerSeverityColumns['__none__'] = ['label' => $langs->trans('Undefined'), 'icon' => 'fa-exclamation-triangle', 'color' => '#adb5bd'];
 
     foreach (array_keys($pickerSeverityColumns) as $sc) {
         $pickerSeverityTickets[$sc] = [];

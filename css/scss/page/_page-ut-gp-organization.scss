@@ -332,6 +332,7 @@ li.route {
     border-radius: 6px;
     padding: 8px 16px;
     transition: box-shadow 0.2s;
+    cursor: pointer;
     
     &:hover {
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
@@ -418,30 +419,8 @@ li.route {
       font-weight: 500;
       color: #333;
 
-      &.element-label {
-        cursor: text;
-        border-bottom: 1px dashed transparent;
-        transition: border-color 0.2s, color 0.3s;
-        padding-bottom: 2px;
-
-        &:hover {
-          border-bottom-color: #b0b0b0;
-        }
-
-        .inline-edit-input {
-          font-size: 15px;
-          font-weight: 500;
-          font-family: inherit;
-          color: #333;
-          border: none;
-          border-bottom: 2px solid #0d8aff;
-          background: transparent;
-          outline: none;
-          width: 100%;
-          padding: 0 0 2px 0;
-          margin: 0;
-        }
-      }
+      // Editable labels get their hover/focus/feedback styles from the generic .contenteditable
+      // component (saturne) — nothing to add here.
     }
 
     .risk-badges {
@@ -489,6 +468,12 @@ li.route {
         &:hover {
           background: #e9ecef;
         }
+      }
+
+      /* Keep the trash icon white on the red delete button */
+      .delete-element-btn,
+      .delete-element-btn i {
+        color: #fff;
       }
     }
   }

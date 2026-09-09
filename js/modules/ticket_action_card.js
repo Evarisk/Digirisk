@@ -1215,14 +1215,14 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
 
     var $input;
     if (type === 'text') {
-        $input = $('<input type="text" class="tac-edit-input">').val(current);
+        $input = $('<input type="text" class="tac-edit-input" autocomplete="new-password">').val(current);
     } else if (type === 'longtext') {
         // Unique id so CKEditor.replace() can target the textarea after it's inserted in the DOM.
         var taId = 'tac-longtext-' + Math.random().toString(36).slice(2, 8);
-        $input = $('<textarea class="tac-edit-textarea" rows="6">').attr('id', taId).val(current);
+        $input = $('<textarea class="tac-edit-textarea" rows="6" autocomplete="new-password">').attr('id', taId).val(current);
         $wrap.data('tac-editor-id', taId);
     } else if (type === 'number') {
-        $input = $('<input type="number" min="0" max="100" step="1" class="tac-edit-input tac-edit-input--narrow">').val(current);
+        $input = $('<input type="number" min="0" max="100" step="1" class="tac-edit-input tac-edit-input--narrow" autocomplete="new-password">').val(current);
     } else if (type === 'date') {
         // Render YYYY-MM-DD for the native picker. Source value may be a timestamp.
         var dateValue = current;
@@ -1230,7 +1230,7 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
             var d = new Date(parseInt(current, 10) * 1000);
             dateValue = d.toISOString().substring(0, 10);
         }
-        $input = $('<input type="date" class="tac-edit-input">').val(dateValue);
+        $input = $('<input type="date" class="tac-edit-input" autocomplete="off">').val(dateValue);
     } else if (type === 'select') {
         var options = $wrap.data('edit-options') || [];
         // Long lists (or any server-searched field) get a searchable combo; short
@@ -1304,9 +1304,13 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
     };
 
     if (type === 'longtext') {
-        // Init CKEditor on the textarea after it's in the DOM. Save is via the floating
-        // "Enregistrer" button injected next to the editor (blur on a CKEditor area is
-        // unreliable because the user may click any toolbar button).
+        // Inline Save / Cancel buttons — appear directly under the editor (no floating overlay)
+        var $bar = $('<div class="tac-edit-bar" style="margin-top:4px;display:flex;gap:6px;">'
+            + '<button type="button" class="tac-edit-bar__save button smallpaddingimp">Enregistrer</button>'
+            + '<button type="button" class="tac-edit-bar__cancel button button-cancel smallpaddingimp">Annuler</button>'
+            + '</div>');
+
+        // Init CKEditor on the textarea after it's in the DOM.
         if (window.CKEDITOR && $input.attr('id')) {
             try {
                 window.CKEDITOR.replace($input.attr('id'), {
@@ -1323,17 +1327,14 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
                 console.warn('CKEditor init failed, falling back to plain textarea:', e);
             }
         }
-        // Floating action bar for longtext (Save / Cancel) — blur would fire on every
-        // toolbar click otherwise.
-        var $bar = $('<div class="tac-edit-actions">'
-            + '<button type="button" class="tac-edit-actions__save">Enregistrer</button> '
-            + '<button type="button" class="tac-edit-actions__cancel">Annuler</button>'
-            + '</div>');
+
+        // Insert the bar after the textarea/editor
         $input.after($bar);
-        $bar.find('.tac-edit-actions__save').on('click', function(e) { e.stopPropagation(); commit(); });
-        $bar.find('.tac-edit-actions__cancel').on('click', function(e) { e.stopPropagation(); cancel(); });
+        $bar.find('.tac-edit-bar__save').on('click', function(e) { e.stopPropagation(); commit(); });
+        $bar.find('.tac-edit-bar__cancel').on('click', function(e) { e.stopPropagation(); cancel(); });
         $wrap.data('tac-edit-bar', $bar);
-        // Keep Escape support too.
+
+        // Escape to cancel
         $(document).on('keydown.tac-longtext-' + ($input.attr('id') || ''), function(e) {
             if (e.key === 'Escape') { cancel(); }
         });
@@ -1680,6 +1681,7 @@ window.digiriskdolibarr.ticketPickerKanban.init = function() {
     window.digiriskdolibarr.ticketPickerKanban.initSortable();
     window.digiriskdolibarr.ticketPickerKanban.initSettings();
     window.digiriskdolibarr.ticketPickerKanban.initQuickCreate();
+    window.digiriskdolibarr.ticketPickerKanban.restoreTagFilter();
 
     // Restore the last active tab from localStorage.
     var savedDim = localStorage.getItem('tacPickerActiveDim');
@@ -1697,13 +1699,19 @@ window.digiriskdolibarr.ticketPickerKanban.init = function() {
  * @return {void}
  */
 window.digiriskdolibarr.ticketPickerKanban.event = function() {
-    // Assignee initial: click → show select
+    // Assignee initial: click → reveal a searchable select2 user picker.
     $(document).on('click', '.tac-picker-kanban-board .kanban-initial-responsible, .tac-picker-kanban-board .tac-picker-card__assignee-img', function(e) {
         e.stopPropagation();
         var $wrapper = $(this).closest('.kanban-responsible-wrapper');
         var $select  = $wrapper.find('.tac-picker-assignee-select');
         $(this).hide();
-        $select.addClass('visible').trigger('focus');
+        $select.addClass('visible');
+        if ($.fn.select2) {
+            window.digiriskdolibarr.ticketPickerKanban.initAssigneeSelect2($select, $wrapper);
+            $select.select2('open');
+        } else {
+            $select.trigger('focus');
+        }
     });
 
     // Assignee select: change → save + hide select → update avatar
@@ -1718,6 +1726,10 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
         var photo    = userId > 0 ? (selOpt.data('photo') || '') : '';
 
         $select.removeClass('visible');
+        if ($.fn.select2 && $select.hasClass('select2-hidden-accessible')) {
+            $select.off('select2:close');
+            $select.select2('destroy');
+        }
 
         if (photo) {
             $avatar.attr('src', photo).attr('title', selOpt.text().trim()).show();
@@ -1731,9 +1743,13 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
         window.digiriskdolibarr.ticketPickerKanban.saveAssignee(ticketId, userId, $select);
     });
 
-    // Assignee select blur → hide
+    // Assignee select blur → hide (native fallback only; select2 manages its own
+    // close via the select2:close event, so skip when select2 is active).
     $(document).on('blur', '.tac-picker-assignee-select', function() {
         var $select = $(this);
+        if ($.fn.select2 && $select.hasClass('select2-hidden-accessible')) {
+            return;
+        }
         var $avatar = $select.siblings('.kanban-initial-responsible, .tac-picker-card__assignee-img');
         setTimeout(function() {
             $select.removeClass('visible');
@@ -1807,6 +1823,17 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
     // Prevent drag on tag elements
     $(document).on('mousedown', '.tac-picker-kanban-board .kanban-tag, .tac-picker-kanban-board .kanban-tag-remove, .tac-picker-kanban-board .kanban-add-tag-btn, .tac-picker-kanban-board .kanban-tag-dropdown, .tac-picker-kanban-board .kanban-tag-option', function(e) {
         e.stopPropagation();
+    });
+
+    // Tag filter — toggling a chip filters every board at once
+    $(document).on('click', '#tacPickerTagFilter .tac-picker-tagfilter__chip', function() {
+        $(this).toggleClass('selected');
+        window.digiriskdolibarr.ticketPickerKanban.applyTagFilter();
+    });
+
+    $(document).on('click', '#tacPickerTagFilterReset', function() {
+        $('#tacPickerTagFilter .tac-picker-tagfilter__chip').removeClass('selected');
+        window.digiriskdolibarr.ticketPickerKanban.applyTagFilter();
     });
 
     // Tab switching — persist active dim in localStorage so F5 keeps the current tab.
@@ -2001,15 +2028,86 @@ window.digiriskdolibarr.ticketPickerKanban.initSortable = function() {
 };
 
 /**
- * Update column header counters after a card move.
+ * Update column header counters after a card move. Cards hidden by the tag filter
+ * are left out so a column shows what it currently displays.
  *
  * @return {void}
  */
 window.digiriskdolibarr.ticketPickerKanban.updateCounts = function() {
     $('.tac-picker-column').each(function() {
-        var count = $(this).find('.tac-picker-card').length;
+        var count = $(this).find('.tac-picker-card').not('.tac-picker-card--filtered').length;
         $(this).find('.kanban-column-count').text(count);
     });
+};
+
+/**
+ * Tag ids currently selected in the filter bar.
+ *
+ * @return {Array} Category ids, as strings
+ */
+window.digiriskdolibarr.ticketPickerKanban.getFilteredTags = function() {
+    var catIds = [];
+    $('#tacPickerTagFilter .tac-picker-tagfilter__chip.selected').each(function() {
+        catIds.push(String($(this).data('cat-id')));
+    });
+
+    return catIds;
+};
+
+/**
+ * Hide the cards carrying none of the selected tags, on every board at once.
+ * The selection is kept in localStorage so a reload reopens the same filter.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.applyTagFilter = function() {
+    var selectedTags = window.digiriskdolibarr.ticketPickerKanban.getFilteredTags();
+
+    $('.tac-picker-card').each(function() {
+        var $card = $(this);
+        var keep  = true;
+
+        if (selectedTags.length) {
+            keep = $card.find('.kanban-card-tags .kanban-tag').filter(function() {
+                return selectedTags.indexOf(String($(this).data('cat-id'))) !== -1;
+            }).length > 0;
+        }
+
+        $card.toggleClass('tac-picker-card--filtered', !keep);
+    });
+
+    $('#tacPickerTagFilterReset').toggleClass('visible', selectedTags.length > 0);
+
+    try {
+        localStorage.setItem('tacPickerTagFilter', JSON.stringify(selectedTags));
+    } catch (e) {
+        // Private browsing: the filter simply does not survive the reload
+    }
+
+    window.digiriskdolibarr.ticketPickerKanban.updateCounts();
+};
+
+/**
+ * Re-select the tags kept from the previous visit and filter the boards accordingly.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.restoreTagFilter = function() {
+    var savedTags = [];
+    try {
+        savedTags = JSON.parse(localStorage.getItem('tacPickerTagFilter') || '[]');
+    } catch (e) {
+        savedTags = [];
+    }
+    if (!$.isArray(savedTags) || !savedTags.length) {
+        return;
+    }
+
+    savedTags.forEach(function(catId) {
+        $('#tacPickerTagFilter .tac-picker-tagfilter__chip[data-cat-id="' + catId + '"]').addClass('selected');
+    });
+
+    window.digiriskdolibarr.ticketPickerKanban.applyTagFilter();
 };
 
 /**
@@ -2057,6 +2155,57 @@ window.digiriskdolibarr.ticketPickerKanban.saveDim = function(ticketId, dim, new
             setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
         }
     });
+};
+
+/**
+ * Initialise a select2 searchable picker on a card's assignee <select>.
+ * Options are already embedded in the DOM (no AJAX source) so it never hits
+ * the "Searching…" stall that remote select2 shows in this Dolibarr build.
+ *
+ * @param  {jQuery} $select   The .tac-picker-assignee-select element.
+ * @param  {jQuery} $wrapper  The .kanban-responsible-wrapper around it.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.initAssigneeSelect2 = function($select, $wrapper) {
+    if ($select.hasClass('select2-hidden-accessible')) {
+        return;
+    }
+    // select2 builds aria-controls from the element id; the same ticket is rendered
+    // on 4 boards so the markup carries no id. Give each one a unique id to avoid
+    // select2's invalid "input[aria-controls*=]" selector error.
+    if (!$select.attr('id')) {
+        $select.attr('id', 'tac-assignee-' + Math.random().toString(36).slice(2, 9));
+    }
+    $select.select2({
+        width:             '190px',
+        dropdownCssClass:  'tac-picker-assignee-dropdown',
+        containerCssClass: 'tac-picker-assignee-container'
+    });
+    // Closing the picker without choosing anyone restores the avatar. A real
+    // selection is handled by the 'change' handler, which tears select2 down.
+    $select.on('select2:close', function() {
+        setTimeout(function() {
+            if ($select.hasClass('visible')) {
+                window.digiriskdolibarr.ticketPickerKanban.teardownAssigneeSelect2($select, $wrapper);
+            }
+        }, 50);
+    });
+};
+
+/**
+ * Destroy the assignee select2 widget and restore the avatar bubble.
+ *
+ * @param  {jQuery} $select   The .tac-picker-assignee-select element.
+ * @param  {jQuery} $wrapper  The .kanban-responsible-wrapper around it.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.teardownAssigneeSelect2 = function($select, $wrapper) {
+    $select.removeClass('visible');
+    if ($.fn.select2 && $select.hasClass('select2-hidden-accessible')) {
+        $select.off('select2:close');
+        $select.select2('destroy');
+    }
+    $wrapper.find('.kanban-initial-responsible, .tac-picker-card__assignee-img').show();
 };
 
 /**
@@ -2127,6 +2276,8 @@ window.digiriskdolibarr.ticketPickerKanban.saveTagAdd = function(ticketId, catId
                 $opt.addClass('assigned').append('<i class="fas fa-check" style="margin-left:auto;font-size:9px;color:#28a745"></i>');
                 $card.addClass('kanban-card-saved');
                 setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);
+                // The card now carries one more tag, it may enter the filtered selection
+                window.digiriskdolibarr.ticketPickerKanban.applyTagFilter();
             } else {
                 $card.addClass('kanban-card-error');
                 setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
@@ -2162,6 +2313,8 @@ window.digiriskdolibarr.ticketPickerKanban.saveTagRemove = function(ticketId, ca
                 $tag.slideUp(150, function() {
                     $(this).remove();
                     $card.find('.kanban-tag-option[data-value="' + catId + '"]').removeClass('assigned').find('.fa-check').remove();
+                    // The card lost a tag, it may fall out of the filtered selection
+                    window.digiriskdolibarr.ticketPickerKanban.applyTagFilter();
                 });
                 $card.addClass('kanban-card-saved');
                 setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);
