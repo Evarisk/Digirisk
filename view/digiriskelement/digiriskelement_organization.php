@@ -112,7 +112,8 @@ saturne_header(0, '', $title, $helpUrl);
 ?>
 <div id="cardContent" value="">
 <?php
-$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 'status > 0 AND t.entity = ' . $conf->entity));
+// Archived elements are out of the organization tree, they are listed in the archive tab of their parent
+$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 'status > 0 AND t.status <> ' . DigiriskElement::STATUS_ARCHIVED . ' AND t.entity = ' . $conf->entity));
 if (is_array($objects)) {
 	$results = recurse_tree(0, 0, $objects);
 } else {

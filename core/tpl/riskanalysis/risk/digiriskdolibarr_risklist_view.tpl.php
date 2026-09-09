@@ -1,5 +1,8 @@
 <?php
 $allRisks             = $allRisks ?? 0;
+// Archive tab of an element: same list, restricted to the archived risks, without the creation
+// buttons and with Unarchive as the only mass action
+$archivedRiskList     = $archivedRiskList ?? 0;
 $selectedfields_label = 'risklist_selectedfields';
 // Selection of new fields
 require __DIR__ . '/../../../../class/actions_changeselectedfields.php';
@@ -365,6 +368,11 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
         $sql .= " AND e.entity IN (" . $conf->entity . ") ";
     }
     $sql .= ' AND r.type = "' . $riskType . '"';
+    // Archived risks live in the archive tab of the element, they are out of the active list
+    // unless the status filter explicitly asks for them
+    if ($search['status'] === '' || $search['status'] == -1) {
+        $sql .= ' AND r.status <> ' . Risk::STATUS_ARCHIVED;
+    }
 
     foreach ($search as $key => $val) {
         if ($key == 'status' && $search[$key] == -1) continue;
@@ -479,6 +487,11 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
         $sql .= " AND e.entity IN (" . $conf->entity . ")";
     }
     $sql .= ' AND r.type = "' . $riskType . '"';
+    // Archived risks live in the archive tab of the element, they are out of the active list
+    // unless the status filter explicitly asks for them
+    if ($search['status'] === '' || $search['status'] == -1) {
+        $sql .= ' AND r.status <> ' . Risk::STATUS_ARCHIVED;
+    }
 
     foreach ($search as $key => $val) {
         if ($key == 'status' && $search[$key] == -1) continue;
@@ -575,14 +588,23 @@ include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 
 // List of mass actions available
 $arrayofmassactions = [];
-if ($permissiontodelete) {
-    $arrayofmassactions['predelete'] = '<span class="fa fa-trash paddingrightonly"></span>' . $langs->trans("Delete");
+if ($archivedRiskList) {
+    if ($permissiontoadd) {
+        $arrayofmassactions['unarchive'] = '<span class="fa fa-box-open paddingrightonly"></span>' . $langs->trans('Unarchive');
+    }
+} else {
+    if ($permissiontoadd) {
+        $arrayofmassactions['archive'] = '<span class="fa fa-archive paddingrightonly"></span>' . $langs->trans('Archive');
+    }
+    if ($permissiontodelete) {
+        $arrayofmassactions['predelete'] = '<span class="fa fa-trash paddingrightonly"></span>' . $langs->trans("Delete");
+    }
 }
 
 $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
 ?>
-<?php if (!$allRisks) : ?>
+<?php if (!$allRisks && !$archivedRiskList) : ?>
     <!-- BUTTON MODAL RISK ADD -->
     <?php if ($permissiontoadd) {
         $newcardbutton = '<div class="risk-add wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open"  aria-label="' . $langs->trans('AddRisk') . '"  value="' . $object->id . '">';
@@ -855,7 +877,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
     </div>
 <?php endif; ?>
     <input type="hidden" id="dol_url_root" value="<?php echo DOL_URL_ROOT; ?>">
-<?php $title = digirisk_trans_risk_type('DigiriskElement', $riskType, 'sList');
+<?php $title = $archivedRiskList ? $langs->trans('ArchivedRisks') : digirisk_trans_risk_type('DigiriskElement', $riskType, 'sList');
 print '<div class="div-title-and-table-responsive">';
 print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, $risk->picto, 0, $newcardbutton ?? '', '', $limit, 0, 0, 1);
 

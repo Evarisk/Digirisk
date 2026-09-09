@@ -154,8 +154,9 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 
 	//Body navigation digirisk
 	$object = new DigiriskElement($db);
-	// The organization panel never lists trashed/deleted elements (status < 0), regardless of DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT
-	$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 't.status > 0 AND t.entity IN ('. $conf->entity .')'));
+	// The organization panel never lists trashed/deleted elements (status < 0), regardless of DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT,
+	// nor the archived ones, which live in the archive tab of their parent element
+	$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 't.status > 0 AND t.status <> ' . DigiriskElement::STATUS_ARCHIVED . ' AND t.entity IN ('. $conf->entity .')'));
 
 	$digiriskElementTree = array();
 	if (!is_array($objects) && $objects<0) {
