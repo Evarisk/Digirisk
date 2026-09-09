@@ -58,6 +58,14 @@
     transition: all 0.3s ease;
     background: #C993B4;
 
+    // La photo remplit la pastille : overflow + border-radius du parent la découpent en rond
+    img {
+      display: block;
+      width: 20px;
+      height: 20px;
+      object-fit: cover;
+    }
+
     a {
       color: #fff !important;
     }
