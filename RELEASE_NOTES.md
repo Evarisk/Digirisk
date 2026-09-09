@@ -1,4 +1,4 @@
-# [Digirisk] [23.2.0] - Vigilance météo - Terrain sur mobile - PAPRIPACT par année
+# [Digirisk] [23.2.1] - Vigilance météo - Terrain sur mobile - PAPRIPACT par année
 
 Description : Cette version sort du bureau. Les plans de prévention et les permis de feu se créent et se signent depuis un téléphone, une application web progressive les regroupe, et un nouveau module de vigilance météo alerte l'établissement en cas d'épisode orange ou rouge. Côté pilotage, le PAPRIPACT s'organise par année avec report des actions en retard, et la carte ticket gagne un véritable fil de conversation.
 
@@ -91,6 +91,7 @@ Description : Cette version sort du bureau. Les plans de prévention et les perm
 * Identifiants convertis avec `GETPOSTINT` sur les plans de prévention et les permis de feu, pour éviter les `TypeError` de `fetch()` sur PHP 8.
 * Correction des erreurs de type à la création de ticket public, au chargement d'un objet sans identifiant, et des avertissements PHP 8 à la création de tâche.
 * Vrais messages d'erreur lors de la génération de l'archive ZIP du document unique.
+* **Correction d'une erreur fatale qui empêchait toute génération du document unique** : une méthode déclarée `protected` dans la classe parente des modèles de document et redéclarée `private` dans le modèle ODT du document unique rendait la classe inchargeable. La méthode a été déplacée dans le modèle du rapport d'audit, à qui elle appartient.
 
 ### Interface
 
@@ -104,4 +105,4 @@ Description : Cette version sort du bureau. Les plans de prévention et les perm
 * Le module s'appuie sur **Saturne 23.1.0**.
 * Les dépendances communes — ECM, Agenda, FCKeditor, Catégories — sont désormais déclarées par Saturne.
 
-## Comparaison des versions [23.1.0](https://github.com/Evarisk/Digirisk/compare/23.1.0...23.2.0) et 23.2.0
+## Comparaison des versions [23.1.0](https://github.com/Evarisk/Digirisk/compare/23.1.0...23.2.1) et 23.2.1
