@@ -2455,3 +2455,4 @@ RisksArchived = %s risque(s) archivé(s)
 RiskUnarchived = Le risque %s a été désarchivé
 ElementArchived = %s a été archivé
 ElementUnarchived = %s a été désarchivé
+ArchivedElementIsReadOnly = Cet élément est archivé : désarchivez-le pour le modifier

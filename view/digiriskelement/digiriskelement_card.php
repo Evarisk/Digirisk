@@ -502,8 +502,10 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 		if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 		if (empty($reshook)) {
-			// Modify
-			if ($permissiontoadd) {
+			// Modify - an archived element is read-only until it is restored
+			if ($object->status == $object::STATUS_ARCHIVED) {
+				print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans('ArchivedElementIsReadOnly')) . '">' . $langs->trans('Modify') . '</a>' . "\n";
+			} elseif ($permissiontoadd) {
 				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit">' . $langs->trans("Modify") . '</a>' . "\n";
 			} else {
 				print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
