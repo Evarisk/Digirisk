@@ -49,6 +49,15 @@ Description : Cette version sort du bureau. Les plans de prévention et les perm
 
 ![Le tableau de bord des risques](https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/assets/release-23.2.0/.shots/23.2.0-tableau-bord-risques.png)
 
+### Fiche produit
+
+* Nouvelle **fiche d'instruction HSE** sur le produit : six chapitres — identification, sécurité, mode d'emploi simplifié, qualification et habilitation, hygiène et nettoyage, maintenance et contrôles — éditables directement dans l'onglet.
+* Chaque chapitre est **configurable** depuis la nouvelle page de configuration produit : libellé, icône, couleur et description par défaut.
+* Onglet **Risques et protections** du produit, avec sa table d'association et les catégories de danger.
+* Le **PDF produit** reprend dynamiquement les risques et protections, ainsi que l'image du produit.
+
+![L'onglet Fiche d'Instruction sur un produit](https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/assets/issue-5103/.shots/5103-onglet-fiche-instruction.png)
+
 ### Arborescence GP/UT
 
 * **Refonte du panneau de navigation** : glisser-déposer, renommage en ligne, ajout et suppression rapides.
