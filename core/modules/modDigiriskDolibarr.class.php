@@ -387,7 +387,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '23.1.1';
+		$this->version         = '23.2.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr_color@digiriskdolibarr';
 
@@ -497,7 +497,8 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->conflictwith            = [];
 		$this->langfiles               = ["digiriskdolibarr@digiriskdolibarr"];
 		$this->phpmin                  = [7, 4]; // Minimum version of PHP required by module
-		$this->need_dolibarr_version   = [20, 0]; // Minimum version of Dolibarr required by module
+		$this->need_dolibarr_version   = [23, 0]; // Minimum version of Dolibarr required by module
+		$this->max_dolibarr_version    = [23, 0]; // Maximum version of Dolibarr supported by module
 		$this->warnings_activation     = []; // Warning to show when we activate module. array('always'='text') or array('FR'='textfr','ES'='textes'...)
 		$this->warnings_activation_ext = []; // Warning to show when we activate an external module. array('always'='text') or array('FR'='textfr','ES'='textes'...)
 		//$this->automatic_activation = array('FR'=>'DigiriskDolibarrWasAutomaticallyActivatedBecauseOfYourCountryChoice');
