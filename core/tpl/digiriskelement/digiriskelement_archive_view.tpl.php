@@ -18,17 +18,14 @@
 /**
  * \file    core/tpl/digiriskelement/digiriskelement_archive_view.tpl.php
  * \ingroup digiriskdolibarr
- * \brief   Archive screen of a digirisk element: archived risks then archived sub elements.
+ * \brief   Archive screen of a digirisk element: the risk list restricted to the archived risks,
+ *          then the archived sub elements.
  *
- * Requires the following variables to be defined by the calling context:
- * - DoliDB           $db
- * - Conf             $conf
- * - Translate        $langs
+ * Requires the calling context to have set up the risk list variables the same way
+ * digiriskelement_risk.php does, plus:
  * - DigiriskElement  $object
- * - Risk             $risk
- * - RiskAssessment   $evaluation
- * - bool             $permissionToArchive
- * - bool             $permissionToArchiveRisk
+ * - string           $riskType
+ * - bool             $permissionToArchiveElement
  */
 
 // Protection to avoid direct call of template
@@ -37,9 +34,9 @@ if (empty($conf) || !is_object($conf)) {
     exit;
 }
 
-$archivedRisks    = $object->getArchivedRisks();
 $archivedChildren = $object->getArchivedChildren();
 $elementPictos    = $object->getPicto();
+$riskTypes        = ['risk', 'riskenvironmental'];
 ?>
 
 <div class="digirisk-archive">
@@ -49,58 +46,22 @@ $elementPictos    = $object->getPicto();
         </div>
     </div>
 
-    <?php echo load_fiche_titre($langs->trans('ArchivedRisks') . ' <span class="badge">' . count($archivedRisks) . '</span>', '', 'fontawesome_fa-exclamation-triangle_fas_#d35968'); ?>
-
-    <div class="div-table-responsive">
-        <table class="noborder centpercent">
-            <tr class="liste_titre">
-                <td><?php echo $langs->trans('Ref'); ?></td>
-                <td><?php echo $langs->trans('DangerCategory'); ?></td>
-                <td><?php echo $langs->trans('Description'); ?></td>
-                <td class="center"><?php echo $langs->trans('LastRiskAssessment'); ?></td>
-                <td class="center"><?php echo $langs->trans('ArchiveDate'); ?></td>
-                <td class="center"><?php echo $langs->trans('Status'); ?></td>
-                <td class="right"><?php echo $langs->trans('Action'); ?></td>
-            </tr>
-            <?php if (empty($archivedRisks)) : ?>
-                <tr class="oddeven"><td colspan="7"><span class="opacitymedium"><?php echo $langs->trans('NoArchivedRisk'); ?></span></td></tr>
-            <?php else : ?>
-                <?php foreach ($archivedRisks as $archivedRisk) : ?>
-                    <?php
-                    // The last validated assessment carries the cotation shown in every risk listing
-                    $riskAssessments = $evaluation->fetchFromParent($archivedRisk->id, 1);
-                    $lastEvaluation  = is_array($riskAssessments) && !empty($riskAssessments) ? end($riskAssessments) : null;
-                    ?>
-                    <tr class="oddeven">
-                        <td><span class="ref"><?php echo dol_escape_htmltag($archivedRisk->ref); ?></span></td>
-                        <td>
-                            <img class="danger-category-pic" width="40" height="40" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($archivedRisk, $archivedRisk->type) . '.png'; ?>" alt="">
-                            <span><?php echo dol_escape_htmltag($risk->getDangerCategoryName($archivedRisk, $archivedRisk->type)); ?></span>
-                        </td>
-                        <td><?php echo dol_escape_htmltag(dol_trunc($archivedRisk->description, 120)); ?></td>
-                        <td class="center">
-                            <?php if (is_object($lastEvaluation)) : ?>
-                                <span class="risk-evaluation-cotation" data-scale="<?php echo $lastEvaluation->getEvaluationScale(); ?>"><?php echo $lastEvaluation->cotation; ?></span>
-                            <?php else : ?>
-                                <span class="opacitymedium">&mdash;</span>
-                            <?php endif; ?>
-                        </td>
-                        <td class="center"><?php echo dol_print_date($archivedRisk->tms, "dayhour"); ?></td>
-                        <td class="center"><?php echo $archivedRisk->getLibStatut(5); ?></td>
-                        <td class="right">
-                            <?php if ($permissionToArchiveRisk) : ?>
-                                <a class="wpeo-button button-square-40 button-blue wpeo-tooltip-event" data-direction="left" aria-label="<?php echo dol_escape_htmltag($langs->trans('Unarchive')); ?>" href="<?php echo $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=unarchive_risk&risk_id=' . $archivedRisk->id . '&token=' . newToken(); ?>">
-                                    <i class="fas fa-box-open button-icon"></i>
-                                </a>
-                            <?php else : ?>
-                                <span class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" data-direction="left" aria-label="<?php echo dol_escape_htmltag($langs->trans('NotEnoughPermissions')); ?>"><i class="fas fa-box-open button-icon"></i></span>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </table>
+    <div class="archive-risk-type-switch">
+        <?php foreach ($riskTypes as $availableRiskType) : ?>
+            <a href="<?php echo $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&risk_type=' . $availableRiskType; ?>">
+                <div class="wpeo-button <?php echo $availableRiskType == $riskType ? 'button-blue' : 'button-grey'; ?>">
+                    <i class="fas <?php echo $availableRiskType == 'risk' ? 'fa-exclamation-triangle' : 'fa-leaf'; ?> button-icon"></i>
+                    <span><?php echo digirisk_trans_risk_type('', $availableRiskType, 's'); ?></span>
+                </div>
+            </a>
+        <?php endforeach; ?>
     </div>
+
+    <?php
+    // Same list as the risk tab, restricted to the archived risks of the element
+    $archivedRiskList = 1;
+    require __DIR__ . '/../riskanalysis/risk/digiriskdolibarr_risklist_view.tpl.php';
+    ?>
 
     <?php echo load_fiche_titre($langs->trans('ArchivedElements') . ' <span class="badge">' . count($archivedChildren) . '</span>', '', 'fontawesome_fa-network-wired_fas_#d35968'); ?>
 
@@ -133,15 +94,19 @@ $elementPictos    = $object->getPicto();
                             <br>
                             <?php echo $langs->trans('NbOfArchivedRisks') . ' : ' . count($childRisks); ?>
                         </td>
-                        <td class="center"><?php echo dol_print_date($archivedChild->tms, "dayhour"); ?></td>
+                        <td class="center"><?php echo dol_print_date($archivedChild->tms, 'dayhour'); ?></td>
                         <td class="center"><?php echo $archivedChild->getLibStatut(5); ?></td>
                         <td class="right">
-                            <?php if ($permissionToArchive) : ?>
-                                <a class="wpeo-button button-square-40 button-blue wpeo-tooltip-event" data-direction="left" aria-label="<?php echo dol_escape_htmltag($langs->trans('Unarchive')); ?>" href="<?php echo $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=unarchive_element&element_id=' . $archivedChild->id . '&token=' . newToken(); ?>">
-                                    <i class="fas fa-box-open button-icon"></i>
+                            <?php if ($permissionToArchiveElement) : ?>
+                                <a href="<?php echo $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=unarchive_element&element_id=' . $archivedChild->id . '&token=' . newToken(); ?>">
+                                    <div class="wpeo-button button-square-40 button-blue wpeo-tooltip-event" data-direction="left" aria-label="<?php echo dol_escape_htmltag($langs->trans('Unarchive')); ?>">
+                                        <i class="fas fa-box-open button-icon"></i>
+                                    </div>
                                 </a>
                             <?php else : ?>
-                                <span class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" data-direction="left" aria-label="<?php echo dol_escape_htmltag($langs->trans('NotEnoughPermissions')); ?>"><i class="fas fa-box-open button-icon"></i></span>
+                                <div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" data-direction="left" aria-label="<?php echo dol_escape_htmltag($langs->trans('NotEnoughPermissions')); ?>">
+                                    <i class="fas fa-box-open button-icon"></i>
+                                </div>
                             <?php endif; ?>
                         </td>
                     </tr>
