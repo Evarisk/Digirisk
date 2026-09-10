@@ -530,9 +530,9 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
                 $tmpArray['companyName']         = dolibarr_get_const($this->db, 'MAIN_INFO_SOCIETE_NOM', $entity);
                 $tmpArray['siret']               = dolibarr_get_const($this->db, 'MAIN_INFO_SIRET', $entity);
                 $tmpArray['nbEmployeesInvolved'] = $nbEvaluatorByEntities[$entity] ?? 0;
-                $tmpArray['nbTotalRisks']        = $riskByEntity['nbTotalRisks'] ?: 0;
+                $tmpArray['nbTotalRisks']        = $riskByEntity['nbTotalRisks'] ?? 0;
                 foreach ($riskAssessmentCotationTypes as $i => $riskAssessmentCotationType) {
-                    $tmpArray['nb' . $riskAssessmentCotationType] = $riskByEntity[$i] ?: 0;
+                    $tmpArray['nb' . $riskAssessmentCotationType] = $riskByEntity[$i] ?? 0;
                 }
 
                 static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
