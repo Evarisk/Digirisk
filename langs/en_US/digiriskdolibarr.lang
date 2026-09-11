@@ -2447,3 +2447,4 @@ RisksUnarchived = %s risk(s) unarchived
 ElementArchived = %s has been archived
 ElementUnarchived = %s has been unarchived
 ArchivedElementIsReadOnly = This element is archived: unarchive it to make changes
+ProductsServices = Products | Services

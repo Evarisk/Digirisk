@@ -2457,3 +2457,4 @@ RisksUnarchived = %s risque(s) désarchivé(s)
 ElementArchived = %s a été archivé
 ElementUnarchived = %s a été désarchivé
 ArchivedElementIsReadOnly = Cet élément est archivé : désarchivez-le pour le modifier
+ProductsServices = Produits | Services
