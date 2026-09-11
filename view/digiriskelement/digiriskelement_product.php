@@ -113,8 +113,8 @@ $res = $db->query($sql);
 $table_exists = ($res && $db->num_rows($res) > 0);
 
 if (!$table_exists) {
-    print '<div class="warning">' . $langs->trans('ErrorTableNotExist') . '</div>';
-    print '<div class="warning">Il faut désactiver/réactiver le module, veuillez contacter un administrateur.</div>';
+    $link = dol_buildpath('/admin/modules.php', 1);
+    print '<div class="warning">' . $langs->trans('DigiriskUpdateRequiredForProducts', $link) . '</div>';
 } else {
 
 // Add product form
