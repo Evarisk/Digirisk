@@ -288,3 +288,20 @@ ALTER TABLE llx_digiriskdolibarr_riskassessment ADD INDEX idx_digiriskdolibarr_r
 
 -- 23.1.x - enable the prefill of the risk description with the danger category name on every entity
 UPDATE llx_const SET value = 1 WHERE name = 'DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL';
+
+-- 23.1.x - product association with digiriskelement (issue #5103)
+CREATE TABLE llx_digiriskdolibarr_digiriskelement_product(
+	rowid            integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+	entity           integer DEFAULT 1 NOT NULL,
+	date_creation    datetime NOT NULL,
+	tms              timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	fk_user_creat    integer NOT NULL,
+	fk_user_modif    integer,
+	fk_digiriskelement integer NOT NULL,
+	fk_product       integer NOT NULL
+) ENGINE=innodb;
+
+ALTER TABLE llx_digiriskdolibarr_digiriskelement_product ADD INDEX idx_digiriskelement_product_fk_digiriskelement (fk_digiriskelement);
+ALTER TABLE llx_digiriskdolibarr_digiriskelement_product ADD INDEX idx_digiriskelement_product_fk_product (fk_product);
+ALTER TABLE llx_digiriskdolibarr_digiriskelement_product ADD CONSTRAINT fk_digiriskelement_product_digiriskelement FOREIGN KEY (fk_digiriskelement) REFERENCES llx_digiriskdolibarr_digiriskelement (rowid);
+ALTER TABLE llx_digiriskdolibarr_digiriskelement_product ADD CONSTRAINT fk_digiriskelement_product_product FOREIGN KEY (fk_product) REFERENCES llx_product (rowid);
