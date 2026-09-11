@@ -2449,3 +2449,4 @@ ElementUnarchived = %s has been unarchived
 ArchivedElementIsReadOnly = This element is archived: unarchive it to make changes
 ProductsServices = Products | Services
 DigiriskUpdateRequiredForProducts = The database table for this feature is missing. Please <a href="%s">disable and re-enable the module</a> or contact an administrator.
+LinkProductService = Link a Product | Service
