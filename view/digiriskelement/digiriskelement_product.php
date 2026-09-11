@@ -108,6 +108,15 @@ saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true, $m
 
 print '<div class="fichecenter"><br>';
 
+$sql = "SHOW TABLES LIKE '" . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskelement_product'";
+$res = $db->query($sql);
+$table_exists = ($res && $db->num_rows($res) > 0);
+
+if (!$table_exists) {
+    print '<div class="warning">' . $langs->trans('ErrorTableNotExist') . '</div>';
+    print '<div class="warning">Il faut désactiver/réactiver le module, veuillez contacter un administrateur.</div>';
+} else {
+
 // Add product form
 if ($permissionToAdd) {
     require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
@@ -156,7 +165,7 @@ if (!empty($assocs)) {
             print '<td>' . dol_htmlcleanlastbr($product->description) . '</td>';
             print '<td align="center">';
             if ($permissionToAdd) {
-                print '<a href="' . $SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete&assoc_id=' . $assoc->id . '&token=' . newToken() . '">';
+                print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete&assoc_id=' . $assoc->id . '&token=' . newToken() . '">';
                 print '<i class="fas fa-trash-alt"></i>';
                 print '</a>';
             }
@@ -169,6 +178,8 @@ if (!empty($assocs)) {
 }
 
 print '</table>';
+
+} // End if table_exists
 
 print '</div>';
 
