@@ -67,13 +67,28 @@ if ($action == 'add' && $permissionToAdd) {
     $fk_product = GETPOST('fk_product', 'int');
     if ($fk_product > 0) {
         $assoc = new DigiriskElementProduct($db);
-        $assoc->fk_digiriskelement = $object->id;
-        $assoc->fk_product = $fk_product;
-        $result = $assoc->create($user);
-        if ($result < 0) {
-            setEventMessages($assoc->error, $assoc->errors, 'errors');
+        
+        // Prevent duplicates
+        $existing = $assoc->fetchAllByElement($object->id);
+        $already_linked = false;
+        foreach ($existing as $e) {
+            if ($e->fk_product == $fk_product) {
+                $already_linked = true;
+                break;
+            }
+        }
+        
+        if ($already_linked) {
+            setEventMessages($langs->trans('RecordAlreadyExists'), null, 'warnings');
         } else {
-            setEventMessages($langs->trans('RecordSaved'), null, 'mesgs');
+            $assoc->fk_digiriskelement = $object->id;
+            $assoc->fk_product = $fk_product;
+            $result = $assoc->create($user);
+            if ($result < 0) {
+                setEventMessages($assoc->error, $assoc->errors, 'errors');
+            } else {
+                setEventMessages($langs->trans('RecordSaved'), null, 'mesgs');
+            }
         }
     }
 }
@@ -129,7 +144,7 @@ if ($permissionToAdd) {
     
     print '<table class="noborder centpercent">';
     print '<tr class="liste_titre">';
-    print '<td>' . $langs->trans("AddProduct") . '</td>';
+    print '<td>' . $langs->trans("LinkProductService") . '</td>';
     print '</tr>';
     print '<tr class="impair">';
     print '<td>';
