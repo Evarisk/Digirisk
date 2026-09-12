@@ -792,6 +792,18 @@ class Risk extends SaturneObject
 		return -1;
 	}
 
+	public function formatDangerCategoryTooltip(array $category)
+	{
+		$tooltip = $category['name'];
+		if (!empty($category['reference'])) {
+			$tooltip .= '&#10;Référence : ' . $category['reference'];
+			$tooltip .= '&#10;C2P : ' . $category['c2p'];
+			$tooltip .= '&#10;Critères d\'exposition : ' . $category['criteres'];
+			$tooltip .= '&#10;Seuil réglementaire : ' . $category['seuil'];
+		}
+		return $tooltip;
+	}
+
 	/**
 	 * Get danger category picto name
 	 *
@@ -804,7 +816,7 @@ class Risk extends SaturneObject
 		$risk_categories = static::getDangerCategories($riskType);
 		foreach ($risk_categories as $category) {
 			if ($category['position'] == $object->category) {
-				return $category['name'];
+				return $this->formatDangerCategoryTooltip($category);
 			}
 		}
 
@@ -900,7 +912,7 @@ class Risk extends SaturneObject
 		$risk_categories = static::getDangerCategories($riskType);
 		foreach ($risk_categories as $category) {
 			if ($category['position'] == $position) {
-				return $category['name'];
+				return $this->formatDangerCategoryTooltip($category);
 			}
 		}
 
@@ -1536,18 +1548,18 @@ class Risk extends SaturneObject
             }
         }
 
-        $arrayRiskLists[23]['numberOfRisks']['value']    = '<span class="badge badge-info">' . $riskByDangerCategoriesAndRiskAssessments['totalRisks'] . '</span>';
-        $arrayRiskLists[23]['numberOfRisks']['morecss']  = 'risk-evaluation-cotation';
-        $arrayRiskLists[23]['numberOfRisks']['moreAttr'] = 'style="line-height: normal; height: auto; border-radius: 0; background-color: #A1467EAA; color: #FFF;"';
-        $arrayRiskLists[23]['numberOfRisks']['value']   .= ' (' . round($totalPercentages) . ' %)';
+        $arrayRiskLists[999]['numberOfRisks']['value']    = '<span class="badge badge-info">' . $riskByDangerCategoriesAndRiskAssessments['totalRisks'] . '</span>';
+        $arrayRiskLists[999]['numberOfRisks']['morecss']  = 'risk-evaluation-cotation';
+        $arrayRiskLists[999]['numberOfRisks']['moreAttr'] = 'style="line-height: normal; height: auto; border-radius: 0; background-color: #A1467EAA; color: #FFF;"';
+        $arrayRiskLists[999]['numberOfRisks']['value']   .= ' (' . round($totalPercentages) . ' %)';
 
-        $arrayRiskLists[23]['Ref']['value']              = $langs->transnoentities('Total');
-        $arrayRiskLists[23]['Ref']['morecss']            = 'left';
+        $arrayRiskLists[999]['Ref']['value']              = $langs->transnoentities('Total');
+        $arrayRiskLists[999]['Ref']['morecss']            = 'left';
 
         for ($i = 1; $i <= 4; $i++) {
-            $arrayRiskLists[23][$i]['value']    = $totalNbRiskAssessments[$i] . ' (' . round($totalPercentagesRiskAssessment[$i]) . ' %)';
-            $arrayRiskLists[23][$i]['morecss']  = 'risk-evaluation-cotation';
-            $arrayRiskLists[23][$i]['moreAttr'] = 'data-scale = ' . $i . ' style="line-height: normal; height: auto; border-radius: 0;"';
+            $arrayRiskLists[999][$i]['value']    = $totalNbRiskAssessments[$i] . ' (' . round($totalPercentagesRiskAssessment[$i]) . ' %)';
+            $arrayRiskLists[999][$i]['morecss']  = 'risk-evaluation-cotation';
+            $arrayRiskLists[999][$i]['moreAttr'] = 'data-scale = ' . $i . ' style="line-height: normal; height: auto; border-radius: 0;"';
         }
 
         $array['data'] = $arrayRiskLists;

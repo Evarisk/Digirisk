@@ -84,6 +84,11 @@ Analyse l’image selon ces catégories de risque :
   {"name": "Risques de heurt, de cognement", "thumbnail_name": "heurt_PictoCategorie_v2"},
   {"name": "Risques liés aux pratiques addictives", "thumbnail_name": "pratiques_addictives_PictoCategorie_v2"},
   {"name": "Risques liés à l'amiante", "thumbnail_name": "amiante_v2"},
+  {"name": "Risques liés aux postures pénibles", "thumbnail_name": "picto_risk_strenuous-posture_48px-2"},
+  {"name": "Risques liés aux activités exercées en milieu hyperbare", "thumbnail_name": "Pictogrammes_risk_hyperbar_48_px"},
+  {"name": "Risques liés au travail de nuit", "thumbnail_name": "picto_risk_night-work_48_px"},
+  {"name": "Risques liés au travail en équipes successives alternantes", "thumbnail_name": "picto_risk_rotating-shift-team_48_px-2"},
+  {"name": "Risques liés au travail répétitif", "thumbnail_name": "picto_repetitive-work_48_px"},
   {"name": "Risques autres", "thumbnail_name": "autre_PictoCategorie_v2"}
 ]
 
