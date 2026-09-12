@@ -1,165 +1,220 @@
-[{
-  "risk": [
-    {
-      "name": "Risques de chute de plain-pied",
-      "nameDigiriskWordPress": "Risques de trébuchement, heurt ou autre pertubation du mouvement",
-      "thumbnail_name": "chutePP_PictoCategorie_v2",
-      "position": 0
-    },
-    {
-      "name": "Risques de chute de hauteur",
-      "thumbnail_name": "chuteH_PictoCategorie_v2",
-      "position": 1
-    },
-    {
-      "name": "Risques liés aux circulations internes de véhicules et d'engins",
-      "nameDigiriskWordPress": "Risques liés aux circulations internes de véhicules",
-      "thumbnail_name": "circulation_PictoCategorie_v2",
-      "position": 3
-    },
-    {
-      "name": "Risques routiers en mission",
-      "thumbnail_name": "circulation_v2",
-      "position": 4
-    },
-    {
-      "name": "Risques liés à la charge physique de travail",
-      "thumbnail_name": "activitePhysique_v2",
-      "position": 5
-    },
-    {
-      "name": "Risques liés à la manutention mécanique",
-      "thumbnail_name": "manutentionMe_PictoCategorie_v2",
-      "position": 6
-    },
-    {
-      "name": "Risques liés aux produits chimiques, aux émissions et aux déchets",
-      "nameDigiriskWordPress": "Risques liés aux produits, aux émissions et aux déchets",
-      "thumbnail_name": "produitsC_PictoCategorie_v2",
-      "position": 7
-    },
-    {
-      "name": "Risques liés aux agents biologiques",
-      "thumbnail_name": "manqueHygiene_PictoCategorie_v2",
-      "position": 8
-    },
-    {
-      "name": "Risques liés aux équipements de travail",
-      "thumbnail_name": "machine_PictoCategorie_v2",
-      "position": 9
-    },
-    {
-      "name": "Risques liés aux effondrements et aux chutes d'objets",
-      "thumbnail_name": "effondrement_PictoCategorie_v2",
-      "position": 10
-    },
-    {
-      "name": "Risques et nuisances liés au bruit",
-      "thumbnail_name": "nuisances_PictoCategorie_v2",
-      "position": 11
-    },
-    {
-      "name": "Risques liés aux ambiances thermiques",
-      "thumbnail_name": "climat_PictoCategorie_v2",
-      "position": 12
-    },
-    {
-      "name": "Risques d'incendie et d'explosion",
-      "nameDigiriskWordPress": "Risques d'incendie, d'explosion",
-      "thumbnail_name": "incendies_PictoCategorie_v2",
-      "position": 13
-    },
-    {
-      "name": "Risques liés à l'électricité",
-      "thumbnail_name": "electricite_PictoCategorie_v2",
-      "position": 14
-    },
-    {
-      "name": "Risques liés aux ambiances lumineuses",
-      "thumbnail_name": "eclairage_PictoCategorie_v2",
-      "position": 15
-    },
-    {
-      "name": "Risques liés aux rayonnements",
-      "thumbnail_name": "rayonnement_v2",
-      "position": 16
-    },
-    {
-      "name": "Risques psychosociaux",
-      "thumbnail_name": "rps_v2",
-      "position": 17
-    },
-    {
-      "name": "Risques liés aux vibrations",
-      "thumbnail_name": "vibration_PictoCategorie_v2",
-      "position": 18
-    },
-    {
-      "name": "Risques de heurt, de cognement",
-      "thumbnail_name": "heurt_PictoCategorie_v2",
-      "position": 19
-    },
-    {
-      "name": "Risques liés aux pratiques addictives",
-      "thumbnail_name": "pratiques_addictives_PictoCategorie_v2",
-      "position": 20
-    },
-    {
-      "name": "Risques liés à l'amiante",
-      "thumbnail_name": "amiante_v2",
-      "position": 21
-    },
-    {
-      "name": "Risques autres",
-      "thumbnail_name": "autre_PictoCategorie_v2",
-      "position": 22
-    }
-  ],
-  "riskenvironmental": [
-    {
-      "name": "Risques liés aux émissions dans l’air",
-      "thumbnail_name": "Pictogrammes_environnement_rejets_air",
-      "position": 1
-    },
-    {
-      "name": "Risques liés aux rejets dans l’eau",
-      "thumbnail_name": "Pictogrammes_environnement_rejets_eau",
-      "position": 2
-    },
-    {
-      "name": "Risques liés aux rejets dans le sol",
-      "thumbnail_name": "Pictogrammes_environnement_rejets_sol",
-      "position": 3
-    },
-    {
-      "name": "Risques liés à l’utilisation des matières premières et des ressources naturelles",
-      "thumbnail_name": "Pictogrammes_environnement_matieres_premieres",
-      "position": 4
-    },
-    {
-      "name": "Risques liés à l’utilisation de l’énergie",
-      "thumbnail_name": "Pictogrammes_environnement_utilisation_energie",
-      "position": 5
-    },
-    {
-      "name": "Risques liés à l’énergie émise",
-      "thumbnail_name": "Pictogrammes_environnement_energie_emise",
-      "position": 6
-    },
-    {
-      "name": "Risques liés à la production de déchets et/ou de sous-produits",
-      "thumbnail_name": "Pictogrammes_environnement_production_dechets",
-      "position": 7
-    },
-    {
-      "name": "Risques liés à l’utilisation de l’espace",
-      "thumbnail_name": "Pictogrammes_environnement_utilisation_espace",
-      "position": 8
-    },
-    {
-      "name": "Divers risques environnementaux",
-      "thumbnail_name": "Pictogrammes_environnement_divers",
-      "position": 9
-    }
-  ]
-}]
+[
+  {
+    "risk": [
+      {
+        "name": "Risques de chute de plain-pied",
+        "nameDigiriskWordPress": "Risques de trébuchement, heurt ou autre pertubation du mouvement",
+        "thumbnail_name": "chutePP_PictoCategorie_v2",
+        "position": 0
+      },
+      {
+        "name": "Risques de chute de hauteur",
+        "thumbnail_name": "chuteH_PictoCategorie_v2",
+        "position": 1
+      },
+      {
+        "name": "Risques liés aux circulations internes de véhicules et d'engins",
+        "nameDigiriskWordPress": "Risques liés aux circulations internes de véhicules",
+        "thumbnail_name": "circulation_PictoCategorie_v2",
+        "position": 3
+      },
+      {
+        "name": "Risques routiers en mission",
+        "thumbnail_name": "circulation_v2",
+        "position": 4
+      },
+      {
+        "name": "Risques liés à la charge physique de travail",
+        "thumbnail_name": "activitePhysique_v2",
+        "position": 5
+      },
+      {
+        "name": "Risques liés à la manutention mécanique",
+        "thumbnail_name": "manutentionMe_PictoCategorie_v2",
+        "position": 6
+      },
+      {
+        "name": "Risques liés aux produits chimiques, aux émissions et aux déchets",
+        "nameDigiriskWordPress": "Risques liés aux produits, aux émissions et aux déchets",
+        "thumbnail_name": "produitsC_PictoCategorie_v2",
+        "position": 7
+      },
+      {
+        "name": "Risques liés aux agents biologiques",
+        "thumbnail_name": "manqueHygiene_PictoCategorie_v2",
+        "position": 8
+      },
+      {
+        "name": "Risques liés aux équipements de travail",
+        "thumbnail_name": "machine_PictoCategorie_v2",
+        "position": 9
+      },
+      {
+        "name": "Risques liés aux effondrements et aux chutes d'objets",
+        "thumbnail_name": "effondrement_PictoCategorie_v2",
+        "position": 10
+      },
+      {
+        "name": "Risques et nuisances liés au bruit",
+        "thumbnail_name": "nuisances_PictoCategorie_v2",
+        "position": 11,
+        "reference": "L.4161-1",
+        "c2p": "OUI",
+        "criteres": "LEX,8h ≥ 81 dB(A) ou Lp,C,peak ≥ 135 dB(C)",
+        "seuil": "600 h/an ou 120 fois/an"
+      },
+      {
+        "name": "Risques liés aux ambiances thermiques",
+        "thumbnail_name": "climat_PictoCategorie_v2",
+        "position": 12,
+        "reference": "L.4161-1",
+        "c2p": "OUI",
+        "criteres": "T° ≤ 5 °C ou ≥ 30 °C",
+        "seuil": "900 h/an"
+      },
+      {
+        "name": "Risques d'incendie et d'explosion",
+        "nameDigiriskWordPress": "Risques d'incendie, d'explosion",
+        "thumbnail_name": "incendies_PictoCategorie_v2",
+        "position": 13
+      },
+      {
+        "name": "Risques liés à l'électricité",
+        "thumbnail_name": "electricite_PictoCategorie_v2",
+        "position": 14
+      },
+      {
+        "name": "Risques liés aux ambiances lumineuses",
+        "thumbnail_name": "eclairage_PictoCategorie_v2",
+        "position": 15
+      },
+      {
+        "name": "Risques liés aux rayonnements",
+        "thumbnail_name": "rayonnement_v2",
+        "position": 16
+      },
+      {
+        "name": "Risques psychosociaux",
+        "thumbnail_name": "rps_v2",
+        "position": 17
+      },
+      {
+        "name": "Risques liés aux vibrations",
+        "thumbnail_name": "vibration_PictoCategorie_v2",
+        "position": 18
+      },
+      {
+        "name": "Risques de heurt, de cognement",
+        "thumbnail_name": "heurt_PictoCategorie_v2",
+        "position": 19
+      },
+      {
+        "name": "Risques liés aux pratiques addictives",
+        "thumbnail_name": "pratiques_addictives_PictoCategorie_v2",
+        "position": 20
+      },
+      {
+        "name": "Risques liés à l'amiante",
+        "thumbnail_name": "amiante_v2",
+        "position": 21
+      },
+      {
+        "name": "Risques liés aux postures pénibles",
+        "thumbnail_name": "picto_risk_strenuous-posture_48px-2",
+        "position": 22,
+        "reference": "L.4161-1",
+        "c2p": "NON",
+        "criteres": "Maintien prolongé de postures pénibles",
+        "seuil": "900 h/an"
+      },
+      {
+        "name": "Risques liés aux activités exercées en milieu hyperbare",
+        "thumbnail_name": "Pictogrammes_risk_hyperbar_48_px",
+        "position": 23,
+        "reference": "L.4161-1",
+        "c2p": "OUI",
+        "criteres": "Pression ≥ 1 200 hPa",
+        "seuil": "60 interventions ou travaux/an"
+      },
+      {
+        "name": "Risques liés au travail de nuit",
+        "thumbnail_name": "picto_risk_night-work_48_px",
+        "position": 24,
+        "reference": "L.4161-1",
+        "c2p": "OUI",
+        "criteres": "≥ 1 h entre 00 h et 5 h",
+        "seuil": "100 nuits/an"
+      },
+      {
+        "name": "Risques liés au travail en équipes successives alternantes",
+        "thumbnail_name": "picto_risk_rotating-shift-team_48_px-2",
+        "position": 25,
+        "reference": "L.4161-1",
+        "c2p": "OUI",
+        "criteres": "Alternance comportant ≥ 1 h entre 00 h et 5 h",
+        "seuil": "30 nuits/an"
+      },
+      {
+        "name": "Risques liés au travail répétitif",
+        "thumbnail_name": "picto_repetitive-work_48_px",
+        "position": 26,
+        "reference": "L.4161-1",
+        "c2p": "OUI",
+        "criteres": "Cycle ≤ 30 s : ≥ 15 actions techniques/cycle\nCycle > 30 s, variable ou sans cycle : ≥ 30 actions techniques/min",
+        "seuil": "900 h/an"
+      },
+      {
+        "name": "Risques autres",
+        "thumbnail_name": "autre_PictoCategorie_v2",
+        "position": 27
+      }
+    ],
+    "riskenvironmental": [
+      {
+        "name": "Risques liés aux émissions dans l’air",
+        "thumbnail_name": "Pictogrammes_environnement_rejets_air",
+        "position": 1
+      },
+      {
+        "name": "Risques liés aux rejets dans l’eau",
+        "thumbnail_name": "Pictogrammes_environnement_rejets_eau",
+        "position": 2
+      },
+      {
+        "name": "Risques liés aux rejets dans le sol",
+        "thumbnail_name": "Pictogrammes_environnement_rejets_sol",
+        "position": 3
+      },
+      {
+        "name": "Risques liés à l’utilisation des matières premières et des ressources naturelles",
+        "thumbnail_name": "Pictogrammes_environnement_matieres_premieres",
+        "position": 4
+      },
+      {
+        "name": "Risques liés à l’utilisation de l’énergie",
+        "thumbnail_name": "Pictogrammes_environnement_utilisation_energie",
+        "position": 5
+      },
+      {
+        "name": "Risques liés à l’énergie émise",
+        "thumbnail_name": "Pictogrammes_environnement_energie_emise",
+        "position": 6
+      },
+      {
+        "name": "Risques liés à la production de déchets et/ou de sous-produits",
+        "thumbnail_name": "Pictogrammes_environnement_production_dechets",
+        "position": 7
+      },
+      {
+        "name": "Risques liés à l’utilisation de l’espace",
+        "thumbnail_name": "Pictogrammes_environnement_utilisation_espace",
+        "position": 8
+      },
+      {
+        "name": "Divers risques environnementaux",
+        "thumbnail_name": "Pictogrammes_environnement_divers",
+        "position": 9
+      }
+    ]
+  }
+]
