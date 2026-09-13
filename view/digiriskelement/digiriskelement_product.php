@@ -79,7 +79,9 @@ if ($action == 'add' && $permissionToAdd) {
         }
         
         if ($already_linked) {
-            setEventMessages($langs->trans('RecordAlreadyExists'), null, 'warnings');
+            $tmp_product = new Product($db);
+            $tmp_product->fetch($fk_product);
+            setEventMessages($langs->trans('RecordAlreadyExists', $tmp_product->ref), null, 'warnings');
         } else {
             $assoc->fk_digiriskelement = $object->id;
             $assoc->fk_product = $fk_product;
