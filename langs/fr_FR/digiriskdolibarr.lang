@@ -2460,3 +2460,4 @@ ArchivedElementIsReadOnly = Cet élément est archivé : désarchivez-le pour le
 ProductsServices = Produits | Services
 DigiriskUpdateRequiredForProducts = La table de base de données pour cette fonctionnalité est manquante. Veuillez <a href="%s">désactiver et réactiver le module</a> ou contacter un administrateur.
 LinkProductService = Lier un Produit | Service
+RecordAlreadyExists = Ce produit ou service est déjà lié.

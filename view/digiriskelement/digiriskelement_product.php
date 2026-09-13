@@ -181,7 +181,7 @@ if (!empty($assocs)) {
             print '<td align="center">';
             if ($permissionToAdd) {
                 print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete&assoc_id=' . $assoc->id . '&token=' . newToken() . '">';
-                print '<i class="fas fa-trash-alt"></i>';
+                print '<i class="fas fa-unlink"></i>';
                 print '</a>';
             }
             print '</td>';
