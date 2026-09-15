@@ -907,7 +907,7 @@ else $moreforfilter                  = $hookmanager->resPrint;
 // Filter on categories
 if (!empty($conf->categorie->enabled) && $user->rights->categorie->lire && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
     $formcategory   = new FormCategory($db);
-    $moreforfilter  = $formcategory->getFilterBox('risk', $search_category_array);
+    $moreforfilter  = $formcategory->getFilterBox('digiriskrisk', $search_category_array);
 }
 
 if ( ! empty($moreforfilter)) {
@@ -1173,7 +1173,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
                                     print '<div class="risk-categories"><span class="title">'.$langs->trans("Categories").'</span>';
                                     $categoryArborescence = $form->select_all_categories('digiriskrisk', '', 'parent', 64, 0, 1);
                                     $c                    = new Categorie($db);
-                                    $cats                 = $c->containing($risk->id, 'risk');
+                                    $cats                 = $c->containing($risk->id, 'digiriskrisk');
                                     $arrayselected        = [];
                                     if (is_array($cats)) {
                                         foreach ($cats as $cat) {
