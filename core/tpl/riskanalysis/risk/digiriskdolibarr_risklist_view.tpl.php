@@ -681,7 +681,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                                     <?php
                                     if ( ! empty($dangerCategories) ) :
                                         foreach ($dangerCategories as $dangerCategory) : ?>
-                                            <li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
+                                            <li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $risk->formatDangerCategoryTooltip($dangerCategory) ?>">
                                                 <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
                                             </li>
                                         <?php endforeach;
@@ -907,7 +907,7 @@ else $moreforfilter                  = $hookmanager->resPrint;
 // Filter on categories
 if (!empty($conf->categorie->enabled) && $user->rights->categorie->lire && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
     $formcategory   = new FormCategory($db);
-    $moreforfilter  = $formcategory->getFilterBox('risk', $search_category_array);
+    $moreforfilter  = $formcategory->getFilterBox('digiriskrisk', $search_category_array);
 }
 
 if ( ! empty($moreforfilter)) {
@@ -956,7 +956,7 @@ foreach ($risk->fields as $key => $val) {
                     <?php
                     if ( ! empty($dangerCategories) ) :
                         foreach ($dangerCategories as $dangerCategory) : ?>
-                            <li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
+                            <li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $risk->formatDangerCategoryTooltip($dangerCategory) ?>">
                                 <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
                             </li>
                         <?php endforeach;
@@ -1138,7 +1138,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
                                                     <?php
                                                     if ( ! empty($dangerCategories) ) :
                                                         foreach ($dangerCategories as $dangerCategory) : ?>
-                                                            <li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
+                                                            <li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $risk->formatDangerCategoryTooltip($dangerCategory) ?>">
                                                                 <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
                                                             </li>
                                                         <?php endforeach;
@@ -1173,7 +1173,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
                                     print '<div class="risk-categories"><span class="title">'.$langs->trans("Categories").'</span>';
                                     $categoryArborescence = $form->select_all_categories('digiriskrisk', '', 'parent', 64, 0, 1);
                                     $c                    = new Categorie($db);
-                                    $cats                 = $c->containing($risk->id, 'risk');
+                                    $cats                 = $c->containing($risk->id, 'digiriskrisk');
                                     $arrayselected        = [];
                                     if (is_array($cats)) {
                                         foreach ($cats as $cat) {

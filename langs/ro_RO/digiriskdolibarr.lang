@@ -1,0 +1,2387 @@
+﻿# Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+#
+# General
+#
+
+# Module label 'ModuleDigiriskdolibarrName'
+ModuleDigiriskdolibarrName = Digirisk
+
+# Module description 'ModuleDigiriskdolibarrDesc'
+ModuleDigiriskdolibarrDesc = Digirisk pentru Dolibarr
+
+# Modulul Saturne lipsește
+SaturneModuleMissing = Modulul Saturne este necesar pentru Digirisk. Descărcați-l gratuit de pe Dolistore (https://dolistore.com/en/modules/1906-Saturne.html) și instalați-l înainte de a activa Digirisk.
+
+# Coloana imaginilor tutorial din paginile de configurare
+TutoImage = Imagine
+
+#
+# Pagina de administrare
+#
+
+# Date
+DigiriskdolibarrSetup       = Configurarea modulului Digirisk
+DigiriskdolibarrSetupPage        = Pagina de configurare a modulului Digirisk
+AgendaModuleRequired        = Pentru a asigura trasabilitatea acțiunilor în Digirisk, asigurați-vă că modulul Agendă este activat
+DigiriskDolibarrDescription = Digirisk pentru Dolibarr
+HowToSetupOtherModules      = Pentru mai multe funcționalități în Digirisk, puteți activa numeroase module (gestiunea furnizorilor, a facturilor etc.) la acest link:
+ConfigMyModules             = Configurarea modulelor
+AvoidLogoProblems              = Pentru a evita orice problemă legată de logouri în documentele generate, consultați aceste recomandări de configurare:
+LogoHelpLink                = https://wiki.dolibarr.org/index.php?title=Premiers_paramétrages
+SecurityConfiguration       = Configurarea datelor de securitate
+SocialConfiguration          = Configurarea datelor sociale
+Uncompleted                     = Necompletat
+DigiriskData                 = Date configurabile ale Digirisk
+DigiriskManagement          = Redirecționare după conectarea la site
+DigiriskDescription          = Redirecționare implicită către pagina de întâmpinare Digirisk în locul celei Dolibarr.
+HowToSetupIHM                   = Pentru mai multe opțiuni privind afișarea Dolibarr (configurarea imaginii de fundal etc.), puteți accesa acest link:
+ConfigIHM                    = Configurarea afișării
+ConfigDico                     = Accesați pagina de configurare a dicționarelor
+LinkedProject               = Proiect asociat
+DigiriskUpdate                  = Actualizarea Digirisk:
+Security                       = Securitate
+HowToSharedElement          = Pentru mai multe informații despre configurarea elementelor partajate, accesați acest link:
+
+HowToSharedElementLink        = https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Configuration
+ConfigSharedElement         = Configurarea elementelor partajate (riscuri/semnalizări)
+DisabledSharedElement       = Opțiune dezactivată deoarece Multi-company nu este activat sau configurarea elementelor partajate (riscuri/semnalizări) nu a fost efectuată
+DigiriskEventAutoDesc       = Definiți aici evenimentele pentru care Digirisk va crea automat o intrare în agendă. Fiecare eveniment conține informațiile referitoare la acțiunea efectuată.
+DigiriskActionsEvents       = Evenimente pentru care Digirisk trebuie să insereze automat un eveniment în agendă.
+DigiriskDolibarr            = Digirisk
+Create                      = Creare
+
+# Ticket
+MultiCompanyTicketPublicInterfaceConfig = Configurarea interfeței publice a tichetelor multi-companie
+Subtitle                                = Subtitlu
+
+# DigiriskElement
+DigiriskElementDepthGraph            = Nivelul de profunzime în graficele elementelor Digirisk
+DigiriskElementDepthGraphDescription = Această opțiune permite alegerea nivelului de profunzime în graficele elementelor Digirisk <br> Implicit: nivelul 1
+
+# WHSRegister = Registru de securitate și sănătate în muncă
+TicketsPublicInterfaceConfig         = Configurarea interfeței publice a tichetelor
+WHSRegister                          = Registru de securitate și sănătate în muncă
+CurrentTicketPublicInterfaceURL      = URL-ul interfeței publice a tichetelor
+MulticompanyTicketPublicInterfaceURL = URL-ul interfeței publice a tichetelor multi-companie
+OriginURL                            = URL de origine
+ShortURL                             = URL scurtat
+ExternalURL                          = URL extern
+AddExtraField                        = Creați un câmp suplimentar
+IfEmptyVisibleAllCategories          = Dacă este gol, vizibil în toate categoriile
+
+# DigiQuali Sheet - Modele
+LinkDigiriskdolibarr_digiriskstandard                 = Activați legătura cu entitățile principale Digirisk Standard
+LinkDigiriskdolibarr_digiriskstandardDescription      = Permite legătura dintre entitățile standard Digirisk și modele
+LinkDigiriskdolibarr_digiriskelement                  = Activați legătura cu grupările și unitățile de lucru
+LinkDigiriskdolibarr_digiriskelementDescription       = Permite legătura dintre grupări și unitățile de lucru și modele
+LinkDigiriskdolibarr_risk                             = Activați legătura cu riscurile
+LinkDigiriskdolibarr_riskDescription                  = Permite legătura dintre riscuri și modele
+LinkDigiriskdolibarr_riskassessment                   = Activați legătura cu evaluările
+LinkDigiriskdolibarr_riskassessmentDescription        = Permite legătura dintre evaluări și modele
+LinkDigiriskdolibarr_evaluator                        = Activați legătura cu evaluatorii
+LinkDigiriskdolibarr_evaluatorDescription             = Permite legătura dintre evaluatori și modele
+LinkDigiriskdolibarr_risksign                         = Activați legătura cu semnalizările
+LinkDigiriskdolibarr_risksignDescription              = Permite legătura dintre semnalizări și modele
+LinkDigiriskdolibarr_preventionplan                   = Activați legătura cu planurile de prevenire
+LinkDigiriskdolibarr_preventionplanDescription        = Permite legătura dintre planurile de prevenire și modele
+LinkDigiriskdolibarr_firepermit                       = Activați legătura cu permisele de lucru cu foc
+LinkDigiriskdolibarr_firepermitDescription            = Permite legătura dintre permisele de lucru cu foc și modele
+LinkDigiriskdolibarr_accident                         = Activați legătura cu accidentele
+LinkDigiriskdolibarr_accidentDescription              = Permite legătura dintre accidente și modele
+LinkDigiriskdolibarr_accidentinvestigation            = Activați legătura cu anchetele de accident
+LinkDigiriskdolibarr_accidentinvestigationDescription = Permite legătura dintre anchete și modele
+
+#
+# DigiriskDolibarr
+#
+
+# Drept
+LireDigirisk                 = Consultarea tabloului de bord Digirisk
+ReadDigirisk                 = Consultarea tabloului de bord Digirisk (citire)
+YouDontHaveTheRightToSeeThis = Nu aveți dreptul să vedeți grupările și unitățile de lucru
+CanNotDoThis                 = Nu aveți dreptul să faceți acest lucru
+EnableDigiriskdolibarr       = Activați modulul DigiriskDolibarr pentru a accesa această pagină
+
+# Date
+DigiriskMenu          = Adăugați informații despre compania/organizația dumneavoastră. Faceți clic pe butonul "Salvare" din partea de jos a paginii pentru a le păstra
+DigiriskConfigSociety = Configurarea companiei
+PermissionDenied      = Permisiune refuzată
+AddUser               = Creați un utilizator
+StartDate             = Data de început
+EndDate               = Data de sfârșit
+NoPhoneNumber         = Fără număr de telefon
+HasBeenCreatedF       = a fost creată
+HasBeenCreatedM       = a fost creat
+HasNotBeenCreatedF    = nu a fost creată
+HasNotBeenCreatedM    = nu a fost creat
+YourDocuments         = Documente
+NoData                = N/A
+HasBeenEditedF        = a fost editată
+HasBeenEditedM        = a fost editat
+HasNotBeenEditedF     = nu a fost editată
+HasNotBeenEditedM     = nu a fost editat
+
+HasBeenDeletedF    = a fost ștearsă
+HasBeenDeletedM    = a fost șters
+HasNotBeenDeletedF = nu a fost ștearsă
+HasNotBeenDeletedM = nu a fost șters
+
+DigiriskUserGroup                 = Digirisk - Utilizatori
+DigiriskUserGroupDescription      = Grupul de utilizatori DigiRisk are dreptul de a consulta și modifica obiectele legate de DigiRisk
+DigiriskAdminUserGroup            = DigiRisk - Administratori
+DigiriskAdminUserGroupDescription = Grupul de administratori are toate drepturile asupra DigiRisk și a modulelor necesare
+DigiriskReaderGroup               = DigiRisk - Cititori
+DigiriskReaderGroupDescription    = Grupul de cititori are toate drepturile de citire asupra DigiRisk și a modulelor necesare
+
+ContractType              = Tip de contract
+Apprentice/Student        = Ucenic/Elev
+Interim                   = Lucrător temporar
+ProfessionalQualification = Calificare profesională
+DigiriskDocumentation     = Documentația Digirisk
+
+SelectUser               = Selectați un utilizator
+LabourInspectorFirstName = Inspector de
+LabourInspectorLastName  = muncă
+LabourInspector          = Inspector de muncă
+LabourInspectorSociety   = Terț Inspector de muncă
+LabourInspectorAssigned  = Inspector de muncă
+
+SocieteSchedules = Programul companiei
+weekDayDefault   = Vezi site-ul web
+weekEndDefault   = Închis Închis
+
+#
+# DigriskDocuments - Documente Digirisk
+#
+
+# Date
+DigiriskDocuments              = Document Digirisk
+Responsible                    = Responsabil
+ContactsAction                 = Contacte ale acțiunii
+PERCOTooltip                   = Dacă societatea dumneavoastră dispune de un plan de economii pentru pensie (PERCO), bifați această căsuță
+PEETooltip                     = Dacă societatea dumneavoastră dispune de un plan de economii al întreprinderii (PEE), bifați această căsuță
+ShowPictoName                  = Afișați numele pictogramei de pericol
+ShowPictoNameDescription       = Afișați numele pictogramei de pericol a riscului în documente <br> Util dacă doriți să transferați tabelul într-un program de calcul tabelar
+RiskAssessmentColor            = Culoarea evaluărilor
+RiskAssessmentColorDescription = Afișează culoarea evaluărilor în documentul Papripact-A3-Peisaj
+
+#
+# LegalDisplay - Afișaj legal
+#
+
+# Drept
+LegalDisplaysMin = Afișaje legale
+
+# Date
+LegalDisplay             = Afișaj legal
+Legaldisplay             = Afișaj legal
+HowToSetDataLegalDisplay = Pentru a configura datele afișajului legal, accesați Acasă - Configurare - Companie/Organizație - Securitate
+
+LegalDisplayDocumentGenerated       = Generarea afișajului legal
+LabourDoctor                        = Medic de medicina muncii
+LabourInspector                     = Inspector de muncă
+FireBrigade                         = Pompieri
+AllEmergencies                      = Orice urgență
+RightsDefender                      = Avocatul Poporului
+PoisonControlCenter                 = Centrul de Toxicologie
+Police                              = Poliția de urgență
+SafetyInstructions                  = Instrucțiuni de securitate
+ResponsibleToNotify                 = Responsabil de anunțat
+PreventionOfficers                  = Responsabili cu prevenirea
+PreventionOfficer                   = Responsabil cu prevenirea
+LocationOfDetailedInstructions      = Amplasarea instrucțiunii detaliate
+LocationOfDetailedInstructionsValue = Nicio instrucțiune detaliată la acest amplasament
+FirstAid                            = Primul ajutor
+FirstAidValue                       = <h2>Lista salvatorilor prezenți la fața locului (Nume, Companie, Telefon)</h2><br><br>Fiecare echipă trebuie constituită astfel încât, în orice împrejurare, să se poată acorda primul ajutor oricărui membru al echipei.<br />Salvatorii de la locul de muncă trebuie identificați clar și cunoscuți de toți.<h2>Cum se procedează în caz de accident</h2><br><br><h3>Accident ușor</h3><br><ul><li> - Îngrijiri acordate de salvatori</li><br><li> - Existența unei truse de prim ajutor</li></ul><br><br>Fiecare mașină este dotată cu cel puțin o trusă de prim ajutor care permite acordarea de îngrijiri pentru răni ușoare.<br><br><h3>Accident grav</h3><br><ul><li> - Anunțați salvatorul prezent la fața locului</li><br><li> - Declanșați procedura de urgență</li><br><li> - Informați responsabilul întreprinderii utilizatoare, serviciul de permanență 24/24</li><br><li> - Contactați în caz de accident</li></ul><br><br>Întreprinderea utilizatoare reamintește în anexă numerele de urgență. <br />
+AddPhoneNumber                      = Adăugați un număr de telefon utilizatorului
+ConfigureLabourInspector            = Configurați un inspector de muncă
+SocietyAdditionalDetails            = Informații suplimentare despre companie
+GeneralMeansAtDisposal              = Mijloace generale puse la dispoziție
+GeneralMeansAtDisposalValue         = <h2>Mijloace de prim ajutor puse la dispoziție</h2><br><ul><li> - Infirmerie</li><br><li> - Personalul nostru salvator este identificat pe căști și pe echipamentul de lucru cu ecusonul de salvator</li><br><li> - Truse de prim ajutor pentru accidente ușoare disponibile la fiecare amplasament</li></ul><br><br><h2>Instrucțiuni în caz de accident ușor</h2><br><ul><li> - Contactați salvatorul cel mai apropiat</li><br><li> - Îngrijiri cu trusa de prim ajutor pusă la dispoziție</li><br><li> - Declarație la fața locului:</li></ul><br><br><h2>Instrucțiuni în caz de accident</h2><br><ul><li> - Apel pompieri: 18</li><br><li> - Serviciul medical de urgență: 15</li><br><li> - Poliție și Jandarmerie: 17</li><br><li> - Nr. de urgență european: 112</li></ul><br><br><h2>Instrucțiuni în caz de incendiu</h2><br>În caz de incendiu, procedați în această ordine:<br><ol><li> - Declanșați semnalul de alarmă.</li><br><li> - Atacați focul (dacă nu este prea mare) cu un stingător.</li><br><li> - Dacă focul nu s-a stins după utilizarea unui singur stingător sau dacă focul este deja prea mare, anunțați pompierii.</li><br><li> - Închideți ușile și ferestrele înainte de a părăsi spațiile.</li><br><li> - Solicitați ajutorul echipelor instruite.</li><br></ol>
+GeneralInstructions                 = Instrucțiuni generale
+GeneralInstructionsValue            = <h2>Toate instalațiile</h2><br><br><p>Este strict interzis să fumați, să faceți foc sau să utilizați flacără deschisă în și pe instalații.<br />Dacă intervenția necesită utilizarea unei flăcări deschise (lucrări de sudură etc.), este obligatoriu să se emită un permis de lucru cu foc (a se vedea exemplul din anexa 9.5).<br />În general, accesul la instalații este interzis persoanelor neautorizate.<br />Fiecare lucrător trebuie să dețină autorizațiile și certificatele de formare. Trebuie să le poată prezenta la fața locului la cererea întreprinderii utilizatoare.</p><br><br><h2>Autorizări</h2><br>Orice persoană participantă trebuie să dispună de o copie a următoarelor autorizări:<br><ul><li> - Autorizare electrică în funcție de lucrările de realizat</li><br><li> - Certificat de formare sau autorizare pentru lucrul la înălțime și salvarea de la înălțime</li></ul><br>Și să fie în măsură să o prezinte la simpla cerere a întreprinderii utilizatoare, a responsabilului de intervenție/de lucrări sau a oricărui inspector autorizat<br><br><h2>Protecții individuale</h2><br>Orice persoană participantă trebuie să poată dispune de următoarele echipamente individuale de protecție, în funcție de tipurile de lucrări efectuate și de măsurile de protecție definite în analiza riscurilor.<br><br><h3>Lucrări diverse</h3><br><ul><li> - Cască concepută pentru lucrul la înălțime (EN397) cu curea de bărbie și/sau care asigură izolarea electrică (mediu electric)</li><br><li> - Încălțăminte de protecție</li><br><li> - Protecții auditive, dacă este necesar</li><br><li> - Altele (de precizat): în funcție de lucrările realizate și de riscurile asociate.</li></ul><br><br><h3>Lucrări electrice</h3><br><ul><li> - Covor izolant sau scaun izolant</li><br><li> - Mănuși adaptate domeniului de tensiune</li><br><li> - Căști pentru lucrări electrice cu vizieră facială (EN166)</li><br><li> - EIP reglementare pentru intervenția la medie tensiune (UTE C 18-510)</li></ul><br><br><h3>Altele</h3><br>Notă: întreprinderile externe trebuie să furnizeze lucrătorilor lor EIP menționate mai sus. Un scaun și o prăjină se află în posturile de transformare.<br><br><h3>Lucrări la înălțime</h3><br><ul><li> - EIP reglementare (ham, cască, 2 corzi cu absorbant sau coardă dublă în Y, carabiniere, opritor de cădere etc.) cu verificarea la zi</li><br><li> - Sistem de evacuare automată:</li><br><li> - Cantitate: 1 kit de evacuare (prevăzut pentru 2 persoane)</li><li>Amplasare: în nacelă</li><br><li> - Nu uitați să luați un kit de evacuare suplimentar dacă sunt mai mult de două persoane în nacelă</li><br><li> - Altul (de precizat): opritor de cădere utilizat: HACA cu referința 0529 7103 (prindere sternală pe ham)</li></ul><br><br>Opritoarele de cădere trebuie să fie compatibile cu sistemul de asigurare rigid cu care sunt echipate mașinile. Opritoarele de cădere trebuie să fie conforme cu ultima normă și să fi trecut cu succes încercările suplimentare (teste adiționale CNB/P/11.073 din 13.10.2010) devenite obligatorii prin Avizul Ministerului Muncii din Franța din 28 septembrie 2010, pentru a garanta conformitatea cu cerințele directivei 89/686/CEE.
+RulesOfProcedure                    = Regulament intern
+RulesOfProcedureValue               = Disponibil la afișajul obligatoriu din sala de pauză
+CollectiveAgreement                 = Contracte colective de muncă
+CollectiveAgreementValue            = Disponibil pe site-ul guvernului:<br /><a href="https://www.service-public.fr/particuliers/vosdroits/F78" target="_blank">https://www.service-public.fr/particuliers/vosdroits/F78</a>
+legaldisplay.odt                    = Afișaj legal
+legaldisplay_custom.odt             = Afișaj legal personalizat
+
+#
+# InformationsSharing - Difuzarea informațiilor
+#
+
+# Drept
+InformationsSharingsMin = Difuzări de informații
+
+# Date
+InformationsSharing                  = Difuzarea informațiilor
+Informationssharing                  = Difuzarea informațiilor
+InformationsSharingDocumentGenerated = Generarea difuzării informațiilor
+HowToSetDataInformationsSharing      = Pentru a configura datele privind difuzarea informațiilor, accesați Acasă - Configurare - Companie/Organizație - Social
+ConfigureSecurityAndSocialData       = Configurați datele companiei
+LastMainDoc                          = Ultimul document generat
+
+ParticipationAgreement      = Acorduri de participare la profit
+ParticipationAgreementValue = Da, toți colaboratorii care au un contract de muncă pe durată nedeterminată sau determinată în curs cu întreprinderea, indiferent de natura acestuia, vor putea beneficia de participarea la profit.<br />Este însă necesară o condiție de vechime: 6 luni în întreprindere.<br />Pentru determinarea vechimii necesare sunt luate în considerare toate contractele de muncă executate în perioada de calcul și în cele 12 luni precedente.<br />Vechimea se apreciază la data încheierii exercițiului în cauză sau la data plecării în cazul încetării contractului în cursul exercițiului.
+TermsAndConditions          = Modalități
+
+ESC                  = Comitetul Social și Economic
+StaffRepresentatives = Reprezentanții personalului
+ElectionDate         = Data alegerilor
+ElectionDateCSE      = Data alegerilor Comitetului Social și Economic
+ElectionDateDP       = Data alegerilor reprezentanților personalului
+
+Titulars                       = Titulari
+Alternates                     = Supleanți
+informationssharing.odt        = Difuzarea informațiilor
+informationssharing_custom.odt = Difuzarea informațiilor personalizată
+ActionOnUser                   = Utilizator vizat
+HarassmentOfficer              = Responsabil pentru hărțuire
+HarassmentOfficerCSE           = Responsabil pentru hărțuire al Comitetului Social și Economic
+ExceptionsToWorkingHours       = Derogări de la programul de lucru
+PermanentDerogation            = Derogare permanentă
+PermanentDerogationValue       = Nu
+OccasionalDerogation           = Derogare ocazională
+OccasionalDerogationValue      = Da
+
+
+#
+# PreventionPlan - Plan de prevenire
+#
+
+# Drept
+PreventionPlansMin = planuri de prevenire
+
+# Date
+
+PreventionPlan                                        = Plan de prevenire
+Preventionplan                                        = Plan de prevenire
+ThePreventionplan                                     = planul de prevenire
+PreventionPlanDocument                                = Plan de prevenire
+Preventionplandocument                                = Plan de prevenire
+PreventionPlanDocumentGenerated                       = Generarea planului de prevenire
+PreventionPlanList                                    = Lista planurilor de prevenire
+PreventionPlanLine                                    = risc(uri)
+PreventionPlanLineCreated                             = Crearea unui risc în planul de prevenire
+PreventionPlanLineModified                            = Modificarea unui risc în planul de prevenire
+PreventionPlanLineDeleted                             = Ștergerea unui risc din planul de prevenire
+NewPreventionPlan                                     = Plan de prevenire nou
+PriorVisit                                            = Inspecție comună prealabilă
+PriorVisitYesNo                                       = Vizită preliminară efectuată
+PriorVisitText                                        = Nota inspecției
+CSSCTIntervention                                     = Intervenția CSSCT
+CSSCTInterventionText                                 = Intervenția CSSCT?
+MasterWorker                                          = Responsabilul întreprinderii utilizatoare
+MasterWorker                                          = Responsabilul întreprinderii utilizatoare
+ExtSociety                                            = Întreprindere externă
+ExtSocietyResponsible                                 = Responsabilul întreprinderii externe
+ExtSocietyResponsible                                 = Responsabilul întreprinderii externe
+ExtSocietyAttendant                                   = Lucrător al întreprinderii externe
+ActionsDescription                                    = Descrierea acțiunilor
+INRSRisk                                              = Risc (INRS)
+PreventionMethod                                      = Mijloace de prevenire
+PreventionplanSchedules                               = Programul planului de prevenire
+Attendants                                            = Participanți
+ModifyPreventionPlan                                  = Modificați planul de prevenire
+ActionsDescriptionTooltip                             = Descrierea acțiunilor realizate de lucrător
+INRSRiskTooltip                                       = Lista categoriilor de riscuri propuse în referențialul INRS
+PreventionMethodTooltip                               = Mijloc de prevenire de implementat pentru limitarea riscului
+LockPreventionPlan                                    = Blocați planul de prevenire
+ConfirmLockPreventionPlan                             = Sigur doriți să blocați planul de prevenire?<br>Această blocare permite fixarea datelor și a generării documentului.
+AllSignatoriesMustHaveSigned                          = Toți participanții trebuie să fi semnat pentru a bloca obiectul
+ValidatePreventionPlan                                = Validați planul de prevenire
+ConfirmValidatePreventionPlan                         = Sigur doriți să validați planul de prevenire? <br> Validarea permite participanților să semneze documentul, dar <b> împiedică adăugarea de noi participanți sau modificarea planului de prevenire </b>.
+ReOpenPreventionPlan                                  = Redeschideți planul de prevenire
+ConfirmReOpenPreventionPlan                           = Sigur doriți să redeschideți planul de prevenire? Redeschiderea permite modificarea planului de prevenire și adăugarea de noi participanți, dar <b>toate semnăturile documentului vor fi pierdute</b>.
+PreventionPlanRiskList                                = Lista riscurilor planului de prevenire
+ActionsPreventionPlanRisk                             = Acțiuni
+PreventionPlanDescription                             = Proiectul planurilor de prevenire
+PriorVisitDate                                        = Data inspecției comune prealabile
+AddPreventionPlanLine                                 = Adăugarea riscului
+UpdatePreventionPlanLine                              = Actualizarea riscului
+DeletePreventionPlanLine                              = Ștergerea riscului
+PreventionPlanDet                                     = Risc al planului de prevenire
+Preventionplandet                                     = Risc al planului de prevenire
+PreventionPlanMessage                                 = la planul de prevenire
+PreventionPlanMustBeValidated                         = Planul de prevenire trebuie să fie validat pentru a putea fi redeschis
+PreventionPlanMustBeInProgress                        = Planul de prevenire trebuie să fie în curs pentru a accesa această funcționalitate
+PreventionPlanMustBeInProgressToValidate              = Planul de prevenire este deja validat
+CSEMustBeAlerted3DaysBeforeVisit                      = CSE trebuie anunțat cu 3 zile înainte de inspecția comună prealabilă (art. R. 4514-1 1°, R. 4514-3 și R. 4514-9 din Codul muncii francez)
+PreventionPlanData                                    = Datele planului de prevenire
+MasterWorkerDescription                               = Utilizatorul folosit implicit ca responsabil al întreprinderii utilizatoare
+NoPreventionPlanRisk                                  = Niciun risc în planul de prevenire
+NoPreventionPlanLinked                                = Niciun plan de prevenire asociat
+PreventionPlanLinked                                  = Plan de prevenire asociat
+PreventionPlanManagement                              = Gestiunea planurilor de prevenire
+PPRProject                                            = Proiect asociat planurilor de prevenire
+NewLabelForClonePreventionPlan                        = Denumirea noului plan de prevenire
+ClonePreventionPlanRisk                               = Clonați riscurile planului de prevenire
+CloneAttendantsPreventionPlan                         = Clonați participanții planului de prevenire
+CloneSchedulePreventionPlan                           = Clonați programul planului de prevenire
+ConfirmClonePreventionPlan                            = Sigur doriți să clonați planul de prevenire <b> %s </b>?
+preventionplandocument.odt                            = Plan de prevenire
+preventionplandocument_custom.odt                     = Plan de prevenire personalizat
+ErrorThirdPartyHasAtLeastOneChildOfTypePreventionPlan = Terțul este asociat cu cel puțin un element subordonat de tip plan de prevenire:
+ErrorContactHasAtLeastOneChildOfTypePreventionPlan    = Contactul este asociat cu cel puțin un element subordonat de tip plan de prevenire:
+ConfirmDeletePreventionPlan                           = Sigur doriți să ștergeți acest plan de prevenire?
+PreventionPlanRole                                    = Rolurile planului de prevenire
+
+# Email
+PreventionPlanLabel   = Rezumatul planului de prevenire
+PreventionPlanSubject = Email plan de prevenire
+PreventionPlanContent = Atașat găsiți documentul ODT al planului de prevenire.
+
+# Declanșatoare
+PreventionPlanCreated          = Crearea unui plan de prevenire
+PreventionPlanModified         = Modificarea unui plan de prevenire
+PreventionPlanDeleted          = Ștergerea unui plan de prevenire
+PreventionPlanInProgress       = Redeschiderea planului de prevenire
+PreventionPlanPendingSignature = Punerea planului de prevenire în așteptarea semnăturii
+PreventionPlanLocked           = Blocarea planului de prevenire
+PreventionPlanArchived         = Arhivarea planului de prevenire
+PreventionPlanSentByMail       = Trimiterea planului de prevenire prin email
+
+#
+# FirePermit - Permis de lucru cu foc
+#
+
+# Drept
+FirePermitMin  = permis de lucru cu foc
+FirePermitsMin = permise de lucru cu foc
+
+# Date
+NewFirePermit                                     = Permis de lucru cu foc nou
+ModifyFirePermit                                  = Modificați permisul de lucru cu foc
+FirePermitList                                    = Lista permiselor de lucru cu foc
+FirePermit                                        = Permis de lucru cu foc
+Firepermit                                        = Permis de lucru cu foc
+TheFirepermit                                     = permisul de lucru cu foc
+FirePermitDocument                                = Permis de lucru cu foc
+Firepermitdocument                                = Permis de lucru cu foc
+FirePermitDocumentGenerated                       = Generarea permisului de lucru cu foc
+FirePermitCreated                                 = Crearea unui permis de lucru cu foc
+FirePermitModified                                = Modificarea unui permis de lucru cu foc
+FirePermitDeleted                                 = Ștergerea unui permis de lucru cu foc
+FirePermitInProgress                              = Redeschiderea permisului de lucru cu foc
+FirePermitPendingSignature                        = Punerea permisului de lucru cu foc în așteptarea semnăturii
+FirePermitLocked                                  = Blocarea permisului de lucru cu foc
+FirePermitArchived                                = Arhivarea permisului de lucru cu foc
+FirePermitSignatureAddAttendant                   = Adăugarea unui participant la permisul de lucru cu foc
+FirePermitSentByMail                              = Trimiterea permisului de lucru cu foc prin email
+FirePermitLine                                    = risc(uri)
+FirePermitDet                                     = Risc al permisului de lucru cu foc
+Firepermitdet                                     = Risc al permisului de lucru cu foc
+FirePermitLineCreated                             = Crearea unui risc în permisul de lucru cu foc
+FirePermitLineModified                            = Modificarea unui risc în permisul de lucru cu foc
+FirePermitLineDeleted                             = Ștergerea unui risc din permisul de lucru cu foc
+FirePermitRiskList                                = Lista riscurilor permisului de lucru cu foc
+AddFirePermitLine                                 = Adăugarea riscului
+UpdateFirePermitLine                              = Actualizarea riscului
+DeleteFirePermitLine                              = Ștergerea riscului
+FirePermitMessage                                 = la permisul de lucru cu foc
+UsedMaterialTooltip                               = Material de utilizat pentru limitarea riscului
+ActionsFirePermitRisk                             = Acțiuni
+ConfirmValidateFirePermit                         = Sigur doriți să validați permisul de lucru cu foc? <br> Validarea permite participanților să semneze documentul, dar <b> împiedică adăugarea de noi participanți sau modificarea permisului de lucru cu foc </b>.
+ConfirmReOpenFirePermit                           = Sigur doriți să redeschideți permisul de lucru cu foc? Redeschiderea permite modificarea permisului de lucru cu foc și adăugarea de noi participanți, dar <b>toate semnăturile documentului vor fi pierdute</b>.
+ConfirmLockFirePermit                             = Sigur doriți să blocați permisul de lucru cu foc?<br>Această blocare permite fixarea datelor și a generării documentului.
+FirePermitMustBeInProgress                        = Permisul de lucru cu foc trebuie să fie în curs pentru a accesa această funcționalitate
+NewLabelForCloneFirePermit                        = Denumirea noului permis de lucru cu foc
+CloneFirePermitRisk                               = Clonați riscurile permisului de lucru cu foc
+CloneAttendantsFirePermit                         = Clonați participanții permisului de lucru cu foc
+CloneScheduleFirePermit                           = Clonați programul permisului de lucru cu foc
+ConfirmCloneFirePermit                            = Sigur doriți să clonați permisul de lucru cu foc <b> %s </b>?
+FirePermitDescription                             = Proiectul permiselor de lucru cu foc
+FirePermitData                                    = Datele permisului de lucru cu foc
+FirePermitManagement                              = Gestiunea permiselor de lucru cu foc
+FPRProject                                        = Proiect asociat permiselor de lucru cu foc
+firepermitdocument.odt                            = Permis de lucru cu foc
+firepermitdocument_custom.odt                     = Permis de lucru cu foc personalizat
+UsedEquipment                                     = Material utilizat
+ErrorThirdPartyHasAtLeastOneChildOfTypeFirePermit = Terțul este asociat cu cel puțin un element subordonat de tip permis de lucru cu foc:
+ErrorContactHasAtLeastOneChildOfTypeFirePermit    = Contactul este asociat cu cel puțin un element subordonat de tip permis de lucru cu foc:
+ConfirmDeleteFirePermit                           = Sigur doriți să ștergeți acest permis de lucru cu foc?
+FirePermitRole                                    = Rolurile permisului de lucru cu foc
+FirepermitSchedules                               = Programul permisului de lucru cu foc
+
+# Email
+FirePermitLabel   = Rezumatul permisului de lucru cu foc
+FirePermitSubject = Email permis de lucru cu foc
+FirePermitContent = Atașat găsiți documentul ODT al permisului de lucru cu foc.
+
+
+#
+# Accident - Accident
+#
+
+# Drept
+AccidentsMin = accidente
+
+# Declanșator
+AccidentCreateTrigger         = Accidentul %s a fost creat
+ActionsOnAccident             = Evenimente asociate accidentului
+AccidentGeneratedWithDolibarr = Accident generat cu Dolibarr
+AccidentWorkStopCreateTrigger = Concediul medical %s a fost adăugat la accident
+AccidentWorkStopModifyTrigger = Concediul medical %s a fost modificat la accident
+AccidentWorkStopDeleteTrigger = Concediul medical %s a fost șters din accident
+AccidentModifyTrigger         = Accidentul %s a fost modificat
+AccidentDeleteTrigger         = Accidentul %s a fost șters
+AccidentMetaDataCreateTrigger = Înregistrarea datelor suplimentare ale accidentului
+AccidentLesionCreateTrigger   = Leziunea %s a fost adăugată la accident
+AccidentLesionModifyTrigger   = Leziunea %s a fost modificată la accident
+AccidentLesionDeleteTrigger   = Leziunea %s a fost ștearsă din accident
+ACC_USER_EMPLOYERSigned       = Semnătura responsabilului companiei
+VictimAndCaregivers           = Victimă și persoana care acordă îngrijiri
+Victim                        = Victimă
+Caregiver                     = Persoana care acordă îngrijiri
+
+# Model de numerotare
+DigiriskAccidentNumberingModule         = Model de numerotare a accidentelor Digirisk
+DigiriskAccidentStandardModel           = Returnează numărul sub forma ACCn, unde n este un contor secvențial fără întrerupere și fără resetare la 0.
+DigiriskAccidentWorkStopNumberingModule = Model de numerotare a concediilor medicale asociate accidentului
+DigiriskAccidentWorkStopStandardModel   = Returnează numărul sub forma ACCWn, unde n este un contor secvențial fără întrerupere și fără resetare la 0.
+DigiriskAccidentLesionNumberingModule   = Model de numerotare a leziunilor asociate accidentului
+DigiriskAccidentLesionStandardModel     = Returnează numărul sub forma ACCLn, unde n este un contor secvențial fără întrerupere și fără resetare la 0.
+DigiriskAccidentDocumentNumberingModule = Model de numerotare a fișelor de accident Digirisk
+DigiriskAccidentDocumentStandardModel   = Returnează numărul sub forma ACCDn, unde n este un contor secvențial fără întrerupere și fără resetare la 0.
+
+# Șablon ODT
+DigiriskTemplateDocumentAccident       = Modele de documente pentru accidentele Digirisk
+AccidentDocumentCustomDigiriskTemplate = ODT personalizat pentru accidente
+AccidentDocumentDigiriskTemplate       = ODT implicit pentru accidente
+AccidentDocument                       = Fișă de accident
+AccidentDocumentGeneratedWithDolibarr  = Accident generat cu Dolibarr
+
+# Date
+NewAccident                              = Accident nou
+ModifyAccident                           = Modificați accidentul
+AccidentList                             = Lista accidentelor
+Accident                                 = Accident
+AccidentCreated                          = Crearea unui accident
+DeleteAccident                           = Ștergeți accidentul?
+AccidentModified                         = Modificarea unui accident
+AccidentDeleted                          = Ștergerea unui accident
+AccidentLine                             = risc(uri)
+AccidentDate                             = Data accidentului
+AccidentSchedule                         = Programul accidentului
+AccidentRiskList                         = Lista informațiilor suplimentare despre accident
+Accidentworkstop                         = Concediu medical
+AccidentWorkStopCreated                  = Crearea unui concediu medical
+AccidentWorkStopModified                 = Modificarea unui concediu medical
+AccidentWorkStopDeleted                  = Ștergerea unui concediu medical
+AddAccidentWorkStop                      = Adăugarea unui concediu medical la accident
+UpdateAccidentWorkStop                   = Actualizarea unui concediu medical la accident
+DeleteAccidentWorkStop                   = Ștergerea unui concediu medical din accident
+Accidentlesion                           = Leziune
+AccidentLesionCreated                    = Crearea unei leziuni
+AccidentLesionModified                   = Modificarea unei leziuni
+AccidentLesionDeleted                    = Ștergerea unei leziuni
+AddAccidentLesion                        = Adăugarea unei leziuni la accident
+UpdateAccidentLesion                     = Actualizarea unei leziuni la accident
+DeleteAccidentLesion                     = Ștergerea unei leziuni din accident
+AccidentDescription                      = Proiectul accidentelor
+AccidentManagement                       = Gestiunea accidentelor
+AccidentWorkstopManagement               = Gestiunea concediilor medicale
+AccidentLesionManagement                 = Gestiunea leziunilor
+AccidentInvestigationManagement          = Gestiunea anchetelor de accident
+ACCProject                               = Proiect asociat accidentelor
+UserVictim                               = Victima accidentului
+AccidentType                             = Tipul accidentului
+WorkAccidentStatement                    = Accident de muncă
+CommutingAccident                        = Accident de traseu
+AccidentMetaData                         = Date suplimentare
+RelativeLocation                         = Precizări suplimentare privind locul accidentului
+VictimActivity                           = Activitatea victimei în momentul accidentului
+AccidentNature                           = Natura accidentului
+AccidentObject                           = Obiectul al cărui contact a rănit victima
+AccidentNatureDoubt                      = Eventuale rezerve motivate (atașați, dacă este necesar, o scrisoare de însoțire)
+AccidentNatureDoubtLink                  = Link către scrisoarea de însoțire
+VictimTransportedTo                      = Victima a fost transportată la
+VictimWorkHours                          = Programul de lucru al victimei în ziua accidentului
+WorkHoursMorningDateStart                = Începutul programului de lucru al victimei (dimineața)
+WorkHoursMorningDateEnd                  = Sfârșitul programului de lucru al victimei (dimineața)
+WorkHoursAfternoonDateStart              = Începutul programului de lucru al victimei (după-amiaza)
+WorkHoursAfternoonDateEnd                = Sfârșitul programului de lucru al victimei (după-amiaza)
+AccidentNoticed                          = Informarea despre accident
+Found                                    = Constatat
+Known                                    = Cunoscut
+AccidentNoticeDate                       = Data luării la cunoștință a accidentului
+AccidentNoticeBy                         = Persoana care a informat despre accident
+ByEmployer                               = De către angajator
+ByEmployees                              = De către prepușii săi
+AccidentDescribedByVictim                = Accidentul a fost descris de victimă
+RegisteredInAccidentRegister             = Accidentul este înscris în registrul accidentelor de muncă ușoare
+RegisterDate                             = Data înscrierii în registrul accidentelor de muncă ușoare
+RegisterNumber                           = Numărul de înscriere în registrul accidentelor de muncă ușoare
+Consequence                              = Consecințe
+WithoutWorkStop                          = Fără concediu medical
+LessThanFourDays                         = Mai puțin de 4 zile
+LessThanTwentyOneDays                    = Mai puțin de 21 de zile
+LessThanThreeMonth                       = Mai puțin de 3 luni
+LessThanSixMonths                        = Mai puțin de 6 luni
+LongTimeWorkStop                         = Mai mult de 6 luni
+WithWorkStop                             = Cu concediu medical
+Fatal                                    = Deces
+PoliceReport                             = Raport de poliție
+PoliceReportBy                           = Persoana care a întocmit raportul de poliție
+FirstPersonNoticedIsWitness              = Persoană înștiințată
+Witness                                  = Martor
+FirstPersonNoticed                       = Prima persoană înștiințată
+ThirdPartyResponsability                 = Accidentul a fost cauzat de un terț?
+FkSocResponsible                         = Compania terțului responsabil
+FkSocResponsibleInsuranceSociety         = Compania de asigurări a terțului
+LesionLocalization                       = Localizarea leziunilor
+LesionNature                             = Natura leziunilor
+AccidentInvestigation                    = Anchetă de accident
+Accidentinvestigation                    = Anchetă de accident
+AccidentInvestigationLink                = Link către ancheta de accident
+AccidentLocation                         = Locul accidentului
+DigiriskDolibarrActionTrigger            = Declanșatorul evenimentelor Digirisk
+CollateralVictim                         = Victimă colaterală
+FromDigirisk                             = De la
+At                                       = La
+AndFrom                                  = Și de la
+ExternalAccident                         = Accidentul a avut loc într-o altă unitate decât cea de care aparține victima?
+AccidentAttendants                       = Accident - Participanți
+UserEmployer                             = Responsabilul companiei
+SignatureUserEmployer                    = Semnătura responsabilului companiei
+CerfaLink                                = Link către formularul Cerfa
+WorkStopDays                             = Numărul de zile de concediu medical
+AccidentLesionList                       = Lista leziunilor asociate accidentului
+DocumentsMetaData                        = Fișiere atașate suplimentare
+WorkStopDocument                         = Declarație de concediu medical
+AccidentMetaDataSave                     = Datele suplimentare ale accidentului au fost înregistrate
+ErrorFieldNotEmpty                       = Eroare: câmpul <b>'%s'</b> nu poate fi gol
+ErrorFieldMustBeGreaterOrEqualZero       = Eroare: câmpul <b>'%s'</b> trebuie să fie mai mare sau egal cu 0
+ConfirmDeleteAccidentWorkStop            = Sigur doriți să ștergeți concediul medical <b>%s</b> de la accident?
+AccidentMetaDataLesion                   = Date suplimentare ale leziunilor
+TotalWorkStopDays                        = Numărul total de zile de concediu medical
+RegisterAccident                         = Accident ușor
+AccidentsLinked                          = Accident(e) asociat(e)
+GaugeCounter                             = Acest câmp este utilizat în contorul indicatorului
+DateStartWorkStop                        = Data de început a concediului medical
+DateEndWorkStop                          = Data de sfârșit a concediului medical
+ReturnWorkDate                           = Data reluării activității
+DayWithoutAccident                       = Zile fără accident(e)
+AccidentRepartition                      = Repartizarea accidentelor pe tipuri
+AccidentByYear                           = Repartizarea accidentelor pe ani
+NbAccidentsByEmployees                   = Numărul de accidente per angajat
+AccidentRegister                         = Accident pe registru
+AccidentWithoutRegister                  = Accidente fără registru
+AccidentWithRegister                     = Accidente cu registru
+WorkStopDurationDistribution             = Repartizarea timpului pe concediu medical
+WorkStopDurationDistributionDigiriskElem = Repartizarea timpului de concediu medical pe GP/UT
+WorkStopDuration                         = Durata concediului medical
+NoAbsence                                = Niciun concediu
+UpTo4Days                                = Până la 4 zile
+UpTo21Days                               = Până la 21 de zile
+UpTo3Months                              = Până la 3 luni
+UpTo6Months                              = Până la 6 luni
+MoreThan6Months                          = Mai mult de 6 luni
+FrequencyIndex                           = Indice de frecvență
+FrequencyRate                            = Rata de frecvență
+GravityIndex                             = Indice de gravitate
+GravityRate                              = Rata de gravitate
+AccidentRateIndicator                    = Rate și indici ai indicatorilor de performanță privind accidentele
+NbPresquAccidents                        = Numărul de incidente periculoase
+NbAccidentInvestigations                 = Numărul de anchete de accident
+AccidentInvestigationsMin                = anchete de accident
+NbWorkedHours                            = Numărul de ore lucrate
+ConfirmDeleteAccident                    = Sigur doriți să ștergeți accidentul?
+TheAccident                              = accidentul
+AccidentInvestigation                    = Anchetă de accident
+Accident_investigation                   = Anchetă de accident
+AccidentInvestigationDocument            = Document de anchetă de accident
+Accidentinvestigationdocument            = Document de anchetă de accident
+accidentinvestigationdocument.odt        = Anchetă de accident
+NewAccidentInvestigation                 = Anchetă de accident nouă
+UpdateAccidentInvestigation              = Modificați o anchetă de accident
+AccidentInvestigationList                = Lista anchetelor de accident
+TheAccidentinvestigation                 = ancheta de accident
+SeniorityInPosition                      = Vechimea în post
+VictimSkills                             = Competențele accidentatului
+CollectiveEquipment                      = Echipament de Protecție Colectivă (EPC)
+IndividualEquipment                      = Echipament Individual de Protecție (EIP)
+Circumstances                            = Împrejurări
+CurativeAction                           = Acțiuni curative
+CorrectiveAction                         = Acțiuni corective
+PreventiveAction                         = Acțiuni preventive
+DigiriskActionType                       = Tip de acțiune Digirisk
+Actions                                  = Acțiuni
+ActionsTab                               = Acțiuni
+CurativeActions                          = Acțiuni curative
+PreventiveActions                        = Acțiuni preventive
+TotalPlannedBudget                       = Buget prevăzut
+AccidentInvestigationDocumentPDF         = EA-A4-PORTRET
+PreventionPlanDocumentPDF                = PP-A4-PORTRET
+PreventionPlanDocumentPDFDescription     = Generați planul de prevenire în PDF
+AccidentInvestigationDocumentPDFDescription = Generați ancheta de accident în PDF
+AccidentInvestigationDocumentGeneratedAt = Generat la
+CorrectiveActions                        = Acțiuni corective
+AddCurativeAction                        = Adăugați o acțiune curativă
+AddCorrectiveAction                      = Adăugați o acțiune corectivă
+InvestigationNotValidatedYet             = Validați mai întâi ancheta de accident pentru a putea crea acțiuni
+ActionLabel                              = Denumirea acțiunii
+ActionDeadline                           = Termen
+ActionAssignedTo                         = Atribuită lui
+ActionProgress                           = Progres
+MarkAsDone                               = Marcați ca finalizată
+XActionsOfY                              = %s / %s finalizată(e)
+NoActionsYet                             = Nicio acțiune deocamdată
+ActionAdded                              = Acțiunea a fost creată
+ActionClosed                             = Acțiunea a fost închisă
+ActionsAreProjectTasks                   = Acțiunile sunt subsarcini ale proiectului Dolibarr
+SeeProjectTasksView                      = Vedeți sarcina părinte
+OpenTask                                 = Deschideți sarcina
+AccidentInvestigationValidated           = Ancheta de accident a fost validată
+AccidentInvestigationReOpened            = Ancheta de accident a fost redeschisă
+AccidentInvestigationTaskCreated         = Sarcinile anchetei de accident au fost create
+AccidentInvestigationTaskDeleted         = Sarcinile anchetei de accident au fost șterse
+CausalityTree                            = Arborele cauzelor
+TaskWillBeCreatedAfterValidation         = Sarcinile vor fi create după validarea anchetei de accident
+AccidentInvestigationCreated             = Crearea unei anchete de accident
+AccidentInvestigationModified            = Modificarea unei anchete de accident
+AccidentInvestigationDeleted             = Ștergerea unei anchete de accident
+AccidentInvestigationValidate            = Validarea unei anchete de accident
+AccidentInvestigationUnValidate          = Redeschiderea unei anchete de accident
+AccidentInvestigationLock                = Blocarea anchetei de accident
+AccidentInvestigationSigned              = Semnarea unei anchete de accident
+CloneWorkStop                            = Clonați concediile medicale?
+CloneMetadata                            = Clonați datele suplimentare?
+CloneLesion                              = Clonați datele suplimentare ale leziunilor?
+CloneFrom                                = Clonă a
+AccidentInvestigationRole                = Rolurile anchetei de accident
+LesionsOrWorkStop                        = leziuni sau concedii medicale
+AccidentsCategoriesArea                  = Spațiul etichetelor/categoriilor accidentelor
+AddAccidentIntoCategory                  = Atribuiți această categorie accidentului
+PreventionplansCategoriesArea            = Spațiul etichetelor/categoriilor planurilor de prevenire
+AddPreventionplanIntoCategory            = Atribuiți această categorie planului de prevenire
+FirepermitsCategoriesArea                = Spațiul etichetelor/categoriilor permiselor de lucru cu foc
+AddFirepermitIntoCategory                = Atribuiți această categorie permisului de lucru cu foc
+RisksCategoriesArea                      = Spațiul etichetelor/categoriilor riscurilor
+AddRiskIntoCategory                      = Atribuiți această categorie riscului
+AddTicketIntoCategory                    = Atribuiți această categorie tichetului
+StartDateInvestigate                     = Data de început a anchetei
+EndDateInvestigate                       = Data de sfârșit a anchetei
+YearType                                 = Tipul de an
+AllYears                                 = Toți anii
+FiscalYear                               = An fiscal
+CalendarYear                             = An calendaristic
+
+# AccidentTooltip - Indicii pentru accidente
+VictimActivityTooltip              = Precizați activitatea sau sarcina victimei în momentul accidentului, adică ce făcea victima
+AccidentNatureTooltip              = Descrieți evenimentul care a condus la accident, cum s-a produs accidentul (problemă electrică, scurgere de gaz, rupere de material, alunecare, cădere, efort fizic, agresiune...) sau cum s-a rănit victima (lovire, coliziune, strivire, înțepare, înec, contact cu o substanță...)
+AccidentObjectTooltip              = Adică cu ce s-a rănit victima: material, deșeu, unealtă (șurubelniță, cutter, mașină de găurit...), mașină, vehicul, motostivuitor, substanță chimică, element de construcție (ușă, perete...), pardoseală...
+AccidentNatureDoubtTooltip         = Indicați, dacă este cazul, rezervele motivate, care nu vor putea fi luate în considerare decât dacă privesc împrejurările de timp și de loc ale accidentului sau existența unei cauze complet străine de muncă (art. R. 441-11 din Codul securității sociale francez)
+VictimWorkHoursTooltip             = Indicați orele de lucru efectuate de angajatul dumneavoastră sau orele prevăzute în ziua accidentului
+ConsequenceTooltip                 = Dacă victima și-a întrerupt activitatea la recomandarea unui medic, trebuie OBLIGATORIU să întocmiți și să trimiteți formularul «attestation de salaire accident du travail ou maladie professionnelle» - referința S6202, la Casa primară de la locul de reședință obișnuită a victimei. <br> Ulterior, în cazul unui nou concediu după o perioadă de îngrijiri sau o reluare a activității, într-o lună diferită, va trebui să îndepliniți de asemenea aceeași formalitate
+FirstPersonNoticedIsWitnessTooltip = Indicați numele, prenumele și adresa martorului. <br> În lipsa unui martor, indicați prima persoană din întreprindere care a fost înștiințată despre accident
+ThirdPartyResponsabilityTooltip    = Atunci când aveți cunoștință de implicarea unui terț, indiferent de partea sa de răspundere, într-un accident de muncă sau de traseu, această mențiune trebuie obligatoriu consemnată în această parte
+FrequencyIndexTooltip              = Numărul de accidente per angajat x 1 000
+FrequencyRateTooltip               = Numărul de accidente per ore lucrate x 1 000 000
+GravityRateTooltip                 = Numărul de zile de concediu medical per ore lucrate x 1 000
+NbWorkedHoursTooltip               = Numărul de ore lucrate a fost introdus manual
+DocumentGeneratedWithVersioning    = Document generat la crearea versiunii
+
+# Dicționar
+UsualWorkplace                  = Loc de muncă obișnuit
+OccasionalWorkplace             = Loc de muncă ocazional
+LocationOfTheMeal               = Locul mesei
+OnTheWayBetweenHomeAndWorkplace = În timpul deplasării între domiciliu și locul de muncă
+OnTheWayBetweenMealAndWorkplace = În timpul deplasării între locul de muncă și locul mesei
+DuringATripForTheEmployer       = În timpul unei deplasări în interesul angajatorului
+
+Trunk             = Trunchi
+Hand              = Mână
+LowerLimbs        = Membre inferioare
+UpperLimbs        = Membre superioare
+MultipleLocations = Localizări multiple
+Foot              = Picior
+Head              = Cap
+Eyes              = Ochi
+InternalSeating   = Localizări interne
+Neck              = Gât
+Back              = Spate
+WholeBody         = Întregul corp
+NotSpecified      = Neprecizat
+
+PainEffortLumbago           = Durere de efort, lumbago
+Contusion                   = Contuzie
+Wounds                      = Plăgi
+Sprain                      = Entorsă
+FracturePitting             = Fractură sau fisură
+MultipleInjuries            = Leziuni de natură multiplă
+MuscleOrTendonTear          = Ruptură musculară sau tendinoasă
+PresenceOfForeignBody       = Prezența unui corp străin
+Burns                       = Arsură
+UnspecifiedAndMiscellaneous = Neprecizat și diverse
+Other                       = Altele
+CutOff                      = Tăietură
+
+Investigator = Anchetator
+Rescuer      = Salvator
+
+#
+# ListingRisksDocument - Listă de riscuri cu documente
+#
+
+# Drept
+ListingRisksDocumentMin = liste de riscuri cu documente
+
+# Date
+ListingRisksDocument            = Listă de riscuri
+Listingrisksdocument            = Listă de riscuri
+ListingRisksHeader              = Riscuri - %s
+ListingRisksDocumentGenerated   = Generarea listei de riscuri cu documente
+listingrisksdocument.odt        = Listă de riscuri cu documente
+listingrisksdocument_custom.odt = Listă de riscuri cu documente personalizată
+
+#
+# ListingRisksPhoto - Listă de riscuri cu fotografii
+#
+
+# Drept
+ListingRisksPhotosMin = liste de riscuri cu fotografii
+
+# Date
+ListingRisksPhoto            = Listă de riscuri cu fotografii
+Listingrisksphoto            = Listă de riscuri cu fotografii
+ListingRisksPhotoGenerated   = Generarea listei de riscuri cu fotografii
+listingrisksphoto.odt        = Listă de riscuri cu fotografii
+listingrisksphoto_custom.odt = Listă de riscuri cu fotografii personalizată
+
+
+#
+# ListingRisksAction - Listă de riscuri cu acțiuni corective
+#
+
+# Drept
+ListingRisksActionsMin = liste de riscuri cu acțiuni corective
+
+# Date
+ListingRisksAction                        = Listă de riscuri cu acțiuni corective
+Listingrisksaction                        = Listă de riscuri cu acțiuni corective
+ListingRisksActionGenerated               = Generarea listei de riscuri cu acțiuni corective
+listingrisksaction.odt                    = Listă de riscuri cu acțiuni corective
+listingrisksaction_custom.odt             = Listă de riscuri cu acțiuni corective personalizată
+DigiriskListingRisksActionData            = Date configurabile ale listelor de riscuri cu acțiuni corective
+ShowTaskDoneListingRisksActionDescription = Permite afișarea sau ascunderea sarcinilor finalizate în lista de riscuri cu acțiuni corective
+
+
+#
+# RiskAssessmentDocument - Document de evaluare a riscurilor
+#
+
+# Drept
+
+RiskAssessmentDocumentsMin = Documente de evaluare a riscurilor
+
+# Date
+RiskAssessmentDocument                                    = Document de evaluare a riscurilor
+Riskassessmentdocument                                    = Document de evaluare a riscurilor
+RiskAssessmentDocumentGenerated                           = Generarea documentului de evaluare a riscurilor
+AuditStartDate                                            = Data de început a auditului
+AuditEndDate                                              = Data de sfârșit a auditului
+Recipient                                                 = Destinatar
+ImportantNote                                             = Observație importantă
+SitePlans                                                 = Amplasarea planurilor
+SetStartEndDateBeforeSendEmail                            = Definiți data de început și data de sfârșit a auditului pe această pagină pentru a trimite un email
+NoSitePlans                                               = Niciun plan al companiei completat
+riskassessmentdocument.odt                                = Document de evaluare a riscurilor
+riskassessmentdocument_custom.odt                         = Document de evaluare a riscurilor personalizat
+DigiriskRiskAssessmentDocumentData                        = Date configurabile ale documentului de evaluare a riscurilor
+ActionPreventionCompletedTaskDone                         = Acțiunile finalizate nu sunt afișate
+AppliedOn                                                 = Activ pe:
+RiskAssessmentDocumentMethod                              = * Etapa 1: Colectarea informațiilor<br />- Vizitarea spațiilor<br />- Colectarea datelor despre personal<br /><br />* Etapa 2: Definirea metodologiei și a documentului<br />- Validarea fișelor standard de unitate de lucru<br />- Validarea structurii unităților<br /><br />* Etapa 3: Realizarea studiului de riscuri<br />- Conștientizarea personalului privind riscurile și pericolele<br />- Crearea unităților de lucru împreună cu personalul și responsabilul/responsabilii<br />- Evaluarea riscurilor pe unități de lucru împreună cu personalul<br /><br />* Etapa 4<br />- Prelucrarea și redactarea documentului de evaluare a riscurilor
+RiskAssessmentDocumentSources                             = Conștientizarea riscurilor este definită în ED840 editat de INRS.<br />În acest document veți găsi:<br />- Definiția unui risc și a unui pericol, cu o schemă explicativă<br />- Explicațiile privind diferitele metode de evaluare
+RiskAssessmentDocumentImportantNote                       = Note importante:<br />Puteți citi documentația DigiRisk aici<br /><a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk" target="_blank">https://wiki.dolibarr.org/index.php?title=Module_Digirisk</a><br />Puteți urmări proiectul aici:<br /><a href="https://github.com/Evarisk/Digirisk/projects?type=classic" target="_blank">https://github.com/Evarisk/Digirisk/projects?type=classic</a><br />Raportați o eroare aici<br /><a href="https://github.com/Evarisk/Digirisk/issues" target="_blank">https://github.com/Evarisk/Digirisk/issues</a>
+GenerateZipArchiveWithDigiriskElementDocuments            = Generarea unei arhive ZIP cu documentul de evaluare a riscurilor
+GenerateZipArchiveWithDigiriskElementDocumentsDescription = Generarea automată a unei arhive ZIP care conține documentul de evaluare a riscurilor și toate fișele de post la generarea documentului de evaluare a riscurilor
+RiskAssessmentDocumentDescription                         = Planul de acțiune al documentului de evaluare a riscurilor
+ErrorFailToFetchDigiriskElements                          = Eroare: nu s-au putut prelua grupările și unitățile de lucru care trebuie incluse în arhiva ZIP
+ErrorNoDocumentModelFound                                 = Eroare: niciun model de document disponibil pentru <b>%s</b>
+ErrorFailToGenerateDigiriskElementDocument                = Eroare: generarea documentului pentru <b>%s</b> a eșuat, acesta lipsește din arhiva ZIP
+
+# Boxes - Widget
+NextGenerateDate  = Următoarea generare
+LastGenerateDate  = Ultima generare
+DelayGenerateDate = Zile rămase
+NoDelay           = Fără întârziere
+
+# Email
+RiskAssessmentDocumentLabel   = Rezumatul documentului de evaluare a riscurilor
+RiskAssessmentDocumentSubject = Email document de evaluare a riscurilor
+RiskAssessmentDocumentContent = Atașat găsiți arhiva ZIP și documentul ODT al documentului de evaluare a riscurilor.
+
+
+
+#
+# AuditReportDocument - Raport de audit
+#
+
+# Date
+AuditReportDocument     = Raport de audit
+Auditreportdocument     = Raport de audit
+AuditReportDocumentsMin = rapoarte de audit
+auditreportdocument.odt = Raport de audit
+
+
+
+#
+# GroupmentDocument - Fișă de grupare
+#
+
+# Drept
+
+# Date
+GroupmentDocument                        = Fișă de grupare
+Groupmentdocument                        = Fișă de grupare
+DocumentModelStandardPDF                 = Model PDF standard
+GroupmentDocumentGenerated               = Generarea fișei de grupare
+groupmentdocument.odt                    = Fișă de grupare
+groupmentdocument_custom.odt             = Fișă de grupare personalizată
+groupmentdocumentinherited.odt           = Fișă de grupare - Riscuri moștenite
+groupmentdocumentinherited_custom.odt    = Fișă de grupare - Riscuri moștenite personalizată
+groupmentdocumentshared.odt              = Fișă de grupare - Riscuri partajate
+groupmentdocumentshared_custom.odt       = Fișă de grupare - Riscuri partajate personalizată
+DigiriskGroupmentDocumentData            = Date configurabile ale fișelor de grupare
+ShowTaskDoneGroupmentDocumentDescription = Permite afișarea sau ascunderea sarcinilor finalizate în fișa de grupare
+
+#
+# WorkUnitDocumment - Fișă de unitate de lucru
+#
+
+# Drept
+
+# Date
+WorkUnitDocument                        = Fișă de unitate de lucru
+Workunitdocument                        = Fișă de unitate de lucru
+WorkUnitDocumentGenerated               = Generarea fișei de unitate de lucru
+workunitdocument.odt                    = Fișă de unitate de lucru
+workunitdocument_custom.odt             = Fișă de unitate de lucru personalizată
+workunitdocumentinherited.odt           = Fișă de unitate de lucru - Riscuri moștenite
+workunitdocumentinherited_custom.odt    = Fișă de unitate de lucru - Riscuri moștenite personalizată
+workunitdocumentshared.odt              = Fișă de unitate de lucru - Riscuri partajate
+workunitdocumentshared_custom.odt       = Fișă de unitate de lucru - Riscuri partajate personalizată
+workunitdocumentcomplete.odt            = Fișă de unitate de lucru - Toate riscurile (proprii, moștenite, partajate)
+workunitdocumentcomplete_custom.odt     = Fișă de unitate de lucru - Toate riscurile personalizată
+DigiriskWorkUnitDocumentData            = Date configurabile ale fișelor de unitate de lucru
+ShowTaskDoneWorkUnitDocumentDescription = Permite afișarea sau ascunderea sarcinilor finalizate în fișa de unitate de lucru
+
+
+#
+# DigiriskElement - Element Digirisk
+#
+
+# Drepturi
+DigiriskElementsMin = elemente Digirisk (grupare și unitate de lucru)
+
+# Date
+NewDigiriskElement                  = Element Digirisk nou
+Digiriskelement                     = Grupare / Unitate de lucru
+GPUTOrganization                    = Organizarea GP/UT
+DigiriskElement                     = Element Digirisk
+HiddenElements                      = Coș de gunoi
+DigiriskElementCreated              = Crearea unui element Digirisk
+DigiriskElementModified             = Modificarea unui element Digirisk
+DigiriskElementDeleted              = Ștergerea unui element Digirisk
+ElementType                         = Tip de element
+ParentElement                       = Element părinte
+OrganizationSaved                   = Organizarea grupărilor și a unităților de lucru a fost salvată
+OrganizationNotSaved                = Organizarea grupărilor și a unităților de lucru nu a putut fi salvată
+UnsavedChanges                      = Modificări nesalvate
+SavingInProgress                    = Salvare în curs...
+Saved                               = Salvat
+ErrorSaving                         = Eroare la salvare
+DigiriskElementOrganization         = Organizarea structurii
+ShareDigiriskelement                = Activați partajarea grupărilor și a unităților de lucru
+DIGIRISKELEMENTSharing              = Partajarea grupărilor și a unităților de lucru
+DIGIRISKELEMENTSharingDescription   = Selectarea entităților care își vor partaja grupările și unitățile de lucru cu această entitate.
+DigiriskElementSharedTooltip        = Această opțiune permite partajarea grupărilor și a unităților de lucru. <br> INFO: dacă doriți să afișați sarcinile, trebuie să activați opțiunea de partajare a proiectelor.
+PleaseSelectADigiriskElement        = Selectați o grupare sau o unitate de lucru...
+Registers                           = Registre
+ShowInSelectOnPublicTicketInterface = Trebuie să apară în lista elementelor din interfața publică a tichetelor
+Organization                        = Organizare GP/UT
+YouDontHaveOrganization             = Nu ați creat grupări sau unități de lucru, accesați "Document de evaluare a riscurilor" sau faceți clic <b> aici </b> pentru a crea.
+
+
+#
+# Groupment - Grupare
+#
+
+# Date
+Groupment                  = Grupare
+GroupmentManagement        = Gestiunea datelor grupărilor
+NewGroupment               = Grupare nouă
+ModifyGroupment            = Modificați gruparea
+TrashGroupment             = Grupare coș de gunoi
+DeletedElements            = Coș de gunoi
+DeletedDigiriskElement     = Grupări / Unități de lucru mutate în coșul de gunoi
+ShowDeletedDigiriskElement = Afișați grupările / unitățile de lucru care se află în coșul de gunoi
+
+#
+# WorkUnit - Unitate de lucru
+#
+
+# Date
+WorkUnit           = Unitate de lucru
+Workunit           = Unitate de lucru
+WorkUnitManagement = Gestiunea datelor unităților de lucru
+NewWorkUnit        = Unitate de lucru nouă
+ModifyWorkUnit     = Modificați unitatea de lucru
+
+
+#
+# Evaluator - Evaluator
+#
+
+# Drepturi
+EvaluatorsMin = evaluatori
+
+# Date
+Evaluator                    = Evaluator
+Evaluators                   = Evaluatori
+EvaluatorCreated             = Crearea unui evaluator
+EvaluatorModified            = Modificarea unui evaluator
+EvaluatorDeleted             = Ștergerea unui evaluator
+TheEvaluator                 = Evaluatorul
+EvaluatorWellCreated         = Evaluator creat
+EvaluatorNotCreated          = Eroare la crearea evaluatorului
+EvaluatorList                = Lista evaluatorilor
+AssignmentDate               = Data atribuirii
+EvaluationDuration           = Durată
+UserAssigned                 = Utilizator atribuit
+AddEvaluatorTitle            = Adăugarea unui evaluator
+AddEvaluatorButton           = Adăugați evaluatorul
+EvaluatorConfig              = Configurarea datelor evaluatorilor
+DeleteEvaluatorMessage       = Ștergerea evaluatorului
+DigiriskEvaluatorData        = Date configurabile ale evaluatorilor
+EvaluatorDuration            = Durata evaluării de către evaluator
+EvaluatorDurationDescription = Timpul necesar evaluatorului pentru a realiza evaluarea riscurilor
+NbEmployeesInvolved          = Angajați implicați
+NbEmployees                  = Angajați
+NbEmployeesInvolvedTooltip   = Angajați (evaluatori) unici
+NbEmployeesTooltip           = Dacă gestiunea centralizată a utilizatorilor și a grupurilor pe entitatea principală este activată.<br>Numărul de angajați corespunde numărului de utilizatori partajați/atribuiți unui grup, precum și numărului de administratori ai entității principale
+NbEmployeesConfTooltip       = Numărul de angajați a fost introdus manual
+
+
+#
+# DigiriskStandard - Standard Digirisk
+#
+
+# Date
+DigiriskStandardInformation = Informație
+Digiriskstandard            = Standard Digirisk
+DigiriskStandardMin         = standarde Digirisk
+TheDigiriskstandard         = standardul Digirisk
+
+
+#
+# RisksAnalysis - Analiza riscurilor
+#
+
+# Date
+RiskAnalysis = Analiza riscurilor
+UpdateData   = Actualizați
+
+#
+# Risks - Riscuri
+#
+
+# Drepturi
+RisksMin = riscuri
+
+# Date
+Risks                                    = Riscuri
+Risk                                     = Risc
+Riskprofessionals                        = Riscuri profesionale
+RiskCreated                              = Crearea unui risc
+RiskModified                             = Modificarea unui risc
+RiskDeleted                              = Ștergerea unui risc
+RiskConfig                               = Configurarea datelor riscurilor
+TheRisk                                  = Riscul
+RiskWellCreated                          = Risc creat
+RiskNotCreated                           = Eroare la crearea riscului
+RiskWellEdited                           = Risc editat
+RiskNotEdited                            = Eroare la editarea riscului
+RiskList                                 = Listă de riscuri
+AddRiskTitle                             = Adăugarea riscului
+AddRiskButton                            = Adăugați riscul
+EditRisk                                 = Editarea riscului
+LinkedRisk                               = Risc asociat
+RiskCategory                             = Cat.
+RiskCategoryEdit                         = Categorie de risc
+RiskCategoryEditDescription              = Activați modificarea categoriei unui risc existent
+HowToEditRiskCategory                    = Pentru a modifica categoria riscului, faceți clic pe pictograma categoriei
+DigiriskElementRisksList                 = Lista riscurilor
+DigiriskElementRisk                      = Riscuri
+RiskDescriptionNotEnabled                = Câmpul descriere a riscului nu este activat
+HowToEnableRiskDescription               = Pentru a activa câmpul descriere a riscului, accesați "Configurarea modulului -> Document de evaluare a riscurilor"
+HowToEnableRiskCategoryEdit              = Pentru a activa modificarea categoriei de risc, accesați "Configurarea modulului -> Document de evaluare a riscurilor"
+SortRisksListingsByEvaluation            = Sortați riscurile după evaluare
+SortRisksListingsByEvaluationDescription = Activați sortarea automată a riscurilor după evaluare în liste
+ListingHeaderEvaluation                  = Lista evaluărilor
+RiskDescription                          = Descrierea riscului
+RiskDescriptionDescription               = Activați câmpul descriere a riscului
+RiskDescriptionNotActivated              = Activați câmpul descriere a riscului în Configurarea modulului / Analiza riscurilor / Riscuri
+AddRisk                                  = Adăugați un risc
+MoveRisk                                 = Mutați riscul
+MoveRisks                                = Mutați riscurile
+MoveRisksDescription                     = Permite mutarea riscurilor de la o grupare sau o unitate de lucru la alta
+SetConfToMoveRisk                        = Trebuie mai întâi să permiteți mutarea riscurilor în "Configurarea modulului -> Document de evaluare a riscurilor"
+RiskDescriptionPrefill                   = Precompletați descrierea
+RiskDescriptionPrefillDescription        = Precompletați descrierea riscului cu numele categoriei
+DigiriskElementSharedRisksList           = Lista riscurilor partajate
+ImportSharedRisks                        = Importați riscuri partajate
+SelectAllSharedRisksOfElement            = Selectați toate riscurile acestui element
+AlreadyImported                          = Deja importat
+ShowSharedRisks                          = Riscuri partajate
+ShareRisk                                = Activați partajarea riscurilor
+RISKSharing                              = Partajarea riscurilor
+RISKSharingDescription                   = Selectarea entităților care își vor partaja riscurile cu această entitate.
+ShowSharedRisksDescription               = Afișați riscurile partajate în documente și în liste
+UnlinkSharedRisk                         = Dezasociați riscul partajat
+RiskWellUnlinkShared                     = Risc dezasociat
+RiskNotUnlinkShared                      = Eroare la dezasocierea riscului
+HasBeenUnlinkSharedM                     = a fost dezasociat
+HasNotBeenUnlinkSharedM                  = nu a fost dezasociat
+RiskSharedTooltip                        = Această opțiune permite partajarea riscurilor. <br> INFO: dacă doriți să afișați sarcinile, trebuie să activați opțiunea de partajare a proiectelor.
+ShowInheritedRisksInListings             = Riscuri moștenite - Liste <br> (provenind de la nivelurile superioare)
+ShowInheritedRisksInListingsDescription  = Riscurile moștenite sunt cele definite la un nivel superior (ex.: amplasament sau GP) și aplicate automat GP/UT. <br> Activați această opțiune pentru a le afișa în liste
+ShowInheritedRisksInDocuments            = Riscuri moștenite - Documente <br> (provenind de la nivelurile superioare)
+ShowInheritedRisksInDocumentsDescription = Riscurile moștenite sunt cele definite la un nivel superior (ex.: amplasament sau GP) și aplicate automat GP/UT. <br> Activați această opțiune pentru a le afișa în documente
+DigiriskElementInheritedRisksList        = Lista riscurilor moștenite
+ConfirmImportSharedRisks                 = Alegeți riscurile partajate de importat
+RisksRepartition                         = Repartizarea riscurilor după evaluare
+ShowRiskOrigin                           = Afișați proveniența riscului
+ShowRiskOriginDescription                = Afișați proveniența riscurilor în documente (Document de evaluare a riscurilor, Grupare, Unități de lucru, Listă de riscuri cu acțiuni și cu fotografii etc.).
+SharedRiskImportWithSuccess              = Risc importat cu succes
+RiskImport                               = Import de riscuri
+RiskUnlink                               = Ștergerea riscului partajat
+RiskDeleted                              = Riscul %s a fost șters
+RiskSharedWithEntityRefLabel             = Partajarea riscului %s cu
+RiskUnlinkedFromEntityRefLabel           = Disocierea riscului %s de
+TheDigiriskelement                       = elementul Digirisk
+DefaultProjectContactType                = Rol atribuit implicit proiectului documentului de evaluare a riscurilor
+DefaultTaskContactType                   = Rol atribuit implicit sarcinilor proiectului documentului de evaluare a riscurilor
+RiskListParentView                       = Afișați toate elementele părinte
+RiskListParentViewDescription            = Afișați toate elementele părinte ale unui risc în lista riscurilor și în documente
+CategoryOnRisk                           = Afișați etichetele/categoriile pe riscuri
+CategoryOnRiskDescription                = Permite atribuirea de etichete/categorii riscurilor și afișarea lor - a se utiliza cu prudență
+AddPsychosocialRisk                      = Adăugați un risc psihosocial
+AddPsychosocialRiskTitle                 = Adăugarea unui risc psihosocial
+AddPsychosocialRiskButton                = Adăugați riscul psihosocial
+AddSelectedPsychosocialRisks             = Adăugați riscurile psihosociale selectate
+SocialRelationsAtWork                    = Relații sociale la locul de muncă
+WorkIntensityAndTime                     = Intensitatea și timpul de lucru
+EmotionalRequirements                    = Cerințe emoționale
+Autonomy                                 = Autonomie
+MeaningOfWork                            = Sensul muncii
+WorkSituationInsecurity                  = Nesiguranța situației de lucru
+PreventionContextInCompany               = Contextul prevenirii în întreprindere
+RPSImpactOnCompanyAndEmployees           = Impactul riscurilor psihosociale asupra întreprinderii și a angajaților
+PsychosocialRisksFactors                 = Factori de riscuri psihosociale
+CompanyPreventionInformations            = Informații despre prevenirea în întreprindere
+Weak                                     = Scăzut
+Moderate                                 = Moderat
+High                                     = Ridicat
+Extreme                                  = Extrem
+HereIsTheWorkStationDescription          = Aceasta este descrierea postului de lucru
+ImageAnalysis                            = Analiza imaginii
+TextAnalysis                             = Analiza textului
+AnalyzeText                              = Analizați textul
+EnterTextForAnalysis                     = Introduceți textul de analizat
+AIRiskAnalysis                           = Analiza riscurilor prin IA
+AnalysisInProgress                       = Analiză în curs...
+
+# Statistici
+GreyRisk                                         = Risc scăzut
+OrangeRisk                                       = Risc de planificat
+RedRisk                                          = Risc de tratat
+BlackRisk                                        = Risc inacceptabil
+RisksNotAssessed                                 = Riscuri neevaluate
+RisksRepartitionByDangerCategories               = Repartizarea riscurilor pe categorii de pericol
+RiskListsByDangerCategories                      = Lista riscurilor pe categorii de pericol
+DigiriskElementsRepartitionByDepth               = Repartizarea structurii grupărilor de nivel %s
+RisksRepartitionByDangerCategoriesAndCriticality = Repartizarea riscurilor pe categorii de pericol și criticitate
+NumberOfRisks                                    = Numărul de riscuri
+DangerCategories                                 = Categorii de pericol
+RisksRepartitionByDigiriskElement                = Repartizarea riscurilor pe grupare / unitate de lucru %s
+
+
+
+#
+# RiskEnvironmentals - Riscuri de mediu
+#
+
+# Date
+Environment                                    = Mediu
+Riskenvironmental                              = Risc de mediu
+RiskEnvironmentals                             = Riscuri de mediu
+Riskenvironmentals                             = Riscuri de mediu
+RiskEnvironmentalsMin                          = riscuri de mediu
+AddRiskenvironmentalTitle                      = Adăugarea riscului de mediu
+DigiriskElementRiskenvironmentalsList          = Lista riscurilor de mediu
+DigiriskElementInheritedRiskenvironmentalsList = Lista riscurilor de mediu moștenite
+DigiriskElementSharedRiskenvironmentalsList    = Lista riscurilor de mediu partajate
+ImportSharedRiskenvironmentals                 = Importați riscuri de mediu partajate
+SelectAllSharedRiskenvironmentalsOfElement     = Selectați toate riscurile de mediu ale acestui element
+ConfirmImportSharedRiskenvironmentals          = Alegeți riscurile de mediu partajate de importat
+EnvironmentDescription                         = Planificare - Acțiuni de implementat față de riscuri și oportunități
+
+#
+# ListingRisksEnvironmentalAction - Listă de riscuri de mediu cu acțiuni corective
+#
+
+# Drept
+ListingRisksEnvironmentalActionMin = Listă de riscuri de mediu cu acțiuni corective
+
+# Date
+ListingRisksEnvironmentalAction            = Listă de riscuri de mediu cu acțiuni corective
+Listingrisksenvironmentalaction            = Listă de riscuri de mediu cu acțiuni corective
+ListingRisksEnvironmentalActionGenerated   = Generarea listei de riscuri de mediu cu acțiuni corective
+listingrisksenvironmentalaction.odt        = Listă de riscuri de mediu cu acțiuni corective
+listingrisksenvironmentalaction_custom.odt = Listă de riscuri de mediu cu acțiuni corective personalizată
+
+#
+# ListingRisksEnvironmentalDocument - Listă de riscuri de mediu cu documente
+#
+
+# Date
+ListingRisksEnvironmentalDocument = Listă de riscuri de mediu
+
+
+
+#
+# RiskAssessment - Evaluare
+#
+
+# Date
+RiskAssessment                              = Evaluare
+Riskassessment                              = Evaluare
+RiskAssessments                             = Evaluări
+RiskAssessmentCreated                       = Crearea unei evaluări
+RiskAssessmentModified                      = Modificarea unei evaluări
+RiskAssessmentDeleted                       = Ștergerea unei evaluări
+RiskAssessmentConfig                        = Configurarea datelor evaluărilor
+TheRiskAssessment                           = Evaluarea
+LastRiskAssessment                          = Ultima evaluare a riscului
+RiskAssessmentWellCreated                   = Evaluare creată
+RiskAssessmentNotCreated                    = Eroare la crearea evaluării
+RiskAssessmentWellEdited                    = Evaluare editată
+RiskAssessmentNotEdited                     = Eroare la editarea evaluării
+RiskAssessmentWellDeleted                   = Evaluare ștearsă
+RiskAssessmentNotDeleted                    = Eroare la ștergerea evaluării
+EvaluationCreate                            = Adăugarea evaluării
+EvaluationEdit                              = Editarea evaluării
+EvaluationMethod                            = Metodă de evaluare
+lastEvaluationOn                            = Ultima evaluare la
+DeleteEvaluation                            = Sigur doriți să ștergeți evaluarea?
+DigiriskRiskAssessmentData                  = Date configurabile ale evaluărilor
+MultipleRiskAssessmentMethodName            = Metode de evaluare
+MultipleRiskAssessmentMethodDescription     = Activați schimbarea metodei de evaluare
+AdvancedRiskAssessmentMethod                = Metodă de evaluare avansată
+AdvancedRiskAssessmentMethodDescription     = Activați metoda de evaluare avansată
+RiskAssessmentList                          = Lista evaluărilor riscului
+EditRiskAssessment                          = Editați evaluarea
+ShowAllRiskAssessments                      = Vedeți toate evaluările
+ShowAllRiskAssessmentsDescription           = Afișați lista completă a evaluărilor riscurilor în lista riscurilor
+ParentRisk                                  = Risc părinte
+RiskAssessmentDate                          = Data evaluării
+SimpleEvaluation                            = Evaluare simplă
+AdvancedEvaluation                          = Evaluare avansată
+CalculatedEvaluation                        = Evaluare calculată
+SelectEvaluation                            = Bifați casetele pentru a calcula evaluarea dumneavoastră
+EvaluationList                              = Lista evaluărilor riscului
+HowToSetMultipleRiskAssessmentMethod        = Pentru a configura utilizarea multiplă a metodelor de evaluare, accesați Configurarea modulului - Analiza riscurilor - Evaluare
+NoFileLinked                                = Nicio fotografie asociată
+AddRiskAssessment                           = Adăugați o evaluare a riscului
+AddRiskAssessmentTask                       = Adăugați o sarcină la risc
+ListRiskAssessmentTask                      = Lista sarcinilor riscului
+ShowRiskAssessmentDate                      = Data evaluărilor
+ShowRiskAssessmentDateDescription           = Înlocuiește data creării cu data de început a evaluărilor în fișă și în documente
+RiskAssessmentHideDateInDocument            = Ascundeți data evaluării în documente
+RiskAssessmentHideDateInDocumentDescription = Ascundeți data evaluării din coloana "Informații despre evaluare" în documente
+RiskTaskComplete                            = Sarcina %s finalizată
+
+# Statistici
+TasksRepartition = Repartizarea sarcinilor după progresul real declarat
+TaskAt0Percent   = Sarcină la 0
+TaskInProgress   = Sarcină în curs
+TaskAt100Percent = Sarcină la 100
+
+
+#
+# RiskSign - Semnalizare
+#
+
+# Drepturi
+RiskSignsMin = semnalizări
+
+# Date
+RiskSign                           = Semnalizare
+RiskSignCreated                    = Crearea unei semnalizări
+RiskSignModified                   = Modificarea unei semnalizări
+RiskSignDeleted                    = Ștergerea unei semnalizări
+TheRiskSign                        = Semnalizarea
+RiskSignConfig                     = Configurarea datelor semnalizărilor
+RiskSignWellCreated                = Semnalizare creată
+RiskSignNotCreated                 = Eroare la crearea semnalizării
+RiskSignWellEdited                 = Semnalizare editată
+RiskSignNotEdited                  = Eroare la editarea semnalizării
+RiskSignWellDeleted                = Semnalizare ștearsă
+RiskSignNotDeleted                 = Eroare la ștergerea semnalizării
+RiskSignCategory                   = Categorie
+RiskSignImport                     = Import de semnalizări
+RiskSignUnlink                     = Ștergerea semnalizării partajate
+AddRiskSignTitle                   = Adăugarea unei semnalizări
+AddRiskSignButton                  = Adăugați semnalizarea
+EditRiskSign                       = Editarea unei semnalizări
+DeleteRiskSignMessage              = Ștergerea semnalizării
+DigiriskElementRiskSignList        = Lista semnalizărilor
+RiskSigns                          = Semnalizări
+DigiriskElementSharedRiskSignsList = Lista semnalizărilor partajate
+ImportSharedRiskSigns              = Importați semnalizări partajate
+SelectAllSharedRiskSignsOfElement  = Selectați toate semnalizările acestui element
+AlreadyImportedF                   = Deja importată
+ShowSharedRiskSigns                = Semnalizări partajate
+ShowSharedRiskSignsDescription     = Afișați semnalizările partajate în documente și în liste
+DigiriskElementSharedRiskSign      = Semnalizări partajate
+SharedRiskSigns                    = Semnalizări partajate
+ShareRisksign                      = Activați partajarea semnalizărilor
+RISKSIGNSharing                    = Partajarea semnalizărilor
+RISKSIGNSharingDescription         = Selectarea entităților care își vor partaja semnalizările cu această entitate.
+UnlinkSharedRiskSign               = Dezasociați semnalizarea partajată
+RiskSignWellUnlinkShared           = Semnalizare dezasociată
+RiskSignNotUnlinkShared            = Eroare la dezasocierea semnalizării
+HasBeenUnlinkSharedF               = a fost dezasociată
+HasNotBeenUnlinkSharedF            = nu a fost dezasociată
+RiskSignSharedTooltip              = Această opțiune permite partajarea semnalizărilor. <br> INFO: dacă doriți să afișați sarcinile, trebuie să activați opțiunea de partajare a proiectelor.
+ShowInheritedRiskSigns             = Semnalizări moștenite
+ShowInheritedRiskSignsDescription  = Afișați semnalizările moștenite în documente și în liste
+DigiriskElementInheritedRiskSignsList = Lista semnalizărilor moștenite
+ConfirmImportSharedRiskSigns       = Alegeți semnalizările partajate de importat
+RiskSignSharedWithEntityRefLabel   = Partajarea semnalizării %s cu
+RiskSignUnlinkedFromEntityRefLabel = Disocierea semnalizării %s de
+
+#
+# Tasks - Sarcină
+#
+
+# Date
+ActionPlan                               = Plan de acțiune
+Task                                     = Sarcină
+TaskCreatedEvent                         = Crearea unei sarcini
+TaskModifiedEvent                        = Modificarea unei sarcini
+TaskDeletedEvent                         = Ștergerea unei sarcini
+TheTask                                  = Sarcina
+TaskConfig                               = Configurarea datelor sarcinilor
+TaskWellCreated                          = Sarcină creată
+TaskNotCreated                           = Eroare la crearea sarcinii
+TaskWellEdited                           = Sarcină editată
+TaskNotEdited                            = Eroare la editarea sarcinii
+TaskWellDeleted                          = Sarcină ștearsă
+TaskNotDeleted                           = Eroare la ștergerea sarcinii
+TasksManagement                          = Gestiunea sarcinilor
+SelectProject                            = Alegerea proiectului
+DUProject                                = Proiect asociat sarcinilor riscurilor
+EnvironmentProject                       = Proiect asociat sarcinilor riscurilor de mediu
+NoTaskLinked                             = Nicio sarcină în curs
+TaskList                                 = Lista sarcinilor riscului
+TaskCreate                               = Adăugarea sarcinii
+TaskEdit                                 = Editarea sarcinii
+HowToSetDUProject                        = Pentru a configura alegerea proiectului, accesați Configurarea modulului - Analiza riscurilor - Sarcină
+DeleteTask                               = Sigur doriți să ștergeți sarcina?
+ListingHeaderTask                        = Lista sarcinilor
+ListingHeaderTaskTooltip                 = Activați partajarea proiectelor pentru a afișa sarcinile
+TasksManagementDescription               = Activați gestiunea sarcinilor
+TaskManagementNotActivated               = Activați gestiunea sarcinilor în Configurarea modulului / Analiza riscurilor / Sarcină
+DigiriskProgress                         = Progres
+ShowTaskStartDate                        = Data de început a sarcinilor
+ShowTaskStartDateDescription             = Înlocuiește data creării cu data de început a sarcinilor în fișă și în documente
+ShowTaskEndDate                          = Data de sfârșit a sarcinilor
+ShowTaskEndDateDescription               = Afișați data de sfârșit a sarcinilor
+ShowTasksDone                            = Sarcini finalizate
+ShowTasksDoneDescription                 = Afișați sarcinile finalizate la 100
+ShowTasksDoneDescriptionExtend           = în listele de riscuri
+ShowTaskCalculatedProgress               = Progresul sarcinii
+ShowTaskCalculatedProgressDescription    = Afișați progresul calculat al sarcinii în locul progresului declarat
+ShowAllTasks                             = Toate sarcinile unui risc în liste
+ShowAllTasksDescription                  = Afișați toate sarcinile în lista sarcinilor unui risc în liste
+DeleteTaskTimeSpent                      = Sigur doriți să ștergeți %s min de timp consumat din sarcină?
+TaskTimeSpentEdit                        = Editarea timpului consumat al sarcinii
+TheTaskTimeSpent                         = Timpul consumat
+TaskTimeSpentCreated                     = Crearea de timp consumat
+TaskTimeSpentModified                    = Modificarea timpului consumat
+TaskTimeSpentDeleted                     = Ștergerea timpului consumat
+TaskTimeSpentWellCreated                 = Timp consumat creat
+TaskTimeSpentNotCreated                  = Eroare la crearea timpului consumat
+TaskTimeSpentWellEdited                  = Timp consumat editat
+TaskTimeSpentNotEdited                   = Eroare la editarea timpului consumat
+TaskTimeSpentWellDeleted                 = Timp consumat șters
+TaskTimeSpentNotDeleted                  = Eroare la ștergerea timpului consumat
+OnTheTask                                = la sarcină
+TaskTimeSpentDuration                    = Durata timpului consumat
+TaskTimeSpentDurationDescription         = Timpul consumat adăugat implicit fiecărei sarcini
+NoTaskShared                             = Nicio sarcină partajată
+WarningTaskLabel                         = Atenție, ați depășit numărul maxim de caractere permis (255)
+ErrorRecordHasSubTasks                   = Sarcina are elemente subordonate
+TotalConsumedTime                        = Total timp consumat pe proiect
+TotalConsumedTimeAmount                  = Costul timpului consumat
+NbTasks                                  = Numărul de sarcini
+TotalProgress                            = Progresul real global al sarcinilor
+TotalBudget                              = Suma bugetului sarcinilor
+TaskTimeSpentDate                        = Data timpului consumat
+StartDateCannotBeAfterEndDate            = Data de sfârșit nu poate fi anterioară datei de început
+TasksFromProject                         = Sarcinile afișate provin din proiectul definit ca "Proiectul documentului de evaluare a riscurilor"
+TaskHideRefInDocument                    = Ascundeți referința
+TaskHideRefInDocumentDescription         = Ascundeți referința sarcinii în documente
+TaskHideResponsibleInDocument            = Ascundeți responsabilul
+TaskHideResponsibleInDocumentDescription = Ascundeți responsabilul sarcinii în documente
+TaskHideDateInDocument                   = Ascundeți data
+TaskHideDateInDocumentDescription        = Ascundeți data de început și de sfârșit a sarcinii în documente
+TaskHideBudgetInDocument                 = Ascundeți bugetul
+TaskHideBudgetInDocumentDescription      = Ascundeți bugetul sarcinii în documente
+
+#
+# DigiAI - DigiAI
+#
+
+# Date
+WelcomeToDigiAI = Bine ați venit la DigiAI
+UploadAnImage = Încărcați o imagine
+OpenAIApiKey = Cheie API OpenAI
+OpenAIApiKeyDescription = Pentru a utiliza DigiAI, trebuie să dispuneți de o cheie API OpenAI. Puteți obține una creând un cont pe <a href="https://platform.openai.com/signup" target="_blank">https://platform.openai.com/signup</a>. După înregistrare, veți putea genera o cheie API în secțiunea "API Keys" a tabloului dumneavoastră de bord.
+
+#
+# Ticket - Interfața publică a tichetelor
+#
+
+# Drepturi
+TicketTagsConfig                         = Modificarea registrelor de securitate și sănătate în muncă
+
+# Date
+Register                                 = Registru
+Send                                     = Trimiteți
+TicketSent                               = Tichet trimis
+FilesLinked                              = Fotografii / Atașamente
+AddDocument                              = Adăugați document
+LastnamePlaceholder                      = Exemplu: Popescu
+FirstnamePlaceholder                     = Exemplu: Ion
+PhonePlaceholder                         = 00.00.00.00.00
+LocationPlaceholder                      = Exemplu: Biroul A
+ServicePlaceholder                       = Exemplu: Lucrător salubritate
+Location                                 = Loc
+CategoriesCreated                        = Crearea categoriilor de tichete
+ExtrafieldsCreated                       = Crearea câmpurilor suplimentare pentru tichete
+AnticipatedLeave                         = Plecare anticipată
+DGI                                      = Pericol grav și iminent
+SST                                      = Securitate și sănătate în muncă
+PresquAccident                           = Incident periculos
+Accident                                 = Accident
+EnhancementSuggestion                    = Sugestie de îmbunătățire
+MaterialProblem                          = Problemă materială
+HumanProblem                             = Problemă umană
+Others                                   = Altele
+AccidentWithoutDIAT                      = Accident ușor
+AccidentWithDIAT                         = Accident de muncă
+Environment                              = Mediu
+Quality                                  = Calitate
+NonCompliance                            = Neconformitate
+FirstName                                = Prenume
+LastName                                 = Nume
+Phone                                    = Telefon
+DeclarationDate                          = Declarație
+DigiriskTicketPublicAccess               = O interfață publică ce nu necesită nicio identificare este disponibilă la următorul URL
+TicketActivatePublicInterface            = Activați interfața publică
+GenerateExtrafields                      = Generarea câmpurilor suplimentare implicite pentru tichete
+GenerateTicketCategories                 = Generarea categoriilor implicite de tichete
+AlreadyGenerated                         = Deja generate
+NotGenerated                             = Încă negenerat
+NotCreated                               = Încă necreate
+ExtrafieldsGeneration                    = Această opțiune permite generarea câmpurilor suplimentare implicite ale tichetelor. Câmpurile create vor fi: <br> Nume, Prenume, Telefon, GP/UT, Loc și Dată
+CategoriesGeneration                     = Această opțiune permite generarea categoriilor implicite ale tichetelor. Categoriile create vor fi: <br> - Registru <br> - - Accident <br> - - - Incident periculos, Accident ușor, Accident de muncă <br> - - Securitate și sănătate în muncă <br> - - - Plecare anticipată, Altele, Problemă umană, Problemă materială <br> - - Pericol grav și iminent <br> - - Calitate <br> - - - Neconformitate, Sugestie de îmbunătățire <br> - - Mediu <br> - - - Neconformitate, Altele
+TicketSuccess                            = Registrul dumneavoastră a fost transmis serviciului de prevenire cu numărul:
+TicketPublicAccess                       = Link de întoarcere la interfața publică a tichetelor:
+TicketShowCompanyLogo                    = Afișați logoul companiei în interfața publică
+TicketShowCompanyLogoHelp                = Activați această opțiune pentru a ascunde logoul companiei în paginile interfeței publice
+YouMustNotifyYourHierarchy               = Aveți <b>obligația</b> de a vă anunța superiorii ierarhici
+GoBackToTicketCreation                   = Accesați pagina de urmărire a tichetelor
+SendEmailOnTicketSubmit                  = Trimiteți emailuri la creare
+CatTicketsList                           = Lista etichetelor/categoriilor tichetelor
+SendEmailTo                              = Adresă de email de notificat
+SendEmailOnTicketSubmitHelp              = Activați trimiterea automată a unui email la crearea unui tichet
+MultipleEmailsSeparator                  = Pentru a atribui mai multe adrese de email de notificat, separați-le cu ";". De exemplu: "aaaa@bbb.cc;dddd@eee.ff"
+TicketCategories                         = Categoriile tichetelor
+TicketDocumentsConfig                    = Documentele tichetelor
+TicketExtrafields                        = Câmpurile suplimentare ale tichetelor
+MainCategorySetting                      = Această opțiune permite definirea categoriei ale cărei subcategorii vor apărea în interfața publică
+TicketCategoriesInDocumentsSetting       = Această opțiune permite alegerea categoriilor de tichete afișate în lista tichetelor din documente (Document de evaluare a riscurilor, fișă de grupare etc.). Dacă nu este selectată nicio categorie, se afișează toate categoriile
+ParentCategorySetting                    = Această opțiune permite definirea titlului categoriei părinte pentru interfața publică a tichetelor
+ChildCategorySetting                     = Această opțiune permite definirea titlului categoriei subordonate pentru interfața publică a tichetelor
+TicketManagement                         = Gestiunea tichetelor
+MainCategory                             = Alegerea categoriei principale
+TicketCategoriesInDocuments              = Categorii afișate în documente
+ParentCategoryLabel                      = Titlul categoriei părinte
+ChildCategoryLabel                       = Titlul categoriei subordonate
+TicketPublicInterfaceEnabled             = Interfața publică a tichetelor a fost activată
+TicketPublicInterfaceDisabled            = Interfața publică a tichetelor a fost dezactivată
+TicketPublicInterface                    = Interfață publică
+EmailsToNotifySet                        = Adresele de email de notificat au fost înregistrate
+MainCategorySet                          = Categoria principală a fost definită
+TicketCategoriesInDocumentsSet           = Categoriile afișate în documente au fost definite
+ParentCategoryLabelSet                   = Titlul categoriei părinte a fost definit
+ChildCategoryLabelSet                    = Titlul categoriei subordonate a fost definit
+TicketPublicInterfaceConfigDocumentation = Pentru a configura interfața publică a tichetelor, consultați documentația
+ParentCategory                           = Categorie părinte
+TSProject                                = Proiect asociat tichetelor
+TicketDescription                        = Proiectul tichetelor
+TicketProjectUpdated                     = Proiectul implicit al tichetelor a fost actualizat
+QRCodeAlreadyGenerated                   = Cod QR generat
+GenerateQRCode                           = Generați codul QR
+CompanyQRCodeGeneration                  = Generarea codului QR al entității
+QRCodeGeneration                         = Generarea codului QR
+MultiCompanyQRCodeGeneration             = Generarea codului QR multi-entitate
+TicketCreationMailWellSent               = Email de confirmare a creării tichetului trimis
+TicketCreationMailSent                   = Emailul de creare a tichetului a fost trimis către %s
+HowToSetupTicketCategories               = Pentru a configura categoriile de tichete, faceți clic pe acest link:
+ConfigTicketCategories                   = Configurarea categoriilor de tichete
+NewTicketSubmitted                       = Un tichet a fost trimis prin interfața publică
+ANewTicketHasBeenSubmitted               = Registru de securitate nou creat pentru %s
+TicketCreationSubject                    = Crearea unui tichet prin interfața publică Digirisk
+TicketDocumentCustomDigiriskTemplate     = ODT personalizat pentru fișele de tichet
+HowToSetupDigiriskElement                = Pentru a configura elementele Digirisk (grupări/unități de lucru), faceți clic pe acest link:
+ConfigDigiriskElement                    = Configurarea elementelor Digirisk
+ErrorFieldEmail                          = Eroare: emailul trebuie să corespundă următorului format: <b>'aaa@aaa.fr'</b>
+ErrorFieldPhone                          = Eroare: telefonul trebuie să corespundă următorului format: <b>'0XXXXXXXXXXX'</b> sau <b>'+33XXXXXXXXX'</b>
+TicketEmailRequired                      = Email obligatoriu pentru crearea unui tichet
+TicketEmailRequiredHelp                  = Activați această opțiune pentru a face obligatorie introducerea unui email la crearea unui tichet în interfața publică
+WelcomeToPublicTicketInterface           = Bine ați venit în interfața publică a tichetelor
+PleaseSelectAnEntity                     = Selectați o entitate:
+ShowSelectorOnTicketPublicInterface      = Afișați selectorul multi-entitate în interfața publică a tichetelor în locul listei entităților
+ShowSelectorOnTicketPublicInterfaceHelp  = Afișați selectorul multi-entitate în interfața publică a tichetelor în locul listei entităților cu logoul lor
+MultiEntityPublicInterface               = Interfața publică a tichetelor multi-companie
+TicketCategoriesNotCreated               = Nu ați creat categorii de tichete
+TicketPublicInterfaceQRCode              = Codul QR al interfeței publice a tichetelor
+MultiEntityTicketPublicInterfaceQRCode   = Codul QR al interfeței publice a tichetelor multi-companie
+PublicInterfaceConfiguration             = Câmpuri vizibile / obligatorii ale interfeței publice
+TicketNumber                             = Nr. tichetului
+FromAndDate                              = Proveniență și dată
+AuthorRequest                            = Solicitant
+DateCloture                              = Data închiderii
+
+PublicInterfaceUseSignatory              = Semnătură obligatorie pentru declararea acestui registru
+ValidateText                             = Condiții de acceptat pentru semnătură
+TicketPublicInterfaceShowCategory        = Afișați descrierea categoriei
+EmailTemplate                            = Șablon de email
+EmailTemplateDescription                 = Șablon de email
+
+OpenInNewTab                             = Deschideți într-o filă nouă
+TicketDigiriskElementRequired            = GP/UT obligatoriu pentru crearea unui tichet
+TicketDigiriskElementRequiredHelp        = Activați această opțiune pentru a face obligatorie selectarea unui GP/UT la crearea unui tichet în interfața publică
+TicketDigiriskElementHideRef             = Ascundeți referința GP/UT în selectorul de serviciu al interfeței publice
+TicketDigiriskElementHideRefHelp         = Activați această opțiune pentru a ascunde referința unui GP/UT în interfața publică
+TicketDigiriskelementVisible             = Afișați câmpul GP/UT pentru crearea unui tichet
+TicketServiceVisible                     = Afișați câmpul GP/UT pentru crearea unui tichet
+TicketDigiriskelementVisibleHelp         = Activați această opțiune pentru a afișa câmpul GP/UT în interfața publică și pentru a-l face obligatoriu dacă este necesar
+TicketServiceVisibleHelp                 = Activați această opțiune pentru a afișa câmpul GP/UT în interfața publică și pentru a-l face obligatoriu dacă este necesar
+TicketPhotoVisible                       = Afișați câmpul Fotografie pentru crearea unui tichet
+TicketPhotoVisibleHelp                   = Activați această opțiune pentru a afișa câmpul Fotografie în interfața publică
+TicketEmailVisible                       = Afișați câmpul Email pentru crearea unui tichet
+TicketEmailVisibleHelp                   = Activați această opțiune pentru a afișa câmpul Email în interfața publică și pentru a-l face obligatoriu dacă este necesar
+TicketLastnameVisible                    = Afișați câmpul Nume pentru crearea unui tichet
+TicketLastnameVisibleHelp                = Activați această opțiune pentru a afișa câmpul Nume în interfața publică și pentru a-l face obligatoriu dacă este necesar
+TicketFirstnameVisible                   = Afișați câmpul Prenume pentru crearea unui tichet
+TicketFirstnameVisibleHelp               = Activați această opțiune pentru a afișa câmpul Prenume în interfața publică și pentru a-l face obligatoriu dacă este necesar
+TicketPhoneVisible                       = Afișați câmpul Telefon pentru crearea unui tichet
+TicketPhoneVisibleHelp                   = Activați această opțiune pentru a afișa câmpul Telefon în interfața publică și pentru a-l face obligatoriu dacă este necesar
+TicketLocationVisible                    = Afișați câmpul Loc pentru crearea unui tichet
+TicketLocationVisibleHelp                = Activați această opțiune pentru a afișa câmpul Loc în interfața publică și pentru a-l face obligatoriu dacă este necesar
+TicketDateVisible                        = Afișați câmpul Dată pentru crearea unui tichet
+TicketDateVisibleHelp                    = Activați această opțiune pentru a afișa câmpul Dată în interfața publică și pentru a-l face obligatoriu dacă este necesar
+QRCodeGenerated                          = Cod QR generat
+FkTicket                                 = Tichet asociat
+PublicTicket                             = Interfața publică a tichetelor
+TicketPublicInterfaceForbidden           = Acces interzis la interfața publică a tichetelor
+DefaultUserGroup                         = Grup implicit
+DefaultUserGroupDescription              = Grup implicit în selectoarele de grupuri
+ConfigureDefaultUserGroup                = Configurați grupul implicit
+RegisterSigned                           = Registru semnat
+
+#Interfața publică
+TicketPublicInterfaceShowCategoryDescription     = Afișați descrierea categoriilor de tichete în interfața publică
+TicketPublicInterfaceShowCategoryDescriptionHelp = Activați această opțiune pentru a afișa descrierea categoriilor de tichete în interfața publică
+
+
+# Statistici
+TicketStatistics    = Statistici privind tichetele
+ExportCSV           = Export CSV
+GenerateCSV         = Generați fișierul CSV
+SuccessGenerateCSV  = Fișierul CSV %s a fost generat cu succes
+ErrorMissingData    = Eroare: fișierul CSV nu a putut fi generat, datele trimise către fișier sunt incorecte. <br> Verificați dacă aveți GP/UT atribuite unor tichete.
+CSVFileExport       = Exportul registrelor în format CSV asociate cu GP/UT
+ThirdPartyHelp      = Dacă filtrul "Terț" este gol, niciun terț nu este utilizat pentru căutare
+GP/UTHelp           = Implicit, filtrul preia toate GP/UT
+CategoryTicketHelp  = Implicit, filtrul preia toate categoriile
+CreatedByHelp       = Dacă filtrul "Creat de" este gol, niciun utilizator nu este utilizat pentru căutare
+AssignedToHelp      = Dacă filtrul "Atribuit lui" este gol, niciun utilizator nu este utilizat pentru căutare
+StatusHelp          = Implicit, filtrul preia toate stările<br>
+ConcernedTimePeriod = Perioada luată în considerare
+LessThan            = Mai puțin de
+MoreThan            = Mai mult de
+Comparator          = Comparator
+RangeNumber         = Cantitate
+TimeRange           = Unitate de timp
+RangeLabel          = Numele restricției
+Inferior            = Inferior lui
+Superior            = Superior lui
+TimeRangeAdded      = Restricție adăugată
+TimeRangeDeleted    = Restricție ștearsă
+
+NumberOfTicketsByMainCategorieAndDigiriskElement    = Numărul de registre pe categorie și pe GP
+NumberOfTicketsByMainSubCategorieAndDigiriskElement = Numărul de registre pe subcategorie și pe GP
+NumberOfTicketsByYear                           = Numărul de tichete pe an
+
+# Ticket Management Dashboard - Tablou de bord al gestiunii tichetelor
+TicketManagementDashboard                 = Tablou de bord al gestiunii tichetelor
+RunningTicket                             = Tichete în curs
+NbOfOpenedTicket                          = Numărul de tichete deschise
+OldestTicket                              = Cel mai vechi tichet
+OldestTicketDescription                   = Cel mai vechi tichet cu timpul scurs de la crearea sa
+OldestMessageTicket                       = Cel mai vechi tichet cu un mesaj
+OldestMessageTicketDescription            = Cel mai vechi tichet cu un mesaj și timpul scurs de la crearea mesajului
+MeanAnswerTime                            = Timp mediu de răspuns
+MeanAnswerTimeDescription                 = Termen mediu între deschidere și închidere, calculat doar pe tichetele închise
+MeanFirstResponseTime                     = Termen mediu al primului răspuns
+MeanFirstResponseTimeDescription          = Termen mediu între deschiderea tichetului și primul mesaj vizibil pentru declarant. Notele interne nu sunt luate în calcul, iar tichetele fără mesaj public sunt excluse din calcul
+NbTicketPerUser                           = Numărul mediu de tichete atribuite per persoană
+NbExchangePerTicket                       = Numărul de schimburi per tichet
+TicketRepartitionPerUserAndMeanAnswerTime = Repartizarea tichetelor pe utilizator și timpul mediu de răspuns
+TopSocietyWithMostTickets                 = Top %s companii cu cele mai multe tichete
+TicketsCreatedVersusClosedByMonth         = Tichete create și închise în ultimele %s luni
+TicketsCreated                            = Create
+TicketsClosed                             = Închise
+OpenTicketsByStatus                       = Repartizarea tichetelor deschise pe stări
+OpenTicketBacklogAge                      = Vechimea tichetelor deschise (de la creare)
+BacklogAgeUnderDays                       = Mai puțin de %s zile
+BacklogAgeBetweenDays                     = De la %s la %s zile
+BacklogAgeOverDays                        = Mai mult de %s zile
+ShowSelectedDateTypes                     = Selectați tipul de dată de afișat
+
+# Email
+The                            = La
+TicketMessage                  = Mesajul registrului
+SeeTicketUrl                   = Vedeți tichetul
+AutoNotificationTicket         = Notificare prin email trimisă automat de
+TicketPublicInterfaceOtherName = Interfața de gestiune a registrelor de securitate și sănătate în muncă și de pericol grav și iminent
+
+
+
+# Document de tichet
+
+# Date
+TicketDocument                 = Fișa tichetului
+Ticketdocument                 = Fișa tichetului
+ticketdocument.odt             = Fișa tichetului
+ticketdocument_custom.odt      = Fișă personalizată a tichetului
+ticketdocument_events.odt      = Fișa tichetului cu evenimente
+ticketdocument_sign.odt        = Fișa tichetului cu semnătură
+ticketdocument_event_sign.odt  = Fișa tichetului cu eveniment și semnătură
+TicketSuccessMessage           = Mesaj de succes al tichetului
+TicketSuccessMessageSet        = Mesajul a fost modificat
+TicketDocumentPDF              = FT-A4-PEISAJ
+TicketDocumentPDFDescription   = Afișați fișa tichetului
+GeneratedTicketDocumentDate    = Data exportului acestui tichet
+
+
+# Document de proiect
+
+# Șablon ODT
+DigiriskTemplateDocumentProject = Modele de documente pentru fișele de proiect Digirisk
+DocumentModelPapripactA3Paysage = Modele de document de raport previzional privind sarcinile proiectelor
+PapripactFullName               = Programul Anual de Prevenire a Riscurilor Profesionale și de Îmbunătățire a Condițiilor de Muncă
+
+# Document de registru
+
+RegisterDocument     = Registrul accidentelor de muncă ușoare
+Registerdocument     = Registrul accidentelor de muncă ușoare
+RegisterDocumentsMin = registre ale accidentelor de muncă ușoare
+registerdocument.odt = Registrul accidentelor de muncă ușoare
+
+#
+# Tools - Instrumente
+#
+
+# Date
+Tools                                        = Instrumente
+DigiriskDataMigration                        = Gestiunea datelor de migrare
+DataMigrationImport                          = Importul datelor structurii Digirisk
+DataMigrationImportDescription               = Importul datelor structurii Digirisk WordPress în format ZIP
+DataMigrationImportRisks                     = Importul datelor riscurilor Digirisk
+DataMigrationImportRisksDescription          = Importul datelor riscurilor Digirisk WordPress în format ZIP
+ErrorFileNotWellFormatted                    = Fișierul nu are formatul corect sau este gol. Trebuie să atașați un fișier de import provenind de la Digirisk WordPress, denumit DATE_OBJET_export.json
+ErrorFileNotWellFormattedZIP                 = Fișierul nu are formatul corect sau este gol. Trebuie să atașați un fișier de import provenind de la Digirisk WordPress, denumit DATE_OBJET_export.zip
+ErrorJsonBadFormatted                        = Fișierul JSON nu este formatat corect
+SuccessImport                                = Importul datelor a reușit
+DataMigrationImportRiskSigns                 = Importul datelor semnalizărilor Digirisk
+DataMigrationImportRiskSignsDescription      = Importul datelor semnalizărilor Digirisk WordPress în format ZIP
+DataMigrationImportGlobal                    = Importul datelor globale Digirisk <br> (Structură, riscuri și semnalizări)
+DataMigrationImportGlobalDescription         = Importul datelor globale Digirisk WordPress în format ZIP <br> (Structură, riscuri și semnalizări)
+DataMigrationExportGlobal                    = Exportul datelor globale Digirisk <br> (Structură, riscuri și semnalizări)
+DataMigrationExportGlobalDescription         = Exportul datelor globale Digirisk Dolibarr în format ZIP <br> (Structură, riscuri și semnalizări)
+DataMigrationExportTree                      = Exportul structurii Digirisk <br> (Doar structura)
+DataMigrationExportTreeDescription           = Exportul structurii Digirisk Dolibarr în format ZIP <br> (GP/UT vizibile pentru entitatea curentă, fără riscuri și fără semnalizări)
+DataMigrationImportGlobalDolibarrDescription = Importul datelor globale Digirisk Dolibarr în format ZIP <br> (Structură, riscuri și semnalizări)
+DataMigrationTreeAlreadyImported             = Importul datelor structurii a fost deja efectuat
+DataMigrationRisksAlreadyImported            = Importul datelor riscurilor a fost deja efectuat
+DataMigrationRiskSignsAlreadyImported        = Importul datelor semnalizărilor a fost deja efectuat
+DataMigrationGlobalAlreadyImported           = Importul datelor globale (Structură, riscuri și semnalizări) a fost deja efectuat
+AdvancedImport                               = Import avansat
+AdvancedImportDescription                    = Permite importul fiecărui element în mod independent (Structură, riscuri și semnalizări)
+DataMigrationWordPressToDolibarr             = Migrarea datelor din WordPress în Dolibarr
+DataMigrationDolibarrToDolibarr              = Migrarea datelor din Dolibarr în Dolibarr
+RepairRisks                                  = Reparați riscurile
+NumberOfRisksCorrupted                       = Aveți %s risc(uri) a căror categorie este coruptă, accesați pagina "Instrumente" pentru a le repara
+NoRiskToRepair                               = Niciun risc de reparat
+DigiriskElementSuccessfullyRepaired          = Elementele Digirisk (GP/UT) au fost reparate cu succes
+RiskSuccessfullyRepaired                     = Riscurile au fost reparate cu succes
+RiskAssessmentSuccessfullyRepaired           = Evaluările au fost reparate cu succes
+CorruptedCategoryOnRiskList                  = Lista riscurilor a căror categorie este coruptă
+
+# Clean - Curățare
+Clean                                          = Curățare
+CleanObject                                    = Curățați datele
+CleanDigiriskElementExistParentDigiriskElement = %d elemente Digirisk (GP/UT) au un element părinte nevalid
+CleanDigiriskElement                           = Curățați elementele Digirisk (GP/UT)
+CleanRiskFkElement                             = %d riscuri au un GP/UT nevalid
+CleanRiskStatus                                = %d riscuri au o stare nevalidă
+CleanRiskExistFkElement                        = %d riscuri sunt orfane
+CleanRiskExistRiskAssessment                   = %d riscuri nu au nicio evaluare
+CleanRisk                                      = Curățați riscurile
+CleanRiskAssessmentStatus                      = %d evaluări au o stare nevalidă
+CleanRiskAssessmentCotation                    = %d evaluări au o cotație goală
+CleanRiskAssessmentExistFkRisk                 = %d evaluări sunt orfane
+CleanRiskAssessment                            = Curățați evaluările
+NoDigiriskElementToClean                       = Niciun element Digirisk (GP/UT) de curățat
+NoRiskToClean                                  = Niciun risc de curățat
+NoRiskAssessmentToClean                        = Nicio evaluare de curățat
+
+
+#
+# Altele
+#
+
+# Date
+AT = la
+
+LabourInspectorName                 = DREETS
+UrlLabourInspector                  = https://travail-emploi.gouv.fr/ministere/organisation/article/dreets-directions-regionales-de-l-economie-de-l-emploi-du-travail-et-des
+IDCCTooltip                         = Acest câmp provine din modulul Digirisk pentru Dolibarr <br> Nomenclatura contractelor colective provine de la travail-emploi.gouv.fr
+NoEmailContact                      = Fără email la acest contact
+AddMedia                            = Adăugați un fișier media
+NoMediaLinked                       = Niciun fișier media asociat
+UserGroup                           = Grup de utilizatori
+ReaderGroup                         = Grup de cititori
+UserCreated                         = Utilizatorul a fost creat
+GetAPI                              = Utilizarea rutelor API Digirisk cu metoda GET
+PostAPI                             = Utilizarea rutelor API Digirisk cu metoda POST
+MinimizeMenu                        = Reduceți meniul
+ActionsLine                         = Acțiuni
+PhotoWellSent                       = Fotografia a fost adăugată în biblioteca media
+PhotoNotSent                        = Fotografia nu a fost trimisă corect
+PhotoWellSaved                      = Fișierul (fișierele) media a (au) fost adăugat(e)
+PhotoNotSaved                       = Fișierul (fișierele) media nu a (nu au) fost adăugat(e)
+UseCaptcha                          = Cod grafic (CAPTCHA)
+UseCaptchaDescription               = Utilizarea codului grafic (CAPTCHA) pe paginile interfeței publice
+GP/UTParticipation                  = Participare GP/UT
+LabourDoctorName                    = AMETRA
+LabourDoctorFirstName               = Medic de
+LabourDoctorLastName                = medicina muncii
+DashBoard                           = Tablou de bord
+Close                               = Închideți
+DateRange                           = Interval de date
+UseDateRange                        = Utilizați intervalul de date
+SiretNumber                         = Nr. de identificare fiscală
+Society                             = Companie
+MulticompanyTransverseModeEnabled   = Gestiunea centralizată a utilizatorilor și a grupurilor pe entitatea principală este activată.<br>Prin urmare, nu puteți crea un utilizator sau un grup pe această entitate.<br>Accesați entitatea principală pentru a efectua această adăugare.
+ManuelInputNBEmployees              = Introduceți manual numărul de angajați
+ManuelInputNBEmployeesDescription   = Dacă opțiunea este activată, puteți introduce manual numărul de angajați în configurarea companiei.<br>În caz contrar, numărul de angajați este calculat.<br>Consultați documentația pentru mai multe informații.
+ManuelInputNBWorkedHours            = Introduceți manual numărul de ore lucrate
+ManuelInputNBWorkedHoursDescription = Dacă opțiunea este activată, puteți introduce manual numărul de ore lucrate în configurarea companiei.<br>În caz contrar, numărul de ore lucrate este calculat.<br>Consultați documentația pentru mai multe informații.
+ShowPatchNoteAgain                  = Afișați nota de actualizare
+ShowPatchNoteAgainDescription       = Dacă opțiunea este activată, nota de actualizare a versiunii curente reapare pe pagina de pornire Digirisk.<br>(Necesită ca opțiunea «Afișați notele de actualizare de pe GitHub» să fie activată pentru a fi vizibilă.)
+HowToConfigureSetupConf             = Pentru a configura datele companiei asociate cu Digirisk,<br>accesați Digirisk - Configurare - Setări
+LabourDoctorNameFull                = Asociația Medicilor
+PermissionInheritedFromConfig       = Drepturile sunt moștenite din configurarea generală sau din configurarea părinte
+CategorieManagement                 = Gestiunea categoriilor
+ShowSelectedRiskTypes               = Selectați tipurile de riscuri de afișat
+CharRemaining                       = Caractere rămase
+NumberOfLinkedFiles                 = Numărul de fișiere atașate
+ChooseAnImage                       = Alegeți o imagine
+
+# Action Plan - Gantt / Kanban
+ActionPlanGantt                     = Diagramă Gantt
+ActionPlanKanban                    = Kanban
+ActionPlanView                      = Plan de acțiune
+ColumnDraft                         = Ciornă
+ColumnInProgress                    = În curs
+ColumnInControl                     = De verificat
+ColumnDone                          = Finalizat
+NoTasks                             = Nicio acțiune corectivă
+ActionPlanGlobalProgress            = Progresul global al PAPRIPACT
+ActionPlanGlobalProgressInfo        = Media progresului a %s acțiune(i) corectivă(e)
+KanbanLoadMore                      = Vedeți mai mult (%s)
+KanbanDisplay                       = Afișarea Kanban
+KanbanPageSize                      = Numărul de carduri pe coloană
+KanbanPageSizeDesc                  = Numărul de acțiuni corective afișate din start în fiecare coloană; următoarele sunt încărcate prin butonul «Vedeți mai mult» (îmbunătățește performanța la volume mari)
+KanbanDraftMax                      = Prag coloana «Ciornă»
+KanbanDraftMaxDesc                  = Progres maxim (%) pentru ca o acțiune să rămână în coloana «Ciornă»
+KanbanProgressMax                   = Prag coloana «În curs»
+KanbanProgressMaxDesc               = Progres maxim (%) pentru coloana «În curs»
+KanbanControlMax                    = Prag coloana «De verificat»
+KanbanControlMaxDesc                = Progres maxim (%) pentru coloana «De verificat»; peste acest prag acțiunea trece în «Finalizat»
+PlannedWorkload                     = Sarcină prevăzută
+TimeSpent                           = Timp consumat
+LinkedRisk                          = Risc asociat
+TaskMovedTo                         = Sarcină mutată în %s
+
+AddCategory                        = Adăugați o categorie
+SelectCategory                     = Alegeți o categorie
+DateEndBeforeStart                 = Data de sfârșit anterioară celei de început
+InternalUsers                      = Utilizatori interni
+ExternalContacts                   = Contacte externe
+AddContributor                     = Adăugați un contribuitor
+RemoveContact                      = Retrageți contactul
+ColumnWidth                        = Lățime
+ColumnGap                          = Spațiere
+ActionPlanExportCsv                = Descărcați PAPRIPACT în format CSV
+ActionPlanExportA3                 = Descărcați PAPRIPACT în PDF A3 peisaj
+ActionPlanExportGantt              = Descărcați diagrama Gantt ca imagine PNG
+ActionPlanDisplayedProject         = Proiect afișat
+ActionPlanChangeProject            = Schimbați proiectul
+ActionPlanDefaultProject           = Document de evaluare a riscurilor (implicit)
+ActionPlanNoProjectConfigured      = Niciun proiect configurat
+
+# ActionPlan — Jurnalizarea evenimentelor
+ActionPlanLogging                  = Plan de acțiune — Istoricul modificărilor
+ActionPlanLoggingDescription       = Activați crearea de evenimente la modificările din Kanban
+ActionPlanLogLabel                 = Modificarea denumirii
+ActionPlanLogLabelDesc             = Creați un eveniment atunci când denumirea unei sarcini este modificată
+ActionPlanLogWorkload              = Modificarea sarcinii de lucru
+ActionPlanLogWorkloadDesc          = Creați un eveniment atunci când sarcina de lucru prevăzută este modificată
+ActionPlanLogBudget                = Modificarea bugetului
+ActionPlanLogBudgetDesc            = Creați un eveniment atunci când bugetul este modificat
+ActionPlanLogContributorAdd        = Adăugarea unui contribuitor
+ActionPlanLogContributorAddDesc    = Creați un eveniment atunci când un contribuitor este adăugat
+ActionPlanLogContributorRemove     = Retragerea unui contribuitor
+ActionPlanLogContributorRemoveDesc = Creați un eveniment atunci când un contribuitor este retras
+ActionPlanLogProgress              = Modificarea progresului
+ActionPlanLogProgressDesc          = Creați un eveniment atunci când progresul este modificat
+ActionPlanLogTag                   = Modificarea etichetelor
+ActionPlanLogTagDesc               = Creați un eveniment atunci când o etichetă este adăugată sau retrasă
+ActionPlanLogDateStart             = Modificarea datei de început
+ActionPlanLogDateStartDesc         = Creați un eveniment atunci când data de început este modificată
+ActionPlanLogDateEnd               = Modificarea datei de sfârșit
+ActionPlanLogDateEndDesc           = Creați un eveniment atunci când data de sfârșit este modificată
+ActionPlanTaskLabelChanged         = Denumire modificată: "%s" → "%s"
+ActionPlanTaskWorkloadChanged      = Sarcină de lucru modificată: %s → %s
+ActionPlanTaskBudgetChanged        = Buget modificat: %s → %s
+ActionPlanTaskContributorAdded     = Contribuitor adăugat: %s
+ActionPlanTaskContributorRemoved   = Contribuitor retras: ID %s
+ActionPlanTaskProgressChanged      = Progres modificat: %s%% → %s%%
+ActionPlanTaskTagAdded             = Etichetă adăugată: %s
+ActionPlanTaskTagRemoved           = Etichetă retrasă: ID %s
+ActionPlanTaskDateStartChanged     = Data de început modificată: %s → %s
+ActionPlanTaskDateEndChanged       = Data de sfârșit modificată: %s → %s
+
+# ===========================================================================
+# Filtrele planului de acțiune — issue #4907 (GP/UT, nivel de risc, etichete)
+# ===========================================================================
+ActionPlanElement                    = GP/UT
+ActionPlanFilterElementChildren      = Cu subelementele
+ActionPlanFilterElementChildrenHelp  = Includeți acțiunile corective ale GP/UT subordonate GP/UT selectat
+ActionPlanFilterScale                = Nivel de risc
+ActionPlanFilterAllScales            = Toate nivelurile
+ActionPlanFilterTags                 = Etichete
+ActionPlanFilterCount                = %s acțiune(i) corectivă(e) afișată(e) din %s
+ActionPlanDictionaries               = Listele Kanban
+ActionPlanDictionariesDesc           = Gestionați valorile propuse în listele planului de acțiune și ale Kanban
+ActionPlanTagDictionary              = Etichetele acțiunilor corective
+ActionPlanTagDictionaryDesc          = Etichete (categorii de sarcini) propuse pe carduri și în filtrul Kanban al planului de acțiune
+ActionPlanTicketDictionaries         = Dicționarele Kanban tichete
+ActionPlanTicketDictionariesDesc     = Tipuri, grupuri și severități care compun coloanele Kanban tichete
+ActionPlanManageDictionary           = Gestionați
+
+# ===========================================================================
+# Card de acțiune tichet — issue #4443 (interfață cu 1 clic)
+# ===========================================================================
+TicketActionCard                     = Acțiune tichet
+TicketActionCardPickerIntro          = Selectați un tichet pentru a efectua o acțiune rapidă cu 1 clic.
+TicketActionCardStatusSection        = Stare
+TicketActionCardAssignSection        = Atribuire
+TicketActionCardContentSection       = Conținut
+TicketActionCardDangerSection        = Zonă sensibilă
+TicketActionMarkRead                 = Marcați ca citit
+TicketActionInProgress               = Puneți în curs
+TicketActionWaiting                  = Puneți în așteptare
+TicketActionClose                    = Închideți
+TicketActionCancel                   = Anulați tichetul
+TicketActionAssignSelf               = Atribuiți-mi
+TicketActionAssignOther              = Atribuiți lui...
+TicketActionAddMessage               = Adăugați un mesaj
+TicketActionLinkAccident             = Asociați un accident
+TicketActionOpenFull                 = Detalii complete
+TicketActionMarkedRead               = Tichet marcat ca citit
+TicketActionInProgressDone           = Tichet pus în curs
+TicketActionWaitingDone              = Tichet pus în așteptare
+TicketActionClosedDone               = Tichet închis
+TicketActionCancelledDone            = Tichet anulat
+TicketActionAssignedSelfDone         = Tichet atribuit dumneavoastră
+TicketActionAssignedOtherDone        = Tichet atribuit
+TicketActionCloseConfirm             = Confirmați închiderea
+TicketActionCancelConfirm            = Confirmați anularea
+TicketActionCardRegistresSection      = Informații registre
+TicketMessageTitle                    = Titlul mesajului
+TicketResponsibleAndProgress          = Responsabil și progres
+TicketActionCardClassificationSection = Clasificare
+TicketActionCardDatesSection          = Date-cheie
+TicketActionCardIdentificationSection = Identificare
+TicketActionCardOtherFieldsSection    = Alte informații
+TicketActionCardEventsSection         = Evenimente recente
+TicketActionCardRelatedSection        = Obiecte asociate
+UnknownFieldToUpdate                  = Câmp necunoscut: %s
+Saved                                 = Salvat
+SeeAll                                = Vedeți tot
+LayoutCustomize                       = Personalizați
+LayoutDone                            = Finalizat
+LayoutControls                        = Controale de aranjare
+LayoutWidthHalf                       = Jumătate de coloană
+LayoutWidthFull                       = Coloană întreagă
+LayoutWidthSpan                       = Lățime completă
+LayoutSaved                           = Aranjare salvată
+LayoutReset                           = Resetați
+LayoutResetTitle                      = Resetați aranjarea (revenire la valorile implicite)
+LayoutDensity                         = Densitatea afișării
+LayoutDensityCompact                  = Compact
+LayoutDensityCozy                     = Confortabil
+LayoutDensitySpacious                 = Spațios
+AddTag                                = Adăugați o etichetă
+TagAdded                              = Etichetă adăugată
+TagRemoved                            = Etichetă retrasă
+Preview                               = Previzualizare
+OpenInNewTab                          = Deschideți într-o filă nouă
+FileDeleted                           = Fișier șters
+OtherTicket                           = alt tichet
+OtherTickets                          = alte tichete
+SeeOtherTicketsForThisCompany         = Vedeți istoricul tichetelor acestui client
+StatusTimeline                        = Cronologia stării
+WatchTicket                           = Urmăriți acest tichet
+UnwatchTicket                         = Nu mai urmăriți acest tichet
+TicketWatched                         = Tichet urmărit
+TicketUnwatched                       = Tichet retras din urmărire
+WatchedTicket                         = Tichet urmărit
+WatchedOnly                           = Doar cele urmărite
+AllTickets                            = Toate
+NoWatchedTicket                       = Niciun tichet urmărit
+FileUploaded                          = Fișier trimis
+UploadFile                            = Alegeți un fișier
+OrDropAnywhere                        = sau trageți și plasați pe card
+Messages                              = Mesaje
+TypeYourReply                         = Scrieți răspunsul dumneavoastră…
+PrivateMessage                        = Mesaj privat
+Send                                  = Trimiteți
+NoMessageYet                          = Niciun mesaj deocamdată
+BeFirstToReply                        = Fiți primul care răspunde
+MessagePosted                         = Mesaj trimis
+MessageEdited                         = Mesaj modificat
+MessageDeleted                        = Mesaj șters
+ConfirmDeleteMessage                  = Ștergeți acest mesaj?
+ReplyByEmail                          = Trimiteți prin email
+SentByMail                            = Trimis prin email
+MailSentToNRecipients                 = email trimis către %d destinatar(i)
+MailNotSent                           = trimiterea emailului a eșuat
+NoRecipientFound                      = niciun destinatar găsit
+OriginalMessage                       = Mesaj original
+JustNow                               = chiar acum
+NMinAgo                               = acum %d min
+NHAgo                                 = acum %d h
+NDAgo                                 = acum %d z
+NAttachedFiles                        = %d fișier(e) atașat(e)
+Quote                                 = Citați
+NotAllowed                            = Acțiune neautorizată
+Private                               = Privat
+Unknown                               = Necunoscut
+LayoutTagsMode                        = Afișarea etichetelor
+LayoutTagsModeChips                   = Listă completă (chips)
+LayoutTagsModeSelector                = Selector derulant
+LayoutActionsMode                     = Afișarea acțiunilor
+LayoutActionsModeBar                  = Bară de acțiuni
+LayoutActionsModeMenu                 = Meniu (⋮)
+Move                                  = Mutați
+Hide                                  = Ascundeți
+Show                                  = Afișați
+
+# ===========================================================================
+# Kanban tichete — configurarea jurnalizării — issue #4753
+# ===========================================================================
+TicketKanban                           = Kanban tichete
+TicketKanbanLogging                    = Kanban tichete — Istoricul modificărilor
+TicketKanbanLoggingDescription         = Activați crearea de evenimente la modificările din kanban
+TicketKanbanLogStatus                  = Modificarea stării
+TicketKanbanLogStatusDesc              = Creați un eveniment atunci când starea unui tichet este modificată prin kanban
+TicketKanbanLogAssignee                = Modificarea persoanei atribuite
+TicketKanbanLogAssigneeDesc            = Creați un eveniment atunci când persoana atribuită unui tichet este modificată prin kanban
+TicketKanbanLogCategoryAdd             = Adăugarea unei etichete
+TicketKanbanLogCategoryAddDesc         = Creați un eveniment atunci când o etichetă este adăugată unui tichet prin kanban
+TicketKanbanLogCategoryRemove          = Retragerea unei etichete
+TicketKanbanLogCategoryRemoveDesc      = Creați un eveniment atunci când o etichetă este retrasă de la un tichet prin kanban
+TicketKanbanLogType                    = Modificarea tipului
+TicketKanbanLogTypeDesc                = Creați un eveniment atunci când tipul unui tichet este modificat prin kanban
+TicketKanbanLogGroup                   = Modificarea grupului
+TicketKanbanLogGroupDesc               = Creați un eveniment atunci când grupul unui tichet este modificat prin kanban
+TicketKanbanLogSeverity                = Modificarea severității
+TicketKanbanLogSeverityDesc            = Creați un eveniment atunci când severitatea unui tichet este modificată prin kanban
+TicketKanbanLogSubject                 = Modificarea subiectului
+TicketKanbanLogSubjectDesc             = Creați un eveniment atunci când subiectul unui tichet este modificat prin kanban
+TicketKanbanLogDeadline                = Modificarea termenului limită
+TicketKanbanLogDeadlineDesc            = Creați un eveniment atunci când termenul limită al unui tichet este modificat prin kanban
+TicketKanbanClosedLimit                = Limita tichetelor închise
+TicketKanbanClosedLimitDesc            = Numărul maxim de tichete închise/anulate afișate în kanban (0 = nelimitat)
+
+# ===========================================================================
+# Ticket — trasabilitatea modificărilor — issue #4885
+# ===========================================================================
+TicketLogModifications                 = Trasabilitatea modificărilor
+TicketLogModificationsDesc             = Creați un eveniment pentru fiecare editare efectuată din fișa tichetului (subiect, mesaj, registre, persoană atribuită, terț, proiect, progres, stare, sarcini, documente)
+TicketMessageEdited                    = Mesaj modificat
+TicketMessageDeleted                   = Mesaj șters
+TicketTaskCreated                      = Sarcină creată: %s
+TicketDocumentGenerated                = Document generat
+TicketFileDeleted                      = Fișier șters
+
+# Panou de creare rapidă a unui tichet
+SelectNothing                          = — Selectați —
+QuickCreateTicket                      = Creați rapid un tichet
+TicketSubjectPlaceholder               = Titlul tichetului...
+TicketInitialMessage                   = Mesaj inițial
+OptionalDescription                    = Descriere (opțional)...
+Unassigned                             = Neatribuit
+QuickCreateAttachments                 = Atașamente
+QuickCreateDropzone                    = Trageți și plasați sau faceți clic pentru a selecta
+QuickCreateDropzoneActive              = Plasați aici…
+QuickCreateAttachmentHint              = Formate acceptate: imagini, PDF, documente. Max. 10 MB per fișier.
+QuickCreateTicketSuccess               = Tichetul %s a fost creat cu succes.
+
+# MeteoVigilance - Avertizare meteo Météo-France
+MeteoVigilance = Avertizare meteo Météo-France
+MeteoVigilancePanelTitle = Avertizare %s
+MeteoVigilanceAdvice2 = Fiți atent
+MeteoVigilanceAdvice3 = Fiți foarte vigilent
+MeteoVigilanceAdvice4 = Vigilență absolută
+MeteoVigilanceUpdatedAt = Actualizat %s
+MeteoVigilanceEnabled = Activați avertizarea meteo
+MeteoVigilanceEnabledDescription = Afișează widgetul de avertizare meteo Météo-France pe tabloul de bord (și banda de alertă în caz de avertizare portocalie/roșie).
+MeteoVigilanceLevel = Nivel de avertizare
+MeteoVigilanceActivePhenomena = Fenomene active
+MeteoVigilanceNoAlert = Nicio avertizare specială
+MeteoVigilanceSource = Sursă
+MeteoVigilanceSeeOnMeteoFrance = Vedeți pe vigilance.meteofrance.fr
+MeteoVigilanceNotConfigured = Cheia API Météo-France nu este configurată — faceți clic pentru a o configura
+MeteoVigilanceUnknownDepartment = Departamentul companiei nu a fost determinat
+MeteoVigilanceUnavailable = Datele de avertizare sunt momentan indisponibile
+MeteoVigilanceBannerTitle = Avertizare %s în curs în departamentul %s
+MeteoVigilanceLevel1 = Verde
+MeteoVigilanceLevel2 = Galben
+MeteoVigilanceLevel3 = Portocaliu
+MeteoVigilanceLevel4 = Roșu
+MeteoVigilancePhenomenon1 = Vânt puternic
+MeteoVigilancePhenomenon2 = Ploaie și inundații
+MeteoVigilancePhenomenon3 = Furtuni
+MeteoVigilancePhenomenon4 = Viituri
+MeteoVigilancePhenomenon5 = Zăpadă și polei
+MeteoVigilancePhenomenon6 = Val de căldură
+MeteoVigilancePhenomenon7 = Frig extrem
+MeteoVigilancePhenomenon8 = Avalanșe
+MeteoVigilancePhenomenon9 = Valuri și inundații costiere
+MeteoVigilanceSetup = Configurarea avertizării meteo
+MeteoVigilanceApiKey = Cheia API Météo-France
+MeteoVigilanceApiKeyDescription = Cheia API a portalului Météo-France (creați un cont și o aplicație «Bulletin Vigilance» pe <a href="https://portail-api.meteofrance.fr" target="_blank">portail-api.meteofrance.fr</a> pentru a genera cheia).
+MeteoVigilanceDepartment = Cod de departament (suprascriere)
+MeteoVigilanceDepartmentDescription = Lăsați gol pentru a deduce automat departamentul din adresa companiei. În caz contrar, introduceți un cod (ex. 35, 2A).
+MeteoVigilanceCacheTTL = Durata memoriei cache (secunde)
+MeteoVigilanceCacheTTLDescription = Durata în care datele API sunt păstrate în memoria cache înainte de un nou apel (implicit 3600).
+MeteoVigilanceSettings = Configurarea avertizării meteo
+MeteoVigilanceRefreshNow = Actualizați acum
+MeteoVigilanceRefreshed = Date actualizate: avertizare %s în departamentul %s
+
+# Sistemul de conversație al tichetelor
+Conversation = Conversație
+PublicMessage = Mesaj public
+ConvTo = Către
+ConvCc = Cc
+
+SaveNote = Salvați nota
+
+AddRecipient = Adăugați un destinatar
+NoRecipientFound = Niciun destinatar
+
+AddFile = Adăugați un fișier
+
+MentionAgents = Menționați agenți
+YouWereMentionedOnTicket = Ați fost menționat pe tichetul %s
+YouWereMentionedOnTicketBody = %s v-a menționat pe tichetul %s:
+
+Mentioned = Menționat
+
+# Crearea rapidă mobilă a planului de prevenire
+MobileQuickCreation = Creare rapidă mobilă
+MobilePPInteriorCompany = Întreprindere utilizatoare (internă)
+MobilePPResponsibleAutoSign = Responsabil (semnează automat)
+MobilePPSignatureSaved = Semnătură înregistrată
+MobilePPEditSignature = Modificați semnătura
+MobilePPDrawSignatureHint = Desenați semnătura dumneavoastră mai jos și salvați-o. Va fi reutilizată pentru planurile următoare.
+MobilePPClearSignature = Ștergeți
+MobilePPSaveSignature = Salvați semnătura mea
+MobilePPExteriorCompany = Întreprindere externă
+MobileSirenOrSiret = SIREN / SIRET
+MobileSirenOrSiretPlaceholder = 9 sau 14 cifre
+MobilePPResponsibleToSign = Responsabil care trebuie să semneze
+MobilePPChooseExistingContact = Alegeți un contact existent
+MobilePPNewContact = Contact nou
+MobilePPEmailForSignatureHelp = Acest email va primi cererea de semnătură.
+MobilePPPeriod = Perioada de intervenție
+MobilePPMaxOneYearHint = Maximum 1 an între data de început și data de sfârșit.
+MobilePPSubmit = Creați planul de prevenire
+MobilePPErrorNoSignature = Trebuie să vă salvați semnătura înainte de a crea planul.
+MobilePPErrorEmptySignature = Semnătura este goală.
+MobilePPErrorInvalidSiren = SIREN sau SIRET nevalid (se așteaptă 9 sau 14 cifre).
+MobilePPErrorEndBeforeStart = Data de sfârșit trebuie să fie ulterioară datei de început.
+MobilePPErrorMaxOneYear = Durata nu poate depăși 1 an.
+MobilePPErrorDatesRequired = Completați data de început și data de sfârșit.
+MobilePPErrorStartRequired = Data de început lipsește.
+MobilePPErrorEndRequired = Data de sfârșit lipsește.
+MobilePPErrorNoProject = Nu este configurat niciun proiect implicit de plan de prevenire.
+MobilePPCompanyFound = Întreprindere găsită:
+MobilePPCompanyNotFound = Nicio întreprindere găsită în baza de date: va fi creată una nouă.
+MobilePPWarningEmailNotSent = Planul a fost creat, dar emailul de semnătură nu a putut fi trimis.
+MobilePPWarningEmailNotConfigured = Planul a fost creat, dar emailul nu este configurat: cererea de semnătură nu a fost trimisă.
+MobilePPCreated = Planul de prevenire %s a fost creat.
+MobilePPUpdated = Planul de prevenire %s a fost actualizat.
+MobilePPSignatureEmailSubject = Cerere de semnare a planului de prevenire %s
+MobilePPSignatureEmailContent = Bună ziua,<br><br>Sunteți invitat să semnați planul de prevenire referitor la %s.<br><br><a href="%s">Faceți clic aici pentru a semna</a><br><br>Cu stimă.
+MobilePPSuccessTitle = Plan de prevenire creat
+MobilePPSuccessText = Responsabilul intern a semnat automat. O cerere de semnătură a fost trimisă întreprinderii externe.
+MobilePPViewPlan = Vedeți planul
+MobilePPCreateAnother = Creați un alt plan
+MobileSuccessInteriorSigned = Responsabil intern: semnat
+MobileSuccessExteriorNotified = Întreprindere externă: cerere de semnătură trimisă
+MobileSuccessExteriorNotSigned = Întreprindere externă: semnătură de obținut
+MobileSuccessExteriorNotNotified = Întreprindere externă: cerere de semnătură netrimisă
+MobileSuccessExteriorSigned = Întreprindere externă: semnat
+MobileSuccessDocumentGenerated = Documentul planului a fost generat
+MobilePPWarningEmailNotSentDetail = Emailul de semnătură nu a putut fi trimis: %s
+MobilePPWarningNoRecipientEmail = nicio adresă de email validă pentru responsabilul extern
+MobilePPSignatureEmailSentTo = Cerere de semnătură trimisă către %s
+MobilePPExtSignatureTitle = Semnătura întreprinderii externe
+MobilePPExtEmailSentOn = Cerere trimisă către %s la %s
+MobilePPExtEmailNotSent = Cerere de semnătură netrimisă: transmiteți linkul sau solicitați semnătura acum
+MobilePPSpreadDefaultsTitle = Afișarea publică a difuzării
+MobilePPSpreadShowCount = Afișați numărul de semnatari
+MobilePPSpreadShowName = Afișați numele și prenumele
+MobilePPSpreadShowContact = Afișați telefonul și emailul
+MobilePPSpreadHidePublicNote = Nu afișați nota publică
+MobilePPExtAlreadySigned = Semnat la %s
+MobilePPExtSignNow = Solicitați semnătura acum
+MobilePPExtResendEmail = Retrimiteți emailul
+MobilePPNoTagAvailable = Nicio etichetă de plan de prevenire nu este disponibilă.
+MobilePPCreateTag = Creați o etichetă
+MobileSpreadShareTitle = Partajați difuzarea
+MobileSpreadShareText = Cereți persoanelor vizate să scaneze acest cod. Fără cont și fără conectare, își completează datele de contact, își depun documentele și semnează.
+MobileSpreadOpen = Deschideți difuzarea
+MobilePPRisks = Riscuri
+MobilePPAddRisk = Adăugați un risc
+MobilePPRiskModalTitle = Alegeți un risc
+MobilePPRiskComment = Comentariu
+MobilePPRiskDescriptionPlaceholder = Descrieți riscul la fața locului
+MobilePPNoRiskYet = Niciun risc adăugat deocamdată.
+MobilePPDeleteRiskTitle = Ștergeți riscul
+MobilePPDeleteRiskConfirm = «%s» va fi retras din plan, împreună cu descrierea, fotografiile și protecțiile sale.
+MobilePPUserCompany = Întreprindere utilizatoare
+MobilePPUserCompanyShort = EU
+MobilePPConcernedCompanies = Privește
+MobilePPExteriorCompanyShort = EE
+MobilePPPriorFormalities = Formalități prealabile
+MobilePPPriorVisitDone = Inspecție comună prealabilă efectuată
+MobilePPPriorVisitTextPlaceholder = Ce a fost constatat în timpul inspecției
+MobileRiskCompanies = Întreprinderi vizate de riscuri (mobil)
+CertificationDictionary = Certificări și autorizări
+MobilePPChooseExistingCompany = Alegeți un terț existent
+MobilePPOrFillManually = sau introduceți informațiile
+MobilePPProtections = Protecții
+MobilePPAddProtection = Adăugați o protecție
+MobilePPProtectionModalTitle = Alegeți o protecție
+MobilePPMandatory = Obligatoriu
+MobileProtections = Protecții (mobil)
+MobilePPCertifications = Certificări obligatorii
+MobilePPAddCertification = Adăugați o certificare
+MobileCertifications = Certificări (mobil)
+MobilePPUploadCertPhoto = Trimiteți o fotografie
+MobilePPErrorCreatingThirdparty = Eroare la crearea terțului.
+MobilePPErrorCreatingContact = Eroare la crearea contactului.
+MobilePPErrorUpdatingPlan = Eroare la actualizarea planului de prevenire.
+MobilePPErrorCreatingPlan = Eroare la crearea planului de prevenire.
+MobileSuccessViewDocument = Vedeți documentul
+MobileSuccessPlanSentByEmailOn = Plan de prevenire trimis prin email la %s
+MobileSuccessExteriorSignedOn = Responsabilul Întreprinderii Externe (EE): Semnat la %s
+MobileSuccessExteriorPendingSignature = Responsabilul Întreprinderii Externe (EE): În așteptarea semnăturii
+MobilePPDefaultsTitle = Valori implicite (creare mobilă)
+MobilePPDefaultDateStartToday = Data de început = data de azi
+MobilePPDefaultDuration = Durata implicită a perioadei (zile)
+MobilePPEmailAutoSend = Trimiteți automat emailul de semnătură la creare
+
+# Crearea rapidă mobilă a permisului de lucru cu foc
+MobileFPPreventionPlanHelp = Întreprinderea externă și perioada planului selectat sunt preluate automat.
+MobileFPPeriod = Locul și perioada lucrărilor
+MobileFPMaxOneMonthHint = Maximum o lună între începutul și sfârșitul lucrărilor.
+MobileFPErrorMaxOneMonth = Durata nu poate depăși o lună.
+MobileFPErrorNoProject = Nu este configurat niciun proiect implicit de permis de lucru cu foc.
+MobileFPWorkTypes = Tipuri de lucrări
+MobileFPAddWorkType = Adăugați un tip de lucrări
+MobileFPWorkTypeModalTitle = Alegeți un tip de lucrări
+MobileFPSubmit = Creați permisul de lucru cu foc
+MobileFPCreated = Permisul de lucru cu foc %s a fost creat.
+MobileFPUpdated = Permisul de lucru cu foc %s a fost actualizat.
+MobileFPSignatureEmailSubject = Cerere de semnare a permisului de lucru cu foc %s
+MobileFPSignatureEmailContent = Bună ziua,<br><br>Sunteți invitat să semnați permisul de lucru cu foc pentru %s.<br><br><a href="%s">Faceți clic aici pentru a semna</a><br><br>Cu stimă.
+MobileFPSuccessTitle = Permis de lucru cu foc creat
+MobileFPViewPermit = Vedeți permisul
+MobileFPCreateAnother = Creați un alt permis
+
+# Digirisk PWA
+PwaApplication = Aplicație mobilă
+PwaNavHome = Acasă
+PwaNavPreventionPlans = Planuri
+PwaNavFirePermits = Permise
+PwaNavMenu = Meniu
+PwaNavFavoritesHint = Favorite afișate jos (max. %s)
+PwaNavAddFavorite = Adăugați la favorite
+PwaNavRemoveFavorite = Retrageți din favorite
+PwaHello = Bună ziua %s
+PwaResultCount = %s rezultat(e)
+AllStatus = Toate stările
+PwaTilePreventionPlanInProgress = Planuri în curs
+PwaTilePreventionPlanToSign = Planuri de semnat
+PwaTileFirePermitInProgress = Permise în curs
+PwaTileFirePermitToSign = Permise de semnat
+
+# Acțiuni în masă asupra sarcinilor
+MassValidateTasks = Validați sarcinile
+MassChangeTasksProject = Schimbați proiectul
+ConfirmMassValidateTasksQuestion = Sigur doriți să validați cele %s sarcină(i) selectată(e)? Vor fi validate doar sarcinile cu starea ciornă.
+ConfirmMassChangeTasksProjectQuestion = Sigur doriți să atașați cele %s sarcină(i) selectată(e) la proiectul ales?
+MassValidateTasksSuccess = %s sarcină(i) validată(e) din %s selectată(e)
+MassChangeTasksProjectSuccess = %s sarcină(i) atașată(e) la proiectul %s
+
+# PDF-ul planului de prevenire
+PreventionPlanLegalNotice = Planul de prevenire este un document obligatoriu care vizează prevenirea riscurilor legate de interferența dintre activitățile mai multor întreprinderi pe același amplasament, în conformitate cu articolul R4512-7 din Codul muncii francez.
+PreventionPlanUserCompany = Întreprindere Utilizatoare - EU
+PreventionPlanExteriorCompany = Întreprindere Externă - EE
+PreventionPlanUserCompanyResponsible = Responsabilul Întreprinderii Utilizatoare (EU)
+PreventionPlanExteriorCompanyResponsible = Responsabilul Întreprinderii Externe (EE)
+EmergencyNumbers = Numere de urgență
+Firefighters = Pompieri
+AnyEmergency = Orice urgență
+PriorVisitIntro = Întreprinderea utilizatoare a efectuat, înainte de executarea operațiunii, o inspecție comună prealabilă la data de %s. În timpul acestei vizite, următoarele puncte au fost prezentate de întreprinderea utilizatoare (art. R. 4512-2 și R. 4512-3 din Codul muncii francez):
+PriorVisitCheckList = Locurile de muncă|Instalațiile aflate acolo|Materialele eventual puse la dispoziția întreprinderilor externe|Delimitarea sectorului de intervenție al întreprinderilor externe|Marcarea zonelor din acest sector care pot prezenta pericole pentru lucrători|Indicarea căilor de circulație pe care le vor putea folosi lucrătorii, precum și vehiculele și utilajele de orice natură aparținând întreprinderilor externe|Definirea căilor de acces ale lucrătorilor la spațiile și instalațiile destinate EE (în special instalațiile sanitare, vestiarele colective și spațiile de servire a mesei)
+PriorVisitComments = Au fost consemnate următoarele observații:
+InterventionPeriodSentence = Acest plan începe la %s și se încheie la %s. Intervențiile se vor desfășura în următoarele intervale orare:
+RiskAnalysisIntro = Ați prevăzut %s intervenție(i) pentru acest plan de prevenire: mai jos, detaliul acțiunilor prevăzute, riscurile generate și mijloacele de prevenire puse în aplicare.
+PreventionPlanAttendants = Participanți: Întreprinderea Externă (EE) și subcontractanții
+Morning = Dimineața
+Afternoon = După-amiaza
+Signatures = Semnături
+SignaturePending = În așteptare
+PreventionPlanRiskPhotos = Fotografiile riscului
+InterventionPeriodOnly = Acest plan începe la %s și se încheie la %s.
+
+DigiRisk=DigiRisk
+DigiriskIdentification=DESCRIERE ȘI CARACTERISTICI
+DigiriskSecurity=SECURITATE
+DigiriskUserManual=MOD DE UTILIZARE SIMPLIFICAT
+DigiriskQualification=CALIFICARE ȘI AUTORIZARE
+DigiriskHygiene=IGIENĂ ȘI CURĂȚENIE
+DigiriskMaintenance=MENTENANȚĂ ȘI CONTROALE
+DangerCategory=Familie de risc
+SelectDangerCategory=Alegeți o familie de risc
+DescribeRiskOnProduct=Descrieți riscul pentru acest produs...
+ConfirmDeleteProductRisk=Ștergeți acest risc?
+AddProductRisk=Adăugați un risc de produs
+ClickToAddContent=Faceți clic pentru a adăuga conținut...
+AddProtection=Adăugați o protecție
+
+SelectProtection=Alegeți o protecție EIP
+TechnicalSheet=Fișă tehnică
+DigiriskRisks=RISCURI ȘI PROTECȚII
+MobileSuccessInteriorSignedOn=Responsabilul Întreprinderii Utilizatoare (EU): Semnat la %s
+
+MobileSuccessPlanSentByEmailOn = Plan de prevenire trimis prin email la %s
+MobileSuccessExteriorSignedOn = Responsabilul Întreprinderii Externe (EE): Semnat la %s
+MobileSuccessExteriorPendingSignature = Responsabilul Întreprinderii Externe (EE): În așteptarea semnăturii
+
+MobilePPErrorInvalidEmail = Respectați formatul adresei de email.
+MobilePPErrorInvalidPhone = Respectați formatul numărului de telefon.
+MobilePPExtSendEmail = Trimiteți emailul
+MobilePPErrorMailServerNotConfigured = Serverul dumneavoastră de email nu este configurat, contactați administratorul.
+MobilePPDoliletterNotInstalled = Modulul Doliletter nu este instalat. Difuzarea planurilor de prevenire și a permiselor de lucru cu foc nu va fi disponibilă (contactați administratorul)
+
+# Stări și tipuri pentru indicii
+preventionplan = Plan de prevenire
+Locked = Blocat
+InProgress = În curs
+ValidatePendingSignature = În așteptarea semnăturii
+Archived = Arhivat
+
+ProductFIChaptersManagement=Personalizarea capitolelor fișei de instruire
+ProductFIChaptersManagementSub=Personalizarea filei "Fișă de instruire" și a filei "Riscuri" din fișa produsului
+DefaultContent=Conținut implicit
+CustomSvgUploaded=SVG personalizat
+DeleteCustomSvg=Ștergeți
+DefaultSvgUsed=SVG implicit
+
+PwaTilePreventionPlanLocked = Planuri validate
+PwaTileFirePermitLocked = Permise validate
+
+# ===========================================================================
+# Dicționarul coloanelor Kanban ale planului de acțiune — issue #5017
+# ===========================================================================
+ActionPlanColumnDictionary           = Coloanele Kanban ale planului de acțiune
+ActionPlanColumnDictionaryDesc       = Coloane afișate în Kanbanul PAPRIPACT atunci când modul dicționar este activat: denumire, interval de progres, culoare și pictogramă
+KanbanColumnSource                   = Sursa coloanelor
+KanbanColumnSourceDesc               = Împărțiți Kanbanul cu pragurile procentuale de mai jos (funcționare istorică) sau cu dicționarul coloanelor
+KanbanColumnSourceThresholds         = Praguri procentuale (implicit)
+KanbanColumnSourceDictionary         = Dicționarul coloanelor
+ActionPlanColumnProgressHelp         = Limitele de progres acoperite de coloană, de la 0 la 100
+ActionPlanColumnColorHelp            = Culoarea hexazecimală a coloanei, de exemplu #3085d6
+ActionPlanColumnPictoHelp            = Numele pictogramei Font Awesome, de exemplu fa-check
+Progress_min                         = Progres min.
+Progress_max                         = Progres max.
+Picto                                = Pictogramă
+
+# Urmărirea timpului consumat
+GenerateTimeSpentReport = Generați urmărirea timpului (PDF)
+TimeSpentReport = Urmărirea timpului consumat
+TimeSpentReportUsersHelp = Lăsați gol pentru a include toate persoanele care au înregistrat timp pe acest proiect.
+TimeSpentReportSummary = Rezumat pe utilizator
+TimeSpentReportGrandTotal = Total general
+TimeSpentReportGeneratedAt = Generat la
+TimeSpentReportWholePeriod = De la începutul proiectului
+TimeSpentReportNoData = Niciun timp consumat nu corespunde utilizatorilor și perioadei selectate.
+TimeSpentDocumentPDFDescription = Timp consumat pe un proiect, grupat pe utilizator
+
+# Alinierea permisului de lucru cu foc mobil la planul de prevenire - issue #5042
+MobileProgress = Progres
+MobileStepDone = EFECTUAT
+MobileStepInProgress = ÎN CURS
+MobileStepTodo = DE EFECTUAT
+MobileStepSignedOn = SEMNAT LA
+MobilePPStepCreated = PP creat
+MobileFPStepCreated = PF creat
+MobileStepUserCompanyResponsible = Resp. EU
+MobileStepExteriorCompanyResponsible = Resp. EE
+MobileStepLock = Blocați
+MobileStepArchive = Arhivați
+MobileLock = Blocați
+MobileResponsibleShort = Resp.
+MobileMailSentTo = Email trimis către
+MobilePPMotif = Motivul intervenției
+MobilePPSchedules = Program de intervenție
+MobilePPConfigHours = Configurați aici programul dumneavoastră
+MobilePPCopyCompanyHours = Copiați programul companiei
+FirePermitUserCompany = Întreprindere Utilizatoare - EU
+FirePermitExteriorCompany = Întreprindere Externă - EE
+MobileFPMotif = Motivul lucrărilor
+MobileFPMotifPlaceholder = Ex.: sudură pe șarpantă
+MobileFPNoMotif = Niciun motiv completat
+MobileFPSchedules = Programul lucrărilor
+MobileFPWorkTypeDescriptionPlaceholder = Descrieți lucrările la fața locului
+MobileFPNoWorkTypeYet = Niciun tip de lucrări adăugat deocamdată.
+MobileFPDeleteWorkTypeTitle = Ștergeți tipul de lucrări
+MobileFPDeleteWorkTypeConfirm = «%s» va fi retras din permis, împreună cu descrierea, materialul, fotografiile și protecțiile sale.
+MobileFPNoTagAvailable = Nicio etichetă de permis de lucru cu foc nu este disponibilă.
+MobileFPErrorUpdatingPermit = Eroare la actualizarea permisului de lucru cu foc.
+MobileFPErrorCreatingPermit = Eroare la crearea permisului de lucru cu foc.
+MobileFPLockNeedsSignature = Permisul trebuie semnat înainte de a putea fi blocat.
+MobileFPSpreadAvailableOnceSignedAndLocked = Difuzarea va fi disponibilă de îndată ce permisul va fi semnat de responsabili și blocat.
+MobileFPDefaultDateStartToday = Data de început = data de azi
+MobileFPDefaultDuration = Durata implicită a perioadei (zile)
+firepermit = Permis de lucru cu foc
+ErrorRecordIsLocked = Această înregistrare este blocată, nu mai poate fi modificată.
+MobilePPEmailTemplateExt = Șablon de email pentru responsabilul întreprinderii externe
+MobilePPEmailTemplateInt = Șablon de email pentru lucrătorii întreprinderii externe
+
+#
+# ListingRisksDocument PDF - Listă de riscuri în format PDF
+#
+
+ListingRisksDocumentPDF            = Listă de riscuri PDF
+ListingRisksDocumentPDFDescription = Listă de riscuri în PDF nativ, deschisă pe mini documentul de evaluare a riscurilor al elementului
+ListingRisksDocumentPDFTitle       = EVALUAREA RISCURILOR
+ListingRisksEstablishment          = Unitate
+ListingRisksCoverContent           = Cuprins
+ListingRisksCoverHierarchy         = Ierarhie
+ListingRisksCoverDuerpFollowUp     = Monitorizarea documentului de evaluare a riscurilor
+ListingRisksCoverEmergencyNumbers  = Numere de urgență
+ListingRisksCoverReportIncident    = Semnalați un accident sau o problemă
+ListingRisksCoverRegisters         = Registre de securitate și sănătate în muncă și de pericol grav și iminent
+ListingRisksCoverIllustration      = Imagine ilustrativă
+NoPreventionOfficerAssigned        = Niciun responsabil cu prevenirea desemnat
+NoEmergencyNumberConfigured        = Niciun număr de urgență configurat
+NoResponsibleAssigned              = Niciun responsabil desemnat
+ListingRisksLegalTitle             = Cadru de reglementare
+RiskDefinitionTitle                = Definiția unui risc
+RiskDefinitionText                 = Risc: subst. masc. Pericol sau inconvenient la care cineva se expune. A face ceva pe riscul propriu, asumându-și întreaga responsabilitate pentru consecințe. Un risc calculat. A-și asuma riscuri: a se expune unui pericol.
+DangerDefinitionTitle              = Definiția unui pericol
+DangerDefinitionText               = Pericol: subst. neutru (din latina populară dominiarium «putere», de la dominus «stăpân»; inițial faptul de a fi la discreția cuiva). Ceea ce amenință siguranța sau viața cuiva; ceea ce riscă să compromită o situație, o întreprindere etc.
+SingleDocumentTitle                = Documentul de evaluare a riscurilor
+SingleDocumentText                 = Documentul de evaluare a riscurilor este reglementat de articolele R4121-1 până la 4 din Codul muncii francez. Principiile generale de prevenire impun ordinea de tratare a riscului.
+PreventionPrinciplesTitle          = Principiile generale de prevenire - Articolul L4121-2
+PreventionPrinciplesIntro          = Angajatorul pune în aplicare măsurile prevăzute la articolul L. 4121-1 pe baza următoarelor principii generale de prevenire:
+PreventionPrinciple1               = Evitarea riscurilor.
+PreventionPrinciple2               = Evaluarea riscurilor care nu pot fi evitate.
+PreventionPrinciple3               = Combaterea riscurilor la sursă.
+PreventionPrinciple4               = Adaptarea muncii la om, în special în ceea ce privește proiectarea posturilor de lucru, precum și alegerea echipamentelor de muncă și a metodelor de muncă și de producție, în vederea limitării muncii monotone și a muncii în ritm impus și a reducerii efectelor acestora asupra sănătății.
+PreventionPrinciple5               = Luarea în considerare a stadiului de evoluție a tehnicii.
+PreventionPrinciple6               = Înlocuirea a ceea ce este periculos cu ceea ce nu este periculos sau cu ceea ce este mai puțin periculos.
+PreventionPrinciple7               = Planificarea prevenirii prin integrarea, într-un ansamblu coerent, a tehnicii, a organizării muncii, a condițiilor de muncă, a relațiilor sociale și a influenței factorilor de mediu, în special a riscurilor legate de hărțuirea morală și de hărțuirea sexuală, precum și a celor legate de comportamentele sexiste.
+PreventionPrinciple8               = Adoptarea de măsuri de protecție colectivă, acordându-le prioritate față de măsurile de protecție individuală.
+PreventionPrinciple9               = Furnizarea de instrucțiuni adecvate lucrătorilor.
+ListingRisksCotationMethodTitle    = Metoda de calcul a cotațiilor
+ListingRisksCotationMethodText     = Cotația unui risc este un punctaj de la 0 la 100 atribuit la evaluarea acestuia. Nivelul de risc indicat în listă decurge direct din acesta, conform grilei de mai jos.
+ListingRisksCotationLevel          = Nivel
+ListingRisksCotationRange          = Cotație
+ListingRisksCotationMeaning        = Semnificație
+ListingRisksCotationAction         = Conduita de urmat
+ListingRisksCotationAction1        = Menținerea mijloacelor de prevenire existente.
+ListingRisksCotationAction2        = Înscrierea unei acțiuni în programul anual de prevenire.
+ListingRisksCotationAction3        = Inițierea unei acțiuni de prevenire pe termen scurt.
+ListingRisksCotationAction4        = Acțiune imediată, expunerea trebuie să înceteze.
+ListingRisksListTitle              = Lista riscurilor
+ListingRisksActionPlan             = Acțiunile programului anual de prevenire
+ListingRisksCotationColumn         = Cot.
+ListingRisksRiskColumn             = Risc
+ListingRisksAssessmentColumn       = Informații despre evaluare
+NoRiskAssessed                     = Niciun risc evaluat în acest perimetru

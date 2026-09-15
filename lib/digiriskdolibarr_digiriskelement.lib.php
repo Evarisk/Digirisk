@@ -81,6 +81,11 @@ function digiriskelement_prepare_head(DigiriskElement $object): array
             $h++;
         }
 
+        $head[$h][0] = dol_buildpath('digiriskdolibarr/view/digiriskelement/digiriskelement_product.php', 1) . '?id=' . $object->id;
+        $head[$h][1] = $conf->browser->layout == 'classic' ? '<i class="fas fa-box pictofixedwidth"></i>' . $langs->trans('ProductsServices') : '<i class="fas fa-box"></i>';
+        $head[$h][2] = 'elementProduct';
+        $h++;
+
         $head[$h][0] = dol_buildpath('digiriskdolibarr/view/digiriskelement/digiriskelement_informations.php', 1) . '?id=' . $object->id;
         $head[$h][1] = $conf->browser->layout == 'classic' ? '<i class="fas fa-info-circle pictofixedwidth"></i>' . $langs->trans('Informations') : '<i class="fas fa-info-circle pictofixedwidth"></i>';
         $head[$h][2] = 'elementInformations';
