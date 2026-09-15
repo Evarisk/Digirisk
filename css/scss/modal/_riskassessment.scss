@@ -94,8 +94,7 @@
 
         /** A one line field next to a 50px high cotation row looks unfinished: align both columns */
         textarea {
-          height: 50px !important;
-          min-height: 50px !important;
+          min-height: 50px;
         }
       }
     }

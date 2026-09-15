@@ -1,0 +1,2387 @@
+﻿# Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+#
+# Allgemein
+#
+
+# Module label 'ModuleDigiriskdolibarrName'
+ModuleDigiriskdolibarrName = Digirisk
+
+# Module description 'ModuleDigiriskdolibarrDesc'
+ModuleDigiriskdolibarrDesc = Digirisk für Dolibarr
+
+# Fehlendes Saturne-Modul
+SaturneModuleMissing = Das Modul Saturne wird von Digirisk benötigt. Laden Sie es kostenlos im Dolistore (https://dolistore.com/en/modules/1906-Saturne.html) herunter und installieren Sie es, bevor Sie Digirisk aktivieren.
+
+# Spalte der Tutorial-Bilder auf den Konfigurationsseiten
+TutoImage = Bild
+
+#
+# Administrationsseite
+#
+
+# Daten
+DigiriskdolibarrSetup       = Konfiguration des Moduls Digirisk
+DigiriskdolibarrSetupPage        = Konfigurationsseite des Moduls Digirisk
+AgendaModuleRequired        = Um die Nachvollziehbarkeit der Aktionen in Digirisk zu gewährleisten, stellen Sie sicher, dass das Modul Termine aktiviert ist
+DigiriskDolibarrDescription = Digirisk für Dolibarr
+HowToSetupOtherModules      = Für weitere Funktionen in Digirisk können Sie zahlreiche Module aktivieren (Lieferantenverwaltung, Rechnungen usw.) über diesen Link:
+ConfigMyModules             = Konfiguration der Module
+AvoidLogoProblems              = Um Probleme mit Logos in den erzeugten Dokumenten zu vermeiden, beachten Sie bitte diese Konfigurationshinweise:
+LogoHelpLink                = https://wiki.dolibarr.org/index.php?title=Premiers_paramétrages
+SecurityConfiguration       = Konfiguration der Sicherheitsdaten
+SocialConfiguration          = Konfiguration der Sozialdaten
+Uncompleted                     = Nicht ausgefüllt
+DigiriskData                 = Konfigurierbare Daten von Digirisk
+DigiriskManagement          = Weiterleitung nach der Anmeldung
+DigiriskDescription          = Standardmäßig auf die Digirisk-Startseite weiterleiten statt auf die von Dolibarr.
+HowToSetupIHM                   = Für weitere Möglichkeiten zur Darstellung von Dolibarr (Konfiguration des Hintergrundbilds usw.) können Sie diesen Link aufrufen:
+ConfigIHM                    = Konfiguration der Darstellung
+ConfigDico                     = Zur Konfigurationsseite der Wörterbücher wechseln
+LinkedProject               = Verknüpftes Projekt
+DigiriskUpdate                  = Aktualisierung von Digirisk:
+Security                       = Sicherheit
+HowToSharedElement          = Weitere Informationen zur Konfiguration der geteilten Elemente finden Sie unter diesem Link:
+
+HowToSharedElementLink        = https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Configuration
+ConfigSharedElement         = Konfiguration der geteilten Elemente (Risiken/Kennzeichnungen)
+DisabledSharedElement       = Option deaktiviert, weil Multi-Company nicht aktiviert ist oder die Konfiguration der geteilten Elemente (Risiken/Kennzeichnungen) nicht durchgeführt wurde
+DigiriskEventAutoDesc       = Legen Sie hier die Ereignisse fest, für die Digirisk automatisch einen Eintrag im Kalender erstellt. Jedes Ereignis enthält die Informationen zur durchgeführten Aktion.
+DigiriskActionsEvents       = Ereignisse, für die Digirisk automatisch einen Eintrag im Kalender anlegen soll.
+DigiriskDolibarr            = Digirisk
+Create                      = Anlegen
+
+# Ticket
+MultiCompanyTicketPublicInterfaceConfig = Konfiguration der öffentlichen Ticket-Schnittstelle für mehrere Mandanten
+Subtitle                                = Untertitel
+
+# DigiriskElement
+DigiriskElementDepthGraph            = Tiefe in den Diagrammen der Digirisk-Elemente
+DigiriskElementDepthGraphDescription = Diese Option legt die Tiefe in den Diagrammen der Digirisk-Elemente fest <br> Standard: Stufe 1
+
+# WHSRegister = Arbeitsschutzregister
+TicketsPublicInterfaceConfig         = Konfiguration der öffentlichen Ticket-Schnittstelle
+WHSRegister                          = Arbeitsschutzregister
+CurrentTicketPublicInterfaceURL      = URL der öffentlichen Ticket-Schnittstelle
+MulticompanyTicketPublicInterfaceURL = URL der öffentlichen Ticket-Schnittstelle für mehrere Mandanten
+OriginURL                            = Ursprungs-URL
+ShortURL                             = Kurz-URL
+ExternalURL                          = Externe URL
+AddExtraField                        = Zusatzfeld anlegen
+IfEmptyVisibleAllCategories          = Wenn leer, in allen Kategorien sichtbar
+
+# DigiQuali Sheet - Vorlagen
+LinkDigiriskdolibarr_digiriskstandard                 = Verknüpfung mit den Hauptentitäten von Digirisk Standard aktivieren
+LinkDigiriskdolibarr_digiriskstandardDescription      = Ermöglicht die Verknüpfung der Digirisk-Standardentitäten mit den Vorlagen
+LinkDigiriskdolibarr_digiriskelement                  = Verknüpfung mit den Gruppierungen und Arbeitseinheiten aktivieren
+LinkDigiriskdolibarr_digiriskelementDescription       = Ermöglicht die Verknüpfung der Gruppierungen und Arbeitseinheiten mit den Vorlagen
+LinkDigiriskdolibarr_risk                             = Verknüpfung mit den Risiken aktivieren
+LinkDigiriskdolibarr_riskDescription                  = Ermöglicht die Verknüpfung der Risiken mit den Vorlagen
+LinkDigiriskdolibarr_riskassessment                   = Verknüpfung mit den Bewertungen aktivieren
+LinkDigiriskdolibarr_riskassessmentDescription        = Ermöglicht die Verknüpfung der Bewertungen mit den Vorlagen
+LinkDigiriskdolibarr_evaluator                        = Verknüpfung mit den Bewertern aktivieren
+LinkDigiriskdolibarr_evaluatorDescription             = Ermöglicht die Verknüpfung der Bewerter mit den Vorlagen
+LinkDigiriskdolibarr_risksign                         = Verknüpfung mit den Kennzeichnungen aktivieren
+LinkDigiriskdolibarr_risksignDescription              = Ermöglicht die Verknüpfung der Kennzeichnungen mit den Vorlagen
+LinkDigiriskdolibarr_preventionplan                   = Verknüpfung mit den Präventionsplänen aktivieren
+LinkDigiriskdolibarr_preventionplanDescription        = Ermöglicht die Verknüpfung der Präventionspläne mit den Vorlagen
+LinkDigiriskdolibarr_firepermit                       = Verknüpfung mit den Feuererlaubnisscheinen aktivieren
+LinkDigiriskdolibarr_firepermitDescription            = Ermöglicht die Verknüpfung der Feuererlaubnisscheine mit den Vorlagen
+LinkDigiriskdolibarr_accident                         = Verknüpfung mit den Unfällen aktivieren
+LinkDigiriskdolibarr_accidentDescription              = Ermöglicht die Verknüpfung der Unfälle mit den Vorlagen
+LinkDigiriskdolibarr_accidentinvestigation            = Verknüpfung mit den Unfalluntersuchungen aktivieren
+LinkDigiriskdolibarr_accidentinvestigationDescription = Ermöglicht die Verknüpfung der Untersuchungen mit den Vorlagen
+
+#
+# DigiriskDolibarr
+#
+
+# Berechtigung
+LireDigirisk                 = Digirisk-Übersicht einsehen
+ReadDigirisk                 = Digirisk-Übersicht einsehen (Lesen)
+YouDontHaveTheRightToSeeThis = Sie haben keine Berechtigung, die Gruppierungen und Arbeitseinheiten zu sehen
+CanNotDoThis                 = Sie haben keine Berechtigung, dies zu tun
+EnableDigiriskdolibarr       = Bitte aktivieren Sie das Modul DigiriskDolibarr, um auf diese Seite zuzugreifen
+
+# Daten
+DigiriskMenu          = Fügen Sie Informationen zu Ihrem Unternehmen/Ihrer Organisation hinzu. Klicken Sie unten auf der Seite auf "Speichern", um sie zu sichern
+DigiriskConfigSociety = Konfiguration des Unternehmens
+PermissionDenied      = Zugriff verweigert
+AddUser               = Benutzer anlegen
+StartDate             = Startdatum
+EndDate               = Enddatum
+NoPhoneNumber         = Keine Telefonnummer
+HasBeenCreatedF       = wurde angelegt
+HasBeenCreatedM       = wurde angelegt
+HasNotBeenCreatedF    = wurde nicht angelegt
+HasNotBeenCreatedM    = wurde nicht angelegt
+YourDocuments         = Dokumente
+NoData                = k. A.
+HasBeenEditedF        = wurde bearbeitet
+HasBeenEditedM        = wurde bearbeitet
+HasNotBeenEditedF     = wurde nicht bearbeitet
+HasNotBeenEditedM     = wurde nicht bearbeitet
+
+HasBeenDeletedF    = wurde gelöscht
+HasBeenDeletedM    = wurde gelöscht
+HasNotBeenDeletedF = wurde nicht gelöscht
+HasNotBeenDeletedM = wurde nicht gelöscht
+
+DigiriskUserGroup                 = Digirisk - Benutzer
+DigiriskUserGroupDescription      = Die Digirisk-Benutzergruppe hat die Berechtigung, die Digirisk-Objekte einzusehen und zu bearbeiten
+DigiriskAdminUserGroup            = DigiRisk - Administratoren
+DigiriskAdminUserGroupDescription = Die Administratorgruppe hat alle Berechtigungen für DigiRisk und die erforderlichen Module
+DigiriskReaderGroup               = DigiRisk - Leser
+DigiriskReaderGroupDescription    = Die Lesergruppe hat alle Leseberechtigungen für DigiRisk und die erforderlichen Module
+
+ContractType              = Vertragsart
+Apprentice/Student        = Auszubildender/Schüler
+Interim                   = Leiharbeitnehmer
+ProfessionalQualification = Berufliche Qualifikation
+DigiriskDocumentation     = Dokumentation von Digirisk
+
+SelectUser               = Benutzer auswählen
+LabourInspectorFirstName = Gewerbe-
+LabourInspectorLastName  = aufsicht
+LabourInspector          = Gewerbeaufsicht
+LabourInspectorSociety   = Partner Gewerbeaufsicht
+LabourInspectorAssigned  = Gewerbeaufsicht
+
+SocieteSchedules = Öffnungszeiten des Unternehmens
+weekDayDefault   = Siehe Website
+weekEndDefault   = Geschlossen Geschlossen
+
+#
+# DigriskDocuments - Digirisk-Dokumente
+#
+
+# Daten
+DigiriskDocuments              = Digirisk-Dokument
+Responsible                    = Verantwortlicher
+ContactsAction                 = Kontakte der Aktion
+PERCOTooltip                   = Wenn Ihr Unternehmen über einen PERCO-Sparplan verfügt, aktivieren Sie dieses Kästchen
+PEETooltip                     = Wenn Ihr Unternehmen über einen PEE-Sparplan verfügt, aktivieren Sie dieses Kästchen
+ShowPictoName                  = Namen des Gefahrenpiktogramms anzeigen
+ShowPictoNameDescription       = Den Namen des Gefahrenpiktogramms des Risikos in den Dokumenten anzeigen <br> Nützlich, wenn die Tabelle in eine Tabellenkalkulation übernommen werden soll
+RiskAssessmentColor            = Farbe der Bewertungen
+RiskAssessmentColorDescription = Zeigt die Farbe der Bewertungen im Dokument Papripact-A3-Querformat an
+
+#
+# LegalDisplay - Gesetzlicher Aushang
+#
+
+# Berechtigung
+LegalDisplaysMin = Gesetzliche Aushänge
+
+# Daten
+LegalDisplay             = Gesetzlicher Aushang
+Legaldisplay             = Gesetzlicher Aushang
+HowToSetDataLegalDisplay = Um die Daten für den gesetzlichen Aushang zu konfigurieren, gehen Sie zu Start - Konfiguration - Unternehmen/Organisation - Sicherheit
+
+LegalDisplayDocumentGenerated       = Erzeugung des gesetzlichen Aushangs
+LabourDoctor                        = Betriebsarzt
+LabourInspector                     = Gewerbeaufsicht
+FireBrigade                         = Feuerwehr
+AllEmergencies                      = Alle Notfälle
+RightsDefender                      = Bürgerbeauftragter
+PoisonControlCenter                 = Giftnotrufzentrale
+Police                              = Polizeinotruf
+SafetyInstructions                  = Sicherheitsanweisungen
+ResponsibleToNotify                 = Zu benachrichtigender Verantwortlicher
+PreventionOfficers                  = Präventionsverantwortliche
+PreventionOfficer                   = Präventionsverantwortlicher
+LocationOfDetailedInstructions      = Ort der ausführlichen Anweisung
+LocationOfDetailedInstructionsValue = Keine ausführliche Anweisung an diesem Standort
+FirstAid                            = Erste Hilfe
+FirstAidValue                       = <h2>Liste der am Standort anwesenden Ersthelfer (Name, Unternehmen, Telefon)</h2><br><br>Jedes Team muss so zusammengesetzt sein, dass jedem Teammitglied unter allen Umständen Erste Hilfe geleistet werden kann.<br />Die Ersthelfer müssen eindeutig gekennzeichnet und allen bekannt sein.<h2>Verhalten im Falle eines Unfalls</h2><br><br><h3>Leichter Unfall</h3><br><ul><li> - Versorgung durch die Ersthelfer</li><br><li> - Vorhandensein eines Verbandkastens</li></ul><br><br>Jede Maschine ist mit mindestens einem Verbandkasten ausgestattet, mit dem leichte Verletzungen versorgt werden können.<br><br><h3>Schwerer Unfall</h3><br><ul><li> - Den am Standort anwesenden Ersthelfer verständigen</li><br><li> - Das Notfallverfahren auslösen</li><br><li> - Den Verantwortlichen des Einsatzbetriebs informieren, Betriebsbereitschaft rund um die Uhr</li><br><li> - Im Falle eines Unfalls Kontakt aufnehmen</li></ul><br><br>Der Einsatzbetrieb führt die Notrufnummern im Anhang auf. <br />
+AddPhoneNumber                      = Dem Benutzer eine Telefonnummer hinzufügen
+ConfigureLabourInspector            = Eine Gewerbeaufsicht konfigurieren
+SocietyAdditionalDetails            = Ergänzende Informationen zum Unternehmen
+GeneralMeansAtDisposal              = Bereitgestellte allgemeine Mittel
+GeneralMeansAtDisposalValue         = <h2>Bereitgestellte Rettungsmittel</h2><br><ul><li> - Sanitätsraum</li><br><li> - Unsere Ersthelfer sind an ihren Helmen und ihrer Arbeitskleidung mit dem Ersthelfer-Abzeichen gekennzeichnet</li><br><li> - Verbandkästen für leichte Unfälle sind an jedem Standort verfügbar</li></ul><br><br><h2>Anweisungen bei leichten Unfällen</h2><br><ul><li> - Den nächstgelegenen Ersthelfer kontaktieren</li><br><li> - Versorgung mit dem bereitgestellten Verbandkasten</li><br><li> - Meldung am Standort:</li></ul><br><br><h2>Anweisungen im Falle eines Unfalls</h2><br><ul><li> - Feuerwehr: 18</li><br><li> - Rettungsdienst: 15</li><br><li> - Polizei und Gendarmerie: 17</li><br><li> - Europäische Notrufnummer: 112</li></ul><br><br><h2>Anweisungen im Brandfall</h2><br>Gehen Sie im Brandfall in dieser Reihenfolge vor:<br><ol><li> - Den Alarm auslösen.</li><br><li> - Das Feuer (sofern es nicht zu groß ist) mit einem Feuerlöscher bekämpfen.</li><br><li> - Ist das Feuer nach dem Einsatz eines einzigen Feuerlöschers nicht erloschen oder bereits zu groß, die Feuerwehr verständigen.</li><br><li> - Türen und Fenster schließen, bevor Sie die Räume verlassen.</li><br><li> - Die ausgebildeten Teams um Hilfe bitten.</li><br></ol>
+GeneralInstructions                 = Allgemeine Anweisungen
+GeneralInstructionsValue            = <h2>Alle Anlagen</h2><br><br><p>Rauchen, Feuer machen oder die Verwendung offener Flammen ist in und auf den Anlagen strengstens untersagt.<br />Erfordert der Einsatz die Verwendung einer offenen Flamme (Schweißarbeiten usw.), muss zwingend ein Feuererlaubnisschein ausgestellt werden (siehe Beispiel in Anhang 9.5).<br />Grundsätzlich ist der Zugang zu den Anlagen für Unbefugte untersagt.<br />Jeder Beteiligte muss seine Befähigungsnachweise und Schulungsbescheinigungen mit sich führen. Er muss sie am Standort auf Verlangen des Einsatzbetriebs vorzeigen können.</p><br><br><h2>Befähigungen</h2><br>Jede beteiligte Person muss eine Kopie der folgenden Befähigungsnachweise besitzen:<br><ul><li> - Elektrotechnische Befähigung entsprechend den auszuführenden Arbeiten</li><br><li> - Schulungsbescheinigung oder Befähigung für Höhenarbeiten und Höhenrettung</li></ul><br>Und in der Lage sein, sie auf einfache Anforderung des Einsatzbetriebs, des Einsatz- bzw. Bauleiters oder eines vereidigten Aufsichtsbeamten vorzulegen<br><br><h2>Persönliche Schutzausrüstung</h2><br>Jede beteiligte Person muss je nach Art der ausgeführten Arbeiten und den in der Gefährdungsbeurteilung festgelegten Schutzmaßnahmen über die folgende persönliche Schutzausrüstung verfügen können.<br><br><h3>Verschiedene Arbeiten</h3><br><ul><li> - Für Höhenarbeiten ausgelegter Helm (EN397) mit Kinnriemen und/oder mit elektrischer Isolierung (elektrische Umgebung)</li><br><li> - Sicherheitsschuhe</li><br><li> - Gehörschutz, falls erforderlich</li><br><li> - Sonstiges (bitte angeben): je nach ausgeführten Arbeiten und den damit verbundenen Risiken.</li></ul><br><br><h3>Elektrische Arbeiten</h3><br><ul><li> - Isoliermatte oder Isolierschemel</li><br><li> - Der Spannungsebene angepasste Handschuhe</li><br><li> - Helme für elektrische Arbeiten mit Gesichtsschutz (EN166)</li><br><li> - Vorgeschriebene PSA für Arbeiten an Mittelspannung (UTE C 18-510)</li></ul><br><br><h3>Sonstiges</h3><br>Hinweis: Die Fremdfirmen müssen ihren Beschäftigten die oben genannte PSA zur Verfügung stellen. In den Übergabestationen befinden sich ein Schemel und eine Rettungsstange.<br><br><h3>Höhenarbeiten</h3><br><ul><li> - Vorgeschriebene PSA (Auffanggurt, Helm, 2 Verbindungsmittel mit Falldämpfer oder Y-Verbindungsmittel, Karabiner, Höhensicherungsgerät usw.) mit gültiger Prüfung</li><br><li> - Automatisches Rettungssystem:</li><br><li> - Anzahl: 1 Rettungsset (ausgelegt für 2 Personen)</li><li>Ort: in der Arbeitsbühne</li><br><li> - Denken Sie an ein zusätzliches Rettungsset, wenn sich mehr als zwei Personen in der Arbeitsbühne befinden</li><br><li> - Sonstiges (bitte angeben): verwendetes Höhensicherungsgerät: HACA mit der Referenz 0529 7103 (Brustbefestigung am Auffanggurt)</li></ul><br><br>Die Höhensicherungsgeräte müssen mit dem festen Sicherungssystem der Maschinen kompatibel sein. Die Höhensicherungsgeräte müssen der neuesten Norm entsprechen und die ergänzenden Prüfungen (Zusatzprüfungen CNB/P/11.073 vom 13.10.2010) erfolgreich bestanden haben, die durch die Stellungnahme des französischen Arbeitsministeriums vom 28. September 2010 vorgeschrieben sind, um die Konformität mit den Anforderungen der Richtlinie 89/686/EWG zu gewährleisten.
+RulesOfProcedure                    = Betriebsordnung
+RulesOfProcedureValue               = Verfügbar am gesetzlich vorgeschriebenen Aushang im Pausenraum
+CollectiveAgreement                 = Tarifverträge
+CollectiveAgreementValue            = Verfügbar auf der Website der Regierung:<br /><a href="https://www.service-public.fr/particuliers/vosdroits/F78" target="_blank">https://www.service-public.fr/particuliers/vosdroits/F78</a>
+legaldisplay.odt                    = Gesetzlicher Aushang
+legaldisplay_custom.odt             = Individueller gesetzlicher Aushang
+
+#
+# InformationsSharing - Informationsverbreitung
+#
+
+# Berechtigung
+InformationsSharingsMin = Informationsverbreitungen
+
+# Daten
+InformationsSharing                  = Informationsverbreitung
+Informationssharing                  = Informationsverbreitung
+InformationsSharingDocumentGenerated = Erzeugung der Informationsverbreitung
+HowToSetDataInformationsSharing      = Um die Daten zur Informationsverbreitung zu konfigurieren, gehen Sie zu Start - Konfiguration - Unternehmen/Organisation - Soziales
+ConfigureSecurityAndSocialData       = Die Unternehmensdaten konfigurieren
+LastMainDoc                          = Zuletzt erzeugtes Dokument
+
+ParticipationAgreement      = Vereinbarungen zur Gewinnbeteiligung
+ParticipationAgreementValue = Ja, alle Mitarbeiter mit einem laufenden unbefristeten oder befristeten Arbeitsvertrag mit dem Unternehmen können unabhängig von dessen Art an der Gewinnbeteiligung teilhaben.<br />Es ist jedoch eine Mindestbetriebszugehörigkeit erforderlich: 6 Monate im Unternehmen.<br />Zur Ermittlung der erforderlichen Betriebszugehörigkeit werden alle Arbeitsverträge berücksichtigt, die im Berechnungszeitraum und in den 12 vorangegangenen Monaten erfüllt wurden.<br />Die Betriebszugehörigkeit wird zum Abschlussstichtag des betreffenden Geschäftsjahres oder zum Austrittsdatum bei Vertragsbeendigung im laufenden Geschäftsjahr bewertet.
+TermsAndConditions          = Modalitäten
+
+ESC                  = Sozial- und Wirtschaftsausschuss
+StaffRepresentatives = Personalvertreter
+ElectionDate         = Wahldatum
+ElectionDateCSE      = Wahldatum des Sozial- und Wirtschaftsausschusses
+ElectionDateDP       = Wahldatum der Personalvertreter
+
+Titulars                       = Ordentliche Mitglieder
+Alternates                     = Stellvertreter
+informationssharing.odt        = Informationsverbreitung
+informationssharing_custom.odt = Individuelle Informationsverbreitung
+ActionOnUser                   = Betroffener Benutzer
+HarassmentOfficer              = Beauftragter für Belästigung
+HarassmentOfficerCSE           = Beauftragter für Belästigung des Sozial- und Wirtschaftsausschusses
+ExceptionsToWorkingHours       = Ausnahmen von den Arbeitszeiten
+PermanentDerogation            = Dauerhafte Ausnahme
+PermanentDerogationValue       = Nein
+OccasionalDerogation           = Gelegentliche Ausnahme
+OccasionalDerogationValue      = Ja
+
+
+#
+# PreventionPlan - Präventionsplan
+#
+
+# Berechtigung
+PreventionPlansMin = Präventionspläne
+
+# Daten
+
+PreventionPlan                                        = Präventionsplan
+Preventionplan                                        = Präventionsplan
+ThePreventionplan                                     = der Präventionsplan
+PreventionPlanDocument                                = Präventionsplan
+Preventionplandocument                                = Präventionsplan
+PreventionPlanDocumentGenerated                       = Erzeugung des Präventionsplans
+PreventionPlanList                                    = Liste der Präventionspläne
+PreventionPlanLine                                    = Risiko/Risiken
+PreventionPlanLineCreated                             = Anlegen eines Risikos im Präventionsplan
+PreventionPlanLineModified                            = Änderung eines Risikos im Präventionsplan
+PreventionPlanLineDeleted                             = Löschen eines Risikos im Präventionsplan
+NewPreventionPlan                                     = Neuer Präventionsplan
+PriorVisit                                            = Gemeinsame Vorbegehung
+PriorVisitYesNo                                       = Vorbegehung durchgeführt
+PriorVisitText                                        = Notiz zur Begehung
+CSSCTIntervention                                     = Beteiligung des Arbeitsschutzausschusses
+CSSCTInterventionText                                 = Beteiligung des Arbeitsschutzausschusses?
+MasterWorker                                          = Verantwortlicher des Einsatzbetriebs
+MasterWorker                                          = Verantwortlicher des Einsatzbetriebs
+ExtSociety                                            = Fremdfirma
+ExtSocietyResponsible                                 = Verantwortlicher der Fremdfirma
+ExtSocietyResponsible                                 = Verantwortlicher der Fremdfirma
+ExtSocietyAttendant                                   = Beschäftigter der Fremdfirma
+ActionsDescription                                    = Beschreibung der Tätigkeiten
+INRSRisk                                              = Risiko (INRS)
+PreventionMethod                                      = Präventionsmittel
+PreventionplanSchedules                               = Zeiten des Präventionsplans
+Attendants                                            = Teilnehmer
+ModifyPreventionPlan                                  = Präventionsplan bearbeiten
+ActionsDescriptionTooltip                             = Beschreibung der vom Beschäftigten ausgeführten Tätigkeiten
+INRSRiskTooltip                                       = Liste der Risikokategorien aus dem Referenzwerk des INRS
+PreventionMethodTooltip                               = Präventionsmittel, das zur Begrenzung des Risikos umzusetzen ist
+LockPreventionPlan                                    = Präventionsplan sperren
+ConfirmLockPreventionPlan                             = Möchten Sie den Präventionsplan wirklich sperren?<br>Diese Sperre friert die Daten und die Dokumenterzeugung ein.
+AllSignatoriesMustHaveSigned                          = Alle Teilnehmer müssen unterschrieben haben, um das Objekt zu sperren
+ValidatePreventionPlan                                = Präventionsplan freigeben
+ConfirmValidatePreventionPlan                         = Möchten Sie den Präventionsplan wirklich freigeben? <br> Die Freigabe ermöglicht den Teilnehmern die Unterzeichnung des Dokuments, <b> verhindert aber das Hinzufügen neuer Teilnehmer sowie die Änderung des Präventionsplans </b>.
+ReOpenPreventionPlan                                  = Präventionsplan erneut öffnen
+ConfirmReOpenPreventionPlan                           = Möchten Sie den Präventionsplan wirklich erneut öffnen? Das erneute Öffnen ermöglicht die Änderung des Präventionsplans und das Hinzufügen neuer Teilnehmer, <b>alle Unterschriften des Dokuments gehen dabei jedoch verloren</b>.
+PreventionPlanRiskList                                = Liste der Risiken des Präventionsplans
+ActionsPreventionPlanRisk                             = Aktionen
+PreventionPlanDescription                             = Projekt der Präventionspläne
+PriorVisitDate                                        = Datum der gemeinsamen Vorbegehung
+AddPreventionPlanLine                                 = Risiko hinzugefügt
+UpdatePreventionPlanLine                              = Risiko aktualisiert
+DeletePreventionPlanLine                              = Risiko gelöscht
+PreventionPlanDet                                     = Risiko des Präventionsplans
+Preventionplandet                                     = Risiko des Präventionsplans
+PreventionPlanMessage                                 = zum Präventionsplan
+PreventionPlanMustBeValidated                         = Der Präventionsplan muss freigegeben sein, um ihn erneut öffnen zu können
+PreventionPlanMustBeInProgress                        = Der Präventionsplan muss laufend sein, um auf diese Funktion zuzugreifen
+PreventionPlanMustBeInProgressToValidate              = Der Präventionsplan ist bereits freigegeben
+CSEMustBeAlerted3DaysBeforeVisit                      = Der Sozial- und Wirtschaftsausschuss muss 3 Tage vor der gemeinsamen Vorbegehung informiert werden (Art. R. 4514-1 1°, R. 4514-3 und R. 4514-9 des französischen Arbeitsgesetzbuchs)
+PreventionPlanData                                    = Daten des Präventionsplans
+MasterWorkerDescription                               = Der standardmäßig als Verantwortlicher des Einsatzbetriebs verwendete Benutzer
+NoPreventionPlanRisk                                  = Kein Risiko im Präventionsplan
+NoPreventionPlanLinked                                = Kein verknüpfter Präventionsplan
+PreventionPlanLinked                                  = Verknüpfter Präventionsplan
+PreventionPlanManagement                              = Verwaltung der Präventionspläne
+PPRProject                                            = Mit den Präventionsplänen verknüpftes Projekt
+NewLabelForClonePreventionPlan                        = Bezeichnung des neuen Präventionsplans
+ClonePreventionPlanRisk                               = Risiken des Präventionsplans klonen
+CloneAttendantsPreventionPlan                         = Teilnehmer des Präventionsplans klonen
+CloneSchedulePreventionPlan                           = Zeiten des Präventionsplans klonen
+ConfirmClonePreventionPlan                            = Möchten Sie den Präventionsplan <b> %s </b> wirklich klonen?
+preventionplandocument.odt                            = Präventionsplan
+preventionplandocument_custom.odt                     = Individueller Präventionsplan
+ErrorThirdPartyHasAtLeastOneChildOfTypePreventionPlan = Der Partner ist mit mindestens einem untergeordneten Element vom Typ Präventionsplan verknüpft:
+ErrorContactHasAtLeastOneChildOfTypePreventionPlan    = Der Kontakt ist mit mindestens einem untergeordneten Element vom Typ Präventionsplan verknüpft:
+ConfirmDeletePreventionPlan                           = Möchten Sie diesen Präventionsplan wirklich löschen?
+PreventionPlanRole                                    = Die Rollen des Präventionsplans
+
+# E-Mail
+PreventionPlanLabel   = Zusammenfassung des Präventionsplans
+PreventionPlanSubject = E-Mail zum Präventionsplan
+PreventionPlanContent = Anbei finden Sie das ODT-Dokument des Präventionsplans.
+
+# Trigger
+PreventionPlanCreated          = Anlegen eines Präventionsplans
+PreventionPlanModified         = Änderung eines Präventionsplans
+PreventionPlanDeleted          = Löschen eines Präventionsplans
+PreventionPlanInProgress       = Erneutes Öffnen des Präventionsplans
+PreventionPlanPendingSignature = Präventionsplan wartet auf Unterschrift
+PreventionPlanLocked           = Sperren des Präventionsplans
+PreventionPlanArchived         = Archivierung des Präventionsplans
+PreventionPlanSentByMail       = Versand des Präventionsplans per E-Mail
+
+#
+# FirePermit - Feuererlaubnisschein
+#
+
+# Berechtigung
+FirePermitMin  = Feuererlaubnisschein
+FirePermitsMin = Feuererlaubnisscheine
+
+# Daten
+NewFirePermit                                     = Neuer Feuererlaubnisschein
+ModifyFirePermit                                  = Feuererlaubnisschein bearbeiten
+FirePermitList                                    = Liste der Feuererlaubnisscheine
+FirePermit                                        = Feuererlaubnisschein
+Firepermit                                        = Feuererlaubnisschein
+TheFirepermit                                     = der Feuererlaubnisschein
+FirePermitDocument                                = Feuererlaubnisschein
+Firepermitdocument                                = Feuererlaubnisschein
+FirePermitDocumentGenerated                       = Erzeugung des Feuererlaubnisscheins
+FirePermitCreated                                 = Anlegen eines Feuererlaubnisscheins
+FirePermitModified                                = Änderung eines Feuererlaubnisscheins
+FirePermitDeleted                                 = Löschen eines Feuererlaubnisscheins
+FirePermitInProgress                              = Erneutes Öffnen des Feuererlaubnisscheins
+FirePermitPendingSignature                        = Feuererlaubnisschein wartet auf Unterschrift
+FirePermitLocked                                  = Sperren des Feuererlaubnisscheins
+FirePermitArchived                                = Archivierung des Feuererlaubnisscheins
+FirePermitSignatureAddAttendant                   = Teilnehmer zum Feuererlaubnisschein hinzugefügt
+FirePermitSentByMail                              = Versand des Feuererlaubnisscheins per E-Mail
+FirePermitLine                                    = Risiko/Risiken
+FirePermitDet                                     = Risiko des Feuererlaubnisscheins
+Firepermitdet                                     = Risiko des Feuererlaubnisscheins
+FirePermitLineCreated                             = Anlegen eines Risikos im Feuererlaubnisschein
+FirePermitLineModified                            = Änderung eines Risikos im Feuererlaubnisschein
+FirePermitLineDeleted                             = Löschen eines Risikos im Feuererlaubnisschein
+FirePermitRiskList                                = Liste der Risiken des Feuererlaubnisscheins
+AddFirePermitLine                                 = Risiko hinzugefügt
+UpdateFirePermitLine                              = Risiko aktualisiert
+DeleteFirePermitLine                              = Risiko gelöscht
+FirePermitMessage                                 = zum Feuererlaubnisschein
+UsedMaterialTooltip                               = Zur Begrenzung des Risikos zu verwendende Ausrüstung
+ActionsFirePermitRisk                             = Aktionen
+ConfirmValidateFirePermit                         = Möchten Sie den Feuererlaubnisschein wirklich freigeben? <br> Die Freigabe ermöglicht den Teilnehmern die Unterzeichnung des Dokuments, <b> verhindert aber das Hinzufügen neuer Teilnehmer sowie die Änderung des Feuererlaubnisscheins </b>.
+ConfirmReOpenFirePermit                           = Möchten Sie den Feuererlaubnisschein wirklich erneut öffnen? Das erneute Öffnen ermöglicht die Änderung des Feuererlaubnisscheins und das Hinzufügen neuer Teilnehmer, <b>alle Unterschriften des Dokuments gehen dabei jedoch verloren</b>.
+ConfirmLockFirePermit                             = Möchten Sie den Feuererlaubnisschein wirklich sperren?<br>Diese Sperre friert die Daten und die Dokumenterzeugung ein.
+FirePermitMustBeInProgress                        = Der Feuererlaubnisschein muss laufend sein, um auf diese Funktion zuzugreifen
+NewLabelForCloneFirePermit                        = Bezeichnung des neuen Feuererlaubnisscheins
+CloneFirePermitRisk                               = Risiken des Feuererlaubnisscheins klonen
+CloneAttendantsFirePermit                         = Teilnehmer des Feuererlaubnisscheins klonen
+CloneScheduleFirePermit                           = Zeiten des Feuererlaubnisscheins klonen
+ConfirmCloneFirePermit                            = Möchten Sie den Feuererlaubnisschein <b> %s </b> wirklich klonen?
+FirePermitDescription                             = Projekt der Feuererlaubnisscheine
+FirePermitData                                    = Daten des Feuererlaubnisscheins
+FirePermitManagement                              = Verwaltung der Feuererlaubnisscheine
+FPRProject                                        = Mit den Feuererlaubnisscheinen verknüpftes Projekt
+firepermitdocument.odt                            = Feuererlaubnisschein
+firepermitdocument_custom.odt                     = Individueller Feuererlaubnisschein
+UsedEquipment                                     = Verwendete Ausrüstung
+ErrorThirdPartyHasAtLeastOneChildOfTypeFirePermit = Der Partner ist mit mindestens einem untergeordneten Element vom Typ Feuererlaubnisschein verknüpft:
+ErrorContactHasAtLeastOneChildOfTypeFirePermit    = Der Kontakt ist mit mindestens einem untergeordneten Element vom Typ Feuererlaubnisschein verknüpft:
+ConfirmDeleteFirePermit                           = Möchten Sie diesen Feuererlaubnisschein wirklich löschen?
+FirePermitRole                                    = Die Rollen des Feuererlaubnisscheins
+FirepermitSchedules                               = Zeiten des Feuererlaubnisscheins
+
+# E-Mail
+FirePermitLabel   = Zusammenfassung des Feuererlaubnisscheins
+FirePermitSubject = E-Mail zum Feuererlaubnisschein
+FirePermitContent = Anbei finden Sie das ODT-Dokument des Feuererlaubnisscheins.
+
+
+#
+# Accident - Unfall
+#
+
+# Berechtigung
+AccidentsMin = Unfälle
+
+# Trigger
+AccidentCreateTrigger         = Unfall %s angelegt
+ActionsOnAccident             = Mit dem Unfall verknüpfte Ereignisse
+AccidentGeneratedWithDolibarr = Unfall mit Dolibarr erzeugt
+AccidentWorkStopCreateTrigger = Arbeitsunfähigkeit %s zum Unfall hinzugefügt
+AccidentWorkStopModifyTrigger = Arbeitsunfähigkeit %s am Unfall geändert
+AccidentWorkStopDeleteTrigger = Arbeitsunfähigkeit %s vom Unfall gelöscht
+AccidentModifyTrigger         = Unfall %s geändert
+AccidentDeleteTrigger         = Unfall %s gelöscht
+AccidentMetaDataCreateTrigger = Speicherung der ergänzenden Unfalldaten
+AccidentLesionCreateTrigger   = Verletzung %s zum Unfall hinzugefügt
+AccidentLesionModifyTrigger   = Verletzung %s am Unfall geändert
+AccidentLesionDeleteTrigger   = Verletzung %s vom Unfall gelöscht
+ACC_USER_EMPLOYERSigned       = Unterschrift des Unternehmensverantwortlichen
+VictimAndCaregivers           = Verunfallter und betreuende Person
+Victim                        = Verunfallter
+Caregiver                     = Betreuende Person
+
+# Nummerierungsmodell
+DigiriskAccidentNumberingModule         = Nummerierungsmodell der Unfälle von Digirisk
+DigiriskAccidentStandardModel           = Gibt die Nummer in der Form ACCn zurück, wobei n ein fortlaufender Zähler ohne Lücken und ohne Rücksetzung ist.
+DigiriskAccidentWorkStopNumberingModule = Nummerierungsmodell der mit dem Unfall verknüpften Arbeitsunfähigkeiten
+DigiriskAccidentWorkStopStandardModel   = Gibt die Nummer in der Form ACCWn zurück, wobei n ein fortlaufender Zähler ohne Lücken und ohne Rücksetzung ist.
+DigiriskAccidentLesionNumberingModule   = Nummerierungsmodell der mit dem Unfall verknüpften Verletzungen
+DigiriskAccidentLesionStandardModel     = Gibt die Nummer in der Form ACCLn zurück, wobei n ein fortlaufender Zähler ohne Lücken und ohne Rücksetzung ist.
+DigiriskAccidentDocumentNumberingModule = Nummerierungsmodell der Unfallblätter von Digirisk
+DigiriskAccidentDocumentStandardModel   = Gibt die Nummer in der Form ACCDn zurück, wobei n ein fortlaufender Zähler ohne Lücken und ohne Rücksetzung ist.
+
+# ODT-Vorlage
+DigiriskTemplateDocumentAccident       = Dokumentvorlagen der Unfälle von Digirisk
+AccidentDocumentCustomDigiriskTemplate = Individuelle ODT-Vorlage der Unfälle
+AccidentDocumentDigiriskTemplate       = Standard-ODT-Vorlage der Unfälle
+AccidentDocument                       = Unfallblatt
+AccidentDocumentGeneratedWithDolibarr  = Unfall mit Dolibarr erzeugt
+
+# Daten
+NewAccident                              = Neuer Unfall
+ModifyAccident                           = Unfall bearbeiten
+AccidentList                             = Liste der Unfälle
+Accident                                 = Unfall
+AccidentCreated                          = Anlegen eines Unfalls
+DeleteAccident                           = Unfall löschen?
+AccidentModified                         = Änderung eines Unfalls
+AccidentDeleted                          = Löschen eines Unfalls
+AccidentLine                             = Risiko/Risiken
+AccidentDate                             = Datum des Unfalls
+AccidentSchedule                         = Zeiten des Unfalls
+AccidentRiskList                         = Liste der ergänzenden Informationen zum Unfall
+Accidentworkstop                         = Arbeitsunfähigkeit
+AccidentWorkStopCreated                  = Anlegen einer Arbeitsunfähigkeit
+AccidentWorkStopModified                 = Änderung einer Arbeitsunfähigkeit
+AccidentWorkStopDeleted                  = Löschen einer Arbeitsunfähigkeit
+AddAccidentWorkStop                      = Hinzufügen einer Arbeitsunfähigkeit zum Unfall
+UpdateAccidentWorkStop                   = Aktualisierung einer Arbeitsunfähigkeit am Unfall
+DeleteAccidentWorkStop                   = Löschen einer Arbeitsunfähigkeit vom Unfall
+Accidentlesion                           = Verletzung
+AccidentLesionCreated                    = Anlegen einer Verletzung
+AccidentLesionModified                   = Änderung einer Verletzung
+AccidentLesionDeleted                    = Löschen einer Verletzung
+AddAccidentLesion                        = Hinzufügen einer Verletzung zum Unfall
+UpdateAccidentLesion                     = Aktualisierung einer Verletzung am Unfall
+DeleteAccidentLesion                     = Löschen einer Verletzung vom Unfall
+AccidentDescription                      = Projekt der Unfälle
+AccidentManagement                       = Verwaltung der Unfälle
+AccidentWorkstopManagement               = Verwaltung der Arbeitsunfähigkeiten
+AccidentLesionManagement                 = Verwaltung der Verletzungen
+AccidentInvestigationManagement          = Verwaltung der Unfalluntersuchungen
+ACCProject                               = Mit den Unfällen verknüpftes Projekt
+UserVictim                               = Verunfallte Person
+AccidentType                             = Art des Unfalls
+WorkAccidentStatement                    = Arbeitsunfall
+CommutingAccident                        = Wegeunfall
+AccidentMetaData                         = Ergänzende Daten
+RelativeLocation                         = Ergänzende Angaben zum Unfallort
+VictimActivity                           = Tätigkeit des Verunfallten zum Zeitpunkt des Unfalls
+AccidentNature                           = Art des Unfalls
+AccidentObject                           = Gegenstand, durch dessen Kontakt der Verunfallte verletzt wurde
+AccidentNatureDoubt                      = Etwaige begründete Vorbehalte (fügen Sie bei Bedarf ein Begleitschreiben bei)
+AccidentNatureDoubtLink                  = Link zum Begleitschreiben
+VictimTransportedTo                      = Der Verunfallte wurde gebracht nach
+VictimWorkHours                          = Arbeitszeit des Verunfallten am Unfalltag
+WorkHoursMorningDateStart                = Beginn der Arbeitszeit des Verunfallten (Vormittag)
+WorkHoursMorningDateEnd                  = Ende der Arbeitszeit des Verunfallten (Vormittag)
+WorkHoursAfternoonDateStart              = Beginn der Arbeitszeit des Verunfallten (Nachmittag)
+WorkHoursAfternoonDateEnd                = Ende der Arbeitszeit des Verunfallten (Nachmittag)
+AccidentNoticed                          = Information über den Unfall
+Found                                    = Festgestellt
+Known                                    = Bekannt
+AccidentNoticeDate                       = Datum der Kenntnisnahme des Unfalls
+AccidentNoticeBy                         = Person, die über den Unfall informiert hat
+ByEmployer                               = Durch den Arbeitgeber
+ByEmployees                              = Durch dessen Beschäftigte
+AccidentDescribedByVictim                = Der Unfall wurde vom Verunfallten geschildert
+RegisteredInAccidentRegister             = Der Unfall ist im Register für leichte Arbeitsunfälle eingetragen
+RegisterDate                             = Datum der Eintragung im Register für leichte Arbeitsunfälle
+RegisterNumber                           = Nummer der Eintragung im Register für leichte Arbeitsunfälle
+Consequence                              = Folgen
+WithoutWorkStop                          = Ohne Arbeitsunfähigkeit
+LessThanFourDays                         = Weniger als 4 Tage
+LessThanTwentyOneDays                    = Weniger als 21 Tage
+LessThanThreeMonth                       = Weniger als 3 Monate
+LessThanSixMonths                        = Weniger als 6 Monate
+LongTimeWorkStop                         = Mehr als 6 Monate
+WithWorkStop                             = Mit Arbeitsunfähigkeit
+Fatal                                    = Todesfall
+PoliceReport                             = Polizeibericht
+PoliceReportBy                           = Person, die den Polizeibericht erstellt hat
+FirstPersonNoticedIsWitness              = Benachrichtigte Person
+Witness                                  = Zeuge
+FirstPersonNoticed                       = Erste benachrichtigte Person
+ThirdPartyResponsability                 = Wurde der Unfall durch einen Dritten verursacht?
+FkSocResponsible                         = Unternehmen des haftenden Dritten
+FkSocResponsibleInsuranceSociety         = Versicherungsgesellschaft des Dritten
+LesionLocalization                       = Lokalisation der Verletzungen
+LesionNature                             = Art der Verletzungen
+AccidentInvestigation                    = Unfalluntersuchung
+Accidentinvestigation                    = Unfalluntersuchung
+AccidentInvestigationLink                = Link zur Unfalluntersuchung
+AccidentLocation                         = Unfallort
+DigiriskDolibarrActionTrigger            = Trigger der Digirisk-Ereignisse
+CollateralVictim                         = Mitbetroffene Person
+FromDigirisk                             = Von
+At                                       = Bis
+AndFrom                                  = Und von
+ExternalAccident                         = Ereignete sich der Unfall in einem anderen Betrieb als dem Stammbetrieb des Verunfallten?
+AccidentAttendants                       = Unfall - Teilnehmer
+UserEmployer                             = Verantwortlicher des Unternehmens
+SignatureUserEmployer                    = Unterschrift des Unternehmensverantwortlichen
+CerfaLink                                = Link zum Cerfa-Formular
+WorkStopDays                             = Anzahl der Tage der Arbeitsunfähigkeit
+AccidentLesionList                       = Liste der mit dem Unfall verknüpften Verletzungen
+DocumentsMetaData                        = Ergänzende Dateianhänge
+WorkStopDocument                         = Meldung der Arbeitsunfähigkeit
+AccidentMetaDataSave                     = Die ergänzenden Unfalldaten wurden gespeichert
+ErrorFieldNotEmpty                       = Fehler: Das Feld <b>'%s'</b> darf nicht leer sein
+ErrorFieldMustBeGreaterOrEqualZero       = Fehler: Das Feld <b>'%s'</b> muss größer oder gleich 0 sein
+ConfirmDeleteAccidentWorkStop            = Möchten Sie die Arbeitsunfähigkeit <b>%s</b> am Unfall wirklich löschen?
+AccidentMetaDataLesion                   = Ergänzende Daten der Verletzungen
+TotalWorkStopDays                        = Gesamtzahl der Tage der Arbeitsunfähigkeit
+RegisterAccident                         = Leichter Unfall
+AccidentsLinked                          = Verknüpfte(r) Unfall/Unfälle
+GaugeCounter                             = Dieses Feld wird im Zähler der Anzeige verwendet
+DateStartWorkStop                        = Beginn der Arbeitsunfähigkeit
+DateEndWorkStop                          = Ende der Arbeitsunfähigkeit
+ReturnWorkDate                           = Datum der Wiederaufnahme der Tätigkeit
+DayWithoutAccident                       = Tage ohne Unfall/Unfälle
+AccidentRepartition                      = Verteilung der Unfälle nach Art
+AccidentByYear                           = Verteilung der Unfälle nach Jahr
+NbAccidentsByEmployees                   = Anzahl der Unfälle je Beschäftigten
+AccidentRegister                         = Unfall nach Register
+AccidentWithoutRegister                  = Unfälle ohne Register
+AccidentWithRegister                     = Unfälle mit Register
+WorkStopDurationDistribution             = Verteilung der Zeit nach Arbeitsunfähigkeit
+WorkStopDurationDistributionDigiriskElem = Verteilung der Arbeitsunfähigkeitszeit nach GP/UT
+WorkStopDuration                         = Dauer der Arbeitsunfähigkeit
+NoAbsence                                = Keine Arbeitsunfähigkeit
+UpTo4Days                                = Bis zu 4 Tage
+UpTo21Days                               = Bis zu 21 Tage
+UpTo3Months                              = Bis zu 3 Monate
+UpTo6Months                              = Bis zu 6 Monate
+MoreThan6Months                          = Mehr als 6 Monate
+FrequencyIndex                           = Häufigkeitsindex
+FrequencyRate                            = Häufigkeitsrate
+GravityIndex                             = Schwereindex
+GravityRate                              = Schwererate
+AccidentRateIndicator                    = Raten und Indizes der Leistungskennzahlen zu Unfällen
+NbPresquAccidents                        = Anzahl der Beinaheunfälle
+NbAccidentInvestigations                 = Anzahl der Unfalluntersuchungen
+AccidentInvestigationsMin                = Unfalluntersuchungen
+NbWorkedHours                            = Anzahl der geleisteten Arbeitsstunden
+ConfirmDeleteAccident                    = Möchten Sie den Unfall wirklich löschen?
+TheAccident                              = der Unfall
+AccidentInvestigation                    = Unfalluntersuchung
+Accident_investigation                   = Unfalluntersuchung
+AccidentInvestigationDocument            = Dokument der Unfalluntersuchung
+Accidentinvestigationdocument            = Dokument der Unfalluntersuchung
+accidentinvestigationdocument.odt        = Unfalluntersuchung
+NewAccidentInvestigation                 = Neue Unfalluntersuchung
+UpdateAccidentInvestigation              = Eine Unfalluntersuchung bearbeiten
+AccidentInvestigationList                = Liste der Unfalluntersuchungen
+TheAccidentinvestigation                 = die Unfalluntersuchung
+SeniorityInPosition                      = Betriebszugehörigkeit auf der Stelle
+VictimSkills                             = Kompetenzen des Verunfallten
+CollectiveEquipment                      = Kollektive Schutzausrüstung (KSA)
+IndividualEquipment                      = Persönliche Schutzausrüstung (PSA)
+Circumstances                            = Umstände
+CurativeAction                           = Sofortmaßnahmen
+CorrectiveAction                         = Korrekturmaßnahmen
+PreventiveAction                         = Präventivmaßnahmen
+DigiriskActionType                       = Digirisk-Aktionstyp
+Actions                                  = Aktionen
+ActionsTab                               = Aktionen
+CurativeActions                          = Sofortmaßnahmen
+PreventiveActions                        = Präventivmaßnahmen
+TotalPlannedBudget                       = Geplantes Budget
+AccidentInvestigationDocumentPDF         = EA-A4-HOCHFORMAT
+PreventionPlanDocumentPDF                = PP-A4-HOCHFORMAT
+PreventionPlanDocumentPDFDescription     = Den Präventionsplan als PDF erzeugen
+AccidentInvestigationDocumentPDFDescription = Die Unfalluntersuchung als PDF erzeugen
+AccidentInvestigationDocumentGeneratedAt = Erzeugt am
+CorrectiveActions                        = Korrekturmaßnahmen
+AddCurativeAction                        = Eine Sofortmaßnahme hinzufügen
+AddCorrectiveAction                      = Eine Korrekturmaßnahme hinzufügen
+InvestigationNotValidatedYet             = Geben Sie zuerst die Unfalluntersuchung frei, um Maßnahmen anlegen zu können
+ActionLabel                              = Bezeichnung der Maßnahme
+ActionDeadline                           = Fälligkeit
+ActionAssignedTo                         = Zugewiesen an
+ActionProgress                           = Fortschritt
+MarkAsDone                               = Als erledigt markieren
+XActionsOfY                              = %s / %s erledigt
+NoActionsYet                             = Derzeit keine Maßnahme
+ActionAdded                              = Die Maßnahme wurde angelegt
+ActionClosed                             = Die Maßnahme wurde abgeschlossen
+ActionsAreProjectTasks                   = Die Maßnahmen sind Unteraufgaben des Dolibarr-Projekts
+SeeProjectTasksView                      = Übergeordnete Aufgabe anzeigen
+OpenTask                                 = Aufgabe öffnen
+AccidentInvestigationValidated           = Die Unfalluntersuchung wurde freigegeben
+AccidentInvestigationReOpened            = Die Unfalluntersuchung wurde erneut geöffnet
+AccidentInvestigationTaskCreated         = Die Aufgaben der Unfalluntersuchung wurden angelegt
+AccidentInvestigationTaskDeleted         = Die Aufgaben der Unfalluntersuchung wurden gelöscht
+CausalityTree                            = Ursachenbaum
+TaskWillBeCreatedAfterValidation         = Die Aufgaben werden nach der Freigabe der Unfalluntersuchung angelegt
+AccidentInvestigationCreated             = Anlegen einer Unfalluntersuchung
+AccidentInvestigationModified            = Änderung einer Unfalluntersuchung
+AccidentInvestigationDeleted             = Löschen einer Unfalluntersuchung
+AccidentInvestigationValidate            = Freigabe einer Unfalluntersuchung
+AccidentInvestigationUnValidate          = Erneutes Öffnen einer Unfalluntersuchung
+AccidentInvestigationLock                = Sperren der Unfalluntersuchung
+AccidentInvestigationSigned              = Unterzeichnung einer Unfalluntersuchung
+CloneWorkStop                            = Arbeitsunfähigkeiten klonen?
+CloneMetadata                            = Ergänzende Daten klonen?
+CloneLesion                              = Ergänzende Daten der Verletzungen klonen?
+CloneFrom                                = Klon von
+AccidentInvestigationRole                = Die Rollen der Unfalluntersuchung
+LesionsOrWorkStop                        = Verletzungen oder Arbeitsunfähigkeiten
+AccidentsCategoriesArea                  = Bereich der Tags/Kategorien der Unfälle
+AddAccidentIntoCategory                  = Diese Kategorie dem Unfall zuweisen
+PreventionplansCategoriesArea            = Bereich der Tags/Kategorien der Präventionspläne
+AddPreventionplanIntoCategory            = Diese Kategorie dem Präventionsplan zuweisen
+FirepermitsCategoriesArea                = Bereich der Tags/Kategorien der Feuererlaubnisscheine
+AddFirepermitIntoCategory                = Diese Kategorie dem Feuererlaubnisschein zuweisen
+RisksCategoriesArea                      = Bereich der Tags/Kategorien der Risiken
+AddRiskIntoCategory                      = Diese Kategorie dem Risiko zuweisen
+AddTicketIntoCategory                    = Diese Kategorie dem Ticket zuweisen
+StartDateInvestigate                     = Beginn der Untersuchung
+EndDateInvestigate                       = Ende der Untersuchung
+YearType                                 = Art des Jahres
+AllYears                                 = Alle Jahre
+FiscalYear                               = Geschäftsjahr
+CalendarYear                             = Kalenderjahr
+
+# AccidentTooltip - Tooltips der Unfälle
+VictimActivityTooltip              = Geben Sie die Tätigkeit oder die Aufgabe des Verunfallten zum Zeitpunkt des Unfalls an, das heißt, was der Verunfallte gerade tat
+AccidentNatureTooltip              = Beschreiben Sie das Ereignis, das zum Unfall geführt hat, wie sich der Unfall ereignet hat (elektrisches Problem, Gasleck, Materialbruch, Ausrutschen, Sturz, körperliche Anstrengung, Übergriff ...) oder wie sich der Verunfallte verletzt hat (Anstoßen, Zusammenstoß, Quetschung, Stich, Ertrinken, Kontakt mit einem Stoff ...)
+AccidentObjectTooltip              = Das heißt, womit sich der Verunfallte verletzt hat: Material, Abfall, Werkzeug (Schraubendreher, Cutter, Bohrmaschine ...), Maschine, Fahrzeug, Flurförderzeug, chemischer Stoff, Bauteil (Tür, Wand ...), Boden ...
+AccidentNatureDoubtTooltip         = Geben Sie gegebenenfalls die begründeten Vorbehalte an, die nur berücksichtigt werden können, wenn sie die zeitlichen und örtlichen Umstände des Unfalls oder das Vorliegen einer vollständig arbeitsfremden Ursache betreffen (Art. R. 441-11 des französischen Sozialgesetzbuchs)
+VictimWorkHoursTooltip             = Geben Sie die von Ihrem Mitarbeiter geleisteten oder die vorgesehenen Arbeitsstunden am Unfalltag an
+ConsequenceTooltip                 = Hat der Verunfallte die Arbeit auf ärztliche Verordnung hin eingestellt, müssen Sie ZWINGEND das Formular «attestation de salaire accident du travail ou maladie professionnelle» - Referenz S6202 - ausfüllen und an die zuständige Krankenkasse am gewöhnlichen Wohnort des Verunfallten senden. <br> Bei einer erneuten Arbeitsunfähigkeit nach einer Behandlungsphase oder einer Wiederaufnahme der Arbeit in einem anderen Monat müssen Sie diese Formalität ebenfalls erneut erfüllen
+FirstPersonNoticedIsWitnessTooltip = Geben Sie Name, Vorname und Anschrift des Zeugen an. <br> Gibt es keinen Zeugen, geben Sie die erste Person des Unternehmens an, die über den Unfall informiert wurde
+ThirdPartyResponsabilityTooltip    = Wenn Ihnen die Beteiligung eines Dritten an einem Arbeits- oder Wegeunfall bekannt ist, muss dies unabhängig von dessen Haftungsanteil zwingend in diesem Abschnitt vermerkt werden
+FrequencyIndexTooltip              = Anzahl der Unfälle je Beschäftigten x 1 000
+FrequencyRateTooltip               = Anzahl der Unfälle je geleistete Arbeitsstunden x 1 000 000
+GravityRateTooltip                 = Anzahl der Tage der Arbeitsunfähigkeit je geleistete Arbeitsstunden x 1 000
+NbWorkedHoursTooltip               = Die Anzahl der geleisteten Arbeitsstunden wurde manuell eingegeben
+DocumentGeneratedWithVersioning    = Beim Versionieren erzeugtes Dokument
+
+# Wörterbuch
+UsualWorkplace                  = Gewöhnlicher Arbeitsplatz
+OccasionalWorkplace             = Gelegentlicher Arbeitsplatz
+LocationOfTheMeal               = Ort der Mahlzeit
+OnTheWayBetweenHomeAndWorkplace = Auf dem Weg zwischen Wohnung und Arbeitsstätte
+OnTheWayBetweenMealAndWorkplace = Auf dem Weg zwischen Arbeit und Ort der Mahlzeit
+DuringATripForTheEmployer       = Während einer Dienstreise für den Arbeitgeber
+
+Trunk             = Rumpf
+Hand              = Hand
+LowerLimbs        = Untere Gliedmaßen
+UpperLimbs        = Obere Gliedmaßen
+MultipleLocations = Mehrfache Lokalisationen
+Foot              = Fuß
+Head              = Kopf
+Eyes              = Augen
+InternalSeating   = Innere Lokalisationen
+Neck              = Hals
+Back              = Rücken
+WholeBody         = Ganzer Körper
+NotSpecified      = Nicht angegeben
+
+PainEffortLumbago           = Schmerzen, Überlastung, Hexenschuss
+Contusion                   = Prellung
+Wounds                      = Wunden
+Sprain                      = Verstauchung
+FracturePitting             = Bruch oder Riss
+MultipleInjuries            = Verletzungen unterschiedlicher Art
+MuscleOrTendonTear          = Muskel- oder Sehnenriss
+PresenceOfForeignBody       = Vorhandensein eines Fremdkörpers
+Burns                       = Verbrennung
+UnspecifiedAndMiscellaneous = Nicht angegeben und Sonstiges
+Other                       = Sonstige
+CutOff                      = Schnittverletzung
+
+Investigator = Untersuchender
+Rescuer      = Ersthelfer
+
+#
+# ListingRisksDocument - Risikoauflistung mit Dokumenten
+#
+
+# Berechtigung
+ListingRisksDocumentMin = Risikoauflistungen mit Dokumenten
+
+# Daten
+ListingRisksDocument            = Risikoauflistung
+Listingrisksdocument            = Risikoauflistung
+ListingRisksHeader              = Risiken - %s
+ListingRisksDocumentGenerated   = Erzeugung der Risikoauflistung mit Dokumenten
+listingrisksdocument.odt        = Risikoauflistung mit Dokumenten
+listingrisksdocument_custom.odt = Individuelle Risikoauflistung mit Dokumenten
+
+#
+# ListingRisksPhoto - Risikoauflistung mit Fotos
+#
+
+# Berechtigung
+ListingRisksPhotosMin = Risikoauflistungen mit Fotos
+
+# Daten
+ListingRisksPhoto            = Risikoauflistung mit Fotos
+Listingrisksphoto            = Risikoauflistung mit Fotos
+ListingRisksPhotoGenerated   = Erzeugung der Risikoauflistung mit Fotos
+listingrisksphoto.odt        = Risikoauflistung mit Fotos
+listingrisksphoto_custom.odt = Individuelle Risikoauflistung mit Fotos
+
+
+#
+# ListingRisksAction - Risikoauflistung mit Korrekturmaßnahmen
+#
+
+# Berechtigung
+ListingRisksActionsMin = Risikoauflistungen mit Korrekturmaßnahmen
+
+# Daten
+ListingRisksAction                        = Risikoauflistung mit Korrekturmaßnahmen
+Listingrisksaction                        = Risikoauflistung mit Korrekturmaßnahmen
+ListingRisksActionGenerated               = Erzeugung der Risikoauflistung mit Korrekturmaßnahmen
+listingrisksaction.odt                    = Risikoauflistung mit Korrekturmaßnahmen
+listingrisksaction_custom.odt             = Individuelle Risikoauflistung mit Korrekturmaßnahmen
+DigiriskListingRisksActionData            = Konfigurierbare Daten der Risikoauflistungen mit Korrekturmaßnahmen
+ShowTaskDoneListingRisksActionDescription = Ermöglicht das Ein- und Ausblenden der abgeschlossenen Aufgaben in der Risikoauflistung mit Korrekturmaßnahmen
+
+
+#
+# RiskAssessmentDocument - Gefährdungsbeurteilung
+#
+
+# Berechtigung
+
+RiskAssessmentDocumentsMin = Gefährdungsbeurteilungen
+
+# Daten
+RiskAssessmentDocument                                    = Gefährdungsbeurteilung
+Riskassessmentdocument                                    = Gefährdungsbeurteilung
+RiskAssessmentDocumentGenerated                           = Erzeugung der Gefährdungsbeurteilung
+AuditStartDate                                            = Beginn des Audits
+AuditEndDate                                              = Ende des Audits
+Recipient                                                 = Empfänger
+ImportantNote                                             = Wichtiger Hinweis
+SitePlans                                                 = Lage der Pläne
+SetStartEndDateBeforeSendEmail                            = Legen Sie auf dieser Seite das Anfangs- und Enddatum des Audits fest, um eine E-Mail zu versenden
+NoSitePlans                                               = Kein Plan des Unternehmens hinterlegt
+riskassessmentdocument.odt                                = Gefährdungsbeurteilung
+riskassessmentdocument_custom.odt                         = Individuelle Gefährdungsbeurteilung
+DigiriskRiskAssessmentDocumentData                        = Konfigurierbare Daten der Gefährdungsbeurteilung
+ActionPreventionCompletedTaskDone                         = Die abgeschlossenen Maßnahmen werden nicht angezeigt
+AppliedOn                                                 = Aktiv auf:
+RiskAssessmentDocumentMethod                              = * Schritt 1: Erhebung der Informationen<br />- Begehung der Räumlichkeiten<br />- Erhebung der Personaldaten<br /><br />* Schritt 2: Festlegung der Methodik und des Dokuments<br />- Freigabe der Standard-Datenblätter der Arbeitseinheiten<br />- Freigabe der Struktur der Einheiten<br /><br />* Schritt 3: Durchführung der Risikostudie<br />- Sensibilisierung des Personals für Risiken und Gefahren<br />- Anlegen der Arbeitseinheiten mit dem Personal und den Verantwortlichen<br />- Bewertung der Risiken je Arbeitseinheit mit dem Personal<br /><br />* Schritt 4<br />- Aufbereitung und Erstellung der Gefährdungsbeurteilung
+RiskAssessmentDocumentSources                             = Die Sensibilisierung für Risiken ist in der vom INRS herausgegebenen ED840 beschrieben.<br />In diesem Dokument finden Sie:<br />- Die Definition eines Risikos und einer Gefahr sowie eine erläuternde Grafik<br />- Die Erläuterungen zu den verschiedenen Bewertungsmethoden
+RiskAssessmentDocumentImportantNote                       = Wichtige Hinweise:<br />Die Dokumentation von DigiRisk finden Sie hier<br /><a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk" target="_blank">https://wiki.dolibarr.org/index.php?title=Module_Digirisk</a><br />Das Projekt können Sie hier verfolgen:<br /><a href="https://github.com/Evarisk/Digirisk/projects?type=classic" target="_blank">https://github.com/Evarisk/Digirisk/projects?type=classic</a><br />Einen Fehler melden Sie hier<br /><a href="https://github.com/Evarisk/Digirisk/issues" target="_blank">https://github.com/Evarisk/Digirisk/issues</a>
+GenerateZipArchiveWithDigiriskElementDocuments            = Erzeugung eines ZIP-Archivs mit der Gefährdungsbeurteilung
+GenerateZipArchiveWithDigiriskElementDocumentsDescription = Automatische Erzeugung eines ZIP-Archivs mit der Gefährdungsbeurteilung und allen Arbeitsplatzdatenblättern beim Erzeugen der Gefährdungsbeurteilung
+RiskAssessmentDocumentDescription                         = Aktionsplan der Gefährdungsbeurteilung
+ErrorFailToFetchDigiriskElements                          = Fehler: Die Gruppierungen und Arbeitseinheiten für das ZIP-Archiv konnten nicht abgerufen werden
+ErrorNoDocumentModelFound                                 = Fehler: Für <b>%s</b> ist keine Dokumentvorlage verfügbar
+ErrorFailToGenerateDigiriskElementDocument                = Fehler: Die Dokumenterzeugung für <b>%s</b> ist fehlgeschlagen, es fehlt im ZIP-Archiv
+
+# Boxes - Widget
+NextGenerateDate  = Nächste Erzeugung
+LastGenerateDate  = Letzte Erzeugung
+DelayGenerateDate = Verbleibende Tage
+NoDelay           = Kein Verzug
+
+# E-Mail
+RiskAssessmentDocumentLabel   = Zusammenfassung der Gefährdungsbeurteilung
+RiskAssessmentDocumentSubject = E-Mail zur Gefährdungsbeurteilung
+RiskAssessmentDocumentContent = Anbei finden Sie das ZIP-Archiv und das ODT-Dokument der Gefährdungsbeurteilung.
+
+
+
+#
+# AuditReportDocument - Auditbericht
+#
+
+# Daten
+AuditReportDocument     = Auditbericht
+Auditreportdocument     = Auditbericht
+AuditReportDocumentsMin = Auditberichte
+auditreportdocument.odt = Auditbericht
+
+
+
+#
+# GroupmentDocument - Datenblatt der Gruppierung
+#
+
+# Berechtigung
+
+# Daten
+GroupmentDocument                        = Datenblatt der Gruppierung
+Groupmentdocument                        = Datenblatt der Gruppierung
+DocumentModelStandardPDF                 = Standard-PDF-Vorlage
+GroupmentDocumentGenerated               = Erzeugung des Datenblatts der Gruppierung
+groupmentdocument.odt                    = Datenblatt der Gruppierung
+groupmentdocument_custom.odt             = Individuelles Datenblatt der Gruppierung
+groupmentdocumentinherited.odt           = Datenblatt der Gruppierung - Vererbte Risiken
+groupmentdocumentinherited_custom.odt    = Individuelles Datenblatt der Gruppierung - Vererbte Risiken
+groupmentdocumentshared.odt              = Datenblatt der Gruppierung - Geteilte Risiken
+groupmentdocumentshared_custom.odt       = Individuelles Datenblatt der Gruppierung - Geteilte Risiken
+DigiriskGroupmentDocumentData            = Konfigurierbare Daten der Datenblätter der Gruppierungen
+ShowTaskDoneGroupmentDocumentDescription = Ermöglicht das Ein- und Ausblenden der abgeschlossenen Aufgaben im Datenblatt der Gruppierung
+
+#
+# WorkUnitDocumment - Datenblatt der Arbeitseinheit
+#
+
+# Berechtigung
+
+# Daten
+WorkUnitDocument                        = Datenblatt der Arbeitseinheit
+Workunitdocument                        = Datenblatt der Arbeitseinheit
+WorkUnitDocumentGenerated               = Erzeugung des Datenblatts der Arbeitseinheit
+workunitdocument.odt                    = Datenblatt der Arbeitseinheit
+workunitdocument_custom.odt             = Individuelles Datenblatt der Arbeitseinheit
+workunitdocumentinherited.odt           = Datenblatt der Arbeitseinheit - Vererbte Risiken
+workunitdocumentinherited_custom.odt    = Individuelles Datenblatt der Arbeitseinheit - Vererbte Risiken
+workunitdocumentshared.odt              = Datenblatt der Arbeitseinheit - Geteilte Risiken
+workunitdocumentshared_custom.odt       = Individuelles Datenblatt der Arbeitseinheit - Geteilte Risiken
+workunitdocumentcomplete.odt            = Datenblatt der Arbeitseinheit - Alle Risiken (eigene, vererbte, geteilte)
+workunitdocumentcomplete_custom.odt     = Individuelles Datenblatt der Arbeitseinheit - Alle Risiken
+DigiriskWorkUnitDocumentData            = Konfigurierbare Daten der Datenblätter der Arbeitseinheiten
+ShowTaskDoneWorkUnitDocumentDescription = Ermöglicht das Ein- und Ausblenden der abgeschlossenen Aufgaben im Datenblatt der Arbeitseinheit
+
+
+#
+# DigiriskElement - Digirisk-Element
+#
+
+# Berechtigungen
+DigiriskElementsMin = Digirisk-Elemente (Gruppierung und Arbeitseinheit)
+
+# Daten
+NewDigiriskElement                  = Neues Digirisk-Element
+Digiriskelement                     = Gruppierung / Arbeitseinheit
+GPUTOrganization                    = Organisation der GP/UT
+DigiriskElement                     = Digirisk-Element
+HiddenElements                      = Papierkorb
+DigiriskElementCreated              = Anlegen eines Digirisk-Elements
+DigiriskElementModified             = Änderung eines Digirisk-Elements
+DigiriskElementDeleted              = Löschen eines Digirisk-Elements
+ElementType                         = Elementtyp
+ParentElement                       = Übergeordnetes Element
+OrganizationSaved                   = Die Organisation der Gruppierungen und Arbeitseinheiten wurde gespeichert
+OrganizationNotSaved                = Die Organisation der Gruppierungen und Arbeitseinheiten konnte nicht gespeichert werden
+UnsavedChanges                      = Nicht gespeicherte Änderungen
+SavingInProgress                    = Speichern läuft ...
+Saved                               = Gespeichert
+ErrorSaving                         = Fehler beim Speichern
+DigiriskElementOrganization         = Organisation der Struktur
+ShareDigiriskelement                = Teilen der Gruppierungen und Arbeitseinheiten aktivieren
+DIGIRISKELEMENTSharing              = Teilen der Gruppierungen und Arbeitseinheiten
+DIGIRISKELEMENTSharingDescription   = Auswahl der Mandanten, die ihre Gruppierungen und Arbeitseinheiten mit diesem Mandanten teilen.
+DigiriskElementSharedTooltip        = Diese Option ermöglicht das Teilen der Gruppierungen und Arbeitseinheiten. <br> INFO: Wenn Sie die Aufgaben anzeigen möchten, müssen Sie die Option zum Teilen der Projekte aktivieren.
+PleaseSelectADigiriskElement        = Eine Gruppierung oder eine Arbeitseinheit auswählen ...
+Registers                           = Register
+ShowInSelectOnPublicTicketInterface = Muss in der Elementliste der öffentlichen Ticket-Schnittstelle erscheinen
+Organization                        = Organisation GP/UT
+YouDontHaveOrganization             = Sie haben keine Gruppierungen oder Arbeitseinheiten angelegt, wechseln Sie zu "Gefährdungsbeurteilung" oder klicken Sie <b> hier </b>, um welche anzulegen.
+
+
+#
+# Groupment - Gruppierung
+#
+
+# Daten
+Groupment                  = Gruppierung
+GroupmentManagement        = Verwaltung der Daten der Gruppierungen
+NewGroupment               = Neue Gruppierung
+ModifyGroupment            = Gruppierung bearbeiten
+TrashGroupment             = Papierkorb-Gruppierung
+DeletedElements            = Papierkorb
+DeletedDigiriskElement     = In den Papierkorb verschobene Gruppierungen / Arbeitseinheiten
+ShowDeletedDigiriskElement = Die Gruppierungen / Arbeitseinheiten anzeigen, die sich im Papierkorb befinden
+
+#
+# WorkUnit - Arbeitseinheit
+#
+
+# Daten
+WorkUnit           = Arbeitseinheit
+Workunit           = Arbeitseinheit
+WorkUnitManagement = Verwaltung der Daten der Arbeitseinheiten
+NewWorkUnit        = Neue Arbeitseinheit
+ModifyWorkUnit     = Arbeitseinheit bearbeiten
+
+
+#
+# Evaluator - Bewerter
+#
+
+# Berechtigungen
+EvaluatorsMin = Bewerter
+
+# Daten
+Evaluator                    = Bewerter
+Evaluators                   = Bewerter
+EvaluatorCreated             = Anlegen eines Bewerters
+EvaluatorModified            = Änderung eines Bewerters
+EvaluatorDeleted             = Löschen eines Bewerters
+TheEvaluator                 = Der Bewerter
+EvaluatorWellCreated         = Bewerter angelegt
+EvaluatorNotCreated          = Fehler beim Anlegen des Bewerters
+EvaluatorList                = Liste der Bewerter
+AssignmentDate               = Zuweisungsdatum
+EvaluationDuration           = Dauer
+UserAssigned                 = Zugewiesener Benutzer
+AddEvaluatorTitle            = Hinzufügen eines Bewerters
+AddEvaluatorButton           = Bewerter hinzufügen
+EvaluatorConfig              = Konfiguration der Daten der Bewerter
+DeleteEvaluatorMessage       = Löschen des Bewerters
+DigiriskEvaluatorData        = Konfigurierbare Daten der Bewerter
+EvaluatorDuration            = Dauer der Bewertung durch den Bewerter
+EvaluatorDurationDescription = Die Zeit, die der Bewerter für seine Risikobewertung benötigt
+NbEmployeesInvolved          = Beteiligte Beschäftigte
+NbEmployees                  = Beschäftigte
+NbEmployeesInvolvedTooltip   = Eindeutige Beschäftigte (Bewerter)
+NbEmployeesTooltip           = Wenn die zentrale Verwaltung der Benutzer und Gruppen auf dem Hauptmandanten aktiviert ist.<br>Die Anzahl der Beschäftigten entspricht der Anzahl der geteilten bzw. einer Gruppe zugewiesenen Benutzer sowie der Anzahl der Administratoren des Hauptmandanten
+NbEmployeesConfTooltip       = Die Anzahl der Beschäftigten wurde manuell eingegeben
+
+
+#
+# DigiriskStandard - Digirisk-Standard
+#
+
+# Daten
+DigiriskStandardInformation = Information
+Digiriskstandard            = Digirisk-Standard
+DigiriskStandardMin         = Digirisk-Standards
+TheDigiriskstandard         = der Digirisk-Standard
+
+
+#
+# RisksAnalysis - Risikoanalyse
+#
+
+# Daten
+RiskAnalysis = Risikoanalyse
+UpdateData   = Aktualisieren
+
+#
+# Risks - Risiken
+#
+
+# Berechtigungen
+RisksMin = Risiken
+
+# Daten
+Risks                                    = Risiken
+Risk                                     = Risiko
+Riskprofessionals                        = Berufsbedingte Risiken
+RiskCreated                              = Anlegen eines Risikos
+RiskModified                             = Änderung eines Risikos
+RiskDeleted                              = Löschen eines Risikos
+RiskConfig                               = Konfiguration der Daten der Risiken
+TheRisk                                  = Das Risiko
+RiskWellCreated                          = Risiko angelegt
+RiskNotCreated                           = Fehler beim Anlegen des Risikos
+RiskWellEdited                           = Risiko bearbeitet
+RiskNotEdited                            = Fehler beim Bearbeiten des Risikos
+RiskList                                 = Risikoauflistung
+AddRiskTitle                             = Hinzufügen des Risikos
+AddRiskButton                            = Risiko hinzufügen
+EditRisk                                 = Bearbeitung des Risikos
+LinkedRisk                               = Verknüpftes Risiko
+RiskCategory                             = Kat.
+RiskCategoryEdit                         = Risikokategorie
+RiskCategoryEditDescription              = Die Änderung der Kategorie eines bestehenden Risikos aktivieren
+HowToEditRiskCategory                    = Um die Kategorie des Risikos zu ändern, klicken Sie auf das Piktogramm der Kategorie
+DigiriskElementRisksList                 = Liste der Risiken
+DigiriskElementRisk                      = Risiken
+RiskDescriptionNotEnabled                = Das Feld Beschreibung des Risikos ist nicht aktiviert
+HowToEnableRiskDescription               = Um das Feld Beschreibung des Risikos zu aktivieren, gehen Sie zu "Konfiguration des Moduls -> Gefährdungsbeurteilung"
+HowToEnableRiskCategoryEdit              = Um die Änderung der Risikokategorie zu aktivieren, gehen Sie zu "Konfiguration des Moduls -> Gefährdungsbeurteilung"
+SortRisksListingsByEvaluation            = Die Risiken nach Bewertung sortieren
+SortRisksListingsByEvaluationDescription = Die automatische Sortierung der Risiken nach Bewertung in den Auflistungen aktivieren
+ListingHeaderEvaluation                  = Liste der Bewertungen
+RiskDescription                          = Beschreibung des Risikos
+RiskDescriptionDescription               = Das Feld Beschreibung des Risikos aktivieren
+RiskDescriptionNotActivated              = Bitte aktivieren Sie das Feld Beschreibung des Risikos unter Konfiguration des Moduls / Risikoanalyse / Risiken
+AddRisk                                  = Ein Risiko hinzufügen
+MoveRisk                                 = Das Risiko verschieben
+MoveRisks                                = Die Risiken verschieben
+MoveRisksDescription                     = Ermöglicht das Verschieben der Risiken von einer Gruppierung oder Arbeitseinheit zu einer anderen
+SetConfToMoveRisk                        = Sie müssen zunächst das Verschieben der Risiken unter "Konfiguration des Moduls -> Gefährdungsbeurteilung" erlauben
+RiskDescriptionPrefill                   = Die Beschreibung vorausfüllen
+RiskDescriptionPrefillDescription        = Die Beschreibung des Risikos mit dem Namen der Kategorie vorausfüllen
+DigiriskElementSharedRisksList           = Liste der geteilten Risiken
+ImportSharedRisks                        = Geteilte Risiken importieren
+SelectAllSharedRisksOfElement            = Alle Risiken dieses Elements auswählen
+AlreadyImported                          = Bereits importiert
+ShowSharedRisks                          = Geteilte Risiken
+ShareRisk                                = Teilen der Risiken aktivieren
+RISKSharing                              = Teilen der Risiken
+RISKSharingDescription                   = Auswahl der Mandanten, die ihre Risiken mit diesem Mandanten teilen.
+ShowSharedRisksDescription               = Die geteilten Risiken in den Dokumenten und den Auflistungen anzeigen
+UnlinkSharedRisk                         = Verknüpfung des geteilten Risikos aufheben
+RiskWellUnlinkShared                     = Risikoverknüpfung aufgehoben
+RiskNotUnlinkShared                      = Fehler beim Aufheben der Risikoverknüpfung
+HasBeenUnlinkSharedM                     = wurde entkoppelt
+HasNotBeenUnlinkSharedM                  = wurde nicht entkoppelt
+RiskSharedTooltip                        = Diese Option ermöglicht das Teilen der Risiken. <br> INFO: Wenn Sie die Aufgaben anzeigen möchten, müssen Sie die Option zum Teilen der Projekte aktivieren.
+ShowInheritedRisksInListings             = Vererbte Risiken - Auflistungen <br> (aus den übergeordneten Ebenen)
+ShowInheritedRisksInListingsDescription  = Vererbte Risiken sind die auf einer übergeordneten Ebene (z. B. Standort oder GP) definierten und automatisch auf die GP/UT angewendeten Risiken. <br> Aktivieren Sie diese Option, um sie in den Auflistungen anzuzeigen
+ShowInheritedRisksInDocuments            = Vererbte Risiken - Dokumente <br> (aus den übergeordneten Ebenen)
+ShowInheritedRisksInDocumentsDescription = Vererbte Risiken sind die auf einer übergeordneten Ebene (z. B. Standort oder GP) definierten und automatisch auf die GP/UT angewendeten Risiken. <br> Aktivieren Sie diese Option, um sie in den Dokumenten anzuzeigen
+DigiriskElementInheritedRisksList        = Liste der vererbten Risiken
+ConfirmImportSharedRisks                 = Bitte wählen Sie die zu importierenden geteilten Risiken aus
+RisksRepartition                         = Verteilung der Risiken nach Bewertung
+ShowRiskOrigin                           = Die Herkunft des Risikos anzeigen
+ShowRiskOriginDescription                = Die Herkunft der Risiken in den Dokumenten anzeigen (Gefährdungsbeurteilung, Gruppierung, Arbeitseinheiten, Risikoauflistung mit Maßnahmen und mit Fotos usw.).
+SharedRiskImportWithSuccess              = Risiko erfolgreich importiert
+RiskImport                               = Import von Risiken
+RiskUnlink                               = Löschen des geteilten Risikos
+RiskDeleted                              = Das Risiko %s wurde gelöscht
+RiskSharedWithEntityRefLabel             = Teilen des Risikos %s mit
+RiskUnlinkedFromEntityRefLabel           = Entkopplung des Risikos %s von
+TheDigiriskelement                       = das Digirisk-Element
+DefaultProjectContactType                = Standardrolle für das Projekt der Gefährdungsbeurteilung
+DefaultTaskContactType                   = Standardrolle für die Aufgaben des Projekts der Gefährdungsbeurteilung
+RiskListParentView                       = Alle übergeordneten Elemente anzeigen
+RiskListParentViewDescription            = Alle übergeordneten Elemente eines Risikos in der Risikoliste und in den Dokumenten anzeigen
+CategoryOnRisk                           = Die Tags/Kategorien auf den Risiken anzeigen
+CategoryOnRiskDescription                = Ermöglicht das Zuweisen und Anzeigen von Tags/Kategorien auf den Risiken - mit Vorsicht zu verwenden
+AddPsychosocialRisk                      = Ein psychosoziales Risiko hinzufügen
+AddPsychosocialRiskTitle                 = Hinzufügen eines psychosozialen Risikos
+AddPsychosocialRiskButton                = Das psychosoziale Risiko hinzufügen
+AddSelectedPsychosocialRisks             = Die ausgewählten psychosozialen Risiken hinzufügen
+SocialRelationsAtWork                    = Soziale Beziehungen am Arbeitsplatz
+WorkIntensityAndTime                     = Arbeitsintensität und Arbeitszeit
+EmotionalRequirements                    = Emotionale Anforderungen
+Autonomy                                 = Autonomie
+MeaningOfWork                            = Sinn der Arbeit
+WorkSituationInsecurity                  = Unsicherheit der Arbeitssituation
+PreventionContextInCompany               = Präventionskontext im Unternehmen
+RPSImpactOnCompanyAndEmployees           = Auswirkung der psychosozialen Risiken auf das Unternehmen und die Beschäftigten
+PsychosocialRisksFactors                 = Psychosoziale Risikofaktoren
+CompanyPreventionInformations            = Informationen zur Prävention im Unternehmen
+Weak                                     = Gering
+Moderate                                 = Mäßig
+High                                     = Hoch
+Extreme                                  = Extrem
+HereIsTheWorkStationDescription          = Dies ist die Beschreibung des Arbeitsplatzes
+ImageAnalysis                            = Bildanalyse
+TextAnalysis                             = Textanalyse
+AnalyzeText                              = Den Text analysieren
+EnterTextForAnalysis                     = Geben Sie den zu analysierenden Text ein
+AIRiskAnalysis                           = Risikoanalyse durch KI
+AnalysisInProgress                       = Analyse läuft ...
+
+# Statistiken
+GreyRisk                                         = Geringes Risiko
+OrangeRisk                                       = Zu planendes Risiko
+RedRisk                                          = Zu behandelndes Risiko
+BlackRisk                                        = Nicht hinnehmbares Risiko
+RisksNotAssessed                                 = Nicht bewertete Risiken
+RisksRepartitionByDangerCategories               = Verteilung der Risiken nach Gefahrenkategorie
+RiskListsByDangerCategories                      = Liste der Risiken nach Gefahrenkategorie
+DigiriskElementsRepartitionByDepth               = Verteilung der Struktur der Gruppierungen der Ebene %s
+RisksRepartitionByDangerCategoriesAndCriticality = Verteilung der Risiken nach Gefahrenkategorie und Kritikalität
+NumberOfRisks                                    = Anzahl der Risiken
+DangerCategories                                 = Gefahrenkategorien
+RisksRepartitionByDigiriskElement                = Verteilung der Risiken nach Gruppierung / Arbeitseinheit %s
+
+
+
+#
+# RiskEnvironmentals - Umweltrisiken
+#
+
+# Daten
+Environment                                    = Umwelt
+Riskenvironmental                              = Umweltrisiko
+RiskEnvironmentals                             = Umweltrisiken
+Riskenvironmentals                             = Umweltrisiken
+RiskEnvironmentalsMin                          = Umweltrisiken
+AddRiskenvironmentalTitle                      = Hinzufügen des Umweltrisikos
+DigiriskElementRiskenvironmentalsList          = Liste der Umweltrisiken
+DigiriskElementInheritedRiskenvironmentalsList = Liste der vererbten Umweltrisiken
+DigiriskElementSharedRiskenvironmentalsList    = Liste der geteilten Umweltrisiken
+ImportSharedRiskenvironmentals                 = Geteilte Umweltrisiken importieren
+SelectAllSharedRiskenvironmentalsOfElement     = Alle Umweltrisiken dieses Elements auswählen
+ConfirmImportSharedRiskenvironmentals          = Bitte wählen Sie die zu importierenden geteilten Umweltrisiken aus
+EnvironmentDescription                         = Planung - Maßnahmen zur Bewältigung von Risiken und Chancen
+
+#
+# ListingRisksEnvironmentalAction - Auflistung der Umweltrisiken mit Korrekturmaßnahmen
+#
+
+# Berechtigung
+ListingRisksEnvironmentalActionMin = Auflistung der Umweltrisiken mit Korrekturmaßnahmen
+
+# Daten
+ListingRisksEnvironmentalAction            = Auflistung der Umweltrisiken mit Korrekturmaßnahmen
+Listingrisksenvironmentalaction            = Auflistung der Umweltrisiken mit Korrekturmaßnahmen
+ListingRisksEnvironmentalActionGenerated   = Erzeugung der Auflistung der Umweltrisiken mit Korrekturmaßnahmen
+listingrisksenvironmentalaction.odt        = Auflistung der Umweltrisiken mit Korrekturmaßnahmen
+listingrisksenvironmentalaction_custom.odt = Individuelle Auflistung der Umweltrisiken mit Korrekturmaßnahmen
+
+#
+# ListingRisksEnvironmentalDocument - Auflistung der Umweltrisiken mit Dokumenten
+#
+
+# Daten
+ListingRisksEnvironmentalDocument = Auflistung der Umweltrisiken
+
+
+
+#
+# RiskAssessment - Bewertung
+#
+
+# Daten
+RiskAssessment                              = Bewertung
+Riskassessment                              = Bewertung
+RiskAssessments                             = Bewertungen
+RiskAssessmentCreated                       = Anlegen einer Bewertung
+RiskAssessmentModified                      = Änderung einer Bewertung
+RiskAssessmentDeleted                       = Löschen einer Bewertung
+RiskAssessmentConfig                        = Konfiguration der Daten der Bewertungen
+TheRiskAssessment                           = Die Bewertung
+LastRiskAssessment                          = Letzte Bewertung des Risikos
+RiskAssessmentWellCreated                   = Bewertung angelegt
+RiskAssessmentNotCreated                    = Fehler beim Anlegen der Bewertung
+RiskAssessmentWellEdited                    = Bewertung bearbeitet
+RiskAssessmentNotEdited                     = Fehler beim Bearbeiten der Bewertung
+RiskAssessmentWellDeleted                   = Bewertung gelöscht
+RiskAssessmentNotDeleted                    = Fehler beim Löschen der Bewertung
+EvaluationCreate                            = Hinzufügen der Bewertung
+EvaluationEdit                              = Bearbeitung der Bewertung
+EvaluationMethod                            = Bewertungsmethode
+lastEvaluationOn                            = Letzte Bewertung am
+DeleteEvaluation                            = Möchten Sie die Bewertung wirklich löschen?
+DigiriskRiskAssessmentData                  = Konfigurierbare Daten der Bewertungen
+MultipleRiskAssessmentMethodName            = Bewertungsmethoden
+MultipleRiskAssessmentMethodDescription     = Den Wechsel der Bewertungsmethode aktivieren
+AdvancedRiskAssessmentMethod                = Erweiterte Bewertungsmethode
+AdvancedRiskAssessmentMethodDescription     = Die erweiterte Bewertungsmethode aktivieren
+RiskAssessmentList                          = Liste der Bewertungen des Risikos
+EditRiskAssessment                          = Bewertung bearbeiten
+ShowAllRiskAssessments                      = Alle Bewertungen anzeigen
+ShowAllRiskAssessmentsDescription           = Die vollständige Liste der Risikobewertungen in der Risikoliste anzeigen
+ParentRisk                                  = Übergeordnetes Risiko
+RiskAssessmentDate                          = Datum der Bewertung
+SimpleEvaluation                            = Einfache Bewertung
+AdvancedEvaluation                          = Erweiterte Bewertung
+CalculatedEvaluation                        = Berechnete Bewertung
+SelectEvaluation                            = Aktivieren Sie die Kästchen, um Ihre Bewertung zu berechnen
+EvaluationList                              = Liste der Bewertungen des Risikos
+HowToSetMultipleRiskAssessmentMethod        = Um die mehrfache Verwendung der Bewertungsmethoden zu konfigurieren, gehen Sie zu Konfiguration des Moduls - Risikoanalyse - Bewertung
+NoFileLinked                                = Kein verknüpftes Foto
+AddRiskAssessment                           = Eine Bewertung des Risikos hinzufügen
+AddRiskAssessmentTask                       = Eine Aufgabe zum Risiko hinzufügen
+ListRiskAssessmentTask                      = Liste der Aufgaben des Risikos
+ShowRiskAssessmentDate                      = Datum der Bewertungen
+ShowRiskAssessmentDateDescription           = Ersetzt das Erstellungsdatum durch das Anfangsdatum der Bewertungen im Datenblatt und in den Dokumenten
+RiskAssessmentHideDateInDocument            = Das Datum der Bewertung in den Dokumenten ausblenden
+RiskAssessmentHideDateInDocumentDescription = Das Datum der Bewertung in der Spalte "Informationen zur Bewertung" in den Dokumenten ausblenden
+RiskTaskComplete                            = Aufgabe %s abgeschlossen
+
+# Statistiken
+TasksRepartition = Verteilung der Aufgaben nach gemeldetem tatsächlichem Fortschritt
+TaskAt0Percent   = Aufgabe bei 0
+TaskInProgress   = Laufende Aufgabe
+TaskAt100Percent = Aufgabe bei 100
+
+
+#
+# RiskSign - Kennzeichnung
+#
+
+# Berechtigungen
+RiskSignsMin = Kennzeichnungen
+
+# Daten
+RiskSign                           = Kennzeichnung
+RiskSignCreated                    = Anlegen einer Kennzeichnung
+RiskSignModified                   = Änderung einer Kennzeichnung
+RiskSignDeleted                    = Löschen einer Kennzeichnung
+TheRiskSign                        = Die Kennzeichnung
+RiskSignConfig                     = Konfiguration der Daten der Kennzeichnungen
+RiskSignWellCreated                = Kennzeichnung angelegt
+RiskSignNotCreated                 = Fehler beim Anlegen der Kennzeichnung
+RiskSignWellEdited                 = Kennzeichnung bearbeitet
+RiskSignNotEdited                  = Fehler beim Bearbeiten der Kennzeichnung
+RiskSignWellDeleted                = Kennzeichnung gelöscht
+RiskSignNotDeleted                 = Fehler beim Löschen der Kennzeichnung
+RiskSignCategory                   = Kategorie
+RiskSignImport                     = Import von Kennzeichnungen
+RiskSignUnlink                     = Löschen der geteilten Kennzeichnung
+AddRiskSignTitle                   = Hinzufügen einer Kennzeichnung
+AddRiskSignButton                  = Kennzeichnung hinzufügen
+EditRiskSign                       = Bearbeitung einer Kennzeichnung
+DeleteRiskSignMessage              = Löschen der Kennzeichnung
+DigiriskElementRiskSignList        = Liste der Kennzeichnungen
+RiskSigns                          = Kennzeichnungen
+DigiriskElementSharedRiskSignsList = Liste der geteilten Kennzeichnungen
+ImportSharedRiskSigns              = Geteilte Kennzeichnungen importieren
+SelectAllSharedRiskSignsOfElement  = Alle Kennzeichnungen dieses Elements auswählen
+AlreadyImportedF                   = Bereits importiert
+ShowSharedRiskSigns                = Geteilte Kennzeichnungen
+ShowSharedRiskSignsDescription     = Die geteilten Kennzeichnungen in den Dokumenten und den Auflistungen anzeigen
+DigiriskElementSharedRiskSign      = Geteilte Kennzeichnungen
+SharedRiskSigns                    = Geteilte Kennzeichnungen
+ShareRisksign                      = Teilen der Kennzeichnungen aktivieren
+RISKSIGNSharing                    = Teilen der Kennzeichnungen
+RISKSIGNSharingDescription         = Auswahl der Mandanten, die ihre Kennzeichnungen mit diesem Mandanten teilen.
+UnlinkSharedRiskSign               = Verknüpfung der geteilten Kennzeichnung aufheben
+RiskSignWellUnlinkShared           = Kennzeichnungsverknüpfung aufgehoben
+RiskSignNotUnlinkShared            = Fehler beim Aufheben der Kennzeichnungsverknüpfung
+HasBeenUnlinkSharedF               = wurde entkoppelt
+HasNotBeenUnlinkSharedF            = wurde nicht entkoppelt
+RiskSignSharedTooltip              = Diese Option ermöglicht das Teilen der Kennzeichnungen. <br> INFO: Wenn Sie die Aufgaben anzeigen möchten, müssen Sie die Option zum Teilen der Projekte aktivieren.
+ShowInheritedRiskSigns             = Vererbte Kennzeichnungen
+ShowInheritedRiskSignsDescription  = Die vererbten Kennzeichnungen in den Dokumenten und den Auflistungen anzeigen
+DigiriskElementInheritedRiskSignsList = Liste der vererbten Kennzeichnungen
+ConfirmImportSharedRiskSigns       = Bitte wählen Sie die zu importierenden geteilten Kennzeichnungen aus
+RiskSignSharedWithEntityRefLabel   = Teilen der Kennzeichnung %s mit
+RiskSignUnlinkedFromEntityRefLabel = Entkopplung der Kennzeichnung %s von
+
+#
+# Tasks - Aufgabe
+#
+
+# Daten
+ActionPlan                               = Aktionsplan
+Task                                     = Aufgabe
+TaskCreatedEvent                         = Anlegen einer Aufgabe
+TaskModifiedEvent                        = Änderung einer Aufgabe
+TaskDeletedEvent                         = Löschen einer Aufgabe
+TheTask                                  = Die Aufgabe
+TaskConfig                               = Konfiguration der Daten der Aufgaben
+TaskWellCreated                          = Aufgabe angelegt
+TaskNotCreated                           = Fehler beim Anlegen der Aufgabe
+TaskWellEdited                           = Aufgabe bearbeitet
+TaskNotEdited                            = Fehler beim Bearbeiten der Aufgabe
+TaskWellDeleted                          = Aufgabe gelöscht
+TaskNotDeleted                           = Fehler beim Löschen der Aufgabe
+TasksManagement                          = Verwaltung der Aufgaben
+SelectProject                            = Auswahl des Projekts
+DUProject                                = Mit den Aufgaben der Risiken verknüpftes Projekt
+EnvironmentProject                       = Mit den Aufgaben der Umweltrisiken verknüpftes Projekt
+NoTaskLinked                             = Keine laufende Aufgabe
+TaskList                                 = Liste der Aufgaben des Risikos
+TaskCreate                               = Hinzufügen der Aufgabe
+TaskEdit                                 = Bearbeitung der Aufgabe
+HowToSetDUProject                        = Um die Auswahl des Projekts zu konfigurieren, gehen Sie zu Konfiguration des Moduls - Risikoanalyse - Aufgabe
+DeleteTask                               = Möchten Sie die Aufgabe wirklich löschen?
+ListingHeaderTask                        = Liste der Aufgaben
+ListingHeaderTaskTooltip                 = Aktivieren Sie das Teilen der Projekte, um die Aufgaben anzuzeigen
+TasksManagementDescription               = Die Aufgabenverwaltung aktivieren
+TaskManagementNotActivated               = Bitte aktivieren Sie die Aufgabenverwaltung unter Konfiguration des Moduls / Risikoanalyse / Aufgabe
+DigiriskProgress                         = Fortschritt
+ShowTaskStartDate                        = Anfangsdatum der Aufgaben
+ShowTaskStartDateDescription             = Ersetzt das Erstellungsdatum durch das Anfangsdatum der Aufgaben im Datenblatt und in den Dokumenten
+ShowTaskEndDate                          = Enddatum der Aufgaben
+ShowTaskEndDateDescription               = Das Enddatum der Aufgaben anzeigen
+ShowTasksDone                            = Abgeschlossene Aufgaben
+ShowTasksDoneDescription                 = Die zu 100 abgeschlossenen Aufgaben anzeigen
+ShowTasksDoneDescriptionExtend           = in den Risikolisten
+ShowTaskCalculatedProgress               = Fortschritt der Aufgabe
+ShowTaskCalculatedProgressDescription    = Den berechneten Fortschritt der Aufgabe anstelle des gemeldeten Fortschritts anzeigen
+ShowAllTasks                             = Alle Aufgaben eines Risikos in den Auflistungen
+ShowAllTasksDescription                  = Alle Aufgaben in der Aufgabenliste eines Risikos in den Auflistungen anzeigen
+DeleteTaskTimeSpent                      = Möchten Sie wirklich %s Min. aufgewendete Zeit von der Aufgabe löschen?
+TaskTimeSpentEdit                        = Bearbeitung der aufgewendeten Zeit der Aufgabe
+TheTaskTimeSpent                         = Die aufgewendete Zeit
+TaskTimeSpentCreated                     = Anlegen aufgewendeter Zeit
+TaskTimeSpentModified                    = Änderung aufgewendeter Zeit
+TaskTimeSpentDeleted                     = Löschen aufgewendeter Zeit
+TaskTimeSpentWellCreated                 = Aufgewendete Zeit angelegt
+TaskTimeSpentNotCreated                  = Fehler beim Anlegen der aufgewendeten Zeit
+TaskTimeSpentWellEdited                  = Aufgewendete Zeit bearbeitet
+TaskTimeSpentNotEdited                   = Fehler beim Bearbeiten der aufgewendeten Zeit
+TaskTimeSpentWellDeleted                 = Aufgewendete Zeit gelöscht
+TaskTimeSpentNotDeleted                  = Fehler beim Löschen der aufgewendeten Zeit
+OnTheTask                                = an der Aufgabe
+TaskTimeSpentDuration                    = Dauer der aufgewendeten Zeit
+TaskTimeSpentDurationDescription         = Die standardmäßig zu jeder Aufgabe hinzugefügte aufgewendete Zeit
+NoTaskShared                             = Keine geteilten Aufgaben
+WarningTaskLabel                         = Achtung, Sie haben die maximal zulässige Zeichenzahl (255) überschritten
+ErrorRecordHasSubTasks                   = Die Aufgabe hat untergeordnete Elemente
+TotalConsumedTime                        = Gesamte aufgewendete Zeit im Projekt
+TotalConsumedTimeAmount                  = Kosten der aufgewendeten Zeit
+NbTasks                                  = Anzahl der Aufgaben
+TotalProgress                            = Gesamter tatsächlicher Fortschritt der Aufgaben
+TotalBudget                              = Summe der Budgets der Aufgaben
+TaskTimeSpentDate                        = Datum der aufgewendeten Zeit
+StartDateCannotBeAfterEndDate            = Das Enddatum darf nicht vor dem Anfangsdatum liegen
+TasksFromProject                         = Die angezeigten Aufgaben stammen aus dem Projekt, das als "Projekt der Gefährdungsbeurteilung" festgelegt ist
+TaskHideRefInDocument                    = Die Referenz ausblenden
+TaskHideRefInDocumentDescription         = Die Referenz der Aufgabe in den Dokumenten ausblenden
+TaskHideResponsibleInDocument            = Den Verantwortlichen ausblenden
+TaskHideResponsibleInDocumentDescription = Den Verantwortlichen der Aufgabe in den Dokumenten ausblenden
+TaskHideDateInDocument                   = Das Datum ausblenden
+TaskHideDateInDocumentDescription        = Das Anfangs- und Enddatum der Aufgabe in den Dokumenten ausblenden
+TaskHideBudgetInDocument                 = Das Budget ausblenden
+TaskHideBudgetInDocumentDescription      = Das Budget der Aufgabe in den Dokumenten ausblenden
+
+#
+# DigiAI - DigiAI
+#
+
+# Daten
+WelcomeToDigiAI = Willkommen bei DigiAI
+UploadAnImage = Ein Bild hochladen
+OpenAIApiKey = OpenAI-API-Schlüssel
+OpenAIApiKeyDescription = Um DigiAI zu verwenden, benötigen Sie einen OpenAI-API-Schlüssel. Sie erhalten einen, indem Sie ein Konto auf <a href="https://platform.openai.com/signup" target="_blank">https://platform.openai.com/signup</a> anlegen. Nach der Registrierung können Sie im Bereich "API Keys" Ihres Dashboards einen API-Schlüssel erzeugen.
+
+#
+# Ticket - Öffentliche Ticket-Schnittstelle
+#
+
+# Berechtigungen
+TicketTagsConfig                         = Änderung der Arbeitsschutzregister
+
+# Daten
+Register                                 = Register
+Send                                     = Senden
+TicketSent                               = Ticket gesendet
+FilesLinked                              = Fotos / Anhänge
+AddDocument                              = Dokument hinzufügen
+LastnamePlaceholder                      = Beispiel: Müller
+FirstnamePlaceholder                     = Beispiel: Hans
+PhonePlaceholder                         = 00.00.00.00.00
+LocationPlaceholder                      = Beispiel: Büro A
+ServicePlaceholder                       = Beispiel: Müllwerker
+Location                                 = Ort
+CategoriesCreated                        = Anlegen der Ticket-Kategorien
+ExtrafieldsCreated                       = Anlegen der Zusatzfelder für Tickets
+AnticipatedLeave                         = Vorzeitiges Verlassen
+DGI                                      = Ernste und unmittelbare Gefahr
+SST                                      = Sicherheit und Gesundheit bei der Arbeit
+PresquAccident                           = Beinaheunfall
+Accident                                 = Unfall
+EnhancementSuggestion                    = Verbesserungsvorschlag
+MaterialProblem                          = Materielles Problem
+HumanProblem                             = Menschliches Problem
+Others                                   = Sonstiges
+AccidentWithoutDIAT                      = Leichter Unfall
+AccidentWithDIAT                         = Arbeitsunfall
+Environment                              = Umwelt
+Quality                                  = Qualität
+NonCompliance                            = Nichtkonformität
+FirstName                                = Vorname
+LastName                                 = Name
+Phone                                    = Telefon
+DeclarationDate                          = Meldung
+DigiriskTicketPublicAccess               = Unter der folgenden URL steht eine öffentliche Schnittstelle zur Verfügung, die keine Anmeldung erfordert
+TicketActivatePublicInterface            = Die öffentliche Schnittstelle aktivieren
+GenerateExtrafields                      = Erzeugung der Standard-Zusatzfelder für Tickets
+GenerateTicketCategories                 = Erzeugung der Standard-Kategorien für Tickets
+AlreadyGenerated                         = Bereits erzeugt
+NotGenerated                             = Noch nicht erzeugt
+NotCreated                               = Noch nicht angelegt
+ExtrafieldsGeneration                    = Diese Option ermöglicht die Erzeugung der Standard-Zusatzfelder für Tickets. Angelegt werden: <br> Name, Vorname, Telefon, GP/UT, Ort und Datum
+CategoriesGeneration                     = Diese Option ermöglicht die Erzeugung der Standard-Kategorien für Tickets. Angelegt werden: <br> - Register <br> - - Unfall <br> - - - Beinaheunfall, Leichter Unfall, Arbeitsunfall <br> - - Sicherheit und Gesundheit bei der Arbeit <br> - - - Vorzeitiges Verlassen, Sonstiges, Menschliches Problem, Materielles Problem <br> - - Ernste und unmittelbare Gefahr <br> - - Qualität <br> - - - Nichtkonformität, Verbesserungsvorschlag <br> - - Umwelt <br> - - - Nichtkonformität, Sonstiges
+TicketSuccess                            = Ihr Registereintrag wurde an die Präventionsabteilung übermittelt unter der Nummer:
+TicketPublicAccess                       = Rücklink zur öffentlichen Ticket-Schnittstelle:
+TicketShowCompanyLogo                    = Das Logo des Unternehmens in der öffentlichen Schnittstelle anzeigen
+TicketShowCompanyLogoHelp                = Aktivieren Sie diese Option, um das Logo des Unternehmens auf den Seiten der öffentlichen Schnittstelle auszublenden
+YouMustNotifyYourHierarchy               = Sie sind <b>verpflichtet</b>, Ihre Vorgesetzten zu informieren
+GoBackToTicketCreation                   = Zur Seite der Ticketverfolgung wechseln
+SendEmailOnTicketSubmit                  = E-Mails beim Anlegen versenden
+CatTicketsList                           = Liste der Tags/Kategorien der Tickets
+SendEmailTo                              = Zu benachrichtigende E-Mail-Adresse
+SendEmailOnTicketSubmitHelp              = Den automatischen E-Mail-Versand beim Anlegen eines Tickets aktivieren
+MultipleEmailsSeparator                  = Um mehrere zu benachrichtigende E-Mail-Adressen zuzuweisen, trennen Sie sie durch ein ";". Beispiel: "aaaa@bbb.cc;dddd@eee.ff"
+TicketCategories                         = Kategorien der Tickets
+TicketDocumentsConfig                    = Dokumente der Tickets
+TicketExtrafields                        = Zusatzfelder der Tickets
+MainCategorySetting                      = Diese Option legt die Kategorie fest, deren Unterkategorien in der öffentlichen Schnittstelle erscheinen
+TicketCategoriesInDocumentsSetting       = Diese Option legt fest, welche Ticket-Kategorien in der Ticketliste der Dokumente (Gefährdungsbeurteilung, Datenblatt der Gruppierung usw.) angezeigt werden. Ist keine Kategorie ausgewählt, werden alle Kategorien angezeigt
+ParentCategorySetting                    = Diese Option legt den Titel der übergeordneten Kategorie für die öffentliche Ticket-Schnittstelle fest
+ChildCategorySetting                     = Diese Option legt den Titel der untergeordneten Kategorie für die öffentliche Ticket-Schnittstelle fest
+TicketManagement                         = Verwaltung der Tickets
+MainCategory                             = Auswahl der Hauptkategorie
+TicketCategoriesInDocuments              = In den Dokumenten angezeigte Kategorien
+ParentCategoryLabel                      = Titel der übergeordneten Kategorie
+ChildCategoryLabel                       = Titel der untergeordneten Kategorie
+TicketPublicInterfaceEnabled             = Die öffentliche Ticket-Schnittstelle wurde aktiviert
+TicketPublicInterfaceDisabled            = Die öffentliche Ticket-Schnittstelle wurde deaktiviert
+TicketPublicInterface                    = Öffentliche Schnittstelle
+EmailsToNotifySet                        = Die zu benachrichtigenden E-Mail-Adressen wurden gespeichert
+MainCategorySet                          = Die Hauptkategorie wurde festgelegt
+TicketCategoriesInDocumentsSet           = Die in den Dokumenten angezeigten Kategorien wurden festgelegt
+ParentCategoryLabelSet                   = Der Titel der übergeordneten Kategorie wurde festgelegt
+ChildCategoryLabelSet                    = Der Titel der untergeordneten Kategorie wurde festgelegt
+TicketPublicInterfaceConfigDocumentation = Um die öffentliche Ticket-Schnittstelle zu konfigurieren, lesen Sie die Dokumentation
+ParentCategory                           = Übergeordnete Kategorie
+TSProject                                = Mit den Tickets verknüpftes Projekt
+TicketDescription                        = Projekt der Tickets
+TicketProjectUpdated                     = Das Standardprojekt der Tickets wurde aktualisiert
+QRCodeAlreadyGenerated                   = QR-Code erzeugt
+GenerateQRCode                           = QR-Code erzeugen
+CompanyQRCodeGeneration                  = Erzeugung des QR-Codes des Mandanten
+QRCodeGeneration                         = Erzeugung des QR-Codes
+MultiCompanyQRCodeGeneration             = Erzeugung des mandantenübergreifenden QR-Codes
+TicketCreationMailWellSent               = Bestätigungs-E-Mail zum Anlegen des Tickets gesendet
+TicketCreationMailSent                   = Die E-Mail zum Anlegen des Tickets wurde an %s gesendet
+HowToSetupTicketCategories               = Um die Ticket-Kategorien zu konfigurieren, klicken Sie bitte auf diesen Link:
+ConfigTicketCategories                   = Konfiguration der Ticket-Kategorien
+NewTicketSubmitted                       = Über die öffentliche Schnittstelle wurde ein Ticket eingereicht
+ANewTicketHasBeenSubmitted               = Neues Sicherheitsregister angelegt für %s
+TicketCreationSubject                    = Anlegen eines Tickets über die öffentliche Schnittstelle von Digirisk
+TicketDocumentCustomDigiriskTemplate     = Individuelle ODT-Vorlage der Ticket-Datenblätter
+HowToSetupDigiriskElement                = Um die Digirisk-Elemente (Gruppierungen/Arbeitseinheiten) zu konfigurieren, klicken Sie bitte auf diesen Link:
+ConfigDigiriskElement                    = Konfiguration der Digirisk-Elemente
+ErrorFieldEmail                          = Fehler: Die E-Mail muss dem folgenden Format entsprechen: <b>'aaa@aaa.fr'</b>
+ErrorFieldPhone                          = Fehler: Die Telefonnummer muss dem folgenden Format entsprechen: <b>'0XXXXXXXXXXX'</b> oder <b>'+33XXXXXXXXX'</b>
+TicketEmailRequired                      = E-Mail zum Anlegen eines Tickets erforderlich
+TicketEmailRequiredHelp                  = Aktivieren Sie diese Option, um die Eingabe einer E-Mail-Adresse beim Anlegen eines Tickets in der öffentlichen Schnittstelle verpflichtend zu machen
+WelcomeToPublicTicketInterface           = Willkommen in der öffentlichen Ticket-Schnittstelle
+PleaseSelectAnEntity                     = Bitte wählen Sie einen Mandanten aus:
+ShowSelectorOnTicketPublicInterface      = Die Mandantenauswahl in der öffentlichen Ticket-Schnittstelle anstelle der Mandantenliste anzeigen
+ShowSelectorOnTicketPublicInterfaceHelp  = Die Mandantenauswahl in der öffentlichen Ticket-Schnittstelle anstelle der Liste der Mandanten mit ihrem Logo anzeigen
+MultiEntityPublicInterface               = Öffentliche Ticket-Schnittstelle für mehrere Mandanten
+TicketCategoriesNotCreated               = Sie haben keine Ticket-Kategorien angelegt
+TicketPublicInterfaceQRCode              = QR-Code der öffentlichen Ticket-Schnittstelle
+MultiEntityTicketPublicInterfaceQRCode   = QR-Code der öffentlichen Ticket-Schnittstelle für mehrere Mandanten
+PublicInterfaceConfiguration             = Sichtbare / erforderliche Felder der öffentlichen Schnittstelle
+TicketNumber                             = Ticket-Nr.
+FromAndDate                              = Herkunft und Datum
+AuthorRequest                            = Antragsteller
+DateCloture                              = Abschlussdatum
+
+PublicInterfaceUseSignatory              = Unterschrift zum Melden dieses Registereintrags erforderlich
+ValidateText                             = Für die Unterschrift zu akzeptierende Bedingungen
+TicketPublicInterfaceShowCategory        = Die Beschreibung der Kategorie anzeigen
+EmailTemplate                            = E-Mail-Vorlage
+EmailTemplateDescription                 = E-Mail-Vorlage
+
+OpenInNewTab                             = In einem neuen Tab öffnen
+TicketDigiriskElementRequired            = GP/UT zum Anlegen eines Tickets erforderlich
+TicketDigiriskElementRequiredHelp        = Aktivieren Sie diese Option, um die Auswahl einer GP/UT beim Anlegen eines Tickets in der öffentlichen Schnittstelle verpflichtend zu machen
+TicketDigiriskElementHideRef             = Die Referenz der GP/UT in der Bereichsauswahl der öffentlichen Schnittstelle ausblenden
+TicketDigiriskElementHideRefHelp         = Aktivieren Sie diese Option, um die Referenz einer GP/UT in der öffentlichen Schnittstelle auszublenden
+TicketDigiriskelementVisible             = Das Feld GP/UT zum Anlegen eines Tickets anzeigen
+TicketServiceVisible                     = Das Feld GP/UT zum Anlegen eines Tickets anzeigen
+TicketDigiriskelementVisibleHelp         = Aktivieren Sie diese Option, um das Feld GP/UT in der öffentlichen Schnittstelle anzuzeigen und es bei Bedarf verpflichtend zu machen
+TicketServiceVisibleHelp                 = Aktivieren Sie diese Option, um das Feld GP/UT in der öffentlichen Schnittstelle anzuzeigen und es bei Bedarf verpflichtend zu machen
+TicketPhotoVisible                       = Das Feld Foto zum Anlegen eines Tickets anzeigen
+TicketPhotoVisibleHelp                   = Aktivieren Sie diese Option, um das Feld Foto in der öffentlichen Schnittstelle anzuzeigen
+TicketEmailVisible                       = Das Feld E-Mail zum Anlegen eines Tickets anzeigen
+TicketEmailVisibleHelp                   = Aktivieren Sie diese Option, um das Feld E-Mail in der öffentlichen Schnittstelle anzuzeigen und es bei Bedarf verpflichtend zu machen
+TicketLastnameVisible                    = Das Feld Name zum Anlegen eines Tickets anzeigen
+TicketLastnameVisibleHelp                = Aktivieren Sie diese Option, um das Feld Name in der öffentlichen Schnittstelle anzuzeigen und es bei Bedarf verpflichtend zu machen
+TicketFirstnameVisible                   = Das Feld Vorname zum Anlegen eines Tickets anzeigen
+TicketFirstnameVisibleHelp               = Aktivieren Sie diese Option, um das Feld Vorname in der öffentlichen Schnittstelle anzuzeigen und es bei Bedarf verpflichtend zu machen
+TicketPhoneVisible                       = Das Feld Telefon zum Anlegen eines Tickets anzeigen
+TicketPhoneVisibleHelp                   = Aktivieren Sie diese Option, um das Feld Telefon in der öffentlichen Schnittstelle anzuzeigen und es bei Bedarf verpflichtend zu machen
+TicketLocationVisible                    = Das Feld Ort zum Anlegen eines Tickets anzeigen
+TicketLocationVisibleHelp                = Aktivieren Sie diese Option, um das Feld Ort in der öffentlichen Schnittstelle anzuzeigen und es bei Bedarf verpflichtend zu machen
+TicketDateVisible                        = Das Feld Datum zum Anlegen eines Tickets anzeigen
+TicketDateVisibleHelp                    = Aktivieren Sie diese Option, um das Feld Datum in der öffentlichen Schnittstelle anzuzeigen und es bei Bedarf verpflichtend zu machen
+QRCodeGenerated                          = QR-Code erzeugt
+FkTicket                                 = Verknüpftes Ticket
+PublicTicket                             = Öffentliche Ticket-Schnittstelle
+TicketPublicInterfaceForbidden           = Zugriff auf die öffentliche Ticket-Schnittstelle verboten
+DefaultUserGroup                         = Standardgruppe
+DefaultUserGroupDescription              = Standardgruppe in den Gruppenauswahlen
+ConfigureDefaultUserGroup                = Die Standardgruppe konfigurieren
+RegisterSigned                           = Register unterschrieben
+
+#Öffentliche Schnittstelle
+TicketPublicInterfaceShowCategoryDescription     = Die Beschreibung der Ticket-Kategorien in der öffentlichen Schnittstelle anzeigen
+TicketPublicInterfaceShowCategoryDescriptionHelp = Aktivieren Sie diese Option, um die Beschreibung der Ticket-Kategorien in der öffentlichen Schnittstelle anzuzeigen
+
+
+# Statistiken
+TicketStatistics    = Statistiken der Tickets
+ExportCSV           = CSV-Export
+GenerateCSV         = Die CSV-Datei erzeugen
+SuccessGenerateCSV  = CSV-Datei %s erfolgreich erzeugt
+ErrorMissingData    = Fehler: Die CSV-Datei konnte nicht erzeugt werden, die an die Datei gesendeten Daten sind fehlerhaft. <br> Bitte prüfen Sie, ob Tickets GP/UT zugewiesen sind.
+CSVFileExport       = Export der Registereinträge im CSV-Format mit Zuordnung zu GP/UT
+ThirdPartyHelp      = Ist der Filter "Partner" leer, wird kein Partner für die Suche verwendet
+GP/UTHelp           = Standardmäßig berücksichtigt der Filter alle GP/UT
+CategoryTicketHelp  = Standardmäßig berücksichtigt der Filter alle Kategorien
+CreatedByHelp       = Ist der Filter "Angelegt von" leer, wird kein Benutzer für die Suche verwendet
+AssignedToHelp      = Ist der Filter "Zugewiesen an" leer, wird kein Benutzer für die Suche verwendet
+StatusHelp          = Standardmäßig berücksichtigt der Filter alle Status<br>
+ConcernedTimePeriod = Berücksichtigter Zeitraum
+LessThan            = Weniger als
+MoreThan            = Mehr als
+Comparator          = Vergleichsoperator
+RangeNumber         = Menge
+TimeRange           = Zeiteinheit
+RangeLabel          = Name der Bedingung
+Inferior            = Kleiner als
+Superior            = Größer als
+TimeRangeAdded      = Bedingung hinzugefügt
+TimeRangeDeleted    = Bedingung gelöscht
+
+NumberOfTicketsByMainCategorieAndDigiriskElement    = Anzahl der Registereinträge nach Kategorie und nach GP
+NumberOfTicketsByMainSubCategorieAndDigiriskElement = Anzahl der Registereinträge nach Unterkategorie und nach GP
+NumberOfTicketsByYear                           = Anzahl der Tickets nach Jahr
+
+# Ticket Management Dashboard - Übersicht der Ticketverwaltung
+TicketManagementDashboard                 = Übersicht der Ticketverwaltung
+RunningTicket                             = Laufende Tickets
+NbOfOpenedTicket                          = Anzahl der offenen Tickets
+OldestTicket                              = Ältestes Ticket
+OldestTicketDescription                   = Ältestes Ticket mit der seit seiner Erstellung vergangenen Zeit
+OldestMessageTicket                       = Ältestes Ticket mit einer Nachricht
+OldestMessageTicketDescription            = Ältestes Ticket mit einer Nachricht und der seit der Erstellung der Nachricht vergangenen Zeit
+MeanAnswerTime                            = Durchschnittliche Antwortzeit
+MeanAnswerTimeDescription                 = Durchschnittliche Zeit zwischen Öffnung und Abschluss, nur auf Basis der abgeschlossenen Tickets berechnet
+MeanFirstResponseTime                     = Durchschnittliche Zeit bis zur ersten Antwort
+MeanFirstResponseTimeDescription          = Durchschnittliche Zeit zwischen der Öffnung des Tickets und der ersten für den Melder sichtbaren Nachricht. Interne Notizen zählen nicht, und Tickets ohne öffentliche Nachricht sind von der Berechnung ausgenommen
+NbTicketPerUser                           = Durchschnittliche Anzahl der je Person zugewiesenen Tickets
+NbExchangePerTicket                       = Anzahl der Kontakte je Ticket
+TicketRepartitionPerUserAndMeanAnswerTime = Verteilung der Tickets nach Benutzer und durchschnittliche Antwortzeit
+TopSocietyWithMostTickets                 = Top %s der Unternehmen mit den meisten Tickets
+TicketsCreatedVersusClosedByMonth         = In den letzten %s Monaten angelegte und abgeschlossene Tickets
+TicketsCreated                            = Angelegt
+TicketsClosed                             = Abgeschlossen
+OpenTicketsByStatus                       = Verteilung der offenen Tickets nach Status
+OpenTicketBacklogAge                      = Alter der offenen Tickets (seit der Erstellung)
+BacklogAgeUnderDays                       = Weniger als %s Tage
+BacklogAgeBetweenDays                     = Von %s bis %s Tage
+BacklogAgeOverDays                        = Mehr als %s Tage
+ShowSelectedDateTypes                     = Wählen Sie die anzuzeigende Datumsart aus
+
+# E-Mail
+The                            = Am
+TicketMessage                  = Nachricht des Registereintrags
+SeeTicketUrl                   = Ticket anzeigen
+AutoNotificationTicket         = E-Mail-Benachrichtigung automatisch versendet von
+TicketPublicInterfaceOtherName = Verwaltungsschnittstelle der Arbeitsschutzregister und der Register für ernste und unmittelbare Gefahr
+
+
+
+# Ticket-Dokument
+
+# Daten
+TicketDocument                 = Datenblatt des Tickets
+Ticketdocument                 = Datenblatt des Tickets
+ticketdocument.odt             = Datenblatt des Tickets
+ticketdocument_custom.odt      = Individuelles Datenblatt des Tickets
+ticketdocument_events.odt      = Datenblatt des Tickets mit Ereignissen
+ticketdocument_sign.odt        = Datenblatt des Tickets mit Unterschrift
+ticketdocument_event_sign.odt  = Datenblatt des Tickets mit Ereignis und Unterschrift
+TicketSuccessMessage           = Erfolgsmeldung des Tickets
+TicketSuccessMessageSet        = Die Meldung wurde geändert
+TicketDocumentPDF              = FT-A4-QUERFORMAT
+TicketDocumentPDFDescription   = Das Datenblatt des Tickets anzeigen
+GeneratedTicketDocumentDate    = Datum des Exports dieses Tickets
+
+
+# Projektdokument
+
+# ODT-Vorlage
+DigiriskTemplateDocumentProject = Dokumentvorlagen der Projektdatenblätter von Digirisk
+DocumentModelPapripactA3Paysage = Dokumentvorlagen des Prognoseberichts zu den Projektaufgaben
+PapripactFullName               = Jährliches Programm zur Verhütung berufsbedingter Risiken und zur Verbesserung der Arbeitsbedingungen
+
+# Registerdokument
+
+RegisterDocument     = Register für leichte Arbeitsunfälle
+Registerdocument     = Register für leichte Arbeitsunfälle
+RegisterDocumentsMin = Register für leichte Arbeitsunfälle
+registerdocument.odt = Register für leichte Arbeitsunfälle
+
+#
+# Tools - Werkzeuge
+#
+
+# Daten
+Tools                                        = Werkzeuge
+DigiriskDataMigration                        = Verwaltung der Migrationsdaten
+DataMigrationImport                          = Import der Strukturdaten von Digirisk
+DataMigrationImportDescription               = Import der Strukturdaten von Digirisk WordPress im ZIP-Format
+DataMigrationImportRisks                     = Import der Risikodaten von Digirisk
+DataMigrationImportRisksDescription          = Import der Risikodaten von Digirisk WordPress im ZIP-Format
+ErrorFileNotWellFormatted                    = Die Datei hat nicht das richtige Format oder ist leer. Sie müssen eine Importdatei aus Digirisk WordPress mit dem Namen DATE_OBJET_export.json anhängen
+ErrorFileNotWellFormattedZIP                 = Die Datei hat nicht das richtige Format oder ist leer. Sie müssen eine Importdatei aus Digirisk WordPress mit dem Namen DATE_OBJET_export.zip anhängen
+ErrorJsonBadFormatted                        = Die JSON-Datei ist nicht korrekt formatiert
+SuccessImport                                = Import der Daten erfolgreich
+DataMigrationImportRiskSigns                 = Import der Kennzeichnungsdaten von Digirisk
+DataMigrationImportRiskSignsDescription      = Import der Kennzeichnungsdaten von Digirisk WordPress im ZIP-Format
+DataMigrationImportGlobal                    = Import der Gesamtdaten von Digirisk <br> (Struktur, Risiken und Kennzeichnungen)
+DataMigrationImportGlobalDescription         = Import der Gesamtdaten von Digirisk WordPress im ZIP-Format <br> (Struktur, Risiken und Kennzeichnungen)
+DataMigrationExportGlobal                    = Export der Gesamtdaten von Digirisk <br> (Struktur, Risiken und Kennzeichnungen)
+DataMigrationExportGlobalDescription         = Export der Gesamtdaten von Digirisk Dolibarr im ZIP-Format <br> (Struktur, Risiken und Kennzeichnungen)
+DataMigrationExportTree                      = Export der Struktur von Digirisk <br> (Nur die Struktur)
+DataMigrationExportTreeDescription           = Export der Struktur von Digirisk Dolibarr im ZIP-Format <br> (Für den aktuellen Mandanten sichtbare GP/UT, ohne Risiken und ohne Kennzeichnungen)
+DataMigrationImportGlobalDolibarrDescription = Import der Gesamtdaten von Digirisk Dolibarr im ZIP-Format <br> (Struktur, Risiken und Kennzeichnungen)
+DataMigrationTreeAlreadyImported             = Import der Strukturdaten bereits durchgeführt
+DataMigrationRisksAlreadyImported            = Import der Risikodaten bereits durchgeführt
+DataMigrationRiskSignsAlreadyImported        = Import der Kennzeichnungsdaten bereits durchgeführt
+DataMigrationGlobalAlreadyImported           = Import der Gesamtdaten (Struktur, Risiken und Kennzeichnungen) bereits durchgeführt
+AdvancedImport                               = Erweiterter Import
+AdvancedImportDescription                    = Ermöglicht den unabhängigen Import jedes Elements (Struktur, Risiken und Kennzeichnungen)
+DataMigrationWordPressToDolibarr             = Migration der Daten von WordPress nach Dolibarr
+DataMigrationDolibarrToDolibarr              = Migration der Daten von Dolibarr nach Dolibarr
+RepairRisks                                  = Die Risiken reparieren
+NumberOfRisksCorrupted                       = Sie haben %s Risiko/Risiken mit beschädigter Kategorie, gehen Sie zur Seite "Werkzeuge", um sie zu reparieren
+NoRiskToRepair                               = Kein Risiko zu reparieren
+DigiriskElementSuccessfullyRepaired          = Digirisk-Elemente (GP/UT) erfolgreich repariert
+RiskSuccessfullyRepaired                     = Risiken erfolgreich repariert
+RiskAssessmentSuccessfullyRepaired           = Bewertungen erfolgreich repariert
+CorruptedCategoryOnRiskList                  = Liste der Risiken mit beschädigter Kategorie
+
+# Clean - Bereinigen
+Clean                                          = Bereinigen
+CleanObject                                    = Die Daten bereinigen
+CleanDigiriskElementExistParentDigiriskElement = %d Digirisk-Elemente (GP/UT) haben ein ungültiges übergeordnetes Element
+CleanDigiriskElement                           = Die Digirisk-Elemente (GP/UT) bereinigen
+CleanRiskFkElement                             = %d Risiken haben eine ungültige GP/UT
+CleanRiskStatus                                = %d Risiken haben einen ungültigen Status
+CleanRiskExistFkElement                        = %d Risiken sind verwaist
+CleanRiskExistRiskAssessment                   = %d Risiken haben keine Bewertung
+CleanRisk                                      = Die Risiken bereinigen
+CleanRiskAssessmentStatus                      = %d Bewertungen haben einen ungültigen Status
+CleanRiskAssessmentCotation                    = %d Bewertungen haben eine leere Einstufung
+CleanRiskAssessmentExistFkRisk                 = %d Bewertungen sind verwaist
+CleanRiskAssessment                            = Die Bewertungen bereinigen
+NoDigiriskElementToClean                       = Kein Digirisk-Element (GP/UT) zu bereinigen
+NoRiskToClean                                  = Kein Risiko zu bereinigen
+NoRiskAssessmentToClean                        = Keine Bewertung zu bereinigen
+
+
+#
+# Sonstiges
+#
+
+# Daten
+AT = bis
+
+LabourInspectorName                 = DREETS
+UrlLabourInspector                  = https://travail-emploi.gouv.fr/ministere/organisation/article/dreets-directions-regionales-de-l-economie-de-l-emploi-du-travail-et-des
+IDCCTooltip                         = Dieses Feld stammt aus dem Modul Digirisk für Dolibarr <br> Die Systematik der Tarifverträge stammt von travail-emploi.gouv.fr
+NoEmailContact                      = Keine E-Mail-Adresse bei diesem Kontakt
+AddMedia                            = Ein Medium hinzufügen
+NoMediaLinked                       = Kein verknüpftes Medium
+UserGroup                           = Benutzergruppe
+ReaderGroup                         = Lesergruppe
+UserCreated                         = Der Benutzer wurde angelegt
+GetAPI                              = Verwendung der Digirisk-API-Routen mit der Methode GET
+PostAPI                             = Verwendung der Digirisk-API-Routen mit der Methode POST
+MinimizeMenu                        = Menü verkleinern
+ActionsLine                         = Aktionen
+PhotoWellSent                       = Das Foto wurde der Medienbibliothek hinzugefügt
+PhotoNotSent                        = Das Foto wurde nicht korrekt gesendet
+PhotoWellSaved                      = Das Medium bzw. die Medien wurde(n) hinzugefügt
+PhotoNotSaved                       = Das Medium bzw. die Medien wurde(n) nicht hinzugefügt
+UseCaptcha                          = Grafischer Code (CAPTCHA)
+UseCaptchaDescription               = Verwendung des grafischen Codes (CAPTCHA) auf den Seiten der öffentlichen Schnittstelle
+GP/UTParticipation                  = Beteiligung GP/UT
+LabourDoctorName                    = AMETRA
+LabourDoctorFirstName               = Betriebs-
+LabourDoctorLastName                = arzt
+DashBoard                           = Übersicht
+Close                               = Schließen
+DateRange                           = Zeitraum
+UseDateRange                        = Den Zeitraum verwenden
+SiretNumber                         = Siret-Nr.
+Society                             = Unternehmen
+MulticompanyTransverseModeEnabled   = Die zentrale Verwaltung der Benutzer und Gruppen auf dem Hauptmandanten ist aktiviert.<br>Sie können daher auf diesem Mandanten keinen Benutzer und keine Gruppe anlegen.<br>Bitte wechseln Sie zum Hauptmandanten, um dies vorzunehmen.
+ManuelInputNBEmployees              = Die Anzahl der Beschäftigten manuell eingeben
+ManuelInputNBEmployeesDescription   = Ist die Option aktiviert, können Sie die Anzahl der Beschäftigten in der Konfiguration des Unternehmens manuell eingeben.<br>Andernfalls wird die Anzahl der Beschäftigten berechnet.<br>Weitere Informationen finden Sie in der Dokumentation.
+ManuelInputNBWorkedHours            = Die Anzahl der geleisteten Arbeitsstunden manuell eingeben
+ManuelInputNBWorkedHoursDescription = Ist die Option aktiviert, können Sie die Anzahl der geleisteten Arbeitsstunden in der Konfiguration des Unternehmens manuell eingeben.<br>Andernfalls wird die Anzahl der geleisteten Arbeitsstunden berechnet.<br>Weitere Informationen finden Sie in der Dokumentation.
+ShowPatchNoteAgain                  = Den Versionshinweis anzeigen
+ShowPatchNoteAgainDescription       = Ist die Option aktiviert, erscheint der Versionshinweis der aktuellen Version erneut auf der Startseite von Digirisk.<br>(Erfordert, dass die Option «Versionshinweise von GitHub anzeigen» aktiviert ist, um sichtbar zu sein.)
+HowToConfigureSetupConf             = Um die mit Digirisk verknüpften Unternehmensdaten zu konfigurieren,<br>wechseln Sie bitte zu Digirisk - Konfiguration - Einstellungen
+LabourDoctorNameFull                = Ärztevereinigung
+PermissionInheritedFromConfig       = Die Berechtigungen werden von der allgemeinen Konfiguration oder von der übergeordneten Konfiguration geerbt
+CategorieManagement                 = Verwaltung der Kategorien
+ShowSelectedRiskTypes               = Wählen Sie die anzuzeigenden Risikoarten aus
+CharRemaining                       = Verbleibende Zeichen
+NumberOfLinkedFiles                 = Anzahl der Dateianhänge
+ChooseAnImage                       = Ein Bild auswählen
+
+# Action Plan - Gantt / Kanban
+ActionPlanGantt                     = Gantt-Diagramm
+ActionPlanKanban                    = Kanban
+ActionPlanView                      = Aktionsplan
+ColumnDraft                         = Entwurf
+ColumnInProgress                    = Laufend
+ColumnInControl                     = Zu prüfen
+ColumnDone                          = Erledigt
+NoTasks                             = Keine Korrekturmaßnahme
+ActionPlanGlobalProgress            = Gesamtfortschritt des PAPRIPACT
+ActionPlanGlobalProgressInfo        = Durchschnitt des Fortschritts von %s Korrekturmaßnahme(n)
+KanbanLoadMore                      = Mehr anzeigen (%s)
+KanbanDisplay                       = Darstellung des Kanban
+KanbanPageSize                      = Anzahl der Karten je Spalte
+KanbanPageSizeDesc                  = Anzahl der zunächst in jeder Spalte angezeigten Korrekturmaßnahmen; die weiteren werden über die Schaltfläche «Mehr anzeigen» geladen (verbessert die Leistung bei großen Datenmengen)
+KanbanDraftMax                      = Schwelle der Spalte «Entwurf»
+KanbanDraftMaxDesc                  = Maximaler Fortschritt (%), damit eine Maßnahme in der Spalte «Entwurf» bleibt
+KanbanProgressMax                   = Schwelle der Spalte «Laufend»
+KanbanProgressMaxDesc               = Maximaler Fortschritt (%) für die Spalte «Laufend»
+KanbanControlMax                    = Schwelle der Spalte «Zu prüfen»
+KanbanControlMaxDesc                = Maximaler Fortschritt (%) für die Spalte «Zu prüfen»; darüber wechselt die Maßnahme zu «Erledigt»
+PlannedWorkload                     = Geplanter Aufwand
+TimeSpent                           = Aufgewendete Zeit
+LinkedRisk                          = Zugeordnetes Risiko
+TaskMovedTo                         = Aufgabe verschoben nach %s
+
+AddCategory                        = Eine Kategorie hinzufügen
+SelectCategory                     = Eine Kategorie auswählen
+DateEndBeforeStart                 = Enddatum liegt vor dem Anfangsdatum
+InternalUsers                      = Interne Benutzer
+ExternalContacts                   = Externe Kontakte
+AddContributor                     = Einen Mitwirkenden hinzufügen
+RemoveContact                      = Den Kontakt entfernen
+ColumnWidth                        = Breite
+ColumnGap                          = Abstand
+ActionPlanExportCsv                = Den PAPRIPACT im CSV-Format herunterladen
+ActionPlanExportA3                 = Den PAPRIPACT als PDF im A3-Querformat herunterladen
+ActionPlanExportGantt              = Das Gantt-Diagramm als PNG-Bild herunterladen
+ActionPlanDisplayedProject         = Angezeigtes Projekt
+ActionPlanChangeProject            = Projekt wechseln
+ActionPlanDefaultProject           = Gefährdungsbeurteilung (Standard)
+ActionPlanNoProjectConfigured      = Kein Projekt konfiguriert
+
+# ActionPlan — Ereignisprotokollierung
+ActionPlanLogging                  = Aktionsplan — Verlauf der Änderungen
+ActionPlanLoggingDescription       = Das Anlegen von Ereignissen bei Änderungen im Kanban aktivieren
+ActionPlanLogLabel                 = Änderung der Bezeichnung
+ActionPlanLogLabelDesc             = Ein Ereignis anlegen, wenn die Bezeichnung einer Aufgabe geändert wird
+ActionPlanLogWorkload              = Änderung des Aufwands
+ActionPlanLogWorkloadDesc          = Ein Ereignis anlegen, wenn der geplante Aufwand geändert wird
+ActionPlanLogBudget                = Änderung des Budgets
+ActionPlanLogBudgetDesc            = Ein Ereignis anlegen, wenn das Budget geändert wird
+ActionPlanLogContributorAdd        = Hinzufügen eines Mitwirkenden
+ActionPlanLogContributorAddDesc    = Ein Ereignis anlegen, wenn ein Mitwirkender hinzugefügt wird
+ActionPlanLogContributorRemove     = Entfernen eines Mitwirkenden
+ActionPlanLogContributorRemoveDesc = Ein Ereignis anlegen, wenn ein Mitwirkender entfernt wird
+ActionPlanLogProgress              = Änderung des Fortschritts
+ActionPlanLogProgressDesc          = Ein Ereignis anlegen, wenn der Fortschritt geändert wird
+ActionPlanLogTag                   = Änderung der Tags
+ActionPlanLogTagDesc               = Ein Ereignis anlegen, wenn ein Tag hinzugefügt oder entfernt wird
+ActionPlanLogDateStart             = Änderung des Anfangsdatums
+ActionPlanLogDateStartDesc         = Ein Ereignis anlegen, wenn das Anfangsdatum geändert wird
+ActionPlanLogDateEnd               = Änderung des Enddatums
+ActionPlanLogDateEndDesc           = Ein Ereignis anlegen, wenn das Enddatum geändert wird
+ActionPlanTaskLabelChanged         = Bezeichnung geändert: "%s" → "%s"
+ActionPlanTaskWorkloadChanged      = Aufwand geändert: %s → %s
+ActionPlanTaskBudgetChanged        = Budget geändert: %s → %s
+ActionPlanTaskContributorAdded     = Mitwirkender hinzugefügt: %s
+ActionPlanTaskContributorRemoved   = Mitwirkender entfernt: ID %s
+ActionPlanTaskProgressChanged      = Fortschritt geändert: %s%% → %s%%
+ActionPlanTaskTagAdded             = Tag hinzugefügt: %s
+ActionPlanTaskTagRemoved           = Tag entfernt: ID %s
+ActionPlanTaskDateStartChanged     = Anfangsdatum geändert: %s → %s
+ActionPlanTaskDateEndChanged       = Enddatum geändert: %s → %s
+
+# ===========================================================================
+# Filter des Aktionsplans — issue #4907 (GP/UT, Risikostufe, Tags)
+# ===========================================================================
+ActionPlanElement                    = GP/UT
+ActionPlanFilterElementChildren      = Mit den untergeordneten Elementen
+ActionPlanFilterElementChildrenHelp  = Die Korrekturmaßnahmen der untergeordneten GP/UT der ausgewählten GP/UT einbeziehen
+ActionPlanFilterScale                = Risikostufe
+ActionPlanFilterAllScales            = Alle Stufen
+ActionPlanFilterTags                 = Tags
+ActionPlanFilterCount                = %s Korrekturmaßnahme(n) von %s angezeigt
+ActionPlanDictionaries               = Listen des Kanban
+ActionPlanDictionariesDesc           = Die in den Listen des Aktionsplans und der Kanban angebotenen Werte verwalten
+ActionPlanTagDictionary              = Tags der Korrekturmaßnahmen
+ActionPlanTagDictionaryDesc          = Tags (Aufgabenkategorien), die auf den Karten und im Filter des Kanban des Aktionsplans angeboten werden
+ActionPlanTicketDictionaries         = Wörterbücher der Ticket-Kanban
+ActionPlanTicketDictionariesDesc     = Typen, Gruppen und Schweregrade, aus denen sich die Spalten der Ticket-Kanban zusammensetzen
+ActionPlanManageDictionary           = Verwalten
+
+# ===========================================================================
+# Ticket-Aktionskarte — issue #4443 (1-Klick-Oberfläche)
+# ===========================================================================
+TicketActionCard                     = Ticket-Aktion
+TicketActionCardPickerIntro          = Wählen Sie ein Ticket aus, um eine schnelle Aktion mit 1 Klick auszuführen.
+TicketActionCardStatusSection        = Status
+TicketActionCardAssignSection        = Zuweisung
+TicketActionCardContentSection       = Inhalt
+TicketActionCardDangerSection        = Sensibler Bereich
+TicketActionMarkRead                 = Als gelesen markieren
+TicketActionInProgress               = Auf laufend setzen
+TicketActionWaiting                  = Auf wartend setzen
+TicketActionClose                    = Abschließen
+TicketActionCancel                   = Ticket stornieren
+TicketActionAssignSelf               = Mir zuweisen
+TicketActionAssignOther              = Zuweisen an ...
+TicketActionAddMessage               = Eine Nachricht hinzufügen
+TicketActionLinkAccident             = Einen Unfall verknüpfen
+TicketActionOpenFull                 = Vollständige Details
+TicketActionMarkedRead               = Ticket als gelesen markiert
+TicketActionInProgressDone           = Ticket auf laufend gesetzt
+TicketActionWaitingDone              = Ticket auf wartend gesetzt
+TicketActionClosedDone               = Ticket abgeschlossen
+TicketActionCancelledDone            = Ticket storniert
+TicketActionAssignedSelfDone         = Ticket Ihnen zugewiesen
+TicketActionAssignedOtherDone        = Ticket zugewiesen
+TicketActionCloseConfirm             = Abschluss bestätigen
+TicketActionCancelConfirm            = Stornierung bestätigen
+TicketActionCardRegistresSection      = Informationen zu den Registern
+TicketMessageTitle                    = Titel der Nachricht
+TicketResponsibleAndProgress          = Verantwortlicher und Fortschritt
+TicketActionCardClassificationSection = Klassifizierung
+TicketActionCardDatesSection          = Wichtige Daten
+TicketActionCardIdentificationSection = Identifikation
+TicketActionCardOtherFieldsSection    = Weitere Informationen
+TicketActionCardEventsSection         = Aktuelle Ereignisse
+TicketActionCardRelatedSection        = Verknüpfte Objekte
+UnknownFieldToUpdate                  = Unbekanntes Feld: %s
+Saved                                 = Gespeichert
+SeeAll                                = Alles anzeigen
+LayoutCustomize                       = Anpassen
+LayoutDone                            = Fertig
+LayoutControls                        = Layout-Steuerung
+LayoutWidthHalf                       = Halbe Spalte
+LayoutWidthFull                       = Ganze Spalte
+LayoutWidthSpan                       = Volle Breite
+LayoutSaved                           = Layout gespeichert
+LayoutReset                           = Zurücksetzen
+LayoutResetTitle                      = Das Layout zurücksetzen (zu den Standardwerten zurückkehren)
+LayoutDensity                         = Anzeigedichte
+LayoutDensityCompact                  = Kompakt
+LayoutDensityCozy                     = Komfortabel
+LayoutDensitySpacious                 = Großzügig
+AddTag                                = Einen Tag hinzufügen
+TagAdded                              = Tag hinzugefügt
+TagRemoved                            = Tag entfernt
+Preview                               = Vorschau
+OpenInNewTab                          = In einem neuen Tab öffnen
+FileDeleted                           = Datei gelöscht
+OtherTicket                           = weiteres Ticket
+OtherTickets                          = weitere Tickets
+SeeOtherTicketsForThisCompany         = Den Ticketverlauf dieses Kunden anzeigen
+StatusTimeline                        = Zeitleiste des Status
+WatchTicket                           = Diesem Ticket folgen
+UnwatchTicket                         = Diesem Ticket nicht mehr folgen
+TicketWatched                         = Ticket wird verfolgt
+TicketUnwatched                       = Ticket aus der Verfolgung entfernt
+WatchedTicket                         = Verfolgtes Ticket
+WatchedOnly                           = Nur verfolgte
+AllTickets                            = Alle
+NoWatchedTicket                       = Kein verfolgtes Ticket
+FileUploaded                          = Datei gesendet
+UploadFile                            = Eine Datei auswählen
+OrDropAnywhere                        = oder per Drag-and-drop auf die Karte ziehen
+Messages                              = Nachrichten
+TypeYourReply                         = Geben Sie Ihre Antwort ein …
+PrivateMessage                        = Private Nachricht
+Send                                  = Senden
+NoMessageYet                          = Derzeit keine Nachricht
+BeFirstToReply                        = Antworten Sie als Erster
+MessagePosted                         = Nachricht gesendet
+MessageEdited                         = Nachricht geändert
+MessageDeleted                        = Nachricht gelöscht
+ConfirmDeleteMessage                  = Diese Nachricht löschen?
+ReplyByEmail                          = Per E-Mail senden
+SentByMail                            = Per E-Mail gesendet
+MailSentToNRecipients                 = E-Mail an %d Empfänger gesendet
+MailNotSent                           = E-Mail-Versand fehlgeschlagen
+NoRecipientFound                      = kein Empfänger gefunden
+OriginalMessage                       = Ursprüngliche Nachricht
+JustNow                               = gerade eben
+NMinAgo                               = vor %d Min.
+NHAgo                                 = vor %d Std.
+NDAgo                                 = vor %d T.
+NAttachedFiles                        = %d Dateianhang/Dateianhänge
+Quote                                 = Zitieren
+NotAllowed                            = Aktion nicht zulässig
+Private                               = Privat
+Unknown                               = Unbekannt
+LayoutTagsMode                        = Darstellung der Tags
+LayoutTagsModeChips                   = Vollständige Liste (Chips)
+LayoutTagsModeSelector                = Auswahlliste
+LayoutActionsMode                     = Darstellung der Aktionen
+LayoutActionsModeBar                  = Aktionsleiste
+LayoutActionsModeMenu                 = Menü (⋮)
+Move                                  = Verschieben
+Hide                                  = Ausblenden
+Show                                  = Anzeigen
+
+# ===========================================================================
+# Ticket-Kanban — Konfiguration der Protokollierung — issue #4753
+# ===========================================================================
+TicketKanban                           = Ticket-Kanban
+TicketKanbanLogging                    = Ticket-Kanban — Verlauf der Änderungen
+TicketKanbanLoggingDescription         = Das Anlegen von Ereignissen bei Änderungen im Kanban aktivieren
+TicketKanbanLogStatus                  = Änderung des Status
+TicketKanbanLogStatusDesc              = Ein Ereignis anlegen, wenn der Status eines Tickets über das Kanban geändert wird
+TicketKanbanLogAssignee                = Änderung des Zuständigen
+TicketKanbanLogAssigneeDesc            = Ein Ereignis anlegen, wenn der Zuständige eines Tickets über das Kanban geändert wird
+TicketKanbanLogCategoryAdd             = Hinzufügen eines Tags
+TicketKanbanLogCategoryAddDesc         = Ein Ereignis anlegen, wenn einem Ticket über das Kanban ein Tag hinzugefügt wird
+TicketKanbanLogCategoryRemove          = Entfernen eines Tags
+TicketKanbanLogCategoryRemoveDesc      = Ein Ereignis anlegen, wenn von einem Ticket über das Kanban ein Tag entfernt wird
+TicketKanbanLogType                    = Änderung des Typs
+TicketKanbanLogTypeDesc                = Ein Ereignis anlegen, wenn der Typ eines Tickets über das Kanban geändert wird
+TicketKanbanLogGroup                   = Änderung der Gruppe
+TicketKanbanLogGroupDesc               = Ein Ereignis anlegen, wenn die Gruppe eines Tickets über das Kanban geändert wird
+TicketKanbanLogSeverity                = Änderung des Schweregrads
+TicketKanbanLogSeverityDesc            = Ein Ereignis anlegen, wenn der Schweregrad eines Tickets über das Kanban geändert wird
+TicketKanbanLogSubject                 = Änderung des Betreffs
+TicketKanbanLogSubjectDesc             = Ein Ereignis anlegen, wenn der Betreff eines Tickets über das Kanban geändert wird
+TicketKanbanLogDeadline                = Änderung der Frist
+TicketKanbanLogDeadlineDesc            = Ein Ereignis anlegen, wenn die Frist eines Tickets über das Kanban geändert wird
+TicketKanbanClosedLimit                = Grenze für abgeschlossene Tickets
+TicketKanbanClosedLimitDesc            = Maximale Anzahl der im Kanban angezeigten abgeschlossenen/stornierten Tickets (0 = unbegrenzt)
+
+# ===========================================================================
+# Ticket — Nachvollziehbarkeit der Änderungen — issue #4885
+# ===========================================================================
+TicketLogModifications                 = Nachvollziehbarkeit der Änderungen
+TicketLogModificationsDesc             = Für jede Bearbeitung im Ticket-Datenblatt ein Ereignis anlegen (Betreff, Nachricht, Register, Zuständiger, Partner, Projekt, Fortschritt, Status, Aufgaben, Dokumente)
+TicketMessageEdited                    = Nachricht geändert
+TicketMessageDeleted                   = Nachricht gelöscht
+TicketTaskCreated                      = Aufgabe angelegt: %s
+TicketDocumentGenerated                = Dokument erzeugt
+TicketFileDeleted                      = Datei gelöscht
+
+# Bereich für das schnelle Anlegen eines Tickets
+SelectNothing                          = — Auswählen —
+QuickCreateTicket                      = Schnell ein Ticket anlegen
+TicketSubjectPlaceholder               = Titel des Tickets ...
+TicketInitialMessage                   = Erste Nachricht
+OptionalDescription                    = Beschreibung (optional) ...
+Unassigned                             = Nicht zugewiesen
+QuickCreateAttachments                 = Anhänge
+QuickCreateDropzone                    = Ziehen Sie Dateien hierher oder klicken Sie zur Auswahl
+QuickCreateDropzoneActive              = Hier ablegen …
+QuickCreateAttachmentHint              = Zulässige Formate: Bilder, PDF, Dokumente. Max. 10 MB je Datei.
+QuickCreateTicketSuccess               = Ticket %s erfolgreich angelegt.
+
+# MeteoVigilance - Wetterwarnung Météo-France
+MeteoVigilance = Wetterwarnung Météo-France
+MeteoVigilancePanelTitle = Warnung %s
+MeteoVigilanceAdvice2 = Seien Sie aufmerksam
+MeteoVigilanceAdvice3 = Seien Sie sehr wachsam
+MeteoVigilanceAdvice4 = Höchste Wachsamkeit
+MeteoVigilanceUpdatedAt = Aktualisiert %s
+MeteoVigilanceEnabled = Die Wetterwarnung aktivieren
+MeteoVigilanceEnabledDescription = Zeigt das Widget der Wetterwarnung von Météo-France in der Übersicht an (sowie das Warnband bei einer orangen/roten Warnung).
+MeteoVigilanceLevel = Warnstufe
+MeteoVigilanceActivePhenomena = Aktive Phänomene
+MeteoVigilanceNoAlert = Keine besondere Warnung
+MeteoVigilanceSource = Quelle
+MeteoVigilanceSeeOnMeteoFrance = Auf vigilance.meteofrance.fr ansehen
+MeteoVigilanceNotConfigured = API-Schlüssel von Météo-France nicht konfiguriert — zum Konfigurieren klicken
+MeteoVigilanceUnknownDepartment = Département des Unternehmens nicht ermittelt
+MeteoVigilanceUnavailable = Warndaten vorübergehend nicht verfügbar
+MeteoVigilanceBannerTitle = Warnung %s aktiv im Département %s
+MeteoVigilanceLevel1 = Grün
+MeteoVigilanceLevel2 = Gelb
+MeteoVigilanceLevel3 = Orange
+MeteoVigilanceLevel4 = Rot
+MeteoVigilancePhenomenon1 = Sturm
+MeteoVigilancePhenomenon2 = Regen und Überschwemmung
+MeteoVigilancePhenomenon3 = Gewitter
+MeteoVigilancePhenomenon4 = Hochwasser
+MeteoVigilancePhenomenon5 = Schnee und Glatteis
+MeteoVigilancePhenomenon6 = Hitzewelle
+MeteoVigilancePhenomenon7 = Extreme Kälte
+MeteoVigilancePhenomenon8 = Lawinen
+MeteoVigilancePhenomenon9 = Sturmflut
+MeteoVigilanceSetup = Konfiguration der Wetterwarnung
+MeteoVigilanceApiKey = API-Schlüssel von Météo-France
+MeteoVigilanceApiKeyDescription = API-Schlüssel des Portals von Météo-France (legen Sie ein Konto und eine Anwendung «Bulletin Vigilance» auf <a href="https://portail-api.meteofrance.fr" target="_blank">portail-api.meteofrance.fr</a> an, um den Schlüssel zu erzeugen).
+MeteoVigilanceDepartment = Code des Départements (Überschreibung)
+MeteoVigilanceDepartmentDescription = Lassen Sie das Feld leer, um das Département automatisch aus der Anschrift des Unternehmens abzuleiten. Andernfalls geben Sie einen Code ein (z. B. 35, 2A).
+MeteoVigilanceCacheTTL = Dauer des Caches (Sekunden)
+MeteoVigilanceCacheTTLDescription = Dauer, für die die Daten der API zwischengespeichert werden, bevor ein neuer Aufruf erfolgt (Standard 3600).
+MeteoVigilanceSettings = Konfiguration der Wetterwarnung
+MeteoVigilanceRefreshNow = Jetzt aktualisieren
+MeteoVigilanceRefreshed = Daten aktualisiert: Warnung %s im Département %s
+
+# Konversationssystem der Tickets
+Conversation = Konversation
+PublicMessage = Öffentliche Nachricht
+ConvTo = An
+ConvCc = Cc
+
+SaveNote = Notiz speichern
+
+AddRecipient = Einen Empfänger hinzufügen
+NoRecipientFound = Kein Empfänger
+
+AddFile = Eine Datei hinzufügen
+
+MentionAgents = Mitarbeiter erwähnen
+YouWereMentionedOnTicket = Sie wurden im Ticket %s erwähnt
+YouWereMentionedOnTicketBody = %s hat Sie im Ticket %s erwähnt:
+
+Mentioned = Erwähnt
+
+# Schnelles mobiles Anlegen eines Präventionsplans
+MobileQuickCreation = Schnelles mobiles Anlegen
+MobilePPInteriorCompany = Einsatzbetrieb (intern)
+MobilePPResponsibleAutoSign = Verantwortlicher (unterschreibt automatisch)
+MobilePPSignatureSaved = Unterschrift gespeichert
+MobilePPEditSignature = Die Unterschrift ändern
+MobilePPDrawSignatureHint = Zeichnen Sie unten Ihre Unterschrift und speichern Sie sie. Sie wird für Ihre nächsten Pläne wiederverwendet.
+MobilePPClearSignature = Löschen
+MobilePPSaveSignature = Meine Unterschrift speichern
+MobilePPExteriorCompany = Fremdfirma
+MobileSirenOrSiret = SIREN / SIRET
+MobileSirenOrSiretPlaceholder = 9 oder 14 Ziffern
+MobilePPResponsibleToSign = Verantwortlicher, der unterschreiben soll
+MobilePPChooseExistingContact = Einen bestehenden Kontakt auswählen
+MobilePPNewContact = Neuer Kontakt
+MobilePPEmailForSignatureHelp = An diese E-Mail-Adresse wird die Unterschriftsanfrage gesendet.
+MobilePPPeriod = Einsatzzeitraum
+MobilePPMaxOneYearHint = Maximal 1 Jahr zwischen Anfangs- und Enddatum.
+MobilePPSubmit = Den Präventionsplan anlegen
+MobilePPErrorNoSignature = Sie müssen Ihre Unterschrift speichern, bevor Sie den Plan anlegen.
+MobilePPErrorEmptySignature = Die Unterschrift ist leer.
+MobilePPErrorInvalidSiren = Ungültige SIREN oder SIRET (9 oder 14 Ziffern erwartet).
+MobilePPErrorEndBeforeStart = Das Enddatum muss nach dem Anfangsdatum liegen.
+MobilePPErrorMaxOneYear = Die Dauer darf 1 Jahr nicht überschreiten.
+MobilePPErrorDatesRequired = Geben Sie das Anfangs- und das Enddatum an.
+MobilePPErrorStartRequired = Das Anfangsdatum fehlt.
+MobilePPErrorEndRequired = Das Enddatum fehlt.
+MobilePPErrorNoProject = Es ist kein Standardprojekt für Präventionspläne konfiguriert.
+MobilePPCompanyFound = Unternehmen gefunden:
+MobilePPCompanyNotFound = Kein Unternehmen in der Datenbank gefunden: Es wird ein neues angelegt.
+MobilePPWarningEmailNotSent = Der Plan wurde angelegt, die E-Mail zur Unterschrift konnte jedoch nicht gesendet werden.
+MobilePPWarningEmailNotConfigured = Der Plan wurde angelegt, die E-Mail ist jedoch nicht konfiguriert: Unterschriftsanfrage nicht gesendet.
+MobilePPCreated = Präventionsplan %s angelegt.
+MobilePPUpdated = Präventionsplan %s aktualisiert.
+MobilePPSignatureEmailSubject = Anfrage zur Unterzeichnung des Präventionsplans %s
+MobilePPSignatureEmailContent = Guten Tag,<br><br>Sie sind eingeladen, den Präventionsplan zu %s zu unterzeichnen.<br><br><a href="%s">Hier klicken, um zu unterschreiben</a><br><br>Mit freundlichen Grüßen.
+MobilePPSuccessTitle = Präventionsplan angelegt
+MobilePPSuccessText = Der interne Verantwortliche hat automatisch unterschrieben. Eine Unterschriftsanfrage wurde an die Fremdfirma gesendet.
+MobilePPViewPlan = Den Plan anzeigen
+MobilePPCreateAnother = Einen weiteren Plan anlegen
+MobileSuccessInteriorSigned = Interner Verantwortlicher: unterschrieben
+MobileSuccessExteriorNotified = Fremdfirma: Unterschriftsanfrage gesendet
+MobileSuccessExteriorNotSigned = Fremdfirma: Unterschrift noch einzuholen
+MobileSuccessExteriorNotNotified = Fremdfirma: Unterschriftsanfrage nicht gesendet
+MobileSuccessExteriorSigned = Fremdfirma: unterschrieben
+MobileSuccessDocumentGenerated = Dokument des Plans erzeugt
+MobilePPWarningEmailNotSentDetail = Die E-Mail zur Unterschrift konnte nicht gesendet werden: %s
+MobilePPWarningNoRecipientEmail = keine gültige E-Mail-Adresse für den externen Verantwortlichen
+MobilePPSignatureEmailSentTo = Unterschriftsanfrage gesendet an %s
+MobilePPExtSignatureTitle = Unterschrift der Fremdfirma
+MobilePPExtEmailSentOn = Anfrage gesendet an %s am %s
+MobilePPExtEmailNotSent = Unterschriftsanfrage nicht gesendet: Leiten Sie den Link weiter oder lassen Sie jetzt unterschreiben
+MobilePPSpreadDefaultsTitle = Öffentliche Darstellung der Verteilung
+MobilePPSpreadShowCount = Die Anzahl der Unterzeichner anzeigen
+MobilePPSpreadShowName = Vor- und Nachname anzeigen
+MobilePPSpreadShowContact = Telefon und E-Mail-Adresse anzeigen
+MobilePPSpreadHidePublicNote = Die öffentliche Notiz nicht anzeigen
+MobilePPExtAlreadySigned = Unterschrieben am %s
+MobilePPExtSignNow = Jetzt unterschreiben lassen
+MobilePPExtResendEmail = Die E-Mail erneut senden
+MobilePPNoTagAvailable = Es ist kein Tag für Präventionspläne verfügbar.
+MobilePPCreateTag = Einen Tag anlegen
+MobileSpreadShareTitle = Die Verteilung teilen
+MobileSpreadShareText = Lassen Sie die betroffenen Personen diesen Code scannen. Ohne Konto und ohne Anmeldung geben sie ihre Kontaktdaten ein, laden ihre Dokumente hoch und unterschreiben.
+MobileSpreadOpen = Die Verteilung öffnen
+MobilePPRisks = Risiken
+MobilePPAddRisk = Ein Risiko hinzufügen
+MobilePPRiskModalTitle = Ein Risiko auswählen
+MobilePPRiskComment = Kommentar
+MobilePPRiskDescriptionPlaceholder = Das Risiko vor Ort beschreiben
+MobilePPNoRiskYet = Derzeit kein Risiko hinzugefügt.
+MobilePPDeleteRiskTitle = Das Risiko löschen
+MobilePPDeleteRiskConfirm = «%s» wird mit seiner Beschreibung, seinen Fotos und seinen Schutzmaßnahmen aus dem Plan entfernt.
+MobilePPUserCompany = Einsatzbetrieb
+MobilePPUserCompanyShort = EU
+MobilePPConcernedCompanies = Betrifft
+MobilePPExteriorCompanyShort = EE
+MobilePPPriorFormalities = Vorherige Formalitäten
+MobilePPPriorVisitDone = Gemeinsame Vorbegehung durchgeführt
+MobilePPPriorVisitTextPlaceholder = Was bei der Begehung festgestellt wurde
+MobileRiskCompanies = Von den Risiken betroffene Unternehmen (mobil)
+CertificationDictionary = Zertifizierungen und Befähigungen
+MobilePPChooseExistingCompany = Einen bestehenden Partner auswählen
+MobilePPOrFillManually = oder die Informationen eingeben
+MobilePPProtections = Schutzmaßnahmen
+MobilePPAddProtection = Eine Schutzmaßnahme hinzufügen
+MobilePPProtectionModalTitle = Eine Schutzmaßnahme auswählen
+MobilePPMandatory = Pflicht
+MobileProtections = Schutzmaßnahmen (mobil)
+MobilePPCertifications = Erforderliche Zertifizierungen
+MobilePPAddCertification = Eine Zertifizierung hinzufügen
+MobileCertifications = Zertifizierungen (mobil)
+MobilePPUploadCertPhoto = Ein Foto senden
+MobilePPErrorCreatingThirdparty = Fehler beim Anlegen des Partners.
+MobilePPErrorCreatingContact = Fehler beim Anlegen des Kontakts.
+MobilePPErrorUpdatingPlan = Fehler beim Aktualisieren des Präventionsplans.
+MobilePPErrorCreatingPlan = Fehler beim Anlegen des Präventionsplans.
+MobileSuccessViewDocument = Das Dokument anzeigen
+MobileSuccessPlanSentByEmailOn = Präventionsplan per E-Mail gesendet am %s
+MobileSuccessExteriorSignedOn = Verantwortlicher der Fremdfirma (EE): Unterschrieben am %s
+MobileSuccessExteriorPendingSignature = Verantwortlicher der Fremdfirma (EE): Wartet auf Unterschrift
+MobilePPDefaultsTitle = Standardwerte (mobiles Anlegen)
+MobilePPDefaultDateStartToday = Anfangsdatum = heutiges Datum
+MobilePPDefaultDuration = Standarddauer des Zeitraums (Tage)
+MobilePPEmailAutoSend = Die E-Mail zur Unterschrift beim Anlegen automatisch senden
+
+# Schnelles mobiles Anlegen eines Feuererlaubnisscheins
+MobileFPPreventionPlanHelp = Die Fremdfirma und der Zeitraum des ausgewählten Plans werden automatisch übernommen.
+MobileFPPeriod = Ort und Zeitraum der Arbeiten
+MobileFPMaxOneMonthHint = Maximal ein Monat zwischen Beginn und Ende der Arbeiten.
+MobileFPErrorMaxOneMonth = Die Dauer darf einen Monat nicht überschreiten.
+MobileFPErrorNoProject = Es ist kein Standardprojekt für Feuererlaubnisscheine konfiguriert.
+MobileFPWorkTypes = Arten der Arbeiten
+MobileFPAddWorkType = Eine Art der Arbeiten hinzufügen
+MobileFPWorkTypeModalTitle = Eine Art der Arbeiten auswählen
+MobileFPSubmit = Den Feuererlaubnisschein anlegen
+MobileFPCreated = Feuererlaubnisschein %s angelegt.
+MobileFPUpdated = Feuererlaubnisschein %s aktualisiert.
+MobileFPSignatureEmailSubject = Anfrage zur Unterzeichnung des Feuererlaubnisscheins %s
+MobileFPSignatureEmailContent = Guten Tag,<br><br>Sie sind eingeladen, den Feuererlaubnisschein für %s zu unterzeichnen.<br><br><a href="%s">Hier klicken, um zu unterschreiben</a><br><br>Mit freundlichen Grüßen.
+MobileFPSuccessTitle = Feuererlaubnisschein angelegt
+MobileFPViewPermit = Den Erlaubnisschein anzeigen
+MobileFPCreateAnother = Einen weiteren Erlaubnisschein anlegen
+
+# Digirisk PWA
+PwaApplication = Mobile App
+PwaNavHome = Start
+PwaNavPreventionPlans = Pläne
+PwaNavFirePermits = Erlaubnisscheine
+PwaNavMenu = Menü
+PwaNavFavoritesHint = Unten angezeigte Favoriten (max. %s)
+PwaNavAddFavorite = Zu den Favoriten hinzufügen
+PwaNavRemoveFavorite = Aus den Favoriten entfernen
+PwaHello = Guten Tag %s
+PwaResultCount = %s Ergebnis(se)
+AllStatus = Alle Status
+PwaTilePreventionPlanInProgress = Laufende Pläne
+PwaTilePreventionPlanToSign = Zu unterschreibende Pläne
+PwaTileFirePermitInProgress = Laufende Erlaubnisscheine
+PwaTileFirePermitToSign = Zu unterschreibende Erlaubnisscheine
+
+# Massenaktionen auf den Aufgaben
+MassValidateTasks = Die Aufgaben freigeben
+MassChangeTasksProject = Projekt wechseln
+ConfirmMassValidateTasksQuestion = Möchten Sie die %s ausgewählte(n) Aufgabe(n) wirklich freigeben? Nur Aufgaben mit dem Status Entwurf werden freigegeben.
+ConfirmMassChangeTasksProjectQuestion = Möchten Sie die %s ausgewählte(n) Aufgabe(n) wirklich dem gewählten Projekt zuordnen?
+MassValidateTasksSuccess = %s Aufgabe(n) von %s ausgewählten freigegeben
+MassChangeTasksProjectSuccess = %s Aufgabe(n) dem Projekt %s zugeordnet
+
+# PDF des Präventionsplans
+PreventionPlanLegalNotice = Der Präventionsplan ist ein verpflichtendes Dokument zur Verhütung der Risiken, die sich aus dem Zusammenwirken der Tätigkeiten mehrerer Unternehmen an einem Standort ergeben, gemäß Artikel R4512-7 des französischen Arbeitsgesetzbuchs.
+PreventionPlanUserCompany = Einsatzbetrieb - EU
+PreventionPlanExteriorCompany = Fremdfirma - EE
+PreventionPlanUserCompanyResponsible = Verantwortlicher des Einsatzbetriebs (EU)
+PreventionPlanExteriorCompanyResponsible = Verantwortlicher der Fremdfirma (EE)
+EmergencyNumbers = Notrufnummern
+Firefighters = Feuerwehr
+AnyEmergency = Jeder Notfall
+PriorVisitIntro = Der Einsatzbetrieb hat vor der Durchführung des Vorhabens am %s eine gemeinsame Vorbegehung durchgeführt. Bei dieser Begehung wurden vom Einsatzbetrieb die folgenden Punkte vorgestellt (Art. R. 4512-2 und R. 4512-3 des französischen Arbeitsgesetzbuchs):
+PriorVisitCheckList = Arbeitsstätten|Dort befindliche Anlagen|Gegebenenfalls den Fremdfirmen zur Verfügung gestellte Ausrüstung|Den Einsatzbereich der Fremdfirmen abgrenzen|Die Zonen dieses Bereichs kennzeichnen, die Gefahren für die Beschäftigten darstellen können|Die Verkehrswege angeben, die die Beschäftigten sowie die Fahrzeuge und Maschinen aller Art der Fremdfirmen benutzen dürfen|Die Zugangswege der Beschäftigten zu den Räumen und Anlagen für die Fremdfirmen festlegen (insbesondere Sanitäranlagen, Gemeinschaftsumkleiden und Aufenthaltsräume)
+PriorVisitComments = Die folgenden Anmerkungen wurden festgehalten:
+InterventionPeriodSentence = Dieser Plan beginnt am %s und endet am %s. Die Einsätze finden zu folgenden Zeiten statt:
+RiskAnalysisIntro = Sie haben %s Einsatz/Einsätze für diesen Präventionsplan vorgesehen: nachstehend die Einzelheiten der vorgesehenen Tätigkeiten, die entstehenden Risiken und die umgesetzten Präventionsmittel.
+PreventionPlanAttendants = Beteiligte: Fremdfirma (EE) und Nachunternehmer
+Morning = Vormittag
+Afternoon = Nachmittag
+Signatures = Unterschriften
+SignaturePending = Ausstehend
+PreventionPlanRiskPhotos = Fotos des Risikos
+InterventionPeriodOnly = Dieser Plan beginnt am %s und endet am %s.
+
+DigiRisk=DigiRisk
+DigiriskIdentification=BESCHREIBUNG UND MERKMALE
+DigiriskSecurity=SICHERHEIT
+DigiriskUserManual=VEREINFACHTE BEDIENUNGSANLEITUNG
+DigiriskQualification=QUALIFIKATION UND BEFÄHIGUNG
+DigiriskHygiene=HYGIENE UND REINIGUNG
+DigiriskMaintenance=WARTUNG UND PRÜFUNGEN
+DangerCategory=Risikofamilie
+SelectDangerCategory=Eine Risikofamilie auswählen
+DescribeRiskOnProduct=Das Risiko bei diesem Produkt beschreiben ...
+ConfirmDeleteProductRisk=Dieses Risiko löschen?
+AddProductRisk=Ein Produktrisiko hinzufügen
+ClickToAddContent=Zum Hinzufügen von Inhalt klicken ...
+AddProtection=Eine Schutzmaßnahme hinzufügen
+
+SelectProtection=Eine PSA-Schutzmaßnahme auswählen
+TechnicalSheet=Technisches Datenblatt
+DigiriskRisks=RISIKEN UND SCHUTZMASSNAHMEN
+MobileSuccessInteriorSignedOn=Verantwortlicher des Einsatzbetriebs (EU): Unterschrieben am %s
+
+MobileSuccessPlanSentByEmailOn = Präventionsplan per E-Mail gesendet am %s
+MobileSuccessExteriorSignedOn = Verantwortlicher der Fremdfirma (EE): Unterschrieben am %s
+MobileSuccessExteriorPendingSignature = Verantwortlicher der Fremdfirma (EE): Wartet auf Unterschrift
+
+MobilePPErrorInvalidEmail = Bitte beachten Sie das Format der E-Mail-Adresse.
+MobilePPErrorInvalidPhone = Bitte beachten Sie das Format der Telefonnummer.
+MobilePPExtSendEmail = Die E-Mail senden
+MobilePPErrorMailServerNotConfigured = Ihr Mailserver ist nicht konfiguriert, wenden Sie sich bitte an den Administrator.
+MobilePPDoliletterNotInstalled = Das Modul Doliletter ist nicht installiert. Die Verteilung der Präventionspläne und Feuererlaubnisscheine steht nicht zur Verfügung (wenden Sie sich an Ihren Administrator)
+
+# Status und Typen für die Tooltips
+preventionplan = Präventionsplan
+Locked = Gesperrt
+InProgress = Laufend
+ValidatePendingSignature = Wartet auf Unterschrift
+Archived = Archiviert
+
+ProductFIChaptersManagement=Anpassung der Kapitel des Unterweisungsblatts
+ProductFIChaptersManagementSub=Anpassung des Reiters "Unterweisungsblatt" und des Reiters "Risiken" im Produktdatenblatt
+DefaultContent=Standardinhalt
+CustomSvgUploaded=Individuelles SVG
+DeleteCustomSvg=Löschen
+DefaultSvgUsed=Standard-SVG
+
+PwaTilePreventionPlanLocked = Freigegebene Pläne
+PwaTileFirePermitLocked = Freigegebene Erlaubnisscheine
+
+# ===========================================================================
+# Wörterbuch der Kanban-Spalten des Aktionsplans — issue #5017
+# ===========================================================================
+ActionPlanColumnDictionary           = Spalten des Kanban des Aktionsplans
+ActionPlanColumnDictionaryDesc       = Im Kanban des PAPRIPACT angezeigte Spalten, wenn der Wörterbuchmodus aktiviert ist: Bezeichnung, Fortschrittsbereich, Farbe und Symbol
+KanbanColumnSource                   = Quelle der Spalten
+KanbanColumnSourceDesc               = Das Kanban mit den nachstehenden Prozentschwellen (bisheriges Verhalten) oder mit dem Wörterbuch der Spalten aufteilen
+KanbanColumnSourceThresholds         = Prozentschwellen (Standard)
+KanbanColumnSourceDictionary         = Wörterbuch der Spalten
+ActionPlanColumnProgressHelp         = Von der Spalte abgedeckte Fortschrittsgrenzen, von 0 bis 100
+ActionPlanColumnColorHelp            = Hexadezimale Farbe der Spalte, zum Beispiel #3085d6
+ActionPlanColumnPictoHelp            = Name des Font-Awesome-Symbols, zum Beispiel fa-check
+Progress_min                         = Fortschritt min.
+Progress_max                         = Fortschritt max.
+Picto                                = Symbol
+
+# Erfassung der aufgewendeten Zeit
+GenerateTimeSpentReport = Die Zeiterfassung erzeugen (PDF)
+TimeSpentReport = Erfassung der aufgewendeten Zeit
+TimeSpentReportUsersHelp = Lassen Sie das Feld leer, um alle Personen einzubeziehen, die Zeit auf dieses Projekt gebucht haben.
+TimeSpentReportSummary = Zusammenfassung nach Benutzer
+TimeSpentReportGrandTotal = Gesamtsumme
+TimeSpentReportGeneratedAt = Erzeugt am
+TimeSpentReportWholePeriod = Seit Beginn des Projekts
+TimeSpentReportNoData = Keine aufgewendete Zeit entspricht den ausgewählten Benutzern und dem ausgewählten Zeitraum.
+TimeSpentDocumentPDFDescription = Auf ein Projekt aufgewendete Zeit, nach Benutzer gruppiert
+
+# Angleichung des mobilen Feuererlaubnisscheins an den Präventionsplan - issue #5042
+MobileProgress = Fortschritt
+MobileStepDone = ERLEDIGT
+MobileStepInProgress = LAUFEND
+MobileStepTodo = ZU ERLEDIGEN
+MobileStepSignedOn = UNTERSCHRIEBEN AM
+MobilePPStepCreated = PP angelegt
+MobileFPStepCreated = FE angelegt
+MobileStepUserCompanyResponsible = Verantw. EU
+MobileStepExteriorCompanyResponsible = Verantw. EE
+MobileStepLock = Sperren
+MobileStepArchive = Archivieren
+MobileLock = Sperren
+MobileResponsibleShort = Verantw.
+MobileMailSentTo = E-Mail gesendet an
+MobilePPMotif = Grund des Einsatzes
+MobilePPSchedules = Einsatzzeiten
+MobilePPConfigHours = Konfigurieren Sie hier Ihre Zeiten
+MobilePPCopyCompanyHours = Die Zeiten des Unternehmens übernehmen
+FirePermitUserCompany = Einsatzbetrieb - EU
+FirePermitExteriorCompany = Fremdfirma - EE
+MobileFPMotif = Grund der Arbeiten
+MobileFPMotifPlaceholder = Z. B.: Schweißen am Dachstuhl
+MobileFPNoMotif = Kein Grund angegeben
+MobileFPSchedules = Zeiten der Arbeiten
+MobileFPWorkTypeDescriptionPlaceholder = Die Arbeiten vor Ort beschreiben
+MobileFPNoWorkTypeYet = Derzeit keine Art der Arbeiten hinzugefügt.
+MobileFPDeleteWorkTypeTitle = Die Art der Arbeiten löschen
+MobileFPDeleteWorkTypeConfirm = «%s» wird mit ihrer Beschreibung, ihrer Ausrüstung, ihren Fotos und ihren Schutzmaßnahmen aus dem Erlaubnisschein entfernt.
+MobileFPNoTagAvailable = Es ist kein Tag für Feuererlaubnisscheine verfügbar.
+MobileFPErrorUpdatingPermit = Fehler beim Aktualisieren des Feuererlaubnisscheins.
+MobileFPErrorCreatingPermit = Fehler beim Anlegen des Feuererlaubnisscheins.
+MobileFPLockNeedsSignature = Der Erlaubnisschein muss unterschrieben sein, bevor er gesperrt werden kann.
+MobileFPSpreadAvailableOnceSignedAndLocked = Die Verteilung steht zur Verfügung, sobald der Erlaubnisschein von den Verantwortlichen unterschrieben und gesperrt ist.
+MobileFPDefaultDateStartToday = Anfangsdatum = heutiges Datum
+MobileFPDefaultDuration = Standarddauer des Zeitraums (Tage)
+firepermit = Feuererlaubnisschein
+ErrorRecordIsLocked = Dieser Datensatz ist gesperrt und kann nicht mehr geändert werden.
+MobilePPEmailTemplateExt = E-Mail-Vorlage für den Verantwortlichen der Fremdfirma
+MobilePPEmailTemplateInt = E-Mail-Vorlage für die Beschäftigten der Fremdfirma
+
+#
+# ListingRisksDocument PDF - Risikoauflistung im PDF-Format
+#
+
+ListingRisksDocumentPDF            = Risikoauflistung PDF
+ListingRisksDocumentPDFDescription = Risikoauflistung als natives PDF, beginnend mit der Kurz-Gefährdungsbeurteilung des Elements
+ListingRisksDocumentPDFTitle       = GEFÄHRDUNGSBEURTEILUNG
+ListingRisksEstablishment          = Betrieb
+ListingRisksCoverContent           = Inhalt
+ListingRisksCoverHierarchy         = Hierarchie
+ListingRisksCoverDuerpFollowUp     = Nachverfolgung der Gefährdungsbeurteilung
+ListingRisksCoverEmergencyNumbers  = Notrufnummern
+ListingRisksCoverReportIncident    = Einen Unfall oder ein Problem melden
+ListingRisksCoverRegisters         = Arbeitsschutzregister und Register für ernste und unmittelbare Gefahr
+ListingRisksCoverIllustration      = Illustrationsbild
+NoPreventionOfficerAssigned        = Kein Präventionsverantwortlicher benannt
+NoEmergencyNumberConfigured        = Keine Notrufnummer konfiguriert
+NoResponsibleAssigned              = Kein Verantwortlicher benannt
+ListingRisksLegalTitle             = Rechtlicher Rahmen
+RiskDefinitionTitle                = Definition eines Risikos
+RiskDefinitionText                 = Risiko: Subst. Gefahr oder Nachteil, dem man sich aussetzt. Etwas auf eigenes Risiko tun, also die volle Verantwortung für die Folgen übernehmen. Ein kalkuliertes Risiko. Risiken eingehen: sich einer Gefahr aussetzen.
+DangerDefinitionTitle              = Definition einer Gefahr
+DangerDefinitionText               = Gefahr: Subst. (aus dem Vulgärlatein dominiarium „Macht", von dominus „Herr"; ursprünglich der Umstand, jemandem ausgeliefert zu sein). Was die Sicherheit oder das Leben einer Person bedroht; was eine Situation, ein Vorhaben usw. gefährden kann.
+SingleDocumentTitle                = Die Gefährdungsbeurteilung
+SingleDocumentText                 = Die Gefährdungsbeurteilung ist in den Artikeln R4121-1 bis 4 des französischen Arbeitsgesetzbuchs geregelt. Die allgemeinen Grundsätze der Prävention geben die Reihenfolge der Risikobehandlung vor.
+PreventionPrinciplesTitle          = Die allgemeinen Grundsätze der Prävention - Artikel L4121-2
+PreventionPrinciplesIntro          = Der Arbeitgeber setzt die in Artikel L. 4121-1 vorgesehenen Maßnahmen auf der Grundlage der folgenden allgemeinen Präventionsgrundsätze um:
+PreventionPrinciple1               = Risiken vermeiden.
+PreventionPrinciple2               = Nicht vermeidbare Risiken beurteilen.
+PreventionPrinciple3               = Risiken an der Quelle bekämpfen.
+PreventionPrinciple4               = Die Arbeit an den Menschen anpassen, insbesondere hinsichtlich der Gestaltung der Arbeitsplätze sowie der Auswahl der Arbeitsmittel und der Arbeits- und Fertigungsverfahren, vor allem um eintönige Arbeit und taktgebundene Arbeit zu begrenzen und ihre Auswirkungen auf die Gesundheit zu verringern.
+PreventionPrinciple5               = Den Stand der Technik berücksichtigen.
+PreventionPrinciple6               = Gefährliches durch Ungefährliches oder weniger Gefährliches ersetzen.
+PreventionPrinciple7               = Die Prävention planen und dabei Technik, Arbeitsorganisation, Arbeitsbedingungen, soziale Beziehungen und den Einfluss von Umgebungsfaktoren zu einem stimmigen Ganzen verbinden, insbesondere die Risiken durch Mobbing und sexuelle Belästigung sowie durch sexistisches Verhalten.
+PreventionPrinciple8               = Kollektive Schutzmaßnahmen ergreifen und ihnen Vorrang vor individuellen Schutzmaßnahmen einräumen.
+PreventionPrinciple9               = Den Beschäftigten geeignete Anweisungen erteilen.
+ListingRisksCotationMethodTitle    = Berechnungsmethode der Bewertungspunkte
+ListingRisksCotationMethodText     = Die Bewertung eines Risikos ist eine Punktzahl von 0 bis 100, die bei seiner Beurteilung vergeben wird. Die in der Auflistung angegebene Risikostufe ergibt sich unmittelbar daraus, gemäß der nachstehenden Tabelle.
+ListingRisksCotationLevel          = Stufe
+ListingRisksCotationRange          = Bewertung
+ListingRisksCotationMeaning        = Bedeutung
+ListingRisksCotationAction         = Vorgehensweise
+ListingRisksCotationAction1        = Die vorhandenen Präventionsmittel beibehalten.
+ListingRisksCotationAction2        = Eine Maßnahme in das jährliche Präventionsprogramm aufnehmen.
+ListingRisksCotationAction3        = Eine kurzfristige Präventionsmaßnahme einleiten.
+ListingRisksCotationAction4        = Sofort handeln, die Exposition muss aufhören.
+ListingRisksListTitle              = Liste der Risiken
+ListingRisksActionPlan             = Maßnahmen des jährlichen Präventionsprogramms
+ListingRisksCotationColumn         = Bew.
+ListingRisksRiskColumn             = Risiko
+ListingRisksAssessmentColumn       = Informationen zur Beurteilung
+NoRiskAssessed                     = Kein Risiko in diesem Bereich beurteilt

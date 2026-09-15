@@ -1,0 +1,2387 @@
+﻿# Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+#
+# Algemeen
+#
+
+# Module label 'ModuleDigiriskdolibarrName'
+ModuleDigiriskdolibarrName = Digirisk
+
+# Module description 'ModuleDigiriskdolibarrDesc'
+ModuleDigiriskdolibarrDesc = Digirisk voor Dolibarr
+
+# Ontbrekende module Saturne
+SaturneModuleMissing = De module Saturne is vereist voor Digirisk. Download deze gratis in de Dolistore (https://dolistore.com/en/modules/1906-Saturne.html) en installeer deze voordat u Digirisk activeert.
+
+# Kolom met tutorialafbeeldingen op de instellingenpagina's
+TutoImage = Afbeelding
+
+#
+# Beheerpagina
+#
+
+# Gegevens
+DigiriskdolibarrSetup       = Instellingen van de module Digirisk
+DigiriskdolibarrSetupPage        = Instellingenpagina van de module Digirisk
+AgendaModuleRequired        = Zorg ervoor dat de module Agenda is geactiveerd om de traceerbaarheid van de acties in Digirisk te waarborgen
+DigiriskDolibarrDescription = Digirisk voor Dolibarr
+HowToSetupOtherModules      = Voor meer functies in Digirisk kunt u tal van modules activeren (leveranciersbeheer, facturen, enz.) via deze link:
+ConfigMyModules             = Instellingen van de modules
+AvoidLogoProblems              = Raadpleeg deze instellingsadviezen om problemen met logo's in de gegenereerde documenten te voorkomen:
+LogoHelpLink                = https://wiki.dolibarr.org/index.php?title=Premiers_paramétrages
+SecurityConfiguration       = Instellingen van de veiligheidsgegevens
+SocialConfiguration          = Instellingen van de sociale gegevens
+Uncompleted                     = Niet ingevuld
+DigiriskData                 = Configureerbare gegevens van Digirisk
+DigiriskManagement          = Doorverwijzing na het inloggen
+DigiriskDescription          = Standaard doorverwijzen naar de welkomstpagina van Digirisk in plaats van die van Dolibarr.
+HowToSetupIHM                   = Voor meer mogelijkheden voor de weergave van Dolibarr (instelling van de achtergrondafbeelding, enz.) kunt u naar deze link gaan:
+ConfigIHM                    = Instellingen van de weergave
+ConfigDico                     = Ga naar de instellingenpagina van de woordenboeken
+LinkedProject               = Gekoppeld project
+DigiriskUpdate                  = Update van Digirisk:
+Security                       = Veiligheid
+HowToSharedElement          = Ga naar deze link voor meer informatie over de instellingen van de gedeelde elementen:
+
+HowToSharedElementLink        = https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Configuration
+ConfigSharedElement         = Instellingen van de gedeelde elementen (risico's/signaleringen)
+DisabledSharedElement       = Optie uitgeschakeld omdat Multi-company niet is geactiveerd of de instellingen van de gedeelde elementen (risico's/signaleringen) niet zijn uitgevoerd
+DigiriskEventAutoDesc       = Bepaal hier de gebeurtenissen waarvoor Digirisk automatisch een vermelding in de agenda aanmaakt. Elke gebeurtenis bevat de informatie over de uitgevoerde actie.
+DigiriskActionsEvents       = Gebeurtenissen waarvoor Digirisk automatisch een gebeurtenis in de agenda moet invoegen.
+DigiriskDolibarr            = Digirisk
+Create                      = Aanmaken
+
+# Ticket
+MultiCompanyTicketPublicInterfaceConfig = Instellingen van de openbare ticketinterface voor meerdere bedrijven
+Subtitle                                = Ondertitel
+
+# DigiriskElement
+DigiriskElementDepthGraph            = Diepteniveau in de grafieken van de Digirisk-elementen
+DigiriskElementDepthGraphDescription = Met deze optie kiest u het diepteniveau in de grafieken van de Digirisk-elementen <br> Standaard: niveau 1
+
+# WHSRegister = Register arbeidsveiligheid en -gezondheid
+TicketsPublicInterfaceConfig         = Instellingen van de openbare ticketinterface
+WHSRegister                          = Register arbeidsveiligheid en -gezondheid
+CurrentTicketPublicInterfaceURL      = URL van de openbare ticketinterface
+MulticompanyTicketPublicInterfaceURL = URL van de openbare ticketinterface voor meerdere bedrijven
+OriginURL                            = Oorspronkelijke URL
+ShortURL                             = Verkorte URL
+ExternalURL                          = Externe URL
+AddExtraField                        = Een extra veld aanmaken
+IfEmptyVisibleAllCategories          = Indien leeg, zichtbaar in alle categorieën
+
+# DigiQuali Sheet - Sjablonen
+LinkDigiriskdolibarr_digiriskstandard                 = De koppeling met de hoofdentiteiten van Digirisk Standard activeren
+LinkDigiriskdolibarr_digiriskstandardDescription      = Maakt de koppeling mogelijk tussen de standaardentiteiten van Digirisk en de sjablonen
+LinkDigiriskdolibarr_digiriskelement                  = De koppeling met de groeperingen en werkeenheden activeren
+LinkDigiriskdolibarr_digiriskelementDescription       = Maakt de koppeling mogelijk tussen de groeperingen en werkeenheden en de sjablonen
+LinkDigiriskdolibarr_risk                             = De koppeling met de risico's activeren
+LinkDigiriskdolibarr_riskDescription                  = Maakt de koppeling mogelijk tussen de risico's en de sjablonen
+LinkDigiriskdolibarr_riskassessment                   = De koppeling met de beoordelingen activeren
+LinkDigiriskdolibarr_riskassessmentDescription        = Maakt de koppeling mogelijk tussen de beoordelingen en de sjablonen
+LinkDigiriskdolibarr_evaluator                        = De koppeling met de beoordelaars activeren
+LinkDigiriskdolibarr_evaluatorDescription             = Maakt de koppeling mogelijk tussen de beoordelaars en de sjablonen
+LinkDigiriskdolibarr_risksign                         = De koppeling met de signaleringen activeren
+LinkDigiriskdolibarr_risksignDescription              = Maakt de koppeling mogelijk tussen de signaleringen en de sjablonen
+LinkDigiriskdolibarr_preventionplan                   = De koppeling met de preventieplannen activeren
+LinkDigiriskdolibarr_preventionplanDescription        = Maakt de koppeling mogelijk tussen de preventieplannen en de sjablonen
+LinkDigiriskdolibarr_firepermit                       = De koppeling met de vuurvergunningen activeren
+LinkDigiriskdolibarr_firepermitDescription            = Maakt de koppeling mogelijk tussen de vuurvergunningen en de sjablonen
+LinkDigiriskdolibarr_accident                         = De koppeling met de ongevallen activeren
+LinkDigiriskdolibarr_accidentDescription              = Maakt de koppeling mogelijk tussen de ongevallen en de sjablonen
+LinkDigiriskdolibarr_accidentinvestigation            = De koppeling met de ongevalsonderzoeken activeren
+LinkDigiriskdolibarr_accidentinvestigationDescription = Maakt de koppeling mogelijk tussen de onderzoeken en de sjablonen
+
+#
+# DigiriskDolibarr
+#
+
+# Recht
+LireDigirisk                 = Het Digirisk-dashboard raadplegen
+ReadDigirisk                 = Het Digirisk-dashboard raadplegen (lezen)
+YouDontHaveTheRightToSeeThis = U hebt niet het recht om de groeperingen en werkeenheden te bekijken
+CanNotDoThis                 = U hebt niet het recht om dit te doen
+EnableDigiriskdolibarr       = Activeer de module DigiriskDolibarr om toegang te krijgen tot deze pagina
+
+# Gegevens
+DigiriskMenu          = Voeg informatie over uw bedrijf/organisatie toe. Klik op de knop "Opslaan" onderaan de pagina om deze te bewaren
+DigiriskConfigSociety = Instellingen van het bedrijf
+PermissionDenied      = Toegang geweigerd
+AddUser               = Een gebruiker aanmaken
+StartDate             = Begindatum
+EndDate               = Einddatum
+NoPhoneNumber         = Geen telefoonnummer
+HasBeenCreatedF       = is aangemaakt
+HasBeenCreatedM       = is aangemaakt
+HasNotBeenCreatedF    = is niet aangemaakt
+HasNotBeenCreatedM    = is niet aangemaakt
+YourDocuments         = Documenten
+NoData                = N.v.t.
+HasBeenEditedF        = is bewerkt
+HasBeenEditedM        = is bewerkt
+HasNotBeenEditedF     = is niet bewerkt
+HasNotBeenEditedM     = is niet bewerkt
+
+HasBeenDeletedF    = is verwijderd
+HasBeenDeletedM    = is verwijderd
+HasNotBeenDeletedF = is niet verwijderd
+HasNotBeenDeletedM = is niet verwijderd
+
+DigiriskUserGroup                 = Digirisk - Gebruikers
+DigiriskUserGroupDescription      = De DigiRisk-gebruikersgroep heeft het recht om de DigiRisk-objecten te raadplegen en te wijzigen
+DigiriskAdminUserGroup            = DigiRisk - Beheerders
+DigiriskAdminUserGroupDescription = De beheerdersgroep heeft alle rechten op DigiRisk en de vereiste modules
+DigiriskReaderGroup               = DigiRisk - Lezers
+DigiriskReaderGroupDescription    = De lezersgroep heeft alle leesrechten op DigiRisk en de vereiste modules
+
+ContractType              = Contracttype
+Apprentice/Student        = Leerling/Student
+Interim                   = Uitzendkracht
+ProfessionalQualification = Beroepskwalificatie
+DigiriskDocumentation     = Documentatie van Digirisk
+
+SelectUser               = Een gebruiker selecteren
+LabourInspectorFirstName = Arbeids-
+LabourInspectorLastName  = inspectie
+LabourInspector          = Arbeidsinspectie
+LabourInspectorSociety   = Relatie Arbeidsinspectie
+LabourInspectorAssigned  = Arbeidsinspectie
+
+SocieteSchedules = Openingstijden van het bedrijf
+weekDayDefault   = Zie website
+weekEndDefault   = Gesloten Gesloten
+
+#
+# DigriskDocuments - Digirisk-documenten
+#
+
+# Gegevens
+DigiriskDocuments              = Digirisk-document
+Responsible                    = Verantwoordelijke
+ContactsAction                 = Contacten van de actie
+PERCOTooltip                   = Vink dit vakje aan als uw bedrijf over een collectief pensioenspaarplan (PERCO) beschikt
+PEETooltip                     = Vink dit vakje aan als uw bedrijf over een bedrijfsspaarplan (PEE) beschikt
+ShowPictoName                  = De naam van het gevarenpictogram weergeven
+ShowPictoNameDescription       = De naam van het gevarenpictogram van het risico in de documenten weergeven <br> Handig als u de tabel naar een rekenblad wilt overzetten
+RiskAssessmentColor            = Kleur van de beoordelingen
+RiskAssessmentColorDescription = Geeft de kleur van de beoordelingen weer in het document Papripact-A3-Liggend
+
+#
+# LegalDisplay - Wettelijke aanplakking
+#
+
+# Recht
+LegalDisplaysMin = Wettelijke aanplakkingen
+
+# Gegevens
+LegalDisplay             = Wettelijke aanplakking
+Legaldisplay             = Wettelijke aanplakking
+HowToSetDataLegalDisplay = Ga naar Start - Instellingen - Bedrijf/Organisatie - Veiligheid om de gegevens van de wettelijke aanplakking in te stellen
+
+LegalDisplayDocumentGenerated       = Genereren van de wettelijke aanplakking
+LabourDoctor                        = Bedrijfsarts
+LabourInspector                     = Arbeidsinspectie
+FireBrigade                         = Brandweer
+AllEmergencies                      = Elke noodsituatie
+RightsDefender                      = Ombudsman
+PoisonControlCenter                 = Antigifcentrum
+Police                              = Politie noodhulp
+SafetyInstructions                  = Veiligheidsinstructies
+ResponsibleToNotify                 = Te waarschuwen verantwoordelijke
+PreventionOfficers                  = Preventiemedewerkers
+PreventionOfficer                   = Preventiemedewerker
+LocationOfDetailedInstructions      = Locatie van de gedetailleerde instructie
+LocationOfDetailedInstructionsValue = Geen gedetailleerde instructie op deze locatie
+FirstAid                            = Eerste hulp
+FirstAidValue                       = <h2>Lijst van de op locatie aanwezige bedrijfshulpverleners (Naam, Bedrijf, Telefoon)</h2><br><br>Elk team moet zo zijn samengesteld dat aan elk teamlid onder alle omstandigheden eerste hulp kan worden verleend.<br />De bedrijfshulpverleners moeten duidelijk herkenbaar zijn en bij iedereen bekend zijn.<h2>Handelwijze bij een ongeval</h2><br><br><h3>Licht ongeval</h3><br><ul><li> - Verzorging door de bedrijfshulpverleners</li><br><li> - Aanwezigheid van een verbanddoos</li></ul><br><br>Elke machine is voorzien van ten minste één verbanddoos waarmee lichte verwondingen kunnen worden verzorgd.<br><br><h3>Ernstig ongeval</h3><br><ul><li> - Waarschuw de op locatie aanwezige bedrijfshulpverlener</li><br><li> - Start de noodprocedure</li><br><li> - Informeer de verantwoordelijke van het inlenend bedrijf, wachtdienst exploitatie 24 u</li><br><li> - Neem contact op bij een ongeval</li></ul><br><br>Het inlenend bedrijf vermeldt de alarmnummers in de bijlage. <br />
+AddPhoneNumber                      = Een telefoonnummer aan de gebruiker toevoegen
+ConfigureLabourInspector            = Een arbeidsinspectie instellen
+SocietyAdditionalDetails            = Aanvullende informatie over het bedrijf
+GeneralMeansAtDisposal              = Beschikbaar gestelde algemene middelen
+GeneralMeansAtDisposalValue         = <h2>Beschikbaar gestelde hulpmiddelen</h2><br><ul><li> - Verbandkamer</li><br><li> - Onze bedrijfshulpverleners zijn herkenbaar aan hun helm en werkkleding met het BHV-insigne</li><br><li> - Verbanddozen voor lichte ongevallen op elke locatie beschikbaar</li></ul><br><br><h2>Instructies bij een licht ongeval</h2><br><ul><li> - Neem contact op met de dichtstbijzijnde bedrijfshulpverlener</li><br><li> - Verzorging met de beschikbaar gestelde verbanddoos</li><br><li> - Melding op locatie:</li></ul><br><br><h2>Instructies bij een ongeval</h2><br><ul><li> - Brandweer: 18</li><br><li> - Ambulance: 15</li><br><li> - Politie en marechaussee: 17</li><br><li> - Europees alarmnummer: 112</li></ul><br><br><h2>Instructies bij brand</h2><br>Ga bij brand in deze volgorde te werk:<br><ol><li> - Sla het alarm.</li><br><li> - Bestrijd het vuur (als het niet te groot is) met een brandblusser.</li><br><li> - Is het vuur na het gebruik van één brandblusser niet gedoofd, of is het vuur al te groot, waarschuw dan de brandweer.</li><br><li> - Sluit de deuren en ramen voordat u het pand verlaat.</li><br><li> - Vraag de opgeleide teams om hulp.</li><br></ol>
+GeneralInstructions                 = Algemene instructies
+GeneralInstructionsValue            = <h2>Alle installaties</h2><br><br><p>Roken, vuur maken of het gebruik van open vuur is streng verboden in en op de installaties.<br />Als voor de werkzaamheden open vuur nodig is (laswerkzaamheden, enz.), moet er verplicht een vuurvergunning worden afgegeven (zie voorbeeld in bijlage 9.5).<br />In het algemeen is de toegang tot de installaties verboden voor onbevoegden.<br />Elke medewerker moet zijn bevoegdheidsbewijzen en opleidingscertificaten bij zich hebben. Hij moet ze op locatie kunnen tonen op verzoek van het inlenend bedrijf.</p><br><br><h2>Bevoegdheden</h2><br>Elke betrokken persoon moet beschikken over een kopie van de volgende bevoegdheidsbewijzen:<br><ul><li> - Elektrische bevoegdheid afhankelijk van de uit te voeren werkzaamheden</li><br><li> - Opleidingscertificaat of bevoegdheid voor werken op hoogte en redding op hoogte</li></ul><br>En deze op eenvoudig verzoek van het inlenend bedrijf, de werkverantwoordelijke of een beëdigd inspecteur kunnen tonen<br><br><h2>Persoonlijke beschermingsmiddelen</h2><br>Elke betrokken persoon moet kunnen beschikken over de volgende persoonlijke beschermingsmiddelen, afhankelijk van de uitgevoerde werkzaamheden en de in de risicoanalyse vastgestelde beschermingsmaatregelen.<br><br><h3>Diverse werkzaamheden</h3><br><ul><li> - Helm ontworpen voor werken op hoogte (EN397) met kinriem en/of met elektrische isolatie (elektrische omgeving)</li><br><li> - Veiligheidsschoenen</li><br><li> - Gehoorbescherming, indien nodig</li><br><li> - Overige (nader te bepalen): afhankelijk van de uitgevoerde werkzaamheden en de bijbehorende risico's.</li></ul><br><br><h3>Elektrische werkzaamheden</h3><br><ul><li> - Isolerende mat of isolerende kruk</li><br><li> - Handschoenen die geschikt zijn voor het spanningsbereik</li><br><li> - Helmen voor elektrische werkzaamheden met gelaatsscherm (EN166)</li><br><li> - Voorgeschreven PBM voor werkzaamheden aan middenspanning (UTE C 18-510)</li></ul><br><br><h3>Overige</h3><br>Opmerking: de externe ondernemingen moeten hun medewerkers de hierboven genoemde PBM ter beschikking stellen. In de transformatorstations bevinden zich een kruk en een reddingsstok.<br><br><h3>Werken op hoogte</h3><br><ul><li> - Voorgeschreven PBM (harnas, helm, 2 lijnen met schokdemper of dubbele Y-lijn, karabijnhaken, valstopapparaat, enz.) met geldige keuring</li><br><li> - Automatisch evacuatiesysteem:</li><br><li> - Aantal: 1 evacuatieset (bedoeld voor 2 personen)</li><li>Locatie: in de hoogwerker</li><br><li> - Denk aan een extra evacuatieset als er meer dan twee personen in de hoogwerker staan</li><br><li> - Overig (nader te bepalen): gebruikt valstopapparaat: HACA met referentie 0529 7103 (borstbevestiging op het harnas)</li></ul><br><br>De valstopapparaten moeten compatibel zijn met het vaste beveiligingssysteem van de machines. De valstopapparaten moeten voldoen aan de laatste norm en met succes de aanvullende beproevingen hebben doorstaan (aanvullende tests CNB/P/11.073 van 13-10-2010) die verplicht zijn gesteld door het advies van het Franse ministerie van Arbeid van 28 september 2010, om de conformiteit met de eisen van richtlijn 89/686/EEG te waarborgen.
+RulesOfProcedure                    = Huishoudelijk reglement
+RulesOfProcedureValue               = Beschikbaar op de verplichte aanplakking in de pauzeruimte
+CollectiveAgreement                 = Collectieve arbeidsovereenkomsten
+CollectiveAgreementValue            = Beschikbaar op de website van de overheid:<br /><a href="https://www.service-public.fr/particuliers/vosdroits/F78" target="_blank">https://www.service-public.fr/particuliers/vosdroits/F78</a>
+legaldisplay.odt                    = Wettelijke aanplakking
+legaldisplay_custom.odt             = Aangepaste wettelijke aanplakking
+
+#
+# InformationsSharing - Informatieverspreiding
+#
+
+# Recht
+InformationsSharingsMin = Informatieverspreidingen
+
+# Gegevens
+InformationsSharing                  = Informatieverspreiding
+Informationssharing                  = Informatieverspreiding
+InformationsSharingDocumentGenerated = Genereren van de informatieverspreiding
+HowToSetDataInformationsSharing      = Ga naar Start - Instellingen - Bedrijf/Organisatie - Sociaal om de gegevens van de informatieverspreiding in te stellen
+ConfigureSecurityAndSocialData       = De bedrijfsgegevens instellen
+LastMainDoc                          = Laatst gegenereerde document
+
+ParticipationAgreement      = Winstdelingsovereenkomsten
+ParticipationAgreementValue = Ja, alle medewerkers met een lopende arbeidsovereenkomst voor onbepaalde of bepaalde tijd met het bedrijf, van welke aard ook, kunnen aanspraak maken op de winstdeling.<br />Er geldt echter een anciënniteitsvoorwaarde: 6 maanden in het bedrijf.<br />Voor de bepaling van de vereiste anciënniteit worden alle arbeidsovereenkomsten meegeteld die tijdens de berekeningsperiode en de 12 daaraan voorafgaande maanden zijn uitgevoerd.<br />De anciënniteit wordt beoordeeld op de afsluitdatum van het betreffende boekjaar of op de vertrekdatum bij beëindiging van de overeenkomst tijdens het boekjaar.
+TermsAndConditions          = Voorwaarden
+
+ESC                  = Sociaal en Economisch Comité
+StaffRepresentatives = Personeelsvertegenwoordigers
+ElectionDate         = Verkiezingsdatum
+ElectionDateCSE      = Verkiezingsdatum van het Sociaal en Economisch Comité
+ElectionDateDP       = Verkiezingsdatum van de personeelsvertegenwoordigers
+
+Titulars                       = Vaste leden
+Alternates                     = Plaatsvervangers
+informationssharing.odt        = Informatieverspreiding
+informationssharing_custom.odt = Aangepaste informatieverspreiding
+ActionOnUser                   = Betrokken gebruiker
+HarassmentOfficer              = Verantwoordelijke voor intimidatie
+HarassmentOfficerCSE           = Verantwoordelijke voor intimidatie van het Sociaal en Economisch Comité
+ExceptionsToWorkingHours       = Afwijkingen van de werktijden
+PermanentDerogation            = Permanente afwijking
+PermanentDerogationValue       = Nee
+OccasionalDerogation           = Incidentele afwijking
+OccasionalDerogationValue      = Ja
+
+
+#
+# PreventionPlan - Preventieplan
+#
+
+# Recht
+PreventionPlansMin = preventieplannen
+
+# Gegevens
+
+PreventionPlan                                        = Preventieplan
+Preventionplan                                        = Preventieplan
+ThePreventionplan                                     = het preventieplan
+PreventionPlanDocument                                = Preventieplan
+Preventionplandocument                                = Preventieplan
+PreventionPlanDocumentGenerated                       = Genereren van het preventieplan
+PreventionPlanList                                    = Lijst van de preventieplannen
+PreventionPlanLine                                    = risico('s)
+PreventionPlanLineCreated                             = Aanmaken van een risico in het preventieplan
+PreventionPlanLineModified                            = Wijzigen van een risico in het preventieplan
+PreventionPlanLineDeleted                             = Verwijderen van een risico uit het preventieplan
+NewPreventionPlan                                     = Nieuw preventieplan
+PriorVisit                                            = Gezamenlijke voorinspectie
+PriorVisitYesNo                                       = Voorbereidend bezoek uitgevoerd
+PriorVisitText                                        = Notitie van de inspectie
+CSSCTIntervention                                     = Tussenkomst van het CSSCT
+CSSCTInterventionText                                 = Tussenkomst van het CSSCT?
+MasterWorker                                          = Verantwoordelijke van het inlenend bedrijf
+MasterWorker                                          = Verantwoordelijke van het inlenend bedrijf
+ExtSociety                                            = Externe onderneming
+ExtSocietyResponsible                                 = Verantwoordelijke van de externe onderneming
+ExtSocietyResponsible                                 = Verantwoordelijke van de externe onderneming
+ExtSocietyAttendant                                   = Medewerker van de externe onderneming
+ActionsDescription                                    = Beschrijving van de werkzaamheden
+INRSRisk                                              = Risico (INRS)
+PreventionMethod                                      = Preventiemiddelen
+PreventionplanSchedules                               = Werktijden van het preventieplan
+Attendants                                            = Deelnemers
+ModifyPreventionPlan                                  = Het preventieplan wijzigen
+ActionsDescriptionTooltip                             = Beschrijving van de door de medewerker uitgevoerde werkzaamheden
+INRSRiskTooltip                                       = Lijst van de risicocategorieën uit het referentiekader van het INRS
+PreventionMethodTooltip                               = Preventiemiddel dat moet worden ingezet om het risico te beperken
+LockPreventionPlan                                    = Het preventieplan vergrendelen
+ConfirmLockPreventionPlan                             = Weet u zeker dat u het preventieplan wilt vergrendelen?<br>Deze vergrendeling legt de gegevens en het genereren van het document vast.
+AllSignatoriesMustHaveSigned                          = Alle deelnemers moeten hebben ondertekend om het object te vergrendelen
+ValidatePreventionPlan                                = Het preventieplan valideren
+ConfirmValidatePreventionPlan                         = Weet u zeker dat u het preventieplan wilt valideren? <br> De validatie stelt de deelnemers in staat het document te ondertekenen, maar <b> verhindert het toevoegen van nieuwe deelnemers of het wijzigen van het preventieplan </b>.
+ReOpenPreventionPlan                                  = Het preventieplan heropenen
+ConfirmReOpenPreventionPlan                           = Weet u zeker dat u het preventieplan wilt heropenen? Het heropenen maakt het wijzigen van het preventieplan en het toevoegen van nieuwe deelnemers mogelijk, maar <b>alle handtekeningen op het document gaan verloren</b>.
+PreventionPlanRiskList                                = Lijst van de risico's van het preventieplan
+ActionsPreventionPlanRisk                             = Acties
+PreventionPlanDescription                             = Project van de preventieplannen
+PriorVisitDate                                        = Datum van de gezamenlijke voorinspectie
+AddPreventionPlanLine                                 = Toevoegen van het risico
+UpdatePreventionPlanLine                              = Bijwerken van het risico
+DeletePreventionPlanLine                              = Verwijderen van het risico
+PreventionPlanDet                                     = Risico van het preventieplan
+Preventionplandet                                     = Risico van het preventieplan
+PreventionPlanMessage                                 = aan het preventieplan
+PreventionPlanMustBeValidated                         = Het preventieplan moet gevalideerd zijn om het te kunnen heropenen
+PreventionPlanMustBeInProgress                        = Het preventieplan moet lopend zijn om toegang te krijgen tot deze functie
+PreventionPlanMustBeInProgressToValidate              = Het preventieplan is al gevalideerd
+CSEMustBeAlerted3DaysBeforeVisit                      = Het CSE moet 3 dagen vóór de gezamenlijke voorinspectie worden geïnformeerd (art. R. 4514-1 1°, R. 4514-3 en R. 4514-9 van het Franse arbeidswetboek)
+PreventionPlanData                                    = Gegevens van het preventieplan
+MasterWorkerDescription                               = De gebruiker die standaard als verantwoordelijke van het inlenend bedrijf wordt gebruikt
+NoPreventionPlanRisk                                  = Geen risico in het preventieplan
+NoPreventionPlanLinked                                = Geen gekoppeld preventieplan
+PreventionPlanLinked                                  = Gekoppeld preventieplan
+PreventionPlanManagement                              = Beheer van de preventieplannen
+PPRProject                                            = Aan de preventieplannen gekoppeld project
+NewLabelForClonePreventionPlan                        = Naam van het nieuwe preventieplan
+ClonePreventionPlanRisk                               = De risico's van het preventieplan klonen
+CloneAttendantsPreventionPlan                         = De deelnemers van het preventieplan klonen
+CloneSchedulePreventionPlan                           = De werktijden van het preventieplan klonen
+ConfirmClonePreventionPlan                            = Weet u zeker dat u het preventieplan <b> %s </b> wilt klonen?
+preventionplandocument.odt                            = Preventieplan
+preventionplandocument_custom.odt                     = Aangepast preventieplan
+ErrorThirdPartyHasAtLeastOneChildOfTypePreventionPlan = De relatie is gekoppeld aan ten minste één onderliggend element van het type preventieplan:
+ErrorContactHasAtLeastOneChildOfTypePreventionPlan    = Het contact is gekoppeld aan ten minste één onderliggend element van het type preventieplan:
+ConfirmDeletePreventionPlan                           = Weet u zeker dat u dit preventieplan wilt verwijderen?
+PreventionPlanRole                                    = De rollen van het preventieplan
+
+# E-mail
+PreventionPlanLabel   = Samenvatting van het preventieplan
+PreventionPlanSubject = E-mail preventieplan
+PreventionPlanContent = Bijgaand vindt u het ODT-document van het preventieplan.
+
+# Triggers
+PreventionPlanCreated          = Aanmaken van een preventieplan
+PreventionPlanModified         = Wijzigen van een preventieplan
+PreventionPlanDeleted          = Verwijderen van een preventieplan
+PreventionPlanInProgress       = Heropenen van het preventieplan
+PreventionPlanPendingSignature = Het preventieplan in afwachting van ondertekening zetten
+PreventionPlanLocked           = Vergrendelen van het preventieplan
+PreventionPlanArchived         = Archiveren van het preventieplan
+PreventionPlanSentByMail       = Versturen van het preventieplan per e-mail
+
+#
+# FirePermit - Vuurvergunning
+#
+
+# Recht
+FirePermitMin  = vuurvergunning
+FirePermitsMin = vuurvergunningen
+
+# Gegevens
+NewFirePermit                                     = Nieuwe vuurvergunning
+ModifyFirePermit                                  = De vuurvergunning wijzigen
+FirePermitList                                    = Lijst van de vuurvergunningen
+FirePermit                                        = Vuurvergunning
+Firepermit                                        = Vuurvergunning
+TheFirepermit                                     = de vuurvergunning
+FirePermitDocument                                = Vuurvergunning
+Firepermitdocument                                = Vuurvergunning
+FirePermitDocumentGenerated                       = Genereren van de vuurvergunning
+FirePermitCreated                                 = Aanmaken van een vuurvergunning
+FirePermitModified                                = Wijzigen van een vuurvergunning
+FirePermitDeleted                                 = Verwijderen van een vuurvergunning
+FirePermitInProgress                              = Heropenen van de vuurvergunning
+FirePermitPendingSignature                        = De vuurvergunning in afwachting van ondertekening zetten
+FirePermitLocked                                  = Vergrendelen van de vuurvergunning
+FirePermitArchived                                = Archiveren van de vuurvergunning
+FirePermitSignatureAddAttendant                   = Deelnemer toegevoegd aan de vuurvergunning
+FirePermitSentByMail                              = Versturen van de vuurvergunning per e-mail
+FirePermitLine                                    = risico('s)
+FirePermitDet                                     = Risico van de vuurvergunning
+Firepermitdet                                     = Risico van de vuurvergunning
+FirePermitLineCreated                             = Aanmaken van een risico in de vuurvergunning
+FirePermitLineModified                            = Wijzigen van een risico in de vuurvergunning
+FirePermitLineDeleted                             = Verwijderen van een risico uit de vuurvergunning
+FirePermitRiskList                                = Lijst van de risico's van de vuurvergunning
+AddFirePermitLine                                 = Toevoegen van het risico
+UpdateFirePermitLine                              = Bijwerken van het risico
+DeleteFirePermitLine                              = Verwijderen van het risico
+FirePermitMessage                                 = aan de vuurvergunning
+UsedMaterialTooltip                               = Te gebruiken materieel om het risico te beperken
+ActionsFirePermitRisk                             = Acties
+ConfirmValidateFirePermit                         = Weet u zeker dat u de vuurvergunning wilt valideren? <br> De validatie stelt de deelnemers in staat het document te ondertekenen, maar <b> verhindert het toevoegen van nieuwe deelnemers of het wijzigen van de vuurvergunning </b>.
+ConfirmReOpenFirePermit                           = Weet u zeker dat u de vuurvergunning wilt heropenen? Het heropenen maakt het wijzigen van de vuurvergunning en het toevoegen van nieuwe deelnemers mogelijk, maar <b>alle handtekeningen op het document gaan verloren</b>.
+ConfirmLockFirePermit                             = Weet u zeker dat u de vuurvergunning wilt vergrendelen?<br>Deze vergrendeling legt de gegevens en het genereren van het document vast.
+FirePermitMustBeInProgress                        = De vuurvergunning moet lopend zijn om toegang te krijgen tot deze functie
+NewLabelForCloneFirePermit                        = Naam van de nieuwe vuurvergunning
+CloneFirePermitRisk                               = De risico's van de vuurvergunning klonen
+CloneAttendantsFirePermit                         = De deelnemers van de vuurvergunning klonen
+CloneScheduleFirePermit                           = De werktijden van de vuurvergunning klonen
+ConfirmCloneFirePermit                            = Weet u zeker dat u de vuurvergunning <b> %s </b> wilt klonen?
+FirePermitDescription                             = Project van de vuurvergunningen
+FirePermitData                                    = Gegevens van de vuurvergunning
+FirePermitManagement                              = Beheer van de vuurvergunningen
+FPRProject                                        = Aan de vuurvergunningen gekoppeld project
+firepermitdocument.odt                            = Vuurvergunning
+firepermitdocument_custom.odt                     = Aangepaste vuurvergunning
+UsedEquipment                                     = Gebruikt materieel
+ErrorThirdPartyHasAtLeastOneChildOfTypeFirePermit = De relatie is gekoppeld aan ten minste één onderliggend element van het type vuurvergunning:
+ErrorContactHasAtLeastOneChildOfTypeFirePermit    = Het contact is gekoppeld aan ten minste één onderliggend element van het type vuurvergunning:
+ConfirmDeleteFirePermit                           = Weet u zeker dat u deze vuurvergunning wilt verwijderen?
+FirePermitRole                                    = De rollen van de vuurvergunning
+FirepermitSchedules                               = Werktijden van de vuurvergunning
+
+# E-mail
+FirePermitLabel   = Samenvatting van de vuurvergunning
+FirePermitSubject = E-mail vuurvergunning
+FirePermitContent = Bijgaand vindt u het ODT-document van de vuurvergunning.
+
+
+#
+# Accident - Ongeval
+#
+
+# Recht
+AccidentsMin = ongevallen
+
+# Trigger
+AccidentCreateTrigger         = Ongeval %s aangemaakt
+ActionsOnAccident             = Aan het ongeval gekoppelde gebeurtenissen
+AccidentGeneratedWithDolibarr = Ongeval gegenereerd met Dolibarr
+AccidentWorkStopCreateTrigger = Ziekteverzuim %s toegevoegd aan het ongeval
+AccidentWorkStopModifyTrigger = Ziekteverzuim %s gewijzigd bij het ongeval
+AccidentWorkStopDeleteTrigger = Ziekteverzuim %s verwijderd uit het ongeval
+AccidentModifyTrigger         = Ongeval %s gewijzigd
+AccidentDeleteTrigger         = Ongeval %s verwijderd
+AccidentMetaDataCreateTrigger = Opslaan van de aanvullende gegevens van het ongeval
+AccidentLesionCreateTrigger   = Letsel %s toegevoegd aan het ongeval
+AccidentLesionModifyTrigger   = Letsel %s gewijzigd bij het ongeval
+AccidentLesionDeleteTrigger   = Letsel %s verwijderd uit het ongeval
+ACC_USER_EMPLOYERSigned       = Handtekening van de verantwoordelijke van het bedrijf
+VictimAndCaregivers           = Slachtoffer en zorgverlener
+Victim                        = Slachtoffer
+Caregiver                     = Zorgverlener
+
+# Nummeringsmodel
+DigiriskAccidentNumberingModule         = Nummeringsmodel van de ongevallen van Digirisk
+DigiriskAccidentStandardModel           = Geeft het nummer terug in de vorm ACCn, waarbij n een doorlopende teller is zonder onderbreking en zonder terugzetting op 0.
+DigiriskAccidentWorkStopNumberingModule = Nummeringsmodel van het aan het ongeval gekoppelde ziekteverzuim
+DigiriskAccidentWorkStopStandardModel   = Geeft het nummer terug in de vorm ACCWn, waarbij n een doorlopende teller is zonder onderbreking en zonder terugzetting op 0.
+DigiriskAccidentLesionNumberingModule   = Nummeringsmodel van het aan het ongeval gekoppelde letsel
+DigiriskAccidentLesionStandardModel     = Geeft het nummer terug in de vorm ACCLn, waarbij n een doorlopende teller is zonder onderbreking en zonder terugzetting op 0.
+DigiriskAccidentDocumentNumberingModule = Nummeringsmodel van de ongevalsfiches van Digirisk
+DigiriskAccidentDocumentStandardModel   = Geeft het nummer terug in de vorm ACCDn, waarbij n een doorlopende teller is zonder onderbreking en zonder terugzetting op 0.
+
+# ODT-sjabloon
+DigiriskTemplateDocumentAccident       = Documentsjablonen van de ongevallen van Digirisk
+AccidentDocumentCustomDigiriskTemplate = Aangepaste ODT van de ongevallen
+AccidentDocumentDigiriskTemplate       = Standaard-ODT van de ongevallen
+AccidentDocument                       = Ongevalsfiche
+AccidentDocumentGeneratedWithDolibarr  = Ongeval gegenereerd met Dolibarr
+
+# Gegevens
+NewAccident                              = Nieuw ongeval
+ModifyAccident                           = Het ongeval wijzigen
+AccidentList                             = Lijst van de ongevallen
+Accident                                 = Ongeval
+AccidentCreated                          = Aanmaken van een ongeval
+DeleteAccident                           = Het ongeval verwijderen?
+AccidentModified                         = Wijzigen van een ongeval
+AccidentDeleted                          = Verwijderen van een ongeval
+AccidentLine                             = risico('s)
+AccidentDate                             = Datum van het ongeval
+AccidentSchedule                         = Tijden van het ongeval
+AccidentRiskList                         = Lijst van aanvullende informatie over het ongeval
+Accidentworkstop                         = Ziekteverzuim
+AccidentWorkStopCreated                  = Aanmaken van een ziekteverzuim
+AccidentWorkStopModified                 = Wijzigen van een ziekteverzuim
+AccidentWorkStopDeleted                  = Verwijderen van een ziekteverzuim
+AddAccidentWorkStop                      = Toevoegen van een ziekteverzuim aan het ongeval
+UpdateAccidentWorkStop                   = Bijwerken van een ziekteverzuim bij het ongeval
+DeleteAccidentWorkStop                   = Verwijderen van een ziekteverzuim uit het ongeval
+Accidentlesion                           = Letsel
+AccidentLesionCreated                    = Aanmaken van een letsel
+AccidentLesionModified                   = Wijzigen van een letsel
+AccidentLesionDeleted                    = Verwijderen van een letsel
+AddAccidentLesion                        = Toevoegen van een letsel aan het ongeval
+UpdateAccidentLesion                     = Bijwerken van een letsel bij het ongeval
+DeleteAccidentLesion                     = Verwijderen van een letsel uit het ongeval
+AccidentDescription                      = Project van de ongevallen
+AccidentManagement                       = Beheer van de ongevallen
+AccidentWorkstopManagement               = Beheer van het ziekteverzuim
+AccidentLesionManagement                 = Beheer van het letsel
+AccidentInvestigationManagement          = Beheer van de ongevalsonderzoeken
+ACCProject                               = Aan de ongevallen gekoppeld project
+UserVictim                               = Slachtoffer van het ongeval
+AccidentType                             = Type ongeval
+WorkAccidentStatement                    = Arbeidsongeval
+CommutingAccident                        = Woon-werkongeval
+AccidentMetaData                         = Aanvullende gegevens
+RelativeLocation                         = Aanvullende gegevens over de plaats van het ongeval
+VictimActivity                           = Activiteit van het slachtoffer op het moment van het ongeval
+AccidentNature                           = Aard van het ongeval
+AccidentObject                           = Voorwerp waarvan het contact het slachtoffer heeft verwond
+AccidentNatureDoubt                      = Eventuele gemotiveerde voorbehouden (voeg zo nodig een begeleidende brief bij)
+AccidentNatureDoubtLink                  = Link naar de begeleidende brief
+VictimTransportedTo                      = Het slachtoffer is vervoerd naar
+VictimWorkHours                          = Werktijd van het slachtoffer op de dag van het ongeval
+WorkHoursMorningDateStart                = Begin van de werktijd van het slachtoffer (ochtend)
+WorkHoursMorningDateEnd                  = Einde van de werktijd van het slachtoffer (ochtend)
+WorkHoursAfternoonDateStart              = Begin van de werktijd van het slachtoffer (middag)
+WorkHoursAfternoonDateEnd                = Einde van de werktijd van het slachtoffer (middag)
+AccidentNoticed                          = Melding van het ongeval
+Found                                    = Vastgesteld
+Known                                    = Bekend
+AccidentNoticeDate                       = Datum waarop het ongeval bekend werd
+AccidentNoticeBy                         = Persoon die het ongeval heeft gemeld
+ByEmployer                               = Door de werkgever
+ByEmployees                              = Door zijn medewerkers
+AccidentDescribedByVictim                = Het ongeval is beschreven door het slachtoffer
+RegisteredInAccidentRegister             = Het ongeval is opgenomen in het register van lichte arbeidsongevallen
+RegisterDate                             = Datum van opname in het register van lichte arbeidsongevallen
+RegisterNumber                           = Nummer van opname in het register van lichte arbeidsongevallen
+Consequence                              = Gevolgen
+WithoutWorkStop                          = Zonder ziekteverzuim
+LessThanFourDays                         = Minder dan 4 dagen
+LessThanTwentyOneDays                    = Minder dan 21 dagen
+LessThanThreeMonth                       = Minder dan 3 maanden
+LessThanSixMonths                        = Minder dan 6 maanden
+LongTimeWorkStop                         = Meer dan 6 maanden
+WithWorkStop                             = Met ziekteverzuim
+Fatal                                    = Overlijden
+PoliceReport                             = Politierapport
+PoliceReportBy                           = Persoon die het politierapport heeft opgesteld
+FirstPersonNoticedIsWitness              = Gewaarschuwde persoon
+Witness                                  = Getuige
+FirstPersonNoticed                       = Eerste gewaarschuwde persoon
+ThirdPartyResponsability                 = Is het ongeval veroorzaakt door een derde?
+FkSocResponsible                         = Bedrijf van de aansprakelijke derde
+FkSocResponsibleInsuranceSociety         = Verzekeringsmaatschappij van de derde
+LesionLocalization                       = Locatie van het letsel
+LesionNature                             = Aard van het letsel
+AccidentInvestigation                    = Ongevalsonderzoek
+Accidentinvestigation                    = Ongevalsonderzoek
+AccidentInvestigationLink                = Link naar het ongevalsonderzoek
+AccidentLocation                         = Plaats van het ongeval
+DigiriskDolibarrActionTrigger            = Trigger van de Digirisk-gebeurtenissen
+CollateralVictim                         = Nevenslachtoffer
+FromDigirisk                             = Van
+At                                       = Tot
+AndFrom                                  = En van
+ExternalAccident                         = Heeft het ongeval plaatsgevonden in een andere vestiging dan die waaraan het slachtoffer verbonden is?
+AccidentAttendants                       = Ongeval - Deelnemers
+UserEmployer                             = Verantwoordelijke van het bedrijf
+SignatureUserEmployer                    = Handtekening van de verantwoordelijke van het bedrijf
+CerfaLink                                = Link naar het Cerfa-formulier
+WorkStopDays                             = Aantal dagen ziekteverzuim
+AccidentLesionList                       = Lijst van het aan het ongeval gekoppelde letsel
+DocumentsMetaData                        = Aanvullende bijlagen
+WorkStopDocument                         = Verzuimmelding
+AccidentMetaDataSave                     = De aanvullende gegevens van het ongeval zijn opgeslagen
+ErrorFieldNotEmpty                       = Fout: het veld <b>'%s'</b> mag niet leeg zijn
+ErrorFieldMustBeGreaterOrEqualZero       = Fout: het veld <b>'%s'</b> moet groter dan of gelijk aan 0 zijn
+ConfirmDeleteAccidentWorkStop            = Weet u zeker dat u het ziekteverzuim <b>%s</b> bij het ongeval wilt verwijderen?
+AccidentMetaDataLesion                   = Aanvullende gegevens van het letsel
+TotalWorkStopDays                        = Totaal aantal dagen ziekteverzuim
+RegisterAccident                         = Licht ongeval
+AccidentsLinked                          = Gekoppeld(e) ongeval(len)
+GaugeCounter                             = Dit veld wordt gebruikt in de teller van de meter
+DateStartWorkStop                        = Begindatum van het ziekteverzuim
+DateEndWorkStop                          = Einddatum van het ziekteverzuim
+ReturnWorkDate                           = Datum van werkhervatting
+DayWithoutAccident                       = Dagen zonder ongeval(len)
+AccidentRepartition                      = Verdeling van de ongevallen per type
+AccidentByYear                           = Verdeling van de ongevallen per jaar
+NbAccidentsByEmployees                   = Aantal ongevallen per medewerker
+AccidentRegister                         = Ongeval per register
+AccidentWithoutRegister                  = Ongevallen zonder register
+AccidentWithRegister                     = Ongevallen met register
+WorkStopDurationDistribution             = Verdeling van de tijd per ziekteverzuim
+WorkStopDurationDistributionDigiriskElem = Verdeling van de verzuimtijd per GP/UT
+WorkStopDuration                         = Duur van het ziekteverzuim
+NoAbsence                                = Geen verzuim
+UpTo4Days                                = Tot 4 dagen
+UpTo21Days                               = Tot 21 dagen
+UpTo3Months                              = Tot 3 maanden
+UpTo6Months                              = Tot 6 maanden
+MoreThan6Months                          = Meer dan 6 maanden
+FrequencyIndex                           = Frequentie-index
+FrequencyRate                            = Frequentiegraad
+GravityIndex                             = Ernstindex
+GravityRate                              = Ernstgraad
+AccidentRateIndicator                    = Graden en indexen van de prestatie-indicatoren voor ongevallen
+NbPresquAccidents                        = Aantal bijna-ongevallen
+NbAccidentInvestigations                 = Aantal ongevalsonderzoeken
+AccidentInvestigationsMin                = ongevalsonderzoeken
+NbWorkedHours                            = Aantal gewerkte uren
+ConfirmDeleteAccident                    = Weet u zeker dat u het ongeval wilt verwijderen?
+TheAccident                              = het ongeval
+AccidentInvestigation                    = Ongevalsonderzoek
+Accident_investigation                   = Ongevalsonderzoek
+AccidentInvestigationDocument            = Document van het ongevalsonderzoek
+Accidentinvestigationdocument            = Document van het ongevalsonderzoek
+accidentinvestigationdocument.odt        = Ongevalsonderzoek
+NewAccidentInvestigation                 = Nieuw ongevalsonderzoek
+UpdateAccidentInvestigation              = Een ongevalsonderzoek wijzigen
+AccidentInvestigationList                = Lijst van de ongevalsonderzoeken
+TheAccidentinvestigation                 = het ongevalsonderzoek
+SeniorityInPosition                      = Anciënniteit in de functie
+VictimSkills                             = Vaardigheden van het slachtoffer
+CollectiveEquipment                      = Collectieve beschermingsmiddelen (CBM)
+IndividualEquipment                      = Persoonlijke beschermingsmiddelen (PBM)
+Circumstances                            = Omstandigheden
+CurativeAction                           = Curatieve acties
+CorrectiveAction                         = Corrigerende acties
+PreventiveAction                         = Preventieve acties
+DigiriskActionType                       = Digirisk-actietype
+Actions                                  = Acties
+ActionsTab                               = Acties
+CurativeActions                          = Curatieve acties
+PreventiveActions                        = Preventieve acties
+TotalPlannedBudget                       = Voorzien budget
+AccidentInvestigationDocumentPDF         = EA-A4-STAAND
+PreventionPlanDocumentPDF                = PP-A4-STAAND
+PreventionPlanDocumentPDFDescription     = Het preventieplan als PDF genereren
+AccidentInvestigationDocumentPDFDescription = Het ongevalsonderzoek als PDF genereren
+AccidentInvestigationDocumentGeneratedAt = Gegenereerd op
+CorrectiveActions                        = Corrigerende acties
+AddCurativeAction                        = Een curatieve actie toevoegen
+AddCorrectiveAction                      = Een corrigerende actie toevoegen
+InvestigationNotValidatedYet             = Valideer eerst het ongevalsonderzoek om acties te kunnen aanmaken
+ActionLabel                              = Naam van de actie
+ActionDeadline                           = Vervaldatum
+ActionAssignedTo                         = Toegewezen aan
+ActionProgress                           = Voortgang
+MarkAsDone                               = Als voltooid markeren
+XActionsOfY                              = %s / %s voltooid
+NoActionsYet                             = Nog geen actie
+ActionAdded                              = De actie is aangemaakt
+ActionClosed                             = De actie is afgesloten
+ActionsAreProjectTasks                   = De acties zijn subtaken van het Dolibarr-project
+SeeProjectTasksView                      = Bovenliggende taak bekijken
+OpenTask                                 = De taak openen
+AccidentInvestigationValidated           = Het ongevalsonderzoek is gevalideerd
+AccidentInvestigationReOpened            = Het ongevalsonderzoek is heropend
+AccidentInvestigationTaskCreated         = De taken van het ongevalsonderzoek zijn aangemaakt
+AccidentInvestigationTaskDeleted         = De taken van het ongevalsonderzoek zijn verwijderd
+CausalityTree                            = Oorzakenboom
+TaskWillBeCreatedAfterValidation         = De taken worden aangemaakt na de validatie van het ongevalsonderzoek
+AccidentInvestigationCreated             = Aanmaken van een ongevalsonderzoek
+AccidentInvestigationModified            = Wijzigen van een ongevalsonderzoek
+AccidentInvestigationDeleted             = Verwijderen van een ongevalsonderzoek
+AccidentInvestigationValidate            = Valideren van een ongevalsonderzoek
+AccidentInvestigationUnValidate          = Heropenen van een ongevalsonderzoek
+AccidentInvestigationLock                = Vergrendelen van het ongevalsonderzoek
+AccidentInvestigationSigned              = Ondertekenen van een ongevalsonderzoek
+CloneWorkStop                            = Het ziekteverzuim klonen?
+CloneMetadata                            = De aanvullende gegevens klonen?
+CloneLesion                              = De aanvullende gegevens van het letsel klonen?
+CloneFrom                                = Kloon van
+AccidentInvestigationRole                = De rollen van het ongevalsonderzoek
+LesionsOrWorkStop                        = letsel of ziekteverzuim
+AccidentsCategoriesArea                  = Ruimte voor tags/categorieën van de ongevallen
+AddAccidentIntoCategory                  = Deze categorie aan het ongeval toewijzen
+PreventionplansCategoriesArea            = Ruimte voor tags/categorieën van de preventieplannen
+AddPreventionplanIntoCategory            = Deze categorie aan het preventieplan toewijzen
+FirepermitsCategoriesArea                = Ruimte voor tags/categorieën van de vuurvergunningen
+AddFirepermitIntoCategory                = Deze categorie aan de vuurvergunning toewijzen
+RisksCategoriesArea                      = Ruimte voor tags/categorieën van de risico's
+AddRiskIntoCategory                      = Deze categorie aan het risico toewijzen
+AddTicketIntoCategory                    = Deze categorie aan het ticket toewijzen
+StartDateInvestigate                     = Begindatum van het onderzoek
+EndDateInvestigate                       = Einddatum van het onderzoek
+YearType                                 = Type jaar
+AllYears                                 = Alle jaren
+FiscalYear                               = Boekjaar
+CalendarYear                             = Kalenderjaar
+
+# AccidentTooltip - Tooltips van de ongevallen
+VictimActivityTooltip              = Geef de activiteit of de taak van het slachtoffer op het moment van het ongeval aan, dat wil zeggen wat het slachtoffer aan het doen was
+AccidentNatureTooltip              = Beschrijf de gebeurtenis die tot het ongeval heeft geleid, hoe het ongeval is gebeurd (elektrisch probleem, gaslek, materiaalbreuk, uitglijden, val, lichamelijke inspanning, agressie...), of hoe het slachtoffer gewond is geraakt (stoten, botsing, beknelling, prik, verdrinking, contact met een stof...)
+AccidentObjectTooltip              = Dat wil zeggen waarmee het slachtoffer gewond is geraakt: materiaal, afval, gereedschap (schroevendraaier, mes, boormachine...), machine, voertuig, heftruck, chemische stof, bouwelement (deur, muur...), vloer...
+AccidentNatureDoubtTooltip         = Vermeld indien van toepassing de gemotiveerde voorbehouden, die alleen in aanmerking kunnen worden genomen als ze betrekking hebben op de omstandigheden van tijd en plaats van het ongeval of op het bestaan van een oorzaak die volledig losstaat van het werk (art. R. 441-11 van het Franse socialezekerheidswetboek)
+VictimWorkHoursTooltip             = Vermeld de door uw medewerker gewerkte uren, of de geplande uren, op de dag van het ongeval
+ConsequenceTooltip                 = Als het slachtoffer op voorschrift van een arts het werk heeft gestaakt, moet u VERPLICHT het formulier «attestation de salaire accident du travail ou maladie professionnelle» - referentie S6202 - invullen en versturen naar het ziekenfonds van de gewone woonplaats van het slachtoffer. <br> Vervolgens moet u dezelfde formaliteit opnieuw vervullen bij een nieuw verzuim na een behandelperiode of een werkhervatting in een andere maand
+FirstPersonNoticedIsWitnessTooltip = Vermeld de achternaam, de voornaam en het adres van de getuige. <br> Bij afwezigheid van een getuige vermeldt u de eerste persoon in het bedrijf die van het ongeval op de hoogte is gesteld
+ThirdPartyResponsabilityTooltip    = Wanneer u weet dat een derde betrokken is bij een arbeids- of woon-werkongeval, ongeacht diens aandeel in de aansprakelijkheid, moet dit verplicht in dit deel worden vermeld
+FrequencyIndexTooltip              = Aantal ongevallen per medewerker x 1 000
+FrequencyRateTooltip               = Aantal ongevallen per gewerkte uren x 1 000 000
+GravityRateTooltip                 = Aantal dagen ziekteverzuim per gewerkte uren x 1 000
+NbWorkedHoursTooltip               = Het aantal gewerkte uren is handmatig ingevoerd
+DocumentGeneratedWithVersioning    = Document gegenereerd bij het versiebeheer
+
+# Woordenboek
+UsualWorkplace                  = Gebruikelijke werkplek
+OccasionalWorkplace             = Incidentele werkplek
+LocationOfTheMeal               = Plaats van de maaltijd
+OnTheWayBetweenHomeAndWorkplace = Tijdens het traject tussen de woning en de werkplek
+OnTheWayBetweenMealAndWorkplace = Tijdens het traject tussen het werk en de plaats van de maaltijd
+DuringATripForTheEmployer       = Tijdens een verplaatsing voor de werkgever
+
+Trunk             = Romp
+Hand              = Hand
+LowerLimbs        = Onderste ledematen
+UpperLimbs        = Bovenste ledematen
+MultipleLocations = Meerdere locaties
+Foot              = Voet
+Head              = Hoofd
+Eyes              = Ogen
+InternalSeating   = Inwendige locaties
+Neck              = Nek
+Back              = Rug
+WholeBody         = Hele lichaam
+NotSpecified      = Niet gespecificeerd
+
+PainEffortLumbago           = Pijn door inspanning, spit
+Contusion                   = Kneuzing
+Wounds                      = Wonden
+Sprain                      = Verstuiking
+FracturePitting             = Breuk of barst
+MultipleInjuries            = Letsel van uiteenlopende aard
+MuscleOrTendonTear          = Spier- of peesscheur
+PresenceOfForeignBody       = Aanwezigheid van een vreemd voorwerp
+Burns                       = Brandwond
+UnspecifiedAndMiscellaneous = Niet gespecificeerd en overige
+Other                       = Overige
+CutOff                      = Snijwond
+
+Investigator = Onderzoeker
+Rescuer      = Hulpverlener
+
+#
+# ListingRisksDocument - Risicolijst met documenten
+#
+
+# Recht
+ListingRisksDocumentMin = risicolijsten met documenten
+
+# Gegevens
+ListingRisksDocument            = Risicolijst
+Listingrisksdocument            = Risicolijst
+ListingRisksHeader              = Risico's - %s
+ListingRisksDocumentGenerated   = Genereren van de risicolijst met documenten
+listingrisksdocument.odt        = Risicolijst met documenten
+listingrisksdocument_custom.odt = Aangepaste risicolijst met documenten
+
+#
+# ListingRisksPhoto - Risicolijst met foto's
+#
+
+# Recht
+ListingRisksPhotosMin = risicolijsten met foto's
+
+# Gegevens
+ListingRisksPhoto            = Risicolijst met foto's
+Listingrisksphoto            = Risicolijst met foto's
+ListingRisksPhotoGenerated   = Genereren van de risicolijst met foto's
+listingrisksphoto.odt        = Risicolijst met foto's
+listingrisksphoto_custom.odt = Aangepaste risicolijst met foto's
+
+
+#
+# ListingRisksAction - Risicolijst met corrigerende acties
+#
+
+# Recht
+ListingRisksActionsMin = risicolijsten met corrigerende acties
+
+# Gegevens
+ListingRisksAction                        = Risicolijst met corrigerende acties
+Listingrisksaction                        = Risicolijst met corrigerende acties
+ListingRisksActionGenerated               = Genereren van de risicolijst met corrigerende acties
+listingrisksaction.odt                    = Risicolijst met corrigerende acties
+listingrisksaction_custom.odt             = Aangepaste risicolijst met corrigerende acties
+DigiriskListingRisksActionData            = Configureerbare gegevens van de risicolijsten met corrigerende acties
+ShowTaskDoneListingRisksActionDescription = Maakt het mogelijk de voltooide taken al dan niet weer te geven in de risicolijst met corrigerende acties
+
+
+#
+# RiskAssessmentDocument - Risico-inventarisatie
+#
+
+# Recht
+
+RiskAssessmentDocumentsMin = Risico-inventarisaties
+
+# Gegevens
+RiskAssessmentDocument                                    = Risico-inventarisatie
+Riskassessmentdocument                                    = Risico-inventarisatie
+RiskAssessmentDocumentGenerated                           = Genereren van de risico-inventarisatie
+AuditStartDate                                            = Begindatum van de audit
+AuditEndDate                                              = Einddatum van de audit
+Recipient                                                 = Ontvanger
+ImportantNote                                             = Belangrijke opmerking
+SitePlans                                                 = Locatie van de plattegronden
+SetStartEndDateBeforeSendEmail                            = Stel op deze pagina de begin- en einddatum van de audit in om een e-mail te versturen
+NoSitePlans                                               = Geen plattegrond van het bedrijf ingevuld
+riskassessmentdocument.odt                                = Risico-inventarisatie
+riskassessmentdocument_custom.odt                         = Aangepaste risico-inventarisatie
+DigiriskRiskAssessmentDocumentData                        = Configureerbare gegevens van de risico-inventarisatie
+ActionPreventionCompletedTaskDone                         = De voltooide acties worden niet weergegeven
+AppliedOn                                                 = Actief op:
+RiskAssessmentDocumentMethod                              = * Stap 1: Verzamelen van de informatie<br />- Bezoek aan de locaties<br />- Verzamelen van de personeelsgegevens<br /><br />* Stap 2: Bepalen van de methodiek en het document<br />- Valideren van de standaardfiches van de werkeenheden<br />- Valideren van de structuur van de eenheden<br /><br />* Stap 3: Uitvoeren van het risico-onderzoek<br />- Bewustmaken van het personeel voor risico's en gevaren<br />- Aanmaken van de werkeenheden met het personeel en de verantwoordelijke(n)<br />- Beoordelen van de risico's per werkeenheid met het personeel<br /><br />* Stap 4<br />- Verwerken en opstellen van de risico-inventarisatie
+RiskAssessmentDocumentSources                             = De bewustmaking voor risico's is beschreven in de ED840 uitgegeven door het INRS.<br />In dit document vindt u:<br />- De definitie van een risico en van een gevaar, met een verklarend schema<br />- De uitleg over de verschillende beoordelingsmethoden
+RiskAssessmentDocumentImportantNote                       = Belangrijke opmerkingen:<br />U kunt de documentatie van DigiRisk hier lezen<br /><a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk" target="_blank">https://wiki.dolibarr.org/index.php?title=Module_Digirisk</a><br />U kunt het project hier volgen:<br /><a href="https://github.com/Evarisk/Digirisk/projects?type=classic" target="_blank">https://github.com/Evarisk/Digirisk/projects?type=classic</a><br />Meld hier een fout<br /><a href="https://github.com/Evarisk/Digirisk/issues" target="_blank">https://github.com/Evarisk/Digirisk/issues</a>
+GenerateZipArchiveWithDigiriskElementDocuments            = Genereren van een ZIP-archief met de risico-inventarisatie
+GenerateZipArchiveWithDigiriskElementDocumentsDescription = Automatisch genereren van een ZIP-archief met de risico-inventarisatie en alle functiefiches bij het genereren van de risico-inventarisatie
+RiskAssessmentDocumentDescription                         = Actieplan van de risico-inventarisatie
+ErrorFailToFetchDigiriskElements                          = Fout: de groeperingen en werkeenheden voor het ZIP-archief konden niet worden opgehaald
+ErrorNoDocumentModelFound                                 = Fout: geen documentsjabloon beschikbaar voor <b>%s</b>
+ErrorFailToGenerateDigiriskElementDocument                = Fout: het genereren van het document van <b>%s</b> is mislukt, het ontbreekt in het ZIP-archief
+
+# Boxes - Widget
+NextGenerateDate  = Volgende generatie
+LastGenerateDate  = Laatste generatie
+DelayGenerateDate = Resterende dagen
+NoDelay           = Geen achterstand
+
+# E-mail
+RiskAssessmentDocumentLabel   = Samenvatting van de risico-inventarisatie
+RiskAssessmentDocumentSubject = E-mail risico-inventarisatie
+RiskAssessmentDocumentContent = Bijgaand vindt u het ZIP-bestand en het ODT-document van de risico-inventarisatie.
+
+
+
+#
+# AuditReportDocument - Auditrapport
+#
+
+# Gegevens
+AuditReportDocument     = Auditrapport
+Auditreportdocument     = Auditrapport
+AuditReportDocumentsMin = auditrapporten
+auditreportdocument.odt = Auditrapport
+
+
+
+#
+# GroupmentDocument - Fiche van de groepering
+#
+
+# Recht
+
+# Gegevens
+GroupmentDocument                        = Fiche van de groepering
+Groupmentdocument                        = Fiche van de groepering
+DocumentModelStandardPDF                 = Standaard-PDF-sjabloon
+GroupmentDocumentGenerated               = Genereren van de fiche van de groepering
+groupmentdocument.odt                    = Fiche van de groepering
+groupmentdocument_custom.odt             = Aangepaste fiche van de groepering
+groupmentdocumentinherited.odt           = Fiche van de groepering - Overgeërfde risico's
+groupmentdocumentinherited_custom.odt    = Aangepaste fiche van de groepering - Overgeërfde risico's
+groupmentdocumentshared.odt              = Fiche van de groepering - Gedeelde risico's
+groupmentdocumentshared_custom.odt       = Aangepaste fiche van de groepering - Gedeelde risico's
+DigiriskGroupmentDocumentData            = Configureerbare gegevens van de fiches van de groeperingen
+ShowTaskDoneGroupmentDocumentDescription = Maakt het mogelijk de voltooide taken al dan niet weer te geven in de fiche van de groepering
+
+#
+# WorkUnitDocumment - Fiche van de werkeenheid
+#
+
+# Recht
+
+# Gegevens
+WorkUnitDocument                        = Fiche van de werkeenheid
+Workunitdocument                        = Fiche van de werkeenheid
+WorkUnitDocumentGenerated               = Genereren van de fiche van de werkeenheid
+workunitdocument.odt                    = Fiche van de werkeenheid
+workunitdocument_custom.odt             = Aangepaste fiche van de werkeenheid
+workunitdocumentinherited.odt           = Fiche van de werkeenheid - Overgeërfde risico's
+workunitdocumentinherited_custom.odt    = Aangepaste fiche van de werkeenheid - Overgeërfde risico's
+workunitdocumentshared.odt              = Fiche van de werkeenheid - Gedeelde risico's
+workunitdocumentshared_custom.odt       = Aangepaste fiche van de werkeenheid - Gedeelde risico's
+workunitdocumentcomplete.odt            = Fiche van de werkeenheid - Alle risico's (eigen, overgeërfd, gedeeld)
+workunitdocumentcomplete_custom.odt     = Aangepaste fiche van de werkeenheid - Alle risico's
+DigiriskWorkUnitDocumentData            = Configureerbare gegevens van de fiches van de werkeenheden
+ShowTaskDoneWorkUnitDocumentDescription = Maakt het mogelijk de voltooide taken al dan niet weer te geven in de fiche van de werkeenheid
+
+
+#
+# DigiriskElement - Digirisk-element
+#
+
+# Rechten
+DigiriskElementsMin = Digirisk-elementen (groepering en werkeenheid)
+
+# Gegevens
+NewDigiriskElement                  = Nieuw Digirisk-element
+Digiriskelement                     = Groepering / Werkeenheid
+GPUTOrganization                    = Organisatie van de GP/UT
+DigiriskElement                     = Digirisk-element
+HiddenElements                      = Prullenbak
+DigiriskElementCreated              = Aanmaken van een Digirisk-element
+DigiriskElementModified             = Wijzigen van een Digirisk-element
+DigiriskElementDeleted              = Verwijderen van een Digirisk-element
+ElementType                         = Elementtype
+ParentElement                       = Bovenliggend element
+OrganizationSaved                   = De organisatie van de groeperingen en de werkeenheden is opgeslagen
+OrganizationNotSaved                = De organisatie van de groeperingen en de werkeenheden kon niet worden opgeslagen
+UnsavedChanges                      = Niet-opgeslagen wijzigingen
+SavingInProgress                    = Bezig met opslaan...
+Saved                               = Opgeslagen
+ErrorSaving                         = Fout bij het opslaan
+DigiriskElementOrganization         = Organisatie van de structuur
+ShareDigiriskelement                = Het delen van de groeperingen en werkeenheden activeren
+DIGIRISKELEMENTSharing              = Delen van de groeperingen en werkeenheden
+DIGIRISKELEMENTSharingDescription   = Selectie van de entiteiten die hun groeperingen en werkeenheden met deze entiteit delen.
+DigiriskElementSharedTooltip        = Met deze optie kunt u de groeperingen en werkeenheden delen. <br> INFO: als u de taken wilt kunnen weergeven, moet u de optie voor het delen van projecten activeren.
+PleaseSelectADigiriskElement        = Een groepering of een werkeenheid selecteren...
+Registers                           = Registers
+ShowInSelectOnPublicTicketInterface = Moet verschijnen in de elementenlijst van de openbare ticketinterface
+Organization                        = Organisatie GP/UT
+YouDontHaveOrganization             = U hebt geen groeperingen of werkeenheden aangemaakt, ga naar "Risico-inventarisatie" of klik <b> hier </b> om er aan te maken.
+
+
+#
+# Groupment - Groepering
+#
+
+# Gegevens
+Groupment                  = Groepering
+GroupmentManagement        = Beheer van de gegevens van de groeperingen
+NewGroupment               = Nieuwe groepering
+ModifyGroupment            = Groepering wijzigen
+TrashGroupment             = Prullenbakgroepering
+DeletedElements            = Prullenbak
+DeletedDigiriskElement     = Groeperingen / Werkeenheden in de prullenbak geplaatst
+ShowDeletedDigiriskElement = De groeperingen / werkeenheden weergeven die zich in de prullenbak bevinden
+
+#
+# WorkUnit - Werkeenheid
+#
+
+# Gegevens
+WorkUnit           = Werkeenheid
+Workunit           = Werkeenheid
+WorkUnitManagement = Beheer van de gegevens van de werkeenheden
+NewWorkUnit        = Nieuwe werkeenheid
+ModifyWorkUnit     = Werkeenheid wijzigen
+
+
+#
+# Evaluator - Beoordelaar
+#
+
+# Rechten
+EvaluatorsMin = beoordelaars
+
+# Gegevens
+Evaluator                    = Beoordelaar
+Evaluators                   = Beoordelaars
+EvaluatorCreated             = Aanmaken van een beoordelaar
+EvaluatorModified            = Wijzigen van een beoordelaar
+EvaluatorDeleted             = Verwijderen van een beoordelaar
+TheEvaluator                 = De beoordelaar
+EvaluatorWellCreated         = Beoordelaar aangemaakt
+EvaluatorNotCreated          = Fout bij het aanmaken van de beoordelaar
+EvaluatorList                = Lijst van de beoordelaars
+AssignmentDate               = Toewijzingsdatum
+EvaluationDuration           = Duur
+UserAssigned                 = Toegewezen gebruiker
+AddEvaluatorTitle            = Toevoegen van een beoordelaar
+AddEvaluatorButton           = De beoordelaar toevoegen
+EvaluatorConfig              = Instellingen van de gegevens van de beoordelaars
+DeleteEvaluatorMessage       = Verwijderen van de beoordelaar
+DigiriskEvaluatorData        = Configureerbare gegevens van de beoordelaars
+EvaluatorDuration            = Duur van de beoordeling door de beoordelaar
+EvaluatorDurationDescription = De tijd die de beoordelaar nodig heeft om zijn risicobeoordeling uit te voeren
+NbEmployeesInvolved          = Betrokken medewerkers
+NbEmployees                  = Medewerkers
+NbEmployeesInvolvedTooltip   = Unieke medewerkers (beoordelaars)
+NbEmployeesTooltip           = Als het centrale beheer van gebruikers en groepen op de hoofdentiteit is geactiveerd.<br>Het aantal medewerkers komt overeen met het aantal gedeelde/aan een groep toegewezen gebruikers en ook met het aantal beheerders van de hoofdentiteit
+NbEmployeesConfTooltip       = Het aantal medewerkers is handmatig ingevoerd
+
+
+#
+# DigiriskStandard - Digirisk-standaard
+#
+
+# Gegevens
+DigiriskStandardInformation = Informatie
+Digiriskstandard            = Digirisk-standaard
+DigiriskStandardMin         = Digirisk-standaarden
+TheDigiriskstandard         = de Digirisk-standaard
+
+
+#
+# RisksAnalysis - Risicoanalyse
+#
+
+# Gegevens
+RiskAnalysis = Risicoanalyse
+UpdateData   = Bijwerken
+
+#
+# Risks - Risico's
+#
+
+# Rechten
+RisksMin = risico's
+
+# Gegevens
+Risks                                    = Risico's
+Risk                                     = Risico
+Riskprofessionals                        = Beroepsrisico's
+RiskCreated                              = Aanmaken van een risico
+RiskModified                             = Wijzigen van een risico
+RiskDeleted                              = Verwijderen van een risico
+RiskConfig                               = Instellingen van de gegevens van de risico's
+TheRisk                                  = Het risico
+RiskWellCreated                          = Risico aangemaakt
+RiskNotCreated                           = Fout bij het aanmaken van het risico
+RiskWellEdited                           = Risico bewerkt
+RiskNotEdited                            = Fout bij het bewerken van het risico
+RiskList                                 = Risicolijst
+AddRiskTitle                             = Toevoegen van het risico
+AddRiskButton                            = Het risico toevoegen
+EditRisk                                 = Bewerken van het risico
+LinkedRisk                               = Gekoppeld risico
+RiskCategory                             = Cat.
+RiskCategoryEdit                         = Risicocategorie
+RiskCategoryEditDescription              = Het wijzigen van de categorie van een bestaand risico activeren
+HowToEditRiskCategory                    = Klik op het pictogram van de categorie om de categorie van het risico te wijzigen
+DigiriskElementRisksList                 = Lijst van de risico's
+DigiriskElementRisk                      = Risico's
+RiskDescriptionNotEnabled                = Het veld beschrijving van het risico is niet geactiveerd
+HowToEnableRiskDescription               = Ga naar "Module-instellingen -> Risico-inventarisatie" om het veld beschrijving van het risico te activeren
+HowToEnableRiskCategoryEdit              = Ga naar "Module-instellingen -> Risico-inventarisatie" om het wijzigen van de risicocategorie te activeren
+SortRisksListingsByEvaluation            = De risico's op beoordeling sorteren
+SortRisksListingsByEvaluationDescription = Het automatisch sorteren van de risico's op beoordeling in de lijsten activeren
+ListingHeaderEvaluation                  = Lijst van de beoordelingen
+RiskDescription                          = Beschrijving van het risico
+RiskDescriptionDescription               = Het veld beschrijving van het risico activeren
+RiskDescriptionNotActivated              = Activeer het veld beschrijving van het risico in Module-instellingen / Risicoanalyse / Risico's
+AddRisk                                  = Een risico toevoegen
+MoveRisk                                 = Het risico verplaatsen
+MoveRisks                                = De risico's verplaatsen
+MoveRisksDescription                     = Maakt het mogelijk risico's van de ene groepering of werkeenheid naar de andere te verplaatsen
+SetConfToMoveRisk                        = U moet eerst het verplaatsen van risico's toestaan in "Module-instellingen -> Risico-inventarisatie"
+RiskDescriptionPrefill                   = De beschrijving vooraf invullen
+RiskDescriptionPrefillDescription        = De beschrijving van het risico vooraf invullen met de naam van de categorie
+DigiriskElementSharedRisksList           = Lijst van de gedeelde risico's
+ImportSharedRisks                        = Gedeelde risico's importeren
+SelectAllSharedRisksOfElement            = Alle risico's van dit element selecteren
+AlreadyImported                          = Al geïmporteerd
+ShowSharedRisks                          = Gedeelde risico's
+ShareRisk                                = Het delen van de risico's activeren
+RISKSharing                              = Delen van de risico's
+RISKSharingDescription                   = Selectie van de entiteiten die hun risico's met deze entiteit delen.
+ShowSharedRisksDescription               = De gedeelde risico's weergeven in de documenten en de lijsten
+UnlinkSharedRisk                         = Het gedeelde risico ontkoppelen
+RiskWellUnlinkShared                     = Risico ontkoppeld
+RiskNotUnlinkShared                      = Fout bij het ontkoppelen van het risico
+HasBeenUnlinkSharedM                     = is ontkoppeld
+HasNotBeenUnlinkSharedM                  = is niet ontkoppeld
+RiskSharedTooltip                        = Met deze optie kunt u de risico's delen. <br> INFO: als u de taken wilt kunnen weergeven, moet u de optie voor het delen van projecten activeren.
+ShowInheritedRisksInListings             = Overgeërfde risico's - Lijsten <br> (afkomstig van de hogere niveaus)
+ShowInheritedRisksInListingsDescription  = Overgeërfde risico's zijn de risico's die op een hoger niveau (bijv. locatie of GP) zijn vastgesteld en automatisch op de GP/UT worden toegepast. <br> Activeer deze optie om ze in de lijsten weer te geven
+ShowInheritedRisksInDocuments            = Overgeërfde risico's - Documenten <br> (afkomstig van de hogere niveaus)
+ShowInheritedRisksInDocumentsDescription = Overgeërfde risico's zijn de risico's die op een hoger niveau (bijv. locatie of GP) zijn vastgesteld en automatisch op de GP/UT worden toegepast. <br> Activeer deze optie om ze in de documenten weer te geven
+DigiriskElementInheritedRisksList        = Lijst van de overgeërfde risico's
+ConfirmImportSharedRisks                 = Kies de te importeren gedeelde risico's
+RisksRepartition                         = Verdeling van de risico's per beoordeling
+ShowRiskOrigin                           = De herkomst van het risico weergeven
+ShowRiskOriginDescription                = De herkomst van de risico's weergeven in de documenten (Risico-inventarisatie, Groepering, Werkeenheden, Risicolijst met acties en met foto's enz.).
+SharedRiskImportWithSuccess              = Risico met succes geïmporteerd
+RiskImport                               = Import van risico's
+RiskUnlink                               = Verwijderen van het gedeelde risico
+RiskDeleted                              = Het risico %s is verwijderd
+RiskSharedWithEntityRefLabel             = Delen van het risico %s met
+RiskUnlinkedFromEntityRefLabel           = Ontkoppelen van het risico %s van
+TheDigiriskelement                       = het Digirisk-element
+DefaultProjectContactType                = Standaardrol toegekend aan het project van de risico-inventarisatie
+DefaultTaskContactType                   = Standaardrol toegekend aan de taken van het project van de risico-inventarisatie
+RiskListParentView                       = Alle bovenliggende elementen weergeven
+RiskListParentViewDescription            = Alle bovenliggende elementen van een risico weergeven in de risicolijst en in de documenten
+CategoryOnRisk                           = De tags/categorieën op de risico's weergeven
+CategoryOnRiskDescription                = Maakt het mogelijk tags/categorieën aan de risico's toe te kennen en weer te geven - met voorzichtigheid gebruiken
+AddPsychosocialRisk                      = Een psychosociaal risico toevoegen
+AddPsychosocialRiskTitle                 = Toevoegen van een psychosociaal risico
+AddPsychosocialRiskButton                = Het psychosociale risico toevoegen
+AddSelectedPsychosocialRisks             = De geselecteerde psychosociale risico's toevoegen
+SocialRelationsAtWork                    = Sociale verhoudingen op het werk
+WorkIntensityAndTime                     = Werkintensiteit en werktijd
+EmotionalRequirements                    = Emotionele eisen
+Autonomy                                 = Autonomie
+MeaningOfWork                            = Zingeving van het werk
+WorkSituationInsecurity                  = Onzekerheid van de werksituatie
+PreventionContextInCompany               = Preventiecontext in het bedrijf
+RPSImpactOnCompanyAndEmployees           = Impact van de psychosociale risico's op het bedrijf en de medewerkers
+PsychosocialRisksFactors                 = Psychosociale risicofactoren
+CompanyPreventionInformations            = Informatie over de preventie in het bedrijf
+Weak                                     = Laag
+Moderate                                 = Matig
+High                                     = Hoog
+Extreme                                  = Extreem
+HereIsTheWorkStationDescription          = Dit is de beschrijving van de werkplek
+ImageAnalysis                            = Beeldanalyse
+TextAnalysis                             = Tekstanalyse
+AnalyzeText                              = De tekst analyseren
+EnterTextForAnalysis                     = Voer de te analyseren tekst in
+AIRiskAnalysis                           = Risicoanalyse door AI
+AnalysisInProgress                       = Analyse bezig...
+
+# Statistieken
+GreyRisk                                         = Laag risico
+OrangeRisk                                       = Te plannen risico
+RedRisk                                          = Te behandelen risico
+BlackRisk                                        = Onaanvaardbaar risico
+RisksNotAssessed                                 = Niet-beoordeelde risico's
+RisksRepartitionByDangerCategories               = Verdeling van de risico's per gevarencategorie
+RiskListsByDangerCategories                      = Lijst van de risico's per gevarencategorie
+DigiriskElementsRepartitionByDepth               = Verdeling van de structuur van de groeperingen van niveau %s
+RisksRepartitionByDangerCategoriesAndCriticality = Verdeling van de risico's per gevarencategorie en kriticiteit
+NumberOfRisks                                    = Aantal risico's
+DangerCategories                                 = Gevarencategorieën
+RisksRepartitionByDigiriskElement                = Verdeling van de risico's per groepering / werkeenheid %s
+
+
+
+#
+# RiskEnvironmentals - Milieurisico's
+#
+
+# Gegevens
+Environment                                    = Milieu
+Riskenvironmental                              = Milieurisico
+RiskEnvironmentals                             = Milieurisico's
+Riskenvironmentals                             = Milieurisico's
+RiskEnvironmentalsMin                          = milieurisico's
+AddRiskenvironmentalTitle                      = Toevoegen van het milieurisico
+DigiriskElementRiskenvironmentalsList          = Lijst van de milieurisico's
+DigiriskElementInheritedRiskenvironmentalsList = Lijst van de overgeërfde milieurisico's
+DigiriskElementSharedRiskenvironmentalsList    = Lijst van de gedeelde milieurisico's
+ImportSharedRiskenvironmentals                 = Gedeelde milieurisico's importeren
+SelectAllSharedRiskenvironmentalsOfElement     = Alle milieurisico's van dit element selecteren
+ConfirmImportSharedRiskenvironmentals          = Kies de te importeren gedeelde milieurisico's
+EnvironmentDescription                         = Planning - Acties om risico's en kansen aan te pakken
+
+#
+# ListingRisksEnvironmentalAction - Lijst van milieurisico's met corrigerende acties
+#
+
+# Recht
+ListingRisksEnvironmentalActionMin = Lijst van milieurisico's met corrigerende acties
+
+# Gegevens
+ListingRisksEnvironmentalAction            = Lijst van milieurisico's met corrigerende acties
+Listingrisksenvironmentalaction            = Lijst van milieurisico's met corrigerende acties
+ListingRisksEnvironmentalActionGenerated   = Genereren van de lijst van milieurisico's met corrigerende acties
+listingrisksenvironmentalaction.odt        = Lijst van milieurisico's met corrigerende acties
+listingrisksenvironmentalaction_custom.odt = Aangepaste lijst van milieurisico's met corrigerende acties
+
+#
+# ListingRisksEnvironmentalDocument - Lijst van milieurisico's met documenten
+#
+
+# Gegevens
+ListingRisksEnvironmentalDocument = Lijst van milieurisico's
+
+
+
+#
+# RiskAssessment - Beoordeling
+#
+
+# Gegevens
+RiskAssessment                              = Beoordeling
+Riskassessment                              = Beoordeling
+RiskAssessments                             = Beoordelingen
+RiskAssessmentCreated                       = Aanmaken van een beoordeling
+RiskAssessmentModified                      = Wijzigen van een beoordeling
+RiskAssessmentDeleted                       = Verwijderen van een beoordeling
+RiskAssessmentConfig                        = Instellingen van de gegevens van de beoordelingen
+TheRiskAssessment                           = De beoordeling
+LastRiskAssessment                          = Laatste beoordeling van het risico
+RiskAssessmentWellCreated                   = Beoordeling aangemaakt
+RiskAssessmentNotCreated                    = Fout bij het aanmaken van de beoordeling
+RiskAssessmentWellEdited                    = Beoordeling bewerkt
+RiskAssessmentNotEdited                     = Fout bij het bewerken van de beoordeling
+RiskAssessmentWellDeleted                   = Beoordeling verwijderd
+RiskAssessmentNotDeleted                    = Fout bij het verwijderen van de beoordeling
+EvaluationCreate                            = Toevoegen van de beoordeling
+EvaluationEdit                              = Bewerken van de beoordeling
+EvaluationMethod                            = Beoordelingsmethode
+lastEvaluationOn                            = Laatste beoordeling op
+DeleteEvaluation                            = Weet u zeker dat u de beoordeling wilt verwijderen?
+DigiriskRiskAssessmentData                  = Configureerbare gegevens van de beoordelingen
+MultipleRiskAssessmentMethodName            = Beoordelingsmethoden
+MultipleRiskAssessmentMethodDescription     = Het wisselen van beoordelingsmethode activeren
+AdvancedRiskAssessmentMethod                = Geavanceerde beoordelingsmethode
+AdvancedRiskAssessmentMethodDescription     = De geavanceerde beoordelingsmethode activeren
+RiskAssessmentList                          = Lijst van de beoordelingen van het risico
+EditRiskAssessment                          = De beoordeling bewerken
+ShowAllRiskAssessments                      = Alle beoordelingen bekijken
+ShowAllRiskAssessmentsDescription           = De volledige lijst van de risicobeoordelingen weergeven in de risicolijst
+ParentRisk                                  = Bovenliggend risico
+RiskAssessmentDate                          = Datum van de beoordeling
+SimpleEvaluation                            = Eenvoudige beoordeling
+AdvancedEvaluation                          = Geavanceerde beoordeling
+CalculatedEvaluation                        = Berekende beoordeling
+SelectEvaluation                            = Vink de vakjes aan om uw beoordeling te berekenen
+EvaluationList                              = Lijst van de beoordelingen van het risico
+HowToSetMultipleRiskAssessmentMethod        = Ga naar Module-instellingen - Risicoanalyse - Beoordeling om het meervoudig gebruik van de beoordelingsmethoden in te stellen
+NoFileLinked                                = Geen gekoppelde foto
+AddRiskAssessment                           = Een beoordeling van het risico toevoegen
+AddRiskAssessmentTask                       = Een taak aan het risico toevoegen
+ListRiskAssessmentTask                      = Lijst van de taken van het risico
+ShowRiskAssessmentDate                      = Datum van de beoordelingen
+ShowRiskAssessmentDateDescription           = Vervangt de aanmaakdatum door de begindatum van de beoordelingen in de fiche en de documenten
+RiskAssessmentHideDateInDocument            = De datum van de beoordeling verbergen in de documenten
+RiskAssessmentHideDateInDocumentDescription = De datum van de beoordeling verbergen in de kolom "Informatie over de beoordeling" in de documenten
+RiskTaskComplete                            = Taak %s voltooid
+
+# Statistieken
+TasksRepartition = Verdeling van de taken per gemelde werkelijke voortgang
+TaskAt0Percent   = Taak op 0
+TaskInProgress   = Lopende taak
+TaskAt100Percent = Taak op 100
+
+
+#
+# RiskSign - Signalering
+#
+
+# Rechten
+RiskSignsMin = signaleringen
+
+# Gegevens
+RiskSign                           = Signalering
+RiskSignCreated                    = Aanmaken van een signalering
+RiskSignModified                   = Wijzigen van een signalering
+RiskSignDeleted                    = Verwijderen van een signalering
+TheRiskSign                        = De signalering
+RiskSignConfig                     = Instellingen van de gegevens van de signaleringen
+RiskSignWellCreated                = Signalering aangemaakt
+RiskSignNotCreated                 = Fout bij het aanmaken van de signalering
+RiskSignWellEdited                 = Signalering bewerkt
+RiskSignNotEdited                  = Fout bij het bewerken van de signalering
+RiskSignWellDeleted                = Signalering verwijderd
+RiskSignNotDeleted                 = Fout bij het verwijderen van de signalering
+RiskSignCategory                   = Categorie
+RiskSignImport                     = Import van signaleringen
+RiskSignUnlink                     = Verwijderen van de gedeelde signalering
+AddRiskSignTitle                   = Toevoegen van een signalering
+AddRiskSignButton                  = De signalering toevoegen
+EditRiskSign                       = Bewerken van een signalering
+DeleteRiskSignMessage              = Verwijderen van de signalering
+DigiriskElementRiskSignList        = Lijst van de signaleringen
+RiskSigns                          = Signaleringen
+DigiriskElementSharedRiskSignsList = Lijst van de gedeelde signaleringen
+ImportSharedRiskSigns              = Gedeelde signaleringen importeren
+SelectAllSharedRiskSignsOfElement  = Alle signaleringen van dit element selecteren
+AlreadyImportedF                   = Al geïmporteerd
+ShowSharedRiskSigns                = Gedeelde signaleringen
+ShowSharedRiskSignsDescription     = De gedeelde signaleringen weergeven in de documenten en de lijsten
+DigiriskElementSharedRiskSign      = Gedeelde signaleringen
+SharedRiskSigns                    = Gedeelde signaleringen
+ShareRisksign                      = Het delen van de signaleringen activeren
+RISKSIGNSharing                    = Delen van de signaleringen
+RISKSIGNSharingDescription         = Selectie van de entiteiten die hun signaleringen met deze entiteit delen.
+UnlinkSharedRiskSign               = De gedeelde signalering ontkoppelen
+RiskSignWellUnlinkShared           = Signalering ontkoppeld
+RiskSignNotUnlinkShared            = Fout bij het ontkoppelen van de signalering
+HasBeenUnlinkSharedF               = is ontkoppeld
+HasNotBeenUnlinkSharedF            = is niet ontkoppeld
+RiskSignSharedTooltip              = Met deze optie kunt u de signaleringen delen. <br> INFO: als u de taken wilt kunnen weergeven, moet u de optie voor het delen van projecten activeren.
+ShowInheritedRiskSigns             = Overgeërfde signaleringen
+ShowInheritedRiskSignsDescription  = De overgeërfde signaleringen weergeven in de documenten en de lijsten
+DigiriskElementInheritedRiskSignsList = Lijst van de overgeërfde signaleringen
+ConfirmImportSharedRiskSigns       = Kies de te importeren gedeelde signaleringen
+RiskSignSharedWithEntityRefLabel   = Delen van de signalering %s met
+RiskSignUnlinkedFromEntityRefLabel = Ontkoppelen van de signalering %s van
+
+#
+# Tasks - Taak
+#
+
+# Gegevens
+ActionPlan                               = Actieplan
+Task                                     = Taak
+TaskCreatedEvent                         = Aanmaken van een taak
+TaskModifiedEvent                        = Wijzigen van een taak
+TaskDeletedEvent                         = Verwijderen van een taak
+TheTask                                  = De taak
+TaskConfig                               = Instellingen van de gegevens van de taken
+TaskWellCreated                          = Taak aangemaakt
+TaskNotCreated                           = Fout bij het aanmaken van de taak
+TaskWellEdited                           = Taak bewerkt
+TaskNotEdited                            = Fout bij het bewerken van de taak
+TaskWellDeleted                          = Taak verwijderd
+TaskNotDeleted                           = Fout bij het verwijderen van de taak
+TasksManagement                          = Beheer van de taken
+SelectProject                            = Keuze van het project
+DUProject                                = Aan de taken van de risico's gekoppeld project
+EnvironmentProject                       = Aan de taken van de milieurisico's gekoppeld project
+NoTaskLinked                             = Geen lopende taak
+TaskList                                 = Lijst van de taken van het risico
+TaskCreate                               = Toevoegen van de taak
+TaskEdit                                 = Bewerken van de taak
+HowToSetDUProject                        = Ga naar Module-instellingen - Risicoanalyse - Taak om de keuze van het project in te stellen
+DeleteTask                               = Weet u zeker dat u de taak wilt verwijderen?
+ListingHeaderTask                        = Lijst van de taken
+ListingHeaderTaskTooltip                 = Activeer het delen van projecten om de taken weer te geven
+TasksManagementDescription               = Het taakbeheer activeren
+TaskManagementNotActivated               = Activeer het taakbeheer in Module-instellingen / Risicoanalyse / Taak
+DigiriskProgress                         = Voortgang
+ShowTaskStartDate                        = Begindatum van de taken
+ShowTaskStartDateDescription             = Vervangt de aanmaakdatum door de begindatum van de taken in de fiche en de documenten
+ShowTaskEndDate                          = Einddatum van de taken
+ShowTaskEndDateDescription               = De einddatum van de taken weergeven
+ShowTasksDone                            = Voltooide taken
+ShowTasksDoneDescription                 = De op 100 voltooide taken weergeven
+ShowTasksDoneDescriptionExtend           = in de risicolijsten
+ShowTaskCalculatedProgress               = Voortgang van de taak
+ShowTaskCalculatedProgressDescription    = De berekende voortgang van de taak weergeven in plaats van de gemelde voortgang
+ShowAllTasks                             = Alle taken van een risico in de lijsten
+ShowAllTasksDescription                  = Alle taken weergeven in de takenlijst van een risico in de lijsten
+DeleteTaskTimeSpent                      = Weet u zeker dat u %s min bestede tijd van de taak wilt verwijderen?
+TaskTimeSpentEdit                        = Bewerken van de bestede tijd van de taak
+TheTaskTimeSpent                         = De bestede tijd
+TaskTimeSpentCreated                     = Aanmaken van bestede tijd
+TaskTimeSpentModified                    = Wijzigen van bestede tijd
+TaskTimeSpentDeleted                     = Verwijderen van bestede tijd
+TaskTimeSpentWellCreated                 = Bestede tijd aangemaakt
+TaskTimeSpentNotCreated                  = Fout bij het aanmaken van de bestede tijd
+TaskTimeSpentWellEdited                  = Bestede tijd bewerkt
+TaskTimeSpentNotEdited                   = Fout bij het bewerken van de bestede tijd
+TaskTimeSpentWellDeleted                 = Bestede tijd verwijderd
+TaskTimeSpentNotDeleted                  = Fout bij het verwijderen van de bestede tijd
+OnTheTask                                = op de taak
+TaskTimeSpentDuration                    = Duur van de bestede tijd
+TaskTimeSpentDurationDescription         = De bestede tijd die standaard aan elke taak wordt toegevoegd
+NoTaskShared                             = Geen gedeelde taken
+WarningTaskLabel                         = Let op, u hebt het maximaal toegestane aantal tekens (255) overschreden
+ErrorRecordHasSubTasks                   = De taak heeft onderliggende elementen
+TotalConsumedTime                        = Totale bestede tijd op het project
+TotalConsumedTimeAmount                  = Kosten van de bestede tijd
+NbTasks                                  = Aantal taken
+TotalProgress                            = Totale werkelijke voortgang van de taken
+TotalBudget                              = Som van het budget van de taken
+TaskTimeSpentDate                        = Datum van de bestede tijd
+StartDateCannotBeAfterEndDate            = De einddatum mag niet vóór de begindatum liggen
+TasksFromProject                         = De weergegeven taken komen uit het project dat is ingesteld als "Project risico-inventarisatie"
+TaskHideRefInDocument                    = De referentie verbergen
+TaskHideRefInDocumentDescription         = De referentie van de taak verbergen in de documenten
+TaskHideResponsibleInDocument            = De verantwoordelijke verbergen
+TaskHideResponsibleInDocumentDescription = De verantwoordelijke van de taak verbergen in de documenten
+TaskHideDateInDocument                   = De datum verbergen
+TaskHideDateInDocumentDescription        = De begin- en einddatum van de taak verbergen in de documenten
+TaskHideBudgetInDocument                 = Het budget verbergen
+TaskHideBudgetInDocumentDescription      = Het budget van de taak verbergen in de documenten
+
+#
+# DigiAI - DigiAI
+#
+
+# Gegevens
+WelcomeToDigiAI = Welkom bij DigiAI
+UploadAnImage = Een afbeelding uploaden
+OpenAIApiKey = OpenAI API-sleutel
+OpenAIApiKeyDescription = Om DigiAI te gebruiken hebt u een OpenAI API-sleutel nodig. U kunt er een verkrijgen door een account aan te maken op <a href="https://platform.openai.com/signup" target="_blank">https://platform.openai.com/signup</a>. Na registratie kunt u een API-sleutel genereren in het gedeelte "API Keys" van uw dashboard.
+
+#
+# Ticket - Openbare ticketinterface
+#
+
+# Rechten
+TicketTagsConfig                         = Wijzigen van de registers arbeidsveiligheid en -gezondheid
+
+# Gegevens
+Register                                 = Register
+Send                                     = Versturen
+TicketSent                               = Ticket verstuurd
+FilesLinked                              = Foto's / Bijlagen
+AddDocument                              = Document toevoegen
+LastnamePlaceholder                      = Voorbeeld: Jansen
+FirstnamePlaceholder                     = Voorbeeld: Jan
+PhonePlaceholder                         = 00.00.00.00.00
+LocationPlaceholder                      = Voorbeeld: Kantoor A
+ServicePlaceholder                       = Voorbeeld: Belader
+Location                                 = Plaats
+CategoriesCreated                        = Aanmaken van de ticketcategorieën
+ExtrafieldsCreated                       = Aanmaken van de extra velden voor tickets
+AnticipatedLeave                         = Vervroegd vertrek
+DGI                                      = Ernstig en onmiddellijk gevaar
+SST                                      = Veiligheid en gezondheid op het werk
+PresquAccident                           = Bijna-ongeval
+Accident                                 = Ongeval
+EnhancementSuggestion                    = Verbetervoorstel
+MaterialProblem                          = Materieel probleem
+HumanProblem                             = Menselijk probleem
+Others                                   = Overig
+AccidentWithoutDIAT                      = Licht ongeval
+AccidentWithDIAT                         = Arbeidsongeval
+Environment                              = Milieu
+Quality                                  = Kwaliteit
+NonCompliance                            = Non-conformiteit
+FirstName                                = Voornaam
+LastName                                 = Achternaam
+Phone                                    = Telefoon
+DeclarationDate                          = Melding
+DigiriskTicketPublicAccess               = Op de volgende URL is een openbare interface beschikbaar waarvoor geen identificatie nodig is
+TicketActivatePublicInterface            = De openbare interface activeren
+GenerateExtrafields                      = Genereren van de standaard extra velden voor tickets
+GenerateTicketCategories                 = Genereren van de standaard ticketcategorieën
+AlreadyGenerated                         = Al gegenereerd
+NotGenerated                             = Nog niet gegenereerd
+NotCreated                               = Nog niet aangemaakt
+ExtrafieldsGeneration                    = Met deze optie worden de standaard extra velden van de tickets gegenereerd. De aangemaakte velden zijn: <br> Achternaam, Voornaam, Telefoon, GP/UT, Plaats en Datum
+CategoriesGeneration                     = Met deze optie worden de standaardcategorieën van de tickets gegenereerd. De aangemaakte categorieën zijn: <br> - Register <br> - - Ongeval <br> - - - Bijna-ongeval, Licht ongeval, Arbeidsongeval <br> - - Veiligheid en gezondheid op het werk <br> - - - Vervroegd vertrek, Overige, Menselijk probleem, Materieel probleem <br> - - Ernstig en onmiddellijk gevaar <br> - - Kwaliteit <br> - - - Non-conformiteit, Verbetervoorstel <br> - - Milieu <br> - - - Non-conformiteit, Overige
+TicketSuccess                            = Uw registermelding is doorgestuurd naar de preventiedienst onder het nummer:
+TicketPublicAccess                       = Terugkoppeling naar de openbare ticketinterface:
+TicketShowCompanyLogo                    = Het logo van het bedrijf weergeven in de openbare interface
+TicketShowCompanyLogoHelp                = Activeer deze optie om het logo van het bedrijf te verbergen op de pagina's van de openbare interface
+YouMustNotifyYourHierarchy               = U bent <b>verplicht</b> uw leidinggevende op de hoogte te stellen
+GoBackToTicketCreation                   = Ga naar de pagina voor het volgen van tickets
+SendEmailOnTicketSubmit                  = E-mails versturen bij het aanmaken
+CatTicketsList                           = Lijst van de tags/categorieën van de tickets
+SendEmailTo                              = Te informeren e-mailadres
+SendEmailOnTicketSubmitHelp              = Het automatisch versturen van een e-mail bij het aanmaken van een ticket activeren
+MultipleEmailsSeparator                  = Scheid meerdere te informeren e-mailadressen met een ";". Bijvoorbeeld: "aaaa@bbb.cc;dddd@eee.ff"
+TicketCategories                         = Categorieën van de tickets
+TicketDocumentsConfig                    = Documenten van de tickets
+TicketExtrafields                        = Extra velden van de tickets
+MainCategorySetting                      = Met deze optie bepaalt u van welke categorie de subcategorieën in de openbare interface verschijnen
+TicketCategoriesInDocumentsSetting       = Met deze optie kiest u welke ticketcategorieën worden weergegeven in de ticketlijst van de documenten (Risico-inventarisatie, fiche van de groepering enz.). Als er geen categorie is geselecteerd, worden alle categorieën weergegeven
+ParentCategorySetting                    = Met deze optie bepaalt u de titel van de bovenliggende categorie voor de openbare ticketinterface
+ChildCategorySetting                     = Met deze optie bepaalt u de titel van de onderliggende categorie voor de openbare ticketinterface
+TicketManagement                         = Beheer van de tickets
+MainCategory                             = Keuze van de hoofdcategorie
+TicketCategoriesInDocuments              = Categorieën weergegeven in de documenten
+ParentCategoryLabel                      = Titel van de bovenliggende categorie
+ChildCategoryLabel                       = Titel van de onderliggende categorie
+TicketPublicInterfaceEnabled             = De openbare ticketinterface is geactiveerd
+TicketPublicInterfaceDisabled            = De openbare ticketinterface is gedeactiveerd
+TicketPublicInterface                    = Openbare interface
+EmailsToNotifySet                        = De te informeren e-mailadressen zijn opgeslagen
+MainCategorySet                          = De hoofdcategorie is ingesteld
+TicketCategoriesInDocumentsSet           = De in de documenten weergegeven categorieën zijn ingesteld
+ParentCategoryLabelSet                   = De titel van de bovenliggende categorie is ingesteld
+ChildCategoryLabelSet                    = De titel van de onderliggende categorie is ingesteld
+TicketPublicInterfaceConfigDocumentation = Raadpleeg de documentatie om de openbare ticketinterface in te stellen
+ParentCategory                           = Bovenliggende categorie
+TSProject                                = Aan de tickets gekoppeld project
+TicketDescription                        = Project van de tickets
+TicketProjectUpdated                     = Het standaardproject van de tickets is bijgewerkt
+QRCodeAlreadyGenerated                   = QR-code gegenereerd
+GenerateQRCode                           = De QR-code genereren
+CompanyQRCodeGeneration                  = Genereren van de QR-code van de entiteit
+QRCodeGeneration                         = Genereren van de QR-code
+MultiCompanyQRCodeGeneration             = Genereren van de QR-code voor meerdere entiteiten
+TicketCreationMailWellSent               = Bevestigingsmail voor het aanmaken van het ticket verstuurd
+TicketCreationMailSent                   = De e-mail voor het aanmaken van het ticket is verstuurd naar %s
+HowToSetupTicketCategories               = Klik op deze link om de ticketcategorieën in te stellen:
+ConfigTicketCategories                   = Instellingen van de ticketcategorieën
+NewTicketSubmitted                       = Er is een ticket ingediend via de openbare interface
+ANewTicketHasBeenSubmitted               = Nieuw veiligheidsregister aangemaakt voor %s
+TicketCreationSubject                    = Aanmaken van een ticket via de openbare interface van Digirisk
+TicketDocumentCustomDigiriskTemplate     = Aangepaste ODT van de ticketfiches
+HowToSetupDigiriskElement                = Klik op deze link om de Digirisk-elementen (groeperingen/werkeenheden) in te stellen:
+ConfigDigiriskElement                    = Instellingen van de Digirisk-elementen
+ErrorFieldEmail                          = Fout: het e-mailadres moet overeenkomen met het volgende formaat: <b>'aaa@aaa.fr'</b>
+ErrorFieldPhone                          = Fout: het telefoonnummer moet overeenkomen met het volgende formaat: <b>'0XXXXXXXXXXX'</b> of <b>'+33XXXXXXXXX'</b>
+TicketEmailRequired                      = E-mail verplicht om een ticket aan te maken
+TicketEmailRequiredHelp                  = Activeer deze optie om het invoeren van een e-mailadres verplicht te maken bij het aanmaken van een ticket in de openbare interface
+WelcomeToPublicTicketInterface           = Welkom bij de openbare ticketinterface
+PleaseSelectAnEntity                     = Selecteer een entiteit:
+ShowSelectorOnTicketPublicInterface      = De entiteitkiezer weergeven in de openbare ticketinterface in plaats van de lijst met entiteiten
+ShowSelectorOnTicketPublicInterfaceHelp  = De entiteitkiezer weergeven in de openbare ticketinterface in plaats van de lijst met entiteiten met hun logo
+MultiEntityPublicInterface               = Openbare ticketinterface voor meerdere bedrijven
+TicketCategoriesNotCreated               = U hebt geen ticketcategorieën aangemaakt
+TicketPublicInterfaceQRCode              = QR-code van de openbare ticketinterface
+MultiEntityTicketPublicInterfaceQRCode   = QR-code van de openbare ticketinterface voor meerdere bedrijven
+PublicInterfaceConfiguration             = Zichtbare / verplichte velden van de openbare interface
+TicketNumber                             = Ticketnr.
+FromAndDate                              = Herkomst en datum
+AuthorRequest                            = Aanvrager
+DateCloture                              = Afsluitdatum
+
+PublicInterfaceUseSignatory              = Handtekening verplicht om dit register te melden
+ValidateText                             = Te aanvaarden voorwaarden voor de ondertekening
+TicketPublicInterfaceShowCategory        = De beschrijving van de categorie weergeven
+EmailTemplate                            = E-mailsjabloon
+EmailTemplateDescription                 = E-mailsjabloon
+
+OpenInNewTab                             = In een nieuw tabblad openen
+TicketDigiriskElementRequired            = GP/UT verplicht om een ticket aan te maken
+TicketDigiriskElementRequiredHelp        = Activeer deze optie om het selecteren van een GP/UT verplicht te maken bij het aanmaken van een ticket in de openbare interface
+TicketDigiriskElementHideRef             = De referentie van de GP/UT verbergen in de afdelingskiezer van de openbare interface
+TicketDigiriskElementHideRefHelp         = Activeer deze optie om de referentie van een GP/UT te verbergen in de openbare interface
+TicketDigiriskelementVisible             = Het veld GP/UT weergeven om een ticket aan te maken
+TicketServiceVisible                     = Het veld GP/UT weergeven om een ticket aan te maken
+TicketDigiriskelementVisibleHelp         = Activeer deze optie om het veld GP/UT weer te geven in de openbare interface en het zo nodig verplicht te maken
+TicketServiceVisibleHelp                 = Activeer deze optie om het veld GP/UT weer te geven in de openbare interface en het zo nodig verplicht te maken
+TicketPhotoVisible                       = Het veld Foto weergeven om een ticket aan te maken
+TicketPhotoVisibleHelp                   = Activeer deze optie om het veld Foto weer te geven in de openbare interface
+TicketEmailVisible                       = Het veld E-mail weergeven om een ticket aan te maken
+TicketEmailVisibleHelp                   = Activeer deze optie om het veld E-mail weer te geven in de openbare interface en het zo nodig verplicht te maken
+TicketLastnameVisible                    = Het veld Achternaam weergeven om een ticket aan te maken
+TicketLastnameVisibleHelp                = Activeer deze optie om het veld Achternaam weer te geven in de openbare interface en het zo nodig verplicht te maken
+TicketFirstnameVisible                   = Het veld Voornaam weergeven om een ticket aan te maken
+TicketFirstnameVisibleHelp               = Activeer deze optie om het veld Voornaam weer te geven in de openbare interface en het zo nodig verplicht te maken
+TicketPhoneVisible                       = Het veld Telefoon weergeven om een ticket aan te maken
+TicketPhoneVisibleHelp                   = Activeer deze optie om het veld Telefoon weer te geven in de openbare interface en het zo nodig verplicht te maken
+TicketLocationVisible                    = Het veld Plaats weergeven om een ticket aan te maken
+TicketLocationVisibleHelp                = Activeer deze optie om het veld Plaats weer te geven in de openbare interface en het zo nodig verplicht te maken
+TicketDateVisible                        = Het veld Datum weergeven om een ticket aan te maken
+TicketDateVisibleHelp                    = Activeer deze optie om het veld Datum weer te geven in de openbare interface en het zo nodig verplicht te maken
+QRCodeGenerated                          = QR-code gegenereerd
+FkTicket                                 = Gekoppeld ticket
+PublicTicket                             = Openbare ticketinterface
+TicketPublicInterfaceForbidden           = Toegang tot de openbare ticketinterface geweigerd
+DefaultUserGroup                         = Standaardgroep
+DefaultUserGroupDescription              = Standaardgroep in de groepskiezers
+ConfigureDefaultUserGroup                = De standaardgroep instellen
+RegisterSigned                           = Register ondertekend
+
+#Openbare interface
+TicketPublicInterfaceShowCategoryDescription     = De beschrijving van de ticketcategorieën weergeven in de openbare interface
+TicketPublicInterfaceShowCategoryDescriptionHelp = Activeer deze optie om de beschrijving van de ticketcategorieën weer te geven in de openbare interface
+
+
+# Statistieken
+TicketStatistics    = Statistieken van de tickets
+ExportCSV           = CSV-export
+GenerateCSV         = Het CSV-bestand genereren
+SuccessGenerateCSV  = CSV-bestand %s met succes gegenereerd
+ErrorMissingData    = Fout: het CSV-bestand kon niet worden gegenereerd, de naar het bestand verstuurde gegevens zijn onjuist. <br> Controleer of er GP/UT aan tickets zijn toegewezen.
+CSVFileExport       = Export van de registers in CSV-formaat gekoppeld aan GP/UT
+ThirdPartyHelp      = Als het filter "Relatie" leeg is, wordt er geen relatie gebruikt voor de zoekopdracht
+GP/UTHelp           = Standaard neemt het filter alle GP/UT mee
+CategoryTicketHelp  = Standaard neemt het filter alle categorieën mee
+CreatedByHelp       = Als het filter "Aangemaakt door" leeg is, wordt er geen gebruiker gebruikt voor de zoekopdracht
+AssignedToHelp      = Als het filter "Toegewezen aan" leeg is, wordt er geen gebruiker gebruikt voor de zoekopdracht
+StatusHelp          = Standaard neemt het filter alle statussen mee<br>
+ConcernedTimePeriod = In aanmerking genomen periode
+LessThan            = Minder dan
+MoreThan            = Meer dan
+Comparator          = Vergelijker
+RangeNumber         = Hoeveelheid
+TimeRange           = Tijdseenheid
+RangeLabel          = Naam van de voorwaarde
+Inferior            = Kleiner dan
+Superior            = Groter dan
+TimeRangeAdded      = Voorwaarde toegevoegd
+TimeRangeDeleted    = Voorwaarde verwijderd
+
+NumberOfTicketsByMainCategorieAndDigiriskElement    = Aantal registers per categorie en per GP
+NumberOfTicketsByMainSubCategorieAndDigiriskElement = Aantal registers per subcategorie en per GP
+NumberOfTicketsByYear                           = Aantal tickets per jaar
+
+# Ticket Management Dashboard - Dashboard ticketbeheer
+TicketManagementDashboard                 = Dashboard ticketbeheer
+RunningTicket                             = Lopende tickets
+NbOfOpenedTicket                          = Aantal openstaande tickets
+OldestTicket                              = Oudste ticket
+OldestTicketDescription                   = Oudste ticket met de verstreken tijd sinds het aanmaken
+OldestMessageTicket                       = Oudste ticket met een bericht
+OldestMessageTicketDescription            = Oudste ticket met een bericht en de verstreken tijd sinds het aanmaken van het bericht
+MeanAnswerTime                            = Gemiddelde reactietijd
+MeanAnswerTimeDescription                 = Gemiddelde tijd tussen openen en afsluiten, uitsluitend berekend over de afgesloten tickets
+MeanFirstResponseTime                     = Gemiddelde tijd tot de eerste reactie
+MeanFirstResponseTimeDescription          = Gemiddelde tijd tussen het openen van het ticket en het eerste voor de melder zichtbare bericht. Interne notities tellen niet mee en tickets zonder openbaar bericht zijn uitgesloten van de berekening
+NbTicketPerUser                           = Gemiddeld aantal toegewezen tickets per persoon
+NbExchangePerTicket                       = Aantal uitwisselingen per ticket
+TicketRepartitionPerUserAndMeanAnswerTime = Verdeling van de tickets per gebruiker en gemiddelde reactietijd
+TopSocietyWithMostTickets                 = Top %s van de bedrijven met de meeste tickets
+TicketsCreatedVersusClosedByMonth         = Aangemaakte en afgesloten tickets in de laatste %s maanden
+TicketsCreated                            = Aangemaakt
+TicketsClosed                             = Afgesloten
+OpenTicketsByStatus                       = Verdeling van de openstaande tickets per status
+OpenTicketBacklogAge                      = Ouderdom van de openstaande tickets (sinds het aanmaken)
+BacklogAgeUnderDays                       = Minder dan %s dagen
+BacklogAgeBetweenDays                     = Van %s tot %s dagen
+BacklogAgeOverDays                        = Meer dan %s dagen
+ShowSelectedDateTypes                     = Selecteer het weer te geven datumtype
+
+# E-mail
+The                            = Op
+TicketMessage                  = Bericht van het register
+SeeTicketUrl                   = Het ticket bekijken
+AutoNotificationTicket         = E-mailmelding automatisch verstuurd door
+TicketPublicInterfaceOtherName = Beheerinterface van de registers arbeidsveiligheid en -gezondheid en ernstig en onmiddellijk gevaar
+
+
+
+# Ticketdocument
+
+# Gegevens
+TicketDocument                 = Fiche van het ticket
+Ticketdocument                 = Fiche van het ticket
+ticketdocument.odt             = Fiche van het ticket
+ticketdocument_custom.odt      = Aangepaste fiche van het ticket
+ticketdocument_events.odt      = Fiche van het ticket met gebeurtenissen
+ticketdocument_sign.odt        = Fiche van het ticket met handtekening
+ticketdocument_event_sign.odt  = Fiche van het ticket met gebeurtenis en handtekening
+TicketSuccessMessage           = Succesbericht van het ticket
+TicketSuccessMessageSet        = Het bericht is gewijzigd
+TicketDocumentPDF              = FT-A4-LIGGEND
+TicketDocumentPDFDescription   = De fiche van het ticket weergeven
+GeneratedTicketDocumentDate    = Exportdatum van dit ticket
+
+
+# Projectdocument
+
+# ODT-sjabloon
+DigiriskTemplateDocumentProject = Documentsjablonen van de projectfiches van Digirisk
+DocumentModelPapripactA3Paysage = Documentsjablonen van het prognoserapport over de projecttaken
+PapripactFullName               = Jaarprogramma voor de Preventie van Beroepsrisico's en de Verbetering van de Arbeidsomstandigheden
+
+# Registerdocument
+
+RegisterDocument     = Register van lichte arbeidsongevallen
+Registerdocument     = Register van lichte arbeidsongevallen
+RegisterDocumentsMin = registers van lichte arbeidsongevallen
+registerdocument.odt = Register van lichte arbeidsongevallen
+
+#
+# Tools - Hulpmiddelen
+#
+
+# Gegevens
+Tools                                        = Hulpmiddelen
+DigiriskDataMigration                        = Beheer van de migratiegegevens
+DataMigrationImport                          = Import van de structuurgegevens van Digirisk
+DataMigrationImportDescription               = Import van de structuurgegevens van Digirisk WordPress in ZIP-formaat
+DataMigrationImportRisks                     = Import van de risicogegevens van Digirisk
+DataMigrationImportRisksDescription          = Import van de risicogegevens van Digirisk WordPress in ZIP-formaat
+ErrorFileNotWellFormatted                    = Het bestand heeft niet het juiste formaat of is leeg. U moet een importbestand van Digirisk WordPress bijvoegen met de naam DATE_OBJET_export.json
+ErrorFileNotWellFormattedZIP                 = Het bestand heeft niet het juiste formaat of is leeg. U moet een importbestand van Digirisk WordPress bijvoegen met de naam DATE_OBJET_export.zip
+ErrorJsonBadFormatted                        = Het JSON-bestand is niet correct opgemaakt
+SuccessImport                                = Import van de gegevens geslaagd
+DataMigrationImportRiskSigns                 = Import van de signaleringsgegevens van Digirisk
+DataMigrationImportRiskSignsDescription      = Import van de signaleringsgegevens van Digirisk WordPress in ZIP-formaat
+DataMigrationImportGlobal                    = Import van de globale gegevens van Digirisk <br> (Structuur, risico's en signaleringen)
+DataMigrationImportGlobalDescription         = Import van de globale gegevens van Digirisk WordPress in ZIP-formaat <br> (Structuur, risico's en signaleringen)
+DataMigrationExportGlobal                    = Export van de globale gegevens van Digirisk <br> (Structuur, risico's en signaleringen)
+DataMigrationExportGlobalDescription         = Export van de globale gegevens van Digirisk Dolibarr in ZIP-formaat <br> (Structuur, risico's en signaleringen)
+DataMigrationExportTree                      = Export van de structuur van Digirisk <br> (Alleen de structuur)
+DataMigrationExportTreeDescription           = Export van de structuur van Digirisk Dolibarr in ZIP-formaat <br> (Voor de huidige entiteit zichtbare GP/UT, zonder de risico's en de signaleringen)
+DataMigrationImportGlobalDolibarrDescription = Import van de globale gegevens van Digirisk Dolibarr in ZIP-formaat <br> (Structuur, risico's en signaleringen)
+DataMigrationTreeAlreadyImported             = Import van de structuurgegevens al uitgevoerd
+DataMigrationRisksAlreadyImported            = Import van de risicogegevens al uitgevoerd
+DataMigrationRiskSignsAlreadyImported        = Import van de signaleringsgegevens al uitgevoerd
+DataMigrationGlobalAlreadyImported           = Import van de globale gegevens (Structuur, risico's en signaleringen) al uitgevoerd
+AdvancedImport                               = Geavanceerde import
+AdvancedImportDescription                    = Maakt het mogelijk elk element afzonderlijk te importeren (Structuur, risico's en signaleringen)
+DataMigrationWordPressToDolibarr             = Migratie van de gegevens van WordPress naar Dolibarr
+DataMigrationDolibarrToDolibarr              = Migratie van de gegevens van Dolibarr naar Dolibarr
+RepairRisks                                  = De risico's herstellen
+NumberOfRisksCorrupted                       = U hebt %s risico('s) waarvan de categorie beschadigd is, ga naar de pagina "Hulpmiddelen" om ze te herstellen
+NoRiskToRepair                               = Geen risico te herstellen
+DigiriskElementSuccessfullyRepaired          = Digirisk-elementen (GP/UT) met succes hersteld
+RiskSuccessfullyRepaired                     = Risico's met succes hersteld
+RiskAssessmentSuccessfullyRepaired           = Beoordelingen met succes hersteld
+CorruptedCategoryOnRiskList                  = Lijst van de risico's waarvan de categorie beschadigd is
+
+# Clean - Opschonen
+Clean                                          = Opschonen
+CleanObject                                    = De gegevens opschonen
+CleanDigiriskElementExistParentDigiriskElement = %d Digirisk-elementen (GP/UT) hebben een ongeldig bovenliggend element
+CleanDigiriskElement                           = De Digirisk-elementen (GP/UT) opschonen
+CleanRiskFkElement                             = %d risico's hebben een ongeldige GP/UT
+CleanRiskStatus                                = %d risico's hebben een ongeldige status
+CleanRiskExistFkElement                        = %d risico's zijn verweesd
+CleanRiskExistRiskAssessment                   = %d risico's hebben geen enkele beoordeling
+CleanRisk                                      = De risico's opschonen
+CleanRiskAssessmentStatus                      = %d beoordelingen hebben een ongeldige status
+CleanRiskAssessmentCotation                    = %d beoordelingen hebben een lege score
+CleanRiskAssessmentExistFkRisk                 = %d beoordelingen zijn verweesd
+CleanRiskAssessment                            = De beoordelingen opschonen
+NoDigiriskElementToClean                       = Geen Digirisk-element (GP/UT) om op te schonen
+NoRiskToClean                                  = Geen risico om op te schonen
+NoRiskAssessmentToClean                        = Geen beoordeling om op te schonen
+
+
+#
+# Overige
+#
+
+# Gegevens
+AT = tot
+
+LabourInspectorName                 = DREETS
+UrlLabourInspector                  = https://travail-emploi.gouv.fr/ministere/organisation/article/dreets-directions-regionales-de-l-economie-de-l-emploi-du-travail-et-des
+IDCCTooltip                         = Dit veld komt uit de module Digirisk voor Dolibarr <br> De nomenclatuur van de collectieve arbeidsovereenkomsten komt van travail-emploi.gouv.fr
+NoEmailContact                      = Geen e-mailadres bij dit contact
+AddMedia                            = Een mediabestand toevoegen
+NoMediaLinked                       = Geen gekoppeld mediabestand
+UserGroup                           = Gebruikersgroep
+ReaderGroup                         = Lezersgroep
+UserCreated                         = De gebruiker is aangemaakt
+GetAPI                              = Gebruik van de Digirisk API-routes met de GET-methode
+PostAPI                             = Gebruik van de Digirisk API-routes met de POST-methode
+MinimizeMenu                        = Het menu verkleinen
+ActionsLine                         = Acties
+PhotoWellSent                       = De foto is toegevoegd aan de mediabibliotheek
+PhotoNotSent                        = De foto is niet correct verstuurd
+PhotoWellSaved                      = Het mediabestand of de mediabestanden is/zijn toegevoegd
+PhotoNotSaved                       = Het mediabestand of de mediabestanden is/zijn niet toegevoegd
+UseCaptcha                          = Grafische code (CAPTCHA)
+UseCaptchaDescription               = Gebruik van de grafische code (CAPTCHA) op de pagina's van de openbare interface
+GP/UTParticipation                  = Deelname GP/UT
+LabourDoctorName                    = AMETRA
+LabourDoctorFirstName               = Bedrijfs-
+LabourDoctorLastName                = arts
+DashBoard                           = Dashboard
+Close                               = Sluiten
+DateRange                           = Datumbereik
+UseDateRange                        = Het datumbereik gebruiken
+SiretNumber                         = Fiscaal nr.
+Society                             = Bedrijf
+MulticompanyTransverseModeEnabled   = Het centrale beheer van gebruikers en groepen op de hoofdentiteit is geactiveerd.<br>U kunt daarom geen gebruiker of groep aanmaken op deze entiteit.<br>Ga naar de hoofdentiteit om dit toe te voegen.
+ManuelInputNBEmployees              = Het aantal medewerkers handmatig invoeren
+ManuelInputNBEmployeesDescription   = Als de optie is geactiveerd, kunt u het aantal medewerkers handmatig invoeren in de instellingen van het bedrijf.<br>Anders wordt het aantal medewerkers berekend.<br>Raadpleeg de documentatie voor meer informatie.
+ManuelInputNBWorkedHours            = Het aantal gewerkte uren handmatig invoeren
+ManuelInputNBWorkedHoursDescription = Als de optie is geactiveerd, kunt u het aantal gewerkte uren handmatig invoeren in de instellingen van het bedrijf.<br>Anders wordt het aantal gewerkte uren berekend.<br>Raadpleeg de documentatie voor meer informatie.
+ShowPatchNoteAgain                  = De releasenotitie weergeven
+ShowPatchNoteAgainDescription       = Als de optie is geactiveerd, verschijnt de releasenotitie van de huidige versie opnieuw op de startpagina van Digirisk.<br>(Vereist dat de optie «De releasenotities van GitHub weergeven» is geactiveerd om zichtbaar te zijn.)
+HowToConfigureSetupConf             = Ga naar Digirisk - Instellingen - Configuratie<br>om de aan Digirisk gekoppelde bedrijfsgegevens in te stellen
+LabourDoctorNameFull                = Artsenvereniging
+PermissionInheritedFromConfig       = De rechten worden overgeërfd van de algemene instellingen of van de bovenliggende instellingen
+CategorieManagement                 = Beheer van de categorieën
+ShowSelectedRiskTypes               = Selecteer de weer te geven risicotypes
+CharRemaining                       = Resterende tekens
+NumberOfLinkedFiles                 = Aantal bijlagen
+ChooseAnImage                       = Een afbeelding kiezen
+
+# Action Plan - Gantt / Kanban
+ActionPlanGantt                     = Gantt-diagram
+ActionPlanKanban                    = Kanban
+ActionPlanView                      = Actieplan
+ColumnDraft                         = Concept
+ColumnInProgress                    = Lopend
+ColumnInControl                     = Te controleren
+ColumnDone                          = Voltooid
+NoTasks                             = Geen corrigerende actie
+ActionPlanGlobalProgress            = Totale voortgang van het PAPRIPACT
+ActionPlanGlobalProgressInfo        = Gemiddelde voortgang van %s corrigerende actie(s)
+KanbanLoadMore                      = Meer weergeven (%s)
+KanbanDisplay                       = Weergave van het Kanban
+KanbanPageSize                      = Aantal kaarten per kolom
+KanbanPageSizeDesc                  = Aantal corrigerende acties dat meteen in elke kolom wordt weergegeven; de volgende worden geladen via de knop «Meer weergeven» (verbetert de prestaties bij grote hoeveelheden)
+KanbanDraftMax                      = Drempel kolom «Concept»
+KanbanDraftMaxDesc                  = Maximale voortgang (%) waarbij een actie in de kolom «Concept» blijft
+KanbanProgressMax                   = Drempel kolom «Lopend»
+KanbanProgressMaxDesc               = Maximale voortgang (%) voor de kolom «Lopend»
+KanbanControlMax                    = Drempel kolom «Te controleren»
+KanbanControlMaxDesc                = Maximale voortgang (%) voor de kolom «Te controleren»; daarboven gaat de actie naar «Voltooid»
+PlannedWorkload                     = Voorziene belasting
+TimeSpent                           = Bestede tijd
+LinkedRisk                          = Gekoppeld risico
+TaskMovedTo                         = Taak verplaatst naar %s
+
+AddCategory                        = Een categorie toevoegen
+SelectCategory                     = Een categorie kiezen
+DateEndBeforeStart                 = Einddatum vóór de begindatum
+InternalUsers                      = Interne gebruikers
+ExternalContacts                   = Externe contacten
+AddContributor                     = Een medewerker toevoegen
+RemoveContact                      = Het contact verwijderen
+ColumnWidth                        = Breedte
+ColumnGap                          = Tussenruimte
+ActionPlanExportCsv                = Het PAPRIPACT downloaden in CSV-formaat
+ActionPlanExportA3                 = Het PAPRIPACT downloaden als PDF A3 liggend
+ActionPlanExportGantt              = Het Gantt-diagram downloaden als PNG-afbeelding
+ActionPlanDisplayedProject         = Weergegeven project
+ActionPlanChangeProject            = Van project wisselen
+ActionPlanDefaultProject           = Risico-inventarisatie (standaard)
+ActionPlanNoProjectConfigured      = Geen project ingesteld
+
+# ActionPlan — Gebeurtenisregistratie
+ActionPlanLogging                  = Actieplan — Wijzigingsgeschiedenis
+ActionPlanLoggingDescription       = Het aanmaken van gebeurtenissen bij wijzigingen in het Kanban activeren
+ActionPlanLogLabel                 = Wijziging van de naam
+ActionPlanLogLabelDesc             = Een gebeurtenis aanmaken wanneer de naam van een taak wordt gewijzigd
+ActionPlanLogWorkload              = Wijziging van de belasting
+ActionPlanLogWorkloadDesc          = Een gebeurtenis aanmaken wanneer de voorziene belasting wordt gewijzigd
+ActionPlanLogBudget                = Wijziging van het budget
+ActionPlanLogBudgetDesc            = Een gebeurtenis aanmaken wanneer het budget wordt gewijzigd
+ActionPlanLogContributorAdd        = Toevoegen van een medewerker
+ActionPlanLogContributorAddDesc    = Een gebeurtenis aanmaken wanneer een medewerker wordt toegevoegd
+ActionPlanLogContributorRemove     = Verwijderen van een medewerker
+ActionPlanLogContributorRemoveDesc = Een gebeurtenis aanmaken wanneer een medewerker wordt verwijderd
+ActionPlanLogProgress              = Wijziging van de voortgang
+ActionPlanLogProgressDesc          = Een gebeurtenis aanmaken wanneer de voortgang wordt gewijzigd
+ActionPlanLogTag                   = Wijziging van de tags
+ActionPlanLogTagDesc               = Een gebeurtenis aanmaken wanneer een tag wordt toegevoegd of verwijderd
+ActionPlanLogDateStart             = Wijziging van de begindatum
+ActionPlanLogDateStartDesc         = Een gebeurtenis aanmaken wanneer de begindatum wordt gewijzigd
+ActionPlanLogDateEnd               = Wijziging van de einddatum
+ActionPlanLogDateEndDesc           = Een gebeurtenis aanmaken wanneer de einddatum wordt gewijzigd
+ActionPlanTaskLabelChanged         = Naam gewijzigd: "%s" → "%s"
+ActionPlanTaskWorkloadChanged      = Belasting gewijzigd: %s → %s
+ActionPlanTaskBudgetChanged        = Budget gewijzigd: %s → %s
+ActionPlanTaskContributorAdded     = Medewerker toegevoegd: %s
+ActionPlanTaskContributorRemoved   = Medewerker verwijderd: ID %s
+ActionPlanTaskProgressChanged      = Voortgang gewijzigd: %s%% → %s%%
+ActionPlanTaskTagAdded             = Tag toegevoegd: %s
+ActionPlanTaskTagRemoved           = Tag verwijderd: ID %s
+ActionPlanTaskDateStartChanged     = Begindatum gewijzigd: %s → %s
+ActionPlanTaskDateEndChanged       = Einddatum gewijzigd: %s → %s
+
+# ===========================================================================
+# Filters van het actieplan — issue #4907 (GP/UT, risiconiveau, tags)
+# ===========================================================================
+ActionPlanElement                    = GP/UT
+ActionPlanFilterElementChildren      = Met de subelementen
+ActionPlanFilterElementChildrenHelp  = De corrigerende acties van de onderliggende GP/UT van de geselecteerde GP/UT opnemen
+ActionPlanFilterScale                = Risiconiveau
+ActionPlanFilterAllScales            = Alle niveaus
+ActionPlanFilterTags                 = Tags
+ActionPlanFilterCount                = %s corrigerende actie(s) weergegeven van %s
+ActionPlanDictionaries               = Lijsten van het Kanban
+ActionPlanDictionariesDesc           = De waarden beheren die worden aangeboden in de lijsten van het actieplan en de Kanban
+ActionPlanTagDictionary              = Tags van de corrigerende acties
+ActionPlanTagDictionaryDesc          = Tags (taakcategorieën) die worden aangeboden op de kaarten en in het filter van het Kanban van het actieplan
+ActionPlanTicketDictionaries         = Woordenboeken van de ticket-Kanban
+ActionPlanTicketDictionariesDesc     = Types, groepen en ernstniveaus waaruit de kolommen van de ticket-Kanban bestaan
+ActionPlanManageDictionary           = Beheren
+
+# ===========================================================================
+# Ticketactiekaart — issue #4443 (1-klik-interface)
+# ===========================================================================
+TicketActionCard                     = Ticketactie
+TicketActionCardPickerIntro          = Selecteer een ticket om met 1 klik een snelle actie uit te voeren.
+TicketActionCardStatusSection        = Status
+TicketActionCardAssignSection        = Toewijzing
+TicketActionCardContentSection       = Inhoud
+TicketActionCardDangerSection        = Gevoelige zone
+TicketActionMarkRead                 = Als gelezen markeren
+TicketActionInProgress               = Op lopend zetten
+TicketActionWaiting                  = In de wacht zetten
+TicketActionClose                    = Afsluiten
+TicketActionCancel                   = Ticket annuleren
+TicketActionAssignSelf               = Aan mij toewijzen
+TicketActionAssignOther              = Toewijzen aan...
+TicketActionAddMessage               = Een bericht toevoegen
+TicketActionLinkAccident             = Een ongeval koppelen
+TicketActionOpenFull                 = Volledige details
+TicketActionMarkedRead               = Ticket als gelezen gemarkeerd
+TicketActionInProgressDone           = Ticket op lopend gezet
+TicketActionWaitingDone              = Ticket in de wacht gezet
+TicketActionClosedDone               = Ticket afgesloten
+TicketActionCancelledDone            = Ticket geannuleerd
+TicketActionAssignedSelfDone         = Ticket aan u toegewezen
+TicketActionAssignedOtherDone        = Ticket toegewezen
+TicketActionCloseConfirm             = Het afsluiten bevestigen
+TicketActionCancelConfirm            = De annulering bevestigen
+TicketActionCardRegistresSection      = Informatie registers
+TicketMessageTitle                    = Titel van het bericht
+TicketResponsibleAndProgress          = Verantwoordelijke en voortgang
+TicketActionCardClassificationSection = Classificatie
+TicketActionCardDatesSection          = Belangrijke data
+TicketActionCardIdentificationSection = Identificatie
+TicketActionCardOtherFieldsSection    = Overige informatie
+TicketActionCardEventsSection         = Recente gebeurtenissen
+TicketActionCardRelatedSection        = Gekoppelde objecten
+UnknownFieldToUpdate                  = Onbekend veld: %s
+Saved                                 = Opgeslagen
+SeeAll                                = Alles bekijken
+LayoutCustomize                       = Aanpassen
+LayoutDone                            = Klaar
+LayoutControls                        = Lay-outbediening
+LayoutWidthHalf                       = Halve kolom
+LayoutWidthFull                       = Hele kolom
+LayoutWidthSpan                       = Volledige breedte
+LayoutSaved                           = Lay-out opgeslagen
+LayoutReset                           = Herstellen
+LayoutResetTitle                      = De lay-out herstellen (terug naar de standaardwaarden)
+LayoutDensity                         = Weergavedichtheid
+LayoutDensityCompact                  = Compact
+LayoutDensityCozy                     = Comfortabel
+LayoutDensitySpacious                 = Ruim
+AddTag                                = Een tag toevoegen
+TagAdded                              = Tag toegevoegd
+TagRemoved                            = Tag verwijderd
+Preview                               = Voorbeeld
+OpenInNewTab                          = In een nieuw tabblad openen
+FileDeleted                           = Bestand verwijderd
+OtherTicket                           = ander ticket
+OtherTickets                          = andere tickets
+SeeOtherTicketsForThisCompany         = De ticketgeschiedenis van deze klant bekijken
+StatusTimeline                        = Tijdlijn van de status
+WatchTicket                           = Dit ticket volgen
+UnwatchTicket                         = Dit ticket niet meer volgen
+TicketWatched                         = Ticket gevolgd
+TicketUnwatched                       = Ticket niet meer gevolgd
+WatchedTicket                         = Gevolgd ticket
+WatchedOnly                           = Alleen de gevolgde
+AllTickets                            = Alle
+NoWatchedTicket                       = Geen gevolgd ticket
+FileUploaded                          = Bestand verstuurd
+UploadFile                            = Een bestand kiezen
+OrDropAnywhere                        = of sleep het naar de kaart
+Messages                              = Berichten
+TypeYourReply                         = Typ uw antwoord…
+PrivateMessage                        = Privébericht
+Send                                  = Versturen
+NoMessageYet                          = Nog geen bericht
+BeFirstToReply                        = Wees de eerste die reageert
+MessagePosted                         = Bericht verstuurd
+MessageEdited                         = Bericht gewijzigd
+MessageDeleted                        = Bericht verwijderd
+ConfirmDeleteMessage                  = Dit bericht verwijderen?
+ReplyByEmail                          = Per e-mail versturen
+SentByMail                            = Per e-mail verstuurd
+MailSentToNRecipients                 = e-mail verstuurd naar %d ontvanger(s)
+MailNotSent                           = versturen van de e-mail mislukt
+NoRecipientFound                      = geen ontvanger gevonden
+OriginalMessage                       = Oorspronkelijk bericht
+JustNow                               = zojuist
+NMinAgo                               = %d min geleden
+NHAgo                                 = %d u geleden
+NDAgo                                 = %d d geleden
+NAttachedFiles                        = %d bijlage(n)
+Quote                                 = Citeren
+NotAllowed                            = Actie niet toegestaan
+Private                               = Privé
+Unknown                               = Onbekend
+LayoutTagsMode                        = Weergave van de tags
+LayoutTagsModeChips                   = Volledige lijst (chips)
+LayoutTagsModeSelector                = Uitklapkiezer
+LayoutActionsMode                     = Weergave van de acties
+LayoutActionsModeBar                  = Actiebalk
+LayoutActionsModeMenu                 = Menu (⋮)
+Move                                  = Verplaatsen
+Hide                                  = Verbergen
+Show                                  = Weergeven
+
+# ===========================================================================
+# Ticket-kanban — instellingen van de gebeurtenisregistratie — issue #4753
+# ===========================================================================
+TicketKanban                           = Ticket-Kanban
+TicketKanbanLogging                    = Ticket-Kanban — Wijzigingsgeschiedenis
+TicketKanbanLoggingDescription         = Het aanmaken van gebeurtenissen bij wijzigingen in het kanban activeren
+TicketKanbanLogStatus                  = Wijziging van de status
+TicketKanbanLogStatusDesc              = Een gebeurtenis aanmaken wanneer de status van een ticket via het kanban wordt gewijzigd
+TicketKanbanLogAssignee                = Wijziging van de toegewezen persoon
+TicketKanbanLogAssigneeDesc            = Een gebeurtenis aanmaken wanneer de toegewezen persoon van een ticket via het kanban wordt gewijzigd
+TicketKanbanLogCategoryAdd             = Toevoegen van een tag
+TicketKanbanLogCategoryAddDesc         = Een gebeurtenis aanmaken wanneer een tag via het kanban aan een ticket wordt toegevoegd
+TicketKanbanLogCategoryRemove          = Verwijderen van een tag
+TicketKanbanLogCategoryRemoveDesc      = Een gebeurtenis aanmaken wanneer een tag via het kanban van een ticket wordt verwijderd
+TicketKanbanLogType                    = Wijziging van het type
+TicketKanbanLogTypeDesc                = Een gebeurtenis aanmaken wanneer het type van een ticket via het kanban wordt gewijzigd
+TicketKanbanLogGroup                   = Wijziging van de groep
+TicketKanbanLogGroupDesc               = Een gebeurtenis aanmaken wanneer de groep van een ticket via het kanban wordt gewijzigd
+TicketKanbanLogSeverity                = Wijziging van de ernst
+TicketKanbanLogSeverityDesc            = Een gebeurtenis aanmaken wanneer de ernst van een ticket via het kanban wordt gewijzigd
+TicketKanbanLogSubject                 = Wijziging van het onderwerp
+TicketKanbanLogSubjectDesc             = Een gebeurtenis aanmaken wanneer het onderwerp van een ticket via het kanban wordt gewijzigd
+TicketKanbanLogDeadline                = Wijziging van de uiterste datum
+TicketKanbanLogDeadlineDesc            = Een gebeurtenis aanmaken wanneer de uiterste datum van een ticket via het kanban wordt gewijzigd
+TicketKanbanClosedLimit                = Limiet gesloten tickets
+TicketKanbanClosedLimitDesc            = Maximaal aantal gesloten/geannuleerde tickets dat in het kanban wordt weergegeven (0 = onbeperkt)
+
+# ===========================================================================
+# Ticket — traceerbaarheid van de wijzigingen — issue #4885
+# ===========================================================================
+TicketLogModifications                 = Traceerbaarheid van de wijzigingen
+TicketLogModificationsDesc             = Een gebeurtenis aanmaken voor elke bewerking vanuit de ticketfiche (onderwerp, bericht, registers, toegewezen persoon, relatie, project, voortgang, status, taken, documenten)
+TicketMessageEdited                    = Bericht gewijzigd
+TicketMessageDeleted                   = Bericht verwijderd
+TicketTaskCreated                      = Taak aangemaakt: %s
+TicketDocumentGenerated                = Document gegenereerd
+TicketFileDeleted                      = Bestand verwijderd
+
+# Paneel voor het snel aanmaken van een ticket
+SelectNothing                          = — Selecteren —
+QuickCreateTicket                      = Snel een ticket aanmaken
+TicketSubjectPlaceholder               = Titel van het ticket...
+TicketInitialMessage                   = Eerste bericht
+OptionalDescription                    = Beschrijving (optioneel)...
+Unassigned                             = Niet toegewezen
+QuickCreateAttachments                 = Bijlagen
+QuickCreateDropzone                    = Sleep hierheen of klik om te selecteren
+QuickCreateDropzoneActive              = Hier neerzetten…
+QuickCreateAttachmentHint              = Toegestane formaten: afbeeldingen, PDF, documenten. Max. 10 MB per bestand.
+QuickCreateTicketSuccess               = Ticket %s met succes aangemaakt.
+
+# MeteoVigilance - Weerwaarschuwing Météo-France
+MeteoVigilance = Weerwaarschuwing Météo-France
+MeteoVigilancePanelTitle = Waarschuwing %s
+MeteoVigilanceAdvice2 = Wees oplettend
+MeteoVigilanceAdvice3 = Wees zeer waakzaam
+MeteoVigilanceAdvice4 = Uiterste waakzaamheid
+MeteoVigilanceUpdatedAt = Bijgewerkt %s
+MeteoVigilanceEnabled = De weerwaarschuwing activeren
+MeteoVigilanceEnabledDescription = Geeft de widget Weerwaarschuwing Météo-France weer op het dashboard (en de waarschuwingsbalk bij een oranje/rode waarschuwing).
+MeteoVigilanceLevel = Waarschuwingsniveau
+MeteoVigilanceActivePhenomena = Actieve verschijnselen
+MeteoVigilanceNoAlert = Geen bijzondere waarschuwing
+MeteoVigilanceSource = Bron
+MeteoVigilanceSeeOnMeteoFrance = Bekijken op vigilance.meteofrance.fr
+MeteoVigilanceNotConfigured = API-sleutel Météo-France niet ingesteld — klik om in te stellen
+MeteoVigilanceUnknownDepartment = Departement van het bedrijf niet bepaald
+MeteoVigilanceUnavailable = Waarschuwingsgegevens tijdelijk niet beschikbaar
+MeteoVigilanceBannerTitle = Waarschuwing %s van kracht in departement %s
+MeteoVigilanceLevel1 = Groen
+MeteoVigilanceLevel2 = Geel
+MeteoVigilanceLevel3 = Oranje
+MeteoVigilanceLevel4 = Rood
+MeteoVigilancePhenomenon1 = Zware wind
+MeteoVigilancePhenomenon2 = Regen en overstroming
+MeteoVigilancePhenomenon3 = Onweer
+MeteoVigilancePhenomenon4 = Hoogwater
+MeteoVigilancePhenomenon5 = Sneeuw en ijzel
+MeteoVigilancePhenomenon6 = Hittegolf
+MeteoVigilancePhenomenon7 = Extreme kou
+MeteoVigilancePhenomenon8 = Lawines
+MeteoVigilancePhenomenon9 = Golven en kustoverstroming
+MeteoVigilanceSetup = Instellingen van de weerwaarschuwing
+MeteoVigilanceApiKey = API-sleutel Météo-France
+MeteoVigilanceApiKeyDescription = API-sleutel van het portaal van Météo-France (maak een account en een applicatie «Bulletin Vigilance» aan op <a href="https://portail-api.meteofrance.fr" target="_blank">portail-api.meteofrance.fr</a> om de sleutel te genereren).
+MeteoVigilanceDepartment = Departementscode (overschrijving)
+MeteoVigilanceDepartmentDescription = Laat leeg om het departement automatisch af te leiden uit het adres van het bedrijf. Voer anders een code in (bijv. 35, 2A).
+MeteoVigilanceCacheTTL = Duur van de cache (seconden)
+MeteoVigilanceCacheTTLDescription = Periode waarin de gegevens van de API in de cache worden bewaard vóór een nieuwe aanroep (standaard 3600).
+MeteoVigilanceSettings = Instellingen van de weerwaarschuwing
+MeteoVigilanceRefreshNow = Nu vernieuwen
+MeteoVigilanceRefreshed = Gegevens vernieuwd: waarschuwing %s in departement %s
+
+# Conversatiesysteem van de tickets
+Conversation = Conversatie
+PublicMessage = Openbaar bericht
+ConvTo = Aan
+ConvCc = Cc
+
+SaveNote = De notitie opslaan
+
+AddRecipient = Een ontvanger toevoegen
+NoRecipientFound = Geen ontvanger
+
+AddFile = Een bestand toevoegen
+
+MentionAgents = Medewerkers vermelden
+YouWereMentionedOnTicket = U bent vermeld op ticket %s
+YouWereMentionedOnTicketBody = %s heeft u vermeld op ticket %s:
+
+Mentioned = Vermeld
+
+# Snel mobiel aanmaken van een preventieplan
+MobileQuickCreation = Snel mobiel aanmaken
+MobilePPInteriorCompany = Inlenend bedrijf (intern)
+MobilePPResponsibleAutoSign = Verantwoordelijke (ondertekent automatisch)
+MobilePPSignatureSaved = Handtekening opgeslagen
+MobilePPEditSignature = De handtekening wijzigen
+MobilePPDrawSignatureHint = Teken hieronder uw handtekening en sla deze op. Deze wordt hergebruikt voor uw volgende plannen.
+MobilePPClearSignature = Wissen
+MobilePPSaveSignature = Mijn handtekening opslaan
+MobilePPExteriorCompany = Externe onderneming
+MobileSirenOrSiret = SIREN / SIRET
+MobileSirenOrSiretPlaceholder = 9 of 14 cijfers
+MobilePPResponsibleToSign = Verantwoordelijke die moet ondertekenen
+MobilePPChooseExistingContact = Een bestaand contact kiezen
+MobilePPNewContact = Nieuw contact
+MobilePPEmailForSignatureHelp = Dit e-mailadres ontvangt het ondertekeningsverzoek.
+MobilePPPeriod = Interventieperiode
+MobilePPMaxOneYearHint = Maximaal 1 jaar tussen de begindatum en de einddatum.
+MobilePPSubmit = Het preventieplan aanmaken
+MobilePPErrorNoSignature = U moet uw handtekening opslaan voordat u het plan aanmaakt.
+MobilePPErrorEmptySignature = De handtekening is leeg.
+MobilePPErrorInvalidSiren = Ongeldige SIREN of SIRET (9 of 14 cijfers verwacht).
+MobilePPErrorEndBeforeStart = De einddatum moet na de begindatum liggen.
+MobilePPErrorMaxOneYear = De duur mag niet langer zijn dan 1 jaar.
+MobilePPErrorDatesRequired = Vul de begindatum en de einddatum in.
+MobilePPErrorStartRequired = De begindatum ontbreekt.
+MobilePPErrorEndRequired = De einddatum ontbreekt.
+MobilePPErrorNoProject = Er is geen standaardproject voor preventieplannen ingesteld.
+MobilePPCompanyFound = Bedrijf gevonden:
+MobilePPCompanyNotFound = Geen bedrijf gevonden in de database: er wordt een nieuw bedrijf aangemaakt.
+MobilePPWarningEmailNotSent = Het plan is aangemaakt, maar de e-mail voor de ondertekening kon niet worden verstuurd.
+MobilePPWarningEmailNotConfigured = Het plan is aangemaakt, maar de e-mail is niet ingesteld: ondertekeningsverzoek niet verstuurd.
+MobilePPCreated = Preventieplan %s aangemaakt.
+MobilePPUpdated = Preventieplan %s bijgewerkt.
+MobilePPSignatureEmailSubject = Verzoek tot ondertekening van het preventieplan %s
+MobilePPSignatureEmailContent = Goedendag,<br><br>U wordt uitgenodigd om het preventieplan voor %s te ondertekenen.<br><br><a href="%s">Klik hier om te ondertekenen</a><br><br>Met vriendelijke groet.
+MobilePPSuccessTitle = Preventieplan aangemaakt
+MobilePPSuccessText = De interne verantwoordelijke heeft automatisch ondertekend. Er is een ondertekeningsverzoek verstuurd naar de externe onderneming.
+MobilePPViewPlan = Het plan bekijken
+MobilePPCreateAnother = Een ander plan aanmaken
+MobileSuccessInteriorSigned = Interne verantwoordelijke: ondertekend
+MobileSuccessExteriorNotified = Externe onderneming: ondertekeningsverzoek verstuurd
+MobileSuccessExteriorNotSigned = Externe onderneming: handtekening nog te verkrijgen
+MobileSuccessExteriorNotNotified = Externe onderneming: ondertekeningsverzoek niet verstuurd
+MobileSuccessExteriorSigned = Externe onderneming: ondertekend
+MobileSuccessDocumentGenerated = Document van het plan gegenereerd
+MobilePPWarningEmailNotSentDetail = De e-mail voor de ondertekening kon niet worden verstuurd: %s
+MobilePPWarningNoRecipientEmail = geen geldig e-mailadres voor de externe verantwoordelijke
+MobilePPSignatureEmailSentTo = Ondertekeningsverzoek verstuurd naar %s
+MobilePPExtSignatureTitle = Handtekening van de externe onderneming
+MobilePPExtEmailSentOn = Verzoek verstuurd naar %s op %s
+MobilePPExtEmailNotSent = Ondertekeningsverzoek niet verstuurd: geef de link door of laat nu ondertekenen
+MobilePPSpreadDefaultsTitle = Openbare weergave van de verspreiding
+MobilePPSpreadShowCount = Het aantal ondertekenaars weergeven
+MobilePPSpreadShowName = De naam en voornaam weergeven
+MobilePPSpreadShowContact = Het telefoonnummer en het e-mailadres weergeven
+MobilePPSpreadHidePublicNote = De openbare notitie niet weergeven
+MobilePPExtAlreadySigned = Ondertekend op %s
+MobilePPExtSignNow = Nu laten ondertekenen
+MobilePPExtResendEmail = De e-mail opnieuw versturen
+MobilePPNoTagAvailable = Er is geen tag voor preventieplannen beschikbaar.
+MobilePPCreateTag = Een tag aanmaken
+MobileSpreadShareTitle = De verspreiding delen
+MobileSpreadShareText = Laat de betrokken personen deze code scannen. Zonder account en zonder inloggen vullen zij hun gegevens in, uploaden zij hun documenten en ondertekenen zij.
+MobileSpreadOpen = De verspreiding openen
+MobilePPRisks = Risico's
+MobilePPAddRisk = Een risico toevoegen
+MobilePPRiskModalTitle = Een risico kiezen
+MobilePPRiskComment = Opmerking
+MobilePPRiskDescriptionPlaceholder = Het risico op locatie beschrijven
+MobilePPNoRiskYet = Nog geen risico toegevoegd.
+MobilePPDeleteRiskTitle = Het risico verwijderen
+MobilePPDeleteRiskConfirm = «%s» wordt uit het plan verwijderd, samen met de beschrijving, de foto's en de beschermingsmiddelen.
+MobilePPUserCompany = Inlenend bedrijf
+MobilePPUserCompanyShort = EU
+MobilePPConcernedCompanies = Betreft
+MobilePPExteriorCompanyShort = EE
+MobilePPPriorFormalities = Voorafgaande formaliteiten
+MobilePPPriorVisitDone = Gezamenlijke voorinspectie uitgevoerd
+MobilePPPriorVisitTextPlaceholder = Wat tijdens de inspectie is vastgesteld
+MobileRiskCompanies = Bij de risico's betrokken bedrijven (mobiel)
+CertificationDictionary = Certificeringen en bevoegdheden
+MobilePPChooseExistingCompany = Een bestaande relatie kiezen
+MobilePPOrFillManually = of de gegevens invoeren
+MobilePPProtections = Beschermingsmiddelen
+MobilePPAddProtection = Een beschermingsmiddel toevoegen
+MobilePPProtectionModalTitle = Een beschermingsmiddel kiezen
+MobilePPMandatory = Verplicht
+MobileProtections = Beschermingsmiddelen (mobiel)
+MobilePPCertifications = Verplichte certificeringen
+MobilePPAddCertification = Een certificering toevoegen
+MobileCertifications = Certificeringen (mobiel)
+MobilePPUploadCertPhoto = Een foto versturen
+MobilePPErrorCreatingThirdparty = Fout bij het aanmaken van de relatie.
+MobilePPErrorCreatingContact = Fout bij het aanmaken van het contact.
+MobilePPErrorUpdatingPlan = Fout bij het bijwerken van het preventieplan.
+MobilePPErrorCreatingPlan = Fout bij het aanmaken van het preventieplan.
+MobileSuccessViewDocument = Het document bekijken
+MobileSuccessPlanSentByEmailOn = Preventieplan per e-mail verstuurd op %s
+MobileSuccessExteriorSignedOn = Verantwoordelijke van de Externe Onderneming (EE): Ondertekend op %s
+MobileSuccessExteriorPendingSignature = Verantwoordelijke van de Externe Onderneming (EE): In afwachting van ondertekening
+MobilePPDefaultsTitle = Standaardwaarden (mobiel aanmaken)
+MobilePPDefaultDateStartToday = Begindatum = datum van vandaag
+MobilePPDefaultDuration = Standaardduur van de periode (dagen)
+MobilePPEmailAutoSend = De e-mail voor de ondertekening automatisch versturen bij het aanmaken
+
+# Snel mobiel aanmaken van een vuurvergunning
+MobileFPPreventionPlanHelp = De externe onderneming en de periode van het geselecteerde plan worden automatisch overgenomen.
+MobileFPPeriod = Plaats en periode van de werkzaamheden
+MobileFPMaxOneMonthHint = Maximaal één maand tussen het begin en het einde van de werkzaamheden.
+MobileFPErrorMaxOneMonth = De duur mag niet langer zijn dan één maand.
+MobileFPErrorNoProject = Er is geen standaardproject voor vuurvergunningen ingesteld.
+MobileFPWorkTypes = Types werkzaamheden
+MobileFPAddWorkType = Een type werkzaamheden toevoegen
+MobileFPWorkTypeModalTitle = Een type werkzaamheden kiezen
+MobileFPSubmit = De vuurvergunning aanmaken
+MobileFPCreated = Vuurvergunning %s aangemaakt.
+MobileFPUpdated = Vuurvergunning %s bijgewerkt.
+MobileFPSignatureEmailSubject = Verzoek tot ondertekening van de vuurvergunning %s
+MobileFPSignatureEmailContent = Goedendag,<br><br>U wordt uitgenodigd om de vuurvergunning voor %s te ondertekenen.<br><br><a href="%s">Klik hier om te ondertekenen</a><br><br>Met vriendelijke groet.
+MobileFPSuccessTitle = Vuurvergunning aangemaakt
+MobileFPViewPermit = De vergunning bekijken
+MobileFPCreateAnother = Een andere vergunning aanmaken
+
+# Digirisk PWA
+PwaApplication = Mobiele app
+PwaNavHome = Start
+PwaNavPreventionPlans = Plannen
+PwaNavFirePermits = Vergunningen
+PwaNavMenu = Menu
+PwaNavFavoritesHint = Favorieten onderaan weergegeven (max. %s)
+PwaNavAddFavorite = Aan favorieten toevoegen
+PwaNavRemoveFavorite = Uit favorieten verwijderen
+PwaHello = Goedendag %s
+PwaResultCount = %s resulta(a)t(en)
+AllStatus = Alle statussen
+PwaTilePreventionPlanInProgress = Lopende plannen
+PwaTilePreventionPlanToSign = Te ondertekenen plannen
+PwaTileFirePermitInProgress = Lopende vergunningen
+PwaTileFirePermitToSign = Te ondertekenen vergunningen
+
+# Massa-acties op de taken
+MassValidateTasks = De taken valideren
+MassChangeTasksProject = Van project wisselen
+ConfirmMassValidateTasksQuestion = Weet u zeker dat u de %s geselecteerde ta(a)k(en) wilt valideren? Alleen taken met de status concept worden gevalideerd.
+ConfirmMassChangeTasksProjectQuestion = Weet u zeker dat u de %s geselecteerde ta(a)k(en) aan het gekozen project wilt koppelen?
+MassValidateTasksSuccess = %s ta(a)k(en) gevalideerd van %s geselecteerde
+MassChangeTasksProjectSuccess = %s ta(a)k(en) gekoppeld aan project %s
+
+# PDF van het preventieplan
+PreventionPlanLegalNotice = Het preventieplan is een verplicht document dat de risico's moet voorkomen die voortvloeien uit de wisselwerking tussen de activiteiten van meerdere bedrijven op dezelfde locatie, overeenkomstig artikel R4512-7 van het Franse arbeidswetboek.
+PreventionPlanUserCompany = Inlenend bedrijf - EU
+PreventionPlanExteriorCompany = Externe onderneming - EE
+PreventionPlanUserCompanyResponsible = Verantwoordelijke van het Inlenend Bedrijf (EU)
+PreventionPlanExteriorCompanyResponsible = Verantwoordelijke van de Externe Onderneming (EE)
+EmergencyNumbers = Alarmnummers
+Firefighters = Brandweer
+AnyEmergency = Elke noodsituatie
+PriorVisitIntro = Het inlenend bedrijf heeft, voorafgaand aan de uitvoering van de werkzaamheden, op %s een gezamenlijke voorinspectie uitgevoerd. Tijdens dit bezoek zijn de volgende punten door het inlenend bedrijf gepresenteerd (art. R. 4512-2 en R. 4512-3 van het Franse arbeidswetboek):
+PriorVisitCheckList = Werkplekken|Aldaar aanwezige installaties|Eventueel aan de externe ondernemingen ter beschikking gesteld materieel|Het interventiegebied van de externe ondernemingen afbakenen|De zones van dit gebied markeren die gevaren voor de werknemers kunnen opleveren|De verkeersroutes aangeven die de werknemers mogen gebruiken, evenals de voertuigen en machines van welke aard ook die toebehoren aan de externe ondernemingen|De toegangswegen van de werknemers tot de ruimten en installaties voor de EE vaststellen (met name de sanitaire voorzieningen, collectieve kleedruimten en kantines)
+PriorVisitComments = De volgende opmerkingen zijn genoteerd:
+InterventionPeriodSentence = Dit plan begint op %s en eindigt op %s. De werkzaamheden vinden plaats op de volgende tijden:
+RiskAnalysisIntro = U hebt %s werkzaamhe(i)d(en) voorzien voor dit preventieplan: hieronder de details van de geplande acties, de veroorzaakte risico's en de ingezette preventiemiddelen.
+PreventionPlanAttendants = Betrokkenen: Externe Onderneming (EE) en onderaannemers
+Morning = Ochtend
+Afternoon = Middag
+Signatures = Handtekeningen
+SignaturePending = In afwachting
+PreventionPlanRiskPhotos = Foto's van het risico
+InterventionPeriodOnly = Dit plan begint op %s en eindigt op %s.
+
+DigiRisk=DigiRisk
+DigiriskIdentification=BESCHRIJVING EN KENMERKEN
+DigiriskSecurity=VEILIGHEID
+DigiriskUserManual=VEREENVOUDIGDE GEBRUIKSAANWIJZING
+DigiriskQualification=KWALIFICATIE EN BEVOEGDHEID
+DigiriskHygiene=HYGIËNE EN REINIGING
+DigiriskMaintenance=ONDERHOUD EN CONTROLES
+DangerCategory=Risicofamilie
+SelectDangerCategory=Een risicofamilie kiezen
+DescribeRiskOnProduct=Het risico bij dit product beschrijven...
+ConfirmDeleteProductRisk=Dit risico verwijderen?
+AddProductRisk=Een productrisico toevoegen
+ClickToAddContent=Klik om inhoud toe te voegen...
+AddProtection=Een beschermingsmiddel toevoegen
+
+SelectProtection=Een PBM-beschermingsmiddel kiezen
+TechnicalSheet=Technische fiche
+DigiriskRisks=RISICO'S EN BESCHERMINGSMIDDELEN
+MobileSuccessInteriorSignedOn=Verantwoordelijke van het Inlenend Bedrijf (EU): Ondertekend op %s
+
+MobileSuccessPlanSentByEmailOn = Preventieplan per e-mail verstuurd op %s
+MobileSuccessExteriorSignedOn = Verantwoordelijke van de Externe Onderneming (EE): Ondertekend op %s
+MobileSuccessExteriorPendingSignature = Verantwoordelijke van de Externe Onderneming (EE): In afwachting van ondertekening
+
+MobilePPErrorInvalidEmail = Houd u aan het formaat van het e-mailadres.
+MobilePPErrorInvalidPhone = Houd u aan het formaat van het telefoonnummer.
+MobilePPExtSendEmail = De e-mail versturen
+MobilePPErrorMailServerNotConfigured = Uw mailserver is niet ingesteld, neem contact op met de beheerder.
+MobilePPDoliletterNotInstalled = De module Doliletter is niet geïnstalleerd. De verspreiding van de preventieplannen en vuurvergunningen is niet beschikbaar (neem contact op met uw beheerder)
+
+# Statussen en types voor de tooltips
+preventionplan = Preventieplan
+Locked = Vergrendeld
+InProgress = Lopend
+ValidatePendingSignature = In afwachting van ondertekening
+Archived = Gearchiveerd
+
+ProductFIChaptersManagement=Aanpassing van de hoofdstukken van de instructiefiche
+ProductFIChaptersManagementSub=Aanpassing van het tabblad "Instructiefiche" en het tabblad "Risico's" in de productfiche
+DefaultContent=Standaardinhoud
+CustomSvgUploaded=Aangepaste SVG
+DeleteCustomSvg=Verwijderen
+DefaultSvgUsed=Standaard-SVG
+
+PwaTilePreventionPlanLocked = Gevalideerde plannen
+PwaTileFirePermitLocked = Gevalideerde vergunningen
+
+# ===========================================================================
+# Woordenboek van de Kanban-kolommen van het actieplan — issue #5017
+# ===========================================================================
+ActionPlanColumnDictionary           = Kolommen van het Kanban van het actieplan
+ActionPlanColumnDictionaryDesc       = Kolommen die worden weergegeven in het Kanban van het PAPRIPACT wanneer de woordenboekmodus is geactiveerd: naam, voortgangsbereik, kleur en pictogram
+KanbanColumnSource                   = Bron van de kolommen
+KanbanColumnSourceDesc               = Het Kanban indelen met de onderstaande percentagedrempels (historische werking) of met het woordenboek van de kolommen
+KanbanColumnSourceThresholds         = Percentagedrempels (standaard)
+KanbanColumnSourceDictionary         = Woordenboek van de kolommen
+ActionPlanColumnProgressHelp         = Voortgangsgrenzen die door de kolom worden gedekt, van 0 tot 100
+ActionPlanColumnColorHelp            = Hexadecimale kleur van de kolom, bijvoorbeeld #3085d6
+ActionPlanColumnPictoHelp            = Naam van het Font Awesome-pictogram, bijvoorbeeld fa-check
+Progress_min                         = Voortgang min.
+Progress_max                         = Voortgang max.
+Picto                                = Pictogram
+
+# Registratie van de bestede tijd
+GenerateTimeSpentReport = De tijdregistratie genereren (PDF)
+TimeSpentReport = Registratie van de bestede tijd
+TimeSpentReportUsersHelp = Laat leeg om alle personen op te nemen die tijd op dit project hebben geboekt.
+TimeSpentReportSummary = Samenvatting per gebruiker
+TimeSpentReportGrandTotal = Eindtotaal
+TimeSpentReportGeneratedAt = Gegenereerd op
+TimeSpentReportWholePeriod = Sinds het begin van het project
+TimeSpentReportNoData = Geen bestede tijd komt overeen met de geselecteerde gebruikers en periode.
+TimeSpentDocumentPDFDescription = Bestede tijd op een project, gegroepeerd per gebruiker
+
+# Gelijkschakeling van de mobiele vuurvergunning met het preventieplan - issue #5042
+MobileProgress = Voortgang
+MobileStepDone = GEDAAN
+MobileStepInProgress = LOPEND
+MobileStepTodo = TE DOEN
+MobileStepSignedOn = ONDERTEKEND OP
+MobilePPStepCreated = PP aangemaakt
+MobileFPStepCreated = VV aangemaakt
+MobileStepUserCompanyResponsible = Verantw. EU
+MobileStepExteriorCompanyResponsible = Verantw. EE
+MobileStepLock = Vergrendelen
+MobileStepArchive = Archiveren
+MobileLock = Vergrendelen
+MobileResponsibleShort = Verantw.
+MobileMailSentTo = E-mail verstuurd naar
+MobilePPMotif = Reden van de werkzaamheden
+MobilePPSchedules = Werktijden
+MobilePPConfigHours = Stel hier uw werktijden in
+MobilePPCopyCompanyHours = De werktijden van het bedrijf kopiëren
+FirePermitUserCompany = Inlenend bedrijf - EU
+FirePermitExteriorCompany = Externe onderneming - EE
+MobileFPMotif = Reden van de werkzaamheden
+MobileFPMotifPlaceholder = Bijv.: lassen aan de dakconstructie
+MobileFPNoMotif = Geen reden ingevuld
+MobileFPSchedules = Werktijden van de werkzaamheden
+MobileFPWorkTypeDescriptionPlaceholder = De werkzaamheden op locatie beschrijven
+MobileFPNoWorkTypeYet = Nog geen type werkzaamheden toegevoegd.
+MobileFPDeleteWorkTypeTitle = Het type werkzaamheden verwijderen
+MobileFPDeleteWorkTypeConfirm = «%s» wordt uit de vergunning verwijderd, samen met de beschrijving, het materieel, de foto's en de beschermingsmiddelen.
+MobileFPNoTagAvailable = Er is geen tag voor vuurvergunningen beschikbaar.
+MobileFPErrorUpdatingPermit = Fout bij het bijwerken van de vuurvergunning.
+MobileFPErrorCreatingPermit = Fout bij het aanmaken van de vuurvergunning.
+MobileFPLockNeedsSignature = De vergunning moet ondertekend zijn voordat deze kan worden vergrendeld.
+MobileFPSpreadAvailableOnceSignedAndLocked = De verspreiding is beschikbaar zodra de vergunning door de verantwoordelijken is ondertekend en vergrendeld.
+MobileFPDefaultDateStartToday = Begindatum = datum van vandaag
+MobileFPDefaultDuration = Standaardduur van de periode (dagen)
+firepermit = Vuurvergunning
+ErrorRecordIsLocked = Deze registratie is vergrendeld en kan niet meer worden gewijzigd.
+MobilePPEmailTemplateExt = E-mailsjabloon voor de verantwoordelijke van de externe onderneming
+MobilePPEmailTemplateInt = E-mailsjabloon voor de medewerkers van de externe onderneming
+
+#
+# ListingRisksDocument PDF - Risicolijst in PDF-formaat
+#
+
+ListingRisksDocumentPDF            = Risicolijst PDF
+ListingRisksDocumentPDFDescription = Risicolijst als native PDF, geopend op de mini risico-inventarisatie van het element
+ListingRisksDocumentPDFTitle       = RISICO-INVENTARISATIE
+ListingRisksEstablishment          = Vestiging
+ListingRisksCoverContent           = Inhoud
+ListingRisksCoverHierarchy         = Hiërarchie
+ListingRisksCoverDuerpFollowUp     = Opvolging van de risico-inventarisatie
+ListingRisksCoverEmergencyNumbers  = Alarmnummers
+ListingRisksCoverReportIncident    = Een ongeval of een probleem melden
+ListingRisksCoverRegisters         = Registers arbeidsveiligheid en -gezondheid en ernstig en onmiddellijk gevaar
+ListingRisksCoverIllustration      = Illustratieafbeelding
+NoPreventionOfficerAssigned        = Geen preventiemedewerker aangewezen
+NoEmergencyNumberConfigured        = Geen alarmnummer ingesteld
+NoResponsibleAssigned              = Geen verantwoordelijke aangewezen
+ListingRisksLegalTitle             = Regelgevend kader
+RiskDefinitionTitle                = Definitie van een risico
+RiskDefinitionText                 = Risico: zn. Gevaar of nadeel waaraan men zich blootstelt. Iets op eigen risico doen, waarbij men de volledige verantwoordelijkheid voor de gevolgen draagt. Een berekend risico. Risico's nemen: zich aan een gevaar blootstellen.
+DangerDefinitionTitle              = Definitie van een gevaar
+DangerDefinitionText               = Gevaar: zn. (uit het volkslatijn dominiarium "macht", van dominus "meester"; oorspronkelijk het feit dat men aan iemand is overgeleverd). Wat de veiligheid of het leven van iemand bedreigt; wat een situatie, een onderneming enz. in gevaar kan brengen.
+SingleDocumentTitle                = De risico-inventarisatie
+SingleDocumentText                 = De risico-inventarisatie wordt geregeld door de artikelen R4121-1 tot en met 4 van het Franse arbeidswetboek. De algemene preventiebeginselen bepalen de volgorde waarin het risico wordt aangepakt.
+PreventionPrinciplesTitle          = De algemene preventiebeginselen - Artikel L4121-2
+PreventionPrinciplesIntro          = De werkgever voert de in artikel L. 4121-1 bedoelde maatregelen uit op basis van de volgende algemene preventiebeginselen:
+PreventionPrinciple1               = Risico's vermijden.
+PreventionPrinciple2               = De risico's beoordelen die niet kunnen worden vermeden.
+PreventionPrinciple3               = Risico's bij de bron bestrijden.
+PreventionPrinciple4               = Het werk aan de mens aanpassen, met name wat betreft het ontwerp van de werkplekken en de keuze van de arbeidsmiddelen en de werk- en productiemethoden, in het bijzonder om eentonig werk en tempogebonden werk te beperken en de gevolgen daarvan voor de gezondheid te verminderen.
+PreventionPrinciple5               = Rekening houden met de stand van de techniek.
+PreventionPrinciple6               = Vervangen wat gevaarlijk is door wat niet of minder gevaarlijk is.
+PreventionPrinciple7               = De preventie plannen door techniek, arbeidsorganisatie, arbeidsomstandigheden, sociale verhoudingen en de invloed van omgevingsfactoren tot een samenhangend geheel te verbinden, met name de risico's verbonden aan pesten en seksuele intimidatie, alsook die verbonden aan seksistisch gedrag.
+PreventionPrinciple8               = Collectieve beschermingsmaatregelen treffen en daaraan voorrang geven boven individuele beschermingsmaatregelen.
+PreventionPrinciple9               = De werknemers passende instructies geven.
+ListingRisksCotationMethodTitle    = Berekeningsmethode van de scores
+ListingRisksCotationMethodText     = De score van een risico is een cijfer van 0 tot 100 dat bij de beoordeling wordt toegekend. Het risiconiveau in de lijst volgt daar rechtstreeks uit, volgens onderstaande tabel.
+ListingRisksCotationLevel          = Niveau
+ListingRisksCotationRange          = Score
+ListingRisksCotationMeaning        = Betekenis
+ListingRisksCotationAction         = Te volgen handelwijze
+ListingRisksCotationAction1        = De aanwezige preventiemiddelen in stand houden.
+ListingRisksCotationAction2        = Een actie opnemen in het jaarlijkse preventieprogramma.
+ListingRisksCotationAction3        = Op korte termijn een preventieactie starten.
+ListingRisksCotationAction4        = Onmiddellijk handelen, de blootstelling moet stoppen.
+ListingRisksListTitle              = Lijst van risico's
+ListingRisksActionPlan             = Acties van het jaarlijkse preventieprogramma
+ListingRisksCotationColumn         = Sc.
+ListingRisksRiskColumn             = Risico
+ListingRisksAssessmentColumn       = Informatie over de beoordeling
+NoRiskAssessed                     = Geen risico beoordeeld binnen dit bereik
