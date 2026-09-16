@@ -56,7 +56,9 @@ window.digiriskdolibarr.risk.selectDanger = function( event ) {
 
 	var riskDescriptionPrefill = element.closest('.wpeo-dropdown').find('.input-risk-description-prefill').val();
 	if (riskDescriptionPrefill == 1) {
-		element.closest('.risk-content').find('.risk-description textarea').text(element.closest('.wpeo-tooltip-event').attr('aria-label'));
+		// L'aria-label sert l'infobulle et contient le bloc réglementaire des catégories de pénibilité : la description ne veut que le nom.
+		var categoryName = element.data('name') || element.closest('.wpeo-tooltip-event').attr('aria-label');
+		element.closest('.risk-content').find('.risk-description textarea').text(categoryName);
 	}
 	var elementParent = $(this).closest('.modal-container');
 
