@@ -57,20 +57,12 @@
       {
         "name": "Risques et nuisances liés au bruit",
         "thumbnail_name": "nuisances_PictoCategorie_v2",
-        "position": 11,
-        "reference": "L.4161-1",
-        "c2p": "OUI",
-        "criteres": "LEX,8h ≥ 81 dB(A) ou Lp,C,peak ≥ 135 dB(C)",
-        "seuil": "600 h/an ou 120 fois/an"
+        "position": 11
       },
       {
         "name": "Risques liés aux ambiances thermiques",
         "thumbnail_name": "climat_PictoCategorie_v2",
-        "position": 12,
-        "reference": "L.4161-1",
-        "c2p": "OUI",
-        "criteres": "T° ≤ 5 °C ou ≥ 30 °C",
-        "seuil": "900 h/an"
+        "position": 12
       },
       {
         "name": "Risques d'incendie et d'explosion",
@@ -99,11 +91,6 @@
         "position": 17
       },
       {
-        "name": "Risques liés aux vibrations",
-        "thumbnail_name": "vibration_PictoCategorie_v2",
-        "position": 18
-      },
-      {
         "name": "Risques de heurt, de cognement",
         "thumbnail_name": "heurt_PictoCategorie_v2",
         "position": 19
@@ -119,13 +106,27 @@
         "position": 21
       },
       {
+        "name": "Risques autres",
+        "thumbnail_name": "autre_PictoCategorie_v2",
+        "position": 31
+      },
+      {
+        "name": "Risques liés aux vibrations",
+        "thumbnail_name": "picto_risk_vibration_48px",
+        "position": 18,
+        "reference": "L.4161-1",
+        "c2p": "NON",
+        "criteres": "Mains-bras / corps entier",
+        "seuil": "Pas de seuil C2P réglementaire actuel (A(8) en m/s², durée)"
+      },
+      {
         "name": "Risques liés aux postures pénibles",
         "thumbnail_name": "picto_risk_strenuous-posture_48px-2",
         "position": 22,
         "reference": "L.4161-1",
         "c2p": "NON",
-        "criteres": "Maintien prolongé de postures pénibles",
-        "seuil": "900 h/an"
+        "criteres": "Positions forcées des articulations",
+        "seuil": "Pas de seuil C2P réglementaire actuel (posture, durée, fréquence)"
       },
       {
         "name": "Risques liés aux activités exercées en milieu hyperbare",
@@ -164,9 +165,40 @@
         "seuil": "900 h/an"
       },
       {
-        "name": "Risques autres",
-        "thumbnail_name": "autre_PictoCategorie_v2",
-        "position": 27
+        "name": "Agents chimiques dangereux (ACD)",
+        "thumbnail_name": "picto_risk_acd_48px",
+        "position": 27,
+        "reference": "L.4161-1",
+        "c2p": "NON",
+        "criteres": "ACD, poussières et fumées",
+        "seuil": "Pas de seuil C2P réglementaire actuel (agent, classification CLP, voie, durée, mesures de prévention)"
+      },
+      {
+        "name": "Manutentions manuelles de charges",
+        "thumbnail_name": "picto_risk_heavy-load_48px",
+        "position": 28,
+        "reference": "L.4161-1",
+        "c2p": "NON",
+        "criteres": "Port, levage, poussée, traction, déplacement de charges",
+        "seuil": "Pas de seuil C2P réglementaire actuel (kg, fréquence, durée, type de manutention)"
+      },
+      {
+        "name": "Températures extrêmes",
+        "thumbnail_name": "picto_risk_extreme-temperature_48px",
+        "position": 29,
+        "reference": "L.4161-1",
+        "c2p": "OUI",
+        "criteres": "T° ≤ 5 °C ou ≥ 30 °C",
+        "seuil": "900 h/an"
+      },
+      {
+        "name": "Bruit",
+        "thumbnail_name": "picto_risk_noise_48px",
+        "position": 30,
+        "reference": "L.4161-1",
+        "c2p": "OUI",
+        "criteres": "LEX,8h ≥ 81 dB(A) ou Lp,C,peak ≥ 135 dB(C)",
+        "seuil": "600 h/an ou 120 fois/an"
       }
     ],
     "riskenvironmental": [
