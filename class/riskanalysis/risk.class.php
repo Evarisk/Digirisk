@@ -792,26 +792,60 @@ class Risk extends SaturneObject
 		return -1;
 	}
 
+	/**
+	 * Formate le libellé enrichi d'une catégorie de danger, destiné aux infobulles
+	 *
+	 * Les catégories de pénibilité portent un bloc réglementaire qui n'a de sens qu'au
+	 * survol : il ne doit jamais atterrir dans un PDF, un ODT, un export ou une description.
+	 *
+	 * @param  array  $category Danger category as defined in dangerCategories.json
+	 * @return string           Category name, suffixed by its regulatory block when it has one
+	 */
 	public function formatDangerCategoryTooltip(array $category)
 	{
+		global $langs;
+
 		$tooltip = $category['name'];
 		if (!empty($category['reference'])) {
-			$tooltip .= '&#10;Référence : ' . $category['reference'];
-			$tooltip .= '&#10;C2P : ' . $category['c2p'];
-			$tooltip .= '&#10;Critères d\'exposition : ' . $category['criteres'];
-			$tooltip .= '&#10;Seuil réglementaire : ' . $category['seuil'];
+			$tooltip .= '&#10;' . $langs->transnoentities('DangerCategoryReference') . ' : ' . $category['reference'];
+			$tooltip .= '&#10;' . $langs->transnoentities('DangerCategoryC2P') . ' : ' . $category['c2p'];
+			$tooltip .= '&#10;' . $langs->transnoentities('DangerCategoryExposureCriteria') . ' : ' . $category['criteres'];
+			$tooltip .= '&#10;' . $langs->transnoentities('DangerCategoryRegulatoryThreshold') . ' : ' . $category['seuil'];
 		}
+
 		return $tooltip;
 	}
 
 	/**
-	 * Get danger category picto name
+	 * Get danger category name
 	 *
 	 * @param         $object
-     * @param  string $riskType         Type of risk ('risk', 'riskenvironmental', etc.)
-	 * @return string $category['name'] Name to danger category picto, -1 if don't exist
+	 * @param  string $riskType         Type of risk ('risk', 'riskenvironmental', etc.)
+	 * @return string $category['name'] Name of the danger category, -1 if don't exist
 	 */
 	public function getDangerCategoryName($object, string $riskType = 'risk')
+	{
+		$risk_categories = static::getDangerCategories($riskType);
+		foreach ($risk_categories as $category) {
+			if ($category['position'] == $object->category) {
+				return $category['name'];
+			}
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Get danger category tooltip
+	 *
+	 * Réservé à la construction d'un aria-label : le retour contient le bloc
+	 * réglementaire des catégories de pénibilité, contrairement à getDangerCategoryName().
+	 *
+	 * @param         $object
+	 * @param  string $riskType Type of risk ('risk', 'riskenvironmental', etc.)
+	 * @return string           Tooltip of the danger category, -1 if don't exist
+	 */
+	public function getDangerCategoryTooltip($object, string $riskType = 'risk')
 	{
 		$risk_categories = static::getDangerCategories($riskType);
 		foreach ($risk_categories as $category) {
@@ -901,13 +935,34 @@ class Risk extends SaturneObject
 	}
 
 	/**
-	 * Get danger category picto path
+	 * Get danger category name by position
 	 *
 	 * @param  int    $position
-     * @param  string $riskType                   Type of risk ('risk', 'riskenvironmental', etc.)
-	 * @return string $category['thumbnail_name'] Path to danger category picto, -1 if don't exist
+	 * @param  string $riskType         Type of risk ('risk', 'riskenvironmental', etc.)
+	 * @return string $category['name'] Name of the danger category, -1 if don't exist
 	 */
 	public function getDangerCategoryNameByPosition($position, string $riskType = 'risk')
+	{
+		$risk_categories = static::getDangerCategories($riskType);
+		foreach ($risk_categories as $category) {
+			if ($category['position'] == $position) {
+				return $category['name'];
+			}
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Get danger category tooltip by position
+	 *
+	 * Réservé à la construction d'un aria-label, comme getDangerCategoryTooltip().
+	 *
+	 * @param  int    $position
+	 * @param  string $riskType Type of risk ('risk', 'riskenvironmental', etc.)
+	 * @return string           Tooltip of the danger category, -1 if don't exist
+	 */
+	public function getDangerCategoryTooltipByPosition($position, string $riskType = 'risk')
 	{
 		$risk_categories = static::getDangerCategories($riskType);
 		foreach ($risk_categories as $category) {

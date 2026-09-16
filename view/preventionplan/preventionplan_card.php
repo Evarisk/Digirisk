@@ -1391,7 +1391,7 @@ print '<input type="hidden" name="fk_element" value="0">';
 							<input class="input-hidden-danger" type="hidden" name="risk_category_id"
 								   value="<?php echo $item->category ?>"/>
 							<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
-								 aria-label="<?php echo $risk->getDangerCategoryName($item) ?>">
+								 aria-label="<?php echo $risk->getDangerCategoryTooltip($item) ?>">
 								<img class="danger-category-pic hover"
 									 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($item) . '.png'; ?>"/>
 							</div>
