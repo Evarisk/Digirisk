@@ -1338,7 +1338,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 							if ( ! empty($dangerCategories)) :
 								foreach ($dangerCategories as $dangerCategory) : ?>
 									<li class="item dropdown-item wpeo-tooltip-event"
-										ata-is-preset="<?php echo ''; ?>"
+										data-is-preset="<?php echo ''; ?>"
 										data-id="<?php echo $dangerCategory['position'] ?>"
 										aria-label="<?php echo $dangerCategory['name'] ?>">
 										<img
