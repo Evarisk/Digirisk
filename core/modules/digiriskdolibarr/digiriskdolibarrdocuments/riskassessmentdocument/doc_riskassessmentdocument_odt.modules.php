@@ -317,7 +317,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
      *
      * @param Odf       $odfHandler  Object builder odf library
      * @param Translate $outputLangs Lang object to use for output
-     * @param array     $moreParam   More param (segmentName, dangerCategories, riskByCategories)
+     * @param array     $moreParam   More param (segmentName, dangerCategories, dangerSubCategories, riskBySubCategories, totalRisks)
      *
      * @throws OdfException
      * @throws Exception
@@ -374,11 +374,21 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
             $totalPercentageByCategory = 0;
             $totalNbRiskByCategory     = 0;
             foreach ($dangerCategories as $dangerCategory) {
-                if ($dangerCategory['position'] != 17) {
+                if ($dangerCategory['position'] != Risk::PSYCHOSOCIAL_CATEGORY_POSITION) {
                     continue;
                 }
 
-                foreach($dangerSubCategories[$dangerCategory['position']] as $dangerSubCategory) {
+                $psychosocialLines = $dangerSubCategories[$dangerCategory['position']];
+                // A psychosocial risk filed without any factor is counted nowhere else: the category
+                // table skips the psychosocial category and this one only knows its factors - issue #4724
+                if (!empty($riskBySubCategories[Risk::SUB_CATEGORY_NOT_SPECIFIED])) {
+                    $psychosocialLines[] = [
+                        'name'     => $outputLangs->transnoentities('PsychosocialRiskWithoutFactor'),
+                        'position' => Risk::SUB_CATEGORY_NOT_SPECIFIED
+                    ];
+                }
+
+                foreach ($psychosocialLines as $dangerSubCategory) {
                     $tmpArray['picto']            = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png';
                     $tmpArray['riskCategoryName'] = $dangerSubCategory['name'];
 
@@ -424,7 +434,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
      *
      * @param Odf       $odfHandler  Object builder odf library
      * @param Translate $outputLangs Lang object to use for output
-     * @param array     $moreParam   More param (segmentName, dangerCategories, riskByCategories)
+     * @param array     $moreParam   More param (segmentName, psychosocialRisksByGPUT, digiriskElements)
      *
      * @throws OdfException
      * @throws Exception
@@ -443,46 +453,73 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
 
         if ($foundTagForLines) {
             $digiriskElement = new DigiriskElement($db);
-            $risk = new Risk($db);
-            $psychosocialRisksByGPUT = $moreParam['psychosocialRisksByGPUT'];
-            $tmpArray = [];
-            $dangerSubCategories = $risk->getDangerSubCategories();
+            $risk            = new Risk($db);
 
-            foreach($dangerSubCategories[17] as $dangerSubCategory) {
-                $subCategoryName = $risk->getDangerSubCategoryName(17, $dangerSubCategory['position']);
-                $formattedSubCategoryName = lcfirst($subCategoryName) . 'Scale';
-                $tmpArray[$formattedSubCategoryName] = '-';
+            $psychosocialRisksByGPUT = $moreParam['psychosocialRisksByGPUT'];
+            $dangerSubCategories     = $risk->getDangerSubCategories()[Risk::PSYCHOSOCIAL_CATEGORY_POSITION] ?? [];
+
+            $scaleTagBySubCategory = [];
+            foreach ($dangerSubCategories as $dangerSubCategory) {
+                $subCategoryName = $risk->getDangerSubCategoryName(Risk::PSYCHOSOCIAL_CATEGORY_POSITION, $dangerSubCategory['position']);
+                $scaleTagBySubCategory[$dangerSubCategory['position']] = lcfirst($subCategoryName) . 'Scale';
             }
 
-            if (is_array($psychosocialRisksByGPUT) && !empty($psychosocialRisksByGPUT)) {
-                foreach($psychosocialRisksByGPUT as $digiriskElementId => $psychosocialRiskByGPUT) {
-                    $digiriskElement->fetch($digiriskElementId);
-                    $tmpArray['digiriskElementLabel'] = 'S' . $digiriskElement->entity . ' - ' . $digiriskElement->ref . ' - ' . $digiriskElement->label;
-                    if (is_array($psychosocialRiskByGPUT) && !empty($psychosocialRiskByGPUT)) {
-                        foreach($psychosocialRiskByGPUT as $riskAssessmentCotationType => $riskAssessments) {
-                            $subCategoryName = $risk->getDangerSubCategoryName(17, $riskAssessmentCotationType);
-                            $formattedSubCategoryName = lcfirst($subCategoryName) . 'Scale';
-                            $lastRiskAssessmentCotation = null;
-                            $lastRiskAssessmentDate = null;
+            // An element is only evaluated on some of the sub-categories: without this reset the
+            // columns it leaves untouched keep the values of the previous line - issue #4724
+            $emptyLine = array_fill_keys($scaleTagBySubCategory, '-');
 
-                            if (is_array($riskAssessments) && !empty($riskAssessments)) {
-                                foreach ($riskAssessments as $date => $riskAssessmentCotation) {
-                                     if (is_null($lastRiskAssessmentCotation) || $date > $lastRiskAssessmentDate) {
-                                         $lastRiskAssessmentDate = $date;
-                                         $lastRiskAssessmentCotation = $riskAssessmentCotation;
-                                        }
+            $nbPsychosocialRiskDigiriskElements = 0;
+
+            if (is_array($psychosocialRisksByGPUT) && !empty($psychosocialRisksByGPUT)) {
+                foreach ($psychosocialRisksByGPUT as $digiriskElementId => $psychosocialRiskByGPUT) {
+                    if ($digiriskElement->fetch($digiriskElementId) <= 0) {
+                        continue;
+                    }
+
+                    $tmpArray                         = $emptyLine;
+                    $tmpArray['digiriskElementLabel'] = 'S' . $digiriskElement->entity . ' - ' . $digiriskElement->ref . ' - ' . $digiriskElement->label;
+
+                    // The column holds one date for the whole line, so the most recent assessment of the
+                    // element is the only one that describes it, not the last sub-category met by the loop
+                    $lastElementAssessmentDate = null;
+                    if (is_array($psychosocialRiskByGPUT) && !empty($psychosocialRiskByGPUT)) {
+                        foreach ($psychosocialRiskByGPUT as $subCategoryPosition => $riskAssessments) {
+                            if (!isset($scaleTagBySubCategory[$subCategoryPosition]) || !is_array($riskAssessments) || empty($riskAssessments)) {
+                                continue;
+                            }
+
+                            $lastRiskAssessmentCotation = null;
+                            $lastRiskAssessmentDate     = null;
+                            foreach ($riskAssessments as $date => $riskAssessmentCotation) {
+                                if (is_null($lastRiskAssessmentCotation) || $date > $lastRiskAssessmentDate) {
+                                    $lastRiskAssessmentDate     = $date;
+                                    $lastRiskAssessmentCotation = $riskAssessmentCotation;
                                 }
                             }
 
-                            $tmpArray[$formattedSubCategoryName] = $risk->getDangerSubCategoryScaleLabel($lastRiskAssessmentCotation);
-                            $tmpArray['riskAssessmentDate'] = dol_print_date($lastRiskAssessmentDate, 'dayhour', $outputLangs);
+                            $tmpArray[$scaleTagBySubCategory[$subCategoryPosition]] = $risk->getDangerSubCategoryScaleLabel($lastRiskAssessmentCotation);
+
+                            if ($lastRiskAssessmentDate > $lastElementAssessmentDate) {
+                                $lastElementAssessmentDate = $lastRiskAssessmentDate;
+                            }
                         }
                     }
 
+                    $tmpArray['riskAssessmentDate'] = dol_print_date($lastElementAssessmentDate, 'dayhour', $outputLangs);
+
                     static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                    $nbPsychosocialRiskDigiriskElements++;
                 }
             }
             $odfHandler->mergeSegment($listLines);
+
+            // The sentence introducing the table announces both counts, left as empty tags in the template
+            $tmpArray = [
+                'nbDigiriskElements'                 => count($moreParam['digiriskElements'] ?? []),
+                'nbPsychosocialRiskDigiriskElements' => $nbPsychosocialRiskDigiriskElements
+            ];
+
+            static::setTmpArrayVars($tmpArray, $odfHandler, $outputLangs, false);
         }
     }
 

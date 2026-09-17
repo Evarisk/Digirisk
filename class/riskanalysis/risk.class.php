@@ -69,6 +69,17 @@ class Risk extends SaturneObject
      */
     public const COTATION_NOT_ASSESSED = -2;
 
+    /**
+     * @var int Position of the psychosocial danger category, the only one carrying sub-categories.
+     */
+    public const PSYCHOSOCIAL_CATEGORY_POSITION = 17;
+
+    /**
+     * @var int Pseudo position of the psychosocial risks filed without any factor.
+     *          Negative so it never collides with a real sub-category position, which starts at 0.
+     */
+    public const SUB_CATEGORY_NOT_SPECIFIED = -1;
+
 	/**
 	 * @var string String with name of icon for risk. Must be the part after the 'object_' into object_risk.png
 	 */
@@ -296,9 +307,6 @@ class Risk extends SaturneObject
             $array[$entity]['riskByCategories'][$risk->category ?? ''][$scale]
                 = $array[$entity]['riskByCategories'][$risk->category ?? ''][$scale] ?? 0;
 
-            $array[$entity]['riskBySubCategories'][$risk->sub_category ?? ''][$scale]
-                = $array[$entity]['riskBySubCategories'][$risk->sub_category ?? ''][$scale] ?? 0;
-
             $array['riskByEntities'][$risk->entity ?? '']['nbTotalRisks']
                 = $array['riskByEntities'][$risk->entity ?? '']['nbTotalRisks'] ?? 0;
 
@@ -310,11 +318,22 @@ class Risk extends SaturneObject
             $array[$entity]['riskByRiskAssessmentLevels'][$scale][] = $risk;
             $array[$entity]['riskByRiskAssessmentCotations'][$fkElement]['totalRiskAssessmentCotations'] += $risk->riskAssessmentCotation;
             $array[$entity]['riskByRiskAssessmentCotations'][$fkElement][$scale]++;
-            if ($risk->sub_category >= 0) {
-                $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$risk->sub_category][$risk->riskAssessmentDate] = $riskAssessment->cotation;
-            }
             $array[$entity]['riskByCategories'][$risk->category ?? ''][$scale]++;
-            $array[$entity]['riskBySubCategories'][$risk->sub_category][$scale]++;
+            // Both sub-category breakdowns only describe the psychosocial category, the single one
+            // carrying sub-categories, and the risk assessment document is their only reader.
+            // sub_category is NULL on every other risk and null >= 0 was true, so every risk of the
+            // entity used to land in the RPS table, one line per element - issue #4724
+            if ($risk->category == self::PSYCHOSOCIAL_CATEGORY_POSITION) {
+                // A psychosocial risk can be filed without any factor: give it a key of its own rather
+                // than dropping it, the category table leaves the psychosocial category to these tables
+                $subCategory = is_numeric($risk->sub_category) ? (int) $risk->sub_category : self::SUB_CATEGORY_NOT_SPECIFIED;
+
+                $array[$entity]['riskBySubCategories'][$subCategory][$scale] = ($array[$entity]['riskBySubCategories'][$subCategory][$scale] ?? 0) + 1;
+
+                if ($subCategory != self::SUB_CATEGORY_NOT_SPECIFIED) {
+                    $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$subCategory][$risk->riskAssessmentDate] = $riskAssessment->cotation;
+                }
+            }
             $array['riskByEntities'][$risk->entity]['nbTotalRisks']++;
             $array['riskByEntities'][$risk->entity][$scale]++;
             $nbTotalRisks[$entity]++;
