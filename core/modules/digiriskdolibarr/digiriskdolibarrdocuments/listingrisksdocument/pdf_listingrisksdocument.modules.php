@@ -105,6 +105,11 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     ];
 
     /**
+     * @var array Responsables des taches, indexes par identifiant de tache
+     */
+    protected array $taskResponsibles = [];
+
+    /**
      * Bande basse reservee au pied de page, en mm. Le contenu s'arrete au dessus, le pied
      * s'ecrit dedans : c'est ce qui garantit qu'ils ne se chevauchent jamais.
      */
@@ -1155,6 +1160,8 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         $riskLevels          = $riskInfos['current']['riskByRiskAssessmentLevels'] ?? [];
         $riskTasks           = $riskInfos['current']['riskTasks'] ?? [];
 
+        $this->taskResponsibles = $this->loadTaskResponsibles($riskTasks);
+
         $header = [
             $outputLangs->transnoentities('DigiriskElement'),
             $outputLangs->transnoentities('Ref'),
@@ -1291,6 +1298,46 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     }
 
     /**
+     * Responsables des taches du plan d'action, charges en une seule requete.
+     *
+     * liste_contact() interroge la base tache par tache : sur un listing qui en compte
+     * plusieurs centaines, la meme information couterait autant de requetes.
+     *
+     * @param  array $riskTasks Taches, indexees par identifiant de risque
+     * @return array            Noms des responsables, indexes par identifiant de tache
+     */
+    protected function loadTaskResponsibles(array $riskTasks): array
+    {
+        $taskIds = [];
+        foreach ($riskTasks as $tasks) {
+            foreach ($tasks as $task) {
+                $taskIds[(int) $task->id] = (int) $task->id;
+            }
+        }
+
+        if (empty($taskIds)) {
+            return [];
+        }
+
+        $sql  = 'SELECT ec.element_id, u.firstname, u.lastname FROM ' . MAIN_DB_PREFIX . 'element_contact as ec';
+        $sql .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'c_type_contact as tc ON ec.fk_c_type_contact = tc.rowid';
+        $sql .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'user as u ON ec.fk_socpeople = u.rowid';
+        $sql .= ' WHERE ec.element_id IN (' . implode(',', $taskIds) . ')';
+        $sql .= " AND tc.element = 'project_task' AND tc.source = 'internal' AND tc.code = 'TASKEXECUTIVE'";
+
+        $responsibles = [];
+        $resql        = $this->db->query($sql);
+        if ($resql) {
+            while ($obj = $this->db->fetch_object($resql)) {
+                $responsibles[(int) $obj->element_id][] = trim($obj->firstname . ' ' . $obj->lastname);
+            }
+            $this->db->free($resql);
+        }
+
+        return $responsibles;
+    }
+
+    /**
      * Taches du programme annuel de prevention rattachees a un risque.
      *
      * @param  int       $riskId      Risk ID
@@ -1324,6 +1371,9 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
             $line = $riskTask->label;
             if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT')) {
                 $line = $riskTask->ref . ' - ' . $line;
+            }
+            if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT') && !empty($this->taskResponsibles[$riskTask->id])) {
+                $line .= "\n" . $outputLangs->transnoentities('Responsible') . ' : ' . implode(', ', $this->taskResponsibles[$riskTask->id]);
             }
             if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_DATE_IN_DOCUMENT')) {
                 $startDate = (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_TASK_START_DATE') && !empty($riskTask->dateo)) ? $riskTask->dateo : $riskTask->datec;

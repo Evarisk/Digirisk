@@ -937,7 +937,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 MAIN_DB_PREFIX . 'c_preventionplan_attendants_role',
                 MAIN_DB_PREFIX . 'c_firepermit_attendants_role',
                 MAIN_DB_PREFIX . 'c_digiriskdolibarr_certification',
-                MAIN_DB_PREFIX . 'c_digiriskdolibarr_actionplan_column'
+                MAIN_DB_PREFIX . 'c_digiriskdolibarr_actionplan_column',
+                MAIN_DB_PREFIX . 'c_digiriskdolibarr_ticket_location'
             ],
             // Label of tables
             'tablib' => [
@@ -950,7 +951,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 'PreventionPlanRole',
                 'FirePermitRole',
                 'CertificationDictionary',
-                'ActionPlanColumnDictionary'
+                'ActionPlanColumnDictionary',
+                'TicketLocationDictionary'
             ],
             // Request to select fields
             'tabsql' => [
@@ -963,11 +965,13 @@ class modDigiriskdolibarr extends DolibarrModules
                 'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_preventionplan_attendants_role as f',
                 'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_firepermit_attendants_role as f',
                 'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_certification as f',
-                'SELECT f.rowid as rowid, f.ref, f.label, f.progress_min, f.progress_max, f.color, f.picto, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_actionplan_column as f'
+                'SELECT f.rowid as rowid, f.ref, f.label, f.progress_min, f.progress_max, f.color, f.picto, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_actionplan_column as f',
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_ticket_location as f'
             ],
             // Sort order
             'tabsqlsort' => [
                 'code ASC',
+                'position ASC',
                 'position ASC',
                 'position ASC',
                 'position ASC',
@@ -989,7 +993,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 'ref,label,description,position',
                 'ref,label,description,position',
                 'ref,label,description,position',
-                'ref,label,progress_min,progress_max,color,picto,position'
+                'ref,label,progress_min,progress_max,color,picto,position',
+                'ref,label,description,position'
             ],
             // List of fields (list of fields to edit a record)
             'tabfieldvalue' => [
@@ -1002,7 +1007,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 'ref,label,description,position',
                 'ref,label,description,position',
                 'ref,label,description,position',
-                'ref,label,progress_min,progress_max,color,picto,position'
+                'ref,label,progress_min,progress_max,color,picto,position',
+                'ref,label,description,position'
             ],
             // List of fields (list of fields for insert)
             'tabfieldinsert' => [
@@ -1015,10 +1021,12 @@ class modDigiriskdolibarr extends DolibarrModules
                 'ref,label,description,position',
                 'ref,label,description,position',
                 'ref,label,description,position',
-                'ref,label,progress_min,progress_max,color,picto,position'
+                'ref,label,progress_min,progress_max,color,picto,position',
+                'ref,label,description,position'
             ],
             // Name of columns with primary key (try to always name it 'rowid')
             'tabrowid' => [
+                'rowid',
                 'rowid',
                 'rowid',
                 'rowid',
@@ -1032,6 +1040,7 @@ class modDigiriskdolibarr extends DolibarrModules
             ],
             // Condition to show each dictionary
             'tabcond' => [
+                !empty($conf->digiriskdolibarr->enabled),
                 !empty($conf->digiriskdolibarr->enabled),
                 !empty($conf->digiriskdolibarr->enabled),
                 !empty($conf->digiriskdolibarr->enabled),
@@ -1059,7 +1068,8 @@ class modDigiriskdolibarr extends DolibarrModules
                     'progress_max' => $langs->trans('ActionPlanColumnProgressHelp'),
                     'color'        => $langs->trans('ActionPlanColumnColorHelp'),
                     'picto'        => $langs->trans('ActionPlanColumnPictoHelp')
-                ]
+                ],
+                []
             ]
         ];
 
@@ -2590,7 +2600,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
         saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
 
-        if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) <= 4) {
+        if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) <= 5) {
             $result = $this->_load_tables('/install/mysql/', 'ticket');
             if ($result < 0) {
                 return -1;
@@ -2606,12 +2616,16 @@ class modDigiriskdolibarr extends DolibarrModules
                 'digiriskdolibarr_ticket_phone'      => ['Label' => 'Phone',            'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => $this->numero . 30,                                                                                                        ],
 				'digiriskdolibarr_ticket_service'    => ['Label' => 'GP/UT', 'type' => 'chkbxlst', 'elementtype' => ['ticket'], 'position' => $this->numero . 40, 'params' => ['digiriskdolibarr_digiriskelement:ref|label:rowid::((status:>:0) AND (entity:=:$ENTITY$))::' => null], 'list' => 4],
 				'digiriskdolibarr_ticket_location'   => ['Label' => 'Location',         'type' => 'varchar',  'length' => 255, 'elementtype' => ['ticket'], 'position' => $this->numero . 50,                                                                                                        ],
+                // Deliberately not prefixed with 'digiriskdolibarr_ticket_' : that prefix is what the public form
+                // and the ticket category configuration use to pick the fields they render on their own. The GPS
+                // coordinates are captured by the Location field itself, never typed in a field of their own
+                'digiriskdolibarr_location_gps'      => ['Label' => 'GPSCoordinates',   'type' => 'varchar',  'length' => 64,  'elementtype' => ['ticket'], 'position' => $this->numero . 55,                                                                                                        ],
                 'digiriskdolibarr_ticket_date'       => ['Label' => 'DeclarationDate',  'type' => 'datetime',                  'elementtype' => ['ticket'], 'position' => $this->numero . 60,                                                                                                        ],
                 'digiriskdolibarr_condition_message' => ['Label' => 'ConditionMessage', 'type' => 'text',                      'elementtype' => ['ticket'], 'position' => $this->numero . 70]
             ];
 
             saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
-            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 5, 'integer', 0, '', 0);
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 6, 'integer', 0, '', 0);
         }
 
 		//DigiriskElement favorite medias backward compatibility

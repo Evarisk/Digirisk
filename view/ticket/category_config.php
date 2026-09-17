@@ -334,7 +334,9 @@ foreach ($categoriesConfig as $categoryLabel => $categoryConfig) {
 
 // Success Message
 print '<tr class="oddeven">';
-print '<td>' . $form->textwithpicto($langs->transnoentities("TicketSuccessMessage"), $helpforsubstitution, 1, 'help', '', 0, 2, 'substittooltipfrombody') . '</td>';
+// The success message is printed as is, it is never run through make_substitutions: the help
+// picto could only ever open an empty tooltip, and $helpforsubstitution was never defined
+print '<td>' . $langs->transnoentities('TicketSuccessMessage') . '</td>';
 print '</td><td class="center">';
 $doleditor = new DolEditor('success_message', $ticketCategoryConfig->success_message ?? $successMessage, '100%', 120, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_MAIL, ROWS_2, 70);
 $doleditor->Create();

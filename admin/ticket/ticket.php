@@ -161,6 +161,10 @@ if ($action == 'generateExtrafields') {
         'digiriskdolibarr_ticket_phone'      => ['Label' => 'Phone',            'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => 43630230,                                                                                                        ],
         'digiriskdolibarr_ticket_service'    => ['Label' => 'GP/UT',            'type' => 'link',                      'elementtype' => ['ticket'], 'position' => 43630240, 'params' => ['DigiriskElement:digiriskdolibarr/class/digiriskelement.class.php:1:(status:>:0)' => NULL], 'list' => 4],
         'digiriskdolibarr_ticket_location'   => ['Label' => 'Location',         'type' => 'varchar',  'length' => 255, 'elementtype' => ['ticket'], 'position' => 43630250,                                                                                                        ],
+        // Deliberately not prefixed with 'digiriskdolibarr_ticket_' : that prefix is what the public form
+        // and the ticket category configuration use to pick the fields they render on their own. The GPS
+        // coordinates are captured by the Location field itself, never typed in a field of their own
+        'digiriskdolibarr_location_gps'      => ['Label' => 'GPSCoordinates',   'type' => 'varchar',  'length' => 64,  'elementtype' => ['ticket'], 'position' => 43630255,                                                                                                        ],
         'digiriskdolibarr_ticket_date'       => ['Label' => 'DeclarationDate',  'type' => 'datetime',                  'elementtype' => ['ticket'], 'position' => 43630260,                                                                                                        ],
         'digiriskdolibarr_condition_message' => ['Label' => 'ConditionMessage', 'type' => 'text',                      'elementtype' => ['ticket'], 'position' => 43630270]
     ];
@@ -359,6 +363,62 @@ if ($action == 'set_multi_company_ticket_public_interface') {
     exit;
 }
 
+if ($action == 'set_ticket_location_input_mode' && $permissiontowrite) {
+    $locationInputMode = GETPOST('location_input_mode', 'alpha');
+    if (!in_array($locationInputMode, ['free', 'list', 'listfree'])) {
+        $locationInputMode = 'free';
+    }
+
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_LOCATION_INPUT_MODE', $locationInputMode, 'chaine', 0, '', $conf->entity);
+
+    setEventMessages($langs->transnoentities('SavedConfig'), []);
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?page_y=' . $pageY);
+    exit;
+}
+
+// Seed the location dictionary with the locations already typed in the registers of the entity, so
+// switching an existing customer to the list mode does not mean retyping their whole history (#4732)
+if ($action == 'import_ticket_locations' && $permissiontowrite) {
+    $existingLocations = array_map('dol_strtolower', array_keys(digiriskdolibarr_ticket_location_dictionary()));
+    $importedLocations = 0;
+
+    $sql  = 'SELECT DISTINCT ef.digiriskdolibarr_ticket_location as label';
+    $sql .= ' FROM ' . MAIN_DB_PREFIX . 'ticket_extrafields as ef';
+    $sql .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'ticket as t ON t.rowid = ef.fk_object';
+    $sql .= ' WHERE ef.digiriskdolibarr_ticket_location IS NOT NULL';
+    $sql .= " AND ef.digiriskdolibarr_ticket_location != ''";
+    $sql .= ' AND t.entity IN (' . getEntity('ticket') . ')';
+
+    $resql = $db->query($sql);
+    if ($resql) {
+        $position = 1000;
+        while ($obj = $db->fetch_object($resql)) {
+            // The dictionary columns are shorter than the extrafield the labels come from
+            $label = dol_substr(trim($obj->label), 0, 255);
+            if (!dol_strlen($label) || in_array(dol_strtolower($label), $existingLocations)) {
+                continue;
+            }
+
+            $ref        = dol_substr(dol_string_nospecial(dol_string_unaccent(dol_strtoupper($label)), '_'), 0, 128);
+            $sqlInsert  = 'INSERT INTO ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_ticket_location(entity, ref, label, description, active, position)';
+            $sqlInsert .= ' VALUES (' . (int) $conf->entity . ", '" . $db->escape($ref) . "', '" . $db->escape($label) . "', '', 1, " . (int) $position . ')';
+            if ($db->query($sqlInsert)) {
+                $existingLocations[] = dol_strtolower($label);
+                $importedLocations++;
+                $position += 10;
+            }
+        }
+        $db->free($resql);
+
+        setEventMessages($langs->transnoentities('TicketLocationsImported', $importedLocations), []);
+    } else {
+        setEventMessages($db->lasterror(), [], 'errors');
+    }
+
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?page_y=' . $pageY);
+    exit;
+}
+
 // Actions set_mod, update_mask and the set_/del_ switch of the module constants
 require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
@@ -486,6 +546,61 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print $form->textwithpicto('', $langs->transnoentities("TicketDigiriskElementHideRefHelp"));
 	print '</td>';
 	print '</tr>';
+
+    // Location input mode of the register form (#4732)
+    print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
+    print '<input type="hidden" name="token" value="' . newToken() . '">';
+    print '<input type="hidden" name="action" value="set_ticket_location_input_mode">';
+    print '<input type="hidden" name="page_y">';
+
+    $locationInputModes = [
+        'free'     => $langs->transnoentities('TicketLocationInputModeFree'),
+        'list'     => $langs->transnoentities('TicketLocationInputModeList'),
+        'listfree' => $langs->transnoentities('TicketLocationInputModeListFree')
+    ];
+
+    print '<tr class="oddeven"><td>' . $langs->transnoentities('TicketLocationInputMode') . '</td>';
+    print '<td class="center"></td>';
+    print '<td class="center">';
+    print $form->selectarray('location_input_mode', $locationInputModes, digiriskdolibarr_ticket_location_input_mode(), 0, 0, 0, '', 0, 0, 0, '', 'minwidth200');
+    print '</td>';
+    print '<td class="center">';
+    print '<input type="submit" class="button reposition" value="' . $langs->transnoentities('Save') . '">';
+    print '</td>';
+    print '<td class="center">';
+    print $form->textwithpicto('', $langs->transnoentities('TicketLocationInputModeHelp'));
+    print '</td>';
+    print '</tr>';
+    print '</form>';
+
+    // The dictionary feeds the list modes, and the import saves retyping the locations of an existing base
+    print '<tr class="oddeven"><td>' . $langs->transnoentities('TicketLocationDictionary') . '</td>';
+    print '<td class="center"></td>';
+    print '<td class="center">';
+    print count(digiriskdolibarr_ticket_location_dictionary());
+    print ' <a href="' . DOL_URL_ROOT . '/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="' . $langs->trans('ConfigDico') . '">' . img_picto('', 'globe') . '</a>';
+    print '</td>';
+    print '<td class="center">';
+    print '<a class="button reposition" href="' . $_SERVER['PHP_SELF'] . '?action=import_ticket_locations&token=' . newToken() . '">' . $langs->transnoentities('ImportExistingTicketLocations') . '</a>';
+    print '</td>';
+    print '<td class="center">';
+    print $form->textwithpicto('', $langs->transnoentities('ImportExistingTicketLocationsHelp'));
+    print '</td>';
+    print '</tr>';
+
+    // Geolocation of the declarant, off by default : it needs HTTPS and the consent of the declarant
+    print '<tr class="oddeven"><td>' . $langs->transnoentities('TicketLocationGeoloc') . '</td>';
+    print '<td class="center"></td>';
+    print '<td class="center">';
+    print saturne_constant_onoff('DIGIRISKDOLIBARR_TICKET_LOCATION_GEOLOC', $permissiontowrite);
+    print '</td>';
+    print '<td class="center">';
+    print '';
+    print '</td>';
+    print '<td class="center">';
+    print $form->textwithpicto('', $langs->transnoentities('TicketLocationGeolocHelp'));
+    print '</td>';
+    print '</tr>';
 
 	if (isModEnabled('multicompany')) {
 		//Page de sélection de l'entité
