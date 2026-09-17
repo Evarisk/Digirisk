@@ -2915,3 +2915,70 @@ function digirisk_get_risk_assessments_by_risk(): DigiriskLazyMap
 
     return $riskAssessmentsByRisk;
 }
+
+/**
+ * Give a reference to the risk tasks that do not have one
+ *
+ * The DigiAI risk creation endpoint saved its tasks without asking the numbering module
+ * until 37a696a7 : those rows still carry an empty reference. Only the tasks the module
+ * is responsible for are repaired, those linked to a risk, and only in the current entity.
+ *
+ * The numbering module reads the highest reference already stored, so each task is saved
+ * before the next number is computed - otherwise they would all get the same one.
+ *
+ * @return int Number of repaired tasks, -1 on database error
+ */
+function digiriskdolibarr_backfill_task_refs(): int
+{
+    global $conf, $db;
+
+    require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+
+    $sql  = 'SELECT t.rowid FROM ' . MAIN_DB_PREFIX . 'projet_task as t';
+    $sql .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'projet_task_extrafields as ef ON ef.fk_object = t.rowid AND ef.fk_risk > 0';
+    $sql .= " WHERE (t.ref IS NULL OR t.ref = '') AND t.entity = " . (int) $conf->entity;
+    $sql .= ' ORDER BY t.rowid';
+
+    $resql = $db->query($sql);
+    if (!$resql) {
+        dol_syslog('digiriskdolibarr_backfill_task_refs : ' . $db->lasterror(), LOG_ERR);
+        return -1;
+    }
+
+    $taskIds = [];
+    while ($obj = $db->fetch_object($resql)) {
+        $taskIds[] = (int) $obj->rowid;
+    }
+    $db->free($resql);
+
+    if (empty($taskIds)) {
+        return 0;
+    }
+
+    list($refTaskMod) = saturne_require_objects_mod(['project/task' => getDolGlobalString('PROJECT_TASK_ADDON')], 'digiriskdolibarr');
+
+    $nbRepaired = 0;
+    foreach ($taskIds as $taskId) {
+        $task = new Task($db);
+        if ($task->fetch($taskId) <= 0) {
+            continue;
+        }
+
+        // The numbering module needs the loaded task : its mask may use the creation date
+        $ref = $refTaskMod->getNextValue('', $task);
+        if (empty($ref) || $ref == '-1') {
+            continue;
+        }
+
+        // Direct update rather than Task::update() : a repair has no reason to fire the
+        // modification trigger, nor to rewrite every other field of the row
+        $sql = 'UPDATE ' . MAIN_DB_PREFIX . "projet_task SET ref = '" . $db->escape($ref) . "' WHERE rowid = " . $taskId;
+        if ($db->query($sql)) {
+            $nbRepaired++;
+        }
+    }
+
+    dol_syslog('digiriskdolibarr_backfill_task_refs : ' . $nbRepaired . ' task(s) repaired');
+
+    return $nbRepaired;
+}
