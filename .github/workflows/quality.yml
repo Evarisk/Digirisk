@@ -89,6 +89,11 @@ jobs:
             # Le coeur Dolibarr est necessaire a la resolution des classes (scanDirectories).
             # Epingle sur la derniere version stable pour que le verdict soit reproductible.
             # A garder en phase avec les scanDirectories de phpstan.neon.
+            #
+            # htdocs/core/*.inc.php n'est pas un oubli : les fragments d'action du coeur
+            # (actions_fetchobject, actions_massactions, commonfieldsinimport...) vivent en
+            # vrac a la racine de core/, pas dans un sous-dossier. Sans eux, les include du
+            # module remontent en include.fileNotFound.
             - name: Checkout Dolibarr core (sparse)
               uses: actions/checkout@v4
               with:
@@ -97,6 +102,7 @@ jobs:
                   path: dolibarr-core
                   sparse-checkout: |
                       htdocs/api/class
+                      htdocs/core/*.inc.php
                       htdocs/categories/class
                       htdocs/comm/action/class
                       htdocs/comm/propal/class
