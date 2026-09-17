@@ -53,6 +53,7 @@ require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/modules/ticket/mod_ticket_simple.php';
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 
 // Load Saturne libraries
@@ -200,7 +201,24 @@ if (empty($resHook)) {
             }
         }
 
+        // The location is posted either as free text, as a label picked in the dictionary, or as the
+        // "Other" entry of that select, which carries the typed label in a field of its own (issue #4732).
+        // The resolved label goes back into $_POST so setOptionalsFromPost() stores it like any extrafield
         $location = GETPOST('options_digiriskdolibarr_ticket_location', 'alpha');
+        if ($location == '-1') {
+            $location = '';
+        }
+        if ($location == 'DIGIRISK_LOCATION_OTHER') {
+            $location = GETPOST('ticket_location_other', 'alpha');
+        }
+        $_POST['options_digiriskdolibarr_ticket_location'] = $location;
+
+        // GPS coordinates are filled by the browser, never typed : anything that is not a lat,lon pair is dropped
+        $gpsCoordinates = GETPOST('options_digiriskdolibarr_location_gps', 'alpha');
+        if (dol_strlen($gpsCoordinates) > 0 && !preg_match('/^-?\d{1,3}(\.\d+)?,-?\d{1,3}(\.\d+)?$/', $gpsCoordinates)) {
+            $_POST['options_digiriskdolibarr_location_gps'] = '';
+        }
+
         if (!empty($config['digiriskdolibarr_ticket_location_visible']) && !empty($config['digiriskdolibarr_ticket_location_required'])) {
             if (empty($location)) {
                 setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Location')), array(), 'errors');
@@ -731,6 +749,34 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
                                     $digiriskelementlabel[$element->id] = $element->ref . ' - ' . $element->label;
                                 }
                                 $out .= Form::selectarray('options_' . $key, $digiriskelementlabel, '', 1);
+                            }
+                            break;
+                        case 'digiriskdolibarr_ticket_location':
+                            // Free text, dictionary, or dictionary plus an "Other" entry, depending on the
+                            // module configuration. An empty dictionary always falls back to free text (issue #4732)
+                            $locations      = digiriskdolibarr_ticket_location_dictionary();
+                            $postedLocation = GETPOST('options_' . $key, 'alpha');
+                            if (digiriskdolibarr_ticket_location_use_list($locations)) {
+                                if (digiriskdolibarr_ticket_location_input_mode() == 'listfree') {
+                                    $locations['DIGIRISK_LOCATION_OTHER'] = $langs->transnoentities('OtherLocation');
+                                }
+
+                                $out .= Form::selectarray('options_' . $key, $locations, $postedLocation, 1, 0, 0, ($required ? 'required' : ''), 0, 0, 0, '', 'ticket-location-select');
+
+                                if (isset($locations['DIGIRISK_LOCATION_OTHER'])) {
+                                    $otherLocation = GETPOST('ticket_location_other', 'alpha');
+                                    $out .= '<input type="text" class="ticket-location-other" name="ticket_location_other" id="ticket_location_other" placeholder="' . dol_escape_htmltag($langs->transnoentities('OtherLocation')) . '" value="' . dol_escape_htmltag($otherLocation) . '"' . ($postedLocation == 'DIGIRISK_LOCATION_OTHER' ? '' : ' style="display: none"') . '>';
+                                }
+                            } else {
+                                $out .= $extrafields->showInputField($key, $postedLocation, ($required ? 'required' : ''), '', '', 0, $object, $object->table_element);
+                            }
+
+                            if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_LOCATION_GEOLOC')) {
+                                $out .= '<div class="ticket-location-geoloc">';
+                                $out .= '<input type="hidden" name="options_digiriskdolibarr_location_gps" id="options_digiriskdolibarr_location_gps" value="' . dol_escape_htmltag(GETPOST('options_digiriskdolibarr_location_gps', 'alpha')) . '">';
+                                $out .= '<span class="wpeo-button button-blue ticket-geoloc-button" data-geoloc-wait="' . dol_escape_htmltag($langs->transnoentities('GetMyPositionInProgress')) . '" data-geoloc-error="' . dol_escape_htmltag($langs->transnoentities('GetMyPositionError')) . '"><i class="fas fa-location-arrow button-icon"></i><span class="button-label">' . $langs->transnoentities('GetMyPosition') . '</span></span>';
+                                $out .= '<span class="ticket-geoloc-feedback"></span>';
+                                $out .= '</div>';
                             }
                             break;
 						default:

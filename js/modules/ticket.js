@@ -85,6 +85,10 @@ window.digiriskdolibarr.ticket.event = function() {
   $(document).on( 'keyup', '#email', window.digiriskdolibarr.ticket.checkValidEmail);
   $(document).on( 'keyup', '#options_digiriskdolibarr_ticket_phone', window.digiriskdolibarr.ticket.checkValidPhone);
 
+  // Register form (issue #4732) — location picked in a dictionary, and optional geolocation
+  $(document).on( 'change', '.ticket-location-select', window.digiriskdolibarr.ticket.toggleLocationOther);
+  $(document).on( 'click',  '.ticket-geoloc-button',   window.digiriskdolibarr.ticket.fillGeolocation);
+
   // Ticket card (issue #4443) — inline (on-the-fly) editing
   $(document).on( 'click',   '.digirisk-ticket-card .dtc-subject-value', window.digiriskdolibarr.ticket.editSubjectInline);
   $(document).on( 'keydown', '.digirisk-ticket-card .dtc-subject-input', window.digiriskdolibarr.ticket.subjectInputKeydown);
@@ -373,6 +377,64 @@ window.digiriskdolibarr.ticket.checkValidPhone = function() {
 	} else {
 		$(this).css("border", "3px solid green");
 	}
+};
+
+/**
+ * Register form (#4732) — reveal the free text field when "Other" is picked in the location dictionary.
+ *
+ * Leaving "Other" clears the typed label, so a location the declarant went back on is never submitted.
+ *
+ * @since   23.3.0
+ * @version 23.3.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.toggleLocationOther = function() {
+  var $other = $('.ticket-location-other');
+
+  if ($(this).val() === 'DIGIRISK_LOCATION_OTHER') {
+    $other.show().focus();
+  } else {
+    $other.hide().val('');
+  }
+};
+
+/**
+ * Register form (#4732) — fill the hidden GPS field with the position reported by the browser.
+ *
+ * The button sits inside the <label> of the location field: without preventDefault() the click
+ * would also activate that field, opening the select on a phone.
+ * Geolocation is only served over HTTPS and always asks the declarant for permission, so a
+ * refusal or an unsupported browser must leave the form usable — hence the silent empty value.
+ *
+ * @since   23.3.0
+ * @version 23.3.0
+ *
+ * @param  {Object} event Click event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.fillGeolocation = function(event) {
+  event.preventDefault();
+
+  var $button   = $(this);
+  var $feedback = $button.siblings('.ticket-geoloc-feedback');
+  var $field    = $('#options_digiriskdolibarr_location_gps');
+
+  if (!navigator.geolocation) {
+    $feedback.text($button.data('geoloc-error'));
+    return;
+  }
+
+  $feedback.text($button.data('geoloc-wait'));
+
+  navigator.geolocation.getCurrentPosition(function(position) {
+    var coordinates = position.coords.latitude.toFixed(6) + ',' + position.coords.longitude.toFixed(6);
+    $field.val(coordinates);
+    $feedback.text(coordinates);
+  }, function() {
+    $field.val('');
+    $feedback.text($button.data('geoloc-error'));
+  }, {enableHighAccuracy: true, timeout: 10000, maximumAge: 0});
 };
 
 /**

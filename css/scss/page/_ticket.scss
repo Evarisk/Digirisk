@@ -62,6 +62,27 @@
     }
   }
 
+  // Location field (#4732) — the "Other" text field and the geolocation button sit under the select,
+  // inside the same label, and have to stay readable on the phone the QR code is scanned with
+  .ticket-location-other {
+    display: block;
+    width: 100%;
+    margin-top: 0.5em;
+  }
+
+  .ticket-location-geoloc {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5em;
+    margin-top: 0.5em;
+
+    .ticket-geoloc-feedback {
+      font-size: 0.9em;
+      opacity: 0.7;
+    }
+  }
+
   .tableforinputfields {
     margin-top: 1em;
 
