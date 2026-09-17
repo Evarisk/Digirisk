@@ -741,6 +741,7 @@ $regLastname  = (string) ($extra['digiriskdolibarr_ticket_lastname'] ?? '');
 $regFirstname = (string) ($extra['digiriskdolibarr_ticket_firstname'] ?? '');
 $regPhone     = (string) ($extra['digiriskdolibarr_ticket_phone'] ?? '');
 $regLocation  = (string) ($extra['digiriskdolibarr_ticket_location'] ?? '');
+$regGps       = (string) ($extra['digiriskdolibarr_location_gps'] ?? '');
 $regDateRaw   = $extra['digiriskdolibarr_ticket_date'] ?? null;
 $regDate      = !empty($regDateRaw) ? dol_print_date((int) $regDateRaw, 'day', 'tzuser') : '';
 $regCondition = (string) ($extra['digiriskdolibarr_condition_message'] ?? '');
@@ -808,6 +809,27 @@ if (!$permissionToWrite) {
     $serviceSelectHtml .= '</select>';
 }
 
+// Location (#4732) — a select when the register form itself offers the dictionary, free text otherwise.
+// The value already recorded is always kept in the options: switching to the dictionary must never
+// let a save silently rewrite a location declared before the switch.
+$locationOptions = [];
+$locationType    = 'text';
+if (digiriskdolibarr_ticket_location_input_mode() == 'list') {
+    $locationOptions = digiriskdolibarr_ticket_location_dictionary();
+    if (!empty($locationOptions)) {
+        $locationOptions = array_merge(['' => ''], $locationOptions);
+        if (dol_strlen($regLocation) && !isset($locationOptions[$regLocation])) {
+            $locationOptions[$regLocation] = $regLocation;
+        }
+        $locationType = 'select';
+    }
+}
+
+$locationValue = $renderInlineEditable('digiriskdolibarr_ticket_location', $locationType, dol_escape_htmltag($regLocation), $langs->trans('Location'), $regLocation, $locationOptions);
+if (preg_match('/^(-?\d{1,3}(?:\.\d+)?),(-?\d{1,3}(?:\.\d+)?)$/', $regGps, $gpsCoordinates)) {
+    $locationValue .= ' <a href="https://www.openstreetmap.org/?mlat=' . $gpsCoordinates[1] . '&mlon=' . $gpsCoordinates[2] . '#map=18/' . $gpsCoordinates[1] . '/' . $gpsCoordinates[2] . '" target="_blank" rel="noopener" class="wpeo-tooltip-event" aria-label="' . dol_escape_htmltag($langs->trans('GPSCoordinates') . ' : ' . $regGps) . '"><i class="fas fa-map-marked-alt"></i></a>';
+}
+
 // A colgroup + table-layout:fixed (SCSS) keeps the two label/value column pairs aligned, whatever
 // the content length and whatever the colspan used by the full-width rows below.
 print '<table class="border centpercent tableforfield dtc-registres-table">';
@@ -827,7 +849,7 @@ print '</tr>';
 
 print '<tr>';
 print '<td class="dtc-reg-label">' . $fieldPicto('sitemap') . $langs->trans('GP/UT') . '</td><td>' . $serviceSelectHtml . '</td>';
-print '<td class="dtc-reg-label">' . $fieldPicto('map-marker-alt') . $langs->trans('Location') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_location', 'text', dol_escape_htmltag($regLocation), $langs->trans('Location')) . '</td>';
+print '<td class="dtc-reg-label">' . $fieldPicto('map-marker-alt') . $langs->trans('Location') . '</td><td>' . $locationValue . '</td>';
 print '</tr>';
 
 print '<tr><td class="dtc-reg-label">' . $fieldPicto('comment-dots') . $langs->trans('Condition') . '</td><td colspan="3">' . $renderInlineEditable('digiriskdolibarr_condition_message', 'textarea', ($regCondition !== '' ? dolPrintHTML($regCondition) : ''), $langs->trans('ConditionMessage'), $regCondition) . '</td></tr>';

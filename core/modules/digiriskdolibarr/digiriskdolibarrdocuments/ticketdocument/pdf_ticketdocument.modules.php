@@ -264,6 +264,15 @@
         function getTicketPdfTables($pdf, $object, $tableWidth, $pageWidth, $digiriskElement, $userTmp, $contactNames, $allCategories)
         {
             global $langs;
+
+            // GPS coordinates captured on the public form belong to the register itself : the exact spot
+            // of a declaration is part of the record, so they are printed next to the location (#4732)
+            $location    = $object->array_options['options_digiriskdolibarr_ticket_location'] ?? '';
+            $gpsLocation = $object->array_options['options_digiriskdolibarr_location_gps'] ?? '';
+            if (dol_strlen($gpsLocation) > 0) {
+                $location = dol_strlen($location) > 0 ? $location . ' (' . $gpsLocation . ')' : $gpsLocation;
+            }
+
             $tables = [
                 'header' => [
                     'widths' => [
@@ -313,7 +322,7 @@
                         ],
                         [
                             ['label' => true, 'text' => $langs->transnoentities('Location')],
-                            ['text' => $object->array_options['options_digiriskdolibarr_ticket_location']],
+                            ['text' => $location],
                         ],
                         [
                             ['label' => true, 'text' => $langs->transnoentities('DateCreation')],

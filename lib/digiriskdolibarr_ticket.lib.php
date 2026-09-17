@@ -471,3 +471,62 @@ function digiriskdolibarr_ticket_conversation_bubble($langs, $conf, stdClass $m,
 
     return $out;
 }
+
+/**
+ * Input mode of the Location field on the register form (issue #4732)
+ *
+ * @return string free : free text (historical behaviour), list : dictionary only,
+ *                listfree : dictionary plus an "Other" entry opening a free text field
+ */
+function digiriskdolibarr_ticket_location_input_mode(): string
+{
+    $mode = getDolGlobalString('DIGIRISKDOLIBARR_TICKET_LOCATION_INPUT_MODE', 'free');
+
+    return in_array($mode, ['free', 'list', 'listfree']) ? $mode : 'free';
+}
+
+/**
+ * Locations offered by the register form, read from the c_digiriskdolibarr_ticket_location dictionary
+ *
+ * The declared ticket stores the label as plain text, never the row id : renaming or
+ * deactivating a row must not rewrite the locations already recorded in the register.
+ * The array is therefore keyed by label, which is also the posted value.
+ *
+ * @return array<string,string> Labels of the active rows of the entity, ordered by position
+ */
+function digiriskdolibarr_ticket_location_dictionary(): array
+{
+    global $langs;
+
+    $records = saturne_fetch_dictionary('c_digiriskdolibarr_ticket_location');
+    if (!is_array($records)) {
+        return [];
+    }
+
+    $locations = [];
+    foreach ($records as $record) {
+        if (empty($record->active) || !dol_strlen($record->label)) {
+            continue;
+        }
+
+        // A row seeded with a translation key shows up translated, a row typed by the customer stays as typed
+        $label             = $langs->transnoentities($record->label);
+        $locations[$label] = $label;
+    }
+
+    return $locations;
+}
+
+/**
+ * Tell whether the register form must offer the dictionary for the Location field
+ *
+ * An empty dictionary falls back to the free text field : a list mode must never
+ * leave the declarant with no way to fill a required field.
+ *
+ * @param  array<string,string> $locations Result of digiriskdolibarr_ticket_location_dictionary()
+ * @return bool                            True when the select must be rendered
+ */
+function digiriskdolibarr_ticket_location_use_list(array $locations): bool
+{
+    return !empty($locations) && digiriskdolibarr_ticket_location_input_mode() !== 'free';
+}
