@@ -1,5 +1,6 @@
 <?php
 $selectedfields_label = 'shared_risksignlist_selectedfields';
+$allRisks             = $allRisks ?? 0;
 // Selection of new fields
 require './../../class/actions_changeselectedfields.php';
 
@@ -109,7 +110,8 @@ $search['fk_element_shared'] = GETPOST('search_fk_element_shared');
 
 foreach ($search as $key => $val) {
 	if ($key == 'status' && $search[$key] == -1) continue;
-	$mode_search = (($risksign->isInt($risksign->fields[$key]) || $risksign->isFloat($risksign->fields[$key])) ? 1 : 0);
+	$field       = $risksign->fields[$key] ?? [];
+	$mode_search = (($risksign->isInt($field) || $risksign->isFloat($field)) ? 1 : 0);
 	if (strpos($risksign->fields[$key]['type'] ?? '', 'integer:') === 0) {
 		if ($search[$key] == '-1') $search[$key] = '';
 		$mode_search                             = 2;
@@ -259,7 +261,7 @@ foreach ($risksign->fields as $key => $val) {
 		elseif (strpos($val['type'] ?? '', 'integer:') === 0) {
 			print $risksign->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 		} elseif ($key == 'entity') {
-			print select_entity_list($search['entity'], 'search_entity', 'e.rowid NOT IN (' . $conf->entity . ')');
+			print select_entity_list($search['entity'] ?? '', 'search_entity', 'e.rowid NOT IN (' . $conf->entity . ')');
 		} elseif ($key == 'fk_element') {
 			print $digiriskelement->selectDigiriskElementList($search['fk_element_shared'], 'search_fk_element_shared', ['customsql' => 's.entity NOT IN (' . $conf->entity . ')'], 1, 0, array(), 0, 0, 'minwidth100 maxwidth300', 0, false, 1, $contextpage, false);
 		} elseif ($key == 'category') { ?>
