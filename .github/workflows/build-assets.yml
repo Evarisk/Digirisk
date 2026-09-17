@@ -2,20 +2,23 @@
 name: Build assets
 
 on:
-    push:
-        branches:
-            - main
-            - develop
+    # The .min files are deliberately not excluded here, unlike in the commit mode where
+    # the exclusion kept the bot from retriggering the workflow with its own commit: a
+    # pull request that only refreshes the compiled assets is exactly one worth checking.
+    pull_request:
         paths:
             - 'css/scss/**'
-            - 'js/**/*.js'
-            - '!js/**/*.min.js'
+            - 'js/**'
 
 jobs:
-    build:
+    # The .min files are committed by hand on this repository, and they have to be: the
+    # ruleset requires a pull request for every ref, so github-actions[bot] cannot push
+    # the rebuilt assets either. The commit mode could only ever report its own refusal,
+    # which is why it is not kept here - a workflow that is red at every merge stops
+    # being read. What is left is the part that matters: catching a stale .min before it
+    # reaches develop.
+    verify:
       uses: Evarisk/Saturne/.github/workflows/build-assets-reusable.yml@main
       with:
         module: digiriskdolibarr
-
-      permissions:
-        contents: write
+        mode: verify
