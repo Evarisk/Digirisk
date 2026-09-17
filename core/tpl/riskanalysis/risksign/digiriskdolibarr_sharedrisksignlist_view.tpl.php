@@ -76,6 +76,9 @@ $sql                                                                            
 if (is_array($extrafields->attributes[$risksign->table_element]['label'] ?? null) && count($extrafields->attributes[$risksign->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risksign->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
 // Every filter below is appended with AND: without this WHERE they would be attached to the extrafields LEFT JOIN ON clause and stop filtering anything
 $sql .= " WHERE 1 = 1";
+// Deleting a risk sign only sets its status: the element_element row that shares it with another
+// entity survives, so without this filter the owner deletes it and it stays listed here - issue #4384
+$sql .= " AND t.status > " . $risksign::STATUS_DELETED;
 if ( ! $allRisks) {
 	$sql .= " AND el.fk_target = " . $id;
 	$sql .= " AND el.sourcetype = 'digiriskdolibarr_risksign'";
