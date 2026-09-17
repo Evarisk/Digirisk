@@ -419,6 +419,27 @@ if ($action == 'import_ticket_locations' && $permissiontowrite) {
     exit;
 }
 
+// Attach each location of the dictionary to a GP/UT, or to none (#5176)
+if ($action == 'set_ticket_location_elements' && $permissiontowrite) {
+    $locationElements = GETPOST('location_element', 'array');
+
+    foreach ($locationElements as $locationID => $elementID) {
+        $sql  = 'UPDATE ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_ticket_location';
+        $sql .= ' SET fk_digiriskelement = ' . ((int) $elementID > 0 ? (int) $elementID : 'NULL');
+        $sql .= ' WHERE rowid = ' . (int) $locationID;
+
+        if (!$db->query($sql)) {
+            setEventMessages($db->lasterror(), [], 'errors');
+            header('Location: ' . $_SERVER['PHP_SELF'] . '?page_y=' . $pageY);
+            exit;
+        }
+    }
+
+    setEventMessages($langs->transnoentities('SavedConfig'), []);
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?page_y=' . $pageY);
+    exit;
+}
+
 // Actions set_mod, update_mask and the set_/del_ switch of the module constants
 require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
@@ -659,6 +680,57 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 
 	// Click on a tuto image to display it full size
 	digiriskdolibarr_tuto_overlay();
+
+    // Locations attached to a GP/UT (#5176). The core dictionary page renders a raw text input for
+    // a column it does not know, so the association is made here, where a real selector fits
+    $locationRecords = digiriskdolibarr_ticket_location_records();
+    if (!empty($locationRecords)) {
+        dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
+
+        $locationElement       = new DigiriskElement($db);
+        $locationElementList   = $locationElement->fetchDigiriskElementFlat(0);
+        $locationElementLabels = [];
+        if (is_array($locationElementList)) {
+            foreach ($locationElementList as $locationElementLine) {
+                $locationElementObject = $locationElementLine['object'] ?? null;
+                if (empty($locationElementObject->id)) {
+                    continue;
+                }
+
+                // The option label is escaped by selectarray, so the tree depth is shown with
+                // plain characters instead of the usual non breaking spaces
+                $locationElementLabels[$locationElementObject->id] = str_repeat('- ', (int) ($locationElementLine['depth'] ?? 0)) . $locationElementObject->ref . ' - ' . $locationElementObject->label;
+            }
+        }
+
+        print load_fiche_titre($langs->transnoentities('TicketLocationElements'), '', '');
+
+        print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
+        print '<input type="hidden" name="token" value="' . newToken() . '">';
+        print '<input type="hidden" name="action" value="set_ticket_location_elements">';
+        print '<input type="hidden" name="page_y">';
+
+        print '<div class="div-table-responsive-no-min">';
+        print '<table class="noborder centpercent">';
+        print '<tr class="liste_titre">';
+        print '<td>' . $langs->transnoentities('Location') . '</td>';
+        print '<td>' . $langs->transnoentities('GP/UT') . '</td>';
+        print '</tr>';
+
+        foreach ($locationRecords as $locationRecord) {
+            print '<tr class="oddeven">';
+            print '<td>' . dol_escape_htmltag($langs->transnoentities($locationRecord->label)) . '</td>';
+            print '<td>' . $form->selectarray('location_element[' . $locationRecord->rowid . ']', $locationElementLabels, $locationRecord->fk_digiriskelement, $langs->transnoentities('AllGPUT'), 0, 0, '', 0, 0, 0, '', 'minwidth200 maxwidth300') . '</td>';
+            print '</tr>';
+        }
+
+        print '</table>';
+        print '</div>';
+        print '<div class="tabsAction reposition"><button type="submit" class="butAction">' . $langs->trans('Save') . '</button></div>';
+        print '</form>';
+
+        print '<div class="opacitymedium">' . $langs->transnoentities('TicketLocationElementsHelp') . '</div>';
+    }
 
     // Multi company ticket public interface config
     print load_fiche_titre($langs->transnoentities('MultiCompanyTicketPublicInterfaceConfig'), '', '');
