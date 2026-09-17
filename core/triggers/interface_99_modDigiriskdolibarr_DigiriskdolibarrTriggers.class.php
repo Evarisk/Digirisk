@@ -610,10 +610,20 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
                     $category = new Categorie($this->db);
                     foreach ($categories as $categoryID) {
                         $category->fetch($categoryID);
-                        $categoryConfigs = json_decode($category->array_options['options_ticket_category_config']);
-                        if ($categoryConfigs->mail_template && $categoryConfigs->recipients) {
+                        $categoryConfigs = json_decode($category->array_options['options_ticket_category_config'] ?? '');
+
+                        // The empty entry of the mail template selector is stored as -1, a string that PHP
+                        // reads as true : a category carrying recipients but no template used to fetch the
+                        // template -1, leave SaturneMail::$topic uninitialized, and make the whole public
+                        // declaration fatal right after the ticket had been created
+                        $mailTemplateID = (int) ($categoryConfigs->mail_template ?? 0);
+                        if ($mailTemplateID > 0 && !empty($categoryConfigs->recipients)) {
                             $saturneMail = new SaturneMail($this->db);
-                            $saturneMail->fetch($categoryConfigs->mail_template);
+                            if ($saturneMail->fetch($mailTemplateID) <= 0) {
+                                dol_syslog('TICKET_PUBLIC_INTERFACE_CREATE : mail template ' . $mailTemplateID . ' of category ' . $categoryID . ' not found, no mail sent', LOG_WARNING);
+                                continue;
+                            }
+
                             $recipients = explode(',', $categoryConfigs->recipients);
                             foreach ($recipients as $recipientID) {
                                 $userTmp = new User($this->db);
