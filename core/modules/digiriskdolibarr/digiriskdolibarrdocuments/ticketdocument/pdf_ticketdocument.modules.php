@@ -129,6 +129,7 @@
             }
 
             $widths = $table['widths'];
+            $aligns = $table['align'];
 
             if (isset($table['Ln'])) {
                 $pdf->Ln($table['Ln']);
@@ -155,7 +156,11 @@
                     }
                 }
 
+                // Send the whole row to the next page rather than let it be cut in half
+                $this->checkPageBreak($pdf, $maxHeight);
+
                 // draw the cells array
+                $rowHeight = $maxHeight;
                 foreach ($cells as $key => $cellData) {
                     if (!isset($widths[$key])) {
                         continue;
@@ -182,10 +187,13 @@
                     $cell  = $cell ?? $langs->transnoentities('NoData');
                     $align = $aligns[$key] ?? 'C';
 
-                    $pdf->MultiCell($widths[$key], $lineHeight, $cell, 1, $align, 0, 0, $x, $y, true, 0, false, true, $lineHeight, 'M');
+                    // $maxHeight is the minimum height so every cell of the row shares the same
+                    // border, and the maximum is left open so a long text is not cut off
+                    $pdf->MultiCell($widths[$key], $maxHeight, $cell, 1, $align, 0, 0, $x, $y, true, 0, false, true, 0, 'M');
+                    $rowHeight = max($rowHeight, $pdf->getLastH());
                     $pdf->SetXY($x + $widths[$key], $y);
                 }
-                $pdf->Ln($maxHeight);
+                $pdf->Ln($rowHeight);
             }
         }
 
@@ -406,7 +414,9 @@
             $pdf->setFontSize($defaultFontSize - 2);
 
             $leftText  = $object->ref . ' - ' . $langs->transnoentities('GeneratedTicketDocumentDate') . ' ' . dol_print_date(dol_now(), 'dayhoursec', 'tzuser');
-            $rightText = 'Version '. $this->version . ' - Page ' . $pdf->getNumPages() . '/' . $pdf->getAliasNbPages();
+            // getNumPages() is the page count, not the current page : the footer is written once
+            // per page at the very end of the generation, so both numbers are already known
+            $rightText = 'Version '. $this->version . ' - Page ' . $pdf->getPage() . '/' . $pdf->getNumPages();
 
             $pdf->SetY($pdf->getPageHeight() - $this->marge_basse - $pdf->getStringHeight($pdf->GetStringWidth($leftText), $leftText));
 
@@ -559,7 +569,14 @@
                 }
             }
 
-            $this->_pageFooter($pdf, $object, $outputLangs, $defaultFontSize);
+            // A ticket with a long message spreads over several pages : each one gets its footer.
+            // Auto page break is turned off first so writing at the very bottom adds no blank page
+            $pdf->SetAutoPageBreak(false, 0);
+            for ($page = 1; $page <= $pdf->getNumPages(); $page++) {
+                $pdf->setPage($page);
+                $this->_pageFooter($pdf, $object, $outputLangs, $defaultFontSize);
+            }
+
             try {
                 $pdf->Output($file, 'F');
             } catch (Exception $exception) {
