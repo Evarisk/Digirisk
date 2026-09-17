@@ -830,14 +830,14 @@ RiskAssessmentDocumentContent = In allegato trovi lo ZIP e il documento ODT del 
 
 
 #
-# AuditReportDocument - Rapporto di audit
+# AuditReportDocument - Rapporto di evoluzione
 #
 
 # Dati
-AuditReportDocument     = Rapporto di audit
-Auditreportdocument     = Rapporto di audit
-AuditReportDocumentsMin = rapporti di audit
-auditreportdocument.odt = Rapporto di audit
+AuditReportDocument     = Rapporto di evoluzione
+Auditreportdocument     = Rapporto di evoluzione
+AuditReportDocumentsMin = rapporti di evoluzione
+auditreportdocument.odt = Rapporto di evoluzione
 
 
 

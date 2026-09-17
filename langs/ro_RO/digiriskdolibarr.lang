@@ -830,14 +830,14 @@ RiskAssessmentDocumentContent = Atașat găsiți arhiva ZIP și documentul ODT a
 
 
 #
-# AuditReportDocument - Raport de audit
+# AuditReportDocument - Raport de evoluție
 #
 
 # Date
-AuditReportDocument     = Raport de audit
-Auditreportdocument     = Raport de audit
-AuditReportDocumentsMin = rapoarte de audit
-auditreportdocument.odt = Raport de audit
+AuditReportDocument     = Raport de evoluție
+Auditreportdocument     = Raport de evoluție
+AuditReportDocumentsMin = rapoarte de evoluție
+auditreportdocument.odt = Raport de evoluție
 
 
 

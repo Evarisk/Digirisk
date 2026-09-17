@@ -830,14 +830,14 @@ RiskAssessmentDocumentContent = Bijgaand vindt u het ZIP-bestand en het ODT-docu
 
 
 #
-# AuditReportDocument - Auditrapport
+# AuditReportDocument - Evolutierapport
 #
 
 # Gegevens
-AuditReportDocument     = Auditrapport
-Auditreportdocument     = Auditrapport
-AuditReportDocumentsMin = auditrapporten
-auditreportdocument.odt = Auditrapport
+AuditReportDocument     = Evolutierapport
+Auditreportdocument     = Evolutierapport
+AuditReportDocumentsMin = evolutierapporten
+auditreportdocument.odt = Evolutierapport
 
 
 
