@@ -830,14 +830,14 @@ RiskAssessmentDocumentContent = Anbei finden Sie das ZIP-Archiv und das ODT-Doku
 
 
 #
-# AuditReportDocument - Auditbericht
+# AuditReportDocument - Entwicklungsbericht
 #
 
 # Daten
-AuditReportDocument     = Auditbericht
-Auditreportdocument     = Auditbericht
-AuditReportDocumentsMin = Auditberichte
-auditreportdocument.odt = Auditbericht
+AuditReportDocument     = Entwicklungsbericht
+Auditreportdocument     = Entwicklungsbericht
+AuditReportDocumentsMin = Entwicklungsberichte
+auditreportdocument.odt = Entwicklungsbericht
 
 
 

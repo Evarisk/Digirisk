@@ -830,14 +830,14 @@ RiskAssessmentDocumentContent = Please find attached the ZIP and the ODT documen
 
 
 #
-# AuditReportDocument - Audit report
+# AuditReportDocument - Evolution report
 #
 
 # Data
-AuditReportDocument     = Audit report
-Auditreportdocument     = Audit report
-AuditReportDocumentsMin = audit reports
-auditreportdocument.odt = Audit report
+AuditReportDocument     = Evolution report
+Auditreportdocument     = Evolution report
+AuditReportDocumentsMin = evolution reports
+auditreportdocument.odt = Evolution report
 
 
 

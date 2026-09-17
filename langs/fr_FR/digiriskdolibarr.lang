@@ -831,14 +831,14 @@ RiskAssessmentDocumentContent = Veuillez trouver ci-joint le ZIP et le document 
 
 
 #
-# AuditReportDocument - Rapport d'audit
+# AuditReportDocument - Rapport d'évolution
 #
 
 # Data - Donnée
-AuditReportDocument     = Rapport d'audit
-Auditreportdocument     = Rapport d'audit
-AuditReportDocumentsMin = rapports d'audit
-auditreportdocument.odt = Rapport d'audit
+AuditReportDocument     = Rapport d'évolution
+Auditreportdocument     = Rapport d'évolution
+AuditReportDocumentsMin = rapports d'évolution
+auditreportdocument.odt = Rapport d'évolution
 
 
 
