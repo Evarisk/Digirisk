@@ -1096,6 +1096,7 @@ PreventionContextInCompany               = Prevention context in the company
 RPSImpactOnCompanyAndEmployees           = Impact of psychosocial risks on the company and the employees
 PsychosocialRisksFactors                 = Psychosocial risk factors
 CompanyPreventionInformations            = Information about prevention in the company
+PsychosocialRiskWithoutFactor            = Psychosocial risks without a specified factor
 Weak                                     = Low
 Moderate                                 = Moderate
 High                                     = High
