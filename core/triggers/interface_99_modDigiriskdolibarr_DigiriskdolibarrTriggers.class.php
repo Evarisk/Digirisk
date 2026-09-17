@@ -483,8 +483,14 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 					complete_substitutions_array($substitutionarray, $langs, $object);
 
-					$subject = make_substitutions($arraydefaultmessage->topic,$substitutionarray);
-					$message .= make_substitutions($arraydefaultmessage->content,$substitutionarray);
+					// getEMailTemplate() returns the int -1 on a SQL error, and an empty template when the
+					// install carries no ticket_send model: both used to reach CMailFile with a null subject
+					$mailTemplate = is_object($arraydefaultmessage) ? $arraydefaultmessage : null;
+					$subject = make_substitutions($mailTemplate->topic ?? '', $substitutionarray);
+					$message .= make_substitutions($mailTemplate->content ?? '', $substitutionarray);
+					if (!dol_strlen($subject)) {
+						$subject = $langs->transnoentities('ANewTicketHasBeenSubmitted', getDolGlobalString('MAIN_INFO_SOCIETE_NOM'));
+					}
 
 					if ( ! $error) {
 						$langs->load('mails');
