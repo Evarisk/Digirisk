@@ -761,7 +761,11 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
                                     $locations['DIGIRISK_LOCATION_OTHER'] = $langs->transnoentities('OtherLocation');
                                 }
 
+                                // The list is narrowed to the GP/UT picked by the declarant, in JS,
+                                // from the map carried by this wrapper (issue #5176)
+                                $out .= '<div class="ticket-location-filter" data-location-elements="' . dol_escape_htmltag(json_encode(digiriskdolibarr_ticket_location_element_map())) . '">';
                                 $out .= Form::selectarray('options_' . $key, $locations, $postedLocation, 1, 0, 0, ($required ? 'required' : ''), 0, 0, 0, '', 'ticket-location-select');
+                                $out .= '</div>';
 
                                 if (isset($locations['DIGIRISK_LOCATION_OTHER'])) {
                                     $otherLocation = GETPOST('ticket_location_other', 'alpha');
