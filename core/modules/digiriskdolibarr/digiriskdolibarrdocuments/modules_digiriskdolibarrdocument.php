@@ -258,7 +258,8 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             }
             foreach ($riskTaskTypes as $riskTaskType) {
                 $array['riskTask' . $riskTaskType] .= $outputLangs->transnoentities('Label') . ' : ' . $riskTask->label . '<br>';
-                if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT')) {
+                // Une tache sans reference n'ecrit pas la ligne, plutot qu'un libelle suivi du vide
+                if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT') && !empty($riskTask->ref)) {
                     $array['riskTask' . $riskTaskType] .= $outputLangs->transnoentities('Ref') . ' : ' . $riskTask->ref . '<br>';
                 }
                 if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT')) {

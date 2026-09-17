@@ -1369,7 +1369,8 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
             }
 
             $line = $riskTask->label;
-            if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT')) {
+            // Une tache sans reference garde son seul libelle, sans le tiret de separation
+            if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT') && !empty($riskTask->ref)) {
                 $line = $riskTask->ref . ' - ' . $line;
             }
             if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT') && !empty($this->taskResponsibles[$riskTask->id])) {
