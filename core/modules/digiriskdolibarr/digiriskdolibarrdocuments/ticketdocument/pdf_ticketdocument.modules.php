@@ -147,9 +147,13 @@
                     } else {
                         $cell = $cellData;
                     }
-                    $cell    = $cell ?? $langs->transnoentities('NoData');
-                    $nbLines = $pdf->getNumLines($cell, $widths[$i]);
-                    $height  = $nbLines * $lineHeight;
+                    $cell = $cell ?? $langs->transnoentities('NoData');
+
+                    // Measured with the font the cell will be drawn with, and through
+                    // getStringHeight() which accounts for the cell padding : the row height
+                    // is also the MultiCell maximum, so an approximation would cut the text
+                    $pdf->SetFont('', is_array($cellData) && !empty($cellData['label']) ? 'B' : '', 10);
+                    $height = $pdf->getStringHeight($widths[$i], $cell);
 
                     if ($height > $maxHeight) {
                         $maxHeight = $height;
@@ -187,9 +191,10 @@
                     $cell  = $cell ?? $langs->transnoentities('NoData');
                     $align = $aligns[$key] ?? 'C';
 
-                    // $maxHeight is the minimum height so every cell of the row shares the same
-                    // border, and the maximum is left open so a long text is not cut off
-                    $pdf->MultiCell($widths[$key], $maxHeight, $cell, 1, $align, 0, 0, $x, $y, true, 0, false, true, 0, 'M');
+                    // Minimum and maximum both set to the row height : every cell of the row
+                    // shares the same border, TCPDF keeps honouring the 'M' vertical alignment,
+                    // and the tallest text still fits since the height was measured on it
+                    $pdf->MultiCell($widths[$key], $maxHeight, $cell, 1, $align, 0, 0, $x, $y, true, 0, false, true, $maxHeight, 'M');
                     $rowHeight = max($rowHeight, $pdf->getLastH());
                     $pdf->SetXY($x + $widths[$key], $y);
                 }
