@@ -71,13 +71,13 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($reshook)) {
 	if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
-		$electionDateCSE = GETPOST('ElectionDateCSE', 'none');
-		$electionDateCSE = explode('/', $electionDateCSE);
-		$electionDateCSE = $electionDateCSE[2] . '-' . $electionDateCSE[1] . '-' . $electionDateCSE[0];
+		// An empty date field explodes to a single element: reading [1] and [2] warned, and the
+		// constant was stored as the string '--', which every consumer then has to special-case
+		$electionDateCSE = explode('/', GETPOST('ElectionDateCSE', 'none'));
+		$electionDateCSE = count($electionDateCSE) == 3 ? $electionDateCSE[2] . '-' . $electionDateCSE[1] . '-' . $electionDateCSE[0] : '';
 
-		$electionDateDP = GETPOST('ElectionDateDP', 'none');
-		$electionDateDP = explode('/', $electionDateDP);
-		$electionDateDP = $electionDateDP[2] . '-' . $electionDateDP[1] . '-' . $electionDateDP[0];
+		$electionDateDP = explode('/', GETPOST('ElectionDateDP', 'none'));
+		$electionDateDP = count($electionDateDP) == 3 ? $electionDateDP[2] . '-' . $electionDateDP[1] . '-' . $electionDateDP[0] : '';
 
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", GETPOST("modalites", 'none'), 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT", GETPOST("permanent", 'none'), 'chaine', 0, '', $conf->entity);
