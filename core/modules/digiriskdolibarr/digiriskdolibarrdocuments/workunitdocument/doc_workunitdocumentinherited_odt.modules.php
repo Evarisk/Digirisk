@@ -122,9 +122,10 @@ class doc_workunitdocumentinherited_odt extends ModeleODTDigiriskDolibarrDocumen
             $QRCodeImagePath = '';
         }
 
-        $allLinks             = $digiriskResources->fetchDigiriskResources();
-        $responsibleResources = $allLinks['Responsible'];
-        $userTmp->fetch($responsibleResources->id[0]);
+        $responsibleId = $digiriskResources->getSecurityResponsibleId();
+        if ($responsibleId > 0) {
+            $userTmp->fetch($responsibleId);
+        }
 
         // @todo The keyword "signature" is needed because we want the image to be cropped to fit in the table
         $tmpArray['helpUrl']               = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php';
