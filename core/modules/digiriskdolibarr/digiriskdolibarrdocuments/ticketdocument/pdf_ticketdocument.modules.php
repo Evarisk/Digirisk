@@ -286,9 +286,10 @@
         /**
          *  Show footer of page
          *
-         *  @param	TCPDF		$pdf     		Object PDF
-         *  @param  Ticket		$object     	Object to show
-         *  @param  Translate	$outputlangs	Object lang for output
+         *  @param	TCPDF		$pdf     			Object PDF
+         *  @param  Ticket		$object     		Object to show
+         *  @param  Translate	$outputLangs		Object lang for output
+         *  @param  float		$defaultFontSize	Font size the footer is written with
          *  @return	void
          */
         function _pagefooter($pdf, $object, $outputLangs, $defaultFontSize)
