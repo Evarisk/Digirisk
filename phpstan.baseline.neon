@@ -3409,25 +3409,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
 
 		-
-			message: '#^Call to method AddPage\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
 			message: '#^Call to method AddPage\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method Cell\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 6
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method GetPageWidth\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
@@ -3439,55 +3421,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
 
 		-
-			message: '#^Call to method GetX\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method GetY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method Image\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method Ln\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 4
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method MultiCell\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method Open\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
 			message: '#^Call to method Open\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method Output\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method SetAuthor\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
@@ -3499,19 +3433,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
 
 		-
-			message: '#^Call to method SetAutoPageBreak\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
 			message: '#^Call to method SetAutoPageBreak\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method SetCreator\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
@@ -3523,27 +3445,9 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
 
 		-
-			message: '#^Call to method SetDrawColor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
 			message: '#^Call to method SetDrawColor\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method SetFillColor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method SetFont\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 8
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
 
 		-
@@ -3553,19 +3457,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
 
 		-
-			message: '#^Call to method SetMargins\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
 			message: '#^Call to method SetMargins\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method SetSubject\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
@@ -3577,73 +3469,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
 
 		-
-			message: '#^Call to method SetTextColor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 6
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method SetTitle\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
 			message: '#^Call to method SetTitle\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method SetX\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 5
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method SetXY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method SetY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method getBreakMargin\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method getNumLines\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method getNumPages\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method getPage\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method getPageHeight\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to method setPageOrientation\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
@@ -3662,30 +3488,6 @@ parameters:
 
 		-
 			message: '#^Call to method setPrintHeader\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_accidentinvestigationdocument\:\:_pagefooter\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_accidentinvestigationdocument\:\:_pagehead\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_accidentinvestigationdocument\:\:checkPageBreak\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_accidentinvestigationdocument\:\:drawTable\(\) has invalid type TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
@@ -3883,67 +3685,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
 
 		-
-			message: '#^Call to method AddPage\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
 			message: '#^Call to method AddPage\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method Cell\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 8
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method GetPageWidth\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method GetX\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method GetY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 9
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method Image\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 4
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method Line\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method Ln\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 10
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method MultiCell\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 6
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method Open\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
@@ -3955,37 +3697,13 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
 
 		-
-			message: '#^Call to method Output\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method SetAuthor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
 			message: '#^Call to method SetAuthor\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
 
 		-
-			message: '#^Call to method SetAutoPageBreak\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 5
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
 			message: '#^Call to method SetAutoPageBreak\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method SetCreator\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
@@ -3997,27 +3715,9 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
 
 		-
-			message: '#^Call to method SetDrawColor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
 			message: '#^Call to method SetDrawColor\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method SetFillColor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 5
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method SetFont\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 15
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
 
 		-
@@ -4027,19 +3727,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
 
 		-
-			message: '#^Call to method SetLineWidth\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
 			message: '#^Call to method SetLineWidth\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method SetMargins\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
@@ -4051,103 +3739,13 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
 
 		-
-			message: '#^Call to method SetSubject\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
 			message: '#^Call to method SetSubject\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
 
 		-
-			message: '#^Call to method SetTextColor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 20
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method SetTitle\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
 			message: '#^Call to method SetTitle\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method SetX\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 6
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method SetXY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 9
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method SetY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method getBreakMargin\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method getImageRBY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method getNumLines\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method getNumPages\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method getPage\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method getPageHeight\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 4
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method getStringHeight\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method setPage\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to method setPageOrientation\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
@@ -4171,135 +3769,9 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
 
 		-
-			message: '#^Call to method writeHTMLCell\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
 			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
 			identifier: arguments.count
 			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:_pagefooter\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:_pagehead\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:checkPageBreak\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:contentWidth\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:coverBox\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:coverBoxWithQrCode\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:coverPhoto\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:drawTableHeader\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:htmlParagraph\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:levelTitle\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:newPage\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:paragraph\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:reserveSpace\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:sectionCotationMethod\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:sectionCover\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:sectionLegalReminder\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:sectionRisks\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:sectionTitle\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:table\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_listingrisksdocument\:\:writeFooter\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
 
 		-
@@ -4387,67 +3859,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
 
 		-
-			message: '#^Call to method AddPage\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
 			message: '#^Call to method AddPage\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method Cell\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 23
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method GetPageWidth\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method GetX\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method GetY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 15
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method Image\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 6
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method Line\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method Ln\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 22
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method MultiCell\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 10
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method Open\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
@@ -4459,43 +3871,13 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
 
 		-
-			message: '#^Call to method Output\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method Rect\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method SetAuthor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
 			message: '#^Call to method SetAuthor\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
 
 		-
-			message: '#^Call to method SetAutoPageBreak\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 7
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
 			message: '#^Call to method SetAutoPageBreak\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method SetCreator\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
@@ -4507,27 +3889,9 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
 
 		-
-			message: '#^Call to method SetDrawColor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 5
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
 			message: '#^Call to method SetDrawColor\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method SetFillColor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 8
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method SetFont\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 34
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
 
 		-
@@ -4537,19 +3901,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
 
 		-
-			message: '#^Call to method SetLineWidth\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
 			message: '#^Call to method SetLineWidth\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method SetMargins\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
@@ -4561,97 +3913,13 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
 
 		-
-			message: '#^Call to method SetSubject\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
 			message: '#^Call to method SetSubject\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
 
 		-
-			message: '#^Call to method SetTextColor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 26
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method SetTitle\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
 			message: '#^Call to method SetTitle\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method SetX\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 19
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method SetXY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 12
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method SetY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 6
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method getBreakMargin\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method getNumLines\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 6
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method getNumPages\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method getPage\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method getPageHeight\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 4
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method getStringHeight\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method setPage\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method setPageOrientation\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
@@ -4670,12 +3938,6 @@ parameters:
 
 		-
 			message: '#^Call to method setPrintHeader\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to method writeHTMLCell\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
@@ -4703,168 +3965,6 @@ parameters:
 			identifier: parameter.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:_pagefooter\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:_pagehead\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:blockLabel\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:checkPageBreak\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:contentWidth\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:drawProtections\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:drawRiskBlock\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:drawRiskPhotos\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:htmlBlock\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:htmlParagraph\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:measureRiskBlock\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:newPage\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:paragraph\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:reserveSpace\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:sectionCertifications\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:sectionCompanies\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:sectionEmergency\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:sectionIntervention\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:sectionMeansAndRules\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:sectionPriorVisit\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:sectionRisks\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:sectionSignatures\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:sectionTitle\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:table\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:twoBoxes\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_preventionplandocument\:\:writeFooter\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
 			message: '#^Access to an undefined property pdf_papripact_a3_paysage_projectdocument\:\:\$option_codeproduitservice\.$#'
@@ -4975,6 +4075,12 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
+			message: '#^Call to an undefined method TCPDF\:\:useTemplate\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
+
+		-
 			message: '#^Call to an undefined method Translate\:\:convToOutputCharset\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -4987,55 +4093,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
-			message: '#^Call to method AddPage\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 4
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
 			message: '#^Call to method AddPage\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method AliasNbPages\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method Cell\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method Close\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method GetY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 6
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method Image\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method MultiCell\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 35
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method Open\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
@@ -5047,31 +4105,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
-			message: '#^Call to method Output\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method Rect\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method SetAuthor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
 			message: '#^Call to method SetAuthor\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method SetAutoPageBreak\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
@@ -5083,19 +4117,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
-			message: '#^Call to method SetCompression\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
 			message: '#^Call to method SetCompression\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method SetCreator\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
@@ -5107,37 +4129,13 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
-			message: '#^Call to method SetDrawColor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
 			message: '#^Call to method SetDrawColor\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
-			message: '#^Call to method SetFillColor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 4
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method SetFont\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 18
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
 			message: '#^Call to method SetFont\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method SetKeyWords\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
@@ -5149,25 +4147,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
-			message: '#^Call to method SetLineStyle\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method SetMargins\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
 			message: '#^Call to method SetMargins\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method SetSubject\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
@@ -5179,43 +4159,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
-			message: '#^Call to method SetTextColor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 12
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method SetTitle\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
 			message: '#^Call to method SetTitle\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method SetXY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 32
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method commitTransaction\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method getPage\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 4
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method importPage\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
@@ -5224,30 +4168,6 @@ parameters:
 			message: '#^Call to method importPage\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method line\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method rollbackTransaction\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method setPage\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 7
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method setPageOrientation\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 6
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
@@ -5263,43 +4183,13 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
-			message: '#^Call to method setSourceFile\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
 			message: '#^Call to method setSourceFile\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
-			message: '#^Call to method setTopMargin\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method startTransaction\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method useTemplate\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 5
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
 			message: '#^Call to method useTemplate\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Call to method writeHTMLCell\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
@@ -5335,13 +4225,19 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
+			message: '#^Parameter \#2 \$autopagebreak of method TCPDF\:\:setPageOrientation\(\) expects bool\|null, int given\.$#'
+			identifier: argument.type
+			count: 6
+			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
+
+		-
 			message: '#^Parameter \#2 \$noTrigger of method SaturneDocuments\:\:create\(\) expects int\<0, 1\>, true given\.$#'
 			identifier: argument.type
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
-			message: '#^Parameter \#2 \$tab_top of method pdf_papripact_a3_paysage_projectdocument\:\:_tableau\(\) expects string, \(float\|int\) given\.$#'
+			message: '#^Parameter \#2 \$tab_top of method pdf_papripact_a3_paysage_projectdocument\:\:_tableau\(\) expects string, float\|int given\.$#'
 			identifier: argument.type
 			count: 3
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
@@ -5359,9 +4255,21 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
+			message: '#^Parameter \#2 \$y of method TCPDF\:\:Rect\(\) expects float, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
+
+		-
 			message: '#^Parameter \#3 \$tab_height of method pdf_papripact_a3_paysage_projectdocument\:\:_tableau\(\) expects string, \(float\|int\) given\.$#'
 			identifier: argument.type
-			count: 4
+			count: 2
+			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
+
+		-
+			message: '#^Parameter \#3 \$tab_height of method pdf_papripact_a3_paysage_projectdocument\:\:_tableau\(\) expects string, float\|int given\.$#'
+			identifier: argument.type
+			count: 2
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
@@ -5371,20 +4279,8 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
-			message: '#^Parameter \$pdf of method pdf_papripact_a3_paysage_projectdocument\:\:_pagefoot\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_papripact_a3_paysage_projectdocument\:\:_pagehead\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_papripact_a3_paysage_projectdocument\:\:_tableau\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
+			message: '#^Parameter \#4 \$h of method TCPDF\:\:Rect\(\) expects float, string given\.$#'
+			identifier: argument.type
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
@@ -5449,67 +4345,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
 
 		-
-			message: '#^Call to method AddPage\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
 			message: '#^Call to method AddPage\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method Cell\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 9
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method GetPageWidth\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method GetX\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method GetY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 6
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method Image\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method Line\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method Ln\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 7
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method MultiCell\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method Open\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
@@ -5521,37 +4357,13 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
 
 		-
-			message: '#^Call to method Output\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method SetAuthor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
 			message: '#^Call to method SetAuthor\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
 
 		-
-			message: '#^Call to method SetAutoPageBreak\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
 			message: '#^Call to method SetAutoPageBreak\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method SetCreator\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
@@ -5563,27 +4375,9 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
 
 		-
-			message: '#^Call to method SetDrawColor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
 			message: '#^Call to method SetDrawColor\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method SetFillColor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 4
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method SetFont\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 12
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
 
 		-
@@ -5593,19 +4387,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
 
 		-
-			message: '#^Call to method SetLineWidth\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
 			message: '#^Call to method SetLineWidth\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method SetMargins\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
@@ -5617,91 +4399,13 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
 
 		-
-			message: '#^Call to method SetSubject\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
 			message: '#^Call to method SetSubject\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
 
 		-
-			message: '#^Call to method SetTextColor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 9
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method SetTitle\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
 			message: '#^Call to method SetTitle\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method SetX\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 5
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method SetXY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 4
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method SetY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method getBreakMargin\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method getNumLines\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method getNumPages\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method getPage\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method getPageHeight\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method setPage\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to method setPageOrientation\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
@@ -5727,54 +4431,6 @@ parameters:
 		-
 			message: '#^Parameter \#2 \$noTrigger of method SaturneDocuments\:\:create\(\) expects int\<0, 1\>, true given\.$#'
 			identifier: argument.type
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_timespent_projectdocument\:\:_pagehead\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_timespent_projectdocument\:\:checkPageBreak\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_timespent_projectdocument\:\:contentWidth\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_timespent_projectdocument\:\:newPage\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_timespent_projectdocument\:\:sectionTitle\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_timespent_projectdocument\:\:table\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_timespent_projectdocument\:\:tableHeader\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_timespent_projectdocument\:\:writeFooter\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
 
@@ -5989,73 +4645,13 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
 
 		-
-			message: '#^Call to method AddPage\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
 			message: '#^Call to method AddPage\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
 
 		-
-			message: '#^Call to method Cell\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method GetPageWidth\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 4
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
 			message: '#^Call to method GetPageWidth\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method GetStringWidth\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 4
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method GetX\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method GetY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method Image\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method Ln\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 4
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method MultiCell\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 5
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method Open\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
@@ -6067,31 +4663,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
 
 		-
-			message: '#^Call to method Output\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method Rect\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method SetAuthor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
 			message: '#^Call to method SetAuthor\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method SetAutoPageBreak\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
@@ -6103,19 +4675,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
 
 		-
-			message: '#^Call to method SetCreator\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
 			message: '#^Call to method SetCreator\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method SetDrawColor\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
@@ -6127,37 +4687,13 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
 
 		-
-			message: '#^Call to method SetFillColor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method SetFont\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 9
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
 			message: '#^Call to method SetFont\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 3
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
 
 		-
-			message: '#^Call to method SetMargins\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
 			message: '#^Call to method SetMargins\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method SetSubject\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
@@ -6169,79 +4705,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
 
 		-
-			message: '#^Call to method SetTextColor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method SetTitle\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
 			message: '#^Call to method SetTitle\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method SetX\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method SetXY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method SetY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method getAliasNbPages\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method getNumLines\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method getNumPages\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method getPageHeight\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method getStringHeight\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method setFontSize\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method setPageOrientation\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
@@ -6260,30 +4724,6 @@ parameters:
 
 		-
 			message: '#^Call to method setPrintHeader\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method setX\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method setXY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method setY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to method writeHTML\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
@@ -6343,38 +4783,20 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
 
 		-
+			message: '#^Parameter \#1 \$w of method TCPDF\:\:Cell\(\) expects float, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
+
+		-
 			message: '#^Parameter \#3 \$tableWidth of method pdf_ticketdocument\:\:drawTable\(\) expects array, float given\.$#'
 			identifier: argument.type
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
 
 		-
-			message: '#^Parameter \$pdf of method pdf_ticketdocument\:\:_pageFooter\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_ticketdocument\:\:_pagehead\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_ticketdocument\:\:drawTable\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Parameter \$pdf of method pdf_ticketdocument\:\:getTicketPdfTables\(\) has invalid type TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Variable \$aligns on left side of \?\? is never defined\.$#'
-			identifier: nullCoalesce.variable
+			message: '#^Parameter \#6 \$fill of method TCPDF\:\:MultiCell\(\) expects bool, int given\.$#'
+			identifier: argument.type
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
 
@@ -6667,21 +5089,9 @@ parameters:
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
-			message: '#^Call to method AddPage\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
 			message: '#^Call to method AddPage\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 2
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
-			message: '#^Call to method Cell\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 4
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
@@ -6691,19 +5101,7 @@ parameters:
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
-			message: '#^Call to method GetY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
 			message: '#^Call to method GetY\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 2
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
-			message: '#^Call to method Image\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 2
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
@@ -6715,21 +5113,9 @@ parameters:
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
-			message: '#^Call to method Output\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
 			message: '#^Call to method Output\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
-			message: '#^Call to method RoundedRect\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
@@ -6739,21 +5125,9 @@ parameters:
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
-			message: '#^Call to method SetAuthor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
 			message: '#^Call to method SetAuthor\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
-			message: '#^Call to method SetAutoPageBreak\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 4
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
@@ -6763,19 +5137,7 @@ parameters:
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
-			message: '#^Call to method SetCreator\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
 			message: '#^Call to method SetCreator\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
-			message: '#^Call to method SetFillColor\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
@@ -6787,31 +5149,13 @@ parameters:
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
-			message: '#^Call to method SetFont\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 4
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
 			message: '#^Call to method SetFont\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 4
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
-			message: '#^Call to method SetMargins\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
 			message: '#^Call to method SetMargins\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
-			message: '#^Call to method SetSubject\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
@@ -6823,21 +5167,9 @@ parameters:
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
-			message: '#^Call to method SetTextColor\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 4
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
 			message: '#^Call to method SetTextColor\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 4
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
-			message: '#^Call to method SetTitle\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
@@ -6847,31 +5179,13 @@ parameters:
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
-			message: '#^Call to method SetX\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
 			message: '#^Call to method SetX\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 3
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
-			message: '#^Call to method SetXY\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
 			message: '#^Call to method SetXY\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
-			message: '#^Call to method SetY\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
@@ -6883,21 +5197,9 @@ parameters:
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
-			message: '#^Call to method getNumPages\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
 			message: '#^Call to method getNumPages\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
-			message: '#^Call to method getPage\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 4
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
@@ -6907,21 +5209,9 @@ parameters:
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
-			message: '#^Call to method setPage\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
 			message: '#^Call to method setPage\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
-			message: '#^Call to method setPageOrientation\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 3
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
@@ -6931,31 +5221,13 @@ parameters:
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
-			message: '#^Call to method setPrintFooter\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
 			message: '#^Call to method setPrintFooter\(\) on an unknown class TCPDI\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
 		-
-			message: '#^Call to method setPrintHeader\(\) on an unknown class TCPDF\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
 			message: '#^Call to method setPrintHeader\(\) on an unknown class TCPDI\.$#'
-			identifier: class.notFound
-			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
-			message: '#^Call to method writeHTMLCell\(\) on an unknown class TCPDF\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php

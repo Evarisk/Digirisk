@@ -34,6 +34,10 @@ parameters:
     scanFiles:
         # llxHeader()/llxFooter()/top_httphead() vivent dans main.inc.php
         - ../../main.inc.php
+        # La classe TCPDF elle-meme : sans elle, chaque appel de methode sur un objet
+        # PDF remonte en class.notFound. Cela representait 293 des 1877 entrees de la
+        # baseline, et le moindre ajout dans un builder PDF faisait sauter les compteurs.
+        - ../../includes/tecnickcom/tcpdf/tcpdf.php
         - ../../includes/tecnickcom/tcpdf/tcpdf_barcodes_1d.php
         - ../../includes/tecnickcom/tcpdf/tcpdf_barcodes_2d.php
 
