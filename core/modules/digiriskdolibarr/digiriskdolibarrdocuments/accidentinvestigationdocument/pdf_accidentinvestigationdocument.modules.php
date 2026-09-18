@@ -79,99 +79,19 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
         $this->height      = 6;
         $this->orientation = 'P';
         $this->version     = '1.0.0';
+
+        // Table style of this document, drawTable() itself living in SaturneDocumentModel
+        $this->tableTitleColor         = [211, 89, 104];
+        $this->tableTitleHeight        = 7;
+        $this->tableTitleAlign         = 'L';
+        $this->tableLabelFillColor     = [245, 245, 245];
+        $this->tableDefaultAlign       = 'L';
+        $this->tableCellFontSizeOffset = 1;
+        $this->tableSpaceAfter         = 3;
+        $this->keepTableTogether       = true;
+        $this->tableFillEmptyCells     = true;
     }
 
-    /**
-     * Add a page when the block about to be written would not fit on the current one.
-     *
-     * @param  TCPDF $pdf          PDF handler
-     * @param  float $neededHeight Height the next block needs
-     * @return void
-     */
-    public function checkPageBreak($pdf, float $neededHeight)
-    {
-        if ($pdf->GetY() + $neededHeight + $pdf->getBreakMargin() > $pdf->getPageHeight()) {
-            $pdf->AddPage();
-            $pdf->SetY($this->marge_haute);
-        }
-    }
-
-    /**
-     * Draw one titled table.
-     *
-     * Rows are arrays of cells, a cell being either a string or ['text' => string, 'label' => 1]
-     * for the bold left column. Same contract as the ticket document model.
-     *
-     * @param  TCPDF $pdf             PDF handler
-     * @param  array $table           Table definition: title, widths, rows
-     * @param  float $tableWidth      Total width of the table
-     * @param  float $lineHeight      Height of a single line
-     * @param  float $defaultFontSize Font size of the document
-     * @return void
-     */
-    public function drawTable($pdf, array $table, float $tableWidth, float $lineHeight, float $defaultFontSize)
-    {
-        global $langs;
-
-        if (!isset($table['rows'], $table['widths']) || empty($table['rows'])) {
-            return;
-        }
-
-        $this->checkPageBreak($pdf, $lineHeight * (count($table['rows']) + 1));
-
-        if (!empty($table['title'])) {
-            $pdf->SetFont('', 'B', $defaultFontSize);
-            $pdf->SetFillColor(211, 89, 104);
-            $pdf->SetTextColor(255, 255, 255);
-            $pdf->SetX($this->marge_gauche);
-            $pdf->Cell($tableWidth, 7, $table['title'], 1, 1, 'L', true);
-            $pdf->SetTextColor(0, 0, 0);
-        }
-
-        $widths = $table['widths'];
-
-        foreach ($table['rows'] as $cells) {
-            // A row is as tall as its tallest cell, otherwise a long text overlaps the next line
-            $maxHeight = $lineHeight;
-            foreach ($cells as $index => $cellData) {
-                if (!isset($widths[$index])) {
-                    continue;
-                }
-                $cell   = is_array($cellData) ? ($cellData['text'] ?? '') : $cellData;
-                $height = $pdf->getNumLines((string) $cell, $widths[$index]) * $lineHeight;
-                if ($height > $maxHeight) {
-                    $maxHeight = $height;
-                }
-            }
-
-            $this->checkPageBreak($pdf, $maxHeight);
-            $pdf->SetX($this->marge_gauche);
-
-            foreach ($cells as $index => $cellData) {
-                if (!isset($widths[$index])) {
-                    continue;
-                }
-                $isLabel = is_array($cellData) && !empty($cellData['label']);
-                $cell    = is_array($cellData) ? ($cellData['text'] ?? '') : $cellData;
-                if (!dol_strlen((string) $cell)) {
-                    $cell = $langs->transnoentities('NoData');
-                }
-
-                $pdf->SetFont('', $isLabel ? 'B' : '', $defaultFontSize - 1);
-                if ($isLabel) {
-                    $pdf->SetFillColor(245, 245, 245);
-                }
-
-                $x = $pdf->GetX();
-                $y = $pdf->GetY();
-                $pdf->MultiCell($widths[$index], $maxHeight, (string) $cell, 1, 'L', $isLabel, 0, $x, $y, true, 0, false, true, $maxHeight, 'M');
-                $pdf->SetXY($x + $widths[$index], $y);
-            }
-            $pdf->Ln($maxHeight);
-        }
-
-        $pdf->Ln(3);
-    }
 
     /**
      * Show the top header of the page: company logo, document title and object ref.
@@ -414,19 +334,8 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
             $pdf->Image($data['causality_tree_photo'], $this->marge_gauche, $pdf->GetY(), $tableWidth);
         }
 
-        // An investigation spreads over several pages : each one gets its footer. The count is
-        // read once, so that a page appended here could not give the loop a moving end
-        $numPages = $pdf->getNumPages();
-        for ($page = 1; $page <= $numPages; $page++) {
-            $pdf->setPage($page);
-
-            // setPage() restores the automatic page break saved with the page, so it has to be
-            // switched off again on each one : the footer is written past the break limit and
-            // would otherwise append a page, which would in turn get a footer
-            $pdf->SetAutoPageBreak(false, 0);
-
-            $this->_pagefooter($pdf, $object, $outputLangs, $defaultFontSize);
-        }
+        // An investigation spreads over several pages : each one gets its footer
+        $this->drawFooterOnEveryPage($pdf, $object, $outputLangs, $defaultFontSize);
 
         try {
             $pdf->Output($file, 'F');

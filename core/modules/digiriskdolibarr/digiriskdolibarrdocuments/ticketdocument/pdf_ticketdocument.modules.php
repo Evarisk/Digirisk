@@ -81,188 +81,6 @@
             $this->version      = '1.0.0';
         }
 
-        /**
-         *  Add a page in the pdf if the height is between two pages
-         *
-         * @param Object $pdf
-         * @param float $neededHeight
-         */
-        public function checkPageBreak($pdf, $neededHeight) {
-            $bottomMargin = $pdf->getBreakMargin();
-            $pageHeight   = $pdf->getPageHeight();
-            $currentY     = $pdf->GetY();
-
-            if ($currentY + $neededHeight + $bottomMargin > $pageHeight) {
-                $pdf->AddPage();
-            }
-        }
-
-        /**
-         *  Split a text in two : the longest beginning fitting in a given height, and the rest
-         *
-         * @param  TCPDF  $pdf    Object PDF
-         * @param  string $text   Text to split
-         * @param  float  $width  Width of the cell the text is written in
-         * @param  float  $height Height available for the beginning
-         * @return array          Beginning and rest, the rest being empty when everything fits
-         */
-        protected function splitTextToHeight($pdf, $text, $width, $height): array
-        {
-            if (dol_strlen($text) == 0 || $pdf->getStringHeight($width, $text) <= $height) {
-                return [$text, ''];
-            }
-
-            // Longest beginning that still fits, looked up by dichotomy : TCPDF exposes no way
-            // to ask where it would have wrapped the text
-            $low  = 0;
-            $high = dol_strlen($text);
-            while ($low < $high) {
-                $middle = (int) ceil(($low + $high) / 2);
-                if ($pdf->getStringHeight($width, dol_substr($text, 0, $middle)) <= $height) {
-                    $low = $middle;
-                } else {
-                    $high = $middle - 1;
-                }
-            }
-
-            // Always move forward, even when a single character does not fit : an empty
-            // beginning would keep the caller looping on the same text for ever
-            $cut = max(1, $low);
-
-            // Cut on a space so a word is not torn between two pages
-            $beginning = dol_substr($text, 0, $cut);
-            $space     = function_exists('mb_strrpos') ? mb_strrpos($beginning, ' ') : strrpos($beginning, ' ');
-            if ($space !== false && $space > 0) {
-                $cut = $space;
-            }
-
-            return [dol_substr($text, 0, $cut), trim(dol_substr($text, $cut))];
-        }
-
-        /**
-         *  Draw tables for pdf
-         *
-         * @param TCPDF $pdf pdf object
-         * @param array $table array with values
-         * @param array $tableWidth the total width of the table
-         * @param float $lineHeight is the normal height value for lines
-         * @param float $defaultFontSize to have the default font size
-         * @return void
-         *
-         */
-        function drawTable($pdf, $table, $tableWidth, $lineHeight, $defaultFontSize)
-        {
-            global $langs;
-
-            if (!isset($table['rows'], $table['widths'], $table['align'])) {
-                return;
-            }
-
-            if (!empty($table['title'])) {
-                $pdf->SetFont('', 'B', $defaultFontSize);
-                $pdf->SetFillColor(42, 157, 143);
-                $pdf->SetTextColor(255, 255, 255);
-
-                $pdf->Cell($tableWidth, 8, $table['title'], 1, 1, 'C', true);
-
-                // Reset style
-                $pdf->SetTextColor(0, 0, 0);
-                $pdf->SetFont('', '', $defaultFontSize - 2);
-            }
-
-            $widths = $table['widths'];
-            $aligns = $table['align'];
-
-            if (isset($table['Ln'])) {
-                $pdf->Ln($table['Ln']);
-            }
-            $usableHeight = $pdf->getPageHeight() - $pdf->getBreakMargin() - $this->marge_haute;
-
-            foreach ($table['rows'] as $cells) {
-                // Text and font of every cell, resolved once : a row longer than a page is
-                // written over several of them and each fragment redraws the same cells
-                $texts   = [];
-                $isLabel = [];
-                foreach ($cells as $key => $cellData) {
-                    if (!isset($widths[$key])) {
-                        continue;
-                    }
-                    if (is_array($cellData)) {
-                        $texts[$key]   = $cellData['text'] ?? '';
-                        $isLabel[$key] = !empty($cellData['label']);
-                    } else {
-                        $texts[$key]   = $cellData;
-                        $isLabel[$key] = false;
-                    }
-                    $texts[$key] = $texts[$key] ?? $langs->transnoentities('NoData');
-                }
-
-                while (true) {
-                    $maxHeight = $lineHeight;
-
-                    // Calculating max height for a line to break after. Measured with the font
-                    // the cell will be drawn with, and through getStringHeight() which accounts
-                    // for the cell padding : the row height is also the MultiCell maximum, so
-                    // an approximation would cut the text
-                    foreach ($texts as $key => $text) {
-                        $pdf->SetFont('', $isLabel[$key] ? 'B' : '', 10);
-                        $height = $pdf->getStringHeight($widths[$key], $text);
-
-                        if ($height > $maxHeight) {
-                            $maxHeight = $height;
-                        }
-                    }
-
-                    // Send the whole row to the next page rather than let it be cut in half.
-                    // A row that would not fit on an empty page either is left where it is :
-                    // it gets split below, so moving it would only waste the end of the page
-                    if ($maxHeight <= $usableHeight) {
-                        $this->checkPageBreak($pdf, $maxHeight);
-                    }
-
-                    $availableHeight = $pdf->getPageHeight() - $pdf->getBreakMargin() - $pdf->GetY();
-                    $splitRow        = $maxHeight > $availableHeight;
-                    if ($splitRow) {
-                        $maxHeight = $availableHeight;
-                    }
-
-                    // draw the cells array
-                    $remaining = [];
-                    foreach ($texts as $key => $text) {
-                        if ($isLabel[$key]) {
-                            $pdf->SetFont('', 'B', 10);
-                        } else {
-                            $pdf->SetFont('', '', 10);
-                        }
-
-                        if ($splitRow) {
-                            list($text, $remaining[$key]) = $this->splitTextToHeight($pdf, $text, $widths[$key], $maxHeight);
-                        }
-
-                        $x     = $pdf->GetX();
-                        $y     = $pdf->GetY();
-                        $align = $aligns[$key] ?? 'C';
-
-                        // Minimum and maximum both set to the row height : every cell of the row
-                        // shares the same border, TCPDF keeps honouring the 'M' vertical alignment,
-                        // and the tallest text still fits since the height was measured on it
-                        $pdf->MultiCell($widths[$key], $maxHeight, $text, 1, $align, 0, 0, $x, $y, true, 0, false, true, $maxHeight, 'M');
-                        $pdf->SetXY($x + $widths[$key], $y);
-                    }
-                    $pdf->Ln($maxHeight);
-
-                    if (dol_strlen(implode('', $remaining)) == 0) {
-                        break;
-                    }
-
-                    // What is left carries on at the top of the next page, in the same cells :
-                    // one already emptied keeps its border, so the columns stay readable
-                    $texts = $remaining;
-                    $pdf->AddPage();
-                }
-            }
-        }
-
 
         /**
          *  Show top header of page
@@ -473,7 +291,7 @@
          *  @param  Translate	$outputlangs	Object lang for output
          *  @return	void
          */
-        function _pageFooter($pdf, $object, $outputLangs, $defaultFontSize)
+        function _pagefooter($pdf, $object, $outputLangs, $defaultFontSize)
         {
             global $langs;
 
@@ -638,20 +456,8 @@
                 }
             }
 
-            // A ticket with a long message spreads over several pages : each one gets its footer.
-            // The count is read once : should a page still be appended, re-reading it here would
-            // give the loop a moving end and hang the generation until the time limit
-            $numPages = $pdf->getNumPages();
-            for ($page = 1; $page <= $numPages; $page++) {
-                $pdf->setPage($page);
-
-                // setPage() restores the automatic page break saved with the page, so it has to
-                // be switched off again on each one : the footer is written past the break limit
-                // and would otherwise append a page, which would in turn get a footer
-                $pdf->SetAutoPageBreak(false, 0);
-
-                $this->_pageFooter($pdf, $object, $outputLangs, $defaultFontSize);
-            }
+            // A ticket with a long message spreads over several pages : each one gets its footer
+            $this->drawFooterOnEveryPage($pdf, $object, $outputLangs, $defaultFontSize);
 
             try {
                 $pdf->Output($file, 'F');
