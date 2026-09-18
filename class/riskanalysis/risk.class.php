@@ -234,15 +234,28 @@ class Risk extends SaturneObject
         $filter        = 't.status = ' . Risk::STATUS_VALIDATED . ' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED .  $dateFilter . (!empty($moreParam['filterRisk']) ? $moreParam['filterRisk'] : ' AND t.type = \'risk\'');
         $currentFilter = $filter . ' AND t.entity = ' . $conf->entity;
 
-        $array['riskByEntities']   = [];
-        $array['current']['risks'] = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $currentFilter], 'AND', false, false, false, $join, [], $select, $moreSelects);
-        if (!is_array($array['current']['risks']) || empty($array['current']['risks'])) {
-            $array['current']['risks']                         = [];
-            $array['current']['riskByRiskAssessmentCotations'] = [];
-            $array['current']['riskByCategories']              = [];
-            $array['current']['riskBySubCategories']           = [];
-            $array['current']['psychosocialRisksByGPUT']       = [];
-            $array['current']['riskByRiskAssessmentLevels']    = [];
+        // Each breakdown below is only filled for the risks that feed it: riskBySubCategories and
+        // psychosocialRisksByGPUT describe the psychosocial category alone, so an entity holding
+        // risks but not a single psychosocial one left those two keys undeclared, and the document
+        // models read them without a guard. Declare the whole shape once instead.
+        $array['riskByEntities'] = [];
+        foreach (['current', 'shared'] as $scope) {
+            $array[$scope] = [
+                'risks'                         => [],
+                'riskByRiskAssessmentCotations' => [],
+                'riskByRiskAssessmentLevels'    => [],
+                'riskByCategories'              => [],
+                'riskBySubCategories'           => [],
+                'psychosocialRisksByGPUT'       => [],
+                'riskTasks'                     => [],
+                'totalRisks'                    => 0,
+            ];
+        }
+        $array['shared']['projectEntities'] = [];
+
+        $currentRisks = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $currentFilter], 'AND', false, false, false, $join, [], $select, $moreSelects);
+        if (is_array($currentRisks)) {
+            $array['current']['risks'] = $currentRisks;
         }
 
         // ShowInheritedRisksInDocuments promises "Activez cette option pour les afficher dans les
@@ -264,24 +277,10 @@ class Risk extends SaturneObject
             }
         }
 
-        if (empty($moreParam['tmparray']['showSharedRisk_nocheck'])) {
-            $array['shared']['risks']                         = [];
-            $array['shared']['riskByCategories']              = [];
-            $array['shared']['riskBySubCategories']           = [];
-            $array['shared']['psychosocialRisksByGPUT']       = [];
-            $array['shared']['riskByRiskAssessmentCotations'] = [];
-            $array['shared']['riskByRiskAssessmentLevels']    = [];
-        }
-
         if (!empty($moreParam['tmparray']['showSharedRisk_nocheck'])) {
-            $array['shared']['risks'] = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $filter], 'AND', false, true, false, $sharedJoin, [], $sharedSelect, $sharedMoreSelects);
-            if (!is_array($array['shared']['risks']) || empty($array['shared']['risks'])) {
-                $array['shared']['risks']                         = [];
-                $array['shared']['riskByCategories']              = [];
-                $array['shared']['riskBySubCategories']           = [];
-                $array['shared']['psychosocialRisksByGPUT']       = [];
-                $array['shared']['riskByRiskAssessmentCotations'] = [];
-                $array['shared']['riskByRiskAssessmentLevels']    = [];
+            $sharedRisks = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $filter], 'AND', false, true, false, $sharedJoin, [], $sharedSelect, $sharedMoreSelects);
+            if (is_array($sharedRisks)) {
+                $array['shared']['risks'] = $sharedRisks;
             }
         }
 
@@ -349,11 +348,8 @@ class Risk extends SaturneObject
         }
         $filter        .= ' AND eft.fk_risk > 0';
         $array['tasks'] = saturne_fetch_all_object_type('saturneTask', '', '', 0, 0, ['customsql' => $filter], 'AND', true, false);
-        if (!is_array($array['tasks']) || empty($array['tasks'])) {
-            $array['tasks']                     = [];
-            $array['current']['riskTasks']      = [];
-            $array['shared']['riskTasks']       = [];
-            $array['shared']['projectEntities'] = [];
+        if (!is_array($array['tasks'])) {
+            $array['tasks'] = [];
         }
 
         foreach ($array['tasks'] as $task) {
