@@ -331,7 +331,12 @@ class Risk extends SaturneObject
                 $array[$entity]['riskBySubCategories'][$subCategory][$scale] = ($array[$entity]['riskBySubCategories'][$subCategory][$scale] ?? 0) + 1;
 
                 if ($subCategory != self::SUB_CATEGORY_NOT_SPECIFIED) {
-                    $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$subCategory][$risk->riskAssessmentDate] = $riskAssessment->cotation;
+                    // The table holds one cell per element and sub-category: when a session assesses
+                    // several factors of the same family on the same date, as the RPS-DU grid does,
+                    // the cell has to report the worst of them rather than the last one read
+                    $lastCotation = $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$subCategory][$risk->riskAssessmentDate] ?? null;
+
+                    $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$subCategory][$risk->riskAssessmentDate] = is_null($lastCotation) ? $riskAssessment->cotation : max($lastCotation, $riskAssessment->cotation);
                 }
             }
             $array['riskByEntities'][$risk->entity]['nbTotalRisks']++;
@@ -791,6 +796,38 @@ class Risk extends SaturneObject
         return $riskSubCategories[0];
     }
 
+    /**
+     * Get the INRS psychosocial risk assessment grid (RPS-DU tool, brochure ED 6403)
+     *
+     * Each criterion carries the family heading it is printed under in the official grid, the
+     * question asked during the interview and the sub-category of the psychosocial danger
+     * category it is filed under, so a criterion assessed here feeds the same tables of the
+     * risk assessment document as a factor entered with the "Faire le point" method.
+     *
+     * "reversed" tells which way the four colours run: on a criterion describing a constraint
+     * ("Les salariés sont-ils soumis à des contraintes de rythmes élevés ?") answering "Jamais"
+     * is the green answer, while on a criterion describing a resource ("Les objectifs des
+     * salariés sont-ils clairement définis ?") answering "Jamais" is the red one.
+     *
+     * @return array Array of criteria, or empty array on failure
+     */
+    public static function getPsychosocialRiskGrid(): array
+    {
+        $filePath = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/psychosocialRiskGrid.json';
+
+        if (!file_exists($filePath)) {
+            return [];
+        }
+
+        $criteria = json_decode(file_get_contents($filePath), true);
+
+        if (!is_array($criteria)) {
+            return [];
+        }
+
+        return $criteria;
+    }
+
 
     /**
 	 * Get danger category picto path
@@ -911,7 +948,9 @@ class Risk extends SaturneObject
         } elseif ($scale < 80) {
             return $langs->trans('High');
         } else {
-            return $langs->trans('-');
+            // The cotation scale has a fourth level, which getEvaluationScale() already knows:
+            // an unacceptable factor used to be printed as a dash in the risk assessment document
+            return $langs->trans('Extreme');
         }
     }
 
