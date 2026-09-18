@@ -424,7 +424,15 @@ if ($object->id > 0) {
 		require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_sharedrisklist_view.tpl.php';
 	}
 
-	require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_psychosocial_risk_modal.tpl.php';
+	// Chaque méthode d'évaluation des risques psychosociaux s'active depuis la configuration des
+	// risques, la grille RPS-DU n'étant de surcroît proposée que sur les risques professionnels
+	if (getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_METHOD', 1)) {
+		require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_psychosocial_risk_modal.tpl.php';
+	}
+
+	if ($riskType == 'risk' && getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_GRID_METHOD', 1)) {
+		require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_psychosocial_risk_grid_modal.tpl.php';
+	}
 }
 
 ?>
