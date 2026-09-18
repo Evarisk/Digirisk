@@ -3381,7 +3381,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property pdf_accidentinvestigationdocument\:\:\$height\.$#'
 			identifier: property.notFound
-			count: 2
+			count: 3
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
 
 		-
@@ -4611,7 +4611,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property pdf_ticketdocument\:\:\$height\.$#'
 			identifier: property.notFound
-			count: 4
+			count: 5
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
 
 		-
@@ -4731,18 +4731,6 @@ parameters:
 		-
 			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
 			identifier: arguments.count
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Method pdf_ticketdocument\:\:_pageFooter\(\) has parameter \$defaultFontSize with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Method pdf_ticketdocument\:\:_pageFooter\(\) has parameter \$outputLangs with no type specified\.$#'
-			identifier: missingType.parameter
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
 
