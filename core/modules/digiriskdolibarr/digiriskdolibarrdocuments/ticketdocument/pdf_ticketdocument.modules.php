@@ -639,10 +639,17 @@
             }
 
             // A ticket with a long message spreads over several pages : each one gets its footer.
-            // Auto page break is turned off first so writing at the very bottom adds no blank page
-            $pdf->SetAutoPageBreak(false, 0);
-            for ($page = 1; $page <= $pdf->getNumPages(); $page++) {
+            // The count is read once : should a page still be appended, re-reading it here would
+            // give the loop a moving end and hang the generation until the time limit
+            $numPages = $pdf->getNumPages();
+            for ($page = 1; $page <= $numPages; $page++) {
                 $pdf->setPage($page);
+
+                // setPage() restores the automatic page break saved with the page, so it has to
+                // be switched off again on each one : the footer is written past the break limit
+                // and would otherwise append a page, which would in turn get a footer
+                $pdf->SetAutoPageBreak(false, 0);
+
                 $this->_pageFooter($pdf, $object, $outputLangs, $defaultFontSize);
             }
 
