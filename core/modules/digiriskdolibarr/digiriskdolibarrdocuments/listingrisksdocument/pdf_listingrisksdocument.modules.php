@@ -176,7 +176,7 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
      * @param  float $neededHeight Hauteur necessaire
      * @return void
      */
-    protected function checkPageBreak($pdf, float $neededHeight)
+    public function checkPageBreak($pdf, float $neededHeight)
     {
         $usable = $pdf->getPageHeight() - $this->marge_haute - $pdf->getBreakMargin();
 
