@@ -2202,7 +2202,7 @@ class modDigiriskdolibarr extends DolibarrModules
 	 * @return     int                1 if OK, 0 if KO
 	 * @throws Exception
 	 */
-	public function init($options = '')
+	public function init($options = ''): int
 	{
 		global $conf, $langs, $user;
 
@@ -2968,7 +2968,7 @@ class modDigiriskdolibarr extends DolibarrModules
 	 *  @param      string	$options    Options when enabling module ('', 'noboxes')
 	 *  @return     int                 1 if OK, 0 if KO
 	 */
-	public function remove($options = '')
+	public function remove($options = ''): int
 	{
 		global $conf;
 
