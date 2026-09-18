@@ -123,6 +123,7 @@ jobs:
                       htdocs/includes/odtphp
                       htdocs/includes/parsedown
                       htdocs/includes/restler/framework
+                      htdocs/includes/tecnickcom/tcpdf/tcpdf.php
                       htdocs/includes/tecnickcom/tcpdf/tcpdf_barcodes_1d.php
                       htdocs/includes/tecnickcom/tcpdf/tcpdf_barcodes_2d.php
                       htdocs/main.inc.php
