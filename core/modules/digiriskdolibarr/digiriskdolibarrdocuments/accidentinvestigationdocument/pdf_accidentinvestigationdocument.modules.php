@@ -385,7 +385,9 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
         $pdf->SetAuthor($outputLangs->convToOutputCharset($user->getFullName($outputLangs)));
         $pdf->SetMargins($this->marge_gauche, $this->marge_haute, $this->marge_droite);
         $pdf->setPageOrientation($this->orientation, 1, $this->marge_basse);
-        $pdf->SetAutoPageBreak(1, $this->marge_basse);
+        // The footer is written in the band above marge_basse, so its height belongs to the
+        // break margin : without it the body of a long report is drawn over the footer
+        $pdf->SetAutoPageBreak(1, $this->marge_basse + $this->height);
 
         $pdf->AddPage();
         $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $defaultFontSize);
@@ -412,7 +414,19 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
             $pdf->Image($data['causality_tree_photo'], $this->marge_gauche, $pdf->GetY(), $tableWidth);
         }
 
-        $this->_pagefooter($pdf, $object, $outputLangs, $defaultFontSize);
+        // An investigation spreads over several pages : each one gets its footer. The count is
+        // read once, so that a page appended here could not give the loop a moving end
+        $numPages = $pdf->getNumPages();
+        for ($page = 1; $page <= $numPages; $page++) {
+            $pdf->setPage($page);
+
+            // setPage() restores the automatic page break saved with the page, so it has to be
+            // switched off again on each one : the footer is written past the break limit and
+            // would otherwise append a page, which would in turn get a footer
+            $pdf->SetAutoPageBreak(false, 0);
+
+            $this->_pagefooter($pdf, $object, $outputLangs, $defaultFontSize);
+        }
 
         try {
             $pdf->Output($file, 'F');
