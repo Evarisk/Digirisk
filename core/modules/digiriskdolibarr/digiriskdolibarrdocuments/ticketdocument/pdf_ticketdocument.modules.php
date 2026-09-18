@@ -98,6 +98,48 @@
         }
 
         /**
+         *  Split a text in two : the longest beginning fitting in a given height, and the rest
+         *
+         * @param  TCPDF  $pdf    Object PDF
+         * @param  string $text   Text to split
+         * @param  float  $width  Width of the cell the text is written in
+         * @param  float  $height Height available for the beginning
+         * @return array          Beginning and rest, the rest being empty when everything fits
+         */
+        protected function splitTextToHeight($pdf, $text, $width, $height): array
+        {
+            if (dol_strlen($text) == 0 || $pdf->getStringHeight($width, $text) <= $height) {
+                return [$text, ''];
+            }
+
+            // Longest beginning that still fits, looked up by dichotomy : TCPDF exposes no way
+            // to ask where it would have wrapped the text
+            $low  = 0;
+            $high = dol_strlen($text);
+            while ($low < $high) {
+                $middle = (int) ceil(($low + $high) / 2);
+                if ($pdf->getStringHeight($width, dol_substr($text, 0, $middle)) <= $height) {
+                    $low = $middle;
+                } else {
+                    $high = $middle - 1;
+                }
+            }
+
+            // Always move forward, even when a single character does not fit : an empty
+            // beginning would keep the caller looping on the same text for ever
+            $cut = max(1, $low);
+
+            // Cut on a space so a word is not torn between two pages
+            $beginning = dol_substr($text, 0, $cut);
+            $space     = function_exists('mb_strrpos') ? mb_strrpos($beginning, ' ') : strrpos($beginning, ' ');
+            if ($space !== false && $space > 0) {
+                $cut = $space;
+            }
+
+            return [dol_substr($text, 0, $cut), trim(dol_substr($text, $cut))];
+        }
+
+        /**
          *  Draw tables for pdf
          *
          * @param TCPDF $pdf pdf object
@@ -134,71 +176,90 @@
             if (isset($table['Ln'])) {
                 $pdf->Ln($table['Ln']);
             }
+            $usableHeight = $pdf->getPageHeight() - $pdf->getBreakMargin() - $this->marge_haute;
+
             foreach ($table['rows'] as $cells) {
-                $maxHeight = $lineHeight;
-
-                // Calculating max height for a line to break after
-                foreach ($cells as $i => $cellData) {
-                    if (!isset($widths[$i])) {
-                        continue;
-                    }
-                    if (is_array($cellData)) {
-                        $cell = $cellData['text'] ?? '';
-                    } else {
-                        $cell = $cellData;
-                    }
-                    $cell = $cell ?? $langs->transnoentities('NoData');
-
-                    // Measured with the font the cell will be drawn with, and through
-                    // getStringHeight() which accounts for the cell padding : the row height
-                    // is also the MultiCell maximum, so an approximation would cut the text
-                    $pdf->SetFont('', is_array($cellData) && !empty($cellData['label']) ? 'B' : '', 10);
-                    $height = $pdf->getStringHeight($widths[$i], $cell);
-
-                    if ($height > $maxHeight) {
-                        $maxHeight = $height;
-                    }
-                }
-
-                // Send the whole row to the next page rather than let it be cut in half
-                $this->checkPageBreak($pdf, $maxHeight);
-
-                // draw the cells array
-                $rowHeight = $maxHeight;
+                // Text and font of every cell, resolved once : a row longer than a page is
+                // written over several of them and each fragment redraws the same cells
+                $texts   = [];
+                $isLabel = [];
                 foreach ($cells as $key => $cellData) {
                     if (!isset($widths[$key])) {
                         continue;
                     }
-
-                    $isLabel = false;
-                    $cell    = '';
-
                     if (is_array($cellData)) {
-                        $cell    = $cellData['text'] ?? '';
-                        $isLabel = !empty($cellData['label']);
+                        $texts[$key]   = $cellData['text'] ?? '';
+                        $isLabel[$key] = !empty($cellData['label']);
                     } else {
-                        $cell = $cellData;
+                        $texts[$key]   = $cellData;
+                        $isLabel[$key] = false;
                     }
-
-                    if ($isLabel) {
-                        $pdf->SetFont('', 'B', 10);
-                    } else {
-                        $pdf->SetFont('', '', 10);
-                    }
-
-                    $x     = $pdf->GetX();
-                    $y     = $pdf->GetY();
-                    $cell  = $cell ?? $langs->transnoentities('NoData');
-                    $align = $aligns[$key] ?? 'C';
-
-                    // Minimum and maximum both set to the row height : every cell of the row
-                    // shares the same border, TCPDF keeps honouring the 'M' vertical alignment,
-                    // and the tallest text still fits since the height was measured on it
-                    $pdf->MultiCell($widths[$key], $maxHeight, $cell, 1, $align, 0, 0, $x, $y, true, 0, false, true, $maxHeight, 'M');
-                    $rowHeight = max($rowHeight, $pdf->getLastH());
-                    $pdf->SetXY($x + $widths[$key], $y);
+                    $texts[$key] = $texts[$key] ?? $langs->transnoentities('NoData');
                 }
-                $pdf->Ln($rowHeight);
+
+                while (true) {
+                    $maxHeight = $lineHeight;
+
+                    // Calculating max height for a line to break after. Measured with the font
+                    // the cell will be drawn with, and through getStringHeight() which accounts
+                    // for the cell padding : the row height is also the MultiCell maximum, so
+                    // an approximation would cut the text
+                    foreach ($texts as $key => $text) {
+                        $pdf->SetFont('', $isLabel[$key] ? 'B' : '', 10);
+                        $height = $pdf->getStringHeight($widths[$key], $text);
+
+                        if ($height > $maxHeight) {
+                            $maxHeight = $height;
+                        }
+                    }
+
+                    // Send the whole row to the next page rather than let it be cut in half.
+                    // A row that would not fit on an empty page either is left where it is :
+                    // it gets split below, so moving it would only waste the end of the page
+                    if ($maxHeight <= $usableHeight) {
+                        $this->checkPageBreak($pdf, $maxHeight);
+                    }
+
+                    $availableHeight = $pdf->getPageHeight() - $pdf->getBreakMargin() - $pdf->GetY();
+                    $splitRow        = $maxHeight > $availableHeight;
+                    if ($splitRow) {
+                        $maxHeight = $availableHeight;
+                    }
+
+                    // draw the cells array
+                    $remaining = [];
+                    foreach ($texts as $key => $text) {
+                        if ($isLabel[$key]) {
+                            $pdf->SetFont('', 'B', 10);
+                        } else {
+                            $pdf->SetFont('', '', 10);
+                        }
+
+                        if ($splitRow) {
+                            list($text, $remaining[$key]) = $this->splitTextToHeight($pdf, $text, $widths[$key], $maxHeight);
+                        }
+
+                        $x     = $pdf->GetX();
+                        $y     = $pdf->GetY();
+                        $align = $aligns[$key] ?? 'C';
+
+                        // Minimum and maximum both set to the row height : every cell of the row
+                        // shares the same border, TCPDF keeps honouring the 'M' vertical alignment,
+                        // and the tallest text still fits since the height was measured on it
+                        $pdf->MultiCell($widths[$key], $maxHeight, $text, 1, $align, 0, 0, $x, $y, true, 0, false, true, $maxHeight, 'M');
+                        $pdf->SetXY($x + $widths[$key], $y);
+                    }
+                    $pdf->Ln($maxHeight);
+
+                    if (dol_strlen(implode('', $remaining)) == 0) {
+                        break;
+                    }
+
+                    // What is left carries on at the top of the next page, in the same cells :
+                    // one already emptied keeps its border, so the columns stay readable
+                    $texts = $remaining;
+                    $pdf->AddPage();
+                }
             }
         }
 
@@ -502,7 +563,10 @@
 
             $pdf->SetMargins($this->marge_gauche, $this->marge_haute, $this->marge_droite);
             $pdf->setPageOrientation($this->orientation, 1, $this->marge_basse);
-            $pdf->SetAutoPageBreak(1, $this->marge_basse);
+            // The footer is written at marge_basse from the bottom, so it lands above that
+            // limit : its own height belongs to the break margin, otherwise the body of a long
+            // document is drawn over it
+            $pdf->SetAutoPageBreak(1, $this->marge_basse + $this->height);
 
             $pdf->AddPage();
             $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $defaultFontSize);
