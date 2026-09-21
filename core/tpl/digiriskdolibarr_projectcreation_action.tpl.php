@@ -138,6 +138,24 @@ if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && empty($conf->global->DIGIR
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_PROJECT_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
 }
 
+// Backward compatibility : the project creation below used to overwrite this menu entry with the project task
+// list, which hid the Kanban view added in 23.1.0. The Kanban page resolves the project by itself, so the URL
+// declared by the module descriptor is restored once, on the entity being visited.
+if (empty($conf->global->DIGIRISKDOLIBARR_DU_ACTIONPLAN_MENU_URL_BACKWARD_COMPATIBILITY)) {
+	$sql  = "UPDATE " . MAIN_DB_PREFIX . "menu SET";
+	$sql .= " url = '/digiriskdolibarr/view/digiriskstandard/actionplan_list.php?view=kanban'";
+	$sql .= " WHERE leftmenu = 'digiriskactionplan'";
+	$sql .= " AND entity = " . ((int) $conf->entity);
+
+	$resql = $db->query($sql);
+	if (!$resql) {
+		$error = "Error " . $db->lasterror();
+		return -1;
+	}
+
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_ACTIONPLAN_MENU_URL_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
+}
+
 if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) {
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
 	$project->title       = $langs->trans('RiskAssessmentDocument') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
@@ -163,18 +181,6 @@ if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) 
 	$tags->fetch('', 'DU');
 	$tags->add_type($project, 'project');
 
-	$url = '/projet/tasks.php?id=' . $project_id;
-
-	$sql = "UPDATE ".MAIN_DB_PREFIX."menu SET";
-	$sql .= " url='".$db->escape($url)."'";
-	$sql .= " WHERE leftmenu='digiriskactionplan'";
-	$sql .= " AND entity=" . $conf->entity;
-
-	$resql = $db->query($sql);
-	if (!$resql) {
-		$error = "Error ".$db->lasterror();
-		return -1;
-	}
 	header("Location: " . $_SERVER['PHP_SELF']);
 }
 
