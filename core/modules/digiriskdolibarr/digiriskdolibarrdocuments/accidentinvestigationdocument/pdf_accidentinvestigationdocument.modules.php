@@ -214,6 +214,26 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
             ],
         ];
 
+        // The ITAMAMI grid stays out of the report when the investigation does not use the
+        // method : an investigation filled before it existed would show five empty lines
+        $itamamiFields = ['ItamamiIndividual' => 'itamami_individual', 'ItamamiTask' => 'itamami_task', 'ItamamiActivity' => 'itamami_activity', 'ItamamiMaterial' => 'itamami_material', 'ItamamiEnvironment' => 'itamami_environment'];
+        $itamamiRows   = [];
+        $itamamiFilled = 0;
+        foreach ($itamamiFields as $itamamiLabel => $itamamiKey) {
+            $itamamiRows[] = [['text' => $outputLangs->transnoentities($itamamiLabel), 'label' => 1], $data[$itamamiKey]];
+            if (dol_strlen((string) $data[$itamamiKey]) > 0) {
+                $itamamiFilled = 1;
+            }
+        }
+
+        if (!empty($itamamiFilled)) {
+            $tables[] = [
+                'title'  => $outputLangs->transnoentities('ItamamiMethod'),
+                'widths' => $widths,
+                'rows'   => $itamamiRows,
+            ];
+        }
+
         $tables[] = [
             'title'  => $outputLangs->transnoentities('ActionsTab'),
             'widths' => $widths,
@@ -388,6 +408,11 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
             'collective_equipment'     => $object->collective_equipment,
             'individual_equipment'     => $object->individual_equipment,
             'circumstances'            => $object->circumstances,
+            'itamami_individual'       => $object->itamami_individual,
+            'itamami_task'             => $object->itamami_task,
+            'itamami_activity'         => $object->itamami_activity,
+            'itamami_material'         => $object->itamami_material,
+            'itamami_environment'      => $object->itamami_environment,
             'public_note'              => $object->note_public,
             'relative_location'        => $accidentMetadata->relative_location,
             'accident_date'            => dol_print_date($accident->accident_date, 'day'),
