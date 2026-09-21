@@ -2344,7 +2344,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			if ($trash_id > 0) {
 				// create() forces the validated status, so the bin would show up as an ordinary groupment
 				$digiriskelement->status = DigiriskElement::STATUS_TRASH_ROOT;
-				$digiriskelement->update($user, true);
+				$digiriskelement->update($user, 1);
 
 				// Elements of the current entity already trashed under the foreign trash must follow the new one
 				if ($previousTrashID > 0) {
