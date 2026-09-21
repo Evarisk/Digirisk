@@ -1305,6 +1305,7 @@ NoTaskLinked                             = No task in progress
 TaskList                                 = List of the risk tasks
 TaskCreate                               = Adding the task
 TaskEdit                                 = Task editing
+TaskDeclaredProgress                     = Declared progress (%)
 HowToSetDUProject                        = To configure the project choice, go to Module setup - Risk analysis - Task
 DeleteTask                               = Are you sure you want to delete the task
 ListingHeaderTask                        = List of tasks

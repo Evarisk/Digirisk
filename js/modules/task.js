@@ -243,9 +243,12 @@ window.digiriskdolibarr.riskassessmenttask.saveRiskAssessmentTask = function ( e
 
 	let taskRef =  $('.riskassessment-task-single-'+editedRiskAssessmentTaskId+' .riskassessment-task-reference').attr('value');
 
-	let taskProgress = 0;
-	if (elementRiskAssessmentTask.find('.riskassessment-task-progress-checkbox' + editedRiskAssessmentTaskId).is(':checked')) {
-		taskProgress = 1;
+	// Empty when the declared progress is not editable (calculated progress), the back office then leaves it untouched
+	let taskProgress = elementRiskAssessmentTask.find('.riskassessment-task-declared-progress' + editedRiskAssessmentTaskId).val();
+	if (taskProgress !== undefined && taskProgress !== '') {
+		taskProgress = Math.min(100, Math.max(0, parseInt(taskProgress, 10)));
+	} else {
+		taskProgress = '';
 	}
 
 	let dateStart = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStartEdit' + editedRiskAssessmentTaskId).val();
