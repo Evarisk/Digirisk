@@ -783,6 +783,14 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
                                 $out .= '</div>';
                             }
                             break;
+                        case 'digiriskdolibarr_ticket_date':
+                            // The date input and the hour and minute selects are one single field :
+                            // they are wrapped so the stylesheet keeps them on the same row instead
+                            // of letting each one take a full line of the phone screen (issue #4714)
+                            $out .= '<div class="ticket-date-input">';
+                            $out .= $extrafields->showInputField($key, GETPOST('options_' . $key), ($required ? 'required' : ''), '', '', '', $object, $object->table_element);
+                            $out .= '</div>';
+                            break;
 						default:
 							$out .= $extrafields->showInputField($key, GETPOST($fields[$key]['name'] ?? 'options_' . $key), ($required ? 'required' : ''), '', '', 0, $object, $object->table_element);
 							break;

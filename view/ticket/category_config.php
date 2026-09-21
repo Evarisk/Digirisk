@@ -127,7 +127,7 @@ if (empty($resHook)) {
             $isVisible                 = !empty($data[$extraFieldVisible]) || !empty($inheritedConfig[$extraFieldVisible]);
             $data[$extraFieldRequired] = $isVisible ? GETPOST($extraFieldRequired) : '';
         }
-        $config = json_decode($object->array_options['options_ticket_category_config'], true);
+        $config = json_decode($object->array_options['options_ticket_category_config'] ?? '', true);
         if (empty($config)) {
             $config = [];
         }
@@ -186,7 +186,7 @@ if (empty($resHook)) {
             exit;
         }
 
-        $config = json_decode($object->array_options['options_ticket_category_config'], true);
+        $config = json_decode($object->array_options['options_ticket_category_config'] ?? '', true);
         if (empty($config)) {
             $config = [];
         }
@@ -210,7 +210,12 @@ $helpUrl = 'FR:Module_Digirisk';
 saturne_header(0, '', $title, $helpUrl);
 
 $object->fetch_optionals();
-$ticketCategoryConfig = json_decode($object->array_options['options_ticket_category_config']);
+// A category never configured has no stored value, and one configured by an older version only
+// carries the keys that version knew about : the page always reads an object, never null
+$ticketCategoryConfig = json_decode($object->array_options['options_ticket_category_config'] ?? '');
+if (!$ticketCategoryConfig instanceof stdClass) {
+    $ticketCategoryConfig = new stdClass();
+}
 
 $head = categories_prepare_head($object, 'ticket');
 print dol_get_fiche_head($head, 'config', $langs->trans($title), -1, 'category');
@@ -250,7 +255,7 @@ print '<tr class="oddeven"><td>';
 print img_picto('', 'fa-signature', 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('PublicInterfaceUseSignatory'), $langs->transnoentities('PublicInterfaceUseSignatoryDescription'), 1, 'info');
 print '</td><td class="center">';
 print '<div style="display:flex;align-items:center;gap:8px;">';
-print '<input type="checkbox" id="use_signatory" name="use_signatory"' . ($ticketCategoryConfig->use_signatory ? ' checked=""' : '') . '"> ';
+print '<input type="checkbox" id="use_signatory" name="use_signatory"' . (!empty($ticketCategoryConfig->use_signatory) ? ' checked=""' : '') . '> ';
 $doleditor = new DolEditor('validate_text', $ticketCategoryConfig->validate_text ?? '', '100%', 120, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_MAIL, ROWS_2, 70);
 $doleditor->Create();
 print '</div>';
@@ -260,7 +265,7 @@ print '</td></tr>';
 print '<tr class="oddeven"><td>';
 print img_picto('', 'fa-font', 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('TicketPublicInterfaceShowCategory'), $langs->transnoentities('TicketPublicInterfaceShowCategoryDescriptionHelp'), 1, 'info') . '</td>';
 print '</td><td class="center">';
-print '<input type="checkbox" id="show_description" name="show_description"' . ($ticketCategoryConfig->show_description ? ' checked=""' : '') . '"> ';
+print '<input type="checkbox" id="show_description" name="show_description"' . (!empty($ticketCategoryConfig->show_description) ? ' checked=""' : '') . '> ';
 print '</td></tr>';
 
 // Email template
@@ -273,7 +278,7 @@ foreach ($formMail->lines_model as $emailTemplateLine) {
     $emailTemplateLabels[$emailTemplateLine->id] = $emailTemplateLine->label;
 }
 if (!empty($emailTemplateLabels)) {
-    print Form::selectarray('mail_template', $emailTemplateLabels, $ticketCategoryConfig->mail_template, 1);
+    print Form::selectarray('mail_template', $emailTemplateLabels, $ticketCategoryConfig->mail_template ?? '', 1);
 } else {
     print $langs->transnoentities('NoEmailTemplate');
 }
@@ -289,7 +294,7 @@ if (is_array($userTmp->users) && !empty($userTmp->users)) {
     foreach ($userTmp->users as $recipient) {
         $recipients[$recipient->id] = dolGetFirstLastname($recipient->firstname, $recipient->lastname) . ' (' . $recipient->email . ')';
     }
-    print Form::multiselectarray('recipients', $recipients, explode(',', $ticketCategoryConfig->recipients));
+    print Form::multiselectarray('recipients', $recipients, explode(',', $ticketCategoryConfig->recipients ?? ''));
 } else {
     print $langs->transnoentities('NoRecipient');
 }
@@ -299,8 +304,8 @@ print '</td></tr>';
 print '<tr class="oddeven"><td>';
 print img_picto('', 'fa-external-link-alt', 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('ExternalURL'), $langs->transnoentities('ExternalLinkDescription'), 1, 'info') . '</td>';
 print '</td><td class="center">';
-print '<input type="url" name="external_link" id="external_link" class="marginleftonly" placeholder="https://demo.digirisk.com/ticket" pattern="https?://.*" value="' . $ticketCategoryConfig->external_link . '" />';
-print '<input type="checkbox" id="external_link_new_tab" name="external_link_new_tab" class="marginleftonly" ' . ($ticketCategoryConfig->external_link_new_tab ? ' checked=""' : '') . '> ';
+print '<input type="url" name="external_link" id="external_link" class="marginleftonly" placeholder="https://demo.digirisk.com/ticket" pattern="https?://.*" value="' . dol_escape_htmltag($ticketCategoryConfig->external_link ?? '') . '" />';
+print '<input type="checkbox" id="external_link_new_tab" name="external_link_new_tab" class="marginleftonly" ' . (!empty($ticketCategoryConfig->external_link_new_tab) ? ' checked=""' : '') . '> ';
 print '<label for="external_link_new_tab">' . $langs->transnoentities('OpenInNewTab') . '</label>';
 print '</td></tr>';
 
@@ -312,7 +317,7 @@ foreach ($categories[0] as $category) {
     if ($category->id == $id) {
         continue;
     }
-    $categoriesConfig[$category->label] = json_decode($category->array_options['options_ticket_category_config'], true);
+    $categoriesConfig[$category->label] = json_decode($category->array_options['options_ticket_category_config'] ?? '', true);
     if (isset($categoriesConfig[$category->label]['order'])) {
         $order = array_merge($categoriesConfig[$category->label]['order']);
     }

@@ -952,7 +952,20 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) ? $langs->transnoentities('AlreadyGenerated') : $langs->transnoentities('NotCreated');
 	print '</td>';
 	print '<td class="center">';
-    print dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) ? '<a type="" class=" butActionRefused" value="">'.$langs->transnoentities('Create') .'</a>' : '<input type="submit" class="button reposition" value="'.$langs->transnoentities('Create') .'">' ;
+    if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
+        // Generating them a second time is refused, but the button used to be a dead link : it now
+        // opens the register configuration of the main category, the page where the ticket
+        // extrafields are listed, ordered, shown, made required and created (issue #4714)
+        $mainCategoryId = getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY');
+        if ($mainCategoryId > 0) {
+            $extrafieldsConfigUrl = dol_buildpath('/digiriskdolibarr/view/ticket/category_config.php', 1) . '?id=' . $mainCategoryId . '&type=ticket';
+            print '<a class="butAction" href="' . dol_sanitizeUrl($extrafieldsConfigUrl) . '">' . $langs->transnoentities('ConfigureExtrafields') . '</a>';
+        } else {
+            print $form->textwithpicto('<span class="butActionRefused">' . $langs->transnoentities('ConfigureExtrafields') . '</span>', $langs->transnoentities('MainCategoryNotSet'));
+        }
+    } else {
+        print '<input type="submit" class="button reposition" value="' . $langs->transnoentities('Create') . '">';
+    }
 	print '</td>';
 
 	print '<td class="center">';
