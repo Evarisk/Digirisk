@@ -3379,12 +3379,6 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
 
 		-
-			message: '#^Access to an undefined property pdf_accidentinvestigationdocument\:\:\$height\.$#'
-			identifier: property.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
 			message: '#^Access to an undefined property pdf_accidentinvestigationdocument\:\:\$orientation\.$#'
 			identifier: property.notFound
 			count: 2
@@ -3637,12 +3631,6 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
 
 		-
-			message: '#^Access to an undefined property pdf_listingrisksdocument\:\:\$height\.$#'
-			identifier: property.notFound
-			count: 13
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -3833,12 +3821,6 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/doc_preventionplandocument_odt.modules.php
-
-		-
-			message: '#^Access to an undefined property pdf_preventionplandocument\:\:\$height\.$#'
-			identifier: property.notFound
-			count: 21
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
 
 		-
 			message: '#^Access to an undefined property pdf_preventionplandocument\:\:\$orientation\.$#'
@@ -4291,12 +4273,6 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
-			message: '#^Access to an undefined property pdf_timespent_projectdocument\:\:\$height\.$#'
-			identifier: property.notFound
-			count: 5
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
 			message: '#^Access to an undefined property pdf_timespent_projectdocument\:\:\$orientation\.$#'
 			identifier: property.notFound
 			count: 2
@@ -4606,12 +4582,6 @@ parameters:
 			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
 			identifier: property.notFound
 			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Access to an undefined property pdf_ticketdocument\:\:\$height\.$#'
-			identifier: property.notFound
-			count: 5
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
 
 		-
