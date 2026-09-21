@@ -47,11 +47,25 @@ function digirisk_organization_actions()
         $arrayParentIds = preg_split('/,/', GETPOST('parent_ids'));
 
         if (!empty($arrayIds)) {
+            $trashElement = new DigiriskElement($db);
+            $trashID      = $trashElement->getTrashID();
             foreach ($arrayIds as $position => $elementId) {
                 $digiriskelement = new DigiriskElement($db);
-                $digiriskelement->fetch((int) $elementId);
+                if ($digiriskelement->fetch((int) $elementId) <= 0) {
+                    continue;
+                }
+                $parentID                   = (int) $arrayParentIds[$position];
                 $digiriskelement->ranks     = $position + 1;
-                $digiriskelement->fk_parent = $arrayParentIds[$position];
+                $digiriskelement->fk_parent = $parentID;
+                // Dropping an element in or out of the bin is what deletes or restores it: leaving the
+                // status behind would keep a restored element out of every list, or a binned one in them
+                if ($trashID > 0 && $digiriskelement->id != $trashID) {
+                    if ($parentID == $trashID) {
+                        $digiriskelement->status = DigiriskElement::STATUS_TRASHED;
+                    } elseif ($digiriskelement->status == DigiriskElement::STATUS_TRASHED) {
+                        $digiriskelement->status = DigiriskElement::STATUS_VALIDATED;
+                    }
+                }
                 $digiriskelement->update($user);
             }
         }
@@ -154,9 +168,18 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 
 	//Body navigation digirisk
 	$object = new DigiriskElement($db);
-	// The organization panel never lists trashed/deleted elements (status < 0), regardless of DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT,
-	// nor the archived ones, which live in the archive tab of their parent element
-	$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 't.status > 0 AND t.status <> ' . DigiriskElement::STATUS_ARCHIVED . ' AND t.entity IN ('. $conf->entity .')'));
+	// The archived elements are never listed here, they live in the archive tab of their parent element.
+	// The bin and the elements inside it are out of the active tree as well, and only come back when
+	// DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT is on -- without that branch the config does nothing
+	// and a deleted GP/WU cannot be reached from anywhere anymore
+	$statusFilter = 't.status > 0 AND t.status <> ' . DigiriskElement::STATUS_ARCHIVED;
+	if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT') > 0) {
+		$trashID = $object->getTrashID();
+		if ($trashID > 0) {
+			$statusFilter = '(' . $statusFilter . ' OR t.rowid = ' . $trashID . ' OR t.status = ' . DigiriskElement::STATUS_TRASHED . ')';
+		}
+	}
+	$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => $statusFilter . ' AND t.entity IN ('. $conf->entity .')'));
 
 	$digiriskElementTree = array();
 	if (!is_array($objects) && $objects<0) {
@@ -424,7 +447,9 @@ function display_recurse_tree($digiriskElementTree, $i = 1)
         $obj         = $element['object'];
         $type        = $obj->element_type;
         $hasChildren = ($type == 'groupment' && count($element['children']) > 0);
-        $isTrash     = ($obj->id == $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
+        $isTrash     = ((int) $obj->id === getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH'));
+        // An element sitting in the bin is already deleted: it can only be dragged back out
+        $isTrashed   = ((int) $obj->status === DigiriskElement::STATUS_TRASHED);
 
         $navLink = $user->rights->digiriskdolibarr->risk->read
             ? dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php?id=' . $obj->id . '&risk_type=' . $riskType, 1)
@@ -468,11 +493,11 @@ function display_recurse_tree($digiriskElementTree, $i = 1)
                 <?php echo digirisk_element_label($obj, 'name'); ?>
 
                 <div class="actions">
-                    <?php if ($user->rights->digiriskdolibarr->digiriskelement->write && $type == 'groupment' && !$isTrash) : ?>
+                    <?php if ($user->rights->digiriskdolibarr->digiriskelement->write && $type == 'groupment' && !$isTrash && !$isTrashed) : ?>
                     <div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event quick-add-btn" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>" data-parent-id="<?php echo $obj->id; ?>" data-parent-ref="<?php echo $obj->ref; ?>" data-parent-label="<?php echo dol_escape_htmltag($obj->label); ?>" data-type="groupment"><strong><?php echo $modGroupment->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
                     <div class="wpeo-button button-square-40 wpeo-tooltip-event quick-add-btn" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>" data-parent-id="<?php echo $obj->id; ?>" data-parent-ref="<?php echo $obj->ref; ?>" data-parent-label="<?php echo dol_escape_htmltag($obj->label); ?>" data-type="workunit"><strong><?php echo $modWorkUnit->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
                     <?php endif; ?>
-                    <?php if ($user->rights->digiriskdolibarr->digiriskelement->delete && !$isTrash) : ?>
+                    <?php if ($user->rights->digiriskdolibarr->digiriskelement->delete && !$isTrash && !$isTrashed) : ?>
                     <div class="wpeo-button button-square-40 button-red wpeo-tooltip-event delete-element-btn" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('Delete'); ?>" data-id="<?php echo $obj->id; ?>" data-ref="<?php echo $obj->ref; ?>"><i class="fas fa-trash"></i></div>
                     <?php endif; ?>
                 </div>

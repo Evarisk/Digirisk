@@ -909,6 +909,7 @@ Digiriskelement                     = Groupement / Unité de travail
 GPUTOrganization                    = Organisation des GP/UT
 DigiriskElement                     = Élément Digirisk
 HiddenElements                      = Corbeille
+ErrorTrashNotFound                  = Erreur : la corbeille de cette entité est introuvable, réactivez le module DigiRisk pour la recréer
 DigiriskElementCreated              = Création d'élément Digirisk
 DigiriskElementModified             = Modification d'élément Digirisk
 DigiriskElementDeleted              = Suppression d'élément Digirisk

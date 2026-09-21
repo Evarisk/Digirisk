@@ -71,6 +71,12 @@ class DigiriskElement extends SaturneObject
      */
     public int $isCategoryManaged = 0;
 
+    /**
+     * The bin itself is a groupment kept out of the active tree by its own status. Do not
+     * confuse it with STATUS_TRASHED, which marks the elements that were put inside it.
+     */
+    public const STATUS_TRASH_ROOT = 0;
+
     public const STATUS_TRASHED   = -2;
     public const STATUS_DELETED   = -1;
     public const STATUS_VALIDATED = 1;
@@ -179,6 +185,32 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
+     * Return the id of the bin of the current entity, 0 when there is none usable
+     *
+     * The constant is not enough on its own: a failed creation used to leave -1 in it, and a conf
+     * cloned from another entity (multicompany) points to a groupment of that other entity.
+     *
+     * @return int<0, max> Id of the bin, 0 if the constant cannot be trusted
+     * @throws Exception
+     */
+    public function getTrashID(): int
+    {
+        global $conf;
+
+        $trashID = getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH');
+        if ($trashID <= 0) {
+            return 0;
+        }
+
+        $trash = new self($this->db);
+        if ($trash->fetch($trashID) <= 0 || $trash->entity != $conf->entity) {
+            return 0;
+        }
+
+        return $trashID;
+    }
+
+    /**
      * Delete object in database
      *
      * @param  User        $user       User that deletes
@@ -188,13 +220,23 @@ class DigiriskElement extends SaturneObject
      */
     public function delete(User $user, int $noTrigger = 0, bool $softDelete = true): int
     {
-        global $conf;
+        global $langs;
 
-        $this->fk_parent = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
+        // Without a usable bin the element would be reparented on a missing id: on an entity whose
+        // constant had been left at -1, deleting made it unreachable, out of the tree and out of every list
+        $trashID = $this->getTrashID();
+        if ($trashID <= 0) {
+            $langs->load('digiriskdolibarr@digiriskdolibarr');
+            $this->errors[] = $langs->trans('ErrorTrashNotFound');
+            dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
+            return -1;
+        }
+
+        $this->fk_parent = $trashID;
         $this->status    = self::STATUS_TRASHED;
 
         $result = $this->update($user, true);
-        if ($result > 0 && !empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_DELETE)) {
+        if ($result > 0 && getDolGlobalInt('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_DELETE') > 0) {
             $this->call_trigger('DIGIRISKELEMENT_DELETE', $user);
         }
 

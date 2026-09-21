@@ -2332,24 +2332,34 @@ class modDigiriskdolibarr extends DolibarrModules
 			$trashRef                      = 'GP0';
 			$digiriskelement               = new Groupment($this->db);
 			$digiriskelement->ref          = $trashRef;
-			$digiriskelement->label        = $langs->trans('HiddenElements');
+			$digiriskelement->label        = $langs->transnoentities('HiddenElements');
 			$digiriskelement->element_type = 'groupment';
 			$digiriskelement->ranks        = 0;
-			$digiriskelement->description  = $langs->trans('TrashGroupment');
-			$digiriskelement->status       = DigiriskElement::STATUS_TRASHED;
+			$digiriskelement->description  = $langs->transnoentities('TrashGroupment');
+			$digiriskelement->status       = DigiriskElement::STATUS_TRASH_ROOT;
 			$trash_id                      = $digiriskelement->create($user);
 
-			// Elements of the current entity already trashed under the foreign trash must follow the new one
-			if ($previousTrashID > 0 && $trash_id > 0) {
-				$trashedElements = $trash->fetchAll('', '', 0, 0, ['customsql' => 't.fk_parent = ' . $previousTrashID . ' AND t.entity = ' . ((int) $conf->entity)]);
-				if (is_array($trashedElements)) {
-					foreach ($trashedElements as $trashedElement) {
-						$trashedElement->setValueFrom('fk_parent', $trash_id, '', null, '', '', $user);
+			// A failed creation returns -1: writing it in the constant would make every later delete()
+			// reparent its element on a missing id, which is how an entity ends up losing its GP/WU
+			if ($trash_id > 0) {
+				// create() forces the validated status, so the bin would show up as an ordinary groupment
+				$digiriskelement->status = DigiriskElement::STATUS_TRASH_ROOT;
+				$digiriskelement->update($user, true);
+
+				// Elements of the current entity already trashed under the foreign trash must follow the new one
+				if ($previousTrashID > 0) {
+					$trashedElements = $trash->fetchAll('', '', 0, 0, ['customsql' => 't.fk_parent = ' . $previousTrashID . ' AND t.entity = ' . ((int) $conf->entity)]);
+					if (is_array($trashedElements)) {
+						foreach ($trashedElements as $trashedElement) {
+							$trashedElement->setValueFrom('fk_parent', $trash_id, '', null, '', '', $user);
+						}
 					}
 				}
-			}
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', $trash_id, 'integer', 0, '', $conf->entity);
+				dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', $trash_id, 'integer', 0, '', $conf->entity);
+				// Replay the backward block so the new bin gets its trash picture
+				dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED', 0, 'integer', 0, '', $conf->entity);
+			}
 		}
 
         require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
