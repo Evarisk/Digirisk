@@ -281,10 +281,14 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 									jQuery( '#unit'  + id ).addClass( 'active' );
 									jQuery( '#unit'  + id ).closest( '.unit' ).attr( 'value', id );
 
-									var container = jQuery('.navigation-container');
-									$(container).animate({
-										scrollTop: $("#unit"  + id).offset().top - 100
-									}, 500);
+									// A creation page carries no id: #unitnull does not exist and offset()
+									// comes back undefined, which used to break the whole inline script
+									var currentUnit = jQuery( '#unit' + id );
+									if (currentUnit.length > 0) {
+										jQuery('.navigation-container').animate({
+											scrollTop: currentUnit.offset().top - 100
+										}, 500);
+									}
 								}
 							</script>
 						</ul>
