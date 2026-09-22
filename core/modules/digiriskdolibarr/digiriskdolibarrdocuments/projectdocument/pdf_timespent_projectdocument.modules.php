@@ -504,6 +504,8 @@ class pdf_timespent_projectdocument extends SaturneDocumentModel
             $moreParam = $objectDocument->context['moreparams'] ?? [];
         }
 
+        $moreParam = self::getMoreParam($objectDocument, $moreParam);
+
         $object = $moreParam['object'];
 
         if (!is_object($outputLangs)) {

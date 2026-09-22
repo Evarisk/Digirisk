@@ -326,6 +326,8 @@
         {
             global $action, $langs, $hookmanager, $user;
 
+            $moreparams = self::getMoreParam($objectDocument, $moreparams);
+
             $object = $moreparams['object'];
 
             $moreparams['hideTemplateName'] = 1;
