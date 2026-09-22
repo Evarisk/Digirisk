@@ -678,8 +678,11 @@ class DigiriskElement extends SaturneObject
         $savedIsExtrafieldManaged   = $this->isextrafieldmanaged;
         $this->isextrafieldmanaged  = 0;
         $this->ismultientitymanaged = 0;
-        $objects = $this->fetchAll('',  'ranks', 0,0, array('customsql' => ' status > 0'));
-        $digiriskelement_trashes = $this->fetchAll('',  'ranks', 0,0, array('customsql' => ' status = 0'));
+        // The elements put in the bin carry STATUS_TRASHED: looking for the children of the bin among
+        // the active ones only left every genuinely deleted element out of the list, which is exactly
+        // what the callers exclude with it
+        $objects = $this->fetchAll('',  'ranks', 0,0, array('customsql' => 't.status <> ' . self::STATUS_TRASH_ROOT));
+        $digiriskelement_trashes = $this->fetchAll('',  'ranks', 0,0, array('customsql' => 't.status = ' . self::STATUS_TRASH_ROOT));
         $this->ismultientitymanaged = 1;
         $this->isextrafieldmanaged  = $savedIsExtrafieldManaged;
         if (is_array($digiriskelement_trashes) && !empty($digiriskelement_trashes)) {
