@@ -768,7 +768,10 @@ class DigiriskElement extends SaturneObject
         // extrafields one row at a time (N+1). Cache the raw fetch per request, keyed by
         // everything that changes the result set (filter, entity scope).
         static $activeElementsCache = [];
-        $cacheKey = ($moreParams['filter'] ?? '') . '|' . (string) ($this->ismultientitymanaged ?? '') . '|' . getEntity($this->element);
+        // The column list comes from $this->fields, which a caller may have trimmed (the element card
+        // unsets fk_parent to shape its form): two objects must not share the same cache entry when
+        // they do not load the same columns
+        $cacheKey = ($moreParams['filter'] ?? '') . '|' . (string) ($this->ismultientitymanaged ?? '') . '|' . getEntity($this->element) . '|' . count($this->fields);
         if (!array_key_exists($cacheKey, $activeElementsCache)) {
             $activeElementsCache[$cacheKey] = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ($moreParams['filter'] ?? '')]);
         }
