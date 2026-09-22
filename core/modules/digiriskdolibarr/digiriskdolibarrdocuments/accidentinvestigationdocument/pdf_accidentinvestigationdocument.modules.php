@@ -283,6 +283,8 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
         require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_accidentinvestigation.lib.php';
         require_once __DIR__ . '/../../../../../../saturne/class/task/saturnetask.class.php';
 
+        $moreParam = self::getMoreParam($objectDocument, $moreParam);
+
         $object = $moreParam['object'];
 
         // Lastname / Firstname live in companies, the action labels in projects: without this the

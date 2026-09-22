@@ -624,6 +624,8 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         require_once __DIR__ . '/../../../../../class/digiriskresources.class.php';
         require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
 
+        $moreParam = self::getMoreParam($objectDocument, $moreParam);
+
         $object = $moreParam['object'];
 
         $outputLangs->loadLangs(['companies', 'projects', 'other', 'digiriskdolibarr@digiriskdolibarr']);

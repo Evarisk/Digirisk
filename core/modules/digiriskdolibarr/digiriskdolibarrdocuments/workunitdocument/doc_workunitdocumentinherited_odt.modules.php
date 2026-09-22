@@ -96,6 +96,8 @@ class doc_workunitdocumentinherited_odt extends ModeleODTDigiriskDolibarrDocumen
         $digiriskResources = new DigiriskResources($this->db);
         $userTmp           = new User($this->db);
 
+        $moreParam = self::getMoreParam($objectDocument, $moreParam);
+
         $object = $moreParam['object'];
 
         if (!empty($object->photo)) {

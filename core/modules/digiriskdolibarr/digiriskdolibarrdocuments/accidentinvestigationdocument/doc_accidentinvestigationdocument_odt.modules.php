@@ -177,6 +177,8 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTDigiriskDolibarrDoc
 
 		global $conf;
 
+		$moreParam = self::getMoreParam($objectDocument, $moreParam);
+
 		$object           = $moreParam['object'];
 		$accident         = new Accident($this->db);
 		$accidentMetadata = new AccidentMetaData($this->db);
