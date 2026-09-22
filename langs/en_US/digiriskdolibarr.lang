@@ -907,6 +907,7 @@ Digiriskelement                     = Grouping / Work unit
 GPUTOrganization                    = GP/UT organization
 DigiriskElement                     = Digirisk element
 HiddenElements                      = Trash
+ErrorTrashNotFound                  = Error: the trash of this entity cannot be found, enable the DigiRisk module again to recreate it
 DigiriskElementCreated              = Digirisk element creation
 DigiriskElementModified             = Digirisk element modification
 DigiriskElementDeleted              = Digirisk element deletion
