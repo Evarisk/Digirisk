@@ -253,8 +253,6 @@ class pdf_papripact_a3_paysage_projectdocument
             $moreParam = $objectDocument->context['moreparams'] ?? [];
         }
 
-        $moreParam = self::getMoreParam($objectDocument, $moreParam);
-
         $object = $moreParam['object'];
 
         if (empty($moduleNameLowerCase)) {
