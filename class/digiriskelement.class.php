@@ -557,11 +557,16 @@ class DigiriskElement extends SaturneObject
     {
         global $conf, $form, $langs;
 
+        // The filter used to be completed and then dropped: only the STATUS_VALIDATED condition of
+        // getActiveDigiriskElements() was ever applied, so a caller asking for the groupments of the
+        // other entities, or for anything but its own descendants, got the whole active tree instead
+        $customFilter = '';
         if (isset($filter['customsql']) && dol_strlen($filter['customsql'])) {
-            $filter['customsql'] .= ' AND t.rowid != ' . ($this->id ?? 0);
+            $customFilter = ' AND (' . $filter['customsql'] . ') AND t.rowid != ' . ($this->id ?? 0);
         }
 
-        $objectList = $this->fetchDigiriskElementFlat(0);
+        $digiriskElements = $this->getActiveDigiriskElements('all', ['filter' => $customFilter]);
+        $objectList       = $this->fetchDigiriskElementFlat(0, is_array($digiriskElements) ? $digiriskElements : []);
         $digiriskElementsData = [];
         if ($noroot == 0) {
             $digiriskElementsData[0] = $langs->trans('Root') . ' : ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM') ;
@@ -763,7 +768,10 @@ class DigiriskElement extends SaturneObject
         // extrafields one row at a time (N+1). Cache the raw fetch per request, keyed by
         // everything that changes the result set (filter, entity scope).
         static $activeElementsCache = [];
-        $cacheKey = ($moreParams['filter'] ?? '') . '|' . (string) ($this->ismultientitymanaged ?? '') . '|' . getEntity($this->element);
+        // The column list comes from $this->fields, which a caller may have trimmed (the element card
+        // unsets fk_parent to shape its form): two objects must not share the same cache entry when
+        // they do not load the same columns
+        $cacheKey = ($moreParams['filter'] ?? '') . '|' . (string) ($this->ismultientitymanaged ?? '') . '|' . getEntity($this->element) . '|' . count($this->fields);
         if (!array_key_exists($cacheKey, $activeElementsCache)) {
             $activeElementsCache[$cacheKey] = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ($moreParams['filter'] ?? '')]);
         }
