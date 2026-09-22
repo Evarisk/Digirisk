@@ -557,11 +557,16 @@ class DigiriskElement extends SaturneObject
     {
         global $conf, $form, $langs;
 
+        // The filter used to be completed and then dropped: only the STATUS_VALIDATED condition of
+        // getActiveDigiriskElements() was ever applied, so a caller asking for the groupments of the
+        // other entities, or for anything but its own descendants, got the whole active tree instead
+        $customFilter = '';
         if (isset($filter['customsql']) && dol_strlen($filter['customsql'])) {
-            $filter['customsql'] .= ' AND t.rowid != ' . ($this->id ?? 0);
+            $customFilter = ' AND (' . $filter['customsql'] . ') AND t.rowid != ' . ($this->id ?? 0);
         }
 
-        $objectList = $this->fetchDigiriskElementFlat(0);
+        $digiriskElements = $this->getActiveDigiriskElements('all', ['filter' => $customFilter]);
+        $objectList       = $this->fetchDigiriskElementFlat(0, is_array($digiriskElements) ? $digiriskElements : []);
         $digiriskElementsData = [];
         if ($noroot == 0) {
             $digiriskElementsData[0] = $langs->trans('Root') . ' : ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM') ;
