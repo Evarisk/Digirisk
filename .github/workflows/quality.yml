@@ -14,18 +14,15 @@ on:
             - 'composer.json'
             - 'composer.lock'
             - '.github/workflows/quality.yml'
+    # Pas de filtre paths ici, contrairement a push, et c'est volontaire : une
+    # verification requise qui ne se declenche pas laisse la pull request en
+    # « Expected - Waiting for status to be reported », indefiniment. Filtrer sur les
+    # chemins reviendrait donc a bloquer toute PR sans PHP. Sur push le job n'est
+    # qu'informatif, le filtre y garde son sens.
     pull_request:
         branches:
             - main
             - develop
-        paths:
-            - '**/*.php'
-            - 'langs/**/*.lang'
-            - 'phpstan.neon'
-            - 'phpstan.baseline.neon'
-            - 'composer.json'
-            - 'composer.lock'
-            - '.github/workflows/quality.yml'
     workflow_dispatch:
 
 concurrency:
@@ -163,6 +160,10 @@ jobs:
             # La baseline gele ce qui existait le jour de la mise en place : le job est donc
             # vert des le premier run et ne rougit que sur une regression nouvelle. Elle se
             # reduit au fil des corrections, jamais l'inverse.
+            # --error-format=github pose les erreurs en annotations sur les lignes
+            # concernees de l'onglet « Files changed ». Sans lui, il faut ouvrir le run,
+            # deplier l'etape et faire le rapprochement a la main : une CI qu'on doit
+            # aller chercher est une CI qu'on finit par ne plus regarder.
             - name: Run PHPStan
               working-directory: htdocs/custom/digiriskdolibarr
-              run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+              run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G --error-format=github
