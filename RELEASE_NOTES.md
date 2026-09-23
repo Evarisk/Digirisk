@@ -1,45 +1,82 @@
-# [Digirisk] [23.3.0] - Digirisk parle huit langues
+# [Digirisk] [23.4.0] - Registres géolocalisés et documents réparés
 
-Description : Cette version ouvre Digirisk à l'international : l'anglais est enfin complet et sept nouvelles langues font leur entrée. Elle ajoute aussi les cinq catégories de risques de la pénibilité au sens du Code du travail, un onglet « Produits/Services » sur les groupements et unités de travail, et corrige une erreur fatale sur la liste des risques.
+Description : Cette version ajoute un dictionnaire des lieux avec géolocalisation dans les registres, les tableaux RPS du document unique, et la méthode ITAMAMI dans l'analyse d'accident. Elle complète les catégories de risques de la pénibilité et rétablit la génération de documents sur Dolibarr 24, qui était complètement bloquée. Une série de correctifs touche les modèles PDF, la corbeille, les signalisations et la déclaration publique de ticket.
 
-**Cette version demande Saturne 23.1.1 ou supérieur.**
+**Cette version demande Saturne 23.2.0 ou supérieur.**
 
 ## Nouvelles fonctionnalités et innovations
 
-### Traductions
+### Registres
 
-* Digirisk est désormais disponible en **huit langues** : français, anglais, allemand, espagnol, italien, néerlandais, polonais, portugais et roumain.
-* La traduction anglaise, qui ne couvrait que 560 clés sur 1998, est **complète**. Les pages affichées en anglais laissaient jusqu'ici apparaître des libellés en français, ou pire, le nom technique de la clé.
+* Un **dictionnaire des lieux** alimente désormais les registres, avec géolocalisation. La liste des lieux se filtre par groupement ou unité de travail.
+* Mise en forme des champs du registre adaptée au téléphone.
 
-### Pénibilité
+### Document unique
 
-* Cinq **catégories de risques liées à la pénibilité** rejoignent la liste des dangers, avec leur pictogramme : postures pénibles, activités exercées en milieu hyperbare, travail de nuit, travail en équipes successives alternantes et travail répétitif.
-* Elles sont reconnues par l'analyse d'image : photographier une situation de travail propose directement la bonne catégorie.
-* Le survol d'une de ces catégories rappelle son cadre réglementaire : article de référence, éligibilité au C2P, critère et seuil d'exposition.
+* **Tableaux RPS** dans le document unique.
+* Les quatre catégories de risques de la pénibilité restantes — agents chimiques dangereux, températures extrêmes, bruit, manutention — complètent la liste, avec leurs pictogrammes et une réorganisation de l'ensemble. Leurs quatre clés réglementaires sont traduites dans les sept langues.
 
-![Les vingt-sept catégories de dangers, dont les cinq nouvelles liées à la pénibilité](https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/assets/release-23.3.0/.shots/23.3.0-categories-penibilite.png)
+### Analyse d'accident
 
-### Produits et services par unité de travail
+* Intégration de la **méthode ITAMAMI**.
+* Pied de page sur chaque page du modèle PDF.
 
-* Un onglet **« Produits/Services »** apparaît sur la fiche d'un groupement ou d'une unité de travail. Il permet d'y rattacher les produits et services du catalogue Dolibarr — machines, équipements, consommables — et de garder la trace de ce qui est réellement présent sur le poste.
-* Un produit déjà rattaché n'est pas ajouté deux fois : sa référence est rappelée dans le message d'avertissement.
+### Rapport d'évolution
 
-![L'onglet Produits | Services d'une unité de travail](https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/assets/release-23.3.0/.shots/23.3.0-produits-services.png)
+* Le rapport d'audit devient le **rapport d'évolution**, dans l'interface comme dans le modèle ODT.
+
+### Configuration
+
+* Les réglages du bloc « Actions » sont illustrés par une capture du document produit : on voit ce que le réglage change avant de le toucher.
 
 ## Améliorations & corrections
 
-### Liste des risques
+### Génération de documents
 
-* La liste des risques ne tombe plus en erreur fatale quand les catégories de risques sont activées. Le filtre par catégories interrogeait un type de catégorie inexistant ; sous PHP 8, la page devenait inaccessible pour tout utilisateur ayant le droit de lire les catégories.
-* Les catégories affichées sur une ligne de risque remontent de nouveau : elles étaient cherchées sous le même mauvais code et ressortaient toujours vides.
+* **Dolibarr 24 : la génération de documents est réparée.** Le cœur de Dolibarr 24 refuse tout modèle livré avec le module et ne transmet plus ses paramètres au générateur : aucune génération n'aboutissait. Corrigé ici et dans Saturne 23.2.0.
+* Le document unique n'enchaîne plus sur l'archivage après un échec de génération.
+* Correction des avertissements PHP à la génération, sur les clés de risques et la ressource « Responsable ».
+* Le listing des risques affiche le responsable de la tâche. Une tâche sans référence n'en écrit plus une vide en ODT et en PDF.
+* Séparateur de budget orphelin et date de l'évaluation écrasée dans les modèles ODT.
 
-### Modale d'évaluation
+### Documents de ticket
 
-* Les zones de description du risque et de l'évaluation sont de nouveau **redimensionnables**. Leur hauteur était figée à 48 px, ce qui coupait le texte long sans permettre de l'agrandir.
+* Boucle infinie sur les pieds de page d'un document de plusieurs pages.
+* Message tronqué, alignements et pagination du modèle PDF ; la hauteur d'une ligne est mesurée avec la police de sa cellule, et une ligne plus haute qu'une page ne casse plus la mise en page.
+
+### Groupements et unités de travail
+
+* La corbeille ne s'affichait plus, et sa constante pouvait se graver à `-1`.
+* Le glisser-déposer était perdu quand l'URL n'avait pas de query string.
+* La fiche interrogeait la base avec un objet amputé de ses colonnes.
+* La liste des risques occupe maintenant toute la largeur disponible.
+* Le filtre passé à `selectDigiriskElementList()` était ignoré.
+
+### Risques et signalisations
+
+* La grille des dangers n'est plus rognée par la modale, et son infobulle est enrichie hors des listes.
+* `getDangerCategoryName()` redevient un accesseur de nom : il renvoyait le bloc réglementaire dans les PDF, les ODT et les fiches.
+* Les signalisations supprimées disparaissent de la liste partagée, dont les avertissements PHP 8 sont corrigés.
+* Les tâches créées sans référence par l'endpoint DigiAI sont rattrapées.
+* Saisie du pourcentage d'avancement à la modification d'une tâche.
+
+### Tickets
+
+* Une catégorie sans modèle d'e-mail rendait la **déclaration publique fatale**.
+* Sujet vide sur la notification de nouveau registre.
+* Le bouton des champs personnalisés déjà générés ouvre leur configuration.
+* Avertissements PHP 8 sur la configuration de catégorie.
 
 ### Divers
 
-* Suppression d'un script de débogage commité par erreur à la racine du module.
-* Les feuilles de style livrées sont de nouveau **minifiées** : une recompilation manuelle avait publié la version non compressée, 55 Ko plus lourde à charger sur chaque page.
+* Le menu PAPRIPACT reste affiché sur la vue Kanban du plan d'action.
+* Une date d'élection vide était enregistrée en `--` et produisait des avertissements PHP.
+* La configuration « Social » est enregistrée avant la création d'un utilisateur.
+* Erreur JavaScript `reading 'top'` sur toute page ouverte sans identifiant, et messages d'événement rétablis sur le rapport d'évolution.
 
-## Comparaison des versions [23.2.2](https://github.com/Evarisk/Digirisk/compare/23.2.2...23.3.0) et 23.3.0
+### Qualité et intégration continue
+
+* Digirisk a désormais sa propre chaîne qualité : `php -l`, parité des fichiers de langue et PHPStan, annotée sur la diff et bloquante sur les pull requests.
+* Les assets sont compilés par la chaîne sass + esbuild du socle, dans un ordre déterministe, et vérifiés sur les pull requests.
+
+## Comparaison des versions [23.3.0](https://github.com/Evarisk/Digirisk/compare/23.3.0...23.4.0) et 23.4.0

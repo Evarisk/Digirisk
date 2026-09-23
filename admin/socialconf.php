@@ -71,13 +71,13 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($reshook)) {
 	if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
-		$electionDateCSE = GETPOST('ElectionDateCSE', 'none');
-		$electionDateCSE = explode('/', $electionDateCSE);
-		$electionDateCSE = $electionDateCSE[2] . '-' . $electionDateCSE[1] . '-' . $electionDateCSE[0];
+		// An empty date field explodes to a single element: reading [1] and [2] warned, and the
+		// constant was stored as the string '--', which every consumer then has to special-case
+		$electionDateCSE = explode('/', GETPOST('ElectionDateCSE', 'none'));
+		$electionDateCSE = count($electionDateCSE) == 3 ? $electionDateCSE[2] . '-' . $electionDateCSE[1] . '-' . $electionDateCSE[0] : '';
 
-		$electionDateDP = GETPOST('ElectionDateDP', 'none');
-		$electionDateDP = explode('/', $electionDateDP);
-		$electionDateDP = $electionDateDP[2] . '-' . $electionDateDP[1] . '-' . $electionDateDP[0];
+		$electionDateDP = explode('/', GETPOST('ElectionDateDP', 'none'));
+		$electionDateDP = count($electionDateDP) == 3 ? $electionDateDP[2] . '-' . $electionDateDP[1] . '-' . $electionDateDP[0] : '';
 
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", GETPOST("modalites", 'none'), 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT", GETPOST("permanent", 'none'), 'chaine', 0, '', $conf->entity);
@@ -100,6 +100,14 @@ if (empty($reshook)) {
 
 		$resources->setDigiriskResources($db, $user->id, 'HarassmentOfficer', 'user', array($harassmentOfficer), $conf->entity);
 		$resources->setDigiriskResources($db, $user->id, 'HarassmentOfficerCSE', 'user', array($harassmentOfficerCSE), $conf->entity);
+
+		if (! $error && GETPOSTINT('addUser') > 0) {
+			// Configuration has just been saved, the user can be created without losing it
+			$backToPage = $_SERVER["PHP_SELF"];
+			setEventMessages($langs->trans("SetupSaved"), null);
+			header("Location: " . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($backToPage) . '&backtopageforcancel=' . urlencode($backToPage));
+			exit;
+		}
 
 		if ($action != 'updateedit' && ! $error) {
 			header("Location: " . $_SERVER["PHP_SELF"]);
@@ -147,6 +155,9 @@ print dol_get_fiche_head($head, 'social', '', -1, '');
 $form      = new Form($db);
 $resources = new DigiriskResources($db);
 
+// Saves the configuration before leaving to the user creation page, so nothing is lost on the way back
+$addUserLink = ' <a class="add-user-link" href="#"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+
 $allLinks = $resources->fetchDigiriskResources();
 
 $electionDateCSE = getDolGlobalString('DIGIRISKDOLIBARR_CSE_ELECTION_DATE');
@@ -157,7 +168,8 @@ print "<br>";
 
 print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="social_form">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
-print '<input type="hidden" name="action" value="update">'; ?>
+print '<input type="hidden" name="action" value="update">';
+print '<input type="hidden" name="addUser" id="addUser" value="0">'; ?>
 
 <h2 class="">
 	<?php echo $langs->trans('SocialConfiguration') ?>
@@ -212,7 +224,7 @@ print '<tr>';
 print '<td>' . $langs->trans("ActionOnUser") . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 print $form->select_dolusers($harassmentOfficerIds, 'HarassmentOfficer', 1, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300');
-if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+print $addUserLink;
 print '</td></tr>';
 
 /*
@@ -225,7 +237,7 @@ print '<tr>';
 print '<td>' . $langs->trans("ActionOnUser") . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 print $form->select_dolusers($harassmentOfficerCSEIds, 'HarassmentOfficerCSE', 1, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300');
-if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+print $addUserLink;
 print '</td></tr>';
 
 /*
@@ -252,7 +264,7 @@ print '<td colspan="3" class="maxwidthonsmartphone">';
 
 print $form->multiselectarray('TitularsCSE', $userlist, $titularsCseIds, null, null, null, null, "300");
 
-if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+print $addUserLink;
 
 print '</td></tr>';
 
@@ -267,7 +279,7 @@ print '<td colspan="3" class="maxwidthonsmartphone">';
 
 print $form->multiselectarray('AlternatesCSE', $userlist, $alternatesCseIds, null, null, null, null, "300");
 
-if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+print $addUserLink;
 
 print '</td></tr>';
 
@@ -292,7 +304,7 @@ print '<td colspan="3" class="maxwidthonsmartphone">';
 
 print $form->multiselectarray('TitularsDP', $userlist, $titularsDpIds, null, null, null, null, "300");
 
-if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+print $addUserLink;
 
 print '</td></tr>';
 
@@ -307,7 +319,7 @@ print '<td colspan="3" class="maxwidthonsmartphone">';
 
 print $form->multiselectarray('AlternatesDP', $userlist, $alternatesDpIds, null, null, null, null, "300");
 
-if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+print $addUserLink;
 
 print '</td></tr>';
 
@@ -317,6 +329,16 @@ print '<br><div class="center">';
 print '<input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 print '</div>';
 print '</form>';
+
+print '<script>
+	$(document).ready(function() {
+		$(".add-user-link").on("click", function(event) {
+			event.preventDefault();
+			$("#addUser").val(1);
+			$("form[name=\'social_form\']").submit();
+		});
+	});
+</script>';
 
 llxFooter();
 $db->close();

@@ -830,14 +830,14 @@ RiskAssessmentDocumentContent = Bijgaand vindt u het ZIP-bestand en het ODT-docu
 
 
 #
-# AuditReportDocument - Auditrapport
+# AuditReportDocument - Evolutierapport
 #
 
 # Gegevens
-AuditReportDocument     = Auditrapport
-Auditreportdocument     = Auditrapport
-AuditReportDocumentsMin = auditrapporten
-auditreportdocument.odt = Auditrapport
+AuditReportDocument     = Evolutierapport
+Auditreportdocument     = Evolutierapport
+AuditReportDocumentsMin = evolutierapporten
+auditreportdocument.odt = Evolutierapport
 
 
 
@@ -2227,6 +2227,10 @@ DigiriskHygiene=HYGIËNE EN REINIGING
 DigiriskMaintenance=ONDERHOUD EN CONTROLES
 DangerCategory=Risicofamilie
 SelectDangerCategory=Een risicofamilie kiezen
+DangerCategoryReference=Referentie
+DangerCategoryC2P=C2P
+DangerCategoryExposureCriteria=Blootstellingscriteria
+DangerCategoryRegulatoryThreshold=Wettelijke drempel
 DescribeRiskOnProduct=Het risico bij dit product beschrijven...
 ConfirmDeleteProductRisk=Dit risico verwijderen?
 AddProductRisk=Een productrisico toevoegen

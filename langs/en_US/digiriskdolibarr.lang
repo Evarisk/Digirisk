@@ -617,6 +617,17 @@ VictimSkills                             = Skills of the injured person
 CollectiveEquipment                      = Collective protective equipment (CPE)
 IndividualEquipment                      = Personal protective equipment (PPE)
 Circumstances                            = Circumstances
+ItamamiMethod                            = ITAMAMI method
+ItamamiIndividual                        = ITAMAMI - Individual
+ItamamiTask                              = ITAMAMI - Task
+ItamamiActivity                          = ITAMAMI - Activity
+ItamamiMaterial                          = ITAMAMI - Material
+ItamamiEnvironment                       = ITAMAMI - Environment
+ItamamiIndividualHelp                    = What belongs to the person: training, experience, qualification, health condition, fatigue
+ItamamiTaskHelp                          = The prescribed task: instructions, planned operating mode, work organisation
+ItamamiActivityHelp                      = The activity actually performed when the accident occurred, if it differs from the prescribed task
+ItamamiMaterialHelp                      = The equipment involved: machines, tools, devices, products used
+ItamamiEnvironmentHelp                   = The environment: premises, ground, noise, lighting, weather, working atmosphere
 CurativeAction                           = Curative actions
 CorrectiveAction                         = Corrective actions
 PreventiveAction                         = Preventive actions
@@ -830,14 +841,14 @@ RiskAssessmentDocumentContent = Please find attached the ZIP and the ODT documen
 
 
 #
-# AuditReportDocument - Audit report
+# AuditReportDocument - Evolution report
 #
 
 # Data
-AuditReportDocument     = Audit report
-Auditreportdocument     = Audit report
-AuditReportDocumentsMin = audit reports
-auditreportdocument.odt = Audit report
+AuditReportDocument     = Evolution report
+Auditreportdocument     = Evolution report
+AuditReportDocumentsMin = evolution reports
+auditreportdocument.odt = Evolution report
 
 
 
@@ -896,6 +907,7 @@ Digiriskelement                     = Grouping / Work unit
 GPUTOrganization                    = GP/UT organization
 DigiriskElement                     = Digirisk element
 HiddenElements                      = Trash
+ErrorTrashNotFound                  = Error: the trash of this entity cannot be found, enable the DigiRisk module again to recreate it
 DigiriskElementCreated              = Digirisk element creation
 DigiriskElementModified             = Digirisk element modification
 DigiriskElementDeleted              = Digirisk element deletion
@@ -1096,6 +1108,7 @@ PreventionContextInCompany               = Prevention context in the company
 RPSImpactOnCompanyAndEmployees           = Impact of psychosocial risks on the company and the employees
 PsychosocialRisksFactors                 = Psychosocial risk factors
 CompanyPreventionInformations            = Information about prevention in the company
+PsychosocialRiskWithoutFactor            = Psychosocial risks without a specified factor
 Weak                                     = Low
 Moderate                                 = Moderate
 High                                     = High
@@ -1304,6 +1317,7 @@ NoTaskLinked                             = No task in progress
 TaskList                                 = List of the risk tasks
 TaskCreate                               = Adding the task
 TaskEdit                                 = Task editing
+TaskDeclaredProgress                     = Declared progress (%)
 HowToSetDUProject                        = To configure the project choice, go to Module setup - Risk analysis - Task
 DeleteTask                               = Are you sure you want to delete the task
 ListingHeaderTask                        = List of tasks
@@ -1414,6 +1428,8 @@ AlreadyGenerated                         = Already generated
 NotGenerated                             = Not generated yet
 NotCreated                               = Not created yet
 ExtrafieldsGeneration                    = This option generates the default ticket extrafields. The extrafields created will be: <br> Last name, First name, Phone, GP/UT, Location & Date
+ConfigureExtrafields                     = Configure the extrafields
+MainCategoryNotSet                       = Pick the main category first, higher up this page, to reach the extrafields configuration
 CategoriesGeneration                     = This option generates the default ticket categories. The categories created will be: <br> - Register <br> - - Accident <br> - - - Near miss, Minor accident, Workplace accident <br> - - Occupational health & safety <br> - - - Early departure, Others, Human problem, Material problem <br> - - Serious and imminent danger <br> - - Quality <br> - - - Non-compliance, Improvement suggestion <br> - - Environment <br> - - - Non-compliance, Others
 TicketSuccess                            = Your register entry has been sent to the prevention department under the number:
 TicketPublicAccess                       = Return link to the ticket public interface:
@@ -1511,6 +1527,25 @@ TicketPhoneVisible                       = Show the Phone field to create a tick
 TicketPhoneVisibleHelp                   = Enable this option to show the Phone field in the public interface and make it mandatory if needed
 TicketLocationVisible                    = Show the Location field to create a ticket
 TicketLocationVisibleHelp                = Enable this option to show the Location field in the public interface and make it mandatory if needed
+TicketLocationInputMode                  = Location input in the registers
+TicketLocationInputModeHelp              = Input mode of the Location field of the public interface: free text, a list coming from the location dictionary, or a list with an "Other" entry opening a free text field.<br>An empty dictionary always falls back to free text.
+TicketLocationInputModeFree              = Free text
+TicketLocationInputModeList              = Selection list
+TicketLocationInputModeListFree          = Selection list + Other
+TicketLocationDictionary                 = Location dictionary (registers)
+ImportExistingTicketLocations            = Import the locations already typed
+ImportExistingTicketLocationsHelp        = Adds to the dictionary the locations already typed as free text in the registers of the entity. Locations already present are ignored.
+TicketLocationsImported                  = %s location(s) added to the dictionary
+TicketLocationGeoloc                     = Offer geolocation in the registers
+TicketLocationGeolocHelp                 = Adds a "My position" button next to the Location field of the public interface. Geolocation requires the public interface to be served over HTTPS and the consent of the declarant.
+TicketLocationElements                   = Locations by GP/UT
+TicketLocationElementsHelp               = A location attached to a GP/UT is only offered on that one and on everything underneath. A location left on "All GP/UT" is offered everywhere. A GP/UT with no location of its own shows the whole list.
+AllGPUT                                  = All GP/UT
+OtherLocation                            = Other location
+GetMyPosition                            = My position
+GetMyPositionInProgress                  = Locating...
+GetMyPositionError                       = Position unavailable
+GPSCoordinates                           = GPS coordinates
 TicketDateVisible                        = Show the Date field to create a ticket
 TicketDateVisibleHelp                    = Enable this option to show the Date field in the public interface and make it mandatory if needed
 QRCodeGenerated                          = QR code generated
@@ -2227,6 +2262,10 @@ DigiriskHygiene=HYGIENE & CLEANING
 DigiriskMaintenance=MAINTENANCE & CHECKS
 DangerCategory=Risk family
 SelectDangerCategory=Choose a risk family
+DangerCategoryReference=Reference
+DangerCategoryC2P=C2P
+DangerCategoryExposureCriteria=Exposure criteria
+DangerCategoryRegulatoryThreshold=Regulatory threshold
 DescribeRiskOnProduct=Describe the risk on this product...
 ConfirmDeleteProductRisk=Delete this risk?
 AddProductRisk=Add product risk

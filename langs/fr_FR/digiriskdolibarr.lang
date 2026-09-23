@@ -36,6 +36,7 @@ TutoImage = Image
 # Data - Donnée
 DigiriskdolibarrSetup       = Configuration du module Digirisk
 DigiriskdolibarrSetupPage        = Page de configuration du module Digirisk
+AgendaModuleRequired        = Pour assurer la traçabilité des actions dans Digirisk, vérifiez que le module Agenda est activé
 UserApiWithoutApiModule     = L'utilisateur USERAPI et sa clé d'API existent mais le module API REST est désactivé : les routes Digirisk ne répondront pas et l'application mobile ne pourra pas se connecter tant qu'il n'est pas activé
 ExportImportModulesAdvice   = Digirisk fournit des modèles d'import (unités de travail, risques, évaluations des risques) et d'export (tickets, catégories) : activez les modules Imports et Exports pour les utiliser
 DigiriskDolibarrDescription = Digirisk pour Dolibarr
@@ -618,6 +619,17 @@ VictimSkills                             = Compétences de l'accidenté
 CollectiveEquipment                      = Équipement de Protection Collective (EPC)
 IndividualEquipment                      = Équipement de Protection Individuelle (EPI)
 Circumstances                            = Circonstances
+ItamamiMethod                            = Méthode ITAMAMI
+ItamamiIndividual                        = ITAMAMI - Individu
+ItamamiTask                              = ITAMAMI - Tâche
+ItamamiActivity                          = ITAMAMI - Activité
+ItamamiMaterial                          = ITAMAMI - Matériel
+ItamamiEnvironment                       = ITAMAMI - Milieu
+ItamamiIndividualHelp                    = Ce qui tient à la personne : formation, expérience, qualification, état de santé, fatigue
+ItamamiTaskHelp                          = La tâche prescrite : consignes, mode opératoire prévu, organisation du travail
+ItamamiActivityHelp                      = L'activité réellement exercée au moment de l'accident, si elle diffère de la tâche prescrite
+ItamamiMaterialHelp                      = Le matériel en jeu : machines, outils, équipements, produits utilisés
+ItamamiEnvironmentHelp                   = Le milieu : locaux, sol, bruit, éclairage, météo, ambiance de travail
 CurativeAction                           = Actions curatives
 CorrectiveAction                         = Actions correctives
 PreventiveAction                         = Actions préventives
@@ -831,14 +843,14 @@ RiskAssessmentDocumentContent = Veuillez trouver ci-joint le ZIP et le document 
 
 
 #
-# AuditReportDocument - Rapport d'audit
+# AuditReportDocument - Rapport d'évolution
 #
 
 # Data - Donnée
-AuditReportDocument     = Rapport d'audit
-Auditreportdocument     = Rapport d'audit
-AuditReportDocumentsMin = rapports d'audit
-auditreportdocument.odt = Rapport d'audit
+AuditReportDocument     = Rapport d'évolution
+Auditreportdocument     = Rapport d'évolution
+AuditReportDocumentsMin = rapports d'évolution
+auditreportdocument.odt = Rapport d'évolution
 
 
 
@@ -897,6 +909,7 @@ Digiriskelement                     = Groupement / Unité de travail
 GPUTOrganization                    = Organisation des GP/UT
 DigiriskElement                     = Élément Digirisk
 HiddenElements                      = Corbeille
+ErrorTrashNotFound                  = Erreur : la corbeille de cette entité est introuvable, réactivez le module DigiRisk pour la recréer
 DigiriskElementCreated              = Création d'élément Digirisk
 DigiriskElementModified             = Modification d'élément Digirisk
 DigiriskElementDeleted              = Suppression d'élément Digirisk
@@ -1097,6 +1110,7 @@ PreventionContextInCompany               = Contexte de prévention dans l'entrep
 RPSImpactOnCompanyAndEmployees           = Impact des RPS sur l'entreprise et les salariés
 PsychosocialRisksFactors                 = Facteurs de risques psychosociaux
 CompanyPreventionInformations            = Informations sur la prévention dans l'entreprise
+PsychosocialRiskWithoutFactor            = Risques psychosociaux sans facteur précisé
 RiskCotation                             = Cotation
 PreventionActions                        = Actions de prévention
 AddingInProgress                         = Ajout en cours...
@@ -1308,6 +1322,7 @@ NoTaskLinked                             = Pas de tâche en cours
 TaskList                                 = Liste des tâches du risque
 TaskCreate                               = Ajout de la tâche
 TaskEdit                                 = Édition de la tâche
+TaskDeclaredProgress                     = Avancement déclaré (%)
 HowToSetDUProject                        = Pour configurer le choix du projet, aller dans Configuration du module - Analyse des risques - Tâche
 DeleteTask                               = Êtes-vous sûr(e) de vouloir supprimer la tâche
 ListingHeaderTask                        = Liste des tâches
@@ -1418,6 +1433,8 @@ AlreadyGenerated                         = Déjà généré(e)s
 NotGenerated                             = Pas encore généré(e)
 NotCreated                               = Pas encore créé(e)s
 ExtrafieldsGeneration                    = Cette option permet la génération des extrafields par défaut des tickets. Les extrafields créés seront : <br> Nom, Prénom, Téléphone, GP/UT, Lieu & Date
+ConfigureExtrafields                     = Configurer les extrafields
+MainCategoryNotSet                       = Choisissez d'abord la catégorie principale, plus haut sur cette page, pour accéder à la configuration des extrafields
 CategoriesGeneration                     = Cette option permet la génération des catégories par défaut des tickets. Les catégories créées seront : <br> - Registre <br> - - Accident <br> - - - Presqu'accident, Accident bénin, Accident du travail <br> - - Santé & Sécurité au travail <br> - - - Départ anticipé, Autres, Problème humain, Problème matériel <br> - - Danger grave et imminent <br> - - Qualité <br> - - - Non conformité, Suggestion d'amélioration <br> - - Environnement <br> - - - Non conformité, Autres
 TicketSuccess                            = Votre registre a été transmis au service prévention sous le numéro :
 TicketPublicAccess                       = Lien de retour vers l'interface publique des tickets :
@@ -1515,6 +1532,25 @@ TicketPhoneVisible                       = Afficher le champ Téléphone pour cr
 TicketPhoneVisibleHelp                   = Activer cette option pour afficher le champ Téléphone dans l'interface publique et le rendre obligatoire si nécessaire
 TicketLocationVisible                    = Afficher le champ Lieu pour créer un ticket
 TicketLocationVisibleHelp                = Activer cette option pour afficher le champ Lieu dans l'interface publique et le rendre obligatoire si nécessaire
+TicketLocationInputMode                  = Saisie du lieu dans les registres
+TicketLocationInputModeHelp              = Mode de saisie du champ Lieu de l'interface publique : texte libre, liste de choix issue du dictionnaire des lieux, ou liste de choix avec une entrée « Autre » ouvrant un champ libre.<br>Un dictionnaire vide revient toujours au texte libre.
+TicketLocationInputModeFree              = Texte libre
+TicketLocationInputModeList              = Liste de choix
+TicketLocationInputModeListFree          = Liste de choix + Autre
+TicketLocationDictionary                 = Dictionnaire des lieux (registres)
+ImportExistingTicketLocations            = Importer les lieux déjà saisis
+ImportExistingTicketLocationsHelp        = Ajoute au dictionnaire les lieux déjà saisis en texte libre dans les registres de l'entité. Les lieux déjà présents sont ignorés.
+TicketLocationsImported                  = %s lieu(x) ajouté(s) au dictionnaire
+TicketLocationGeoloc                     = Proposer la géolocalisation dans les registres
+TicketLocationGeolocHelp                 = Ajoute un bouton « Ma position » à côté du champ Lieu de l'interface publique. La géolocalisation nécessite une interface publique servie en HTTPS et l'accord du déclarant.
+TicketLocationElements                   = Lieux par GP/UT
+TicketLocationElementsHelp               = Un lieu rattaché à un GP/UT n'est proposé que sur celui-ci et sur tout ce qui est en dessous. Un lieu laissé sur « Tous les GP/UT » est proposé partout. Un GP/UT sans aucun lieu rattaché voit la liste complète.
+AllGPUT                                  = Tous les GP/UT
+OtherLocation                            = Autre lieu
+GetMyPosition                            = Ma position
+GetMyPositionInProgress                  = Localisation en cours...
+GetMyPositionError                       = Position indisponible
+GPSCoordinates                           = Coordonnées GPS
 TicketDateVisible                        = Afficher le champ Date pour créer un ticket
 TicketDateVisibleHelp                    = Activer cette option pour afficher le champ Date dans l'interface publique et le rendre obligatoire si nécessaire
 QRCodeGenerated                          = QRCode généré
@@ -2241,6 +2277,10 @@ DigiriskHygiene=HYGIÈNE & NETTOYAGE
 DigiriskMaintenance=MAINTENANCE & CONTRÔLES
 DangerCategory=Famille de risque
 SelectDangerCategory=Choisir une famille de risque
+DangerCategoryReference=Référence
+DangerCategoryC2P=C2P
+DangerCategoryExposureCriteria=Critères d'exposition
+DangerCategoryRegulatoryThreshold=Seuil réglementaire
 DescribeRiskOnProduct=Decrire le risque sur ce produit...
 ConfirmDeleteProductRisk=Supprimer ce risque ?
 AddProductRisk=Ajouter un risque produit
@@ -2399,6 +2439,7 @@ ListingRisksCotationColumn         = Cot.
 ListingRisksRiskColumn             = Risque
 ListingRisksAssessmentColumn       = Informations sur l'évaluation
 NoRiskAssessed                     = Aucun risque évalué sur ce périmètre
+NewProductRisk                     = Nouveau risque produit
 
 # Audit report - issue #4459
 NoRiskAtThisLevel = Aucun risque de ce niveau (%s)

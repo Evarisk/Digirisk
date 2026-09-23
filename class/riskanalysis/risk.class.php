@@ -69,6 +69,17 @@ class Risk extends SaturneObject
      */
     public const COTATION_NOT_ASSESSED = -2;
 
+    /**
+     * @var int Position of the psychosocial danger category, the only one carrying sub-categories.
+     */
+    public const PSYCHOSOCIAL_CATEGORY_POSITION = 17;
+
+    /**
+     * @var int Pseudo position of the psychosocial risks filed without any factor.
+     *          Negative so it never collides with a real sub-category position, which starts at 0.
+     */
+    public const SUB_CATEGORY_NOT_SPECIFIED = -1;
+
 	/**
 	 * @var string String with name of icon for risk. Must be the part after the 'object_' into object_risk.png
 	 */
@@ -223,15 +234,28 @@ class Risk extends SaturneObject
         $filter        = 't.status = ' . Risk::STATUS_VALIDATED . ' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED .  $dateFilter . (!empty($moreParam['filterRisk']) ? $moreParam['filterRisk'] : ' AND t.type = \'risk\'');
         $currentFilter = $filter . ' AND t.entity = ' . $conf->entity;
 
-        $array['riskByEntities']   = [];
-        $array['current']['risks'] = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $currentFilter], 'AND', false, false, false, $join, [], $select, $moreSelects);
-        if (!is_array($array['current']['risks']) || empty($array['current']['risks'])) {
-            $array['current']['risks']                         = [];
-            $array['current']['riskByRiskAssessmentCotations'] = [];
-            $array['current']['riskByCategories']              = [];
-            $array['current']['riskBySubCategories']           = [];
-            $array['current']['psychosocialRisksByGPUT']       = [];
-            $array['current']['riskByRiskAssessmentLevels']    = [];
+        // Each breakdown below is only filled for the risks that feed it: riskBySubCategories and
+        // psychosocialRisksByGPUT describe the psychosocial category alone, so an entity holding
+        // risks but not a single psychosocial one left those two keys undeclared, and the document
+        // models read them without a guard. Declare the whole shape once instead.
+        $array['riskByEntities'] = [];
+        foreach (['current', 'shared'] as $scope) {
+            $array[$scope] = [
+                'risks'                         => [],
+                'riskByRiskAssessmentCotations' => [],
+                'riskByRiskAssessmentLevels'    => [],
+                'riskByCategories'              => [],
+                'riskBySubCategories'           => [],
+                'psychosocialRisksByGPUT'       => [],
+                'riskTasks'                     => [],
+                'totalRisks'                    => 0,
+            ];
+        }
+        $array['shared']['projectEntities'] = [];
+
+        $currentRisks = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $currentFilter], 'AND', false, false, false, $join, [], $select, $moreSelects);
+        if (is_array($currentRisks)) {
+            $array['current']['risks'] = $currentRisks;
         }
 
         // ShowInheritedRisksInDocuments promises "Activez cette option pour les afficher dans les
@@ -253,24 +277,10 @@ class Risk extends SaturneObject
             }
         }
 
-        if (empty($moreParam['tmparray']['showSharedRisk_nocheck'])) {
-            $array['shared']['risks']                         = [];
-            $array['shared']['riskByCategories']              = [];
-            $array['shared']['riskBySubCategories']           = [];
-            $array['shared']['psychosocialRisksByGPUT']       = [];
-            $array['shared']['riskByRiskAssessmentCotations'] = [];
-            $array['shared']['riskByRiskAssessmentLevels']    = [];
-        }
-
         if (!empty($moreParam['tmparray']['showSharedRisk_nocheck'])) {
-            $array['shared']['risks'] = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $filter], 'AND', false, true, false, $sharedJoin, [], $sharedSelect, $sharedMoreSelects);
-            if (!is_array($array['shared']['risks']) || empty($array['shared']['risks'])) {
-                $array['shared']['risks']                         = [];
-                $array['shared']['riskByCategories']              = [];
-                $array['shared']['riskBySubCategories']           = [];
-                $array['shared']['psychosocialRisksByGPUT']       = [];
-                $array['shared']['riskByRiskAssessmentCotations'] = [];
-                $array['shared']['riskByRiskAssessmentLevels']    = [];
+            $sharedRisks = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $filter], 'AND', false, true, false, $sharedJoin, [], $sharedSelect, $sharedMoreSelects);
+            if (is_array($sharedRisks)) {
+                $array['shared']['risks'] = $sharedRisks;
             }
         }
 
@@ -296,9 +306,6 @@ class Risk extends SaturneObject
             $array[$entity]['riskByCategories'][$risk->category ?? ''][$scale]
                 = $array[$entity]['riskByCategories'][$risk->category ?? ''][$scale] ?? 0;
 
-            $array[$entity]['riskBySubCategories'][$risk->sub_category ?? ''][$scale]
-                = $array[$entity]['riskBySubCategories'][$risk->sub_category ?? ''][$scale] ?? 0;
-
             $array['riskByEntities'][$risk->entity ?? '']['nbTotalRisks']
                 = $array['riskByEntities'][$risk->entity ?? '']['nbTotalRisks'] ?? 0;
 
@@ -310,11 +317,22 @@ class Risk extends SaturneObject
             $array[$entity]['riskByRiskAssessmentLevels'][$scale][] = $risk;
             $array[$entity]['riskByRiskAssessmentCotations'][$fkElement]['totalRiskAssessmentCotations'] += $risk->riskAssessmentCotation;
             $array[$entity]['riskByRiskAssessmentCotations'][$fkElement][$scale]++;
-            if ($risk->sub_category >= 0) {
-                $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$risk->sub_category][$risk->riskAssessmentDate] = $riskAssessment->cotation;
-            }
             $array[$entity]['riskByCategories'][$risk->category ?? ''][$scale]++;
-            $array[$entity]['riskBySubCategories'][$risk->sub_category][$scale]++;
+            // Both sub-category breakdowns only describe the psychosocial category, the single one
+            // carrying sub-categories, and the risk assessment document is their only reader.
+            // sub_category is NULL on every other risk and null >= 0 was true, so every risk of the
+            // entity used to land in the RPS table, one line per element - issue #4724
+            if ($risk->category == self::PSYCHOSOCIAL_CATEGORY_POSITION) {
+                // A psychosocial risk can be filed without any factor: give it a key of its own rather
+                // than dropping it, the category table leaves the psychosocial category to these tables
+                $subCategory = is_numeric($risk->sub_category) ? (int) $risk->sub_category : self::SUB_CATEGORY_NOT_SPECIFIED;
+
+                $array[$entity]['riskBySubCategories'][$subCategory][$scale] = ($array[$entity]['riskBySubCategories'][$subCategory][$scale] ?? 0) + 1;
+
+                if ($subCategory != self::SUB_CATEGORY_NOT_SPECIFIED) {
+                    $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$subCategory][$risk->riskAssessmentDate] = $riskAssessment->cotation;
+                }
+            }
             $array['riskByEntities'][$risk->entity]['nbTotalRisks']++;
             $array['riskByEntities'][$risk->entity][$scale]++;
             $nbTotalRisks[$entity]++;
@@ -330,11 +348,8 @@ class Risk extends SaturneObject
         }
         $filter        .= ' AND eft.fk_risk > 0';
         $array['tasks'] = saturne_fetch_all_object_type('saturneTask', '', '', 0, 0, ['customsql' => $filter], 'AND', true, false);
-        if (!is_array($array['tasks']) || empty($array['tasks'])) {
-            $array['tasks']                     = [];
-            $array['current']['riskTasks']      = [];
-            $array['shared']['riskTasks']       = [];
-            $array['shared']['projectEntities'] = [];
+        if (!is_array($array['tasks'])) {
+            $array['tasks'] = [];
         }
 
         foreach ($array['tasks'] as $task) {
@@ -792,26 +807,60 @@ class Risk extends SaturneObject
 		return -1;
 	}
 
+	/**
+	 * Formate le libellé enrichi d'une catégorie de danger, destiné aux infobulles
+	 *
+	 * Les catégories de pénibilité portent un bloc réglementaire qui n'a de sens qu'au
+	 * survol : il ne doit jamais atterrir dans un PDF, un ODT, un export ou une description.
+	 *
+	 * @param  array  $category Danger category as defined in dangerCategories.json
+	 * @return string           Category name, suffixed by its regulatory block when it has one
+	 */
 	public function formatDangerCategoryTooltip(array $category)
 	{
+		global $langs;
+
 		$tooltip = $category['name'];
 		if (!empty($category['reference'])) {
-			$tooltip .= '&#10;Référence : ' . $category['reference'];
-			$tooltip .= '&#10;C2P : ' . $category['c2p'];
-			$tooltip .= '&#10;Critères d\'exposition : ' . $category['criteres'];
-			$tooltip .= '&#10;Seuil réglementaire : ' . $category['seuil'];
+			$tooltip .= '&#10;' . $langs->transnoentities('DangerCategoryReference') . ' : ' . $category['reference'];
+			$tooltip .= '&#10;' . $langs->transnoentities('DangerCategoryC2P') . ' : ' . $category['c2p'];
+			$tooltip .= '&#10;' . $langs->transnoentities('DangerCategoryExposureCriteria') . ' : ' . $category['criteres'];
+			$tooltip .= '&#10;' . $langs->transnoentities('DangerCategoryRegulatoryThreshold') . ' : ' . $category['seuil'];
 		}
+
 		return $tooltip;
 	}
 
 	/**
-	 * Get danger category picto name
+	 * Get danger category name
 	 *
 	 * @param         $object
-     * @param  string $riskType         Type of risk ('risk', 'riskenvironmental', etc.)
-	 * @return string $category['name'] Name to danger category picto, -1 if don't exist
+	 * @param  string $riskType         Type of risk ('risk', 'riskenvironmental', etc.)
+	 * @return string $category['name'] Name of the danger category, -1 if don't exist
 	 */
 	public function getDangerCategoryName($object, string $riskType = 'risk')
+	{
+		$risk_categories = static::getDangerCategories($riskType);
+		foreach ($risk_categories as $category) {
+			if ($category['position'] == $object->category) {
+				return $category['name'];
+			}
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Get danger category tooltip
+	 *
+	 * Réservé à la construction d'un aria-label : le retour contient le bloc
+	 * réglementaire des catégories de pénibilité, contrairement à getDangerCategoryName().
+	 *
+	 * @param         $object
+	 * @param  string $riskType Type of risk ('risk', 'riskenvironmental', etc.)
+	 * @return string           Tooltip of the danger category, -1 if don't exist
+	 */
+	public function getDangerCategoryTooltip($object, string $riskType = 'risk')
 	{
 		$risk_categories = static::getDangerCategories($riskType);
 		foreach ($risk_categories as $category) {
@@ -901,13 +950,34 @@ class Risk extends SaturneObject
 	}
 
 	/**
-	 * Get danger category picto path
+	 * Get danger category name by position
 	 *
 	 * @param  int    $position
-     * @param  string $riskType                   Type of risk ('risk', 'riskenvironmental', etc.)
-	 * @return string $category['thumbnail_name'] Path to danger category picto, -1 if don't exist
+	 * @param  string $riskType         Type of risk ('risk', 'riskenvironmental', etc.)
+	 * @return string $category['name'] Name of the danger category, -1 if don't exist
 	 */
 	public function getDangerCategoryNameByPosition($position, string $riskType = 'risk')
+	{
+		$risk_categories = static::getDangerCategories($riskType);
+		foreach ($risk_categories as $category) {
+			if ($category['position'] == $position) {
+				return $category['name'];
+			}
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Get danger category tooltip by position
+	 *
+	 * Réservé à la construction d'un aria-label, comme getDangerCategoryTooltip().
+	 *
+	 * @param  int    $position
+	 * @param  string $riskType Type of risk ('risk', 'riskenvironmental', etc.)
+	 * @return string           Tooltip of the danger category, -1 if don't exist
+	 */
+	public function getDangerCategoryTooltipByPosition($position, string $riskType = 'risk')
 	{
 		$risk_categories = static::getDangerCategories($riskType);
 		foreach ($risk_categories as $category) {

@@ -1,0 +1,169 @@
+---
+name: Quality
+
+on:
+    push:
+        branches:
+            - main
+            - develop
+        paths:
+            - '**/*.php'
+            - 'langs/**/*.lang'
+            - 'phpstan.neon'
+            - 'phpstan.baseline.neon'
+            - 'composer.json'
+            - 'composer.lock'
+            - '.github/workflows/quality.yml'
+    # Pas de filtre paths ici, contrairement a push, et c'est volontaire : une
+    # verification requise qui ne se declenche pas laisse la pull request en
+    # « Expected - Waiting for status to be reported », indefiniment. Filtrer sur les
+    # chemins reviendrait donc a bloquer toute PR sans PHP. Sur push le job n'est
+    # qu'informatif, le filtre y garde son sens.
+    pull_request:
+        branches:
+            - main
+            - develop
+    workflow_dispatch:
+
+concurrency:
+    group: quality-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    # Deux verifications qui ne demandent que PHP : elles tournent seules, sans avoir a
+    # cloner le coeur Dolibarr ni le socle, et rendent leur verdict en quelques secondes.
+    lint:
+        name: PHP lint et parite des langues
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.1'
+                  coverage: none
+
+            # Une erreur de syntaxe passe aujourd'hui le merge sans bruit et se decouvre
+            # en page blanche chez le client.
+            - name: PHP lint
+              run: |
+                  # php -l ecrit son diagnostic sur la sortie standard : le rediriger vers
+                  # /dev/null laisserait un job rouge sans rien dire du fichier fautif.
+                  status=0
+                  while IFS= read -r -d '' file; do
+                    if ! output=$(php -l "$file" 2>&1); then
+                      echo "$output"
+                      status=1
+                    fi
+                  done < <(find . -path ./vendor -prune -o -name '*.php' -print0)
+                  exit $status
+
+            # Une cle presente en en_US et absente de fr_FR reste affichee en anglais, et
+            # la fuite touche tous les modules qui traduisent la meme cle generique.
+            - name: Parite fr_FR / en_US
+              run: php dev/ci/lang-parity.php
+
+    phpstan:
+        name: PHPStan
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout Digirisk
+              uses: actions/checkout@v4
+              with:
+                  path: htdocs/custom/digiriskdolibarr
+
+            # Le module etend SaturneObject et appelle les libs du socle : sans lui, chaque
+            # classe heritee remonterait comme inconnue.
+            - name: Checkout Saturne
+              uses: actions/checkout@v4
+              with:
+                  repository: Evarisk/Saturne
+                  ref: develop
+                  path: htdocs/custom/saturne
+
+            # Le coeur Dolibarr est necessaire a la resolution des classes (scanDirectories).
+            # Epingle sur la derniere version stable pour que le verdict soit reproductible.
+            # A garder en phase avec les scanDirectories de phpstan.neon.
+            #
+            # htdocs/core/*.inc.php n'est pas un oubli : les fragments d'action du coeur
+            # (actions_fetchobject, actions_massactions, commonfieldsinimport...) vivent en
+            # vrac a la racine de core/, pas dans un sous-dossier. Sans eux, les include du
+            # module remontent en include.fileNotFound.
+            - name: Checkout Dolibarr core (sparse)
+              uses: actions/checkout@v4
+              with:
+                  repository: Dolibarr/dolibarr
+                  ref: '23.0.0'
+                  path: dolibarr-core
+                  sparse-checkout: |
+                      htdocs/api/class
+                      htdocs/core/*.inc.php
+                      htdocs/categories/class
+                      htdocs/comm/action/class
+                      htdocs/comm/propal/class
+                      htdocs/commande/class
+                      htdocs/compta/facture/class
+                      htdocs/contact/class
+                      htdocs/contrat/class
+                      htdocs/core/class
+                      htdocs/core/db
+                      htdocs/core/lib
+                      htdocs/core/modules
+                      htdocs/core/tpl
+                      htdocs/core/triggers
+                      htdocs/ecm/class
+                      htdocs/expedition/class
+                      htdocs/fichinter/class
+                      htdocs/fourn/class
+                      htdocs/includes/odtphp
+                      htdocs/includes/parsedown
+                      htdocs/includes/restler/framework
+                      htdocs/includes/tecnickcom/tcpdf/tcpdf.php
+                      htdocs/includes/tecnickcom/tcpdf/tcpdf_barcodes_1d.php
+                      htdocs/includes/tecnickcom/tcpdf/tcpdf_barcodes_2d.php
+                      htdocs/main.inc.php
+                      htdocs/mrp/class
+                      htdocs/product/class
+                      htdocs/product/inventory/class
+                      htdocs/product/stock/class
+                      htdocs/projet/class
+                      htdocs/reception/class
+                      htdocs/societe/class
+                      htdocs/supplier_proposal/class
+                      htdocs/ticket/class
+                      htdocs/user/class
+                  sparse-checkout-cone-mode: false
+
+            - name: Expose Dolibarr core at expected DOL_DOCUMENT_ROOT path
+              run: cp -r dolibarr-core/htdocs/. htdocs/
+
+            - uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.1'
+                  extensions: mbstring, json, mysqli
+                  tools: composer:v2
+                  coverage: none
+
+            - name: Cache Composer packages
+              uses: actions/cache@v4
+              with:
+                  path: htdocs/custom/digiriskdolibarr/vendor
+                  key: composer-8.1-${{ hashFiles('htdocs/custom/digiriskdolibarr/composer.lock') }}
+                  restore-keys: composer-8.1-
+
+            - name: Install Composer dependencies
+              working-directory: htdocs/custom/digiriskdolibarr
+              run: composer install --no-interaction --no-progress
+
+            # La baseline gele ce qui existait le jour de la mise en place : le job est donc
+            # vert des le premier run et ne rougit que sur une regression nouvelle. Elle se
+            # reduit au fil des corrections, jamais l'inverse.
+            # --error-format=github pose les erreurs en annotations sur les lignes
+            # concernees de l'onglet « Files changed ». Sans lui, il faut ouvrir le run,
+            # deplier l'etape et faire le rapprochement a la main : une CI qu'on doit
+            # aller chercher est une CI qu'on finit par ne plus regarder.
+            - name: Run PHPStan
+              working-directory: htdocs/custom/digiriskdolibarr
+              run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G --error-format=github

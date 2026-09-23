@@ -138,6 +138,24 @@ if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && empty($conf->global->DIGIR
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_PROJECT_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
 }
 
+// Backward compatibility : the project creation below used to overwrite this menu entry with the project task
+// list, which hid the Kanban view added in 23.1.0. The Kanban page resolves the project by itself, so the URL
+// declared by the module descriptor is restored once, on the entity being visited.
+if (empty($conf->global->DIGIRISKDOLIBARR_DU_ACTIONPLAN_MENU_URL_BACKWARD_COMPATIBILITY)) {
+	$sql  = "UPDATE " . MAIN_DB_PREFIX . "menu SET";
+	$sql .= " url = '/digiriskdolibarr/view/digiriskstandard/actionplan_list.php?view=kanban'";
+	$sql .= " WHERE leftmenu = 'digiriskactionplan'";
+	$sql .= " AND entity = " . ((int) $conf->entity);
+
+	$resql = $db->query($sql);
+	if (!$resql) {
+		$error = "Error " . $db->lasterror();
+		return -1;
+	}
+
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_ACTIONPLAN_MENU_URL_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
+}
+
 if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) {
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
 	$project->title       = $langs->trans('RiskAssessmentDocument') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
@@ -163,18 +181,6 @@ if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) 
 	$tags->fetch('', 'DU');
 	$tags->add_type($project, 'project');
 
-	$url = '/projet/tasks.php?id=' . $project_id;
-
-	$sql = "UPDATE ".MAIN_DB_PREFIX."menu SET";
-	$sql .= " url='".$db->escape($url)."'";
-	$sql .= " WHERE leftmenu='digiriskactionplan'";
-	$sql .= " AND entity=" . $conf->entity;
-
-	$resql = $db->query($sql);
-	if (!$resql) {
-		$error = "Error ".$db->lasterror();
-		return -1;
-	}
 	header("Location: " . $_SERVER['PHP_SELF']);
 }
 
@@ -558,7 +564,9 @@ if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED == 0) {
 	require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
 
 	$digiriskelement = new Groupment($db);
-	$digiriskelement->fetch($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
+	// A missing bin would send the update below on an empty object, and the const would never be set,
+	// so the whole block would run again on every single page
+	$trashFetched = $digiriskelement->fetch(getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH')) > 0;
 
 	$dirforimage     = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/defaultImgGP0/';
 	$original_file   = 'trash-alt-solid.png';
@@ -582,11 +590,14 @@ if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED == 0) {
 	dol_copy($dirforimage . '/thumbs/trash-alt-solid_mini.png', $src_file . '/thumbs/trash-alt-solid_mini.png', 0, 0);
 	dol_copy($dirforimage . '/thumbs/trash-alt-solid_small.png', $src_file . '/thumbs/trash-alt-solid_small.png', 0, 0);
 
-	$digiriskelement->photo = $original_file;
-	$digiriskelement->status = 0;
-	$result                 = $digiriskelement->update($user);
+	$result = 0;
+	if ($trashFetched) {
+		$digiriskelement->photo  = $original_file;
+		$digiriskelement->status = DigiriskElement::STATUS_TRASH_ROOT;
+		$result                  = $digiriskelement->update($user);
+	}
 
-	if ($result > 0) {
+	if ($result > 0 || !$trashFetched) {
 		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED', 1, 'integer', 0, '', $conf->entity);
 	}
 }
