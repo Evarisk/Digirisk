@@ -387,7 +387,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '23.3.0';
+		$this->version         = '23.4.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr_color@digiriskdolibarr';
 
@@ -831,6 +831,7 @@ class modDigiriskdolibarr extends DolibarrModules
             $i++ => ['DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET', 'integer', 0, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSDOCUMENT_BACKWARD_ODT_PATH_SET', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_BACKWARD_TRASH_ELEMENTS', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_TASK_REF_BACKWARD_SET', 'integer', 1, '', 0, 'current'],
 
             // CONST ACCIDENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'],
@@ -937,7 +938,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 MAIN_DB_PREFIX . 'c_preventionplan_attendants_role',
                 MAIN_DB_PREFIX . 'c_firepermit_attendants_role',
                 MAIN_DB_PREFIX . 'c_digiriskdolibarr_certification',
-                MAIN_DB_PREFIX . 'c_digiriskdolibarr_actionplan_column'
+                MAIN_DB_PREFIX . 'c_digiriskdolibarr_actionplan_column',
+                MAIN_DB_PREFIX . 'c_digiriskdolibarr_ticket_location'
             ],
             // Label of tables
             'tablib' => [
@@ -950,7 +952,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 'PreventionPlanRole',
                 'FirePermitRole',
                 'CertificationDictionary',
-                'ActionPlanColumnDictionary'
+                'ActionPlanColumnDictionary',
+                'TicketLocationDictionary'
             ],
             // Request to select fields
             'tabsql' => [
@@ -963,11 +966,13 @@ class modDigiriskdolibarr extends DolibarrModules
                 'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_preventionplan_attendants_role as f',
                 'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_firepermit_attendants_role as f',
                 'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_certification as f',
-                'SELECT f.rowid as rowid, f.ref, f.label, f.progress_min, f.progress_max, f.color, f.picto, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_actionplan_column as f'
+                'SELECT f.rowid as rowid, f.ref, f.label, f.progress_min, f.progress_max, f.color, f.picto, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_actionplan_column as f',
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_ticket_location as f'
             ],
             // Sort order
             'tabsqlsort' => [
                 'code ASC',
+                'position ASC',
                 'position ASC',
                 'position ASC',
                 'position ASC',
@@ -989,7 +994,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 'ref,label,description,position',
                 'ref,label,description,position',
                 'ref,label,description,position',
-                'ref,label,progress_min,progress_max,color,picto,position'
+                'ref,label,progress_min,progress_max,color,picto,position',
+                'ref,label,description,position'
             ],
             // List of fields (list of fields to edit a record)
             'tabfieldvalue' => [
@@ -1002,7 +1008,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 'ref,label,description,position',
                 'ref,label,description,position',
                 'ref,label,description,position',
-                'ref,label,progress_min,progress_max,color,picto,position'
+                'ref,label,progress_min,progress_max,color,picto,position',
+                'ref,label,description,position'
             ],
             // List of fields (list of fields for insert)
             'tabfieldinsert' => [
@@ -1015,10 +1022,12 @@ class modDigiriskdolibarr extends DolibarrModules
                 'ref,label,description,position',
                 'ref,label,description,position',
                 'ref,label,description,position',
-                'ref,label,progress_min,progress_max,color,picto,position'
+                'ref,label,progress_min,progress_max,color,picto,position',
+                'ref,label,description,position'
             ],
             // Name of columns with primary key (try to always name it 'rowid')
             'tabrowid' => [
+                'rowid',
                 'rowid',
                 'rowid',
                 'rowid',
@@ -1032,6 +1041,7 @@ class modDigiriskdolibarr extends DolibarrModules
             ],
             // Condition to show each dictionary
             'tabcond' => [
+                !empty($conf->digiriskdolibarr->enabled),
                 !empty($conf->digiriskdolibarr->enabled),
                 !empty($conf->digiriskdolibarr->enabled),
                 !empty($conf->digiriskdolibarr->enabled),
@@ -1059,7 +1069,8 @@ class modDigiriskdolibarr extends DolibarrModules
                     'progress_max' => $langs->trans('ActionPlanColumnProgressHelp'),
                     'color'        => $langs->trans('ActionPlanColumnColorHelp'),
                     'picto'        => $langs->trans('ActionPlanColumnPictoHelp')
-                ]
+                ],
+                []
             ]
         ];
 
@@ -2191,7 +2202,7 @@ class modDigiriskdolibarr extends DolibarrModules
 	 * @return     int                1 if OK, 0 if KO
 	 * @throws Exception
 	 */
-	public function init($options = '')
+	public function init($options = ''): int
 	{
 		global $conf, $langs, $user;
 
@@ -2321,24 +2332,34 @@ class modDigiriskdolibarr extends DolibarrModules
 			$trashRef                      = 'GP0';
 			$digiriskelement               = new Groupment($this->db);
 			$digiriskelement->ref          = $trashRef;
-			$digiriskelement->label        = $langs->trans('HiddenElements');
+			$digiriskelement->label        = $langs->transnoentities('HiddenElements');
 			$digiriskelement->element_type = 'groupment';
 			$digiriskelement->ranks        = 0;
-			$digiriskelement->description  = $langs->trans('TrashGroupment');
-			$digiriskelement->status       = DigiriskElement::STATUS_TRASHED;
+			$digiriskelement->description  = $langs->transnoentities('TrashGroupment');
+			$digiriskelement->status       = DigiriskElement::STATUS_TRASH_ROOT;
 			$trash_id                      = $digiriskelement->create($user);
 
-			// Elements of the current entity already trashed under the foreign trash must follow the new one
-			if ($previousTrashID > 0 && $trash_id > 0) {
-				$trashedElements = $trash->fetchAll('', '', 0, 0, ['customsql' => 't.fk_parent = ' . $previousTrashID . ' AND t.entity = ' . ((int) $conf->entity)]);
-				if (is_array($trashedElements)) {
-					foreach ($trashedElements as $trashedElement) {
-						$trashedElement->setValueFrom('fk_parent', $trash_id, '', null, '', '', $user);
+			// A failed creation returns -1: writing it in the constant would make every later delete()
+			// reparent its element on a missing id, which is how an entity ends up losing its GP/WU
+			if ($trash_id > 0) {
+				// create() forces the validated status, so the bin would show up as an ordinary groupment
+				$digiriskelement->status = DigiriskElement::STATUS_TRASH_ROOT;
+				$digiriskelement->update($user, 1);
+
+				// Elements of the current entity already trashed under the foreign trash must follow the new one
+				if ($previousTrashID > 0) {
+					$trashedElements = $trash->fetchAll('', '', 0, 0, ['customsql' => 't.fk_parent = ' . $previousTrashID . ' AND t.entity = ' . ((int) $conf->entity)]);
+					if (is_array($trashedElements)) {
+						foreach ($trashedElements as $trashedElement) {
+							$trashedElement->setValueFrom('fk_parent', $trash_id, '', null, '', '', $user);
+						}
 					}
 				}
-			}
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', $trash_id, 'integer', 0, '', $conf->entity);
+				dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', $trash_id, 'integer', 0, '', $conf->entity);
+				// Replay the backward block so the new bin gets its trash picture
+				dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED', 0, 'integer', 0, '', $conf->entity);
+			}
 		}
 
         require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
@@ -2590,7 +2611,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
         saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
 
-        if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) <= 4) {
+        if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) <= 5) {
             $result = $this->_load_tables('/install/mysql/', 'ticket');
             if ($result < 0) {
                 return -1;
@@ -2606,12 +2627,16 @@ class modDigiriskdolibarr extends DolibarrModules
                 'digiriskdolibarr_ticket_phone'      => ['Label' => 'Phone',            'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => $this->numero . 30,                                                                                                        ],
 				'digiriskdolibarr_ticket_service'    => ['Label' => 'GP/UT', 'type' => 'chkbxlst', 'elementtype' => ['ticket'], 'position' => $this->numero . 40, 'params' => ['digiriskdolibarr_digiriskelement:ref|label:rowid::((status:>:0) AND (entity:=:$ENTITY$))::' => null], 'list' => 4],
 				'digiriskdolibarr_ticket_location'   => ['Label' => 'Location',         'type' => 'varchar',  'length' => 255, 'elementtype' => ['ticket'], 'position' => $this->numero . 50,                                                                                                        ],
+                // Deliberately not prefixed with 'digiriskdolibarr_ticket_' : that prefix is what the public form
+                // and the ticket category configuration use to pick the fields they render on their own. The GPS
+                // coordinates are captured by the Location field itself, never typed in a field of their own
+                'digiriskdolibarr_location_gps'      => ['Label' => 'GPSCoordinates',   'type' => 'varchar',  'length' => 64,  'elementtype' => ['ticket'], 'position' => $this->numero . 55,                                                                                                        ],
                 'digiriskdolibarr_ticket_date'       => ['Label' => 'DeclarationDate',  'type' => 'datetime',                  'elementtype' => ['ticket'], 'position' => $this->numero . 60,                                                                                                        ],
                 'digiriskdolibarr_condition_message' => ['Label' => 'ConditionMessage', 'type' => 'text',                      'elementtype' => ['ticket'], 'position' => $this->numero . 70]
             ];
 
             saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
-            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 5, 'integer', 0, '', 0);
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 6, 'integer', 0, '', 0);
         }
 
 		//DigiriskElement favorite medias backward compatibility
@@ -2876,6 +2901,15 @@ class modDigiriskdolibarr extends DolibarrModules
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_LISTINGRISKSDOCUMENT_BACKWARD_ODT_PATH_SET', 1, 'integer', 0, '', $conf->entity);
         }
 
+        // BACKWARD TASK REF : les taches creees par l'endpoint DigiAI avant 37a696a7 sont parties sans reference
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_REF_BACKWARD_SET')) {
+            require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+
+            if (digiriskdolibarr_backfill_task_refs() >= 0) {
+                dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TASK_REF_BACKWARD_SET', 1, 'integer', 0, '', $conf->entity);
+            }
+        }
+
         $documentsPath = DOL_DATA_ROOT . ($conf->entity > 1 ? '/' . $conf->entity : '');
         $mediaPath     =  $documentsPath . '/digiriskdolibarr';
 
@@ -2944,7 +2978,7 @@ class modDigiriskdolibarr extends DolibarrModules
 	 *  @param      string	$options    Options when enabling module ('', 'noboxes')
 	 *  @return     int                 1 if OK, 0 if KO
 	 */
-	public function remove($options = '')
+	public function remove($options = ''): int
 	{
 		global $conf;
 

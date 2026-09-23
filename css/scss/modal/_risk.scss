@@ -73,12 +73,39 @@
 
 .wpeo-modal[class*="modal-risk"] .modal-container .risk-content {
   display: flex;
+  // Ancre de la grille des dangers : elle se cale sur la largeur du bloc plutot que sur
+  // celle du bouton qui l'ouvre.
+  position: relative;
   padding-bottom: 1em;
   margin-bottom: 1em;
   border-bottom: 1px solid rgba(0,0,0,0.2);
 
   .risk-category {
     margin-right: 1.5em;
+
+    .wpeo-dropdown {
+      position: static;
+    }
+    // Le panneau est en position absolue dans un dropdown de 50px : il n'agrandit pas la
+    // modale, et depuis le passage a 27 categories ses 6 rangees debordaient de
+    // .modal-container (overflow-y: hidden), qui les rognait. Il prend la largeur de la
+    // modale et se borne en hauteur, comme la grille des signalisations.
+    .saturne-dropdown-content {
+      top: 100%;
+      left: 0;
+      right: 0;
+      width: auto;
+      max-height: 300px;
+      overflow-y: auto;
+      grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+      grid-gap: 0.3em;
+
+      // Le padding du dropdown mangeait un quart de la cellule : l'espacement passe par la
+      // gouttiere de la grille, le pictogramme occupe toute sa case.
+      .dropdown-item {
+        padding: 0;
+      }
+    }
   }
   .risk-description {
     flex-grow: 1;

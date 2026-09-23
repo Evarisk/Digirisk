@@ -115,10 +115,11 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                 $tmpArray['riskAssessmentCotation'] = $risk->riskAssessmentCotation ?: 0;
                 $tmpArray['description']            = $risk->description;
 
+                $tmpArray['riskAssessmentComment'] = '';
                 if (!getDolGlobalInt('DIGIRISKDOLIBARR_RISKASSESSMENT_HIDE_DATE_IN_DOCUMENT') && !empty($risk->riskAssessmentComment)) {
                     $tmpArray['riskAssessmentComment'] = dol_print_date((getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE') && !empty($risk->riskAssessmentDate) ? $risk->riskAssessmentDate : $risk->riskAssessmentDateCreation), 'dayreduceformat') . ': ';
                 }
-                $tmpArray['riskAssessmentComment'] = $risk->riskAssessmentComment ?: '';
+                $tmpArray['riskAssessmentComment'] .= $risk->riskAssessmentComment ?: '';
                 $tmpArray['riskAssessmentTrend']   = static::setRiskAssessmentTrendTag($outputLangs, $risk, $moreParam);
 
                 $moreParam['riskId']             = $risk->id;
@@ -257,7 +258,8 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             }
             foreach ($riskTaskTypes as $riskTaskType) {
                 $array['riskTask' . $riskTaskType] .= $outputLangs->transnoentities('Label') . ' : ' . $riskTask->label . '<br>';
-                if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT')) {
+                // Une tache sans reference n'ecrit pas la ligne, plutot qu'un libelle suivi du vide
+                if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT') && !empty($riskTask->ref)) {
                     $array['riskTask' . $riskTaskType] .= $outputLangs->transnoentities('Ref') . ' : ' . $riskTask->ref . '<br>';
                 }
                 if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT')) {
@@ -277,7 +279,9 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                 }
 
                 if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT')) {
-                    $array['riskTask' . $riskTaskType] .= $outputLangs->trans('Budget') . ' : ' . price($riskTask->budget_amount, 0, $outputLangs, 1, 0, 0, $conf->currency) . ' - ';
+                    $array['riskTask' . $riskTaskType] .= $outputLangs->trans('Budget') . ' : ' . price($riskTask->budget_amount, 0, $outputLangs, 1, 0, 0, $conf->currency);
+                    // L'avancement, seul a suivre le budget, n'est ecrit que pour une action en cours
+                    $array['riskTask' . $riskTaskType] .= ($riskTaskType != 'Completed') ? ' - ' : '<br>';
                 }
                 if ($riskTaskType != 'Completed') {
                     $array['riskTask' . $riskTaskType] .= $outputLangs->trans('DigiriskProgress') . ' : ' . ($riskTaskProgress ?: 0) . ' %'  . '<br>';

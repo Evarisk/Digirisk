@@ -1222,7 +1222,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '<td class="center">'; ?>
 					<div class="table-cell table-50 cell-risk" data-title="Risque">
 						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
-							 aria-label="<?php echo $risk->getDangerCategoryName($item) ?>">
+							 aria-label="<?php echo $risk->getDangerCategoryTooltip($item) ?>">
 							<img class="danger-category-pic hover"
 								 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($item) . '.png'; ?>"
 								 alt=""/>
@@ -1338,7 +1338,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 							if ( ! empty($dangerCategories)) :
 								foreach ($dangerCategories as $dangerCategory) : ?>
 									<li class="item dropdown-item wpeo-tooltip-event"
-										ata-is-preset="<?php echo ''; ?>"
+										data-is-preset="<?php echo ''; ?>"
 										data-id="<?php echo $dangerCategory['position'] ?>"
 										aria-label="<?php echo $dangerCategory['name'] ?>">
 										<img

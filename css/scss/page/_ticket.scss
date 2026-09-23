@@ -1,3 +1,7 @@
+// Height shared by every control of the register form, comfortable enough for a finger on the
+// phone that scanned the QR code (issue #4714)
+$ticket__field-height: 44px;
+
 .ticketpublicarea {
   .ticket-parentCategory {
     width: 100%;
@@ -62,16 +66,73 @@
     }
   }
 
+  // Location field (#4732) — the "Other" text field and the geolocation button sit under the select,
+  // inside the same label, and have to stay readable on the phone the QR code is scanned with
+  .ticket-location-other {
+    display: block;
+    width: 100%;
+    margin-top: 0.5em;
+  }
+
+  .ticket-location-geoloc {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5em;
+    margin-top: 0.5em;
+
+    .ticket-geoloc-feedback {
+      font-size: 0.9em;
+      opacity: 0.7;
+    }
+  }
+
+  // Register form fields (issue #4714)
+  // The declarant fills this form on the phone that scanned the QR code : every control is
+  // presented the same way whatever the type of the extrafield behind it. Left alone a select
+  // only takes the width of its longest option and lands next to full width text inputs.
   .tableforinputfields {
     margin-top: 1em;
 
-    input {
+    // The theme caps a text input at 30px while a select keeps the 48px its own padding gives
+    // it, so the height is stated here too and the fields of a same form line up
+    input:not([type="hidden"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]),
+    select,
+    textarea {
       display: block;
       clear: both;
       width: 100%;
       max-width: none;
+      height: $ticket__field-height;
       margin-bottom: 1em;
+      box-sizing: border-box;
     }
+
+    // The message keeps the room its rows ask for, that height is only a floor
+    textarea {
+      height: auto;
+      min-height: $ticket__field-height * 2;
+    }
+
+    // select2 moves the native select off screen and renders a span whose width it computes
+    // itself from that hidden select, hence the !important
+    .select2-container {
+      display: block;
+      width: 100% !important;
+      margin-bottom: 1em;
+
+      .select2-selection--single {
+        height: $ticket__field-height;
+
+        .select2-selection__rendered {
+          line-height: $ticket__field-height - 2px;
+        }
+        .select2-selection__arrow {
+          height: $ticket__field-height - 2px;
+        }
+      }
+    }
+
     .inline-block {
       @media ( max-width: $media__small ) {
         display: block;
@@ -79,8 +140,40 @@
       input {
         display: inline-block;
       }
-      #options_digiriskdolibarr_ticket_date {
-        max-width: 80px;
+    }
+
+    // Declaration date : the date input and the hour and minute selects are one single field,
+    // they share a wrapping row instead of taking a full line each
+    .ticket-date-input {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4em;
+      margin-bottom: 1em;
+
+      .inline-block,
+      .nowraponall {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3em;
+      }
+
+      input,
+      select {
+        display: inline-block;
+        width: auto;
+        max-width: none;
+        margin-bottom: 0;
+      }
+
+      // Room for a whole dd/mm/yyyy : the field used to cut the last digit of the year off
+      input[type="text"] {
+        width: 7.5em;
+        text-align: center;
+      }
+
+      select {
+        min-width: 4.5em;
       }
     }
   }

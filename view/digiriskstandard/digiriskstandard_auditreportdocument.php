@@ -28,9 +28,6 @@ if (!defined('DISABLE_CKEDITOR')) {
 if (!defined('DISABLE_JQUERY_TABLEDND')) {
     define('DISABLE_JQUERY_TABLEDND', 1);
 }
-if (!defined('DISABLE_JQUERY_JNOTIFY')) {
-    define('DISABLE_JQUERY_JNOTIFY', 1);
-}
 if (!defined('DISABLE_JS_GRAPH')) {
     define('DISABLE_JS_GRAPH', 1);
 }

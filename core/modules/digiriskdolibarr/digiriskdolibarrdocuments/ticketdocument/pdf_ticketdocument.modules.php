@@ -81,114 +81,6 @@
             $this->version      = '1.0.0';
         }
 
-        /**
-         *  Add a page in the pdf if the height is between two pages
-         *
-         * @param Object $pdf
-         * @param float $neededHeight
-         */
-        public function checkPageBreak($pdf, $neededHeight) {
-            $bottomMargin = $pdf->getBreakMargin();
-            $pageHeight   = $pdf->getPageHeight();
-            $currentY     = $pdf->GetY();
-
-            if ($currentY + $neededHeight + $bottomMargin > $pageHeight) {
-                $pdf->AddPage();
-            }
-        }
-
-        /**
-         *  Draw tables for pdf
-         *
-         * @param TCPDF $pdf pdf object
-         * @param array $table array with values
-         * @param array $tableWidth the total width of the table
-         * @param float $lineHeight is the normal height value for lines
-         * @param float $defaultFontSize to have the default font size
-         * @return void
-         *
-         */
-        function drawTable($pdf, $table, $tableWidth, $lineHeight, $defaultFontSize)
-        {
-            global $langs;
-
-            if (!isset($table['rows'], $table['widths'], $table['align'])) {
-                return;
-            }
-
-            if (!empty($table['title'])) {
-                $pdf->SetFont('', 'B', $defaultFontSize);
-                $pdf->SetFillColor(42, 157, 143);
-                $pdf->SetTextColor(255, 255, 255);
-
-                $pdf->Cell($tableWidth, 8, $table['title'], 1, 1, 'C', true);
-
-                // Reset style
-                $pdf->SetTextColor(0, 0, 0);
-                $pdf->SetFont('', '', $defaultFontSize - 2);
-            }
-
-            $widths = $table['widths'];
-
-            if (isset($table['Ln'])) {
-                $pdf->Ln($table['Ln']);
-            }
-            foreach ($table['rows'] as $cells) {
-                $maxHeight = $lineHeight;
-
-                // Calculating max height for a line to break after
-                foreach ($cells as $i => $cellData) {
-                    if (!isset($widths[$i])) {
-                        continue;
-                    }
-                    if (is_array($cellData)) {
-                        $cell = $cellData['text'] ?? '';
-                    } else {
-                        $cell = $cellData;
-                    }
-                    $cell    = $cell ?? $langs->transnoentities('NoData');
-                    $nbLines = $pdf->getNumLines($cell, $widths[$i]);
-                    $height  = $nbLines * $lineHeight;
-
-                    if ($height > $maxHeight) {
-                        $maxHeight = $height;
-                    }
-                }
-
-                // draw the cells array
-                foreach ($cells as $key => $cellData) {
-                    if (!isset($widths[$key])) {
-                        continue;
-                    }
-
-                    $isLabel = false;
-                    $cell    = '';
-
-                    if (is_array($cellData)) {
-                        $cell    = $cellData['text'] ?? '';
-                        $isLabel = !empty($cellData['label']);
-                    } else {
-                        $cell = $cellData;
-                    }
-
-                    if ($isLabel) {
-                        $pdf->SetFont('', 'B', 10);
-                    } else {
-                        $pdf->SetFont('', '', 10);
-                    }
-
-                    $x     = $pdf->GetX();
-                    $y     = $pdf->GetY();
-                    $cell  = $cell ?? $langs->transnoentities('NoData');
-                    $align = $aligns[$key] ?? 'C';
-
-                    $pdf->MultiCell($widths[$key], $lineHeight, $cell, 1, $align, 0, 0, $x, $y, true, 0, false, true, $lineHeight, 'M');
-                    $pdf->SetXY($x + $widths[$key], $y);
-                }
-                $pdf->Ln($maxHeight);
-            }
-        }
-
 
         /**
          *  Show top header of page
@@ -264,6 +156,15 @@
         function getTicketPdfTables($pdf, $object, $tableWidth, $pageWidth, $digiriskElement, $userTmp, $contactNames, $allCategories)
         {
             global $langs;
+
+            // GPS coordinates captured on the public form belong to the register itself : the exact spot
+            // of a declaration is part of the record, so they are printed next to the location (#4732)
+            $location    = $object->array_options['options_digiriskdolibarr_ticket_location'] ?? '';
+            $gpsLocation = $object->array_options['options_digiriskdolibarr_location_gps'] ?? '';
+            if (dol_strlen($gpsLocation) > 0) {
+                $location = dol_strlen($location) > 0 ? $location . ' (' . $gpsLocation . ')' : $gpsLocation;
+            }
+
             $tables = [
                 'header' => [
                     'widths' => [
@@ -313,7 +214,7 @@
                         ],
                         [
                             ['label' => true, 'text' => $langs->transnoentities('Location')],
-                            ['text' => $object->array_options['options_digiriskdolibarr_ticket_location']],
+                            ['text' => $location],
                         ],
                         [
                             ['label' => true, 'text' => $langs->transnoentities('DateCreation')],
@@ -387,17 +288,20 @@
          *
          *  @param	TCPDF		$pdf     		Object PDF
          *  @param  Ticket		$object     	Object to show
-         *  @param  Translate	$outputlangs	Object lang for output
+         *  @param  Translate	$outputLangs	Object lang for output
+         *  @param  float		$defaultFontSize Font size of the document
          *  @return	void
          */
-        function _pageFooter($pdf, $object, $outputLangs, $defaultFontSize)
+        function _pagefooter($pdf, $object, $outputLangs, $defaultFontSize)
         {
             global $langs;
 
             $pdf->setFontSize($defaultFontSize - 2);
 
             $leftText  = $object->ref . ' - ' . $langs->transnoentities('GeneratedTicketDocumentDate') . ' ' . dol_print_date(dol_now(), 'dayhoursec', 'tzuser');
-            $rightText = 'Version '. $this->version . ' - Page ' . $pdf->getNumPages() . '/' . $pdf->getAliasNbPages();
+            // getNumPages() is the page count, not the current page : the footer is written once
+            // per page at the very end of the generation, so both numbers are already known
+            $rightText = 'Version '. $this->version . ' - Page ' . $pdf->getPage() . '/' . $pdf->getNumPages();
 
             $pdf->SetY($pdf->getPageHeight() - $this->marge_basse - $pdf->getStringHeight($pdf->GetStringWidth($leftText), $leftText));
 
@@ -421,6 +325,8 @@
         public function write_file($objectDocument, $outputLangs, $srcTemplatePath = '', $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = array()): int
         {
             global $action, $langs, $hookmanager, $user;
+
+            $moreparams = self::getMoreParam($objectDocument, $moreparams);
 
             $object = $moreparams['object'];
 
@@ -478,7 +384,10 @@
 
             $pdf->SetMargins($this->marge_gauche, $this->marge_haute, $this->marge_droite);
             $pdf->setPageOrientation($this->orientation, 1, $this->marge_basse);
-            $pdf->SetAutoPageBreak(1, $this->marge_basse);
+            // The footer is written at marge_basse from the bottom, so it lands above that
+            // limit : its own height belongs to the break margin, otherwise the body of a long
+            // document is drawn over it
+            $pdf->SetAutoPageBreak(1, $this->marge_basse + $this->height);
 
             $pdf->AddPage();
             $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $defaultFontSize);
@@ -550,7 +459,9 @@
                 }
             }
 
-            $this->_pageFooter($pdf, $object, $outputLangs, $defaultFontSize);
+            // A ticket with a long message spreads over several pages : each one gets its footer
+            $this->drawFooterOnEveryPage($pdf, $object, $outputLangs, $defaultFontSize);
+
             try {
                 $pdf->Output($file, 'F');
             } catch (Exception $exception) {

@@ -80,16 +80,20 @@ Analyse l’image selon ces catégories de risque :
   {"name": "Risques liés aux ambiances lumineuses", "thumbnail_name": "eclairage_PictoCategorie_v2"},
   {"name": "Risques liés aux rayonnements", "thumbnail_name": "rayonnement_v2"},
   {"name": "Risques psychosociaux", "thumbnail_name": "rps_v2"},
-  {"name": "Risques liés aux vibrations", "thumbnail_name": "vibration_PictoCategorie_v2"},
+  {"name": "Risques liés aux vibrations", "thumbnail_name": "picto_risk_vibration_48px"},
   {"name": "Risques de heurt, de cognement", "thumbnail_name": "heurt_PictoCategorie_v2"},
   {"name": "Risques liés aux pratiques addictives", "thumbnail_name": "pratiques_addictives_PictoCategorie_v2"},
   {"name": "Risques liés à l'amiante", "thumbnail_name": "amiante_v2"},
+  {"name": "Risques autres", "thumbnail_name": "autre_PictoCategorie_v2"},
   {"name": "Risques liés aux postures pénibles", "thumbnail_name": "picto_risk_strenuous-posture_48px-2"},
   {"name": "Risques liés aux activités exercées en milieu hyperbare", "thumbnail_name": "Pictogrammes_risk_hyperbar_48_px"},
   {"name": "Risques liés au travail de nuit", "thumbnail_name": "picto_risk_night-work_48_px"},
   {"name": "Risques liés au travail en équipes successives alternantes", "thumbnail_name": "picto_risk_rotating-shift-team_48_px-2"},
   {"name": "Risques liés au travail répétitif", "thumbnail_name": "picto_repetitive-work_48_px"},
-  {"name": "Risques autres", "thumbnail_name": "autre_PictoCategorie_v2"}
+  {"name": "Agents chimiques dangereux (ACD)", "thumbnail_name": "picto_risk_acd_48px"},
+  {"name": "Manutentions manuelles de charges", "thumbnail_name": "picto_risk_heavy-load_48px"},
+  {"name": "Températures extrêmes", "thumbnail_name": "picto_risk_extreme-temperature_48px"},
+  {"name": "Bruit", "thumbnail_name": "picto_risk_noise_48px"}
 ]
 
 Donne la réponse uniquement sous forme d’un tableau JSON d’objets avec la structure suivante :

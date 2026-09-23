@@ -1,0 +1,116 @@
+includes:
+    - phpstan.baseline.neon
+
+parameters:
+    phpVersion: 80100 # PHP 8.1 (CI target)
+    level: 8
+    tmpDir: .github/tmp/phpstan
+
+    bootstrapFiles:
+        - dev/phpstan/bootstrap.php
+
+    paths:
+        - .
+
+    excludePaths:
+        analyseAndScan:
+            - vendor/
+            - css/
+            - js/
+            - documents/
+            - langs/
+            - dev/
+            # Le module embarque des scripts de migration ponctuels, ecrits pour une
+            # base precise et joues une fois : les analyser n'apprend rien.
+            - scripts/
+        analyse:
+            # Les fragments de template sont inclus au milieu de la portee de leur
+            # appelant : leurs variables sont indefinies par construction quand on les
+            # analyse isolement. Toujours scannes, pour que les classes qu'ils utilisent
+            # se resolvent.
+            - core/tpl/
+
+    # Fichiers isoles du coeur qui portent des fonctions utilisees par le module.
+    scanFiles:
+        # llxHeader()/llxFooter()/top_httphead() vivent dans main.inc.php
+        - ../../main.inc.php
+        # La classe TCPDF elle-meme : sans elle, chaque appel de methode sur un objet
+        # PDF remonte en class.notFound. Cela representait 293 des 1877 entrees de la
+        # baseline, et le moindre ajout dans un builder PDF faisait sauter les compteurs.
+        - ../../includes/tecnickcom/tcpdf/tcpdf.php
+        - ../../includes/tecnickcom/tcpdf/tcpdf_barcodes_1d.php
+        - ../../includes/tecnickcom/tcpdf/tcpdf_barcodes_2d.php
+
+    # Scanne, sans les analyser, le coeur Dolibarr et le socle Saturne dont ce module
+    # herite (SaturneObject, SaturneSignature, les libs saturne_*).
+    # A garder en phase avec le sparse-checkout de .github/workflows/quality.yml.
+    scanDirectories:
+        - ../saturne/
+        - ../../api/class/
+        - ../../categories/class/
+        - ../../comm/action/class/
+        - ../../comm/propal/class/
+        - ../../commande/class/
+        - ../../compta/facture/class/
+        - ../../contact/class/
+        - ../../contrat/class/
+        - ../../core/class/
+        - ../../core/db/
+        - ../../core/lib/
+        - ../../core/modules/
+        - ../../core/tpl/
+        - ../../core/triggers/
+        - ../../ecm/class/
+        - ../../expedition/class/
+        - ../../fichinter/class/
+        - ../../fourn/class/
+        - ../../includes/odtphp/
+        - ../../includes/parsedown/
+        - ../../includes/restler/framework/
+        - ../../mrp/class/
+        - ../../product/class/
+        - ../../product/inventory/class/
+        - ../../product/stock/class/
+        - ../../projet/class/
+        - ../../reception/class/
+        - ../../societe/class/
+        - ../../supplier_proposal/class/
+        - ../../ticket/class/
+        - ../../user/class/
+
+    # Performance
+    parallel:
+        processTimeout: 300.0
+        maximumNumberOfProcesses: 2
+
+    # Herite de la configuration de Dolibarr : reduit le bruit sur ses patterns dynamiques.
+    checkNullables: false
+    checkUnionTypes: false
+    polluteScopeWithLoopInitialAssignments: false
+    polluteScopeWithAlwaysIterableForeach: false
+    reportMaybes: false
+    reportMaybesInMethodSignatures: false
+    reportStaticMethodSignatures: false
+    reportMagicMethods: false
+    reportMagicProperties: false
+    treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: false
+
+    universalObjectCratesClasses:
+        - stdClass
+        - SimpleXMLElement
+        # Dolibarr affecte les proprietes d'un objet dynamiquement depuis la ligne SQL.
+        - CommonObject
+
+    ignoreErrors:
+        # Dolibarr ne documente jamais le type des valeurs d'un tableau (`@return array`),
+        # donc cette erreur tomberait sur chaque nouveau fichier sans jamais pouvoir etre
+        # resorbee.
+        - identifier: missingType.iterableValue
+        - '#.*phan-var#'
+        - '#^Expression "''…" on a separate line does not do anything#'
+        - '#Empty array passed to foreach#'
+        - '#Unable to resolve the template type T#'
+        - '#in empty\(\) always exists and is always falsy#'
+        - '#in empty\(\) always exists and is not falsy#'
+        - '#in isset\(\) is not nullable#'

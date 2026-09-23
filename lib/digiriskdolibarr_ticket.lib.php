@@ -471,3 +471,162 @@ function digiriskdolibarr_ticket_conversation_bubble($langs, $conf, stdClass $m,
 
     return $out;
 }
+
+/**
+ * Input mode of the Location field on the register form (issue #4732)
+ *
+ * @return string free : free text (historical behaviour), list : dictionary only,
+ *                listfree : dictionary plus an "Other" entry opening a free text field
+ */
+function digiriskdolibarr_ticket_location_input_mode(): string
+{
+    $mode = getDolGlobalString('DIGIRISKDOLIBARR_TICKET_LOCATION_INPUT_MODE', 'free');
+
+    return in_array($mode, ['free', 'list', 'listfree']) ? $mode : 'free';
+}
+
+/**
+ * Locations offered by the register form, read from the c_digiriskdolibarr_ticket_location dictionary
+ *
+ * The declared ticket stores the label as plain text, never the row id : renaming or
+ * deactivating a row must not rewrite the locations already recorded in the register.
+ * The array is therefore keyed by label, which is also the posted value.
+ *
+ * @return array<string,string> Labels of the active rows of the entity, ordered by position
+ */
+function digiriskdolibarr_ticket_location_dictionary(): array
+{
+    global $langs;
+
+    $locations = [];
+    foreach (digiriskdolibarr_ticket_location_records() as $record) {
+        // A row seeded with a translation key shows up translated, a row typed by the customer stays as typed
+        $label             = $langs->transnoentities($record->label);
+        $locations[$label] = $label;
+    }
+
+    return $locations;
+}
+
+/**
+ * Active rows of the location dictionary, ordered by position
+ *
+ * saturne_fetch_dictionary() selects a fixed list of columns that leaves out fk_digiriskelement,
+ * the column the GP/UT filtering of the register form is built on, hence this reader (issue #5176)
+ *
+ * @return stdClass[] Rows carrying rowid, label and fk_digiriskelement
+ */
+function digiriskdolibarr_ticket_location_records(): array
+{
+    global $db;
+
+    $sql  = 'SELECT t.rowid, t.label, t.fk_digiriskelement';
+    $sql .= ' FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_ticket_location as t';
+    $sql .= ' WHERE t.active = 1';
+    $sql .= ' AND t.entity IN (0, ' . getEntity('c_digiriskdolibarr_ticket_location') . ')';
+    $sql .= $db->order('t.position', 'ASC');
+
+    $resql = $db->query($sql);
+    if (!$resql) {
+        return [];
+    }
+
+    $records = [];
+    while ($obj = $db->fetch_object($resql)) {
+        if (!dol_strlen($obj->label)) {
+            continue;
+        }
+
+        $records[] = $obj;
+    }
+    $db->free($resql);
+
+    return $records;
+}
+
+/**
+ * GP/UT each location of the dictionary is offered on (issue #5176)
+ *
+ * A location attached to a site or to a GP stays offered on everything underneath, otherwise it
+ * would have to be declared again on each work unit. A location attached to nothing, or attached
+ * to an element of another entity, is offered everywhere and carries an empty list.
+ *
+ * @return array<string,int[]> Label => digirisk element ids, empty array when offered everywhere
+ */
+function digiriskdolibarr_ticket_location_element_map(): array
+{
+    global $db, $langs;
+
+    $records = digiriskdolibarr_ticket_location_records();
+    if (empty($records)) {
+        return [];
+    }
+
+    require_once __DIR__ . '/../class/digiriskelement.class.php';
+
+    $digiriskElement  = new DigiriskElement($db);
+    $digiriskElements = $digiriskElement->getActiveDigiriskElements();
+    if (!is_array($digiriskElements)) {
+        $digiriskElements = [];
+    }
+
+    $childrenByParent = [];
+    foreach ($digiriskElements as $element) {
+        $childrenByParent[(int) $element->fk_parent][] = (int) $element->id;
+    }
+
+    $map = [];
+    foreach ($records as $record) {
+        $label     = $langs->transnoentities($record->label);
+        $elementID = (int) $record->fk_digiriskelement;
+
+        // An element that the current entity cannot see leaves the location offered everywhere,
+        // rather than filtered out of every GP/UT of that entity
+        $map[$label] = isset($digiriskElements[$elementID]) ? digiriskdolibarr_element_with_descendants($elementID, $childrenByParent) : [];
+    }
+
+    return $map;
+}
+
+/**
+ * An element id followed by the ids of everything below it
+ *
+ * @param  int               $elementID        Digirisk element to walk down from
+ * @param  array<int,int[]>  $childrenByParent Element ids indexed by their parent id
+ * @return int[]                               The element id and its descendants
+ */
+function digiriskdolibarr_element_with_descendants(int $elementID, array $childrenByParent): array
+{
+    $elementIDs = [$elementID];
+    $toVisit    = [$elementID];
+
+    // Walked iteratively and guarded against ids already seen : a corrupted parent chain
+    // must not turn into an infinite loop on the public form
+    while (!empty($toVisit)) {
+        $currentID = array_pop($toVisit);
+        foreach ($childrenByParent[$currentID] ?? [] as $childID) {
+            if (in_array($childID, $elementIDs)) {
+                continue;
+            }
+
+            $elementIDs[] = $childID;
+            $toVisit[]    = $childID;
+        }
+    }
+
+    return $elementIDs;
+}
+
+/**
+ * Tell whether the register form must offer the dictionary for the Location field
+ *
+ * An empty dictionary falls back to the free text field : a list mode must never
+ * leave the declarant with no way to fill a required field.
+ *
+ * @param  array<string,string> $locations Result of digiriskdolibarr_ticket_location_dictionary()
+ * @return bool                            True when the select must be rendered
+ */
+function digiriskdolibarr_ticket_location_use_list(array $locations): bool
+{
+    return !empty($locations) && digiriskdolibarr_ticket_location_input_mode() !== 'free';
+}

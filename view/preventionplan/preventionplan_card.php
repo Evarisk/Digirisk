@@ -1391,7 +1391,7 @@ print '<input type="hidden" name="fk_element" value="0">';
 							<input class="input-hidden-danger" type="hidden" name="risk_category_id"
 								   value="<?php echo $item->category ?>"/>
 							<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
-								 aria-label="<?php echo $risk->getDangerCategoryName($item) ?>">
+								 aria-label="<?php echo $risk->getDangerCategoryTooltip($item) ?>">
 								<img class="danger-category-pic hover"
 									 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($item) . '.png'; ?>"/>
 							</div>
@@ -1405,7 +1405,8 @@ print '<input type="hidden" name="fk_element" value="0">';
 									<li class="item dropdown-item wpeo-tooltip-event"
 										data-is-preset="<?php echo ''; ?>"
 										data-id="<?php echo $dangerCategory['position'] ?>"
-										aria-label="<?php echo $dangerCategory['name'] ?>">
+										data-name="<?php echo dol_escape_htmltag($dangerCategory['name']) ?>"
+										aria-label="<?php echo $risk->formatDangerCategoryTooltip($dangerCategory) ?>">
 										<img
 											src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png' ?>"
 											class="attachment-thumbail size-thumbnail photo photowithmargin" alt="">
@@ -1596,7 +1597,8 @@ print '<input type="hidden" name="fk_element" value="0">';
 						foreach ($dangerCategories as $dangerCategory) : ?>
 							<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>"
 								data-id="<?php echo $dangerCategory['position'] ?>"
-								aria-label="<?php echo $dangerCategory['name'] ?>">
+								data-name="<?php echo dol_escape_htmltag($dangerCategory['name']) ?>"
+								aria-label="<?php echo $risk->formatDangerCategoryTooltip($dangerCategory) ?>">
 								<img
 									src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png' ?>"
 									class="attachment-thumbail size-thumbnail photo photowithmargin" alt="">

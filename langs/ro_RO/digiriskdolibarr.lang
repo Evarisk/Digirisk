@@ -830,14 +830,14 @@ RiskAssessmentDocumentContent = Atașat găsiți arhiva ZIP și documentul ODT a
 
 
 #
-# AuditReportDocument - Raport de audit
+# AuditReportDocument - Raport de evoluție
 #
 
 # Date
-AuditReportDocument     = Raport de audit
-Auditreportdocument     = Raport de audit
-AuditReportDocumentsMin = rapoarte de audit
-auditreportdocument.odt = Raport de audit
+AuditReportDocument     = Raport de evoluție
+Auditreportdocument     = Raport de evoluție
+AuditReportDocumentsMin = rapoarte de evoluție
+auditreportdocument.odt = Raport de evoluție
 
 
 
@@ -2227,6 +2227,10 @@ DigiriskHygiene=IGIENĂ ȘI CURĂȚENIE
 DigiriskMaintenance=MENTENANȚĂ ȘI CONTROALE
 DangerCategory=Familie de risc
 SelectDangerCategory=Alegeți o familie de risc
+DangerCategoryReference=Referință
+DangerCategoryC2P=C2P
+DangerCategoryExposureCriteria=Criterii de expunere
+DangerCategoryRegulatoryThreshold=Prag de reglementare
 DescribeRiskOnProduct=Descrieți riscul pentru acest produs...
 ConfirmDeleteProductRisk=Ștergeți acest risc?
 AddProductRisk=Adăugați un risc de produs

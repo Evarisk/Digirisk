@@ -830,14 +830,14 @@ RiskAssessmentDocumentContent = W załączeniu znajduje się archiwum ZIP oraz d
 
 
 #
-# AuditReportDocument - Raport z audytu
+# AuditReportDocument - Raport ewolucji
 #
 
 # Dane
-AuditReportDocument     = Raport z audytu
-Auditreportdocument     = Raport z audytu
-AuditReportDocumentsMin = raporty z audytu
-auditreportdocument.odt = Raport z audytu
+AuditReportDocument     = Raport ewolucji
+Auditreportdocument     = Raport ewolucji
+AuditReportDocumentsMin = raporty ewolucji
+auditreportdocument.odt = Raport ewolucji
 
 
 
@@ -2227,6 +2227,10 @@ DigiriskHygiene=HIGIENA I CZYSZCZENIE
 DigiriskMaintenance=KONSERWACJA I KONTROLE
 DangerCategory=Rodzina ryzyka
 SelectDangerCategory=Wybierz rodzinę ryzyka
+DangerCategoryReference=Odniesienie
+DangerCategoryC2P=C2P
+DangerCategoryExposureCriteria=Kryteria narażenia
+DangerCategoryRegulatoryThreshold=Próg regulacyjny
 DescribeRiskOnProduct=Opisz ryzyko dotyczące tego produktu...
 ConfirmDeleteProductRisk=Usunąć to ryzyko?
 AddProductRisk=Dodaj ryzyko produktu

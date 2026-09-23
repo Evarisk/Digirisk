@@ -158,6 +158,9 @@ window.digiriskdolibarr.organization.updateChevrons = function() {
 window.digiriskdolibarr.organization.saveOrganization = function() {
 	let config      = window.digiriskdolibarr.organization.getConfig();
 	let token       = window.saturne.toolbox.getToken();
+	// Sans separateur, une page ouverte sans query string donne un chemin et non une requete :
+	// le deplacement n'etait jamais enregistre
+	let separator   = window.saturne.toolbox.getQuerySeparator(document.URL);
 	let idArray     = [];
 	let parentArray = [];
 
@@ -173,7 +176,7 @@ window.digiriskdolibarr.organization.saveOrganization = function() {
 	}
 
 	$.ajax({
-		url: document.URL + '&action=saveOrganization&ids=' + idArray.toString() + '&parent_ids=' + parentArray + '&token=' + token,
+		url: document.URL + separator + 'action=saveOrganization&ids=' + idArray.toString() + '&parent_ids=' + parentArray + '&token=' + token,
 		success: function() {
 			if ($indicator.length) {
 				$indicator.addClass('saved');

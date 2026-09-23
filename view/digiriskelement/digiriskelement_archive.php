@@ -237,9 +237,11 @@ $form    = new Form($db);
 $title   = $langs->trans('Archives');
 $helpUrl = 'FR:Module_Digirisk#.C3.89valuation_des_Risques';
 
-// classforhorizontalscrolloftabs constrains #id-right width so the wide risk list table
-// scrolls inside its own .div-table-responsive instead of widening the whole page
-digirisk_header($title, $helpUrl, [], [], '', 'classforhorizontalscrolloftabs');
+// digirisk-horizontal-scroll bounds #id-right to the viewport so the wide risk list table
+// scrolls inside its own .div-table-responsive instead of widening the whole page. Dolibarr
+// answers this with classforhorizontalscrolloftabs, but that one also reserves the width of
+// the standard left menu, which these pages do not show
+digirisk_header($title, $helpUrl, [], [], '', 'digirisk-horizontal-scroll');
 
 $onPhone = $conf->browser->layout == 'phone' ? 1 : 0;
 

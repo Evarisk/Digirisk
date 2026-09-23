@@ -96,6 +96,8 @@ class doc_groupmentdocumentinherited_odt extends ModeleODTDigiriskDolibarrDocume
         $digiriskResources = new DigiriskResources($this->db);
         $userTmp           = new User($this->db);
 
+        $moreParam = self::getMoreParam($objectDocument, $moreParam);
+
         $object = $moreParam['object'];
 
         if (!empty($object->photo)) {
@@ -122,9 +124,10 @@ class doc_groupmentdocumentinherited_odt extends ModeleODTDigiriskDolibarrDocume
             $QRCodeImagePath = ''; // @todo gerer le cas avec le nouveau fonctionnel des liens externes
         }
 
-        $allLinks             = $digiriskResources->fetchDigiriskResources();
-        $responsibleResources = $allLinks['Responsible'];
-        $userTmp->fetch($responsibleResources->id[0]);
+        $responsibleId = $digiriskResources->getSecurityResponsibleId();
+        if ($responsibleId > 0) {
+            $userTmp->fetch($responsibleId);
+        }
 
         // @todo The keyword "signature" is needed because we want the image to be cropped to fit in the table
         $tmpArray['helpUrl']               = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php';

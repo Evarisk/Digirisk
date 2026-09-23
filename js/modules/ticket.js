@@ -85,6 +85,14 @@ window.digiriskdolibarr.ticket.event = function() {
   $(document).on( 'keyup', '#email', window.digiriskdolibarr.ticket.checkValidEmail);
   $(document).on( 'keyup', '#options_digiriskdolibarr_ticket_phone', window.digiriskdolibarr.ticket.checkValidPhone);
 
+  // Register form (issue #4732) — location picked in a dictionary, and optional geolocation
+  // Scoped to the select itself: Dolibarr gives select2 containerCssClass ':all:', so every class
+  // of the source select is copied onto the widget <span> and a bare class selector matches twice
+  $(document).on( 'change', 'select.ticket-location-select', window.digiriskdolibarr.ticket.toggleLocationOther);
+  $(document).on( 'click',  '.ticket-geoloc-button',   window.digiriskdolibarr.ticket.fillGeolocation);
+  // Register form (issue #5176) — the GP/UT picked narrows the list of locations
+  $(document).on( 'change', '#options_digiriskdolibarr_ticket_service', window.digiriskdolibarr.ticket.filterLocationsByService);
+
   // Ticket card (issue #4443) — inline (on-the-fly) editing
   $(document).on( 'click',   '.digirisk-ticket-card .dtc-subject-value', window.digiriskdolibarr.ticket.editSubjectInline);
   $(document).on( 'keydown', '.digirisk-ticket-card .dtc-subject-input', window.digiriskdolibarr.ticket.subjectInputKeydown);
@@ -373,6 +381,127 @@ window.digiriskdolibarr.ticket.checkValidPhone = function() {
 	} else {
 		$(this).css("border", "3px solid green");
 	}
+};
+
+/**
+ * Register form (#4732) — reveal the free text field when "Other" is picked in the location dictionary.
+ *
+ * Leaving "Other" clears the typed label, so a location the declarant went back on is never submitted.
+ *
+ * @since   23.3.0
+ * @version 23.3.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.toggleLocationOther = function() {
+  var $other = $('.ticket-location-other');
+
+  if ($(this).val() === 'DIGIRISK_LOCATION_OTHER') {
+    $other.show().focus();
+  } else {
+    $other.hide().val('');
+  }
+};
+
+/**
+ * Register form (#5176) — rebuild the list of locations from the GP/UT picked by the declarant.
+ *
+ * The options are rebuilt rather than hidden: select2 reads the <option> elements of the underlying
+ * select when it opens its dropdown, and hiding them there has no effect.
+ * A GP/UT that carries no location of its own keeps the whole list, so the filter can never leave
+ * the declarant with nothing to pick.
+ *
+ * @since   23.4.0
+ * @version 23.4.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.filterLocationsByService = function() {
+  var $select = $('select.ticket-location-select');
+  if (!$select.length) {
+    return;
+  }
+
+  var map       = $('.ticket-location-filter').data('location-elements') || {};
+  var serviceId = parseInt($(this).val(), 10);
+
+  // Whole list kept aside on first use: it is the only place the filtered-out options survive
+  var options = $select.data('all-options');
+  if (!options) {
+    options = [];
+    $select.find('option').each(function() {
+      options.push({value: $(this).val(), label: $(this).text()});
+    });
+    $select.data('all-options', options);
+  }
+
+  var kept = options;
+  if (serviceId > 0) {
+    kept = options.filter(function(option) {
+      var elements = map[option.value];
+      return !elements || !elements.length || elements.indexOf(serviceId) !== -1;
+    });
+
+    // '-1' is the empty entry of the select and is truthy: counting it as a location would
+    // defeat the fallback and leave the declarant with an empty list
+    var hasLocation = kept.some(function(option) {
+      return option.value && option.value !== '-1' && option.value !== 'DIGIRISK_LOCATION_OTHER';
+    });
+    if (!hasLocation) {
+      kept = options;
+    }
+  }
+
+  var current = $select.val();
+  $select.empty();
+  kept.forEach(function(option) {
+    $select.append($('<option></option>').val(option.value).text(option.label));
+  });
+
+  var stillThere = kept.some(function(option) { return option.value === current; });
+  $select.val(stillThere ? current : (kept.length ? kept[0].value : ''));
+
+  // Namespaced on purpose: it refreshes what select2 displays without replaying the handlers
+  // bound to a plain change, which would clear the "Other" field the declarant just typed in
+  $select.trigger('change.select2');
+};
+
+/**
+ * Register form (#4732) — fill the hidden GPS field with the position reported by the browser.
+ *
+ * The button sits inside the <label> of the location field: without preventDefault() the click
+ * would also activate that field, opening the select on a phone.
+ * Geolocation is only served over HTTPS and always asks the declarant for permission, so a
+ * refusal or an unsupported browser must leave the form usable — hence the silent empty value.
+ *
+ * @since   23.3.0
+ * @version 23.3.0
+ *
+ * @param  {Object} event Click event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.fillGeolocation = function(event) {
+  event.preventDefault();
+
+  var $button   = $(this);
+  var $feedback = $button.siblings('.ticket-geoloc-feedback');
+  var $field    = $('#options_digiriskdolibarr_location_gps');
+
+  if (!navigator.geolocation) {
+    $feedback.text($button.data('geoloc-error'));
+    return;
+  }
+
+  $feedback.text($button.data('geoloc-wait'));
+
+  navigator.geolocation.getCurrentPosition(function(position) {
+    var coordinates = position.coords.latitude.toFixed(6) + ',' + position.coords.longitude.toFixed(6);
+    $field.val(coordinates);
+    $feedback.text(coordinates);
+  }, function() {
+    $field.val('');
+    $feedback.text($button.data('geoloc-error'));
+  }, {enableHighAccuracy: true, timeout: 10000, maximumAge: 0});
 };
 
 /**

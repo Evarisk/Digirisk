@@ -397,6 +397,23 @@ class DigiriskResources extends SaturneObject
         return $array;
     }
 
+    /**
+     * Return the identifier of the security responsible of the establishment.
+     *
+     * fetchDigiriskResources() only keys the resources that exist: an establishment without a
+     * security responsible carries no 'Responsible' entry at all, and the callers read an
+     * identifier on that null.
+     *
+     * @return int User identifier, 0 when no responsible is set
+     * @throws Exception
+     */
+    public function getSecurityResponsibleId(): int
+    {
+        $allLinks = $this->fetchDigiriskResources();
+
+        return (int) ($allLinks['Responsible']->id[0] ?? 0);
+    }
+
 	/**
 	 * Get siret number.
 	 *
