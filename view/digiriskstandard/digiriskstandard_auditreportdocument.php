@@ -58,7 +58,9 @@ global $conf, $db, $hookmanager, $langs, $user;
 saturne_load_langs();
 
 // Get parameters
-$id        = GETPOSTINT('id');
+// Toute la vue est sous if ($object->id > 0) : sans identifiant, la page ne rendait que son
+// en-tete. On retombe sur le standard actif, comme le font deja le document unique et le registre
+$id        = GETPOSTINT('id') ?: getDolGlobalInt('DIGIRISKDOLIBARR_ACTIVE_STANDARD');
 $action    = GETPOST('action', 'aZ09');
 $subaction = GETPOST('subaction', 'aZ09');
 
