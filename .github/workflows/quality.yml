@@ -6,6 +6,9 @@ on:
         branches:
             - main
             - develop
+            # Les branches de maintenance, 23.0 aujourd'hui, 24.0 et les suivantes demain :
+            # un motif evite d'avoir a revenir ici a chaque nouvelle ligne
+            - '[0-9]+.[0-9]+'
         paths:
             - '**/*.php'
             - 'langs/**/*.lang'
@@ -23,6 +26,7 @@ on:
         branches:
             - main
             - develop
+            - '[0-9]+.[0-9]+'
     workflow_dispatch:
 
 concurrency:
