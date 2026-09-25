@@ -2424,6 +2424,17 @@ ListingRisksCotationColumn         = Rat.
 ListingRisksRiskColumn             = Risk
 ListingRisksAssessmentColumn       = Assessment information
 NoRiskAssessed                     = No risk assessed on this perimeter
+
+# Risk listing: generation options - issue #5235
+ListingRisksOptions                = Listing options
+ListingRisksShowRegisters          = Include the health and safety registers
+ListingRisksRegistersDateRange     = Registers period
+ListingRisksRegistersTitle         = Health and safety registers
+ListingRisksRegisterRefColumn      = Register no.
+ListingRisksNoRegister             = No register on this perimeter
+ListingRisksPeriodFrom             = From %s
+ListingRisksPeriodUntil            = Until %s
+ListingRisksPeriodRange            = From %s to %s
 NewProductRisk=New product risk
 ActionPlanTabCurrentYear             = PAPRIPACT %s
 ActionPlanTabHistory                 = Previous years PAPRIPACT

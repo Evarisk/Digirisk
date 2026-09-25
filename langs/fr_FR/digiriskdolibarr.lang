@@ -2439,6 +2439,17 @@ ListingRisksCotationColumn         = Cot.
 ListingRisksRiskColumn             = Risque
 ListingRisksAssessmentColumn       = Informations sur l'évaluation
 NoRiskAssessed                     = Aucun risque évalué sur ce périmètre
+
+# Listing des risques : options de génération - issue #5235
+ListingRisksOptions                = Options du listing
+ListingRisksShowRegisters          = Inclure les registres santé sécurité
+ListingRisksRegistersDateRange     = Période des registres
+ListingRisksRegistersTitle         = Registres santé sécurité
+ListingRisksRegisterRefColumn      = N° du registre
+ListingRisksNoRegister             = Aucun registre sur ce périmètre
+ListingRisksPeriodFrom             = À partir du %s
+ListingRisksPeriodUntil            = Jusqu'au %s
+ListingRisksPeriodRange            = Du %s au %s
 NewProductRisk                     = Nouveau risque produit
 
 # Audit report - issue #4459
