@@ -103,6 +103,18 @@ if (empty($resHook)) {
                 exit;
             }
         }
+
+        $moreParams['showAccidents'] = GETPOST('showaccidents') ? 1 : 0;
+
+        if (GETPOST('accidentdaterange')) {
+            $moreParams['accidentDateStart'] = dol_mktime(0, 0, 0, GETPOSTINT('accidentdatestartmonth'), GETPOSTINT('accidentdatestartday'), GETPOSTINT('accidentdatestartyear'));
+            $moreParams['accidentDateEnd']   = dol_mktime(23, 59, 59, GETPOSTINT('accidentdateendmonth'), GETPOSTINT('accidentdateendday'), GETPOSTINT('accidentdateendyear'));
+            if ($moreParams['accidentDateStart'] > $moreParams['accidentDateEnd']) {
+                setEventMessages($langs->trans('StartDateCannotBeAfterEndDate'), null, 'errors');
+                header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . ($type == 'standard' ? '&type=standard' : ''));
+                exit;
+            }
+        }
     }
 
     // Actions builddoc, forcebuilddoc, remove_file
@@ -183,6 +195,15 @@ print '<td>' . $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 're
 print $langs->trans('At') . $form->selectDate(dol_now(), 'registerdateend');
 print $langs->trans('UseDateRange');
 print '<input type="checkbox" id="registerdaterange" name="registerdaterange"></td></tr>';
+
+// Accidents, et la plage de dates qui les borne
+print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksShowAccidents') . '</td>';
+print '<td><input type="checkbox" id="showaccidents" name="showaccidents" checked></td></tr>';
+print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksAccidentsDateRange') . '</td>';
+print '<td>' . $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'accidentdatestart');
+print $langs->trans('At') . $form->selectDate(dol_now(), 'accidentdateend');
+print $langs->trans('UseDateRange');
+print '<input type="checkbox" id="accidentdaterange" name="accidentdaterange"></td></tr>';
 
 print '</table>';
 
