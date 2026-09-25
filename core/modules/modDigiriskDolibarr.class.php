@@ -387,7 +387,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '23.4.0';
+		$this->version         = '23.5.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr_color@digiriskdolibarr';
 
@@ -498,7 +498,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->langfiles               = ["digiriskdolibarr@digiriskdolibarr"];
 		$this->phpmin                  = [7, 4]; // Minimum version of PHP required by module
 		$this->need_dolibarr_version   = [23, 0]; // Minimum version of Dolibarr required by module
-		$this->max_dolibarr_version    = [23, 0]; // Maximum version of Dolibarr supported by module
+		$this->max_dolibarr_version    = [24, 0]; // Maximum version of Dolibarr supported by module
 		$this->warnings_activation     = []; // Warning to show when we activate module. array('always'='text') or array('FR'='textfr','ES'='textes'...)
 		$this->warnings_activation_ext = []; // Warning to show when we activate an external module. array('always'='text') or array('FR'='textfr','ES'='textes'...)
 		//$this->automatic_activation = array('FR'=>'DigiriskDolibarrWasAutomaticallyActivatedBecauseOfYourCountryChoice');
@@ -784,6 +784,7 @@ class modDigiriskdolibarr extends DolibarrModules
             $i++ => ['DIGIRISKDOLIBARR_TICKET_MULTICOMPANY_PUBLIC_INTERFACE_URL_ORIGIN', 'chaine', dol_buildpath('custom/digiriskdolibarr/public/ticket/create_ticket.php', 2), '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', 'chaine', '', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_TICKET_SUBMITTED_MAIL_MODEL', 'chaine', '', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL', 'chaine', $langs->trans('Registre'), '', 0, 'current'],
@@ -832,6 +833,7 @@ class modDigiriskdolibarr extends DolibarrModules
             $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSDOCUMENT_BACKWARD_ODT_PATH_SET', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_BACKWARD_TRASH_ELEMENTS', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_TASK_REF_BACKWARD_SET', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_WORKUNIT_UT_REF_SET', 'integer', 1, '', 0, 'current'],
 
             // CONST ACCIDENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'],
@@ -2849,7 +2851,7 @@ class modDigiriskdolibarr extends DolibarrModules
                 'RiskSign'              => ['greip', 'RS{0}'],
                 'Evaluator'             => ['bebhionn', 'EV{0}'],
                 'Groupment'             => ['sirius', 'GP{0}'],
-                'WorkUnit'              => ['canopus', (version_compare($conf->global->DIGIRISKDOLIBARR_VERSION, '9.14.1', '>=')  ? 'UT{0}' : 'WU{0}')],
+                'WorkUnit'              => ['canopus', 'UT{0}'],
                 'Accident'              => ['curtiss', 'ACC{0}'],
                 'AccidentLesion'        => ['wright', 'ACCL{0}'],
                 'AccidentWorkStop'      => ['richthofen', 'ACCW{0}'],
@@ -2865,7 +2867,7 @@ class modDigiriskdolibarr extends DolibarrModules
                 'ListingRisksAction'            => ['gunnlod', 'RLA{0}'],
                 'ListingRisksPhoto'             => ['fornjot', 'RLP{0}'],
                 'GroupmentDocument'             => ['mundilfari', 'GPD{0}'],
-                'WorkUnitDocument'              => ['hati', (version_compare($conf->global->DIGIRISKDOLIBARR_VERSION, '9.14.1', '>=') ? 'UTD{0}' : 'WUD{0}')],
+                'WorkUnitDocument'              => ['hati', 'UTD{0}'],
                 'RiskAssessmentDocument'        => ['eggther', 'DU{0}'],
                 'PreventionPlanDocument'        => ['bestla', 'PPD{0}'],
                 'FirePermitDocument'            => ['greip', 'FPD{0}'],
@@ -2907,6 +2909,20 @@ class modDigiriskdolibarr extends DolibarrModules
 
             if (digiriskdolibarr_backfill_task_refs() >= 0) {
                 dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TASK_REF_BACKWARD_SET', 1, 'integer', 0, '', $conf->entity);
+            }
+        }
+
+        // BACKWARD WORKUNIT UT REF : les installations anterieures a 9.14.1 numerotaient leurs
+        // unites de travail en WU et continuaient de le faire, le masque n'ayant ete bascule
+        // que pour les nouvelles installations
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_WORKUNIT_UT_REF_SET')) {
+            require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_WORKUNIT_CANOPUS_ADDON', 'UT{0}', 'chaine', 0, '', $conf->entity);
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_HATI_ADDON', 'UTD{0}', 'chaine', 0, '', $conf->entity);
+
+            if (digiriskdolibarr_migrate_workunit_refs_to_ut() >= 0) {
+                dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_WORKUNIT_UT_REF_SET', 1, 'integer', 0, '', $conf->entity);
             }
         }
 
