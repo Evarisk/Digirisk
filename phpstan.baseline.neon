@@ -9491,3 +9491,729 @@ parameters:
 			identifier: variable.undefined
 			count: 1
 			path: view/ticket/ticketstatscsv.php
+
+		-
+			message: '#^Invalid array key type array\<string\>\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 2
+			path: admin/securityconf.php
+
+		-
+			message: '#^Comparison operation "\=\=" between \*NEVER\* and \-2 results in an error\.$#'
+			identifier: equal.invalid
+			count: 1
+			path: class/actions_digiriskdolibarr.class.php
+
+		-
+			message: '#^Comparison operation "\>" between \*NEVER\* and 0 results in an error\.$#'
+			identifier: greater.invalid
+			count: 1
+			path: class/actions_digiriskdolibarr.class.php
+
+		-
+			message: '#^Parameter \#1 \$id of method Project\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_digiriskdolibarr.class.php
+
+		-
+			message: '#^Parameter \#1 \$id of method Task\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_digiriskdolibarr.class.php
+
+		-
+			message: '#^Parameter \#1 \$id of method UserGroup\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/actions_digiriskdolibarr.class.php
+
+		-
+			message: '#^Cannot access property \$nb on object\|false\.$#'
+			identifier: property.nonObject
+			count: 4
+			path: class/digiriskdolibarrdashboard.class.php
+
+		-
+			message: '#^Cannot access property \$year on object\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: class/digiriskdolibarrdashboard.class.php
+
+		-
+			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/digiriskdolibarrdocuments/firepermitdocument.class.php
+
+		-
+			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: class/digiriskdolibarrdocuments/preventionplandocument.class.php
+
+		-
+			message: '#^Cannot access property \$fk_object on object\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: class/digiriskelement.class.php
+
+		-
+			message: '#^Cannot access property \$code_departement on object\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: class/meteovigilance.class.php
+
+		-
+			message: '#^Cannot access property \$nom on object\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: class/meteovigilance.class.php
+
+		-
+			message: '#^Cannot access property \$fk_object on object\|false\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: class/riskanalysis/risk.class.php
+
+		-
+			message: '#^Cannot access property \$fk_risk on object\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: class/riskanalysis/risk.class.php
+
+		-
+			message: '#^Cannot access property \$rowid on object\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: class/riskanalysis/risk.class.php
+
+		-
+			message: '#^Parameter \#4 \$month of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 4
+			path: class/ticketdashboard.class.php
+
+		-
+			message: '#^Parameter \#5 \$day of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 4
+			path: class/ticketdashboard.class.php
+
+		-
+			message: '#^Parameter \#6 \$year of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 4
+			path: class/ticketdashboard.class.php
+
+		-
+			message: '#^Parameter \#1 \$socid of function digirisk_selectcontacts expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: core/ajax/contacts.php
+
+		-
+			message: '#^Parameter \#2 \$param1 of method Translate\:\:transnoentities\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/modules_digiriskdolibarrdocument.php
+
+		-
+			message: '#^Parameter \#3 \$param2 of method Translate\:\:transnoentities\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/modules_digiriskdolibarrdocument.php
+
+		-
+			message: '#^Property User\:\:\$firstname \(string\) on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.property
+			count: 1
+			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/modules_digiriskdolibarrdocument.php
+
+		-
+			message: '#^Property User\:\:\$lastname \(string\) on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.property
+			count: 1
+			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/modules_digiriskdolibarrdocument.php
+
+		-
+			message: '#^Parameter \#2 \$param1 of method Translate\:\:transnoentities\(\) expects string, int\<1, max\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
+
+		-
+			message: '#^Parameter \#1 \$id of method User\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: core/triggers/interface_99_modDigiriskdolibarr_DigiriskdolibarrTriggers.class.php
+
+		-
+			message: '#^Parameter \#2 \$option of method User\:\:getFullName\(\) expects int\<0, 1\>, '''' given\.$#'
+			identifier: argument.type
+			count: 2
+			path: lib/digiriskdolibarr_function.lib.php
+
+		-
+			message: '#^Property Link\:\:\$objectid \(int\) does not accept string\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: lib/digiriskdolibarr_function.lib.php
+
+		-
+			message: '#^Cannot access property \$rowid on object\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: lib/digiriskdolibarr_mobile.lib.php
+
+		-
+			message: '#^Cannot access property \$rowid on object\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: lib/digiriskdolibarr_preventionplan.lib.php
+
+		-
+			message: '#^Parameter \#1 \$id of method Categorie\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: public/ticket/create_ticket.php
+
+		-
+			message: '#^Binary operation "\-" between string and 1 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: view/accident/accident.php
+
+		-
+			message: '#^Parameter \#1 \$id of method User\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/accident/accident.php
+
+		-
+			message: '#^Parameter \#1 \$categories of method SaturneObject\:\:setCategories\(\) expects array\<int\>\|int, array\<string\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/accident/accident_card.php
+
+		-
+			message: '#^Parameter \#1 \$hour of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 7
+			path: view/accident/accident_card.php
+
+		-
+			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 5
+			path: view/accident/accident_card.php
+
+		-
+			message: '#^Parameter \#1 \$id of method User\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 3
+			path: view/accident/accident_card.php
+
+		-
+			message: '#^Parameter \#2 \$minute of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 7
+			path: view/accident/accident_card.php
+
+		-
+			message: '#^Parameter \#4 \$month of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 7
+			path: view/accident/accident_card.php
+
+		-
+			message: '#^Parameter \#5 \$day of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 7
+			path: view/accident/accident_card.php
+
+		-
+			message: '#^Parameter \#6 \$year of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 7
+			path: view/accident/accident_card.php
+
+		-
+			message: '#^Binary operation "\-" between string and 1 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: view/accident/accident_list.php
+
+		-
+			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/accident/accident_list.php
+
+		-
+			message: '#^Parameter \#1 \$id of method User\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/accident/accident_list.php
+
+		-
+			message: '#^Variable \$objectlinked might not be defined\.$#'
+			identifier: variable.undefined
+			count: 7
+			path: view/accident/accident_list.php
+
+		-
+			message: '#^Parameter \#1 \$hour of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 6
+			path: view/accident/accident_metadata.php
+
+		-
+			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/accident/accident_metadata.php
+
+		-
+			message: '#^Parameter \#2 \$minute of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 6
+			path: view/accident/accident_metadata.php
+
+		-
+			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/accident/accident_metadata_lesion.php
+
+		-
+			message: '#^Parameter \#1 \$fk_socpeople of method CommonObject\:\:add_contact\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/accidentinvestigation/accidentinvestigation_actions.php
+
+		-
+			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/accidentinvestigation/accidentinvestigation_actions.php
+
+		-
+			message: '#^Parameter \#1 \$id of method Task\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/accidentinvestigation/accidentinvestigation_actions.php
+
+		-
+			message: '#^Parameter \#3 \$type of function getAccidentInvestigationActionContainerTask expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/accidentinvestigation/accidentinvestigation_actions.php
+
+		-
+			message: '#^Parameter \#4 \$month of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/accidentinvestigation/accidentinvestigation_actions.php
+
+		-
+			message: '#^Parameter \#5 \$day of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/accidentinvestigation/accidentinvestigation_actions.php
+
+		-
+			message: '#^Parameter \#6 \$year of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/accidentinvestigation/accidentinvestigation_actions.php
+
+		-
+			message: '#^Parameter \#1 \$fk_object of method SaturneSignature\:\:checkSignatoriesSignatures\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/accidentinvestigation/accidentinvestigation_card.php
+
+		-
+			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/accidentinvestigation/accidentinvestigation_card.php
+
+		-
+			message: '#^Binary operation "\-" between string and 1 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: view/digiriskelement/digiriskelement_archive.php
+
+		-
+			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/digiriskelement/digiriskelement_card.php
+
+		-
+			message: '#^Parameter \#10 \$current_element of method DigiriskElement\:\:selectDigiriskElementList\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/digiriskelement/digiriskelement_card.php
+
+		-
+			message: '#^Binary operation "\-" between string and 1 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: view/digiriskelement/digiriskelement_digiai.php
+
+		-
+			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/digiriskelement/digiriskelement_environment.php
+
+		-
+			message: '#^Binary operation "\-" between string and 1 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: view/digiriskelement/digiriskelement_evaluator.php
+
+		-
+			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/digiriskelement/digiriskelement_evaluator.php
+
+		-
+			message: '#^Parameter \#1 \$id of method User\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/digiriskelement/digiriskelement_evaluator.php
+
+		-
+			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/digiriskelement/digiriskelement_listingrisksdocument.php
+
+		-
+			message: '#^Parameter \#1 \$id of method DigiriskElementProduct\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/digiriskelement/digiriskelement_product.php
+
+		-
+			message: '#^Parameter \#1 \$id of method Product\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/digiriskelement/digiriskelement_product.php
+
+		-
+			message: '#^Property DigiriskElementProduct\:\:\$fk_product \(int\) does not accept string\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: view/digiriskelement/digiriskelement_product.php
+
+		-
+			message: '#^Binary operation "\-" between string and 1 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: view/digiriskelement/digiriskelement_risk.php
+
+		-
+			message: '#^Binary operation "\-" between string and 1 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: view/digiriskelement/digiriskelement_risksign.php
+
+		-
+			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/digiriskelement/digiriskelement_risksign.php
+
+		-
+			message: '#^Binary operation "\-" between string and 1 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: view/digiriskelement/risk_list.php
+
+		-
+			message: '#^Parameter \#4 \$month of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/digiriskstandard/digiriskstandard_auditreportdocument.php
+
+		-
+			message: '#^Parameter \#5 \$day of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/digiriskstandard/digiriskstandard_auditreportdocument.php
+
+		-
+			message: '#^Parameter \#6 \$year of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/digiriskstandard/digiriskstandard_auditreportdocument.php
+
+		-
+			message: '#^Binary operation "\-" between string and 1 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: view/digiriskusers.php
+
+		-
+			message: '#^Parameter \#1 \$selected of method Form\:\:select_dolgroups\(\) expects array\<int\|object\>\|int\|object, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/digiriskusers.php
+
+		-
+			message: '#^Parameter \#2 \$replace of function str_replace expects array\<string\>\|string, int\<1, max\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/digiriskusers.php
+
+		-
+			message: '#^Parameter \#1 \$categories of method SaturneObject\:\:setCategories\(\) expects array\<int\>\|int, array\<string\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/firepermit/firepermit_card.php
+
+		-
+			message: '#^Parameter \#1 \$hour of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 4
+			path: view/firepermit/firepermit_card.php
+
+		-
+			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/firepermit/firepermit_card.php
+
+		-
+			message: '#^Parameter \#1 \$id of method User\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/firepermit/firepermit_card.php
+
+		-
+			message: '#^Parameter \#2 \$minute of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 4
+			path: view/firepermit/firepermit_card.php
+
+		-
+			message: '#^Parameter \#4 \$month of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 4
+			path: view/firepermit/firepermit_card.php
+
+		-
+			message: '#^Parameter \#5 \$day of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 4
+			path: view/firepermit/firepermit_card.php
+
+		-
+			message: '#^Parameter \#5 \$filter of method User\:\:fetchAll\(\) expects string, array\<string, string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/firepermit/firepermit_card.php
+
+		-
+			message: '#^Parameter \#6 \$year of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 4
+			path: view/firepermit/firepermit_card.php
+
+		-
+			message: '#^Property FirePermit\:\:\$fk_project \(int\|null\) does not accept string\.$#'
+			identifier: assign.propertyType
+			count: 2
+			path: view/firepermit/firepermit_card.php
+
+		-
+			message: '#^Binary operation "\-" between string and 1 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: view/firepermit/firepermit_list.php
+
+		-
+			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/firepermit/firepermit_list.php
+
+		-
+			message: '#^Parameter \#1 \$categories of method SaturneObject\:\:setCategories\(\) expects array\<int\>\|int, array\<string\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/firepermit/firepermit_mobile_create.php
+
+		-
+			message: '#^Parameter \#1 \$categories of method SaturneObject\:\:setCategories\(\) expects array\<int\>\|int, array\<string\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/preventionplan/preventionplan_card.php
+
+		-
+			message: '#^Parameter \#1 \$hour of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 6
+			path: view/preventionplan/preventionplan_card.php
+
+		-
+			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/preventionplan/preventionplan_card.php
+
+		-
+			message: '#^Parameter \#1 \$id of method User\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/preventionplan/preventionplan_card.php
+
+		-
+			message: '#^Parameter \#2 \$minute of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 6
+			path: view/preventionplan/preventionplan_card.php
+
+		-
+			message: '#^Parameter \#4 \$month of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 6
+			path: view/preventionplan/preventionplan_card.php
+
+		-
+			message: '#^Parameter \#5 \$day of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 6
+			path: view/preventionplan/preventionplan_card.php
+
+		-
+			message: '#^Parameter \#5 \$filter of method User\:\:fetchAll\(\) expects string, array\<string, string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/preventionplan/preventionplan_card.php
+
+		-
+			message: '#^Parameter \#6 \$year of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 6
+			path: view/preventionplan/preventionplan_card.php
+
+		-
+			message: '#^Property PreventionPlan\:\:\$fk_project \(int\|null\) does not accept string\.$#'
+			identifier: assign.propertyType
+			count: 2
+			path: view/preventionplan/preventionplan_card.php
+
+		-
+			message: '#^Binary operation "\-" between string and 1 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: view/preventionplan/preventionplan_list.php
+
+		-
+			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/preventionplan/preventionplan_list.php
+
+		-
+			message: '#^Parameter \#4 \$month of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/preventionplan/preventionplan_list.php
+
+		-
+			message: '#^Parameter \#5 \$day of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/preventionplan/preventionplan_list.php
+
+		-
+			message: '#^Parameter \#6 \$year of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/preventionplan/preventionplan_list.php
+
+		-
+			message: '#^Parameter \#1 \$categories of method SaturneObject\:\:setCategories\(\) expects array\<int\>\|int, array\<string\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/preventionplan/preventionplan_mobile_create.php
+
+		-
+			message: '#^Parameter \#1 \$fk_socpeople of method CommonObject\:\:add_contact\(\) expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: view/ticket/ticket_card.php
+
+		-
+			message: '#^Parameter \#4 \$month of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/ticket/ticket_card.php
+
+		-
+			message: '#^Parameter \#5 \$day of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/ticket/ticket_card.php
+
+		-
+			message: '#^Parameter \#6 \$year of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/ticket/ticket_card.php
+
+		-
+			message: '#^Property Task\:\:\$budget_amount \(float\) does not accept string\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: view/ticket/ticket_card.php
+
+		-
+			message: '#^Property Task\:\:\$fk_task_parent \(int\) does not accept string\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: view/ticket/ticket_card.php
+
+		-
+			message: '#^Parameter \#4 \$month of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/ticket/ticketstats.php
+
+		-
+			message: '#^Parameter \#5 \$day of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/ticket/ticketstats.php
+
+		-
+			message: '#^Parameter \#6 \$year of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/ticket/ticketstats.php
+
+		-
+			message: '#^Parameter \#4 \$month of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/ticket/ticketstatscsv.php
+
+		-
+			message: '#^Parameter \#5 \$day of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/ticket/ticketstatscsv.php
+
+		-
+			message: '#^Parameter \#6 \$year of function dol_mktime expects int, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: view/ticket/ticketstatscsv.php
