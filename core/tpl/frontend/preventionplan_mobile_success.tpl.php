@@ -25,7 +25,7 @@
 global $db, $langs, $signatory, $user, $digiriskresources;
 
 if (empty($digiriskresources)) {
-    require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskresources.class.php';
+    dol_include_once('/digiriskdolibarr/class/digiriskresources.class.php');
     $digiriskresources = new DigiriskResources($db);
 }
 

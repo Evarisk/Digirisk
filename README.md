@@ -3,7 +3,7 @@
 ## Informations
 
 - Numéro du module : 436302
-- Dernière mise à jour : 23/09/2026
+- Dernière mise à jour : 25/09/2026
 - Éditeur : [Evarisk](https://evarisk.com)
 - Thème : Eldy Menu
 - Licence : GPLv3
@@ -11,10 +11,10 @@
 
 ### Version
 
-- Version : 23.4.0
+- Version : 23.5.0
 - PHP : 7.4.33
-- Compatibilité : Dolibarr 23.0.0 - 23.0.4
-- Saturne Framework : 23.2.0
+- Compatibilité : Dolibarr 23.0.0 - 24.0.0
+- Saturne Framework : 23.2.1
 
 ## Liens
 
@@ -22,7 +22,7 @@
 - Demo : [Demo Digirisk](https://demodoli.digirisk.com) - ID: demo - Password: demo
 - Documentation : [Wiki Digirisk](https://wiki.dolibarr.org/index.php/Module_DigiriskDolibarr)
 - Projet GitHub : [Projet Digirisk](https://github.com/Evarisk/Digirisk/projects?query=is%3Aopen)
-- Saturne Framework : [Télécharger Saturne](https://dolistore.com/fr/modules/1906-Saturne.html)
+- Saturne Framework : 23.2.1
 - Forum : [Forum Digirisk](https://dolibarr.fr/forum/t/module-digirisk-document-unique/37119)
 - D'autres modules développés par Evarisk disponibles sur [Dolistore.com](https://dolistore.com)
 - Le récapitulatif avec tous les liens [Linktree](https://linktr.ee/DigiRisk)

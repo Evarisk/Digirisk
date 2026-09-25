@@ -23,6 +23,12 @@ parameters:
             # Le module embarque des scripts de migration ponctuels, ecrits pour une
             # base precise et joues une fois : les analyser n'apprend rien.
             - scripts/
+            # Le bootstrap PHPUnit de saturne declare des stubs DoliDB, Conf, Translate,
+            # User et HookManager. Scannes, ils gagnent sur les vraies classes du coeur et
+            # chaque appel de methode remonte en "undefined method" - d'ou une bonne part
+            # de la baseline. Saturne exclut deja ce fichier de sa propre analyse, mais
+            # scanDirectories prend ../saturne/ en entier. Issue #5265
+            - ../saturne/tests/ (?)
         analyse:
             # Les fragments de template sont inclus au milieu de la portee de leur
             # appelant : leurs variables sont indefinies par construction quand on les
