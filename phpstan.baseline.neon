@@ -5319,7 +5319,7 @@ parameters:
 		-
 			message: '#^Call to an undefined method Translate\:\:load\(\)\.$#'
 			identifier: method.notFound
-			count: 10
+			count: 11
 			path: core/triggers/interface_99_modDigiriskdolibarr_DigiriskdolibarrTriggers.class.php
 
 		-

@@ -1442,6 +1442,11 @@ CatTicketsList                           = List of the ticket tags/categories
 SendEmailTo                              = Email address to notify
 SendEmailOnTicketSubmitHelp              = Enable the automatic sending of an email when a ticket is created
 MultipleEmailsSeparator                  = To assign several email addresses to notify, separate them with a ";". For example: "aaaa@bbb.cc;dddd@eee.ff"
+
+# Email template of the declaration notification - issue #5235
+TicketSubmittedMailModel                 = Notification email template
+TicketSubmittedMailModelDefault          = Module built-in content
+TicketSubmittedMailModelHelp             = Pick an email template for the notification sent when a register is declared. Templates are managed in Home &gt; Setup &gt; Emails &gt; Email templates, on a ticket type. Leave empty to keep the module built-in content.<br><br>Available variables: __TICKET_REF__, __TICKET_TRACK_ID__, __TICKET_SUBJECT__, __TICKET_MESSAGE__, __TICKET_DIGIRISK_ELEMENT__, __TICKET_DECLARANT__, __TICKET_DECLARATION_DATE__, __TICKET_LOCATION__, __TICKET_MANAGEMENT_URL__
 TicketCategories                         = Ticket categories
 TicketDocumentsConfig                    = Ticket documents
 TicketExtrafields                        = Ticket extrafields

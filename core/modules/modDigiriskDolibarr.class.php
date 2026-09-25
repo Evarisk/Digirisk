@@ -784,6 +784,7 @@ class modDigiriskdolibarr extends DolibarrModules
             $i++ => ['DIGIRISKDOLIBARR_TICKET_MULTICOMPANY_PUBLIC_INTERFACE_URL_ORIGIN', 'chaine', dol_buildpath('custom/digiriskdolibarr/public/ticket/create_ticket.php', 2), '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', 'chaine', '', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_TICKET_SUBMITTED_MAIL_MODEL', 'chaine', '', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL', 'chaine', $langs->trans('Registre'), '', 0, 'current'],
