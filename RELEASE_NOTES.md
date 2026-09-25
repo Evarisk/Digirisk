@@ -4,6 +4,8 @@ Description : Cette version enrichit le **listing des risques**, qui reprend dé
 
 **Cette version demande Saturne 23.2.1 ou supérieur.**
 
+> **Reprise de données à la réactivation du module.** Les unités de travail encore numérotées `WU` sont renommées `UT`, et leurs documents `WUD` en `UTD` : les références en base **et** les dossiers médias correspondants sur disque. La reprise ne touche qu'aux références qui n'ont pas déjà leur jumelle `UT`, ne réécrit pas le contenu des dossiers, et ne s'exécute qu'une fois. Elle reste une modification de données clientes : **sauvegarder la base et `documents/` avant de réactiver le module**. Sur une base auditée de taille moyenne, elle porte sur 131 éléments et 487 documents.
+
 ## Nouvelles fonctionnalités et innovations
 
 ### Listing des risques
