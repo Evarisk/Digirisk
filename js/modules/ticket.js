@@ -1399,6 +1399,15 @@ $(function() {
   $('.dtc-direct-select').each(function() {
     var $sel = $(this);
 
+    // Dolibarr binds a global select2:open handler that focuses the search input through
+    // document.querySelector('input[aria-controls*=' + (id || name) + ']'). This select
+    // carries neither an id nor a name, so the selector reads "input[aria-controls*=]",
+    // throws a SyntaxError and leaves the dropdown unusable - the GP/UT of a register
+    // could not be changed at all. Issue #5235
+    if (!$sel.attr('id')) {
+      $sel.attr('id', 'dtc-direct-select-' + ($sel.data('field') || $sel.index()));
+    }
+
     // Capture the currently selected value BEFORE rebuilding with Select2
     var selectedId = $sel.val();
 
@@ -1418,9 +1427,11 @@ $(function() {
       templateSelection: function(d) { return d.text; }
     });
 
-    // Restore the selected value (Select2 data[] doesn't propagate the selection)
+    // Restore the selected value (Select2 data[] doesn't propagate the selection).
+    // change.select2 refreshes the widget alone : a plain change would also run the save
+    // handler above and write the unchanged value back on every load of the card
     if (selectedId !== null && selectedId !== '') {
-      $sel.val(selectedId).trigger('change');
+      $sel.val(selectedId).trigger('change.select2');
     }
   });
 });
