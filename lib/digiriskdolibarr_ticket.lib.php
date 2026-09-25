@@ -283,10 +283,32 @@ function load_ticket_infos(array $moreParam = []): array
     }
 
     digiriskdolibarr_ticket_set_digirisk_elements($array['tickets']);
+    digiriskdolibarr_ticket_set_status($array['tickets']);
 
     $array['nbTickets'] = count($array['tickets']);
 
     return $array;
+}
+
+/**
+ * Mirror the fk_statut column onto the status property of each ticket — issue #5235
+ *
+ * Ticket declares its status column as fk_statut but reads it from $status everywhere,
+ * Ticket::fetch() being the only place that copies one onto the other. A ticket loaded
+ * through the generic setVarsFromFetchObj() of saturne_fetch_all_object_type() therefore
+ * keeps a null $status, Ticket::LibStatut() matches its case 0 on that null, returns an
+ * empty label, and the register lists of the documents print "N/A" in their status column.
+ *
+ * @param  array $tickets Tickets to complete, each one gets its status property set
+ * @return void
+ */
+function digiriskdolibarr_ticket_set_status(array $tickets): void
+{
+    foreach ($tickets as $ticket) {
+        if (!isset($ticket->status) && isset($ticket->fk_statut)) {
+            $ticket->status = (int) $ticket->fk_statut;
+        }
+    }
 }
 
 /**
