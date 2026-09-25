@@ -1474,12 +1474,15 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
      */
     protected function registersInPerimeter($object, array $moreParam): array
     {
+        // dol_print_date() plutot que DoliDB::idate(), qui n'en est qu'une enveloppe : la methode
+        // n'est pas resolue par PHPStan, qui ne voit que la classe abstraite DoliDB, et chaque
+        // nouvel appel grossirait la baseline
         $filter = '';
         if (!empty($moreParam['registerDateStart'])) {
-            $filter .= " AND t.datec >= '" . $this->db->idate($moreParam['registerDateStart']) . "'";
+            $filter .= " AND t.datec >= '" . dol_print_date($moreParam['registerDateStart'], '%Y-%m-%d %H:%M:%S', 'tzserver') . "'";
         }
         if (!empty($moreParam['registerDateEnd'])) {
-            $filter .= " AND t.datec <= '" . $this->db->idate($moreParam['registerDateEnd']) . "'";
+            $filter .= " AND t.datec <= '" . dol_print_date($moreParam['registerDateEnd'], '%Y-%m-%d %H:%M:%S', 'tzserver') . "'";
         }
 
         $ticketInfos = load_ticket_infos(['filterTicket' => $filter]);
