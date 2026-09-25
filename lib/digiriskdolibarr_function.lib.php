@@ -3011,3 +3011,159 @@ function digiriskdolibarr_backfill_task_refs(): int
 
     return $nbRepaired;
 }
+
+/**
+ * Rename to UT the work unit references still numbered WU - issue #5235
+ *
+ * Work units were numbered WU until 9.14.1, UT since. bcb1aac5 only moved the mask of the
+ * installs that had never created anything, so an install older than that kept producing
+ * WU references forever and still shows them in every list and every document.
+ *
+ * Three things carry the prefix and have to move together :
+ * - the element reference itself, in digiriskelement,
+ * - the reference of its generated documents, WUD in saturne_object_documents,
+ * - the media directories, named after the element reference : SaturneDocumentModel builds
+ *   its path as <media>/<document type>/<element ref>, so leaving WU1 on disk while the
+ *   element becomes UT1 hides every document already generated for it.
+ *
+ * digiriskelement and saturne_object_documents both carry a unique key on their reference,
+ * so a reference whose UT twin already exists - an archived element, a restored backup - is
+ * left alone and logged rather than failing the whole activation.
+ *
+ * @return int Number of renamed references, -1 on database error
+ */
+function digiriskdolibarr_migrate_workunit_refs_to_ut(): int
+{
+    global $conf, $db;
+
+    $nbRenamed  = 0;
+    $mediaPath  = DOL_DATA_ROOT . ($conf->entity > 1 ? '/' . $conf->entity : '') . '/digiriskdolibarr';
+    $renamedRef = [];
+
+    // Elements : WU<n> becomes UT<n>
+    $sql   = 'SELECT rowid, ref FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement';
+    $sql  .= " WHERE entity = " . (int) $conf->entity . " AND ref LIKE 'WU%' ORDER BY rowid";
+    $resql = $db->query($sql);
+    if (!$resql) {
+        dol_syslog('digiriskdolibarr_migrate_workunit_refs_to_ut : ' . $db->lasterror(), LOG_ERR);
+        return -1;
+    }
+
+    $elements = [];
+    while ($obj = $db->fetch_object($resql)) {
+        if (preg_match('/^WU(\d+)$/', $obj->ref, $matches)) {
+            $elements[(int) $obj->rowid] = ['old' => $obj->ref, 'new' => 'UT' . $matches[1]];
+        }
+    }
+    $db->free($resql);
+
+    $takenRefs = digiriskdolibarr_taken_refs(MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement', 'entity = ' . (int) $conf->entity);
+    if (!is_array($takenRefs)) {
+        return -1;
+    }
+
+    foreach ($elements as $elementId => $refs) {
+        if (isset($takenRefs[$refs['new']])) {
+            dol_syslog('digiriskdolibarr_migrate_workunit_refs_to_ut : element ' . $refs['old'] . ' kept, ' . $refs['new'] . ' is already taken', LOG_WARNING);
+            continue;
+        }
+
+        // Direct update rather than DigiriskElement::update() : a renaming has no reason to
+        // fire the modification trigger, nor to rewrite every other field of the row
+        $sql = 'UPDATE ' . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskelement SET ref = '" . $db->escape($refs['new']) . "' WHERE rowid = " . (int) $elementId;
+        if (!$db->query($sql)) {
+            dol_syslog('digiriskdolibarr_migrate_workunit_refs_to_ut : ' . $db->lasterror(), LOG_ERR);
+            continue;
+        }
+
+        $takenRefs[$refs['new']] = 1;
+        $renamedRef[]            = $refs;
+        $nbRenamed++;
+    }
+
+    // Documents : WUD<n> becomes UTD<n>
+    $sql   = 'SELECT rowid, ref FROM ' . MAIN_DB_PREFIX . 'saturne_object_documents';
+    $sql  .= " WHERE entity = " . (int) $conf->entity . " AND module_name = 'digiriskdolibarr'";
+    $sql  .= " AND type = 'workunitdocument' AND ref LIKE 'WUD%' ORDER BY rowid";
+    $resql = $db->query($sql);
+    if (!$resql) {
+        dol_syslog('digiriskdolibarr_migrate_workunit_refs_to_ut : ' . $db->lasterror(), LOG_ERR);
+        return -1;
+    }
+
+    $documents = [];
+    while ($obj = $db->fetch_object($resql)) {
+        if (preg_match('/^WUD(\d+)$/', $obj->ref, $matches)) {
+            $documents[(int) $obj->rowid] = ['old' => $obj->ref, 'new' => 'UTD' . $matches[1]];
+        }
+    }
+    $db->free($resql);
+
+    $takenDocumentRefs = digiriskdolibarr_taken_refs(MAIN_DB_PREFIX . 'saturne_object_documents', 'entity = ' . (int) $conf->entity . " AND module_name = 'digiriskdolibarr'");
+    if (!is_array($takenDocumentRefs)) {
+        return -1;
+    }
+
+    foreach ($documents as $documentId => $refs) {
+        if (isset($takenDocumentRefs[$refs['new']])) {
+            dol_syslog('digiriskdolibarr_migrate_workunit_refs_to_ut : document ' . $refs['old'] . ' kept, ' . $refs['new'] . ' is already taken', LOG_WARNING);
+            continue;
+        }
+
+        $sql = 'UPDATE ' . MAIN_DB_PREFIX . "saturne_object_documents SET ref = '" . $db->escape($refs['new']) . "' WHERE rowid = " . (int) $documentId;
+        if (!$db->query($sql)) {
+            dol_syslog('digiriskdolibarr_migrate_workunit_refs_to_ut : ' . $db->lasterror(), LOG_ERR);
+            continue;
+        }
+
+        $takenDocumentRefs[$refs['new']] = 1;
+        $nbRenamed++;
+    }
+
+    // Media directories, whatever the document type they belong to. Their content is left
+    // untouched on purpose : saturne_object_documents.last_main_doc holds the file name
+    // alone, so rewriting WU1 into UT1 inside it - what dol_move_dir does by default - would
+    // make every document already generated unreachable. A generated file keeps the
+    // reference its element had the day it was written
+    if (!empty($renamedRef) && is_dir($mediaPath)) {
+        foreach (dol_dir_list($mediaPath, 'directories', 0) as $typeDir) {
+            foreach ($renamedRef as $refs) {
+                $oldDir = $typeDir['fullname'] . '/' . $refs['old'];
+                $newDir = $typeDir['fullname'] . '/' . $refs['new'];
+                if (is_dir($oldDir) && !is_dir($newDir)) {
+                    dol_move_dir($oldDir, $newDir, 0, 1, 0);
+                }
+            }
+        }
+    }
+
+    dol_syslog('digiriskdolibarr_migrate_workunit_refs_to_ut : ' . $nbRenamed . ' reference(s) renamed');
+
+    return $nbRenamed;
+}
+
+/**
+ * List the references already used in a table, as an array keyed by reference
+ *
+ * @param  string     $table Fully prefixed table name
+ * @param  string     $where Conditions restricting the scope the unique key applies to
+ * @return array|int         References as keys, -1 on database error
+ */
+function digiriskdolibarr_taken_refs(string $table, string $where)
+{
+    global $db;
+
+    $resql = $db->query('SELECT ref FROM ' . $table . ' WHERE ' . $where);
+    if (!$resql) {
+        dol_syslog('digiriskdolibarr_taken_refs : ' . $db->lasterror(), LOG_ERR);
+        return -1;
+    }
+
+    $refs = [];
+    while ($obj = $db->fetch_object($resql)) {
+        $refs[$obj->ref] = 1;
+    }
+    $db->free($resql);
+
+    return $refs;
+}
