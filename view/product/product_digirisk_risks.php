@@ -18,7 +18,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/product.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/productrisk.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
-require_once DOL_DOCUMENT_ROOT . '/custom/saturne/lib/medias.lib.php';
+dol_include_once('/saturne/lib/medias.lib.php');
 
 $moduleNameLowerCase  = 'digiriskdolibarr';
 $moduleNameUpperCase  = 'DIGIRISKDOLIBARR';
@@ -824,7 +824,7 @@ print '</div>'; // fichecenter
 print dol_get_fiche_end();
 
 // Photo editor modal (required by saturne_render_media_block)
-require_once DOL_DOCUMENT_ROOT . '/custom/saturne/core/tpl/medias/photo_editor_modal.tpl.php';
+require_once dol_buildpath('/saturne/core/tpl/medias/photo_editor_modal.tpl.php');
 
 
 llxFooter();

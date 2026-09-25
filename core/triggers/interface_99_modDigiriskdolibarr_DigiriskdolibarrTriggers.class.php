@@ -910,7 +910,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
         // une version datee a des gens qui n'ont aucun moyen de s'en apercevoir.
         $signatureTriggers = ['SATURNE_SIGNATURE_SIGN', 'SATURNE_SIGNATURE_SIGN_PUBLIC', 'SATURNE_SIGNATURE_PENDING_SIGNATURE'];
         if (in_array($action, $signatureTriggers) && isset($object->object_type) && in_array($object->object_type, ['preventionplan', 'firepermit']) && $object->fk_object > 0) {
-            require_once DOL_DOCUMENT_ROOT . '/custom/saturne/class/saturnesignature.class.php';
+            dol_include_once('/saturne/class/saturnesignature.class.php');
             $signatory = new SaturneSignature($this->db);
             
             // Check if all signatures are collected
