@@ -1447,6 +1447,11 @@ CatTicketsList                           = Liste des tags/catégories des ticket
 SendEmailTo                              = Adresse e-mail à notifier
 SendEmailOnTicketSubmitHelp              = Activer l'envoi d'e-mail automatique à la création d'un ticket
 MultipleEmailsSeparator                  = Pour assigner plusieurs e-mail à notifier, séparez par un ";". Par exemple : "aaaa@bbb.cc;dddd@eee.ff"
+
+# Modèle d'email du mail de déclaration - issue #5235
+TicketSubmittedMailModel                 = Modèle d'e-mail de la notification
+TicketSubmittedMailModelDefault          = Contenu par défaut du module
+TicketSubmittedMailModelHelp             = Choisir un modèle d'e-mail pour la notification envoyée à la déclaration d'un registre. Les modèles se gèrent dans Accueil &gt; Configuration &gt; E-mails &gt; Modèles d'e-mails, sur un type ticket. Laisser vide pour conserver le contenu par défaut du module.<br><br>Variables disponibles : __TICKET_REF__, __TICKET_TRACK_ID__, __TICKET_SUBJECT__, __TICKET_MESSAGE__, __TICKET_DIGIRISK_ELEMENT__, __TICKET_DECLARANT__, __TICKET_DECLARATION_DATE__, __TICKET_LOCATION__, __TICKET_MANAGEMENT_URL__
 TicketCategories                         = Catégories des tickets
 TicketDocumentsConfig                    = Documents des tickets
 TicketExtrafields                        = Extrafields des tickets
