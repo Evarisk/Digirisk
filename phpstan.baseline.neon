@@ -31,12 +31,6 @@ parameters:
 			path: admin/config/digiriskelement.php
 
 		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: admin/config/firepermit.php
-
-		-
 			message: '#^Negated boolean expression is always true\.$#'
 			identifier: booleanNot.alwaysTrue
 			count: 3
@@ -83,12 +77,6 @@ parameters:
 			identifier: variable.undefined
 			count: 1
 			path: admin/config/meteovigilance.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: admin/config/preventionplan.php
 
 		-
 			message: '#^Negated boolean expression is always true\.$#'
@@ -185,24 +173,6 @@ parameters:
 			identifier: variable.undefined
 			count: 1
 			path: admin/event.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$office_phone\.$#'
-			identifier: property.notFound
-			count: 1
-			path: admin/securityconf.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: admin/securityconf.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: admin/securityconf.php
 
 		-
 			message: '#^Negated boolean expression is always true\.$#'
@@ -487,18 +457,6 @@ parameters:
 			path: admin/ticket/ticket.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 2
-			path: class/accident.class.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 2
-			path: class/accident.class.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:begin\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -511,21 +469,9 @@ parameters:
 			path: class/accident.class.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/accident.class.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:rollback\(\)\.$#'
 			identifier: method.notFound
 			count: 1
-			path: class/accident.class.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 2
 			path: class/accident.class.php
 
 		-
@@ -562,12 +508,6 @@ parameters:
 			message: '#^Call to function property_exists\(\) with Accident and ''status'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
-			path: class/accident.class.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 2
 			path: class/accident.class.php
 
 		-
@@ -1099,18 +1039,6 @@ parameters:
 			path: class/actions_digiriskdolibarr.class.php
 
 		-
-			message: '#^Cannot call method getFullName\(\) on int\|User\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: class/actions_digiriskdolibarr.class.php
-
-		-
-			message: '#^Expression on left side of \?\? is not nullable\.$#'
-			identifier: nullCoalesce.expr
-			count: 1
-			path: class/actions_digiriskdolibarr.class.php
-
-		-
 			message: '#^If condition is always true\.$#'
 			identifier: if.alwaysTrue
 			count: 3
@@ -1339,12 +1267,6 @@ parameters:
 			path: class/actions_digiriskdolibarr.class.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$entity\.$#'
-			identifier: property.notFound
-			count: 48
-			path: class/api_digiriskdolibarr.class.php
-
-		-
 			message: '#^Class modDigiriskdolibarr referenced with incorrect case\: modDigiriskDolibarr\.$#'
 			identifier: class.nameCase
 			count: 1
@@ -1393,12 +1315,6 @@ parameters:
 			path: class/digiriskdolibarrdashboard.class.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/digiriskdolibarrdashboard.class.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:fetch_row\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -1406,18 +1322,6 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method DoliDB\:\:free\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: class/digiriskdolibarrdashboard.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:num_rows\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: class/digiriskdolibarrdashboard.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
 			identifier: method.notFound
 			count: 2
 			path: class/digiriskdolibarrdashboard.class.php
@@ -1447,48 +1351,6 @@ parameters:
 			path: class/digiriskdolibarrdocuments/firepermitdocument.class.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 4
-			path: class/digiriskdolibarrdocuments/informationssharing.class.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 4
-			path: class/digiriskdolibarrdocuments/informationssharing.class.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$office_phone\.$#'
-			identifier: property.notFound
-			count: 2
-			path: class/digiriskdolibarrdocuments/informationssharing.class.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 6
-			path: class/digiriskdolibarrdocuments/informationssharing.class.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getFullName\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: class/digiriskdolibarrdocuments/informationssharing.class.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getNomUrl\(\)\.$#'
-			identifier: method.notFound
-			count: 4
-			path: class/digiriskdolibarrdocuments/informationssharing.class.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 6
-			path: class/digiriskdolibarrdocuments/informationssharing.class.php
-
-		-
 			message: '#^Function json_encode invoked with 2 parameters, 1 required\.$#'
 			identifier: arguments.count
 			count: 1
@@ -1501,50 +1363,8 @@ parameters:
 			path: class/digiriskdolibarrdocuments/informationssharing.class.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: class/digiriskdolibarrdocuments/legaldisplay.class.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: class/digiriskdolibarrdocuments/legaldisplay.class.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$office_phone\.$#'
-			identifier: property.notFound
-			count: 1
-			path: class/digiriskdolibarrdocuments/legaldisplay.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/digiriskdolibarrdocuments/legaldisplay.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/digiriskdolibarrdocuments/legaldisplay.class.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/digiriskdolibarrdocuments/legaldisplay.class.php
-
-		-
 			message: '#^Cannot access property \$libelle on object\|string\.$#'
 			identifier: property.nonObject
-			count: 1
-			path: class/digiriskdolibarrdocuments/legaldisplay.class.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
 			count: 1
 			path: class/digiriskdolibarrdocuments/legaldisplay.class.php
 
@@ -1579,48 +1399,6 @@ parameters:
 			path: class/digiriskdolibarrdocuments/preventionplandocument.class.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 4
-			path: class/digiriskdolibarrdocuments/registerdocument.class.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 4
-			path: class/digiriskdolibarrdocuments/registerdocument.class.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$office_phone\.$#'
-			identifier: property.notFound
-			count: 2
-			path: class/digiriskdolibarrdocuments/registerdocument.class.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 6
-			path: class/digiriskdolibarrdocuments/registerdocument.class.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getFullName\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: class/digiriskdolibarrdocuments/registerdocument.class.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getNomUrl\(\)\.$#'
-			identifier: method.notFound
-			count: 4
-			path: class/digiriskdolibarrdocuments/registerdocument.class.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 6
-			path: class/digiriskdolibarrdocuments/registerdocument.class.php
-
-		-
 			message: '#^Function json_encode invoked with 2 parameters, 1 required\.$#'
 			identifier: arguments.count
 			count: 1
@@ -1639,44 +1417,8 @@ parameters:
 			path: class/digiriskdolibarrdocuments/registerdocument.class.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: class/digiriskdolibarrdocuments/riskassessmentdocument.class.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: class/digiriskdolibarrdocuments/riskassessmentdocument.class.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$office_phone\.$#'
-			identifier: property.notFound
-			count: 2
-			path: class/digiriskdolibarrdocuments/riskassessmentdocument.class.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$user_mobile\.$#'
-			identifier: property.notFound
-			count: 2
-			path: class/digiriskdolibarrdocuments/riskassessmentdocument.class.php
-
-		-
 			message: '#^Array has 2 duplicate keys with value ''picto'' \(''picto'', ''picto''\)\.$#'
 			identifier: array.duplicateKey
-			count: 1
-			path: class/digiriskdolibarrdocuments/riskassessmentdocument.class.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/digiriskdolibarrdocuments/riskassessmentdocument.class.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
 			count: 1
 			path: class/digiriskdolibarrdocuments/riskassessmentdocument.class.php
 
@@ -1723,12 +1465,6 @@ parameters:
 			path: class/digiriskelement.class.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: class/digiriskelement.class.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:free\(\)\.$#'
 			identifier: method.notFound
 			count: 2
@@ -1736,24 +1472,6 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method DoliDB\:\:idate\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: class/digiriskelement.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:lasterror\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: class/digiriskelement.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:num_rows\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: class/digiriskelement.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
 			identifier: method.notFound
 			count: 2
 			path: class/digiriskelement.class.php
@@ -1909,12 +1627,6 @@ parameters:
 			path: class/digiriskelement_product.class.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: class/digiriskelement_product.class.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:idate\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -1930,18 +1642,6 @@ parameters:
 			message: '#^Call to an undefined method DoliDB\:\:last_insert_id\(\)\.$#'
 			identifier: method.notFound
 			count: 1
-			path: class/digiriskelement_product.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:lasterror\(\)\.$#'
-			identifier: method.notFound
-			count: 4
-			path: class/digiriskelement_product.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
-			count: 4
 			path: class/digiriskelement_product.class.php
 
 		-
@@ -1987,12 +1687,6 @@ parameters:
 			path: class/digiriskresources.class.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: class/digiriskresources.class.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:free\(\)\.$#'
 			identifier: method.notFound
 			count: 2
@@ -2005,33 +1699,9 @@ parameters:
 			path: class/digiriskresources.class.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:lasterror\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: class/digiriskresources.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:num_rows\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/digiriskresources.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
-			count: 4
-			path: class/digiriskresources.class.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:rollback\(\)\.$#'
 			identifier: method.notFound
 			count: 1
-			path: class/digiriskresources.class.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 2
 			path: class/digiriskresources.class.php
 
 		-
@@ -2111,30 +1781,6 @@ parameters:
 			identifier: property.phpDocType
 			count: 1
 			path: class/digiriskstandard.class.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: class/evaluator.class.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: class/evaluator.class.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/evaluator.class.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: class/evaluator.class.php
 
 		-
 			message: '#^Method Evaluator\:\:fetchFromParent\(\) has no return type specified\.$#'
@@ -2323,25 +1969,7 @@ parameters:
 			path: class/firepermit.class.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: class/meteovigilance.class.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:free\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: class/meteovigilance.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:num_rows\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: class/meteovigilance.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
 			identifier: method.notFound
 			count: 2
 			path: class/meteovigilance.class.php
@@ -2521,12 +2149,6 @@ parameters:
 			path: class/riskanalysis/productrisk.class.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: class/riskanalysis/productrisk.class.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:idate\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -2545,18 +2167,6 @@ parameters:
 			path: class/riskanalysis/productrisk.class.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:lasterror\(\)\.$#'
-			identifier: method.notFound
-			count: 5
-			path: class/riskanalysis/productrisk.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
-			count: 6
-			path: class/riskanalysis/productrisk.class.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:rollback\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -2567,12 +2177,6 @@ parameters:
 			identifier: property.phpDocType
 			count: 1
 			path: class/riskanalysis/productrisk.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 6
-			path: class/riskanalysis/risk.class.php
 
 		-
 			message: '#^Call to an undefined method DoliDB\:\:free\(\)\.$#'
@@ -2587,27 +2191,9 @@ parameters:
 			path: class/riskanalysis/risk.class.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:lasterror\(\)\.$#'
-			identifier: method.notFound
-			count: 6
-			path: class/riskanalysis/risk.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:num_rows\(\)\.$#'
-			identifier: method.notFound
-			count: 4
-			path: class/riskanalysis/risk.class.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:prefix\(\)\.$#'
 			identifier: method.notFound
 			count: 5
-			path: class/riskanalysis/risk.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
-			count: 6
 			path: class/riskanalysis/risk.class.php
 
 		-
@@ -2632,12 +2218,6 @@ parameters:
 			message: '#^Call to function is_array\(\) with non\-empty\-list\<mixed\> will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 3
-			path: class/riskanalysis/risk.class.php
-
-		-
-			message: '#^Function dol_escape_htmltag invoked with 2 parameters, 1 required\.$#'
-			identifier: arguments.count
-			count: 2
 			path: class/riskanalysis/risk.class.php
 
 		-
@@ -2899,33 +2479,9 @@ parameters:
 			path: class/riskanalysis/risk.class.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/riskanalysis/riskassessment.class.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:free\(\)\.$#'
 			identifier: method.notFound
 			count: 1
-			path: class/riskanalysis/riskassessment.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:lasterror\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/riskanalysis/riskassessment.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:num_rows\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/riskanalysis/riskassessment.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
-			count: 2
 			path: class/riskanalysis/riskassessment.class.php
 
 		-
@@ -3229,36 +2785,6 @@ parameters:
 			path: class/ticketdashboard.class.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$statut\.$#'
-			identifier: property.notFound
-			count: 1
-			path: class/ticketstatsdashboard.class.php
-
-		-
-			message: '#^Access to undefined constant User\:\:STATUS_DISABLED\.$#'
-			identifier: classConstant.notFound
-			count: 1
-			path: class/ticketstatsdashboard.class.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/ticketstatsdashboard.class.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getFullName\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: class/ticketstatsdashboard.class.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: class/ticketstatsdashboard.class.php
-
-		-
 			message: '#^Variable \$ticketDate might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
@@ -3281,30 +2807,6 @@ parameters:
 			identifier: variable.undefined
 			count: 2
 			path: core/ajax/contacts.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/ajax/ticket_action_card.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getFullName\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/ajax/ticket_action_card.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 2
-			path: core/ajax/ticket_action_card.php
-
-		-
-			message: '#^Function dol_escape_htmltag invoked with 6 parameters, 1 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: core/ajax/ticket_action_card.php
 
 		-
 			message: '#^Negated boolean expression is always true\.$#'
@@ -3337,63 +2839,15 @@ parameters:
 			path: core/ajax/ticket_action_card.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$dateemployment\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/doc_accidentinvestigationdocument_odt.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/doc_accidentinvestigationdocument_odt.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/doc_accidentinvestigationdocument_odt.modules.php
-
-		-
 			message: '#^Method doc_accidentinvestigationdocument_odt\:\:setTaskSegment\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/doc_accidentinvestigationdocument_odt.modules.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$dateemployment\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
 			message: '#^Access to an undefined property pdf_accidentinvestigationdocument\:\:\$orientation\.$#'
 			identifier: property.notFound
 			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to an undefined method Translate\:\:convToOutputCharset\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
-
-		-
-			message: '#^Call to an undefined method Translate\:\:loadLangs\(\)\.$#'
-			identifier: method.notFound
-			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
 
 		-
@@ -3487,42 +2941,6 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/pdf_accidentinvestigationdocument.modules.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/auditreportdocument/doc_auditreportdocument_odt.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/auditreportdocument/doc_auditreportdocument_odt.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$office_phone\.$#'
-			identifier: property.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/auditreportdocument/doc_auditreportdocument_odt.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$user_mobile\.$#'
-			identifier: property.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/auditreportdocument/doc_auditreportdocument_odt.modules.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/auditreportdocument/doc_auditreportdocument_odt.modules.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/auditreportdocument/doc_auditreportdocument_odt.modules.php
-
-		-
 			message: '#^Unsafe call to private method doc_auditreportdocument_odt\:\:setDigiriskElementChangesSegment\(\) through static\:\:\.$#'
 			identifier: staticClassAccess.privateMethod
 			count: 1
@@ -3541,127 +2959,13 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/firepermitdocument/doc_firepermitdocument_odt.modules.php
 
 		-
-			message: '#^Deprecated in PHP 8\.0\: Required parameter \$moreParam follows optional parameter \$hideRef\.$#'
-			identifier: parameter.requiredAfterOptional
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/firepermitdocument/doc_firepermitdocument_odt.modules.php
-
-		-
 			message: '#^Method doc_firepermitdocument_odt\:\:setAttendantsSegment\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/firepermitdocument/doc_firepermitdocument_odt.modules.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/groupmentdocument/doc_groupmentdocument_odt.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/groupmentdocument/doc_groupmentdocument_odt.modules.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/groupmentdocument/doc_groupmentdocument_odt.modules.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/groupmentdocument/doc_groupmentdocument_odt.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/groupmentdocument/doc_groupmentdocumentinherited_odt.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/groupmentdocument/doc_groupmentdocumentinherited_odt.modules.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/groupmentdocument/doc_groupmentdocumentinherited_odt.modules.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/groupmentdocument/doc_groupmentdocumentinherited_odt.modules.php
-
-		-
-			message: '#^Deprecated in PHP 8\.0\: Required parameter \$moreParam follows optional parameter \$hideRef\.$#'
-			identifier: parameter.requiredAfterOptional
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/informationssharing/doc_informationssharing_odt.modules.php
-
-		-
-			message: '#^Deprecated in PHP 8\.0\: Required parameter \$moreParam follows optional parameter \$hideRef\.$#'
-			identifier: parameter.requiredAfterOptional
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/legaldisplay/doc_legaldisplay_odt.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$job\.$#'
-			identifier: property.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:free\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to an undefined method Translate\:\:convToOutputCharset\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to an undefined method Translate\:\:loadLangs\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
 			identifier: method.notFound
 			count: 2
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
@@ -3757,24 +3061,6 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
 
 		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/pdf_listingrisksdocument.modules.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/modules_digiriskdolibarrdocument.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/modules_digiriskdolibarrdocument.php
-
-		-
 			message: '#^Offset 0 on non\-empty\-list\<string\> on left side of \?\? always exists and is not nullable\.$#'
 			identifier: nullCoalesce.offset
 			count: 2
@@ -3811,12 +3097,6 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/doc_preventionplandocument_odt.modules.php
 
 		-
-			message: '#^Deprecated in PHP 8\.0\: Required parameter \$moreParam follows optional parameter \$hideRef\.$#'
-			identifier: parameter.requiredAfterOptional
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/doc_preventionplandocument_odt.modules.php
-
-		-
 			message: '#^Method doc_preventionplandocument_odt\:\:setAttendantsSegment\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -3826,18 +3106,6 @@ parameters:
 			message: '#^Access to an undefined property pdf_preventionplandocument\:\:\$orientation\.$#'
 			identifier: property.notFound
 			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to an undefined method Translate\:\:convToOutputCharset\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
-
-		-
-			message: '#^Call to an undefined method Translate\:\:loadLangs\(\)\.$#'
-			identifier: method.notFound
-			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/pdf_preventionplandocument.modules.php
 
 		-
@@ -4063,12 +3331,6 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
-			message: '#^Call to an undefined method Translate\:\:convToOutputCharset\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
 			message: '#^Call to function is_object\(\) with Translate will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -4279,12 +3541,6 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:free\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -4300,18 +3556,6 @@ parameters:
 			message: '#^Call to an undefined method DoliDB\:\:jdate\(\)\.$#'
 			identifier: method.notFound
 			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:lasterror\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
-			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
 
 		-
@@ -4411,44 +3655,14 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_timespent_projectdocument.modules.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$job\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/registerdocument/doc_registerdocument_odt.modules.php
-
-		-
 			message: '#^Access to constant STATUS_LOCKED on an unknown class Control\.$#'
 			identifier: class.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/registerdocument/doc_registerdocument_odt.modules.php
 
 		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/registerdocument/doc_registerdocument_odt.modules.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getFullName\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/registerdocument/doc_registerdocument_odt.modules.php
-
-		-
 			message: '#^Call to method fetchAllWithLeftJoin\(\) on an unknown class Control\.$#'
 			identifier: class.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/registerdocument/doc_registerdocument_odt.modules.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/registerdocument/doc_registerdocument_odt.modules.php
-
-		-
-			message: '#^Deprecated in PHP 8\.0\: Required parameter \$moreParam follows optional parameter \$hideRef\.$#'
-			identifier: parameter.requiredAfterOptional
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/registerdocument/doc_registerdocument_odt.modules.php
 
@@ -4513,44 +3727,8 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/riskassessmentdocument/doc_riskassessmentdocument_odt.modules.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/doc_ticketdocument_odt.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/doc_ticketdocument_odt.modules.php
-
-		-
-			message: '#^Call to an undefined method Translate\:\:load\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/doc_ticketdocument_odt.modules.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/doc_ticketdocument_odt.modules.php
-
-		-
 			message: '#^Call to function is_array\(\) with non\-empty\-array\<mixed\> will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/doc_ticketdocument_odt.modules.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/doc_ticketdocument_odt.modules.php
-
-		-
-			message: '#^Deprecated in PHP 8\.0\: Required parameter \$moreParam follows optional parameter \$hideRef\.$#'
-			identifier: parameter.requiredAfterOptional
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/doc_ticketdocument_odt.modules.php
 
@@ -4573,39 +3751,9 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/doc_ticketdocument_odt.modules.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
 			message: '#^Access to an undefined property pdf_ticketdocument\:\:\$orientation\.$#'
 			identifier: property.notFound
 			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to an undefined method Translate\:\:convToOutputCharset\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getFullName\(\)\.$#'
-			identifier: method.notFound
-			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
 
 		-
@@ -4699,12 +3847,6 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
 
 		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
 			message: '#^Method pdf_ticketdocument\:\:_pagehead\(\) has parameter \$defaultFontSize with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -4713,12 +3855,6 @@ parameters:
 		-
 			message: '#^Method pdf_ticketdocument\:\:_pagehead\(\) has parameter \$outputLangs with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Method pdf_ticketdocument\:\:checkPageBreak\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
 
@@ -4739,72 +3875,6 @@ parameters:
 			identifier: parameter.notFound
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Parameter \#1 \$w of method TCPDF\:\:Cell\(\) expects float, array given\.$#'
-			identifier: argument.type
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Parameter \#3 \$tableWidth of method pdf_ticketdocument\:\:drawTable\(\) expects array, float given\.$#'
-			identifier: argument.type
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Parameter \#6 \$fill of method TCPDF\:\:MultiCell\(\) expects bool, int given\.$#'
-			identifier: argument.type
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/pdf_ticketdocument.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/workunitdocument/doc_workunitdocument_odt.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/workunitdocument/doc_workunitdocument_odt.modules.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/workunitdocument/doc_workunitdocument_odt.modules.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/workunitdocument/doc_workunitdocument_odt.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/workunitdocument/doc_workunitdocumentinherited_odt.modules.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/workunitdocument/doc_workunitdocumentinherited_odt.modules.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/workunitdocument/doc_workunitdocumentinherited_odt.modules.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/workunitdocument/doc_workunitdocumentinherited_odt.modules.php
 
 		-
 			message: '#^Access to an undefined property ModeleNumRefRiskAnalysis\:\:\$version\.$#'
@@ -4933,12 +4003,6 @@ parameters:
 			path: core/modules/modDigiriskDolibarr.class.php
 
 		-
-			message: '#^Comparison operation "\<" between int\<min, 0\> and 3 is always true\.$#'
-			identifier: smaller.alwaysTrue
-			count: 1
-			path: core/modules/modDigiriskDolibarr.class.php
-
-		-
 			message: '#^Comparison operation "\>" between non\-empty\-array\<array\{name\: string, path\: string, level1name\: string, relativename\: string, fullname\: string, date\: string, size\: int, perm\: int, \.\.\.\}\> and 0 results in an error\.$#'
 			identifier: greater.invalid
 			count: 1
@@ -5011,12 +4075,6 @@ parameters:
 			path: core/modules/modDigiriskDolibarr.class.php
 
 		-
-			message: '#^Result of \|\| is always true\.$#'
-			identifier: booleanOr.alwaysTrue
-			count: 1
-			path: core/modules/modDigiriskDolibarr.class.php
-
-		-
 			message: '#^Strict comparison using \!\=\= between mixed and 0 will always evaluate to true\.$#'
 			identifier: notIdentical.alwaysTrue
 			count: 1
@@ -5031,18 +4089,6 @@ parameters:
 		-
 			message: '#^Access to an undefined property pdf_FI_DigiRisk\:\:\$default_version_prefix\.$#'
 			identifier: property.notFound
-			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
 			count: 1
 			path: core/modules/product/doc/pdf_FI_DigiRisk.modules.php
 
@@ -5305,42 +4351,6 @@ parameters:
 			path: core/substitutions/functions_digiriskdolibarr.lib.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$email\.$#'
-			identifier: property.notFound
-			count: 1
-			path: core/triggers/interface_99_modDigiriskdolibarr_DigiriskdolibarrTriggers.class.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/triggers/interface_99_modDigiriskdolibarr_DigiriskdolibarrTriggers.class.php
-
-		-
-			message: '#^Call to an undefined method Translate\:\:load\(\)\.$#'
-			identifier: method.notFound
-			count: 11
-			path: core/triggers/interface_99_modDigiriskdolibarr_DigiriskdolibarrTriggers.class.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: core/triggers/interface_99_modDigiriskdolibarr_DigiriskdolibarrTriggers.class.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: core/triggers/interface_99_modDigiriskdolibarr_DigiriskdolibarrTriggers.class.php
-
-		-
-			message: '#^Comparison operation "\>" between non\-empty\-list\<string\> and 0 results in an error\.$#'
-			identifier: greater.invalid
-			count: 1
-			path: core/triggers/interface_99_modDigiriskdolibarr_DigiriskdolibarrTriggers.class.php
-
-		-
 			message: '#^If condition is always false\.$#'
 			identifier: if.alwaysFalse
 			count: 3
@@ -5349,12 +4359,6 @@ parameters:
 		-
 			message: '#^If condition is always true\.$#'
 			identifier: if.alwaysTrue
-			count: 1
-			path: core/triggers/interface_99_modDigiriskdolibarr_DigiriskdolibarrTriggers.class.php
-
-		-
-			message: '#^Negated boolean expression is always true\.$#'
-			identifier: booleanNot.alwaysTrue
 			count: 1
 			path: core/triggers/interface_99_modDigiriskdolibarr_DigiriskdolibarrTriggers.class.php
 
@@ -5389,12 +4393,6 @@ parameters:
 			path: core/triggers/interface_99_modDigiriskdolibarr_DigiriskdolibarrTriggers.class.php
 
 		-
-			message: '#^Parameter \#2 \$mesgs of function setEventMessages expects array\<string\>\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: core/triggers/interface_99_modDigiriskdolibarr_DigiriskdolibarrTriggers.class.php
-
-		-
 			message: '#^Parameter \#2 \$noTrigger of method SaturneObject\:\:setLocked\(\) expects int\<0, 1\>, false given\.$#'
 			identifier: argument.type
 			count: 1
@@ -5407,34 +4405,10 @@ parameters:
 			path: core/triggers/interface_99_modDigiriskdolibarr_DigiriskdolibarrTriggers.class.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: lib/digiriskdolibarr_accidentinvestigation.lib.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:free\(\)\.$#'
 			identifier: method.notFound
 			count: 2
 			path: lib/digiriskdolibarr_accidentinvestigation.lib.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:lasterror\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: lib/digiriskdolibarr_accidentinvestigation.lib.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: lib/digiriskdolibarr_accidentinvestigation.lib.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 6
-			path: lib/digiriskdolibarr_actionplan.lib.php
 
 		-
 			message: '#^Call to an undefined method DoliDB\:\:free\(\)\.$#'
@@ -5449,56 +4423,8 @@ parameters:
 			path: lib/digiriskdolibarr_actionplan.lib.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:lasterror\(\)\.$#'
-			identifier: method.notFound
-			count: 6
-			path: lib/digiriskdolibarr_actionplan.lib.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
-			count: 6
-			path: lib/digiriskdolibarr_actionplan.lib.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$email\.$#'
-			identifier: property.notFound
-			count: 1
-			path: lib/digiriskdolibarr_firepermit.lib.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$office_phone\.$#'
-			identifier: property.notFound
-			count: 1
-			path: lib/digiriskdolibarr_firepermit.lib.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: lib/digiriskdolibarr_firepermit.lib.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:idate\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: lib/digiriskdolibarr_firepermit.lib.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: lib/digiriskdolibarr_firepermit.lib.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getFullName\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: lib/digiriskdolibarr_firepermit.lib.php
-
-		-
-			message: '#^Class Translate does not have a constructor and must be instantiated without any parameters\.$#'
-			identifier: new.noConstructor
 			count: 1
 			path: lib/digiriskdolibarr_firepermit.lib.php
 
@@ -5521,54 +4447,6 @@ parameters:
 			path: lib/digiriskdolibarr_firepermit.lib.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$conf\.$#'
-			identifier: property.notFound
-			count: 1
-			path: lib/digiriskdolibarr_function.lib.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$datelastlogin\.$#'
-			identifier: property.notFound
-			count: 1
-			path: lib/digiriskdolibarr_function.lib.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$datepreviouslogin\.$#'
-			identifier: property.notFound
-			count: 1
-			path: lib/digiriskdolibarr_function.lib.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$email\.$#'
-			identifier: property.notFound
-			count: 1
-			path: lib/digiriskdolibarr_function.lib.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$entity\.$#'
-			identifier: property.notFound
-			count: 1
-			path: lib/digiriskdolibarr_function.lib.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 2
-			path: lib/digiriskdolibarr_function.lib.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 2
-			path: lib/digiriskdolibarr_function.lib.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$login\.$#'
-			identifier: property.notFound
-			count: 1
-			path: lib/digiriskdolibarr_function.lib.php
-
-		-
 			message: '#^Access to an undefined property WorkboardResponse\:\:\$color\.$#'
 			identifier: property.notFound
 			count: 1
@@ -5577,48 +4455,6 @@ parameters:
 		-
 			message: '#^Access to an undefined property WorkboardResponse\:\:\$visible\.$#'
 			identifier: property.notFound
-			count: 2
-			path: lib/digiriskdolibarr_function.lib.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: lib/digiriskdolibarr_function.lib.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getFullName\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: lib/digiriskdolibarr_function.lib.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getLibStatut\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: lib/digiriskdolibarr_function.lib.php
-
-		-
-			message: '#^Call to an undefined method User\:\:hasRight\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: lib/digiriskdolibarr_function.lib.php
-
-		-
-			message: '#^Call to an undefined method User\:\:loadRights\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: lib/digiriskdolibarr_function.lib.php
-
-		-
-			message: '#^Class HookManager does not have a constructor and must be instantiated without any parameters\.$#'
-			identifier: new.noConstructor
-			count: 1
-			path: lib/digiriskdolibarr_function.lib.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
 			count: 2
 			path: lib/digiriskdolibarr_function.lib.php
 
@@ -5686,12 +4522,6 @@ parameters:
 			message: '#^Function display_recurse_tree_organization\(\) has parameter \$riskInfos with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
-			path: lib/digiriskdolibarr_function.lib.php
-
-		-
-			message: '#^Function dol_escape_htmltag invoked with 2 parameters, 1 required\.$#'
-			identifier: arguments.count
-			count: 8
 			path: lib/digiriskdolibarr_function.lib.php
 
 		-
@@ -5887,25 +4717,7 @@ parameters:
 			path: lib/digiriskdolibarr_function.lib.php
 
 		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: lib/digiriskdolibarr_mobile.lib.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:idate\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: lib/digiriskdolibarr_mobile.lib.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:num_rows\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: lib/digiriskdolibarr_mobile.lib.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: lib/digiriskdolibarr_mobile.lib.php
@@ -5935,50 +4747,8 @@ parameters:
 			path: lib/digiriskdolibarr_mobile.lib.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$email\.$#'
-			identifier: property.notFound
-			count: 1
-			path: lib/digiriskdolibarr_preventionplan.lib.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$office_phone\.$#'
-			identifier: property.notFound
-			count: 1
-			path: lib/digiriskdolibarr_preventionplan.lib.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:fetch_object\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: lib/digiriskdolibarr_preventionplan.lib.php
-
-		-
 			message: '#^Call to an undefined method DoliDB\:\:idate\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: lib/digiriskdolibarr_preventionplan.lib.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:num_rows\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: lib/digiriskdolibarr_preventionplan.lib.php
-
-		-
-			message: '#^Call to an undefined method DoliDB\:\:query\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: lib/digiriskdolibarr_preventionplan.lib.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getFullName\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: lib/digiriskdolibarr_preventionplan.lib.php
-
-		-
-			message: '#^Class Translate does not have a constructor and must be instantiated without any parameters\.$#'
-			identifier: new.noConstructor
 			count: 1
 			path: lib/digiriskdolibarr_preventionplan.lib.php
 
@@ -6011,12 +4781,6 @@ parameters:
 			identifier: variable.undefined
 			count: 4
 			path: lib/digiriskdolibarr_preventionplan.lib.php
-
-		-
-			message: '#^Call to an undefined method User\:\:hasRight\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: lib/digiriskdolibarr_pwa_nav.lib.php
 
 		-
 			message: '#^Function createTicketCategory\(\) has parameter \$color with no type specified\.$#'
@@ -7093,30 +5857,6 @@ parameters:
 			path: test/phpunit/riskanalysis/RiskUnitTest.php
 
 		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/accident/accident.php
-
-		-
-			message: '#^Call to an undefined method User\:\:loadRights\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/accident/accident.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: view/accident/accident.php
-
-		-
-			message: '#^Parameter \#1 \$object of function saturne_get_fiche_head expects CommonObject, User given\.$#'
-			identifier: argument.type
-			count: 1
-			path: view/accident/accident.php
-
-		-
 			message: '#^Variable \$digiriskelement might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
@@ -7141,26 +5881,8 @@ parameters:
 			path: view/accident/accident_card.php
 
 		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 4
-			path: view/accident/accident_card.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getNomUrl\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: view/accident/accident_card.php
-
-		-
 			message: '#^Call to function method_exists\(\) with Accident and ''setCategories'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
-			count: 1
-			path: view/accident/accident_card.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
 			count: 1
 			path: view/accident/accident_card.php
 
@@ -7297,24 +6019,6 @@ parameters:
 			path: view/accident/accident_card.php
 
 		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: view/accident/accident_list.php
-
-		-
-			message: '#^Call to an undefined method User\:\:loadRights\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/accident/accident_list.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 2
-			path: view/accident/accident_list.php
-
-		-
 			message: '#^Comparison operation "\>" between User and 0 results in an error\.$#'
 			identifier: greater.invalid
 			count: 1
@@ -7335,12 +6039,6 @@ parameters:
 		-
 			message: '#^Negated boolean expression is always true\.$#'
 			identifier: booleanNot.alwaysTrue
-			count: 1
-			path: view/accident/accident_list.php
-
-		-
-			message: '#^Parameter \#1 \$object of function saturne_get_fiche_head expects CommonObject, User given\.$#'
-			identifier: argument.type
 			count: 1
 			path: view/accident/accident_list.php
 
@@ -7387,24 +6085,6 @@ parameters:
 			path: view/accident/accident_metadata.php
 
 		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/accident/accident_metadata.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getNomUrl\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/accident/accident_metadata.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: view/accident/accident_metadata.php
-
-		-
 			message: '#^Comparison operation "\>" between Societe and 0 results in an error\.$#'
 			identifier: greater.invalid
 			count: 2
@@ -7423,19 +6103,7 @@ parameters:
 			path: view/accident/accident_metadata.php
 
 		-
-			message: '#^Parameter \#4 \$month of function dol_mktime expects int, string given\.$#'
-			identifier: argument.type
-			count: 4
-			path: view/accident/accident_metadata.php
-
-		-
 			message: '#^Parameter \#4 \$show_empty of method Form\:\:selectarray\(\) expects int\<0, 1\>\|string, \-1 given\.$#'
-			identifier: argument.type
-			count: 4
-			path: view/accident/accident_metadata.php
-
-		-
-			message: '#^Parameter \#5 \$day of function dol_mktime expects int, string given\.$#'
 			identifier: argument.type
 			count: 4
 			path: view/accident/accident_metadata.php
@@ -7450,12 +6118,6 @@ parameters:
 			message: '#^Parameter \#6 \$value_as_key of method Form\:\:selectarray\(\) expects int\<0, 1\>, null given\.$#'
 			identifier: argument.type
 			count: 1
-			path: view/accident/accident_metadata.php
-
-		-
-			message: '#^Parameter \#6 \$year of function dol_mktime expects int, string given\.$#'
-			identifier: argument.type
-			count: 4
 			path: view/accident/accident_metadata.php
 
 		-
@@ -7507,12 +6169,6 @@ parameters:
 			path: view/accidentinvestigation/accidentinvestigation_actions.php
 
 		-
-			message: '#^Call to an undefined method User\:\:getNomUrl\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/accidentinvestigation/accidentinvestigation_card.php
-
-		-
 			message: '#^Parameter \#12 \$param of function saturne_show_documents expects string, int given\.$#'
 			identifier: argument.type
 			count: 1
@@ -7529,12 +6185,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: view/accidentinvestigation/accidentinvestigation_card.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: view/accidentinvestigation/accidentinvestigation_list.php
 
 		-
 			message: '#^Loose comparison using \=\= between '''' and ''pwa'' will always evaluate to false\.$#'
@@ -7573,26 +6223,8 @@ parameters:
 			path: view/digiriskelement/digiriskelement_archive.php
 
 		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/digiriskelement/digiriskelement_card.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getNomUrl\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/digiriskelement/digiriskelement_card.php
-
-		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
-			count: 1
-			path: view/digiriskelement/digiriskelement_card.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
 			count: 1
 			path: view/digiriskelement/digiriskelement_card.php
 
@@ -7687,12 +6319,6 @@ parameters:
 			path: view/digiriskelement/digiriskelement_card.php
 
 		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: view/digiriskelement/digiriskelement_digiai.php
-
-		-
 			message: '#^Variable \$digiai might not be defined\.$#'
 			identifier: variable.undefined
 			count: 2
@@ -7717,72 +6343,6 @@ parameters:
 			path: view/digiriskelement/digiriskelement_environment.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$email\.$#'
-			identifier: property.notFound
-			count: 1
-			path: view/digiriskelement/digiriskelement_evaluator.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$entity\.$#'
-			identifier: property.notFound
-			count: 1
-			path: view/digiriskelement/digiriskelement_evaluator.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: view/digiriskelement/digiriskelement_evaluator.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$job\.$#'
-			identifier: property.notFound
-			count: 3
-			path: view/digiriskelement/digiriskelement_evaluator.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: view/digiriskelement/digiriskelement_evaluator.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$login\.$#'
-			identifier: property.notFound
-			count: 1
-			path: view/digiriskelement/digiriskelement_evaluator.php
-
-		-
-			message: '#^Call to an undefined method User\:\:SetInGroup\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/digiriskelement/digiriskelement_evaluator.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 4
-			path: view/digiriskelement/digiriskelement_evaluator.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getNomUrl\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/digiriskelement/digiriskelement_evaluator.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getrights\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/digiriskelement/digiriskelement_evaluator.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 4
-			path: view/digiriskelement/digiriskelement_evaluator.php
-
-		-
 			message: '#^Negated boolean expression is always true\.$#'
 			identifier: booleanNot.alwaysTrue
 			count: 1
@@ -7790,12 +6350,6 @@ parameters:
 
 		-
 			message: '#^Parameter \#2 \$array of method Form\:\:multiSelectArrayWithCheckbox\(\) expects array\<string, array\{label\: string, checked\?\: string, enabled\?\: string, type\?\: string, langfile\?\: string, position\?\: int, help\?\: string\}\>, array\<non\-falsy\-string, array\{label\: mixed, checked\: 0\|1, enabled\: bool, position\: mixed\}\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: view/digiriskelement/digiriskelement_evaluator.php
-
-		-
-			message: '#^Parameter \#2 \$object of method ExtraFields\:\:setOptionalsFromPost\(\) expects CommonObject, User given\.$#'
 			identifier: argument.type
 			count: 1
 			path: view/digiriskelement/digiriskelement_evaluator.php
@@ -7993,36 +6547,6 @@ parameters:
 			path: view/digiriskelement/risk_list.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: view/digiriskstandard/actionplan_list.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: view/digiriskstandard/actionplan_list.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: view/digiriskstandard/actionplan_list.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getFullName\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: view/digiriskstandard/actionplan_list.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 2
-			path: view/digiriskstandard/actionplan_list.php
-
-		-
 			message: '#^Parameter \#1 \$usert of method Task\:\:getTasksArray\(\) expects User\|null, int given\.$#'
 			identifier: argument.type
 			count: 2
@@ -8065,12 +6589,6 @@ parameters:
 			path: view/digiriskstandard/digiriskstandard_informationssharing.php
 
 		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: view/digiriskstandard/digiriskstandard_legaldisplay.php
-
-		-
 			message: '#^Parameter \#12 \$param of function saturne_show_documents expects string, int given\.$#'
 			identifier: argument.type
 			count: 1
@@ -8093,12 +6611,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: view/digiriskstandard/digiriskstandard_registerdocument.php
-
-		-
-			message: '#^Class Translate does not have a constructor and must be instantiated without any parameters\.$#'
-			identifier: new.noConstructor
-			count: 1
-			path: view/digiriskstandard/digiriskstandard_riskassessmentdocument.php
 
 		-
 			message: '#^Variable \$error might not be defined\.$#'
@@ -8179,163 +6691,7 @@ parameters:
 			path: view/digirisktools.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$admin\.$#'
-			identifier: property.notFound
-			count: 2
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$email\.$#'
-			identifier: property.notFound
-			count: 4
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$employee\.$#'
-			identifier: property.notFound
-			count: 1
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$entity\.$#'
-			identifier: property.notFound
-			count: 1
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$error\.$#'
-			identifier: property.notFound
-			count: 2
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$fields\.$#'
-			identifier: property.notFound
-			count: 2
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 3
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$fk_user\.$#'
-			identifier: property.notFound
-			count: 1
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$gender\.$#'
-			identifier: property.notFound
-			count: 2
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$job\.$#'
-			identifier: property.notFound
-			count: 4
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 3
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$login\.$#'
-			identifier: property.notFound
-			count: 3
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$origin_email\.$#'
-			identifier: property.notFound
-			count: 1
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$photo\.$#'
-			identifier: property.notFound
-			count: 2
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$ref\.$#'
-			identifier: property.notFound
-			count: 1
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$statut\.$#'
-			identifier: property.notFound
-			count: 3
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$table_element\.$#'
-			identifier: property.notFound
-			count: 10
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Call to an undefined method User\:\:SetInGroup\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Call to an undefined method User\:\:create\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getLibStatut\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getNbOfUsers\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getNomUrl\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Call to an undefined method User\:\:send_password\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Call to an undefined method User\:\:setPassword\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 3
-			path: view/digiriskusers.php
-
-		-
 			message: '#^Parameter \#2 \$array of method Form\:\:multiSelectArrayWithCheckbox\(\) expects array\<string, array\{label\: string, checked\?\: string, enabled\?\: string, type\?\: string, langfile\?\: string, position\?\: int, help\?\: string\}\>, non\-empty\-array\<non\-falsy\-string, array\{label\: mixed, checked\: 0\|1, position\?\: int, enabled\?\: bool\}\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: view/digiriskusers.php
-
-		-
-			message: '#^Parameter \#2 \$object of method ExtraFields\:\:setOptionalsFromPost\(\) expects CommonObject, User given\.$#'
 			identifier: argument.type
 			count: 1
 			path: view/digiriskusers.php
@@ -8395,24 +6751,6 @@ parameters:
 			path: view/firepermit/firepermit_card.php
 
 		-
-			message: '#^Call to an undefined method Translate\:\:loadLangs\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/firepermit/firepermit_card.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: view/firepermit/firepermit_card.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getNomUrl\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/firepermit/firepermit_card.php
-
-		-
 			message: '#^Call to function is_object\(\) with FirePermit will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -8431,18 +6769,6 @@ parameters:
 			path: view/firepermit/firepermit_card.php
 
 		-
-			message: '#^Class Translate does not have a constructor and must be instantiated without any parameters\.$#'
-			identifier: new.noConstructor
-			count: 1
-			path: view/firepermit/firepermit_card.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 2
-			path: view/firepermit/firepermit_card.php
-
-		-
 			message: '#^If condition is always true\.$#'
 			identifier: if.alwaysTrue
 			count: 1
@@ -8451,12 +6777,6 @@ parameters:
 		-
 			message: '#^Loose comparison using \=\= between 1 and 0 will always evaluate to false\.$#'
 			identifier: equal.alwaysFalse
-			count: 1
-			path: view/firepermit/firepermit_card.php
-
-		-
-			message: '#^Method User\:\:fetchAll\(\) invoked with 7 parameters, 0 required\.$#'
-			identifier: arguments.count
 			count: 1
 			path: view/firepermit/firepermit_card.php
 
@@ -8671,24 +6991,6 @@ parameters:
 			path: view/firepermit/firepermit_card.php
 
 		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/firepermit/firepermit_list.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getNomUrl\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/firepermit/firepermit_list.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: view/firepermit/firepermit_list.php
-
-		-
 			message: '#^Comparison operation "\>" between non\-empty\-array and 0 results in an error\.$#'
 			identifier: greater.invalid
 			count: 1
@@ -8809,24 +7111,6 @@ parameters:
 			path: view/preventionplan/preventionplan_card.php
 
 		-
-			message: '#^Call to an undefined method Translate\:\:loadLangs\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/preventionplan/preventionplan_card.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: view/preventionplan/preventionplan_card.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getNomUrl\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/preventionplan/preventionplan_card.php
-
-		-
 			message: '#^Call to function is_object\(\) with PreventionPlan will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -8845,18 +7129,6 @@ parameters:
 			path: view/preventionplan/preventionplan_card.php
 
 		-
-			message: '#^Class Translate does not have a constructor and must be instantiated without any parameters\.$#'
-			identifier: new.noConstructor
-			count: 1
-			path: view/preventionplan/preventionplan_card.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 2
-			path: view/preventionplan/preventionplan_card.php
-
-		-
 			message: '#^Left side of \|\| is always true\.$#'
 			identifier: booleanOr.leftAlwaysTrue
 			count: 1
@@ -8865,12 +7137,6 @@ parameters:
 		-
 			message: '#^Loose comparison using \=\= between 1 and 0 will always evaluate to false\.$#'
 			identifier: equal.alwaysFalse
-			count: 1
-			path: view/preventionplan/preventionplan_card.php
-
-		-
-			message: '#^Method User\:\:fetchAll\(\) invoked with 7 parameters, 0 required\.$#'
-			identifier: arguments.count
 			count: 1
 			path: view/preventionplan/preventionplan_card.php
 
@@ -9065,24 +7331,6 @@ parameters:
 			identifier: variable.undefined
 			count: 1
 			path: view/preventionplan/preventionplan_card.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/preventionplan/preventionplan_list.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getNomUrl\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/preventionplan/preventionplan_list.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: view/preventionplan/preventionplan_list.php
 
 		-
 			message: '#^Comparison operation "\>" between non\-empty\-array and 0 results in an error\.$#'
@@ -9289,18 +7537,6 @@ parameters:
 			path: view/product/product_digirisk_risks.php
 
 		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: view/ticket/category_config.php
-
-		-
-			message: '#^Method User\:\:fetchAll\(\) invoked with 7 parameters, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: view/ticket/category_config.php
-
-		-
 			message: '#^Parameter \#11 \$cols of class DolEditor constructor expects string, int given\.$#'
 			identifier: argument.type
 			count: 2
@@ -9325,87 +7561,9 @@ parameters:
 			path: view/ticket/category_config.php
 
 		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: view/ticket/ticket_action_card.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: view/ticket/ticket_action_card.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/ticket/ticket_action_card.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getFullName\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: view/ticket/ticket_action_card.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: view/ticket/ticket_action_card.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$firstname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: view/ticket/ticket_card.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$lastname\.$#'
-			identifier: property.notFound
-			count: 1
-			path: view/ticket/ticket_card.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$login\.$#'
-			identifier: property.notFound
-			count: 3
-			path: view/ticket/ticket_card.php
-
-		-
-			message: '#^Access to an undefined property User\:\:\$photo\.$#'
-			identifier: property.notFound
-			count: 1
-			path: view/ticket/ticket_card.php
-
-		-
-			message: '#^Call to an undefined method User\:\:fetch\(\)\.$#'
-			identifier: method.notFound
-			count: 7
-			path: view/ticket/ticket_card.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getFullName\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: view/ticket/ticket_card.php
-
-		-
-			message: '#^Call to an undefined method User\:\:getNomUrl\(\)\.$#'
-			identifier: method.notFound
-			count: 4
-			path: view/ticket/ticket_card.php
-
-		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
-			path: view/ticket/ticket_card.php
-
-		-
-			message: '#^Class User constructor invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 7
 			path: view/ticket/ticket_card.php
 
 		-
@@ -9763,21 +7921,9 @@ parameters:
 			path: view/accident/accident_list.php
 
 		-
-			message: '#^Parameter \#1 \$hour of function dol_mktime expects int, string given\.$#'
-			identifier: argument.type
-			count: 6
-			path: view/accident/accident_metadata.php
-
-		-
 			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
 			identifier: argument.type
 			count: 1
-			path: view/accident/accident_metadata.php
-
-		-
-			message: '#^Parameter \#2 \$minute of function dol_mktime expects int, string given\.$#'
-			identifier: argument.type
-			count: 6
 			path: view/accident/accident_metadata.php
 
 		-
