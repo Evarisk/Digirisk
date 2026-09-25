@@ -686,6 +686,7 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         $this->sectionCotationMethod($pdf, $outputLangs, $size);
         $this->sectionRisks($pdf, $object, $outputLangs, $size, $moreParam);
         $this->sectionRegisters($pdf, $object, $outputLangs, $size, $moreParam);
+        $this->sectionAccidents($pdf, $object, $outputLangs, $size, $moreParam);
 
         $this->_pagefooter($pdf, $object, $outputLangs, $size);
 
@@ -1562,5 +1563,153 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         }
 
         return $outputLangs->transnoentities('ListingRisksPeriodRange', dol_print_date($dateStart, 'day', 'tzserver', $outputLangs), dol_print_date($dateEnd, 'day', 'tzserver', $outputLangs));
+    }
+
+    /**
+     * Accidents rattaches au perimetre du document - issue #5235
+     *
+     * Un accident porte son GP/UT dans fk_element, directement : le filtrage se fait donc sur
+     * la colonne, contrairement aux registres. Les jours d'arret sont ramenes en une requete
+     * pour tous les accidents affiches, plutot qu'un fetchAll par ligne.
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  object    $object      Element imprime
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @param  array     $moreParam   More param (showAccidents, accidentDateStart, accidentDateEnd)
+     * @return void
+     */
+    protected function sectionAccidents($pdf, $object, Translate $outputLangs, float $size, array $moreParam)
+    {
+        if (empty($moreParam['showAccidents'])) {
+            return;
+        }
+
+        require_once __DIR__ . '/../../../../../class/accident.class.php';
+
+        $accidents = $this->accidentsInPerimeter($object, $moreParam);
+
+        $this->newPage($pdf);
+        $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksAccidentsTitle'), $size);
+
+        $period = $this->periodLabel($moreParam['accidentDateStart'] ?? 0, $moreParam['accidentDateEnd'] ?? 0, $outputLangs);
+        if (dol_strlen($period)) {
+            $this->paragraph($pdf, $period, $size, 'I');
+        }
+
+        if (empty($accidents)) {
+            $this->paragraph($pdf, $outputLangs->transnoentities('ListingRisksNoAccident'), $size, 'I', [140, 140, 140]);
+            return;
+        }
+
+        $header = [
+            $outputLangs->transnoentities('Ref'),
+            $outputLangs->transnoentities('AccidentDate'),
+            $outputLangs->transnoentities('DigiriskElement'),
+            $outputLangs->transnoentities('AccidentType'),
+            $outputLangs->transnoentities('Victim'),
+            $outputLangs->transnoentities('Label'),
+            $outputLangs->transnoentities('WorkStopDays'),
+            $outputLangs->transnoentities('Status')
+        ];
+        $widths = [32, 30, 60, 42, 55, 125, 24, 32];
+
+        $perimeter = $this->perimeterElements($object);
+        $extraData = $this->accidentExtraData(array_keys($accidents));
+
+        $rows = [];
+        foreach ($accidents as $accident) {
+            $elementLabel = '';
+            if (!empty($perimeter[$accident->fk_element])) {
+                $elementLabel = $perimeter[$accident->fk_element]['object']->ref . ' - ' . $perimeter[$accident->fk_element]['object']->label;
+            }
+
+            $rows[] = [
+                $accident->ref,
+                ['text' => dol_print_date($accident->accident_date, 'dayreduceformat', 'tzuser', $outputLangs), 'align' => 'C'],
+                $elementLabel,
+                $outputLangs->transnoentities($accident->fields['accident_type']['arrayofkeyval'][(int) $accident->accident_type] ?? 'WorkAccidentStatement'),
+                $extraData[$accident->id]['victim'] ?? '',
+                $accident->label,
+                ['text' => (int) ($extraData[$accident->id]['days'] ?? 0), 'align' => 'C'],
+                ['text' => $accident->getLibStatut(), 'align' => 'C']
+            ];
+        }
+
+        $this->table($pdf, $header, $rows, $widths, $size);
+    }
+
+    /**
+     * Accidents du perimetre du document, sur la plage de dates demandee.
+     *
+     * @param  object $object    Element imprime
+     * @param  array  $moreParam More param (accidentDateStart, accidentDateEnd)
+     * @return array             Accidents indexes par identifiant
+     */
+    protected function accidentsInPerimeter($object, array $moreParam): array
+    {
+        $accident = new Accident($this->db);
+
+        $filter = 't.status >= ' . Accident::STATUS_VALIDATED;
+        if (!empty($moreParam['accidentDateStart'])) {
+            $filter .= " AND t.accident_date >= '" . dol_print_date($moreParam['accidentDateStart'], '%Y-%m-%d %H:%M:%S', 'tzserver') . "'";
+        }
+        if (!empty($moreParam['accidentDateEnd'])) {
+            $filter .= " AND t.accident_date <= '" . dol_print_date($moreParam['accidentDateEnd'], '%Y-%m-%d %H:%M:%S', 'tzserver') . "'";
+        }
+
+        // Le listing d'un element est borne a son arbre, celui de l'etablissement porte sur toute
+        // la societe : un accident sans GP/UT y a sa place
+        if ($object->element != 'digiriskstandard') {
+            $perimeter = $this->perimeterElements($object);
+            if (empty($perimeter)) {
+                return [];
+            }
+            // Les cles du perimetre sont des identifiants, convertis en entiers : la liste est
+            // sure sans passer par sanitize()
+            $filter .= ' AND t.fk_element IN (' . implode(',', array_map('intval', array_keys($perimeter))) . ')';
+        }
+
+        $accidents = $accident->fetchAll('DESC', 't.accident_date', 0, 0, ['customsql' => $filter]);
+
+        return is_array($accidents) ? $accidents : [];
+    }
+
+    /**
+     * Jours d'arret et victime de chaque accident, en une requete.
+     *
+     * Meme forme que loadTaskResponsibles() plus haut : une jointure sur la table des
+     * utilisateurs plutot qu'un User::fetch() par ligne, le document n'ayant besoin que
+     * du nom. Les identifiants sont convertis en entiers, donc la liste est sure.
+     *
+     * @param  array $accidentIds Identifiants des accidents affiches
+     * @return array              ['days' => int, 'victim' => string], indexes par accident
+     */
+    protected function accidentExtraData(array $accidentIds): array
+    {
+        if (empty($accidentIds)) {
+            return [];
+        }
+
+        $sql  = 'SELECT a.rowid, SUM(ws.workstop_days) as days, u.firstname, u.lastname';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident as a';
+        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop as ws ON ws.fk_accident = a.rowid';
+        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'user as u ON u.rowid = a.fk_user_employer';
+        $sql .= ' WHERE a.rowid IN (' . implode(',', array_map('intval', $accidentIds)) . ')';
+        $sql .= ' GROUP BY a.rowid, u.firstname, u.lastname';
+
+        $extraData = [];
+        $resql     = $this->db->query($sql);
+        if ($resql) {
+            while ($obj = $this->db->fetch_object($resql)) {
+                $extraData[(int) $obj->rowid] = [
+                    'days'   => (int) $obj->days,
+                    'victim' => trim($obj->firstname . ' ' . $obj->lastname)
+                ];
+            }
+            $this->db->free($resql);
+        }
+
+        return $extraData;
     }
 }
