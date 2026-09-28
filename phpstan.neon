@@ -23,12 +23,6 @@ parameters:
             # Le module embarque des scripts de migration ponctuels, ecrits pour une
             # base precise et joues une fois : les analyser n'apprend rien.
             - scripts/
-            # Le bootstrap PHPUnit de saturne declare des stubs DoliDB, Conf, Translate,
-            # User et HookManager. Scannes, ils gagnent sur les vraies classes du coeur et
-            # chaque appel de methode remonte en "undefined method" - d'ou une bonne part
-            # de la baseline. Saturne exclut deja ce fichier de sa propre analyse, mais
-            # scanDirectories prend ../saturne/ en entier. Issue #5265
-            - ../saturne/tests/ (?)
         analyse:
             # Les fragments de template sont inclus au milieu de la portee de leur
             # appelant : leurs variables sont indefinies par construction quand on les
@@ -51,7 +45,18 @@ parameters:
     # herite (SaturneObject, SaturneSignature, les libs saturne_*).
     # A garder en phase avec le sparse-checkout de .github/workflows/quality.yml.
     scanDirectories:
-        - ../saturne/
+        # Seulement les dossiers de saturne qui portent ce dont ce module a besoin, et non
+        # ../saturne/ en entier : le socle range aussi des bouchons de test qui declarent
+        # des classes du coeur - tests/phpunit/bootstrap.php pour DoliDB, Conf, Translate,
+        # User et HookManager, dev/phan/stubs.php pour DolibarrModules, Odf, Segment,
+        # Parsedown, EcmDirectory, Activity et TCPDF2DBarcode. Scannes, ils gagnent sur les
+        # vraies classes et chaque appel de methode remonte en « undefined method ».
+        # Restreindre le scan vaut mieux que de les exclure un a un : c'est immunise contre
+        # un futur bouchon depose ailleurs, et ca ne se fait pas balayer par un alignement
+        # de configuration. Issue #5294
+        - ../saturne/class/
+        - ../saturne/core/
+        - ../saturne/lib/
         - ../../api/class/
         - ../../categories/class/
         - ../../comm/action/class/
