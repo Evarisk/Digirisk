@@ -1488,7 +1488,7 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
             $outputLangs->transnoentities('TicketMessage'),
             $outputLangs->transnoentities('Status')
         ];
-        $widths = [32, 70, 55, 30, 175, 38];
+        $widths = [32, 66, 52, 40, 172, 38];
 
         $rows = [];
         foreach ($tickets as $ticket) {
