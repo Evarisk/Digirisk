@@ -1599,16 +1599,14 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         }
 
         $header = [
-            $outputLangs->transnoentities('Ref'),
-            $outputLangs->transnoentities('AccidentDate'),
-            $outputLangs->transnoentities('DigiriskElement'),
-            $outputLangs->transnoentities('AccidentType'),
-            $outputLangs->transnoentities('Victim'),
-            $outputLangs->transnoentities('Label'),
-            $outputLangs->transnoentities('WorkStopDays'),
-            $outputLangs->transnoentities('Status')
+            $outputLangs->transnoentities('ListingRisksAccidentRefColumn'),
+            $outputLangs->transnoentities('ListingRisksAccidentWorkStopColumn'),
+            $outputLangs->transnoentities('ListingRisksAccidentElementColumn'),
+            $outputLangs->transnoentities('LesionLocalization'),
+            $outputLangs->transnoentities('LesionNature'),
+            $outputLangs->transnoentities('ListingRisksAccidentLabelColumn')
         ];
-        $widths = [32, 30, 60, 42, 55, 125, 24, 32];
+        $widths = [32, 26, 62, 60, 60, 160];
 
         $perimeter = $this->perimeterElements($object);
         $extraData = $this->accidentExtraData(array_keys($accidents));
@@ -1622,17 +1620,17 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
 
             $rows[] = [
                 $accident->ref,
-                ['text' => dol_print_date($accident->accident_date, 'dayreduceformat', 'tzuser', $outputLangs), 'align' => 'C'],
+                ['text' => empty($extraData[$accident->id]['days']) ? '' : (int) $extraData[$accident->id]['days'], 'align' => 'C'],
                 $elementLabel,
-                $outputLangs->transnoentities($accident->fields['accident_type']['arrayofkeyval'][(int) $accident->accident_type] ?? 'WorkAccidentStatement'),
-                $extraData[$accident->id]['victim'] ?? '',
-                $accident->label,
-                ['text' => (int) ($extraData[$accident->id]['days'] ?? 0), 'align' => 'C'],
-                ['text' => $accident->getLibStatut(), 'align' => 'C']
+                $extraData[$accident->id]['lesionLocalization'] ?? '',
+                $extraData[$accident->id]['lesionNature'] ?? '',
+                $accident->label
             ];
         }
 
         $this->table($pdf, $header, $rows, $widths, $size);
+
+        $this->paragraph($pdf, $outputLangs->transnoentities('ListingRisksAccidentWorkStopNote'), $size - 1, 'I', [140, 140, 140]);
     }
 
     /**
@@ -1672,14 +1670,15 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     }
 
     /**
-     * Jours d'arret et victime de chaque accident, en une requete.
+     * Jours d'arret et lesions des accidents, en deux requetes plutot qu'une.
      *
-     * Meme forme que loadTaskResponsibles() plus haut : une jointure sur la table des
-     * utilisateurs plutot qu'un User::fetch() par ligne, le document n'ayant besoin que
-     * du nom. Les identifiants sont convertis en entiers, donc la liste est sure.
+     * Un accident porte plusieurs arrets et plusieurs lesions : les joindre dans la meme
+     * requete multiplierait les lignes et fausserait la somme des jours. Les lesions sont
+     * donc lues a part, puis regroupees en PHP - ni le module ni le socle n'utilisent
+     * GROUP_CONCAT, qui ne serait de toute facon pas portable hors MySQL.
      *
-     * @param  array $accidentIds Identifiants des accidents affiches
-     * @return array              ['days' => int, 'victim' => string], indexes par accident
+     * @param  array $accidentIds Identifiants des accidents
+     * @return array              Par identifiant : days, lesionLocalization, lesionNature
      */
     protected function accidentExtraData(array $accidentIds): array
     {
@@ -1687,23 +1686,47 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
             return [];
         }
 
-        $sql  = 'SELECT a.rowid, SUM(ws.workstop_days) as days, u.firstname, u.lastname';
-        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident as a';
-        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop as ws ON ws.fk_accident = a.rowid';
-        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'user as u ON u.rowid = a.fk_user_employer';
-        $sql .= ' WHERE a.rowid IN (' . implode(',', array_map('intval', $accidentIds)) . ')';
-        $sql .= ' GROUP BY a.rowid, u.firstname, u.lastname';
-
+        $ids       = implode(',', array_map('intval', $accidentIds));
         $extraData = [];
-        $resql     = $this->db->query($sql);
+
+        $sql  = 'SELECT ws.fk_accident, SUM(ws.workstop_days) as days';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop as ws';
+        $sql .= ' WHERE ws.fk_accident IN (' . $ids . ')';
+        $sql .= ' GROUP BY ws.fk_accident';
+
+        $resql = $this->db->query($sql);
         if ($resql) {
             while ($obj = $this->db->fetch_object($resql)) {
-                $extraData[(int) $obj->rowid] = [
-                    'days'   => (int) $obj->days,
-                    'victim' => trim($obj->firstname . ' ' . $obj->lastname)
-                ];
+                $extraData[(int) $obj->fk_accident]['days'] = (int) $obj->days;
             }
             $this->db->free($resql);
+        }
+
+        $sql  = 'SELECT l.fk_accident, l.lesion_localization, l.lesion_nature';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_lesion as l';
+        $sql .= ' WHERE l.fk_accident IN (' . $ids . ')';
+        $sql .= ' ORDER BY l.rowid';
+
+        $localizations = [];
+        $natures       = [];
+        $resql         = $this->db->query($sql);
+        if ($resql) {
+            while ($obj = $this->db->fetch_object($resql)) {
+                $accidentId = (int) $obj->fk_accident;
+                if (dol_strlen($obj->lesion_localization)) {
+                    $localizations[$accidentId][] = $obj->lesion_localization;
+                }
+                if (dol_strlen($obj->lesion_nature)) {
+                    $natures[$accidentId][] = $obj->lesion_nature;
+                }
+            }
+            $this->db->free($resql);
+        }
+
+        foreach ($accidentIds as $accidentId) {
+            $accidentId = (int) $accidentId;
+            $extraData[$accidentId]['lesionLocalization'] = implode(', ', $localizations[$accidentId] ?? []);
+            $extraData[$accidentId]['lesionNature']       = implode(', ', $natures[$accidentId] ?? []);
         }
 
         return $extraData;

@@ -2476,6 +2476,11 @@ ListingRisksPeriodUntil            = Jusqu'au %s
 ListingRisksPeriodRange            = Du %s au %s
 ListingRisksElementColumn          = GP / UT
 ListingRisksRegisterDeclarationDate= Date de déclaration
+ListingRisksAccidentRefColumn      = Id. AT/MP
+ListingRisksAccidentWorkStopColumn = Nbre jours AT
+ListingRisksAccidentElementColumn  = Élément de l'accident
+ListingRisksAccidentLabelColumn    = Description du presque accident ou accident
+ListingRisksAccidentWorkStopNote   = * si non rempli, arrêt en cours
 NewProductRisk                     = Nouveau risque produit
 
 # Audit report - issue #4459
