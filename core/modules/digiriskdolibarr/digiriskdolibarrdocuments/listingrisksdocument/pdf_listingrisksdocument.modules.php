@@ -1439,15 +1439,13 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
 
         $header = [
             $outputLangs->transnoentities('ListingRisksRegisterRefColumn'),
-            $outputLangs->transnoentities('DigiriskElement'),
+            $outputLangs->transnoentities('ListingRisksElementColumn'),
             $outputLangs->transnoentities('Categories'),
-            $outputLangs->transnoentities('DateCreation'),
-            $outputLangs->transnoentities('Subject'),
+            $outputLangs->transnoentities('ListingRisksRegisterDeclarationDate'),
             $outputLangs->transnoentities('TicketMessage'),
-            $outputLangs->transnoentities('DigiriskProgress'),
             $outputLangs->transnoentities('Status')
         ];
-        $widths = [32, 60, 45, 28, 70, 105, 22, 38];
+        $widths = [32, 70, 55, 30, 175, 38];
 
         $rows = [];
         foreach ($tickets as $ticket) {
@@ -1456,9 +1454,7 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
                 $ticket->digiriskElementRefLabel ?? '',
                 $this->registerCategories($ticket),
                 ['text' => dol_print_date($ticket->datec, 'dayreduceformat', 'tzuser', $outputLangs), 'align' => 'C'],
-                $ticket->subject,
                 dol_string_nohtmltag($ticket->message),
-                ['text' => ($ticket->progress ?: 0) . ' %', 'align' => 'C'],
                 ['text' => $ticket->getLibStatut(), 'align' => 'C']
             ];
         }

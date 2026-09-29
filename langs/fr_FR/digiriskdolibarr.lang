@@ -2474,6 +2474,8 @@ ListingRisksNoAccident             = Aucun accident sur ce périmètre
 ListingRisksPeriodFrom             = À partir du %s
 ListingRisksPeriodUntil            = Jusqu'au %s
 ListingRisksPeriodRange            = Du %s au %s
+ListingRisksElementColumn          = GP / UT
+ListingRisksRegisterDeclarationDate= Date de déclaration
 NewProductRisk                     = Nouveau risque produit
 
 # Audit report - issue #4459
