@@ -106,6 +106,8 @@ if (empty($resHook)) {
 
         $moreParams['showAccidents'] = GETPOST('showaccidents') ? 1 : 0;
 
+        $moreParams['showPhoto'] = GETPOST('showphoto') ? 1 : 0;
+
         if (GETPOST('accidentdaterange')) {
             $moreParams['accidentDateStart'] = dol_mktime(0, 0, 0, GETPOSTINT('accidentdatestartmonth'), GETPOSTINT('accidentdatestartday'), GETPOSTINT('accidentdatestartyear'));
             $moreParams['accidentDateEnd']   = dol_mktime(23, 59, 59, GETPOSTINT('accidentdateendmonth'), GETPOSTINT('accidentdateendday'), GETPOSTINT('accidentdateendyear'));
@@ -204,6 +206,10 @@ print '<td>' . $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'ac
 print $langs->trans('At') . $form->selectDate(dol_now(), 'accidentdateend');
 print $langs->trans('UseDateRange');
 print '<input type="checkbox" id="accidentdaterange" name="accidentdaterange"></td></tr>';
+
+// Photo des evaluations : cochee par defaut, soit le rendu historique
+print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksShowPhoto') . '</td>';
+print '<td><input type="checkbox" id="showphoto" name="showphoto" checked></td></tr>';
 
 print '</table>';
 

@@ -110,6 +110,11 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     protected array $taskResponsibles = [];
 
     /**
+     * @var bool Afficher la colonne photo des evaluations - issue #5299
+     */
+    protected bool $showPhoto = true;
+
+    /**
      * Bande basse reservee au pied de page, en mm. Le contenu s'arrete au dessus, le pied
      * s'ecrit dedans : c'est ce qui garantit qu'ils ne se chevauchent jamais.
      */
@@ -1167,17 +1172,24 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
 
         $this->taskResponsibles = $this->loadTaskResponsibles($riskTasks);
 
+        // Sans choix explicite la photo reste affichee : le formulaire n'est pas toujours poste
+        $this->showPhoto = !isset($moreParam['showPhoto']) || !empty($moreParam['showPhoto']);
+
         $header = [
-            $outputLangs->transnoentities('DigiriskElement'),
-            $outputLangs->transnoentities('Ref'),
+            $outputLangs->transnoentities('ListingRisksElementColumn'),
+            $outputLangs->transnoentities('ListingRisksRiskRefColumn'),
             $outputLangs->transnoentities('ListingRisksCotationColumn'),
             $outputLangs->transnoentities('ListingRisksRiskColumn'),
-            $outputLangs->transnoentities('Description'),
-            $outputLangs->transnoentities('Photo'),
+            $outputLangs->transnoentities('ListingRisksRiskDescriptionColumn'),
             $outputLangs->transnoentities('ListingRisksAssessmentColumn'),
             $outputLangs->transnoentities('ListingRisksActionPlan')
         ];
-        $widths = [55, 32, 14, 40, 80, 32, 60, 87];
+        $widths = [55, 32, 14, 40, 95, 70, 94];
+
+        if ($this->showPhoto) {
+            array_splice($header, 5, 0, [$outputLangs->transnoentities('Photo')]);
+            $widths = [55, 32, 14, 40, 80, 32, 60, 87];
+        }
 
         $this->newPage($pdf);
         $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksListTitle'), $size);
@@ -1250,16 +1262,21 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         $categoryName = getDolGlobalInt('DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME') ? $riskLine->getDangerCategoryName($riskLine, $riskLine->type) : '';
         $pictoPath    = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $riskLine->getDangerCategory($riskLine, $riskLine->type) . '.png';
 
-        return [
+        $cells = [
             $elementLabel,
             $riskLine->ref . "\n" . $riskLine->riskAssessmentRef,
             ['text' => (string) ($riskLine->riskAssessmentCotation ?: 0), 'align' => 'C', 'bold' => true, 'fill' => $this->levelBg[$level], 'color' => $this->levelText[$level]],
             ['text' => $categoryName, 'align' => 'C', 'image' => is_readable($pictoPath) ? $pictoPath : ''],
             saturne_flatten_wysiwyg_blocks($riskLine->description, true),
-            ['image' => $this->riskAssessmentPhotoPath($riskLine), 'text' => ''],
             $this->riskAssessmentComment($riskLine, $outputLangs),
             $this->riskTasksText($riskLine->id, $riskTasks, $outputLangs)
         ];
+
+        if ($this->showPhoto) {
+            array_splice($cells, 5, 0, [['image' => $this->riskAssessmentPhotoPath($riskLine), 'text' => '']]);
+        }
+
+        return $cells;
     }
 
     /**
@@ -1343,12 +1360,16 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     }
 
     /**
-     * Taches du programme annuel de prevention rattachees a un risque.
+     * Plan d'actions d'un risque, scinde entre actions en cours et actions terminees.
      *
-     * @param  int       $riskId      Risk ID
-     * @param  array     $riskTasks   Taches, indexees par identifiant de risque
+     * Le SICTOM lit le listing bloc par bloc : une liste unique ne disait pas ou en etait
+     * chaque action. Un bloc sans action n'est pas rendu du tout - la maquette rayait les
+     * « N/A » qui occupaient la place sans rien apprendre. Issue #5299
+     *
+     * @param  int       $riskId      Identifiant du risque
+     * @param  array     $riskTasks   Taches indexees par risque
      * @param  Translate $outputLangs Lang object
-     * @return string                 Texte de la cellule
+     * @return string                 Texte de la cellule, vide si le risque n'a aucune action
      */
     protected function riskTasksText(int $riskId, array $riskTasks, Translate $outputLangs): string
     {
@@ -1358,7 +1379,9 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
             return '';
         }
 
-        $lines = [];
+        $inProgress = [];
+        $done       = [];
+
         foreach ($riskTasks[$riskId] as $riskTask) {
             $progress = $riskTask->progress;
             if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS')) {
@@ -1368,8 +1391,12 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
                 }
             }
 
-            if ($progress == 100 && !getDolGlobalInt('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE')) {
-                $lines[] = $outputLangs->transnoentities('ActionPreventionCompletedTaskDone');
+            $isDone = ($progress >= 100);
+
+            // Les actions soldees peuvent etre masquees : le bloc le dit alors une fois,
+            // au lieu de repeter la meme phrase par action
+            if ($isDone && !getDolGlobalInt('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE')) {
+                $done[0] = $outputLangs->transnoentities('ActionPreventionCompletedTaskDone');
                 continue;
             }
 
@@ -1391,12 +1418,28 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
             if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT')) {
                 $line .= "\n" . $outputLangs->transnoentities('Budget') . ' : ' . price($riskTask->budget_amount, 0, $outputLangs, 1, 0, 0, $conf->currency);
             }
-            $line .= (getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT') ? "\n" : ' - ') . $outputLangs->transnoentities('DigiriskProgress') . ' : ' . ($progress ?: 0) . ' %';
 
-            $lines[] = $line;
+            // Une action terminee porte son avancement dans son bloc : le repeter n'apprend rien
+            if (!$isDone) {
+                $line .= (getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT') ? "\n" : ' - ') . $outputLangs->transnoentities('DigiriskProgress') . ' : ' . ($progress ?: 0) . ' %';
+            }
+
+            if ($isDone) {
+                $done[] = $line;
+            } else {
+                $inProgress[] = $line;
+            }
         }
 
-        return implode("\n\n", $lines);
+        $blocks = [];
+        if (!empty($inProgress)) {
+            $blocks[] = $outputLangs->transnoentities('ListingRisksActionsInProgress') . " :\n" . implode("\n\n", $inProgress);
+        }
+        if (!empty($done)) {
+            $blocks[] = $outputLangs->transnoentities('ListingRisksActionsDone') . " :\n" . implode("\n\n", $done);
+        }
+
+        return implode("\n\n", $blocks);
     }
 
     /**
@@ -1439,15 +1482,13 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
 
         $header = [
             $outputLangs->transnoentities('ListingRisksRegisterRefColumn'),
-            $outputLangs->transnoentities('DigiriskElement'),
+            $outputLangs->transnoentities('ListingRisksElementColumn'),
             $outputLangs->transnoentities('Categories'),
-            $outputLangs->transnoentities('DateCreation'),
-            $outputLangs->transnoentities('Subject'),
+            $outputLangs->transnoentities('ListingRisksRegisterDeclarationDate'),
             $outputLangs->transnoentities('TicketMessage'),
-            $outputLangs->transnoentities('DigiriskProgress'),
             $outputLangs->transnoentities('Status')
         ];
-        $widths = [32, 60, 45, 28, 70, 105, 22, 38];
+        $widths = [32, 66, 52, 40, 172, 38];
 
         $rows = [];
         foreach ($tickets as $ticket) {
@@ -1456,9 +1497,7 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
                 $ticket->digiriskElementRefLabel ?? '',
                 $this->registerCategories($ticket),
                 ['text' => dol_print_date($ticket->datec, 'dayreduceformat', 'tzuser', $outputLangs), 'align' => 'C'],
-                $ticket->subject,
                 dol_string_nohtmltag($ticket->message),
-                ['text' => ($ticket->progress ?: 0) . ' %', 'align' => 'C'],
                 ['text' => $ticket->getLibStatut(), 'align' => 'C']
             ];
         }
@@ -1603,16 +1642,14 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         }
 
         $header = [
-            $outputLangs->transnoentities('Ref'),
-            $outputLangs->transnoentities('AccidentDate'),
-            $outputLangs->transnoentities('DigiriskElement'),
-            $outputLangs->transnoentities('AccidentType'),
-            $outputLangs->transnoentities('Victim'),
-            $outputLangs->transnoentities('Label'),
-            $outputLangs->transnoentities('WorkStopDays'),
-            $outputLangs->transnoentities('Status')
+            $outputLangs->transnoentities('ListingRisksAccidentRefColumn'),
+            $outputLangs->transnoentities('ListingRisksAccidentWorkStopColumn'),
+            $outputLangs->transnoentities('ListingRisksAccidentElementColumn'),
+            $outputLangs->transnoentities('LesionLocalization'),
+            $outputLangs->transnoentities('LesionNature'),
+            $outputLangs->transnoentities('ListingRisksAccidentLabelColumn')
         ];
-        $widths = [32, 30, 60, 42, 55, 125, 24, 32];
+        $widths = [32, 26, 62, 60, 60, 160];
 
         $perimeter = $this->perimeterElements($object);
         $extraData = $this->accidentExtraData(array_keys($accidents));
@@ -1626,17 +1663,17 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
 
             $rows[] = [
                 $accident->ref,
-                ['text' => dol_print_date($accident->accident_date, 'dayreduceformat', 'tzuser', $outputLangs), 'align' => 'C'],
+                ['text' => empty($extraData[$accident->id]['days']) ? '' : (int) $extraData[$accident->id]['days'], 'align' => 'C'],
                 $elementLabel,
-                $outputLangs->transnoentities($accident->fields['accident_type']['arrayofkeyval'][(int) $accident->accident_type] ?? 'WorkAccidentStatement'),
-                $extraData[$accident->id]['victim'] ?? '',
-                $accident->label,
-                ['text' => (int) ($extraData[$accident->id]['days'] ?? 0), 'align' => 'C'],
-                ['text' => $accident->getLibStatut(), 'align' => 'C']
+                $extraData[$accident->id]['lesionLocalization'] ?? '',
+                $extraData[$accident->id]['lesionNature'] ?? '',
+                $accident->label
             ];
         }
 
         $this->table($pdf, $header, $rows, $widths, $size);
+
+        $this->paragraph($pdf, $outputLangs->transnoentities('ListingRisksAccidentWorkStopNote'), $size - 1, 'I', [140, 140, 140]);
     }
 
     /**
@@ -1676,14 +1713,15 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     }
 
     /**
-     * Jours d'arret et victime de chaque accident, en une requete.
+     * Jours d'arret et lesions des accidents, en deux requetes plutot qu'une.
      *
-     * Meme forme que loadTaskResponsibles() plus haut : une jointure sur la table des
-     * utilisateurs plutot qu'un User::fetch() par ligne, le document n'ayant besoin que
-     * du nom. Les identifiants sont convertis en entiers, donc la liste est sure.
+     * Un accident porte plusieurs arrets et plusieurs lesions : les joindre dans la meme
+     * requete multiplierait les lignes et fausserait la somme des jours. Les lesions sont
+     * donc lues a part, puis regroupees en PHP - ni le module ni le socle n'utilisent
+     * GROUP_CONCAT, qui ne serait de toute facon pas portable hors MySQL.
      *
-     * @param  array $accidentIds Identifiants des accidents affiches
-     * @return array              ['days' => int, 'victim' => string], indexes par accident
+     * @param  array $accidentIds Identifiants des accidents
+     * @return array              Par identifiant : days, lesionLocalization, lesionNature
      */
     protected function accidentExtraData(array $accidentIds): array
     {
@@ -1691,23 +1729,47 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
             return [];
         }
 
-        $sql  = 'SELECT a.rowid, SUM(ws.workstop_days) as days, u.firstname, u.lastname';
-        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident as a';
-        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop as ws ON ws.fk_accident = a.rowid';
-        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'user as u ON u.rowid = a.fk_user_employer';
-        $sql .= ' WHERE a.rowid IN (' . implode(',', array_map('intval', $accidentIds)) . ')';
-        $sql .= ' GROUP BY a.rowid, u.firstname, u.lastname';
-
+        $ids       = implode(',', array_map('intval', $accidentIds));
         $extraData = [];
-        $resql     = $this->db->query($sql);
+
+        $sql  = 'SELECT ws.fk_accident, SUM(ws.workstop_days) as days';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop as ws';
+        $sql .= ' WHERE ws.fk_accident IN (' . $ids . ')';
+        $sql .= ' GROUP BY ws.fk_accident';
+
+        $resql = $this->db->query($sql);
         if ($resql) {
             while ($obj = $this->db->fetch_object($resql)) {
-                $extraData[(int) $obj->rowid] = [
-                    'days'   => (int) $obj->days,
-                    'victim' => trim($obj->firstname . ' ' . $obj->lastname)
-                ];
+                $extraData[(int) $obj->fk_accident]['days'] = (int) $obj->days;
             }
             $this->db->free($resql);
+        }
+
+        $sql  = 'SELECT l.fk_accident, l.lesion_localization, l.lesion_nature';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_lesion as l';
+        $sql .= ' WHERE l.fk_accident IN (' . $ids . ')';
+        $sql .= ' ORDER BY l.rowid';
+
+        $localizations = [];
+        $natures       = [];
+        $resql         = $this->db->query($sql);
+        if ($resql) {
+            while ($obj = $this->db->fetch_object($resql)) {
+                $accidentId = (int) $obj->fk_accident;
+                if (dol_strlen($obj->lesion_localization)) {
+                    $localizations[$accidentId][] = $obj->lesion_localization;
+                }
+                if (dol_strlen($obj->lesion_nature)) {
+                    $natures[$accidentId][] = $obj->lesion_nature;
+                }
+            }
+            $this->db->free($resql);
+        }
+
+        foreach ($accidentIds as $accidentId) {
+            $accidentId = (int) $accidentId;
+            $extraData[$accidentId]['lesionLocalization'] = implode(', ', $localizations[$accidentId] ?? []);
+            $extraData[$accidentId]['lesionNature']       = implode(', ', $natures[$accidentId] ?? []);
         }
 
         return $extraData;
