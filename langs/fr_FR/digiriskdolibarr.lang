@@ -2468,6 +2468,7 @@ ListingRisksRegistersTitle         = Registres santé sécurité
 ListingRisksRegisterRefColumn      = N° du registre
 ListingRisksNoRegister             = Aucun registre sur ce périmètre
 ListingRisksShowAccidents          = Inclure les accidents
+ListingRisksShowPhoto              = Inclure la photo des évaluations
 ListingRisksAccidentsDateRange     = Période des accidents
 ListingRisksAccidentsTitle         = Accidents
 ListingRisksNoAccident             = Aucun accident sur ce périmètre
@@ -2481,6 +2482,10 @@ ListingRisksAccidentWorkStopColumn = Nbre jours AT
 ListingRisksAccidentElementColumn  = Élément de l'accident
 ListingRisksAccidentLabelColumn    = Description du presque accident ou accident
 ListingRisksAccidentWorkStopNote   = * si non rempli, arrêt en cours
+ListingRisksRiskRefColumn          = Id RA
+ListingRisksRiskDescriptionColumn  = Description du risque
+ListingRisksActionsInProgress      = Actions en cours
+ListingRisksActionsDone            = Actions terminées
 NewProductRisk                     = Nouveau risque produit
 
 # Audit report - issue #4459

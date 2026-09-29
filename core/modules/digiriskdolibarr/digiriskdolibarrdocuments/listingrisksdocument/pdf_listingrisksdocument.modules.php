@@ -110,6 +110,11 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     protected array $taskResponsibles = [];
 
     /**
+     * @var bool Afficher la colonne photo des evaluations - issue #5299
+     */
+    protected bool $showPhoto = true;
+
+    /**
      * Bande basse reservee au pied de page, en mm. Le contenu s'arrete au dessus, le pied
      * s'ecrit dedans : c'est ce qui garantit qu'ils ne se chevauchent jamais.
      */
@@ -1167,17 +1172,24 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
 
         $this->taskResponsibles = $this->loadTaskResponsibles($riskTasks);
 
+        // Sans choix explicite la photo reste affichee : le formulaire n'est pas toujours poste
+        $this->showPhoto = !isset($moreParam['showPhoto']) || !empty($moreParam['showPhoto']);
+
         $header = [
-            $outputLangs->transnoentities('DigiriskElement'),
-            $outputLangs->transnoentities('Ref'),
+            $outputLangs->transnoentities('ListingRisksElementColumn'),
+            $outputLangs->transnoentities('ListingRisksRiskRefColumn'),
             $outputLangs->transnoentities('ListingRisksCotationColumn'),
             $outputLangs->transnoentities('ListingRisksRiskColumn'),
-            $outputLangs->transnoentities('Description'),
-            $outputLangs->transnoentities('Photo'),
+            $outputLangs->transnoentities('ListingRisksRiskDescriptionColumn'),
             $outputLangs->transnoentities('ListingRisksAssessmentColumn'),
             $outputLangs->transnoentities('ListingRisksActionPlan')
         ];
-        $widths = [55, 32, 14, 40, 80, 32, 60, 87];
+        $widths = [55, 32, 14, 40, 95, 70, 94];
+
+        if ($this->showPhoto) {
+            array_splice($header, 5, 0, [$outputLangs->transnoentities('Photo')]);
+            $widths = [55, 32, 14, 40, 80, 32, 60, 87];
+        }
 
         $this->newPage($pdf);
         $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksListTitle'), $size);
@@ -1250,16 +1262,21 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         $categoryName = getDolGlobalInt('DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME') ? $riskLine->getDangerCategoryName($riskLine, $riskLine->type) : '';
         $pictoPath    = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $riskLine->getDangerCategory($riskLine, $riskLine->type) . '.png';
 
-        return [
+        $cells = [
             $elementLabel,
             $riskLine->ref . "\n" . $riskLine->riskAssessmentRef,
             ['text' => (string) ($riskLine->riskAssessmentCotation ?: 0), 'align' => 'C', 'bold' => true, 'fill' => $this->levelBg[$level], 'color' => $this->levelText[$level]],
             ['text' => $categoryName, 'align' => 'C', 'image' => is_readable($pictoPath) ? $pictoPath : ''],
             saturne_flatten_wysiwyg_blocks($riskLine->description, true),
-            ['image' => $this->riskAssessmentPhotoPath($riskLine), 'text' => ''],
             $this->riskAssessmentComment($riskLine, $outputLangs),
             $this->riskTasksText($riskLine->id, $riskTasks, $outputLangs)
         ];
+
+        if ($this->showPhoto) {
+            array_splice($cells, 5, 0, [['image' => $this->riskAssessmentPhotoPath($riskLine), 'text' => '']]);
+        }
+
+        return $cells;
     }
 
     /**
@@ -1343,12 +1360,16 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     }
 
     /**
-     * Taches du programme annuel de prevention rattachees a un risque.
+     * Plan d'actions d'un risque, scinde entre actions en cours et actions terminees.
      *
-     * @param  int       $riskId      Risk ID
-     * @param  array     $riskTasks   Taches, indexees par identifiant de risque
+     * Le SICTOM lit le listing bloc par bloc : une liste unique ne disait pas ou en etait
+     * chaque action. Un bloc sans action n'est pas rendu du tout - la maquette rayait les
+     * « N/A » qui occupaient la place sans rien apprendre. Issue #5299
+     *
+     * @param  int       $riskId      Identifiant du risque
+     * @param  array     $riskTasks   Taches indexees par risque
      * @param  Translate $outputLangs Lang object
-     * @return string                 Texte de la cellule
+     * @return string                 Texte de la cellule, vide si le risque n'a aucune action
      */
     protected function riskTasksText(int $riskId, array $riskTasks, Translate $outputLangs): string
     {
@@ -1358,7 +1379,9 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
             return '';
         }
 
-        $lines = [];
+        $inProgress = [];
+        $done       = [];
+
         foreach ($riskTasks[$riskId] as $riskTask) {
             $progress = $riskTask->progress;
             if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS')) {
@@ -1368,8 +1391,12 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
                 }
             }
 
-            if ($progress == 100 && !getDolGlobalInt('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE')) {
-                $lines[] = $outputLangs->transnoentities('ActionPreventionCompletedTaskDone');
+            $isDone = ($progress >= 100);
+
+            // Les actions soldees peuvent etre masquees : le bloc le dit alors une fois,
+            // au lieu de repeter la meme phrase par action
+            if ($isDone && !getDolGlobalInt('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE')) {
+                $done[0] = $outputLangs->transnoentities('ActionPreventionCompletedTaskDone');
                 continue;
             }
 
@@ -1391,12 +1418,28 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
             if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT')) {
                 $line .= "\n" . $outputLangs->transnoentities('Budget') . ' : ' . price($riskTask->budget_amount, 0, $outputLangs, 1, 0, 0, $conf->currency);
             }
-            $line .= (getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT') ? "\n" : ' - ') . $outputLangs->transnoentities('DigiriskProgress') . ' : ' . ($progress ?: 0) . ' %';
 
-            $lines[] = $line;
+            // Une action terminee porte son avancement dans son bloc : le repeter n'apprend rien
+            if (!$isDone) {
+                $line .= (getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT') ? "\n" : ' - ') . $outputLangs->transnoentities('DigiriskProgress') . ' : ' . ($progress ?: 0) . ' %';
+            }
+
+            if ($isDone) {
+                $done[] = $line;
+            } else {
+                $inProgress[] = $line;
+            }
         }
 
-        return implode("\n\n", $lines);
+        $blocks = [];
+        if (!empty($inProgress)) {
+            $blocks[] = $outputLangs->transnoentities('ListingRisksActionsInProgress') . " :\n" . implode("\n\n", $inProgress);
+        }
+        if (!empty($done)) {
+            $blocks[] = $outputLangs->transnoentities('ListingRisksActionsDone') . " :\n" . implode("\n\n", $done);
+        }
+
+        return implode("\n\n", $blocks);
     }
 
     /**
