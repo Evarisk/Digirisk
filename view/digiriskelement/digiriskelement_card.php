@@ -368,7 +368,14 @@ if (($id || $ref) && $action == 'edit') {
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_edit.tpl.php';
 
 	if ($id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
-        $children         = $object->fetchDigiriskElementFlat($id);
+        // The edit form unsets fk_parent and element_type from $object->fields to keep them out of
+        // the generic table, and fetchAll() builds its column list from there: queried through
+        // $object, every element came back without its parent, so the tree was flat and no
+        // descendant was ever excluded from the parent list
+        $parentSelector = new DigiriskElement($db);
+        $parentSelector->fetch($id);
+
+        $children         = $parentSelector->fetchDigiriskElementFlat($id);
         $childrenElements = [];
         if (is_array($children) && !empty($children)) {
             foreach ($children as $key => $value) {
@@ -376,7 +383,7 @@ if (($id || $ref) && $action == 'edit') {
             }
         }
         print '<tr><td>' . $langs->trans("ParentElement") . '</td><td>';
-		print $object->selectDigiriskElementList($object->fk_parent, 'fk_parent', ['customsql' => 'element_type="groupment" AND t.rowid NOT IN (' . rtrim(implode(',', $deletedElements) . ',' . implode(',', $childrenElements), ',') . ')'], 0, 0, [], 0, 0, 'minwidth100 maxwidth300', GETPOST('id'));
+		print $parentSelector->selectDigiriskElementList($object->fk_parent, 'fk_parent', ['customsql' => 't.element_type = \'groupment\' AND t.rowid NOT IN (' . rtrim(implode(',', $deletedElements) . ',' . implode(',', $childrenElements), ',') . ')'], 0, 0, [], 0, 0, 'minwidth100 maxwidth300', GETPOST('id'));
 	}
 
 	print '</td></tr>';

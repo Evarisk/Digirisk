@@ -283,10 +283,32 @@ function load_ticket_infos(array $moreParam = []): array
     }
 
     digiriskdolibarr_ticket_set_digirisk_elements($array['tickets']);
+    digiriskdolibarr_ticket_set_status($array['tickets']);
 
     $array['nbTickets'] = count($array['tickets']);
 
     return $array;
+}
+
+/**
+ * Mirror the fk_statut column onto the status property of each ticket — issue #5235
+ *
+ * Ticket declares its status column as fk_statut but reads it from $status everywhere,
+ * Ticket::fetch() being the only place that copies one onto the other. A ticket loaded
+ * through the generic setVarsFromFetchObj() of saturne_fetch_all_object_type() therefore
+ * keeps a null $status, Ticket::LibStatut() matches its case 0 on that null, returns an
+ * empty label, and the register lists of the documents print "N/A" in their status column.
+ *
+ * @param  array $tickets Tickets to complete, each one gets its status property set
+ * @return void
+ */
+function digiriskdolibarr_ticket_set_status(array $tickets): void
+{
+    foreach ($tickets as $ticket) {
+        if (!isset($ticket->status) && isset($ticket->fk_statut)) {
+            $ticket->status = (int) $ticket->fk_statut;
+        }
+    }
 }
 
 /**
@@ -629,4 +651,42 @@ function digiriskdolibarr_element_with_descendants(int $elementID, array $childr
 function digiriskdolibarr_ticket_location_use_list(array $locations): bool
 {
     return !empty($locations) && digiriskdolibarr_ticket_location_input_mode() !== 'free';
+}
+
+/**
+ * Modèles d'email utilisables pour un ticket, pour un sélecteur de configuration — issue #5235
+ *
+ * Même périmètre que le socle : les types de modèle ticket, ticket_send et all, actifs et
+ * visibles depuis l'entité courante. L'entrée vide est celle qui conserve le contenu écrit
+ * en dur, de sorte qu'une configuration jamais touchée ne change rien aux envois en place.
+ *
+ * @return array Libellé du modèle en clé, libellé affiché en valeur
+ */
+function digiriskdolibarr_ticket_mail_models(): array
+{
+    global $db, $langs;
+
+    $mailModels = ['' => $langs->transnoentities('TicketSubmittedMailModelDefault')];
+
+    $sql  = 'SELECT label, lang FROM ' . MAIN_DB_PREFIX . 'c_email_templates';
+    $sql .= " WHERE type_template IN ('ticket', 'ticket_send', 'all')";
+    $sql .= ' AND entity IN (' . getEntity('c_email_templates') . ')';
+    $sql .= ' AND active = 1';
+    $sql .= $db->order('position, label', 'ASC, ASC');
+
+    $resql = $db->query($sql);
+    if (!$resql) {
+        dol_syslog(__FUNCTION__ . ' ' . $db->lasterror(), LOG_ERR);
+        return $mailModels;
+    }
+
+    while ($obj = $db->fetch_object($resql)) {
+        if (empty($obj->label)) {
+            continue;
+        }
+        $mailModels[$obj->label] = $obj->label . (!empty($obj->lang) ? ' (' . $obj->lang . ')' : '');
+    }
+    $db->free($resql);
+
+    return $mailModels;
 }

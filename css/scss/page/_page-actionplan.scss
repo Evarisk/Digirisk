@@ -810,6 +810,25 @@
     color: inherit;
 }
 
+// Danger category thumbnail, on the white disc the pictograms are drawn for so they stay
+// readable over the dark cotation backgrounds
+.kanban-risk-picto {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    object-fit: contain;
+    flex: 0 0 auto;
+}
+
+.kanban-risk-cotation {
+    padding: 0 4px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.35);
+    font-weight: 700;
+    line-height: 14px;
+}
+
 .kanban-risk-tooltip-trigger {
     position: relative;
 }

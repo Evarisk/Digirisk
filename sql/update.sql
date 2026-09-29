@@ -305,3 +305,10 @@ ALTER TABLE llx_digiriskdolibarr_digiriskelement_product ADD INDEX idx_digiriske
 ALTER TABLE llx_digiriskdolibarr_digiriskelement_product ADD INDEX idx_digiriskelement_product_fk_product (fk_product);
 ALTER TABLE llx_digiriskdolibarr_digiriskelement_product ADD CONSTRAINT fk_digiriskelement_product_digiriskelement FOREIGN KEY (fk_digiriskelement) REFERENCES llx_digiriskdolibarr_digiriskelement (rowid);
 ALTER TABLE llx_digiriskdolibarr_digiriskelement_product ADD CONSTRAINT fk_digiriskelement_product_product FOREIGN KEY (fk_product) REFERENCES llx_product (rowid);
+
+-- 23.3.x - ITAMAMI analysis fields on the accident investigation (issue #4624)
+ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD itamami_individual text NULL AFTER circumstances;
+ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD itamami_task text NULL AFTER itamami_individual;
+ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD itamami_activity text NULL AFTER itamami_task;
+ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD itamami_material text NULL AFTER itamami_activity;
+ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD itamami_environment text NULL AFTER itamami_material;

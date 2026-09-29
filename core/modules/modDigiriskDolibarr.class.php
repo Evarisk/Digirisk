@@ -387,7 +387,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '23.3.0';
+		$this->version         = '23.5.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr_color@digiriskdolibarr';
 
@@ -498,7 +498,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->langfiles               = ["digiriskdolibarr@digiriskdolibarr"];
 		$this->phpmin                  = [7, 4]; // Minimum version of PHP required by module
 		$this->need_dolibarr_version   = [23, 0]; // Minimum version of Dolibarr required by module
-		$this->max_dolibarr_version    = [23, 0]; // Maximum version of Dolibarr supported by module
+		$this->max_dolibarr_version    = [24, 0]; // Maximum version of Dolibarr supported by module
 		$this->warnings_activation     = []; // Warning to show when we activate module. array('always'='text') or array('FR'='textfr','ES'='textes'...)
 		$this->warnings_activation_ext = []; // Warning to show when we activate an external module. array('always'='text') or array('FR'='textfr','ES'='textes'...)
 		//$this->automatic_activation = array('FR'=>'DigiriskDolibarrWasAutomaticallyActivatedBecauseOfYourCountryChoice');
@@ -788,6 +788,7 @@ class modDigiriskdolibarr extends DolibarrModules
             $i++ => ['DIGIRISKDOLIBARR_TICKET_MULTICOMPANY_PUBLIC_INTERFACE_URL_ORIGIN', 'chaine', dol_buildpath('custom/digiriskdolibarr/public/ticket/create_ticket.php', 2), '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', 'chaine', '', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_TICKET_SUBMITTED_MAIL_MODEL', 'chaine', '', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL', 'chaine', $langs->trans('Registre'), '', 0, 'current'],
@@ -836,6 +837,7 @@ class modDigiriskdolibarr extends DolibarrModules
             $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSDOCUMENT_BACKWARD_ODT_PATH_SET', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_BACKWARD_TRASH_ELEMENTS', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_TASK_REF_BACKWARD_SET', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_WORKUNIT_UT_REF_SET', 'integer', 1, '', 0, 'current'],
 
             // CONST ACCIDENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'],
@@ -1505,6 +1507,22 @@ class modDigiriskdolibarr extends DolibarrModules
 		];
 
 		$this->menu[$r++] = [
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',
+			'type'     => 'left',
+			'titre'    => $langs->transnoentities('PwaApplication'),
+			'prefix'   => '<i class="fas fa-mobile-alt pictofixedwidth"></i>',
+			'mainmenu' => 'digiriskdolibarr',
+			'leftmenu' => 'digiriskdolibarr_pwa',
+			'url'      => '/digiriskdolibarr/view/frontend/pwa_home.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+			'position' => 100 + $r,
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',
+			'perms'    => '$user->rights->digiriskdolibarr->preventionplan->read || $user->rights->digiriskdolibarr->firepermit->read',
+			'target'   => '',
+			'user'     => 2,
+		];
+
+		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    		// '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left', 										// This is a Left menu entry
 			'titre'    => $langs->trans('RiskAssessmentDocument'),
@@ -1642,22 +1660,6 @@ class modDigiriskdolibarr extends DolibarrModules
             'target'   => '',
             'user'     => 0,
         ];
-
-		$this->menu[$r++] = [
-			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',
-			'type'     => 'left',
-			'titre'    => $langs->transnoentities('PwaApplication'),
-			'prefix'   => '<i class="fas fa-mobile-alt pictofixedwidth"></i>',
-			'mainmenu' => 'digiriskdolibarr',
-			'leftmenu' => 'digiriskdolibarr_pwa',
-			'url'      => '/digiriskdolibarr/view/frontend/pwa_home.php',
-			'langs'    => 'digiriskdolibarr@digiriskdolibarr',
-			'position' => 100 + $r,
-			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',
-			'perms'    => '$user->rights->digiriskdolibarr->preventionplan->read || $user->rights->digiriskdolibarr->firepermit->read',
-			'target'   => '',
-			'user'     => 2,
-		];
 
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
@@ -2206,7 +2208,7 @@ class modDigiriskdolibarr extends DolibarrModules
 	 * @return     int                1 if OK, 0 if KO
 	 * @throws Exception
 	 */
-	public function init($options = '')
+	public function init($options = ''): int
 	{
 		global $conf, $langs, $user;
 
@@ -2336,24 +2338,34 @@ class modDigiriskdolibarr extends DolibarrModules
 			$trashRef                      = 'GP0';
 			$digiriskelement               = new Groupment($this->db);
 			$digiriskelement->ref          = $trashRef;
-			$digiriskelement->label        = $langs->trans('HiddenElements');
+			$digiriskelement->label        = $langs->transnoentities('HiddenElements');
 			$digiriskelement->element_type = 'groupment';
 			$digiriskelement->ranks        = 0;
-			$digiriskelement->description  = $langs->trans('TrashGroupment');
-			$digiriskelement->status       = DigiriskElement::STATUS_TRASHED;
+			$digiriskelement->description  = $langs->transnoentities('TrashGroupment');
+			$digiriskelement->status       = DigiriskElement::STATUS_TRASH_ROOT;
 			$trash_id                      = $digiriskelement->create($user);
 
-			// Elements of the current entity already trashed under the foreign trash must follow the new one
-			if ($previousTrashID > 0 && $trash_id > 0) {
-				$trashedElements = $trash->fetchAll('', '', 0, 0, ['customsql' => 't.fk_parent = ' . $previousTrashID . ' AND t.entity = ' . ((int) $conf->entity)]);
-				if (is_array($trashedElements)) {
-					foreach ($trashedElements as $trashedElement) {
-						$trashedElement->setValueFrom('fk_parent', $trash_id, '', null, '', '', $user);
+			// A failed creation returns -1: writing it in the constant would make every later delete()
+			// reparent its element on a missing id, which is how an entity ends up losing its GP/WU
+			if ($trash_id > 0) {
+				// create() forces the validated status, so the bin would show up as an ordinary groupment
+				$digiriskelement->status = DigiriskElement::STATUS_TRASH_ROOT;
+				$digiriskelement->update($user, 1);
+
+				// Elements of the current entity already trashed under the foreign trash must follow the new one
+				if ($previousTrashID > 0) {
+					$trashedElements = $trash->fetchAll('', '', 0, 0, ['customsql' => 't.fk_parent = ' . $previousTrashID . ' AND t.entity = ' . ((int) $conf->entity)]);
+					if (is_array($trashedElements)) {
+						foreach ($trashedElements as $trashedElement) {
+							$trashedElement->setValueFrom('fk_parent', $trash_id, '', null, '', '', $user);
+						}
 					}
 				}
-			}
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', $trash_id, 'integer', 0, '', $conf->entity);
+				dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', $trash_id, 'integer', 0, '', $conf->entity);
+				// Replay the backward block so the new bin gets its trash picture
+				dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED', 0, 'integer', 0, '', $conf->entity);
+			}
 		}
 
         require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
@@ -2843,7 +2855,7 @@ class modDigiriskdolibarr extends DolibarrModules
                 'RiskSign'              => ['greip', 'RS{0}'],
                 'Evaluator'             => ['bebhionn', 'EV{0}'],
                 'Groupment'             => ['sirius', 'GP{0}'],
-                'WorkUnit'              => ['canopus', (version_compare($conf->global->DIGIRISKDOLIBARR_VERSION, '9.14.1', '>=')  ? 'UT{0}' : 'WU{0}')],
+                'WorkUnit'              => ['canopus', 'UT{0}'],
                 'Accident'              => ['curtiss', 'ACC{0}'],
                 'AccidentLesion'        => ['wright', 'ACCL{0}'],
                 'AccidentWorkStop'      => ['richthofen', 'ACCW{0}'],
@@ -2859,7 +2871,7 @@ class modDigiriskdolibarr extends DolibarrModules
                 'ListingRisksAction'            => ['gunnlod', 'RLA{0}'],
                 'ListingRisksPhoto'             => ['fornjot', 'RLP{0}'],
                 'GroupmentDocument'             => ['mundilfari', 'GPD{0}'],
-                'WorkUnitDocument'              => ['hati', (version_compare($conf->global->DIGIRISKDOLIBARR_VERSION, '9.14.1', '>=') ? 'UTD{0}' : 'WUD{0}')],
+                'WorkUnitDocument'              => ['hati', 'UTD{0}'],
                 'RiskAssessmentDocument'        => ['eggther', 'DU{0}'],
                 'PreventionPlanDocument'        => ['bestla', 'PPD{0}'],
                 'FirePermitDocument'            => ['greip', 'FPD{0}'],
@@ -2901,6 +2913,20 @@ class modDigiriskdolibarr extends DolibarrModules
 
             if (digiriskdolibarr_backfill_task_refs() >= 0) {
                 dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TASK_REF_BACKWARD_SET', 1, 'integer', 0, '', $conf->entity);
+            }
+        }
+
+        // BACKWARD WORKUNIT UT REF : les installations anterieures a 9.14.1 numerotaient leurs
+        // unites de travail en WU et continuaient de le faire, le masque n'ayant ete bascule
+        // que pour les nouvelles installations
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_WORKUNIT_UT_REF_SET')) {
+            require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_WORKUNIT_CANOPUS_ADDON', 'UT{0}', 'chaine', 0, '', $conf->entity);
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_HATI_ADDON', 'UTD{0}', 'chaine', 0, '', $conf->entity);
+
+            if (digiriskdolibarr_migrate_workunit_refs_to_ut() >= 0) {
+                dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_WORKUNIT_UT_REF_SET', 1, 'integer', 0, '', $conf->entity);
             }
         }
 
@@ -2972,7 +2998,7 @@ class modDigiriskdolibarr extends DolibarrModules
 	 *  @param      string	$options    Options when enabling module ('', 'noboxes')
 	 *  @return     int                 1 if OK, 0 if KO
 	 */
-	public function remove($options = '')
+	public function remove($options = ''): int
 	{
 		global $conf;
 

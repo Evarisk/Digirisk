@@ -268,52 +268,54 @@ npm start   # équivalent, défini dans package.json via cross-env
 ---
 
 ## 11. Quality Tooling
+
 | Tool | Purpose | Config file | Enforced in CI |
 |------|---------|-------------|----------------|
-| **PHPCS** | PHP style enforcement (PSR-12) | `.phpcs.xml` | ✓ (blocks build) |
-| **phpcbf** | Auto-fix PSR-12 violations | `.phpcs.xml` | — (local only) |
-| **JSHint** | JS validation | `.jshintrc` | ✓ (blocks build) |
-| **PHPStan** | Static analysis — max level | `phpstan.neon` | ✓ (quality job) |
-| **Phan** | Deep static analysis | `.phan/config.php` | ✓ (quality job) |
-| **PHPUnit** | Unit tests | `tests/phpunit/phpunittest.xml` | ✓ (quality job) |
-| **EditorConfig** | Indentation, charset, line endings consistent across all editors | `.editorconfig` | — (editor-side) |
+| **PHP lint** (`php -l`) | Parse error on any `.php` file | — | ✓ (`quality.yml`, job `lint`) |
+| **Lang parity** | A key in `en_US` with no `fr_FR` counterpart | `dev/ci/lang-parity.php` | ✓ (`quality.yml`, job `lint`) |
+| **PHPStan** | Static analysis, level 8, against a baseline | `phpstan.neon` | ✓ (`quality.yml`, job `phpstan`) |
+| **PHPUnit** | Unit tests | `test/phpunit/phpunit.xml` | ✗ — see below |
+| **EditorConfig** | Indentation, charset, line endings | `.editorconfig` | — (editor-side) |
 
-PHPCS and JSHint run **before** compilation in CI (`build-assets-reusable.yml` — `lint` job must pass before `build` job starts).
-PHPStan, Phan, and PHPUnit run in a separate `quality.yml` workflow, triggered on push/PR to `main` and `develop`.
+Nothing else is enforced. This module has **no PHPCS, no JSHint and no Phan** configuration:
+if you need one, it has to be written first. `build-assets.yml` compiles the assets and does
+not lint anything.
 
-**Indentation** — this project uses **spaces** (PSR-12, 4 spaces), unlike Dolibarr core which uses tabs. Never mix the two.
+**Indentation** — this project uses **spaces** (PSR-12, 4 spaces), unlike Dolibarr core which
+uses tabs. Nothing checks it, so it is on you.
 
-Run locally:
+### PHPStan
+
+Level 8, pinned to PHP 8.1, with `phpstan.baseline.neon` freezing the 3621 errors that
+predate the pipeline. The job is therefore green on a healthy branch and only turns red on a
+**new** error. The baseline is meant to shrink, never to grow: when you fix a baselined
+error, regenerate it and commit the smaller file.
+
+The module is analysed in place, as Dolibarr loads it: `phpstan.neon` reaches outside the
+module (`../saturne/`, `../../core/class/`, …) to resolve the inherited classes. It therefore
+only runs from a real `htdocs/custom/digiriskdolibarr` — see
+`.github/workflows/quality.yml` for the layout the CI builds, and
+`dev/phpstan/bootstrap.php` for the Dolibarr constants it defines.
+
+Never stub a Dolibarr or Saturne class in the bootstrap: a stub wins over the real class and
+turns every one of its methods into a false "undefined method".
+
 ```bash
-# PHPCS — check
-~/.composer/vendor/bin/phpcs --standard=.phpcs.xml --extensions=php --ignore=vendor,node_modules,css,js .
-
-# phpcbf — auto-fix (run before committing)
-~/.composer/vendor/bin/phpcbf --standard=.phpcs.xml .
-
-# JSHint
-jshint js/modules/*.js
-
-# PHPStan (0 errors when baseline is current)
-vendor/bin/phpstan analyse --memory-limit=512M
-
-# PHPUnit
-vendor/bin/phpunit --configuration tests/phpunit/phpunittest.xml --testdox
-
-# Phan — requires php-ast; runs in CI (PHP 8.1) only
-# vendor/bin/phan --config-file=.phan/config.php
+# From htdocs/custom/digiriskdolibarr, with Saturne next to it
+composer install
+vendor/bin/phpstan analyse --memory-limit=1G
+vendor/bin/phpstan analyse --memory-limit=1G --generate-baseline phpstan.baseline.neon
 ```
 
-**PHPStan baseline** — `phpstan.baseline.neon` suppresses pre-existing errors.
-When you fix a baselined error, regenerate it:
-```bash
-vendor/bin/phpstan analyse --memory-limit=512M --generate-baseline phpstan.baseline.neon
-```
+### PHPUnit
 
-**PHPUnit bootstrap** — `tests/phpunit/bootstrap.php` is stub-only (no Dolibarr DB).
-Tests that load `saturne_functions.lib.php` require `DOL_DOCUMENT_ROOT` to point to a Dolibarr `htdocs/` directory (available locally and in CI via sparse checkout).
+`test/phpunit/` holds 14 test classes, and `composer install` brings PHPUnit in, but **no CI
+job runs them**: `phpunit.xml` is an unadapted copy of the one from Dolibarr core (its
+whitelist points at core directories) and the tests need a live Dolibarr database. Treat
+them as a starting point, not as a safety net.
 
-EditorConfig is picked up automatically by most editors (VSCode, PhpStorm, etc.) — install the plugin if prompted.
+EditorConfig is picked up automatically by most editors (VSCode, PhpStorm, etc.) — install
+the plugin if prompted.
 
 ---
 

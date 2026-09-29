@@ -840,6 +840,13 @@ if (!empty($taskRiskMap)) {
             $dangerCatName = '';
         }
 
+        // Thumbnail of the danger category, so a card says which kind of risk it is at a
+        // glance instead of the single warning sign every risk shares - issue #5235
+        $dangerCatPicto = $riskObj->getDangerCategory($riskObj, $riskObj->type ?: 'risk');
+        if ($dangerCatPicto == -1) {
+            $dangerCatPicto = '';
+        }
+
         $raPhotoUrl = '';
         if ($lastRA) {
             $raDir = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastRA->ref;
@@ -875,6 +882,7 @@ if (!empty($taskRiskMap)) {
             'element_type'   => $elementInfo['type'] ?? '',
             'description'    => $riskObj->description,
             'category_name'  => $dangerCatName,
+            'category_picto' => $dangerCatPicto,
             'cotation'       => $cotation,
             'cotation_color' => $cotColor,
             'ra_ref'         => $lastRA ? $lastRA->ref : '',

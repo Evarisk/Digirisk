@@ -752,6 +752,10 @@ class ActionsDigiriskdolibarr
 
                 $moduleNameLowerCase = 'digiriskdolibarr';
                 $permissiontoadd     = $user->rights->ticket->write;
+
+                // The ticket belongs to the Dolibarr core and carries no module : without this,
+                // documents_action.tpl.php builds its download link on an empty modulepart
+                $object->module = $moduleNameLowerCase;
             }
 
             if ($action == 'remove_file' && preg_match('/\/(ticketdocument)\/|\/(digiriskdolibarr)\//', GETPOST('file'))) {

@@ -538,6 +538,8 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
         require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_mobile.lib.php';
 
+        $moreParam = self::getMoreParam($objectDocument, $moreParam);
+
         $object = $moreParam['object'];
 
         $outputLangs->loadLangs(['companies', 'projects', 'other', 'digiriskdolibarr@digiriskdolibarr']);

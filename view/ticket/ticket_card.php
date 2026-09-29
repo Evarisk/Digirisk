@@ -319,6 +319,7 @@ if ($action === 'post_message_ajax' && $permissionToWrite) {
             $modelId       = GETPOSTINT('model_id');
             $mailSubject   = $subject;
             $mailBodyInner = $body;
+            $hasTemplate   = false;
             if ($modelId > 0) {
                 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formmail.class.php';
                 $formmailTpl = new FormMail($db);
@@ -329,6 +330,7 @@ if ($action === 'post_message_ajax' && $permissionToWrite) {
                     }
                     if (!empty($tpl->content)) {
                         $mailBodyInner = $tpl->content . '<br><br>' . $body;
+                        $hasTemplate   = true;
                     }
                 }
             }
@@ -336,7 +338,12 @@ if ($action === 'post_message_ajax' && $permissionToWrite) {
             if ($mailSubject === '') {
                 $mailSubject = '[' . $appli . ' - ' . $langs->transnoentities('Ticket') . ' #' . $object->track_id . '] ' . $langs->transnoentities('TicketNewMessage');
             }
-            $intro     = getDolGlobalString('TICKET_MESSAGE_MAIL_INTRO', $langs->transnoentities('TicketMessageMailIntroText'));
+            // Le preambule du coeur - « Bonjour, une nouvelle reponse a ete ajoutee a un
+            // ticket que vous suivez. Voici le message : » - sert a introduire un message
+            // brut. Quand un modele d'email fournit son propre contenu, c'est lui
+            // l'introduction : mettre les deux donnait deux « Bonjour » a la suite,
+            // l'un au-dessus de l'autre. Issue #5281
+            $intro     = $hasTemplate ? '' : getDolGlobalString('TICKET_MESSAGE_MAIL_INTRO', $langs->transnoentities('TicketMessageMailIntroText'));
             $signature = getDolGlobalString('TICKET_MESSAGE_MAIL_SIGNATURE');
             $urlTicket = dol_buildpath('/ticket/card.php', 2) . '?track_id=' . $object->track_id;
             $mailBody  = ($intro !== '' ? $intro . '<br><br>' : '') . $mailBodyInner . '<br><br>'

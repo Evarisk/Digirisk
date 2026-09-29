@@ -88,6 +88,35 @@ if (empty($resHook)) {
 		$object->ref = '';
 	}
 
+    // Options choisies dans l'encadre de configuration de la page - issue #5235
+    if (($action == 'builddoc' || GETPOST('forcebuilddoc')) && $permissiontoadd) {
+        $moreParams['showRegisters'] = GETPOST('showregisters') ? 1 : 0;
+
+        // La plage de dates ne borne les registres que si elle est cochee : decochee, le
+        // listing les reprend tous
+        if (GETPOST('registerdaterange')) {
+            $moreParams['registerDateStart'] = dol_mktime(0, 0, 0, GETPOSTINT('registerdatestartmonth'), GETPOSTINT('registerdatestartday'), GETPOSTINT('registerdatestartyear'));
+            $moreParams['registerDateEnd']   = dol_mktime(23, 59, 59, GETPOSTINT('registerdateendmonth'), GETPOSTINT('registerdateendday'), GETPOSTINT('registerdateendyear'));
+            if ($moreParams['registerDateStart'] > $moreParams['registerDateEnd']) {
+                setEventMessages($langs->trans('StartDateCannotBeAfterEndDate'), null, 'errors');
+                header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . ($type == 'standard' ? '&type=standard' : ''));
+                exit;
+            }
+        }
+
+        $moreParams['showAccidents'] = GETPOST('showaccidents') ? 1 : 0;
+
+        if (GETPOST('accidentdaterange')) {
+            $moreParams['accidentDateStart'] = dol_mktime(0, 0, 0, GETPOSTINT('accidentdatestartmonth'), GETPOSTINT('accidentdatestartday'), GETPOSTINT('accidentdatestartyear'));
+            $moreParams['accidentDateEnd']   = dol_mktime(23, 59, 59, GETPOSTINT('accidentdateendmonth'), GETPOSTINT('accidentdateendday'), GETPOSTINT('accidentdateendyear'));
+            if ($moreParams['accidentDateStart'] > $moreParams['accidentDateEnd']) {
+                setEventMessages($langs->trans('StartDateCannotBeAfterEndDate'), null, 'errors');
+                header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . ($type == 'standard' ? '&type=standard' : ''));
+                exit;
+            }
+        }
+    }
+
     // Actions builddoc, forcebuilddoc, remove_file
     require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
 
@@ -142,7 +171,45 @@ if ($type != 'standard') {
 $fileDir    = [$upload_dir . '/' . $dirFiles[0], $upload_dir . '/' . $dirFiles[1], $upload_dir . '/' . $dirFiles[2]];
 $modulePart = 'digiriskdolibarr:ListingRisksDocument';
 
+// Options de génération — issue #5235. Le formulaire entoure aussi le bloc des documents :
+// c'est son bouton « Générer » qui le poste, comme sur le rapport d'audit
+$form = new Form($db);
+
+print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . ($type == 'standard' ? '&type=standard' : '') . '#builddoc" id="builddoc_form">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+
+print load_fiche_titre($langs->trans('ListingRisksOptions'), '', '');
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans('Parameters') . '</td>';
+print '<td>' . $langs->trans('Value') . '</td>';
+print '</tr>';
+
+// Registres santé sécurité, et la plage de dates qui les borne
+$firstDayOfTheYear = dol_get_first_day((int) date('Y'));
+print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksShowRegisters') . '</td>';
+print '<td><input type="checkbox" id="showregisters" name="showregisters" checked></td></tr>';
+print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksRegistersDateRange') . '</td>';
+print '<td>' . $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'registerdatestart');
+print $langs->trans('At') . $form->selectDate(dol_now(), 'registerdateend');
+print $langs->trans('UseDateRange');
+print '<input type="checkbox" id="registerdaterange" name="registerdaterange"></td></tr>';
+
+// Accidents, et la plage de dates qui les borne
+print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksShowAccidents') . '</td>';
+print '<td><input type="checkbox" id="showaccidents" name="showaccidents" checked></td></tr>';
+print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksAccidentsDateRange') . '</td>';
+print '<td>' . $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'accidentdatestart');
+print $langs->trans('At') . $form->selectDate(dol_now(), 'accidentdateend');
+print $langs->trans('UseDateRange');
+print '<input type="checkbox" id="accidentdaterange" name="accidentdaterange"></td></tr>';
+
+print '</table>';
+
 print saturne_show_documents($modulePart, $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object);
+
+print '</form>';
 
 // End of page
 llxFooter();

@@ -17,6 +17,25 @@ body:has(.page-ut-gp-list) {
   overflow-x: hidden;
 }
 
+/* Bounds the page #id-right to the viewport, so a wide list scrolls inside its own
+   .div-table-responsive instead of stretching the whole page: #id-right is a table-cell,
+   its width follows its content and every descendant inherits that, overflow-x included.
+   Dolibarr answers this with the body class classforhorizontalscrolloftabs, but it sets
+   width: calc(100% - <left menu width + 30>px): the space of the standard left menu, which
+   GP/UT pages minimize or hide (digirisk_header() nests its own layout and the navigation
+   tree is positioned absolutely). The width was amputated for a menu that is not there.
+   A flex row hands #id-right whatever the left menu leaves, be it displayed, minimized or
+   hidden, and min-width: 0 lets it shrink under its content, which is what makes the inner
+   overflow-x scroll instead of growing. */
+body.digirisk-horizontal-scroll > #id-container {
+  display: flex;
+
+  > #id-right {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
 /** Screen */
 .page-ut-gp-list #id-right {
   padding-left: 300px;

@@ -508,10 +508,9 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 	}
 	$task->budget_amount = is_numeric($budget) ? $budget : ($task->budget ?? 0);
 
-	if ($taskProgress == 1) {
-		$task->progress = 100;
-	} else {
-		$task->progress = 0;
+	// The declared progress is only sent when the modal shows it, the calculated progress mode leaves the stored value alone
+	if (is_numeric($taskProgress)) {
+		$task->progress = min(100, max(0, (int) $taskProgress));
 	}
 
 	$result = $task->update($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_MODIFY));

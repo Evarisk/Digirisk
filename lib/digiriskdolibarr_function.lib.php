@@ -47,11 +47,25 @@ function digirisk_organization_actions()
         $arrayParentIds = preg_split('/,/', GETPOST('parent_ids'));
 
         if (!empty($arrayIds)) {
+            $trashElement = new DigiriskElement($db);
+            $trashID      = $trashElement->getTrashID();
             foreach ($arrayIds as $position => $elementId) {
                 $digiriskelement = new DigiriskElement($db);
-                $digiriskelement->fetch((int) $elementId);
+                if ($digiriskelement->fetch((int) $elementId) <= 0) {
+                    continue;
+                }
+                $parentID                   = (int) $arrayParentIds[$position];
                 $digiriskelement->ranks     = $position + 1;
-                $digiriskelement->fk_parent = $arrayParentIds[$position];
+                $digiriskelement->fk_parent = $parentID;
+                // Dropping an element in or out of the bin is what deletes or restores it: leaving the
+                // status behind would keep a restored element out of every list, or a binned one in them
+                if ($trashID > 0 && $digiriskelement->id != $trashID) {
+                    if ($parentID == $trashID) {
+                        $digiriskelement->status = DigiriskElement::STATUS_TRASHED;
+                    } elseif ($digiriskelement->status == DigiriskElement::STATUS_TRASHED) {
+                        $digiriskelement->status = DigiriskElement::STATUS_VALIDATED;
+                    }
+                }
                 $digiriskelement->update($user);
             }
         }
@@ -154,9 +168,18 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 
 	//Body navigation digirisk
 	$object = new DigiriskElement($db);
-	// The organization panel never lists trashed/deleted elements (status < 0), regardless of DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT,
-	// nor the archived ones, which live in the archive tab of their parent element
-	$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 't.status > 0 AND t.status <> ' . DigiriskElement::STATUS_ARCHIVED . ' AND t.entity IN ('. $conf->entity .')'));
+	// The archived elements are never listed here, they live in the archive tab of their parent element.
+	// The bin and the elements inside it are out of the active tree as well, and only come back when
+	// DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT is on -- without that branch the config does nothing
+	// and a deleted GP/WU cannot be reached from anywhere anymore
+	$statusFilter = 't.status > 0 AND t.status <> ' . DigiriskElement::STATUS_ARCHIVED;
+	if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT') > 0) {
+		$trashID = $object->getTrashID();
+		if ($trashID > 0) {
+			$statusFilter = '(' . $statusFilter . ' OR t.rowid = ' . $trashID . ' OR t.status = ' . DigiriskElement::STATUS_TRASHED . ')';
+		}
+	}
+	$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => $statusFilter . ' AND t.entity IN ('. $conf->entity .')'));
 
 	$digiriskElementTree = array();
 	if (!is_array($objects) && $objects<0) {
@@ -258,10 +281,14 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 									jQuery( '#unit'  + id ).addClass( 'active' );
 									jQuery( '#unit'  + id ).closest( '.unit' ).attr( 'value', id );
 
-									var container = jQuery('.navigation-container');
-									$(container).animate({
-										scrollTop: $("#unit"  + id).offset().top - 100
-									}, 500);
+									// A creation page carries no id: #unitnull does not exist and offset()
+									// comes back undefined, which used to break the whole inline script
+									var currentUnit = jQuery( '#unit' + id );
+									if (currentUnit.length > 0) {
+										jQuery('.navigation-container').animate({
+											scrollTop: currentUnit.offset().top - 100
+										}, 500);
+									}
 								}
 							</script>
 						</ul>
@@ -424,7 +451,9 @@ function display_recurse_tree($digiriskElementTree, $i = 1)
         $obj         = $element['object'];
         $type        = $obj->element_type;
         $hasChildren = ($type == 'groupment' && count($element['children']) > 0);
-        $isTrash     = ($obj->id == $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
+        $isTrash     = ((int) $obj->id === getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH'));
+        // An element sitting in the bin is already deleted: it can only be dragged back out
+        $isTrashed   = ((int) $obj->status === DigiriskElement::STATUS_TRASHED);
 
         $navLink = $user->rights->digiriskdolibarr->risk->read
             ? dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php?id=' . $obj->id . '&risk_type=' . $riskType, 1)
@@ -468,11 +497,11 @@ function display_recurse_tree($digiriskElementTree, $i = 1)
                 <?php echo digirisk_element_label($obj, 'name'); ?>
 
                 <div class="actions">
-                    <?php if ($user->rights->digiriskdolibarr->digiriskelement->write && $type == 'groupment' && !$isTrash) : ?>
+                    <?php if ($user->rights->digiriskdolibarr->digiriskelement->write && $type == 'groupment' && !$isTrash && !$isTrashed) : ?>
                     <div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event quick-add-btn" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>" data-parent-id="<?php echo $obj->id; ?>" data-parent-ref="<?php echo $obj->ref; ?>" data-parent-label="<?php echo dol_escape_htmltag($obj->label); ?>" data-type="groupment"><strong><?php echo $modGroupment->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
                     <div class="wpeo-button button-square-40 wpeo-tooltip-event quick-add-btn" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>" data-parent-id="<?php echo $obj->id; ?>" data-parent-ref="<?php echo $obj->ref; ?>" data-parent-label="<?php echo dol_escape_htmltag($obj->label); ?>" data-type="workunit"><strong><?php echo $modWorkUnit->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
                     <?php endif; ?>
-                    <?php if ($user->rights->digiriskdolibarr->digiriskelement->delete && !$isTrash) : ?>
+                    <?php if ($user->rights->digiriskdolibarr->digiriskelement->delete && !$isTrash && !$isTrashed) : ?>
                     <div class="wpeo-button button-square-40 button-red wpeo-tooltip-event delete-element-btn" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('Delete'); ?>" data-id="<?php echo $obj->id; ?>" data-ref="<?php echo $obj->ref; ?>"><i class="fas fa-trash"></i></div>
                     <?php endif; ?>
                 </div>
@@ -2981,4 +3010,160 @@ function digiriskdolibarr_backfill_task_refs(): int
     dol_syslog('digiriskdolibarr_backfill_task_refs : ' . $nbRepaired . ' task(s) repaired');
 
     return $nbRepaired;
+}
+
+/**
+ * Rename to UT the work unit references still numbered WU - issue #5235
+ *
+ * Work units were numbered WU until 9.14.1, UT since. bcb1aac5 only moved the mask of the
+ * installs that had never created anything, so an install older than that kept producing
+ * WU references forever and still shows them in every list and every document.
+ *
+ * Three things carry the prefix and have to move together :
+ * - the element reference itself, in digiriskelement,
+ * - the reference of its generated documents, WUD in saturne_object_documents,
+ * - the media directories, named after the element reference : SaturneDocumentModel builds
+ *   its path as <media>/<document type>/<element ref>, so leaving WU1 on disk while the
+ *   element becomes UT1 hides every document already generated for it.
+ *
+ * digiriskelement and saturne_object_documents both carry a unique key on their reference,
+ * so a reference whose UT twin already exists - an archived element, a restored backup - is
+ * left alone and logged rather than failing the whole activation.
+ *
+ * @return int Number of renamed references, -1 on database error
+ */
+function digiriskdolibarr_migrate_workunit_refs_to_ut(): int
+{
+    global $conf, $db;
+
+    $nbRenamed  = 0;
+    $mediaPath  = DOL_DATA_ROOT . ($conf->entity > 1 ? '/' . $conf->entity : '') . '/digiriskdolibarr';
+    $renamedRef = [];
+
+    // Elements : WU<n> becomes UT<n>
+    $sql   = 'SELECT rowid, ref FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement';
+    $sql  .= " WHERE entity = " . (int) $conf->entity . " AND ref LIKE 'WU%' ORDER BY rowid";
+    $resql = $db->query($sql);
+    if (!$resql) {
+        dol_syslog('digiriskdolibarr_migrate_workunit_refs_to_ut : ' . $db->lasterror(), LOG_ERR);
+        return -1;
+    }
+
+    $elements = [];
+    while ($obj = $db->fetch_object($resql)) {
+        if (preg_match('/^WU(\d+)$/', $obj->ref, $matches)) {
+            $elements[(int) $obj->rowid] = ['old' => $obj->ref, 'new' => 'UT' . $matches[1]];
+        }
+    }
+    $db->free($resql);
+
+    $takenRefs = digiriskdolibarr_taken_refs(MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement', 'entity = ' . (int) $conf->entity);
+    if (!is_array($takenRefs)) {
+        return -1;
+    }
+
+    foreach ($elements as $elementId => $refs) {
+        if (isset($takenRefs[$refs['new']])) {
+            dol_syslog('digiriskdolibarr_migrate_workunit_refs_to_ut : element ' . $refs['old'] . ' kept, ' . $refs['new'] . ' is already taken', LOG_WARNING);
+            continue;
+        }
+
+        // Direct update rather than DigiriskElement::update() : a renaming has no reason to
+        // fire the modification trigger, nor to rewrite every other field of the row
+        $sql = 'UPDATE ' . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskelement SET ref = '" . $db->escape($refs['new']) . "' WHERE rowid = " . (int) $elementId;
+        if (!$db->query($sql)) {
+            dol_syslog('digiriskdolibarr_migrate_workunit_refs_to_ut : ' . $db->lasterror(), LOG_ERR);
+            continue;
+        }
+
+        $takenRefs[$refs['new']] = 1;
+        $renamedRef[]            = $refs;
+        $nbRenamed++;
+    }
+
+    // Documents : WUD<n> becomes UTD<n>
+    $sql   = 'SELECT rowid, ref FROM ' . MAIN_DB_PREFIX . 'saturne_object_documents';
+    $sql  .= " WHERE entity = " . (int) $conf->entity . " AND module_name = 'digiriskdolibarr'";
+    $sql  .= " AND type = 'workunitdocument' AND ref LIKE 'WUD%' ORDER BY rowid";
+    $resql = $db->query($sql);
+    if (!$resql) {
+        dol_syslog('digiriskdolibarr_migrate_workunit_refs_to_ut : ' . $db->lasterror(), LOG_ERR);
+        return -1;
+    }
+
+    $documents = [];
+    while ($obj = $db->fetch_object($resql)) {
+        if (preg_match('/^WUD(\d+)$/', $obj->ref, $matches)) {
+            $documents[(int) $obj->rowid] = ['old' => $obj->ref, 'new' => 'UTD' . $matches[1]];
+        }
+    }
+    $db->free($resql);
+
+    $takenDocumentRefs = digiriskdolibarr_taken_refs(MAIN_DB_PREFIX . 'saturne_object_documents', 'entity = ' . (int) $conf->entity . " AND module_name = 'digiriskdolibarr'");
+    if (!is_array($takenDocumentRefs)) {
+        return -1;
+    }
+
+    foreach ($documents as $documentId => $refs) {
+        if (isset($takenDocumentRefs[$refs['new']])) {
+            dol_syslog('digiriskdolibarr_migrate_workunit_refs_to_ut : document ' . $refs['old'] . ' kept, ' . $refs['new'] . ' is already taken', LOG_WARNING);
+            continue;
+        }
+
+        $sql = 'UPDATE ' . MAIN_DB_PREFIX . "saturne_object_documents SET ref = '" . $db->escape($refs['new']) . "' WHERE rowid = " . (int) $documentId;
+        if (!$db->query($sql)) {
+            dol_syslog('digiriskdolibarr_migrate_workunit_refs_to_ut : ' . $db->lasterror(), LOG_ERR);
+            continue;
+        }
+
+        $takenDocumentRefs[$refs['new']] = 1;
+        $nbRenamed++;
+    }
+
+    // Media directories, whatever the document type they belong to. Their content is left
+    // untouched on purpose : saturne_object_documents.last_main_doc holds the file name
+    // alone, so rewriting WU1 into UT1 inside it - what dol_move_dir does by default - would
+    // make every document already generated unreachable. A generated file keeps the
+    // reference its element had the day it was written
+    if (!empty($renamedRef) && is_dir($mediaPath)) {
+        foreach (dol_dir_list($mediaPath, 'directories', 0) as $typeDir) {
+            foreach ($renamedRef as $refs) {
+                $oldDir = $typeDir['fullname'] . '/' . $refs['old'];
+                $newDir = $typeDir['fullname'] . '/' . $refs['new'];
+                if (is_dir($oldDir) && !is_dir($newDir)) {
+                    dol_move_dir($oldDir, $newDir, 0, 1, 0);
+                }
+            }
+        }
+    }
+
+    dol_syslog('digiriskdolibarr_migrate_workunit_refs_to_ut : ' . $nbRenamed . ' reference(s) renamed');
+
+    return $nbRenamed;
+}
+
+/**
+ * List the references already used in a table, as an array keyed by reference
+ *
+ * @param  string     $table Fully prefixed table name
+ * @param  string     $where Conditions restricting the scope the unique key applies to
+ * @return array|int         References as keys, -1 on database error
+ */
+function digiriskdolibarr_taken_refs(string $table, string $where)
+{
+    global $db;
+
+    $resql = $db->query('SELECT ref FROM ' . $table . ' WHERE ' . $where);
+    if (!$resql) {
+        dol_syslog('digiriskdolibarr_taken_refs : ' . $db->lasterror(), LOG_ERR);
+        return -1;
+    }
+
+    $refs = [];
+    while ($obj = $db->fetch_object($resql)) {
+        $refs[$obj->ref] = 1;
+    }
+    $db->free($resql);
+
+    return $refs;
 }

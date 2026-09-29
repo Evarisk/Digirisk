@@ -71,6 +71,12 @@ class DigiriskElement extends SaturneObject
      */
     public int $isCategoryManaged = 0;
 
+    /**
+     * The bin itself is a groupment kept out of the active tree by its own status. Do not
+     * confuse it with STATUS_TRASHED, which marks the elements that were put inside it.
+     */
+    public const STATUS_TRASH_ROOT = 0;
+
     public const STATUS_TRASHED   = -2;
     public const STATUS_DELETED   = -1;
     public const STATUS_VALIDATED = 1;
@@ -179,6 +185,32 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
+     * Return the id of the bin of the current entity, 0 when there is none usable
+     *
+     * The constant is not enough on its own: a failed creation used to leave -1 in it, and a conf
+     * cloned from another entity (multicompany) points to a groupment of that other entity.
+     *
+     * @return int<0, max> Id of the bin, 0 if the constant cannot be trusted
+     * @throws Exception
+     */
+    public function getTrashID(): int
+    {
+        global $conf;
+
+        $trashID = getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH');
+        if ($trashID <= 0) {
+            return 0;
+        }
+
+        $trash = new self($this->db);
+        if ($trash->fetch($trashID) <= 0 || $trash->entity != $conf->entity) {
+            return 0;
+        }
+
+        return $trashID;
+    }
+
+    /**
      * Delete object in database
      *
      * @param  User        $user       User that deletes
@@ -188,13 +220,23 @@ class DigiriskElement extends SaturneObject
      */
     public function delete(User $user, int $noTrigger = 0, bool $softDelete = true): int
     {
-        global $conf;
+        global $langs;
 
-        $this->fk_parent = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
+        // Without a usable bin the element would be reparented on a missing id: on an entity whose
+        // constant had been left at -1, deleting made it unreachable, out of the tree and out of every list
+        $trashID = $this->getTrashID();
+        if ($trashID <= 0) {
+            $langs->load('digiriskdolibarr@digiriskdolibarr');
+            $this->errors[] = $langs->trans('ErrorTrashNotFound');
+            dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
+            return -1;
+        }
+
+        $this->fk_parent = $trashID;
         $this->status    = self::STATUS_TRASHED;
 
         $result = $this->update($user, true);
-        if ($result > 0 && !empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_DELETE)) {
+        if ($result > 0 && getDolGlobalInt('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_DELETE') > 0) {
             $this->call_trigger('DIGIRISKELEMENT_DELETE', $user);
         }
 
@@ -515,11 +557,16 @@ class DigiriskElement extends SaturneObject
     {
         global $conf, $form, $langs;
 
+        // The filter used to be completed and then dropped: only the STATUS_VALIDATED condition of
+        // getActiveDigiriskElements() was ever applied, so a caller asking for the groupments of the
+        // other entities, or for anything but its own descendants, got the whole active tree instead
+        $customFilter = '';
         if (isset($filter['customsql']) && dol_strlen($filter['customsql'])) {
-            $filter['customsql'] .= ' AND t.rowid != ' . ($this->id ?? 0);
+            $customFilter = ' AND (' . $filter['customsql'] . ') AND t.rowid != ' . ($this->id ?? 0);
         }
 
-        $objectList = $this->fetchDigiriskElementFlat(0);
+        $digiriskElements = $this->getActiveDigiriskElements('all', ['filter' => $customFilter]);
+        $objectList       = $this->fetchDigiriskElementFlat(0, is_array($digiriskElements) ? $digiriskElements : []);
         $digiriskElementsData = [];
         if ($noroot == 0) {
             $digiriskElementsData[0] = $langs->trans('Root') . ' : ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM') ;
@@ -636,8 +683,11 @@ class DigiriskElement extends SaturneObject
         $savedIsExtrafieldManaged   = $this->isextrafieldmanaged;
         $this->isextrafieldmanaged  = 0;
         $this->ismultientitymanaged = 0;
-        $objects = $this->fetchAll('',  'ranks', 0,0, array('customsql' => ' status > 0'));
-        $digiriskelement_trashes = $this->fetchAll('',  'ranks', 0,0, array('customsql' => ' status = 0'));
+        // The elements put in the bin carry STATUS_TRASHED: looking for the children of the bin among
+        // the active ones only left every genuinely deleted element out of the list, which is exactly
+        // what the callers exclude with it
+        $objects = $this->fetchAll('',  'ranks', 0,0, array('customsql' => 't.status <> ' . self::STATUS_TRASH_ROOT));
+        $digiriskelement_trashes = $this->fetchAll('',  'ranks', 0,0, array('customsql' => 't.status = ' . self::STATUS_TRASH_ROOT));
         $this->ismultientitymanaged = 1;
         $this->isextrafieldmanaged  = $savedIsExtrafieldManaged;
         if (is_array($digiriskelement_trashes) && !empty($digiriskelement_trashes)) {
@@ -718,7 +768,10 @@ class DigiriskElement extends SaturneObject
         // extrafields one row at a time (N+1). Cache the raw fetch per request, keyed by
         // everything that changes the result set (filter, entity scope).
         static $activeElementsCache = [];
-        $cacheKey = ($moreParams['filter'] ?? '') . '|' . (string) ($this->ismultientitymanaged ?? '') . '|' . getEntity($this->element);
+        // The column list comes from $this->fields, which a caller may have trimmed (the element card
+        // unsets fk_parent to shape its form): two objects must not share the same cache entry when
+        // they do not load the same columns
+        $cacheKey = ($moreParams['filter'] ?? '') . '|' . (string) ($this->ismultientitymanaged ?? '') . '|' . getEntity($this->element) . '|' . count($this->fields);
         if (!array_key_exists($cacheKey, $activeElementsCache)) {
             $activeElementsCache[$cacheKey] = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ($moreParams['filter'] ?? '')]);
         }

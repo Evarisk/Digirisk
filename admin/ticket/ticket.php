@@ -146,7 +146,9 @@ if ($action == 'update_ticket_public_interface_url') {
 }
 
 if ($action == 'setEmails') {
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', GETPOST('emails'), 'integer', 0, '', $conf->entity);
+	// 'chaine' et non 'integer' : la valeur est une liste d'adresses, le type etait mal renseigne
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', GETPOST('emails'), 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SUBMITTED_MAIL_MODEL', GETPOST('ticket_submitted_mail_model', 'restricthtml'), 'chaine', 0, '', $conf->entity);
 	setEventMessages($langs->transnoentities('EmailsToNotifySet'), array());
 }
 
@@ -674,6 +676,19 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print $form->textwithpicto('', $langs->transnoentities("MultipleEmailsSeparator"));
 	print '</td>';
 	print '</tr>';
+
+	// Modele d'email de ce mail de declaration - issue #5235. Vide : le contenu historique,
+	// ecrit en dur dans le trigger, est conserve
+	print '<tr class="oddeven"><td>' . $langs->transnoentities('TicketSubmittedMailModel') . '</td>';
+	print '<td class="center"></td>';
+	print '<td class="center">';
+	print $form::selectarray('ticket_submitted_mail_model', digiriskdolibarr_ticket_mail_models(), getDolGlobalString('DIGIRISKDOLIBARR_TICKET_SUBMITTED_MAIL_MODEL'));
+	print '</td>';
+	print '<td class="center"></td>';
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->transnoentities('TicketSubmittedMailModelHelp'));
+	print '</td>';
+	print '</tr>';
 	print '</form>';
 
 	print '</div>';
@@ -952,7 +967,20 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) ? $langs->transnoentities('AlreadyGenerated') : $langs->transnoentities('NotCreated');
 	print '</td>';
 	print '<td class="center">';
-    print dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) ? '<a type="" class=" butActionRefused" value="">'.$langs->transnoentities('Create') .'</a>' : '<input type="submit" class="button reposition" value="'.$langs->transnoentities('Create') .'">' ;
+    if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
+        // Generating them a second time is refused, but the button used to be a dead link : it now
+        // opens the register configuration of the main category, the page where the ticket
+        // extrafields are listed, ordered, shown, made required and created (issue #4714)
+        $mainCategoryId = getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY');
+        if ($mainCategoryId > 0) {
+            $extrafieldsConfigUrl = dol_buildpath('/digiriskdolibarr/view/ticket/category_config.php', 1) . '?id=' . $mainCategoryId . '&type=ticket';
+            print '<a class="butAction" href="' . dol_sanitizeUrl($extrafieldsConfigUrl) . '">' . $langs->transnoentities('ConfigureExtrafields') . '</a>';
+        } else {
+            print $form->textwithpicto('<span class="butActionRefused">' . $langs->transnoentities('ConfigureExtrafields') . '</span>', $langs->transnoentities('MainCategoryNotSet'));
+        }
+    } else {
+        print '<input type="submit" class="button reposition" value="' . $langs->transnoentities('Create') . '">';
+    }
 	print '</td>';
 
 	print '<td class="center">';

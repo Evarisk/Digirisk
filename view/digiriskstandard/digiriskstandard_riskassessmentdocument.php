@@ -207,11 +207,16 @@ if (empty($resHook)) {
         }
 
         $object->ref = $previousRef;
-        $result = $document->generateArchiveWithDigiriskElementDocuments($moreparams, $outputlangs, $hidedetails, $hidedesc, $hideref);
-        if ($result < 0) {
-            setEventMessages($document->error, $document->errors, 'errors');
-            $error++;
-            $action = '';
+
+        // The archive rebundles what the generation just produced: chaining it after a failure only
+        // stacks a second, misleading error on top of the real one.
+        if (!$error) {
+            $result = $document->generateArchiveWithDigiriskElementDocuments($moreparams, $outputlangs, $hidedetails, $hidedesc, $hideref);
+            if ($result < 0) {
+                setEventMessages($document->error, $document->errors, 'errors');
+                $error++;
+                $action = '';
+            }
         }
 
         if (!$error && empty($donotredirect)) {
