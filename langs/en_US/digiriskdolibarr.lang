@@ -2430,6 +2430,9 @@ PreventionPrinciple8               = Give priority to collective protective meas
 PreventionPrinciple9               = Give appropriate instructions to the workers.
 ListingRisksCotationMethodTitle    = Rating calculation method
 ListingRisksCotationMethodText     = The rating of a risk is a score from 0 to 100 given when it is assessed. The risk level shown in the listing follows directly from it, according to the grid below.
+ListingRisksCriteriaTitle          = Criteria of the advanced method
+ListingRisksCriteriaText           = Two rating methods coexist. The simplified one places the risk directly into one of the four levels above. The advanced one rates it as the product of five criteria, each scored from 0 to 4: Rating = Severity × Exposure × Occurrence × Training × Protection.
+ListingRisksCriteriaColumn         = Criterion
 ListingRisksCotationLevel          = Level
 ListingRisksCotationRange          = Rating
 ListingRisksCotationMeaning        = Meaning
