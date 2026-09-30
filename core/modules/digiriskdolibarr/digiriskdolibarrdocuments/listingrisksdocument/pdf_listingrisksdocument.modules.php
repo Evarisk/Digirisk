@@ -687,11 +687,13 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         $this->_pagehead($pdf, $object, $outputLangs, $size);
 
         $this->sectionCover($pdf, $object, $outputLangs, $size);
+        $this->sectionPerimeterTree($pdf, $object, $outputLangs, $size);
         $this->sectionLegalReminder($pdf, $outputLangs, $size);
         $this->sectionCotationMethod($pdf, $outputLangs, $size);
         $this->sectionRisks($pdf, $object, $outputLangs, $size, $moreParam);
         $this->sectionRegisters($pdf, $object, $outputLangs, $size, $moreParam);
         $this->sectionAccidents($pdf, $object, $outputLangs, $size, $moreParam);
+        $this->sectionGlossary($pdf, $outputLangs, $size);
 
         $this->_pagefooter($pdf, $object, $outputLangs, $size);
 
@@ -1065,6 +1067,152 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         $pdf->SetTextColor(0, 0, 0);
 
         return $captionY + $this->height;
+    }
+
+    /**
+     * Arborescence du perimetre : l'organigramme des GP et UT couverts par ce document.
+     *
+     * Le SICTOM a dessine a la main ce qu'il attend (issue #5287) : une seule boite quand le
+     * document porte sur une unite de travail, la boite du groupement et son arbre quand il
+     * porte sur un groupement. Les boites sont indentees par profondeur et reliees a leur
+     * parent, ce qui tient quelle que soit la taille de l'arbre - leur GP38 compte 18 UT.
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  object    $object      Element imprime
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @return void
+     */
+    protected function sectionPerimeterTree($pdf, $object, Translate $outputLangs, float $size)
+    {
+        $perimeter = $this->perimeterElements($object);
+        if (empty($perimeter)) {
+            return;
+        }
+
+        $this->newPage($pdf);
+        $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksPerimeterTreeTitle'), $size);
+
+        $depths = $this->perimeterDepths($perimeter);
+
+        $indent     = 12;
+        $boxHeight  = 7;
+        $gap        = 2.5;
+        $left       = $this->marge_gauche;
+        $maxWidth   = $this->contentWidth($pdf) - 40;
+        // Ordonnee du bas de la derniere boite dessinee a chaque profondeur : c'est de la que
+        // part le trait vers l'enfant suivant
+        $lastBottom = [];
+
+        foreach ($perimeter as $elementId => $element) {
+            $depth = $depths[$elementId] ?? 0;
+            $this->checkPageBreak($pdf, $boxHeight + $gap);
+
+            $x = $left + ($depth * $indent);
+            $y = $pdf->GetY();
+            $width = min($maxWidth - ($depth * $indent), 140);
+
+            // Le trait qui relie la boite a son parent : une descente puis une equerre
+            if ($depth > 0 && isset($lastBottom[$depth - 1])) {
+                $parentX = $left + (($depth - 1) * $indent) + 4;
+                $pdf->SetDrawColor(160, 160, 160);
+                $pdf->Line($parentX, $lastBottom[$depth - 1], $parentX, $y + ($boxHeight / 2));
+                $pdf->Line($parentX, $y + ($boxHeight / 2), $x, $y + ($boxHeight / 2));
+                $pdf->SetDrawColor(190, 190, 190);
+            }
+
+            // Un groupement porte la couleur d'accent, une unite de travail reste claire
+            $isGroup = !empty($element['object']->element_type) && $element['object']->element_type == 'groupment';
+            if ($isGroup) {
+                $pdf->SetFillColor($this->accent[0], $this->accent[1], $this->accent[2]);
+                $pdf->SetTextColor(255, 255, 255);
+                $pdf->SetFont('', 'B', $size);
+            } else {
+                $pdf->SetFillColor($this->headBg[0], $this->headBg[1], $this->headBg[2]);
+                $pdf->SetTextColor(0, 0, 0);
+                $pdf->SetFont('', '', $size);
+            }
+
+            $label = $element['object']->ref . ' - ' . $element['object']->label;
+            $pdf->SetXY($x, $y);
+            $pdf->Cell($width, $boxHeight, ' ' . dol_trunc($label, 70), 1, 0, 'L', true);
+
+            $pdf->SetTextColor(0, 0, 0);
+            $lastBottom[$depth] = $y + $boxHeight;
+            // Les profondeurs plus basses sont refermees : leur dernier trait ne doit pas
+            // redescendre vers une boite qui n'est plus leur enfant
+            foreach (array_keys($lastBottom) as $openDepth) {
+                if ($openDepth > $depth) {
+                    unset($lastBottom[$openDepth]);
+                }
+            }
+
+            $pdf->SetY($y + $boxHeight + $gap);
+        }
+
+        $pdf->SetY($pdf->GetY() + 4);
+        $this->paragraph($pdf, $outputLangs->transnoentities('ListingRisksPerimeterTreeLegend'), $size - 1, 'I', [140, 140, 140]);
+    }
+
+    /**
+     * Profondeur de chaque element du perimetre, relative a la racine du document.
+     *
+     * fetchDigiriskElementFlat() ne remplit sa cle depth que pour une lecture depuis la
+     * racine de l'etablissement : demandee sur un groupement, elle rend 0 partout et
+     * l'arbre sort plat. La profondeur se retrouve en remontant fk_parent tant que le
+     * parent appartient au perimetre.
+     *
+     * @param  array $perimeter Elements du perimetre, indexes par identifiant
+     * @return array            Profondeur par identifiant
+     */
+    protected function perimeterDepths(array $perimeter): array
+    {
+        $depths = [];
+
+        foreach (array_keys($perimeter) as $elementId) {
+            $depth  = 0;
+            $cursor = $elementId;
+            // Garde-fou : une boucle dans les fk_parent ferait tourner la generation sans fin
+            for ($step = 0; $step < 50; $step++) {
+                $parent = (int) ($perimeter[$cursor]['object']->fk_parent ?? 0);
+                if ($parent <= 0 || !isset($perimeter[$parent])) {
+                    break;
+                }
+                $depth++;
+                $cursor = $parent;
+            }
+            $depths[$elementId] = $depth;
+        }
+
+        return $depths;
+    }
+
+    /**
+     * Lexique des abreviations employees dans le document.
+     *
+     * Le SICTOM en tient un a la main au bas de son DUERP (issue #5287). Seules les
+     * abreviations de Digirisk y figurent : celles qui tiennent a l'organisation d'un client
+     * n'ont rien a faire dans un document genere pour tous.
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @return void
+     */
+    protected function sectionGlossary($pdf, Translate $outputLangs, float $size)
+    {
+        $this->newPage($pdf);
+        $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksGlossaryTitle'), $size);
+
+        $rows = [];
+        foreach (['GP', 'UT', 'RK', 'RA', 'COT', 'ATMP', 'TK', 'DUERP', 'PAPRIPACT'] as $abbreviation) {
+            $rows[] = [
+                ['text' => $outputLangs->transnoentities('ListingRisksGlossary' . $abbreviation . 'Short'), 'bold' => true],
+                $outputLangs->transnoentities('ListingRisksGlossary' . $abbreviation)
+            ];
+        }
+
+        $this->table($pdf, [$outputLangs->transnoentities('ListingRisksGlossaryAbbreviation'), $outputLangs->transnoentities('Description')], $rows, [40, 360], $size);
     }
 
     /**
