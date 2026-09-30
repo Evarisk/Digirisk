@@ -2445,6 +2445,9 @@ PreventionPrinciple8               = Prendre des mesures de protection collectiv
 PreventionPrinciple9               = Donner les instructions appropriées aux travailleurs.
 ListingRisksCotationMethodTitle    = Méthode de calcul des cotations
 ListingRisksCotationMethodText     = La cotation d'un risque est une note de 0 à 100 attribuée lors de son évaluation. Le niveau de risque repris dans le listing en découle directement, selon la grille ci-dessous.
+ListingRisksCriteriaTitle          = Critères de la méthode avancée
+ListingRisksCriteriaText           = Deux méthodes de cotation coexistent. La méthode simplifiée classe directement le risque dans l'un des quatre niveaux ci-dessus. La méthode avancée le cote en multipliant cinq critères, chacun noté de 0 à 4 : Cotation = Gravité × Exposition × Occurrence × Formation × Protection.
+ListingRisksCriteriaColumn         = Critère
 ListingRisksCotationLevel          = Niveau
 ListingRisksCotationRange          = Cotation
 ListingRisksCotationMeaning        = Signification

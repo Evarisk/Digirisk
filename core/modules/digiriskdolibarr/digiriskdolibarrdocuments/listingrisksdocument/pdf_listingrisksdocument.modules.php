@@ -1280,6 +1280,91 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         }
 
         $this->table($pdf, $header, $rows, [25, 35, 90, 250], $size);
+
+        $pdf->SetY($pdf->GetY() + 4);
+        $this->sectionCotationCriteria($pdf, $outputLangs, $size);
+    }
+
+    /**
+     * Grille des criteres de la methode avancee, et la formule qui en tire la cotation.
+     *
+     * Les libelles sont lus dans js/json/default.json, le fichier que la fiche de risque
+     * utilise deja pour construire sa grille : recopier ces seuils ici les ferait diverger
+     * silencieusement du jour ou le fichier change. Issue #5303
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @return void
+     */
+    protected function sectionCotationCriteria($pdf, Translate $outputLangs, float $size)
+    {
+        $criteria = $this->advancedCotationCriteria();
+        if (empty($criteria)) {
+            return;
+        }
+
+        $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksCriteriaTitle'), $size);
+        $this->paragraph($pdf, $outputLangs->transnoentities('ListingRisksCriteriaText'), $size);
+
+        // Les seuils vont de 0 a 4 : une colonne par niveau, plus celle du nom du critere
+        $header = [$outputLangs->transnoentities('ListingRisksCriteriaColumn')];
+        for ($level = 0; $level <= 4; $level++) {
+            $header[] = (string) $level;
+        }
+
+        $rows = [];
+        foreach ($criteria as $name => $levels) {
+            // Le fichier ecrit les noms sans accent : la cle de langue existe pour Gravite,
+            // les quatre autres noms sont deja leur propre cle
+            $label = $outputLangs->transnoentities($name == 'Gravite' ? 'Gravity' : $name);
+            $row   = [['text' => $label, 'bold' => true]];
+            for ($level = 0; $level <= 4; $level++) {
+                $row[] = $levels[$level] ?? '';
+            }
+            $rows[] = $row;
+        }
+
+        $this->table($pdf, $header, $rows, [40, 72, 72, 72, 72, 72], $size);
+    }
+
+    /**
+     * Criteres de la methode avancee, lus dans le fichier livre par le module.
+     *
+     * @return array Par nom de critere, le libelle de chaque seuil
+     */
+    protected function advancedCotationCriteria(): array
+    {
+        $path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json';
+        if (!is_readable($path)) {
+            return [];
+        }
+
+        $decoded = json_decode((string) file_get_contents($path), true);
+        // risk_variable porte les criteres du risque professionnel, riskenvironmental_variable
+        // ceux du risque environnemental : ce document est le document unique
+        $variables = $decoded[0]['option']['risk_variable'] ?? null;
+        if (!is_array($variables)) {
+            return [];
+        }
+
+        $criteria = [];
+        foreach ($variables as $variable) {
+            if (empty($variable['name'])) {
+                continue;
+            }
+            $levels = [];
+            foreach (($variable['option']['survey']['request'] ?? []) as $request) {
+                // Un seuil vide signale un niveau que ce critere n'utilise pas
+                if (!isset($request['seuil']) || !dol_strlen((string) $request['seuil'])) {
+                    continue;
+                }
+                $levels[(int) $request['seuil']] = (string) ($request['question'] ?? '');
+            }
+            $criteria[$variable['name']] = $levels;
+        }
+
+        return $criteria;
     }
 
     /**
