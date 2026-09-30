@@ -2472,6 +2472,8 @@ ListingRisksRegisterRefColumn      = N° du registre
 ListingRisksNoRegister             = Aucun registre sur ce périmètre
 ListingRisksShowAccidents          = Inclure les accidents
 ListingRisksShowPhoto              = Inclure la photo des évaluations
+ListingRisksShowElementPhoto       = Ajouter la photo de l'élément en pleine page
+ListingRisksElementPhotoTitle      = Photo de l'élément
 ListingRisksPerimeterTreeTitle     = Arborescence du périmètre
 ListingRisksPerimeterTreeLegend    = GP = groupement de travail, UT = unité de travail. Le document couvre le groupement ci-dessus et tout ce qui en dépend.
 ListingRisksGlossaryTitle          = Lexique

@@ -688,6 +688,7 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
 
         $this->sectionCover($pdf, $object, $outputLangs, $size);
         $this->sectionPerimeterTree($pdf, $object, $outputLangs, $size);
+        $this->sectionElementPhoto($pdf, $object, $outputLangs, $size, $moreParam);
         $this->sectionLegalReminder($pdf, $outputLangs, $size);
         $this->sectionCotationMethod($pdf, $outputLangs, $size);
         $this->sectionRisks($pdf, $object, $outputLangs, $size, $moreParam);
@@ -1213,6 +1214,52 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         }
 
         $this->table($pdf, [$outputLangs->transnoentities('ListingRisksGlossaryAbbreviation'), $outputLangs->transnoentities('Description')], $rows, [40, 360], $size);
+    }
+
+    /**
+     * Photo de l'element, sur sa propre page.
+     *
+     * Digirisk ne porte aucune notion de plan ni de coordonnees : le seul mecanisme
+     * d'image est DigiriskElement::photo, deja affichee en petit sur la couverture. La
+     * montrer en grand permet d'y mettre ce que le client veut - le SICTOM y place la
+     * carte de son territoire. Decochee par defaut : le document ne doit pas gagner une
+     * page chez tout le monde. Issue #5307
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  object    $object      Element imprime
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @param  array     $moreParam   More param (showElementPhoto)
+     * @return void
+     */
+    protected function sectionElementPhoto($pdf, $object, Translate $outputLangs, float $size, array $moreParam)
+    {
+        global $conf;
+
+        if (empty($moreParam['showElementPhoto']) || empty($object->photo) || empty($object->element_type)) {
+            return;
+        }
+
+        // La photo pleine page merite l'original, pas la vignette de la couverture
+        $photoPath = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref . '/' . $object->photo;
+        if (!is_readable($photoPath)) {
+            return;
+        }
+
+        $this->newPage($pdf);
+        $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksElementPhotoTitle'), $size);
+
+        $top    = $pdf->GetY() + 2;
+        $width  = $this->contentWidth($pdf);
+        // getBreakMargin() porte deja la bande du pied de page, posee au setPageOrientation
+        $height = $pdf->getPageHeight() - $top - $pdf->getBreakMargin();
+
+        // fitbox CT : l'image garde ses proportions et se cale en haut, centree, sans jamais
+        // deborder sur le pied de page quel que soit son cadrage
+        $pdf->Image($photoPath, $this->marge_gauche, $top, $width, $height, '', '', '', false, 300, '', false, false, 0, 'CT');
+
+        $pdf->SetY($pdf->getImageRBY() + 2);
+        $this->paragraph($pdf, $this->coverElementLabel($object), $size - 1, 'I', [140, 140, 140]);
     }
 
     /**

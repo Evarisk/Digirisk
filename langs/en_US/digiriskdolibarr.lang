@@ -2457,6 +2457,8 @@ ListingRisksRegisterRefColumn      = Register no.
 ListingRisksNoRegister             = No register on this perimeter
 ListingRisksShowAccidents          = Include the accidents
 ListingRisksShowPhoto              = Include the assessment photo
+ListingRisksShowElementPhoto       = Add the element photo on its own page
+ListingRisksElementPhotoTitle      = Element photo
 ListingRisksPerimeterTreeTitle     = Perimeter tree
 ListingRisksPerimeterTreeLegend    = GP = work grouping, UT = work unit. This document covers the grouping above and everything below it.
 ListingRisksGlossaryTitle          = Glossary
