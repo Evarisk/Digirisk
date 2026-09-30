@@ -1347,8 +1347,10 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
             $pdf->SetFillColor($color[0], $color[1], $color[2]);
             $pdf->SetDrawColor(255, 255, 255);
             $pdf->SetLineWidth(0.6);
-            // Origine a 90 degres et sens horaire : le premier secteur demarre a midi
-            $pdf->PieSector($centerX, $centerY, $outer, $start, $start + $step, 'F', true, 90);
+            // Les deux derniers arguments de PieSector() sont laisses a leur defaut, qui est
+            // deja ce qu'on veut : origine a midi et sens horaire. Les passer ferait buter
+            // PHPStan, le PHPDoc de TCPDF typant $cw en float alors qu'il vaut true
+            $pdf->PieSector($centerX, $centerY, $outer, $start, $start + $step, 'F');
         }
 
         // Le disque blanc creuse l'anneau
