@@ -105,6 +105,21 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     ];
 
     /**
+     * @var array Neuf couleurs de la roue des principes de prevention - issue #5307
+     */
+    protected array $wheelColors = [
+        [214, 69, 65],
+        [232, 125, 55],
+        [240, 176, 60],
+        [163, 188, 66],
+        [76, 166, 107],
+        [61, 158, 160],
+        [59, 122, 176],
+        [110, 92, 165],
+        [186, 84, 140]
+    ];
+
+    /**
      * @var array Responsables des taches, indexes par identifiant de tache
      */
     protected array $taskResponsibles = [];
@@ -688,6 +703,7 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
 
         $this->sectionCover($pdf, $object, $outputLangs, $size);
         $this->sectionPerimeterTree($pdf, $object, $outputLangs, $size);
+        $this->sectionElementPhoto($pdf, $object, $outputLangs, $size, $moreParam);
         $this->sectionLegalReminder($pdf, $outputLangs, $size);
         $this->sectionCotationMethod($pdf, $outputLangs, $size);
         $this->sectionRisks($pdf, $object, $outputLangs, $size, $moreParam);
@@ -1216,6 +1232,55 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     }
 
     /**
+     * Photo de l'element, sur sa propre page.
+     *
+     * Digirisk ne porte aucune notion de plan ni de coordonnees : le seul mecanisme
+     * d'image est DigiriskElement::photo, deja affichee en petit sur la couverture. La
+     * montrer en grand permet d'y mettre ce que le client veut - le SICTOM y place la
+     * carte de son territoire. Decochee par defaut : le document ne doit pas gagner une
+     * page chez tout le monde. Issue #5307
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  object    $object      Element imprime
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @param  array     $moreParam   More param (showElementPhoto)
+     * @return void
+     */
+    protected function sectionElementPhoto($pdf, $object, Translate $outputLangs, float $size, array $moreParam)
+    {
+        global $conf;
+
+        if (empty($moreParam['showElementPhoto']) || empty($object->photo) || empty($object->element_type)) {
+            return;
+        }
+
+        // La photo pleine page merite l'original, pas la vignette de la couverture
+        $photoPath = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref . '/' . $object->photo;
+        if (!is_readable($photoPath)) {
+            return;
+        }
+
+        $this->newPage($pdf);
+        $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksElementPhotoTitle'), $size);
+
+        $caption = 6;
+        $top     = $pdf->GetY() + 2;
+        $width   = $this->contentWidth($pdf);
+        // getBreakMargin() porte deja la bande du pied de page, posee au setPageOrientation.
+        // La legende est retranchee ici : sinon l'image prend toute la hauteur restante et la
+        // legende, ecrite sous elle, part seule a la page suivante
+        $height  = $pdf->getPageHeight() - $top - $pdf->getBreakMargin() - $caption;
+
+        // fitbox CT : l'image garde ses proportions et se cale en haut, centree, sans jamais
+        // deborder sur le pied de page quel que soit son cadrage
+        $pdf->Image($photoPath, $this->marge_gauche, $top, $width, $height, '', '', '', false, 300, '', false, false, 0, 'CT');
+
+        $pdf->SetY($top + $height);
+        $this->paragraph($pdf, $this->coverElementLabel($object), $size - 1, 'I', [140, 140, 140]);
+    }
+
+    /**
      * Rappel reglementaire : definitions et principes generaux de prevention, comme le gabarit.
      *
      * @param  TCPDF     $pdf         PDF handler
@@ -1244,6 +1309,87 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         for ($principle = 1; $principle <= 9; $principle++) {
             $this->paragraph($pdf, $principle . '. ' . $outputLangs->transnoentities('PreventionPrinciple' . $principle), $size);
         }
+
+        $pdf->SetY($pdf->GetY() + 2);
+        $this->preventionWheel($pdf, $outputLangs, $size);
+    }
+
+    /**
+     * Roue des neuf principes generaux de prevention.
+     *
+     * Le module ne livre pas cette illustration - img/legalPicto ne contient qu'un badge
+     * Creative Commons - alors elle se dessine : un anneau de neuf secteurs numerotes, chacun
+     * legende par le verbe du principe. Elle accompagne la liste en toutes lettres qui la
+     * precede, elle ne la remplace pas. Issue #5307
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @return void
+     */
+    protected function preventionWheel($pdf, Translate $outputLangs, float $size)
+    {
+        $outer = 38;
+        $inner = 18;
+        // Hauteur du bloc : le diametre, plus la place des legendes au dessus et en dessous
+        $needed = ($outer * 2) + 24;
+        $this->checkPageBreak($pdf, $needed);
+
+        $centerX = $this->marge_gauche + ($this->contentWidth($pdf) / 2);
+        $centerY = $pdf->GetY() + 12 + $outer;
+
+        $step = 360 / 9;
+
+        for ($principle = 1; $principle <= 9; $principle++) {
+            $start = ($principle - 1) * $step;
+            $color = $this->wheelColors[$principle - 1];
+
+            $pdf->SetFillColor($color[0], $color[1], $color[2]);
+            $pdf->SetDrawColor(255, 255, 255);
+            $pdf->SetLineWidth(0.6);
+            // Les deux derniers arguments de PieSector() sont laisses a leur defaut, qui est
+            // deja ce qu'on veut : origine a midi et sens horaire. Les passer ferait buter
+            // PHPStan, le PHPDoc de TCPDF typant $cw en float alors qu'il vaut true
+            $pdf->PieSector($centerX, $centerY, $outer, $start, $start + $step, 'F');
+        }
+
+        // Le disque blanc creuse l'anneau
+        $pdf->SetFillColor(255, 255, 255);
+        $pdf->Circle($centerX, $centerY, $inner, 0, 360, 'F');
+        $pdf->SetDrawColor(190, 190, 190);
+        $pdf->SetLineWidth(0.2);
+
+        $numberRadius = ($outer + $inner) / 2;
+        $labelRadius  = $outer + 3;
+
+        for ($principle = 1; $principle <= 9; $principle++) {
+            $middle = (($principle - 1) * $step) + ($step / 2);
+            $angle  = deg2rad($middle);
+
+            // Repere du PDF : les ordonnees descendent, d'ou le sinus en abscisse et le
+            // cosinus retranche en ordonnee pour tourner dans le sens horaire depuis midi
+            $numberX = $centerX + ($numberRadius * sin($angle));
+            $numberY = $centerY - ($numberRadius * cos($angle));
+
+            $pdf->SetFont('', 'B', $size + 1);
+            $pdf->SetTextColor(255, 255, 255);
+            $pdf->SetXY($numberX - 5, $numberY - 2.5);
+            $pdf->Cell(10, 5, (string) $principle, 0, 0, 'C');
+
+            $labelX = $centerX + ($labelRadius * sin($angle));
+            $labelY = $centerY - ($labelRadius * cos($angle));
+
+            $pdf->SetFont('', '', $size - 2);
+            $pdf->SetTextColor(60, 60, 60);
+            // A droite de l'axe le texte part vers la droite, a gauche il s'y termine :
+            // les legendes s'ecartent de la roue au lieu de lui passer dessus
+            $onTheRight = (sin($angle) >= 0);
+            $pdf->SetXY($onTheRight ? $labelX : $labelX - 48, $labelY - 3);
+            $pdf->MultiCell(48, 3.5, $outputLangs->transnoentities('PreventionPrincipleShort' . $principle), 0, $onTheRight ? 'L' : 'R', false, 1);
+        }
+
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetY($centerY + $outer + 8);
     }
 
     /**
@@ -1257,6 +1403,9 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
      */
     protected function sectionCotationMethod($pdf, Translate $outputLangs, float $size)
     {
+        // Sa propre page : depuis que la roue occupe le bas du cadre reglementaire, les deux
+        // grilles n y tiennent plus et la derniere ligne partait seule a la page suivante
+        $this->newPage($pdf);
         $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksCotationMethodTitle'), $size);
 
         $this->paragraph($pdf, $outputLangs->transnoentities('ListingRisksCotationMethodText'), $size);
