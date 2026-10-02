@@ -62,7 +62,7 @@ foreach ($signalisationCategories as $signalisationItem) {
           data-risk-comment-label="<?php print dol_escape_htmltag($langs->trans('MobilePPRiskComment')); ?>"
           data-mandatory-label="<?php print dol_escape_htmltag($langs->trans('MobilePPMandatory')); ?>"
           data-risk-start-index="<?php print count($prefill['risks']); ?>"
-          data-delete-risk-label="<?php print dol_escape_htmltag($langs->trans('MobilePPDeleteRiskConfirm')); ?>"
+          data-delete-risk-label="<?php print dol_escape_htmltag($langs->trans('MobilePPDeleteRiskConfirm', '%s')); ?>"
           data-cert-start-index="<?php print count($prefill['certifications']); ?>">
         <input type="hidden" name="token" value="<?php print newToken(); ?>">
         <input type="hidden" name="action" value="add_mobile">
