@@ -110,6 +110,13 @@ if (empty($resHook)) {
 
         $moreParams['showElementPhoto'] = GETPOST('showelementphoto') ? 1 : 0;
 
+        // Masquages du plan d'actions : ce que le formulaire poste l'emporte sur la
+        // configuration du module, le temps de cette generation - issue #5289
+        $moreParams['taskHideRef'] = GETPOST('taskhideref') ? 1 : 0;
+        $moreParams['taskHideResponsible'] = GETPOST('taskhideresponsible') ? 1 : 0;
+        $moreParams['taskHideDate'] = GETPOST('taskhidedate') ? 1 : 0;
+        $moreParams['taskHideBudget'] = GETPOST('taskhidebudget') ? 1 : 0;
+
         if (GETPOST('accidentdaterange')) {
             $moreParams['accidentDateStart'] = dol_mktime(0, 0, 0, GETPOSTINT('accidentdatestartmonth'), GETPOSTINT('accidentdatestartday'), GETPOSTINT('accidentdatestartyear'));
             $moreParams['accidentDateEnd']   = dol_mktime(23, 59, 59, GETPOSTINT('accidentdateendmonth'), GETPOSTINT('accidentdateendday'), GETPOSTINT('accidentdateendyear'));
@@ -216,6 +223,17 @@ print '<td><input type="checkbox" id="showphoto" name="showphoto" checked></td><
 // Photo de l'element en pleine page : decochee, elle n'ajoute pas de page par defaut
 print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksShowElementPhoto') . '</td>';
 print '<td><input type="checkbox" id="showelementphoto" name="showelementphoto"></td></tr>';
+
+// Masquages du plan d'actions : precochees sur la configuration du module, pour que
+// generer sans rien toucher rende le meme document qu avant
+print '<tr class="oddeven"><td>' . $langs->trans('TaskHideRefInDocument') . '</td>';
+print '<td><input type="checkbox" id="taskhideref" name="taskhideref"' . (getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT') ? ' checked' : '') . '></td></tr>';
+print '<tr class="oddeven"><td>' . $langs->trans('TaskHideResponsibleInDocument') . '</td>';
+print '<td><input type="checkbox" id="taskhideresponsible" name="taskhideresponsible"' . (getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT') ? ' checked' : '') . '></td></tr>';
+print '<tr class="oddeven"><td>' . $langs->trans('TaskHideDateInDocument') . '</td>';
+print '<td><input type="checkbox" id="taskhidedate" name="taskhidedate"' . (getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_DATE_IN_DOCUMENT') ? ' checked' : '') . '></td></tr>';
+print '<tr class="oddeven"><td>' . $langs->trans('TaskHideBudgetInDocument') . '</td>';
+print '<td><input type="checkbox" id="taskhidebudget" name="taskhidebudget"' . (getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT') ? ' checked' : '') . '></td></tr>';
 
 print '</table>';
 
