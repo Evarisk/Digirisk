@@ -2263,6 +2263,17 @@ PwaTilePreventionPlanInProgress = Plans en cours
 PwaTilePreventionPlanToSign = Plans à signer
 PwaTileFirePermitInProgress = Permis en cours
 PwaTileFirePermitToSign = Permis à signer
+PwaInstallTitle = Installer l'application
+PwaInstallDescription = Ouvrez Digirisk directement depuis votre écran d'accueil
+PwaInstallButton = Installer
+PwaInstallLater = Plus tard
+PwaInstallIosStep1 = Touchez le bouton <strong>Partager</strong> de Safari (en bas de l'écran, ou dans le menu <strong>⋯</strong>)
+PwaInstallIosStep2 = Choisissez <strong>Sur l'écran d'accueil</strong>
+PwaInstallIosStep3 = Touchez <strong>Ajouter</strong> : l'icône Digirisk apparaît sur votre écran d'accueil
+PwaInstallOtherStep1 = Ouvrez le menu du navigateur (<strong>⋮</strong> ou <strong>☰</strong>)
+PwaInstallOtherStep2 = Choisissez <strong>Installer l'application</strong> ou <strong>Ajouter à l'écran d'accueil</strong>
+PwaInstallOtherStep3 = Confirmez : l'icône Digirisk apparaît sur votre écran d'accueil
+PwaInstallAlreadyInstalled = Déjà installée ? Ouvrez Digirisk depuis l'écran d'accueil de votre téléphone.
 
 # Actions de masse sur les tâches
 MassValidateTasks = Valider les tâches
