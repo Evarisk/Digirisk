@@ -1546,6 +1546,11 @@ body.digirisk-mobile-create {
       color: #2b7de9;
       text-decoration: none;
     }
+
+    // The tags card keeps its message in the page, the list may fill up while the form is open
+    &.hidden {
+      display: none;
+    }
   }
 
 
