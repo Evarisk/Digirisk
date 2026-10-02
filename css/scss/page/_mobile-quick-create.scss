@@ -163,6 +163,11 @@ body.digirisk-mobile-create {
       margin-bottom: 2px;
     }
 
+    /* Asterisk of a mandatory field, red like the Dolibarr forms */
+    .digirisk-mobile-required {
+      color: #dc2626;
+    }
+
     input[type="text"],
     input[type="email"],
     input[type="tel"],
