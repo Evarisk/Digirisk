@@ -142,9 +142,6 @@ $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successSha
         <a class="digirisk-mobile-success__button digirisk-mobile-archive-open" href="<?php print $successArchiveUrl; ?>"><?php print dol_escape_htmltag($successArchiveLabel); ?></a>
         <?php } ?>
         <a class="digirisk-mobile-success__button" href="<?php print $successAgainUrl; ?>"><?php print dol_escape_htmltag($successAgainLabel); ?></a>
-        <a class="digirisk-mobile-success__button" href="<?php print $diffusionModDisabled ? '#' : $successShareUrl; ?>" <?php print $diffusionModDisabled ? 'style="opacity: 0.5; pointer-events: none;"' : 'target="_blank"'; ?>>
-            Diffusion
-        </a>
     </div>
 
     <?php if (!empty($successArchiveUrl)) { ?>
