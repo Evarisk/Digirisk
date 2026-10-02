@@ -2242,6 +2242,7 @@ PwaNavAddFavorite = Add to favorites
 PwaNavRemoveFavorite = Remove from favorites
 PwaHello = Hello %s
 PwaResultCount = %s result(s)
+PwaSearchPlaceholder = Ref., purpose, company, date
 AllStatus = All statuses
 PwaTilePreventionPlanInProgress = Plans in progress
 PwaTilePreventionPlanToSign = Plans to sign
