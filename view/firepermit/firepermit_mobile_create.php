@@ -120,8 +120,8 @@ $isEdit = false;
 // Default dates from admin config
 $defaultStartToday = getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_DATE_START_TODAY', 1);
 $defaultDuration   = getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_DURATION', 1);
-$defaultDateStart  = $defaultStartToday ? dol_print_date(dol_now(), '%Y-%m-%dT%H:%M') : '';
-$defaultDateEnd    = $defaultStartToday ? dol_print_date(dol_time_plus_duree(dol_now(), $defaultDuration, 'd'), '%Y-%m-%dT%H:%M') : '';
+$defaultDateStart  = $defaultStartToday ? dol_print_date(dol_now(), '%Y-%m-%dT%H:%M', 'tzuser') : '';
+$defaultDateEnd    = $defaultStartToday ? dol_print_date(dol_time_plus_duree(dol_now(), $defaultDuration, 'd'), '%Y-%m-%dT%H:%M', 'tzuser') : '';
 
 $prefill = [
     'label' => '',

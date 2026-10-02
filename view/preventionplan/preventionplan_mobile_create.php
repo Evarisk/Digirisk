@@ -106,8 +106,8 @@ $isEdit  = false;
 // Default dates from admin config
 $defaultStartToday = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY', 1);
 $defaultDuration   = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DURATION', 30);
-$defaultDateStart  = $defaultStartToday ? dol_print_date(dol_now(), '%Y-%m-%d') : '';
-$defaultDateEnd    = $defaultStartToday ? dol_print_date(dol_time_plus_duree(dol_now(), $defaultDuration, 'd'), '%Y-%m-%d') : '';
+$defaultDateStart  = $defaultStartToday ? dol_print_date(dol_now(), '%Y-%m-%d', 'tzuser') : '';
+$defaultDateEnd    = $defaultStartToday ? dol_print_date(dol_time_plus_duree(dol_now(), $defaultDuration, 'd'), '%Y-%m-%d', 'tzuser') : '';
 
 $prefill = [
     'label' => '',

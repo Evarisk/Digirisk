@@ -83,7 +83,7 @@ foreach ($signalisationCategories as $signalisationItem) {
                 [
                     'title'   => $langs->trans('MobilePPStepCreated'),
                     'status'  => !empty($isEdit) ? $langs->transnoentities('MobileStepDone') : $langs->transnoentities('MobileStepInProgress'),
-                    'date'    => dol_print_date(dol_now(), 'day'),
+                    'date'    => dol_print_date(dol_now(), 'day', 'tzuser'),
                     'done'    => !empty($isEdit),
                     'current' => empty($isEdit),
                     'viewBox' => $workflowIcons['created']['viewBox'],
