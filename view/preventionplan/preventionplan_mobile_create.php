@@ -908,10 +908,17 @@ if ($action == 'resend_ext_signature_email' && $permissiontoadd) {
         $errorMsg = mb_convert_encoding($errorMsg, 'UTF-8', 'ISO-8859-1');
     }
 
+    // Le JS pose le message en texte dans le bandeau : trans() y laisserait ses entites HTML en clair
+    // ("envoy&eacute;e"). L'erreur de CMailFile arrive elle-meme en HTML (entites, <br>) : ramenee a
+    // du texte d'abord
+    $resendMessage = $resendResult['sent']
+        ? $langs->transnoentities('MobilePPSignatureEmailSentTo', $resendResult['email'])
+        : $langs->transnoentities('MobilePPWarningEmailNotSentDetail', dol_string_nohtmltag($errorMsg, 1));
+
     header('Content-Type: application/json');
     echo json_encode([
         'success' => $resendResult['sent'],
-        'message' => $resendResult['sent'] ? $langs->trans('MobilePPSignatureEmailSentTo', $resendResult['email']) : $langs->trans('MobilePPWarningEmailNotSentDetail', $errorMsg),
+        'message' => $resendMessage,
     ], JSON_INVALID_UTF8_SUBSTITUTE);
     exit;
 }
