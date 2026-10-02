@@ -55,9 +55,83 @@ function digiriskPwaHeader(string $title, string $bodyMore = '')
 }
 
 /**
+ * Turn a search term written as a date into the ranges it covers.
+ *
+ * Accepts a day (12/09/2026, 12/09/26, 2026-09-12), a day without its year (12/09), a month
+ * (09/2026, 2026-09) or a year (2026), with /, - or . as separator. Day and month come in the order
+ * of the user's date format, the one the cards are displayed with.
+ * A day without its year is the same day in every year from ten years back to two years ahead:
+ * one range per year rather than date functions of the database, which differ from one to another.
+ * Bounds are built like the stored dates (dol_mktime() in the server timezone), so that a date
+ * stored at midnight of the searched day falls in it.
+ *
+ * @param  string       $term Search term
+ * @return int[][]|null       List of [start, end] timestamps, null when the term is not a date
+ */
+function digiriskPwaSearchDateRange(string $term): ?array
+{
+    global $langs;
+
+    $monthFirst = strpos($langs->trans('FormatDateShort'), '%m') === 0;
+    $day        = 0;
+    $month      = 0;
+    $year       = 0;
+
+    if (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $term, $parts)) {
+        list(, $year, $month, $day) = $parts;
+    } elseif (preg_match('/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2}|\d{4})$/', $term, $parts)) {
+        list(, $first, $second, $year) = $parts;
+        $day   = $monthFirst ? $second : $first;
+        $month = $monthFirst ? $first : $second;
+    } elseif (preg_match('/^(\d{1,2})[\/.-](\d{4})$/', $term, $parts) || preg_match('/^(\d{4})-(\d{1,2})$/', $term, $parts)) {
+        $month = strlen($parts[1]) === 4 ? $parts[2] : $parts[1];
+        $year  = strlen($parts[1]) === 4 ? $parts[1] : $parts[2];
+    } elseif (preg_match('/^(\d{1,2})[\/.-](\d{1,2})$/', $term, $parts)) {
+        $day   = (int) ($monthFirst ? $parts[2] : $parts[1]);
+        $month = (int) ($monthFirst ? $parts[1] : $parts[2]);
+
+        $ranges      = [];
+        $currentYear = (int) dol_print_date(dol_now(), '%Y');
+        for ($eachYear = $currentYear - 10; $eachYear <= $currentYear + 2; $eachYear++) {
+            if (checkdate($month, $day, $eachYear)) {
+                $ranges[] = [(int) dol_mktime(0, 0, 0, $month, $day, $eachYear), (int) dol_mktime(23, 59, 59, $month, $day, $eachYear)];
+            }
+        }
+
+        return !empty($ranges) ? $ranges : null;
+    } elseif (preg_match('/^(\d{4})$/', $term, $parts)) {
+        $year = $parts[1];
+    } else {
+        return null;
+    }
+
+    $day   = (int) $day;
+    $month = (int) $month;
+    $year  = (int) $year;
+    if ($year < 100) {
+        $year += 2000;
+    }
+    if ($year < 1970 || $year > 2100 || $month > 12 || ($day > 0 && !checkdate($month, $day, $year))) {
+        return null;
+    }
+
+    if ($day > 0) {
+        return [[(int) dol_mktime(0, 0, 0, $month, $day, $year), (int) dol_mktime(23, 59, 59, $month, $day, $year)]];
+    }
+    if ($month > 0) {
+        return [[(int) dol_mktime(0, 0, 0, $month, 1, $year), (int) dol_mktime(23, 59, 59, $month, (int) date('t', mktime(0, 0, 0, $month, 1, $year)), $year)]];
+    }
+
+    return [[(int) dol_mktime(0, 0, 0, 1, 1, $year), (int) dol_mktime(23, 59, 59, 12, 31, $year)]];
+}
+
+/**
  * Fetch one page of a PWA list, filtered by a free text search and a status.
  *
- * The search matches the reference and the label, which is what the cards display.
+ * The search matches what the cards display: reference, label, exterior company and period. Each
+ * word of the search has to match one of them, so that "BMW 09/2026" finds the plans of BMW starting
+ * or ending in September 2026. A word written as a date (with or without its year), a month or a
+ * year finds the records whose start or end date falls in it.
  *
  * @param  string   $className   Object class to fetch ('PreventionPlan', 'FirePermit')
  * @param  string   $search      Free text search (may be empty)
@@ -70,10 +144,29 @@ function digiriskPwaFetchList(string $className, string $search, string $status,
 {
     global $db;
 
+    $element    = (new $className($db))->element;
     $conditions = [];
-    if ($search !== '') {
-        $escaped      = $db->escape($search);
-        $conditions[] = "(t.ref LIKE '%" . $escaped . "%' OR t.label LIKE '%" . $escaped . "%')";
+    foreach (preg_split('/\s+/', $search, -1, PREG_SPLIT_NO_EMPTY) as $term) {
+        $like       = "'%" . $db->escapeforlike($db->escape($term)) . "%'";
+        $termChecks = [
+            't.ref LIKE ' . $like,
+            't.label LIKE ' . $like,
+            // Exterior company, linked through the resources of the record
+            'EXISTS (SELECT 1 FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskresources as r'
+            . ' INNER JOIN ' . MAIN_DB_PREFIX . 'societe as s ON s.rowid = r.element_id'
+            . " WHERE r.ref = 'ExtSociety' AND r.element_type = 'societe' AND r.status = 1"
+            . " AND r.object_type = '" . $db->escape($element) . "' AND r.object_id = t.rowid"
+            . ' AND (s.nom LIKE ' . $like . ' OR s.name_alias LIKE ' . $like . '))',
+        ];
+
+        // Start or end date falling in the day, the month or the year the term is written as: the
+        // dates read on the card, not every period that merely spans them
+        foreach (digiriskPwaSearchDateRange($term) ?? [] as $dateRange) {
+            $rangeSql     = " BETWEEN '" . $db->idate($dateRange[0]) . "' AND '" . $db->idate($dateRange[1]) . "'";
+            $termChecks[] = '(t.date_start' . $rangeSql . ' OR t.date_end' . $rangeSql . ')';
+        }
+
+        $conditions[] = '(' . implode(' OR ', $termChecks) . ')';
     }
     if ($status !== '') {
         $conditions[] = 't.status = ' . ((int) $status);

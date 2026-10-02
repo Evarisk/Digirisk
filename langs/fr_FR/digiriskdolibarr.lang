@@ -2257,6 +2257,7 @@ PwaNavAddFavorite = Ajouter aux favoris
 PwaNavRemoveFavorite = Retirer des favoris
 PwaHello = Bonjour %s
 PwaResultCount = %s résultat(s)
+PwaSearchPlaceholder = Réf., motif, entreprise, date
 AllStatus = Tous les statuts
 PwaTilePreventionPlanInProgress = Plans en cours
 PwaTilePreventionPlanToSign = Plans à signer

@@ -50,7 +50,7 @@ $listPageUrl = function (int $page) use ($listBaseUrl, $listSearch, $listStatus)
 <div class="digirisk-pwa-toolbar">
     <form method="GET" action="<?php print dol_escape_htmltag($listBaseUrl); ?>" class="digirisk-pwa-search">
         <div class="digirisk-pwa-search__field">
-            <input type="search" name="search" value="<?php print dol_escape_htmltag($listSearch); ?>" placeholder="<?php print dol_escape_htmltag($langs->trans('Search')); ?>">
+            <input type="search" name="search" value="<?php print dol_escape_htmltag($listSearch); ?>" placeholder="<?php print dol_escape_htmltag($langs->trans('PwaSearchPlaceholder')); ?>">
         </div>
         <select name="status" class="digirisk-pwa-search__status">
             <?php foreach ($listStatusOptions as $statusValue => $statusLabel) { ?>
