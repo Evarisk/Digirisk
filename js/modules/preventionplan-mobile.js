@@ -57,8 +57,10 @@ window.digiriskdolibarr.preventionplanmobile.init = function() {
     // document: bind only when the prevention plan form or success screen is the one on screen.
     var form = $('.digirisk-mobile-form--preventionplan');
     var successBlock = $('.digirisk-mobile-extsign--preventionplan');
-    
-    if (!form.length && !successBlock.length) {
+    // A plan locked from Dolibarr may have no exterior signatory block, it can still be archived here
+    var archiveModal = $('.digirisk-mobile-archive-modal');
+
+    if (!form.length && !successBlock.length && !archiveModal.length) {
         return;
     }
 
@@ -101,6 +103,7 @@ window.digiriskdolibarr.preventionplanmobile.event = function() {
     $(document).on('click', '.digirisk-mobile-risk-block__delete', window.digiriskdolibarr.preventionplanmobile.confirmRemoveRisk);
     $(document).on('click', '.digirisk-mobile-confirm-cancel', window.digiriskdolibarr.preventionplanmobile.closeConfirmModal);
     $(document).on('click', '.digirisk-mobile-confirm-delete', window.digiriskdolibarr.preventionplanmobile.removeRisk);
+    $(document).on('click', '.digirisk-mobile-archive-open', window.digiriskdolibarr.preventionplanmobile.confirmArchive);
     $(document).on('click', '.digirisk-mobile-protection-add', window.digiriskdolibarr.preventionplanmobile.openProtectionModal);
     $(document).on('click', '.digirisk-mobile-protection-modal-close, .digirisk-mobile-protection-modal__overlay', window.digiriskdolibarr.preventionplanmobile.closeProtectionModal);
     $(document).on('click', '.digirisk-mobile-protection-option', window.digiriskdolibarr.preventionplanmobile.addProtection);
@@ -630,6 +633,18 @@ window.digiriskdolibarr.preventionplanmobile.removeRisk = function() {
     $('.digirisk-mobile-risk-block[data-index="' + riskIndex + '"]').remove();
     window.digiriskdolibarr.preventionplanmobile.closeConfirmModal();
     window.digiriskdolibarr.preventionplanmobile.refreshRiskEmptyState();
+};
+
+/**
+ * Ask before archiving the plan from the success screen: the application offers no way back.
+ * The button keeps its archive URL, so the plan is still archived when JavaScript is off.
+ *
+ * @param  {Event} event Click on the archive button
+ * @return {void}
+ */
+window.digiriskdolibarr.preventionplanmobile.confirmArchive = function(event) {
+    event.preventDefault();
+    $('.digirisk-mobile-archive-modal').removeClass('hidden');
 };
 
 /**

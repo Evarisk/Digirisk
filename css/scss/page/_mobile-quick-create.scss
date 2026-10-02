@@ -947,13 +947,16 @@ body.digirisk-mobile-create {
       gap: 8px;
       padding: 0 14px 14px;
 
-      button {
+      // A confirmation that leads to another page is a link, styled like the buttons
+      button,
+      a {
         display: inline-flex;
         align-items: center;
         gap: 6px;
         padding: 8px 14px;
         font-size: 14px;
         font-weight: 600;
+        text-decoration: none;
         border: none;
         border-radius: 7px;
         cursor: pointer;
@@ -1194,6 +1197,16 @@ body.digirisk-mobile-create {
 
       .digirisk-mobile-success__button {
         flex: 1;
+      }
+
+      /* Four actions do not fit side by side on a phone: two per row. The basis stays under half
+         the width so that the padding of the buttons still lets two of them share a row */
+      &--wrap {
+        flex-wrap: wrap;
+
+        .digirisk-mobile-success__button {
+          flex: 1 1 40%;
+        }
       }
     }
 

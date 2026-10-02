@@ -65,7 +65,8 @@ $id      = GETPOSTINT('id'); // > 0 => edit an existing prevention plan with the
 $object            = new PreventionPlan($db);
 
 if ($id > 0 && $object->fetch($id) > 0) {
-    if ($object->status == PreventionPlan::STATUS_LOCKED) {
+    // Locked or archived: read-only, the plan is only shown by the success screen
+    if ($object->status >= PreventionPlan::STATUS_LOCKED) {
         accessforbidden($langs->trans('ErrorRecordIsLocked'));
     }
 }
@@ -847,6 +848,24 @@ if ($action == 'lock_mobile' && $permissiontoadd) {
         digiriskRefreshPreventionPlanDocument($db, (int) $lockPlan->id, $user, $langs, true);
     }
     
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?created=' . $planId);
+    exit;
+}
+
+/*
+ * Archivage du plan de prevention depuis l'ecran de succes, derniere etape de la barre d'avancement.
+ * Meme regle que la fiche Dolibarr : seul un plan verrouille s'archive.
+ */
+if ($action == 'setArchived' && $permissiontoadd) {
+    $planId      = GETPOSTINT('plan_id');
+    $archivePlan = new PreventionPlan($db);
+
+    if ($planId > 0 && $archivePlan->fetch($planId) > 0 && $archivePlan->status == PreventionPlan::STATUS_LOCKED) {
+        if ($archivePlan->setArchived($user) <= 0) {
+            setEventMessages($archivePlan->error, $archivePlan->errors, 'errors');
+        }
+    }
+
     header('Location: ' . $_SERVER['PHP_SELF'] . '?created=' . $planId);
     exit;
 }
