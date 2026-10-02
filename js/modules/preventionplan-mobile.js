@@ -640,6 +640,8 @@ window.digiriskdolibarr.preventionplanmobile.addRisk = function() {
     $('.digirisk-mobile-risk-list').append($block);
     window.digiriskdolibarr.preventionplanmobile.refreshRiskEmptyState();
     window.digiriskdolibarr.preventionplanmobile.closeRiskModal();
+    // Ready to describe the risk just picked, without hunting for its field
+    $block.find('.digirisk-mobile-risk-block__description').trigger('focus');
 };
 
 /**
@@ -749,6 +751,7 @@ window.digiriskdolibarr.preventionplanmobile.addProtection = function() {
 
     $block.find('.digirisk-mobile-protection-list').append($row);
     window.digiriskdolibarr.preventionplanmobile.closeProtectionModal();
+    $row.find('.digirisk-mobile-protection-item-comment').trigger('focus');
 };
 
 /**
