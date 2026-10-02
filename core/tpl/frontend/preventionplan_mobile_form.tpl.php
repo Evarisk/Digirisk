@@ -131,17 +131,17 @@ foreach ($signalisationCategories as $signalisationItem) {
             ?>
             
             <div class="digirisk-mobile-field" style="margin-bottom: 15px;">
-                <label><?php print $langs->trans('MobilePPMotif') != 'MobilePPMotif' ? $langs->trans('MobilePPMotif') : 'Motif de l\'intervention'; ?> *</label>
+                <label><?php print $langs->trans('MobilePPMotif') != 'MobilePPMotif' ? $langs->trans('MobilePPMotif') : 'Motif de l\'intervention'; ?> <span class="digirisk-mobile-required">*</span></label>
                 <input type="text" name="label" class="digirisk-mobile-label" required placeholder="Ex: Maintenance annuelle" value="<?php print dol_escape_htmltag($prefill['label'] ?? ''); ?>">
             </div>
 
             <div class="digirisk-mobile-row">
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('DateStart'); ?> *</label>
+                    <label><?php print $langs->trans('DateStart'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="date" name="date_start" class="digirisk-mobile-date-start" value="<?php print dol_escape_htmltag($prefill["date_start"]); ?>">
                 </div>
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('DateEnd'); ?> *</label>
+                    <label><?php print $langs->trans('DateEnd'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="date" name="date_end" class="digirisk-mobile-date-end" value="<?php print dol_escape_htmltag($prefill["date_end"]); ?>">
                 </div>
             </div>
@@ -297,11 +297,11 @@ foreach ($signalisationCategories as $signalisationItem) {
 
             <div class="digirisk-mobile-row">
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('CompanyName'); ?> *</label>
+                    <label><?php print $langs->trans('CompanyName'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="text" name="ext_society_name" class="digirisk-mobile-ext-society-name" value="<?php print dol_escape_htmltag($prefill["ext_society_name"]); ?>">
                 </div>
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('MobileSirenOrSiret'); ?> *</label>
+                    <label><?php print $langs->trans('MobileSirenOrSiret'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="text" name="siren" class="digirisk-mobile-siren-input" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="<?php print dol_escape_htmltag($langs->trans('MobileSirenOrSiretPlaceholder')); ?>" value="<?php print dol_escape_htmltag($prefill["siren"]); ?>" pattern="[\d\s]{9,20}" title="SIREN/SIRET (9 ou 14 chiffres)">
                 </div>
             </div>
@@ -336,17 +336,17 @@ foreach ($signalisationCategories as $signalisationItem) {
             </div>
             <div class="digirisk-mobile-row">
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('Lastname'); ?> *</label>
+                    <label><?php print $langs->trans('Lastname'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="text" name="resp_lastname" class="digirisk-mobile-resp-lastname" value="<?php print dol_escape_htmltag($prefill["resp_lastname"]); ?>">
                 </div>
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('Firstname'); ?> *</label>
+                    <label><?php print $langs->trans('Firstname'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="text" name="resp_firstname" class="digirisk-mobile-resp-firstname" value="<?php print dol_escape_htmltag($prefill["resp_firstname"]); ?>">
                 </div>
             </div>
             <div class="digirisk-mobile-row">
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('Email'); ?> *</label>
+                    <label><?php print $langs->trans('Email'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="email" name="resp_email" class="digirisk-mobile-resp-email" autocomplete="off" value="<?php print dol_escape_htmltag($prefill["resp_email"]); ?>" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" title="<?php print $langs->trans('MobilePPErrorInvalidEmail') ?: 'Veuillez saisir une adresse email valide.'; ?>">
                 </div>
                 <div class="digirisk-mobile-field">
