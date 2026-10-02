@@ -667,8 +667,9 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                 // ligne cesse de presenter la version d'avant modification
                 digiriskRefreshPreventionPlanDocument($db, (int) $object->id, $user, $langs, true);
 
-                $redirect = $_SERVER['PHP_SELF'] . '?created=' . $object->id;
-                setEventMessages($langs->trans('MobilePPUpdated', $object->ref), null, 'mesgs');
+                // The success screen shows the confirmation in a banner that stays, rather than a
+                // notification gone in a few seconds
+                $redirect = $_SERVER['PHP_SELF'] . '?created=' . $object->id . '&saved=updated';
                 if ($isAjax) {
                     while (ob_get_level()) {
                         ob_end_clean();
@@ -796,8 +797,9 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                 }
 
                 $db->commit();
-                $redirect = $_SERVER['PHP_SELF'] . '?created=' . $object->id;
-                setEventMessages($langs->trans('MobilePPCreated', $object->ref), null, 'mesgs');
+                // The success screen shows the confirmation in a banner that stays, rather than a
+                // notification gone in a few seconds
+                $redirect = $_SERVER['PHP_SELF'] . '?created=' . $object->id . '&saved=created';
                 if ($isAjax) {
                     while (ob_get_level()) {
                         ob_end_clean();

@@ -198,6 +198,16 @@ if ($ppHasDocument) {
     $successViewUrl = dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php', 1) . '?id=' . $object->id;
     $successViewLabel  = $langs->trans('MobilePPViewPlan');
 }
+// Confirmation banner, only when arriving right after the form was saved (not when the plan is
+// opened from the list)
+$successSaved      = GETPOST('saved', 'aZ09');
+$successBannerText = '';
+if ($successSaved === 'created') {
+    $successBannerText = $langs->trans('MobilePPCreated', $object->ref);
+} elseif ($successSaved === 'updated') {
+    $successBannerText = $langs->trans('MobilePPUpdated', $object->ref);
+}
+
 $successAgainUrl   = $_SERVER['PHP_SELF'];
 $successAgainLabel = $langs->trans('MobilePPCreateAnother');
 

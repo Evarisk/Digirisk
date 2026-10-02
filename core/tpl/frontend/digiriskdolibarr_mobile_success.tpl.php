@@ -24,7 +24,8 @@
  *          Expects: $langs, $successTitle, $successRef, $successLabel, $successFacts, $successShareUrl,
  *                   $successViewUrl, $successViewLabel, $successAgainUrl, $successAgainLabel.
  *          Optional: $successArchiveUrl, $successArchiveLabel, $successArchiveConfirmTitle, $successArchiveConfirmText
- *                    (archive button and its confirmation, shown when the URL is set).
+ *                    (archive button and its confirmation, shown when the URL is set),
+ *                    $successBannerText (confirmation banner on top, ready to print).
  */
 
 global $langs;
@@ -32,6 +33,13 @@ global $langs;
 $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successShareUrl) : '';
 ?>
 <div class="pwa-container digirisk-mobile">
+    <?php if (!empty($successBannerText)) { ?>
+    <!-- Confirmation right after the form was saved: stays on screen, unlike a notification -->
+    <div class="digirisk-mobile-success-banner" role="status">
+        <i class="fas fa-check-circle"></i>
+        <span><?php print $successBannerText; ?></span>
+    </div>
+    <?php } ?>
     <div class="digirisk-mobile-card digirisk-mobile-success">
         <?php if (!empty($successTitle)) { ?>
         <div class="digirisk-mobile-success__eyebrow">
