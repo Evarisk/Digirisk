@@ -213,11 +213,12 @@ $emailTemplateInt     = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_T
 
 // Fetch email templates
 $emailTemplatesList = ['0' => ''];
-$sql = "SELECT rowid, label FROM " . MAIN_DB_PREFIX . "c_email_templates WHERE type_template = 'preventionplan' AND active = 1 ORDER BY position ASC, label ASC";
+$sql = "SELECT rowid, label FROM " . MAIN_DB_PREFIX . "c_email_templates WHERE type_template = 'preventionplan' AND active = 1 AND entity IN (" . getEntity('c_email_templates') . ") ORDER BY position ASC, label ASC";
 $resql = $db->query($sql);
 if ($resql) {
 	while ($obj = $db->fetch_object($resql)) {
-		$emailTemplatesList[$obj->rowid] = $obj->label;
+		// The templates shipped with the module are labelled with a translation key between parentheses
+		$emailTemplatesList[$obj->rowid] = preg_match('/^\((.*)\)$/', $obj->label, $reg) ? $langs->trans($reg[1]) : $obj->label;
 	}
 }
 

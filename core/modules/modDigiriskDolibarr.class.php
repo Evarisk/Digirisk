@@ -2249,6 +2249,18 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$this->_load_tables('/digiriskdolibarr/sql/');
 
+        // The signature request template comes with data.sql: preselect it in the prevention plan setup
+        // so the admin sees which template is used, without overriding a template already picked
+        require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
+        $signatureEmailTemplate = digiriskGetPreventionPlanSignatureEmailTemplate($this->db, 0);
+        if (!empty($signatureEmailTemplate)) {
+            foreach (['DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_TEMPLATE_EXT', 'DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_TEMPLATE_INT'] as $templateConst) {
+                if (!getDolGlobalInt($templateConst)) {
+                    dolibarr_set_const($this->db, $templateConst, (int) $signatureEmailTemplate->rowid, 'integer', 0, '', $conf->entity);
+                }
+            }
+        }
+
         dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
         dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DB_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
 
