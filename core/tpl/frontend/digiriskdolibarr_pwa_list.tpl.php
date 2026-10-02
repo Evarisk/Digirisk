@@ -50,7 +50,6 @@ $listPageUrl = function (int $page) use ($listBaseUrl, $listSearch, $listStatus)
 <div class="digirisk-pwa-toolbar">
     <form method="GET" action="<?php print dol_escape_htmltag($listBaseUrl); ?>" class="digirisk-pwa-search">
         <div class="digirisk-pwa-search__field">
-            <i class="fas fa-search"></i>
             <input type="search" name="search" value="<?php print dol_escape_htmltag($listSearch); ?>" placeholder="<?php print dol_escape_htmltag($langs->trans('Search')); ?>">
         </div>
         <select name="status" class="digirisk-pwa-search__status">
@@ -58,7 +57,7 @@ $listPageUrl = function (int $page) use ($listBaseUrl, $listSearch, $listStatus)
                 <option value="<?php print dol_escape_htmltag($statusValue); ?>"<?php print ((string) $statusValue === $listStatus) ? ' selected' : ''; ?>><?php print dol_escape_htmltag($statusLabel); ?></option>
             <?php } ?>
         </select>
-        <button type="submit" class="digirisk-pwa-search__submit" aria-label="<?php print dol_escape_htmltag($langs->trans('Search')); ?>"><i class="fas fa-arrow-right"></i></button>
+        <button type="submit" class="digirisk-pwa-search__submit" aria-label="<?php print dol_escape_htmltag($langs->trans('Search')); ?>"><i class="fas fa-search"></i></button>
     </form>
     <?php if (!empty($listCreateUrl)) { ?>
         <a href="<?php print dol_escape_htmltag($listCreateUrl); ?>" class="digirisk-pwa-create" aria-label="<?php print dol_escape_htmltag($langs->trans('Add')); ?>"><i class="fas fa-plus"></i></a>
