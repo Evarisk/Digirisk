@@ -45,6 +45,11 @@ global $langs;
                 <input type="checkbox" name="risk_company_ee[<?php print $blockIndex; ?>]" value="1"<?php print !empty($blockCompanyEe) ? ' checked' : ''; ?>>
                 <span><?php print $langs->trans('MobilePPExteriorCompanyShort'); ?></span>
             </label>
+            <!-- What the two boxes mean, in a bubble shown on hover, or on tap since it takes the focus -->
+            <span class="digirisk-mobile-tooltip" tabindex="0" aria-label="<?php print dol_escape_htmltag($langs->trans('MobilePPRiskCompaniesInfo')); ?>">
+                <i class="fas fa-info-circle"></i>
+                <span class="digirisk-mobile-tooltip__bubble" role="tooltip"><?php print $langs->trans('MobilePPRiskCompaniesHelp'); ?></span>
+            </span>
         </div>
 
         <button type="button" class="digirisk-mobile-risk-block__delete" aria-label="<?php print dol_escape_htmltag($langs->trans('Delete')); ?>"><i class="fas fa-trash"></i></button>
