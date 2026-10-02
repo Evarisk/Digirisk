@@ -385,23 +385,22 @@ foreach ($signalisationCategories as $signalisationItem) {
         // Tags of the plan (native preventionplan category type). Tant qu'aucune categorie n'est
         // declaree, le multiselect s'affichait vide sans rien dire : on annonce l'absence et on
         // donne le lien pour en creer une plutot que de laisser chercher.
+        // Le lien reste propose quand des tags existent deja, et la liste est toujours rendue, meme
+        // vide : un tag cree dans l'autre onglet y est ajoute au retour, sans recharger le formulaire.
         if (isModEnabled('categorie')) {
             $planTagOptions = $form->select_all_categories('digiriskpreventionplan', '', 'parent', 64, 0, 1);
             $planTagOptions = is_array($planTagOptions) ? $planTagOptions : [];
         ?>
-        <div class="digirisk-mobile-card">
+        <div class="digirisk-mobile-card digirisk-mobile-tags" data-tags-url="<?php print dol_escape_htmltag(dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_preventionplan_tags.php', 1)); ?>">
             <div class="digirisk-mobile-card__title"><i class="fas fa-tags"></i> <?php print $langs->trans('Categories'); ?></div>
-            <?php if (!empty($planTagOptions)) {
-                print $form->multiselectarray('categories', $planTagOptions, $prefill['categories'], '', 0, 'digirisk-mobile-tags-select minwidth500 width100p');
-            } else { ?>
-            <div class="digirisk-mobile-empty">
+            <?php print $form->multiselectarray('categories', $planTagOptions, $prefill['categories'], '', 0, 'digirisk-mobile-tags-select minwidth500 width100p'); ?>
+            <div class="digirisk-mobile-empty digirisk-mobile-tags__empty<?php print !empty($planTagOptions) ? ' hidden' : ''; ?>">
                 <i class="fas fa-info-circle"></i>
                 <span><?php print $langs->trans('MobilePPNoTagAvailable'); ?></span>
             </div>
             <a class="digirisk-mobile-empty__action" href="<?php print DOL_URL_ROOT . '/categories/card.php?action=create&type=digiriskpreventionplan'; ?>" target="_blank">
                 <i class="fas fa-plus-circle"></i> <?php print $langs->trans('MobilePPCreateTag'); ?>
             </a>
-            <?php } ?>
         </div>
         <?php } ?>
 
