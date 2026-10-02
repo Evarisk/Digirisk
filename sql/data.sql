@@ -2,6 +2,16 @@ INSERT INTO llx_c_email_templates (entity,module,type_template,lang,private,fk_u
 INSERT INTO llx_c_email_templates (entity,module,type_template,lang,private,fk_user,datec,label,position,enabled,active,topic,content,content_lines,joinfiles) VALUES (0,'digiriskdolibarr','firepermit','',0,null,null,'(FirePermitSubject)',85,'$conf->digiriskdolibarr->enabled',1,'[__[MAIN_INFO_SOCIETE_NOM]__] __(FirePermitLabel)__ __REF__','__(Hello)__,<br><br>\n\n__(FirePermitContent)__<br><br>\n__(WithKindRegards)__,<br><br>\n\n__(QHSEService)__<br>__MYCOMPANY_NAME__<br>\n__MYCOMPANY_FULLADDRESS__<br>\n__MYCOMPANY_EMAIL__',null, 1);
 INSERT INTO llx_c_email_templates (entity,module,type_template,lang,private,fk_user,datec,label,position,enabled,active,topic,content,content_lines,joinfiles) VALUES (0,'digiriskdolibarr','riskassessmentdocument','',0,null,null,'(RiskAssessmentDocumentSubject)',90,'$conf->digiriskdolibarr->enabled',1,'[__[MAIN_INFO_SOCIETE_NOM]__] __(RiskAssessmentDocumentLabel)__ __REF__','__(Hello)__,<br><br>\n\n__(RiskAssessmentDocumentContent)__<br><br>\n__(WithKindRegards)__,<br><br>\n\n__(QHSEService)__<br>__MYCOMPANY_NAME__<br>\n__MYCOMPANY_FULLADDRESS__<br>\n__MYCOMPANY_EMAIL__',null, 1);
 INSERT INTO llx_c_email_templates (entity,module,type_template,lang,private,fk_user,datec,label,position,enabled,active,topic,content,content_lines,joinfiles) VALUES (0,'ticket','ticket_send','',0,null,null,'(TicketCreationSubject)',95,'$conf->digiriskdolibarr->enabled',1,'[__[MAIN_INFO_SOCIETE_NOM]__] __(NewTicketSubmitted)__ __REF__','__(QHSEService)__<br>__MYCOMPANY_NAME__<br>\n__MYCOMPANY_FULLADDRESS__<br>\n__MYCOMPANY_EMAIL__',null, 1);
+-- Signature request sent to the exterior company of a prevention plan (PWA creation, resend button).
+-- This file is replayed on every module activation, hence the guard: without it a new copy of the
+-- template would pile up in the list each time the module is enabled again.
+INSERT INTO llx_c_email_templates (entity, module, type_template, lang, private, fk_user, datec, label, position, enabled, active, topic, content, content_lines, joinfiles)
+SELECT 0, 'digiriskdolibarr', 'preventionplan', '', 0, null, null, '(PreventionPlanSignatureRequest)', 81, "isModEnabled('digiriskdolibarr')", 1,
+       '__(PreventionPlanSignatureRequest)__ __PLAN_REF__',
+       '<p>__(Hello)__,</p><p>__(PreventionPlanSignatureRequestIntro)__ __COMPANY_NAME__.</p><p><a href="__SIGNATURE_URL__">__(PreventionPlanSignatureRequestLink)__</a></p><p>__(WithKindRegards)__,<br>__USER_FULLNAME__<br>__MYCOMPANY_NAME__</p>',
+       null, 0
+FROM DUAL
+WHERE NOT EXISTS (SELECT rowid FROM llx_c_email_templates WHERE type_template = 'preventionplan' AND label = '(PreventionPlanSignatureRequest)');
 
 INSERT INTO `llx_c_relative_location` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(1, 0, 'UsualWorkplace', 'UsualWorkplace', '', 1);
 INSERT INTO `llx_c_relative_location` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(2, 0, 'OccasionalWorkplace', 'OccasionalWorkplace', '', 1);

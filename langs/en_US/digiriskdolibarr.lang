@@ -2138,6 +2138,9 @@ MobilePPCreated = Prevention plan %s created.
 MobilePPUpdated = Prevention plan %s updated.
 MobilePPSignatureEmailSubject = Signature request for prevention plan %s
 MobilePPSignatureEmailContent = Hello,<br><br>You are invited to sign the prevention plan for %s.<br><br><a href="%s">Click here to sign</a><br><br>Best regards.
+PreventionPlanSignatureRequest = Prevention plan signature request
+PreventionPlanSignatureRequestIntro = You are invited to sign the prevention plan for
+PreventionPlanSignatureRequestLink = Click here to sign
 MobilePPSuccessTitle = Prevention plan created
 MobilePPSuccessText = The interior responsible signed automatically. A signature request has been sent to the exterior company.
 MobilePPViewPlan = View plan
