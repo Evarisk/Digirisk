@@ -130,6 +130,11 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     protected bool $showPhoto = true;
 
     /**
+     * @var array Options de masquage du plan d'actions retenues pour cette generation - issue #5289
+     */
+    protected array $taskOptions = [];
+
+    /**
      * Bande basse reservee au pied de page, en mm. Le contenu s'arrete au dessus, le pied
      * s'ecrit dedans : c'est ce qui garantit qu'ils ne se chevauchent jamais.
      */
@@ -1556,6 +1561,7 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
 
         // Sans choix explicite la photo reste affichee : le formulaire n'est pas toujours poste
         $this->showPhoto = !isset($moreParam['showPhoto']) || !empty($moreParam['showPhoto']);
+        $this->taskOptions = $this->resolveTaskOptions($moreParam);
 
         $header = [
             $outputLangs->transnoentities('ListingRisksElementColumn'),
@@ -1742,6 +1748,32 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     }
 
     /**
+     * Options de masquage du plan d'actions pour cette generation.
+     *
+     * Elles ne valaient que globalement, par la configuration du module. Le formulaire de
+     * generation peut desormais les choisir au coup par coup : ce qu'il poste l'emporte,
+     * et sans lui la configuration du module continue de decider - un document genere
+     * depuis ailleurs sort donc exactement comme avant. Issue #5289
+     *
+     * @param  array $moreParam More param
+     * @return array            Par cle d'option, 1 pour masquer
+     */
+    protected function resolveTaskOptions(array $moreParam): array
+    {
+        $options = [];
+        foreach ([
+            'taskHideRef' => 'DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT',
+            'taskHideResponsible' => 'DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT',
+            'taskHideDate' => 'DIGIRISKDOLIBARR_TASK_HIDE_DATE_IN_DOCUMENT',
+            'taskHideBudget' => 'DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT',
+        ] as $key => $constant) {
+            $options[$key] = isset($moreParam[$key]) ? (int) $moreParam[$key] : getDolGlobalInt($constant);
+        }
+
+        return $options;
+    }
+
+    /**
      * Plan d'actions d'un risque, scinde entre actions en cours et actions terminees.
      *
      * Le SICTOM lit le listing bloc par bloc : une liste unique ne disait pas ou en etait
@@ -1756,6 +1788,8 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     protected function riskTasksText(int $riskId, array $riskTasks, Translate $outputLangs): string
     {
         global $conf;
+
+        $options = $this->taskOptions ?: $this->resolveTaskOptions([]);
 
         if (empty($riskTasks[$riskId])) {
             return '';
@@ -1784,26 +1818,26 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
 
             $line = $riskTask->label;
             // Une tache sans reference garde son seul libelle, sans le tiret de separation
-            if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT') && !empty($riskTask->ref)) {
+            if (!$options['taskHideRef'] && !empty($riskTask->ref)) {
                 $line = $riskTask->ref . ' - ' . $line;
             }
-            if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT') && !empty($this->taskResponsibles[$riskTask->id])) {
+            if (!$options['taskHideResponsible'] && !empty($this->taskResponsibles[$riskTask->id])) {
                 $line .= "\n" . $outputLangs->transnoentities('Responsible') . ' : ' . implode(', ', $this->taskResponsibles[$riskTask->id]);
             }
-            if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_DATE_IN_DOCUMENT')) {
+            if (!$options['taskHideDate']) {
                 $startDate = (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_TASK_START_DATE') && !empty($riskTask->dateo)) ? $riskTask->dateo : $riskTask->datec;
                 $line     .= "\n" . $outputLangs->transnoentities('DateStart') . ' : ' . dol_print_date($startDate, 'dayreduceformat', 'tzuser', $outputLangs);
                 if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_TASK_END_DATE') && !empty($riskTask->datee)) {
                     $line .= ' - ' . $outputLangs->transnoentities('Deadline') . ' : ' . dol_print_date($riskTask->datee, 'dayreduceformat', 'tzuser', $outputLangs);
                 }
             }
-            if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT')) {
+            if (!$options['taskHideBudget']) {
                 $line .= "\n" . $outputLangs->transnoentities('Budget') . ' : ' . price($riskTask->budget_amount, 0, $outputLangs, 1, 0, 0, $conf->currency);
             }
 
             // Une action terminee porte son avancement dans son bloc : le repeter n'apprend rien
             if (!$isDone) {
-                $line .= (getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT') ? "\n" : ' - ') . $outputLangs->transnoentities('DigiriskProgress') . ' : ' . ($progress ?: 0) . ' %';
+                $line .= ($options['taskHideBudget'] ? "\n" : ' - ') . $outputLangs->transnoentities('DigiriskProgress') . ' : ' . ($progress ?: 0) . ' %';
             }
 
             if ($isDone) {
