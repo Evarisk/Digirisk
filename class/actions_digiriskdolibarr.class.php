@@ -220,7 +220,10 @@ class ActionsDigiriskdolibarr
                 }
             }
 
-            $this->resprints = '<link rel="manifest" href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/' . $manifestFile . '" />';
+            // The browser keeps a manifest 3 hours: the version makes an updated one reach it at once
+            $manifestVersion = (int) @filemtime(__DIR__ . '/../' . $manifestFile);
+
+            $this->resprints = '<link rel="manifest" href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/' . $manifestFile . '?v=' . $manifestVersion . '" />';
         }
 
         return 0; // or return 1 to replace standard code
