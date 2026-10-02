@@ -102,7 +102,7 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
                 [
                     'title'   => $langs->trans('MobileFPStepCreated'),
                     'status'  => !empty($isEdit) ? $langs->transnoentities('MobileStepDone') : $langs->transnoentities('MobileStepInProgress'),
-                    'date'    => dol_print_date(dol_now(), 'day'),
+                    'date'    => dol_print_date(dol_now(), 'day', 'tzuser'),
                     'done'    => !empty($isEdit),
                     'current' => empty($isEdit),
                     'viewBox' => $workflowIcons['created']['viewBox'],

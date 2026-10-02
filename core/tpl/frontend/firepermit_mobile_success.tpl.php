@@ -70,7 +70,7 @@ $successExtraInfoHtml .= '</div></div></div>';
 $successEuBlockHtml  = '<div class="digirisk-mobile-card digirisk-mobile-extsign" style="margin-top: 15px;">';
 $successEuBlockHtml .= '<div class="digirisk-mobile-extsign__title digirisk-mobile-extsign__title--split">';
 $successEuBlockHtml .= '<div><i class="fas fa-user-tie"></i> ' . $langs->trans('FirePermitUserCompany') . '</div>';
-$successEuBlockHtml .= '<div class="digirisk-mobile-extsign__signed"><i class="fas fa-check"></i> ' . $langs->trans('MobilePPExtAlreadySigned', dol_print_date($object->date_creation, 'dayhour')) . '</div>';
+$successEuBlockHtml .= '<div class="digirisk-mobile-extsign__signed"><i class="fas fa-check"></i> ' . $langs->trans('MobilePPExtAlreadySigned', dol_print_date($object->date_creation, 'dayhour', 'tzuser')) . '</div>';
 $successEuBlockHtml .= '</div>';
 $successEuBlockHtml .= '<div class="digirisk-mobile-extsign__who">';
 $successEuBlockHtml .= '<div class="digirisk-mobile-extsign__line">';
@@ -109,7 +109,7 @@ $steps = [
     [
         'title'   => $langs->trans('MobileFPStepCreated'),
         'status'  => $langs->transnoentities('MobileStepDone'),
-        'date'    => dol_print_date($object->date_creation, 'day'),
+        'date'    => dol_print_date($object->date_creation, 'day', 'tzuser'),
         'done'    => true,
         'viewBox' => $workflowIcons['created']['viewBox'],
         'svg'     => $workflowIcons['created']['svg'],
@@ -117,7 +117,7 @@ $steps = [
     [
         'title'   => $langs->trans('MobileStepUserCompanyResponsible'),
         'status'  => $langs->transnoentities('MobileStepSignedOn'),
-        'date'    => dol_print_date($object->date_creation, 'day'),
+        'date'    => dol_print_date($object->date_creation, 'day', 'tzuser'),
         'done'    => true,
         'viewBox' => $workflowIcons['user']['viewBox'],
         'svg'     => $workflowIcons['user']['svg'],
@@ -125,7 +125,7 @@ $steps = [
     [
         'title'   => $langs->trans('MobileStepExteriorCompanyResponsible'),
         'status'  => $fpExtSigned ? $langs->transnoentities('MobileStepSignedOn') : $langs->transnoentities('MobileStepTodo'),
-        'date'    => $fpExtSigned ? dol_print_date($fpExtSignatory->signature_date ?? dol_now(), 'day') : '',
+        'date'    => $fpExtSigned ? dol_print_date($fpExtSignatory->signature_date ?? dol_now(), 'day', 'tzuser') : '',
         'done'    => $fpExtSigned,
         'viewBox' => $workflowIcons['company']['viewBox'],
         'svg'     => $workflowIcons['company']['svg'],
