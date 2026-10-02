@@ -201,4 +201,12 @@ if ($ppHasDocument) {
 $successAgainUrl   = $_SERVER['PHP_SELF'];
 $successAgainLabel = $langs->trans('MobilePPCreateAnother');
 
+// Derniere etape de la barre d'avancement, offerte une fois le plan verrouille (meme regle que la fiche Dolibarr)
+$successArchiveUrl = ($object->status == PreventionPlan::STATUS_LOCKED)
+    ? $_SERVER['PHP_SELF'] . '?action=setArchived&plan_id=' . $object->id . '&token=' . newToken()
+    : '';
+$successArchiveLabel        = $langs->transnoentities('MobileStepArchive');
+$successArchiveConfirmTitle = $langs->transnoentities('ArchiveObject', $langs->transnoentities('ThePreventionplan'));
+$successArchiveConfirmText  = $langs->transnoentities('ConfirmArchiveObject', $langs->transnoentities('ThePreventionplan') . ' ' . $object->ref);
+
 require __DIR__ . '/digiriskdolibarr_mobile_success.tpl.php';
