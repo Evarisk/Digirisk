@@ -863,6 +863,15 @@ body.digirisk-mobile-create {
     }
   }
 
+  /* Option of a picker modal already chosen: kept in place so the grid does not move, but greyed out
+     and inert, picking it again would add nothing */
+  .digirisk-mobile-picker-option--taken {
+    opacity: 0.35;
+    filter: grayscale(1);
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
   /* Protections (EPI) — same look as the risk list/modal, plus a mandatory checkbox */
   .digirisk-mobile-protection-add {
     display: inline-flex;

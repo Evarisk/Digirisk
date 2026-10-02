@@ -75,6 +75,7 @@ window.digiriskdolibarr.preventionplanmobile.init = function() {
     if (form.length) {
         window.digiriskdolibarr.preventionplanmobile.riskIndex = parseInt(form.data('risk-start-index'), 10) || 0;
         window.digiriskdolibarr.preventionplanmobile.certIndex = parseInt(form.data('cert-start-index'), 10) || 0;
+        window.digiriskdolibarr.preventionplanmobile.refreshCertificationPicker();
     }
 };
 
@@ -571,7 +572,38 @@ window.digiriskdolibarr.preventionplanmobile.togglePriorVisit = function() {
  * @return {void}
  */
 window.digiriskdolibarr.preventionplanmobile.openRiskModal = function() {
+    var picked = $('.digirisk-mobile-risk-block').map(function() { return String($(this).attr('data-position')); }).get();
+
+    window.digiriskdolibarr.preventionplanmobile.markTakenOptions($('.digirisk-mobile-risk-option'), picked);
     $('.digirisk-mobile-risk-modal').removeClass('hidden');
+};
+
+/**
+ * Grey out the options of a picker modal already chosen: picking one again would add nothing, the
+ * option has to read as unavailable instead of silently doing nothing.
+ *
+ * @param  {jQuery}   options Options of the picker, each carrying its data-position
+ * @param  {string[]} picked  Positions already chosen
+ * @return {void}
+ */
+window.digiriskdolibarr.preventionplanmobile.markTakenOptions = function(options, picked) {
+    options.each(function() {
+        var taken = picked.indexOf(String($(this).data('position'))) !== -1;
+        $(this).toggleClass('digirisk-mobile-picker-option--taken', taken).attr('aria-disabled', taken ? 'true' : 'false');
+    });
+};
+
+/**
+ * Disable in the certification picker the certifications already listed: select2 greys them out.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.preventionplanmobile.refreshCertificationPicker = function() {
+    var picked = $('.digirisk-mobile-cert-item').map(function() { return String($(this).attr('data-code')); }).get();
+
+    $('.digirisk-mobile-cert-picker option').each(function() {
+        $(this).prop('disabled', this.value !== '' && picked.indexOf(this.value) !== -1);
+    });
 };
 
 /**
@@ -616,6 +648,10 @@ window.digiriskdolibarr.preventionplanmobile.refreshRiskEmptyState = function() 
 window.digiriskdolibarr.preventionplanmobile.addRisk = function() {
     var option   = $(this);
     var position = String(option.data('position'));
+
+    if (option.hasClass('digirisk-mobile-picker-option--taken')) {
+        return;
+    }
 
     // Avoid adding the same danger category twice.
     var exists = false;
@@ -700,7 +736,11 @@ window.digiriskdolibarr.preventionplanmobile.confirmArchive = function(event) {
  * @return {void}
  */
 window.digiriskdolibarr.preventionplanmobile.openProtectionModal = function() {
-    var riskIndex = $(this).closest('.digirisk-mobile-risk-block').attr('data-index');
+    var block     = $(this).closest('.digirisk-mobile-risk-block');
+    var riskIndex = block.attr('data-index');
+    var picked    = block.find('.digirisk-mobile-protection-item').map(function() { return String($(this).attr('data-position')); }).get();
+
+    window.digiriskdolibarr.preventionplanmobile.markTakenOptions($('.digirisk-mobile-protection-option'), picked);
     $('.digirisk-mobile-protection-modal').attr('data-risk-index', riskIndex).removeClass('hidden');
 };
 
@@ -721,6 +761,10 @@ window.digiriskdolibarr.preventionplanmobile.closeProtectionModal = function() {
 window.digiriskdolibarr.preventionplanmobile.addProtection = function() {
     var option    = $(this);
     var position  = String(option.data('position'));
+
+    if (option.hasClass('digirisk-mobile-picker-option--taken')) {
+        return;
+    }
     var riskIndex = $('.digirisk-mobile-protection-modal').attr('data-risk-index');
     var $block    = $('.digirisk-mobile-risk-block[data-index="' + riskIndex + '"]');
 
@@ -806,6 +850,7 @@ window.digiriskdolibarr.preventionplanmobile.addCertification = function() {
     $('<button type="button" class="digirisk-mobile-cert-item-delete"><i class="fas fa-trash"></i></button>').appendTo($row);
 
     $('.digirisk-mobile-cert-list').append($row);
+    window.digiriskdolibarr.preventionplanmobile.refreshCertificationPicker();
 
     // Reset the picker for the next pick.
     picker.val('').trigger('change');
@@ -818,6 +863,7 @@ window.digiriskdolibarr.preventionplanmobile.addCertification = function() {
  */
 window.digiriskdolibarr.preventionplanmobile.removeCertification = function() {
     $(this).closest('.digirisk-mobile-cert-item').remove();
+    window.digiriskdolibarr.preventionplanmobile.refreshCertificationPicker();
 };
 
 /**
