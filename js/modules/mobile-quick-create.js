@@ -671,6 +671,8 @@ window.digiriskdolibarr.mobilequickcreate.addRisk = function() {
     $('.digirisk-mobile-risk-list').append($block);
     window.digiriskdolibarr.mobilequickcreate.refreshRiskEmptyState();
     window.digiriskdolibarr.mobilequickcreate.closeRiskModal();
+    // Ready to describe the type of work just picked, without hunting for its field
+    $block.find('.digirisk-mobile-risk-block__description').trigger('focus');
 };
 
 /**
@@ -768,6 +770,7 @@ window.digiriskdolibarr.mobilequickcreate.addProtection = function() {
 
     $block.find('.digirisk-mobile-protection-list').append($row);
     window.digiriskdolibarr.mobilequickcreate.closeProtectionModal();
+    $row.find('.digirisk-mobile-protection-item-comment').trigger('focus');
 };
 
 /**
