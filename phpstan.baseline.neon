@@ -1291,12 +1291,6 @@ parameters:
 			path: class/digiriskdolibarrdocuments/firepermitdocument.class.php
 
 		-
-			message: '#^Method SaturneObject\:\:fetchAll\(\) invoked with 7 parameters, 0\-6 required\.$#'
-			identifier: arguments.count
-			count: 2
-			path: class/digiriskdolibarrdocuments/firepermitdocument.class.php
-
-		-
 			message: '#^Function json_encode invoked with 2 parameters, 1 required\.$#'
 			identifier: arguments.count
 			count: 1
