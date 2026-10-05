@@ -25,7 +25,8 @@
  *                   $successViewUrl, $successViewLabel, $successAgainUrl, $successAgainLabel.
  *          Optional: $successArchiveUrl, $successArchiveLabel, $successArchiveConfirmTitle, $successArchiveConfirmText
  *                    (archive button and its confirmation, shown when the URL is set),
- *                    $successBannerText (confirmation banner on top, ready to print).
+ *                    $successBannerText (confirmation banner on top, ready to print),
+ *                    $successExtraBlockFile (template, or list of templates, of the blocks proper to the object).
  */
 
 global $langs;
@@ -94,10 +95,12 @@ $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successSha
     } ?>
 
     <?php
-    // Bloc propre a l'objet cree (signature de l'entreprise exterieure pour un plan de prevention),
-    // insere ici pour que l'ecran commun reste identique d'un objet a l'autre
-    if (!empty($successExtraBlockFile) && file_exists($successExtraBlockFile)) {
-        require $successExtraBlockFile;
+    // Blocs propres a l'objet cree (signature de l'entreprise exterieure, surveillance apres travaux du
+    // permis de feu), inseres ici pour que l'ecran commun reste identique d'un objet a l'autre
+    foreach ((array) ($successExtraBlockFile ?? []) as $successExtraBlock) {
+        if (file_exists($successExtraBlock)) {
+            require $successExtraBlock;
+        }
     }
     ?>
 

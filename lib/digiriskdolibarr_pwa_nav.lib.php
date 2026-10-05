@@ -70,6 +70,14 @@ function digiriskPwaNavGetItems(User $user): array
             'icon'  => 'fa-fire-alt',
             'label' => $langs->transnoentities('PwaNavFirePermits'),
         ];
+
+        // Rounds after the hot work of the signed permits
+        $items['firewatch'] = [
+            'url'   => $frontendBase . 'pwa_firepermit_rounds.php',
+            'page'  => 'pwa_firepermit_rounds.php',
+            'icon'  => 'fa-walking',
+            'label' => $langs->transnoentities('PwaNavFireWatch'),
+        ];
     }
 
     return $items;

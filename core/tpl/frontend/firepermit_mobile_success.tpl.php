@@ -25,6 +25,8 @@
 global $conf, $db, $langs, $mysoc, $signatory, $user, $digiriskresources;
 
 require_once __DIR__ . '/../../../lib/digiriskdolibarr_firepermit.lib.php';
+require_once __DIR__ . '/../../../lib/digiriskdolibarr_firepermitround.lib.php';
+require_once __DIR__ . '/../../../class/firepermitround.class.php';
 
 if (empty($digiriskresources)) {
     require_once __DIR__ . '/../../../class/digiriskresources.class.php';
@@ -103,6 +105,18 @@ $fpExtSignatureUrl = !empty($fpExtSignatory) ? digiriskGetFirePermitSignatureUrl
 $fpDocumentDir = $conf->digiriskdolibarr->dir_output . '/firepermitdocument/' . dol_sanitizeFileName($object->ref);
 $fpPdfFiles    = dol_is_dir($fpDocumentDir) ? dol_dir_list($fpDocumentDir, 'files', 0, '\.pdf$') : [];
 
+// Surveillance after the hot work: once the permit is signed, the rounds come before its archiving
+$fpFireWatchNow     = dol_now();
+$fpFireWatchRound   = new FirePermitRound($db);
+$fpFireWatchRounds  = $fpFireWatchRound->fetchFromFirePermit($object->id);
+$fpFireWatch        = digiriskFirePermitRoundsSummary($object, $fpFireWatchRounds, $fpFireWatchNow);
+$fpFireWatchStarted = !empty($object->date_work_end);
+$fpFireWatchDone    = $fpFireWatchStarted && $fpFireWatch['doneCount'] === $fpFireWatch['total'];
+$fpFireWatchLastAt  = 0;
+foreach ($fpFireWatchRounds as $fpRound) {
+    $fpFireWatchLastAt = max($fpFireWatchLastAt, (int) $fpRound->date_done);
+}
+
 $workflowIcons = digiriskMobileWorkflowIcons();
 
 $steps = [
@@ -139,6 +153,15 @@ $steps = [
         'svg'     => $workflowIcons['lock']['svg'],
     ],
     [
+        'title'   => $langs->trans('MobileStepFireWatch'),
+        'status'  => $fpFireWatchDone ? $langs->transnoentities('MobileStepDone') : ($fpFireWatchStarted ? $langs->transnoentities('MobileStepInProgress') : $langs->transnoentities('MobileStepTodo')),
+        'date'    => $fpFireWatchDone && $fpFireWatchLastAt > 0 ? dol_print_date($fpFireWatchLastAt, 'day', 'tzuser') : '',
+        'done'    => $fpFireWatchDone,
+        'current' => $fpFireWatchStarted && !$fpFireWatchDone,
+        'viewBox' => $workflowIcons['firewatch']['viewBox'],
+        'svg'     => $workflowIcons['firewatch']['svg'],
+    ],
+    [
         'title'   => $langs->trans('MobileStepArchive'),
         'status'  => ($object->status >= FirePermit::STATUS_ARCHIVED) ? $langs->transnoentities('MobileStepDone') : $langs->transnoentities('MobileStepTodo'),
         'date'    => '',
@@ -160,8 +183,13 @@ $successShareUrl = isModEnabled('doliletter')
 $successShareEnabled      = $fpExtSigned && ($object->status >= FirePermit::STATUS_LOCKED);
 $successShareDisabledText = $langs->trans('MobileFPSpreadAvailableOnceSignedAndLocked');
 
-// Bloc propre au permis de feu, insere par l'ecran de succes commun
-$successExtraBlockFile = __DIR__ . '/firepermit_mobile_success_extsign.tpl.php';
+// Blocs propres au permis de feu, inseres par l'ecran de succes commun : la signature de l'entreprise
+// exterieure, puis la surveillance apres travaux, qui ne commence qu'une fois le permis verrouille
+$successExtraBlockFile = [__DIR__ . '/firepermit_mobile_success_extsign.tpl.php'];
+if ($object->status == FirePermit::STATUS_LOCKED || $fpFireWatchStarted) {
+    $fpFireWatchUrl          = ($object->status == FirePermit::STATUS_LOCKED) ? dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_firepermit_rounds.php', 1) . '?id=' . $object->id : '';
+    $successExtraBlockFile[] = __DIR__ . '/firepermit_mobile_success_firewatch.tpl.php';
+}
 
 if (!empty($fpPdfFiles)) {
     $successViewUrl   = DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('firepermitdocument/' . dol_sanitizeFileName($object->ref) . '/' . $fpPdfFiles[0]['name']);
