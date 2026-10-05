@@ -105,6 +105,8 @@ window.digiriskdolibarr.preventionplanmobile.event = function() {
     $(document).on('click', '.digirisk-mobile-confirm-cancel', window.digiriskdolibarr.preventionplanmobile.closeConfirmModal);
     $(document).on('click', '.digirisk-mobile-confirm-delete', window.digiriskdolibarr.preventionplanmobile.removeRisk);
     $(document).on('click', '.digirisk-mobile-archive-open', window.digiriskdolibarr.preventionplanmobile.confirmArchive);
+    $(document).on('change', '.digirisk-mobile-template-picker__select', window.digiriskdolibarr.preventionplanmobile.applyTemplate);
+    $(document).on('submit', '.digirisk-mobile-template-picker__delete', window.digiriskdolibarr.preventionplanmobile.confirmDeleteTemplate);
     $(document).on('click', '.digirisk-mobile-protection-add', window.digiriskdolibarr.preventionplanmobile.openProtectionModal);
     $(document).on('click', '.digirisk-mobile-protection-modal-close, .digirisk-mobile-protection-modal__overlay', window.digiriskdolibarr.preventionplanmobile.closeProtectionModal);
     $(document).on('click', '.digirisk-mobile-protection-option', window.digiriskdolibarr.preventionplanmobile.addProtection);
@@ -728,6 +730,28 @@ window.digiriskdolibarr.preventionplanmobile.removeRisk = function() {
 window.digiriskdolibarr.preventionplanmobile.confirmArchive = function(event) {
     event.preventDefault();
     $('.digirisk-mobile-archive-modal').removeClass('hidden');
+};
+
+/**
+ * Start the new plan from the template picked: the page is reloaded with the form pre-filled from it.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.preventionplanmobile.applyTemplate = function() {
+    var templateId = parseInt($(this).val(), 10) || 0;
+    window.location.href = $(this).data('url') + (templateId > 0 ? '?template=' + templateId : '');
+};
+
+/**
+ * Ask before deleting a template: plans already created from it do not change, but it is gone for the next ones.
+ *
+ * @param  {Event} event Submit of the delete form
+ * @return {void}
+ */
+window.digiriskdolibarr.preventionplanmobile.confirmDeleteTemplate = function(event) {
+    if (!window.confirm($(this).data('confirm'))) {
+        event.preventDefault();
+    }
 };
 
 /**

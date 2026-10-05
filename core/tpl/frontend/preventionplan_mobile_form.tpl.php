@@ -44,6 +44,30 @@ foreach ($signalisationCategories as $signalisationItem) {
 }
 ?>
 <div class="pwa-container digirisk-mobile">
+    <?php if (empty($isEdit) && !empty($planTemplates)) { ?>
+    <!-- Partir d'une trame : hors du formulaire du plan, qui ne peut contenir celui de la suppression.
+         Choisir une trame recharge la page, le formulaire en sort pre-rempli -->
+    <div class="digirisk-mobile-card digirisk-mobile-template-picker">
+        <div class="digirisk-mobile-card__title"><i class="fas fa-copy"></i> <?php print $langs->trans('MobilePPTemplateStart'); ?></div>
+        <div class="digirisk-mobile-field">
+            <select class="digirisk-mobile-template-picker__select" aria-label="<?php print dol_escape_htmltag($langs->trans('MobilePPTemplateStart')); ?>" data-url="<?php print dol_escape_htmltag($_SERVER['PHP_SELF']); ?>">
+                <option value="0"><?php print $langs->trans('MobilePPTemplateNone'); ?></option>
+                <?php foreach ($planTemplates as $planTemplateItem) { ?>
+                    <option value="<?php print (int) $planTemplateItem->id; ?>"<?php print (!empty($appliedTemplate) && (int) $appliedTemplate->id === (int) $planTemplateItem->id) ? ' selected' : ''; ?>><?php print dol_escape_htmltag($planTemplateItem->label); ?></option>
+                <?php } ?>
+            </select>
+        </div>
+        <?php if (!empty($appliedTemplate)) { ?>
+        <div class="digirisk-mobile-template-picker__applied"><i class="fas fa-info-circle"></i> <?php print dol_escape_htmltag($langs->transnoentities('MobilePPTemplateApplied', $appliedTemplate->label)); ?></div>
+        <form method="POST" action="<?php print $_SERVER['PHP_SELF']; ?>" class="digirisk-mobile-template-picker__delete" data-confirm="<?php print dol_escape_htmltag($langs->transnoentities('MobilePPTemplateDeleteConfirm', $appliedTemplate->label)); ?>">
+            <input type="hidden" name="token" value="<?php print newToken(); ?>">
+            <input type="hidden" name="action" value="deleteTemplate">
+            <input type="hidden" name="template_id" value="<?php print (int) $appliedTemplate->id; ?>">
+            <button type="submit" class="digirisk-mobile-template-picker__delete-btn"><i class="fas fa-trash-alt"></i> <?php print $langs->trans('MobilePPTemplateDelete'); ?></button>
+        </form>
+        <?php } ?>
+    </div>
+    <?php } ?>
     <form method="POST" action="<?php print $_SERVER['PHP_SELF']; ?>" class="digirisk-mobile-form digirisk-mobile-form--preventionplan"
           data-has-signature="<?php print ($hasSignature || !empty($isEdit)) ? '1' : '0'; ?>"
           data-siren-lookup-url="<?php print dol_escape_htmltag($sirenLookupUrl); ?>"
@@ -431,8 +455,11 @@ foreach ($signalisationCategories as $signalisationItem) {
                     $blockCompanyEe   = $prefillRisk['company_ee'];
 
                     // Edit mode: bring the photos already attached to the risk into the temporary
-                    // upload directory, so the media block manages them like the new ones
-                    digiriskMobileSeedRiskPhotos($object->element, $object->ref, (int) $prefillRisk['category'], $uploadToken, $blockIndex);
+                    // upload directory, so the media block manages them like the new ones. A plan
+                    // started from a template has no photo yet: they belong to each intervention
+                    if (!empty($isEdit)) {
+                        digiriskMobileSeedRiskPhotos($object->element, $object->ref, (int) $prefillRisk['category'], $uploadToken, $blockIndex);
+                    }
                     $blockUploadSubDir = digiriskMobileRiskUploadSubDir($uploadToken, $blockIndex);
 
                     $blockProtections = [];

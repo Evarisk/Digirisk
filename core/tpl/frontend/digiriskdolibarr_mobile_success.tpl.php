@@ -26,7 +26,8 @@
  *          Optional: $successArchiveUrl, $successArchiveLabel, $successArchiveConfirmTitle, $successArchiveConfirmText
  *                    (archive button and its confirmation, shown when the URL is set),
  *                    $successBannerText (confirmation banner on top, ready to print),
- *                    $successExtraBlockFile (template, or list of templates, of the blocks proper to the object).
+ *                    $successExtraBlockFile (template, or list of templates, of the blocks proper to the object),
+ *                    $successFooterBlockFile (same, for discreet secondary actions under the buttons).
  */
 
 global $langs;
@@ -154,6 +155,15 @@ $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successSha
         <?php } ?>
         <a class="digirisk-mobile-success__button" href="<?php print $successAgainUrl; ?>"><?php print dol_escape_htmltag($successAgainLabel); ?></a>
     </div>
+
+    <?php
+    // Actions secondaires, discretes, sous les boutons (enregistrer le plan de prevention comme trame)
+    foreach ((array) ($successFooterBlockFile ?? []) as $successFooterBlock) {
+        if (file_exists($successFooterBlock)) {
+            require $successFooterBlock;
+        }
+    }
+    ?>
 
     <?php if (!empty($successArchiveUrl)) { ?>
     <!-- Archive confirmation: the application offers no way back, and a mistap on a phone is easy -->

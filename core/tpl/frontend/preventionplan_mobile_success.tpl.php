@@ -184,6 +184,8 @@ $successShareDisabledText = 'La diffusion sera disponible dès que le plan sera 
 
 // Bloc propre au plan de prevention, insere par l'ecran de succes commun
 $successExtraBlockFile = __DIR__ . '/preventionplan_mobile_success_extsign.tpl.php';
+// Enregistrer comme trame : action secondaire, discrete sous les boutons
+$successFooterBlockFile = __DIR__ . '/preventionplan_mobile_success_template.tpl.php';
 
 if ($ppHasDocument) {
     // Generate view url for the PDF
@@ -206,6 +208,11 @@ if ($successSaved === 'created') {
     $successBannerText = $langs->trans('MobilePPCreated', $object->ref);
 } elseif ($successSaved === 'updated') {
     $successBannerText = $langs->trans('MobilePPUpdated', $object->ref);
+} elseif ($successSaved === 'template_saved' || $successSaved === 'template_updated') {
+    $savedTemplate = new PreventionPlanTemplate($db);
+    if ($savedTemplate->fetch(GETPOSTINT('template')) > 0) {
+        $successBannerText = dol_escape_htmltag($langs->transnoentities($successSaved === 'template_saved' ? 'MobilePPTemplateSaved' : 'MobilePPTemplateUpdated', $savedTemplate->label));
+    }
 }
 
 $successAgainUrl   = $_SERVER['PHP_SELF'];
