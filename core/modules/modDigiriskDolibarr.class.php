@@ -665,6 +665,14 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_PROJECT', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE', 'integer', 0, '', 0, 'current'],
 
+			// CONST FIRE PERMIT ROUNDS (fire watch after hot work: delays in minutes, then 0 = disabled, 1 = optional, 2 = required)
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_DELAYS', 'chaine', '30,60,120', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COMMENT', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_PHOTO', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_GEOLOC', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_SIGNATURE', 'integer', 2, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_PUBLIC_INTERFACE', 'integer', 0, '', 0, 'current'],
+
 			// CONST FIRE PERMIT DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMITDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON', 'chaine', 'mod_firepermitdocument_standard', '', 0, 'current'],

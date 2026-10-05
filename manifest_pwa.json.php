@@ -136,6 +136,12 @@ $shortcut->short_name  = 'Permis';
 $shortcut->url         = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_firepermit_list.php', 1);
 $manifest->shortcuts[] = $shortcut;
 
+$shortcut              = new stdClass();
+$shortcut->name        = 'Rondes apres travaux';
+$shortcut->short_name  = 'Rondes';
+$shortcut->url         = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_firepermit_rounds.php', 1);
+$manifest->shortcuts[] = $shortcut;
+
 // Pictures of the install dialog, in display order: the presentation visual first, then one per screen.
 // Chrome shows the portrait (narrow) ones on a phone and the landscape (wide) ones on a computer, at most
 // 8 entries in all, and drops a picture whose aspect ratio differs from the first one shown.

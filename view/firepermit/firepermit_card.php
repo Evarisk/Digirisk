@@ -43,11 +43,14 @@ require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../class/firepermit.class.php';
+require_once __DIR__ . '/../../class/firepermitround.class.php';
 require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/firepermitdocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_firepermit.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_firepermitround.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
 
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $user;
@@ -566,9 +569,36 @@ if (empty($reshook)) {
 		}
 	}
 
+	// Action to declare the end of the hot work: the fire watch rounds are planned from it
+	if ($action == 'declareWorkEnd' && $permissiontoadd) {
+		$object->fetch($id);
+
+		$dateWorkEnd   = dol_mktime(GETPOSTINT('work_endhour'), GETPOSTINT('work_endmin'), 0, GETPOSTINT('work_endmonth'), GETPOSTINT('work_endday'), GETPOSTINT('work_endyear'), 'tzuserrel');
+		$fireWatchName = GETPOST('firewatch_name', 'alphanohtml');
+
+		if (empty($dateWorkEnd) || !dol_strlen(trim($fireWatchName))) {
+			setEventMessages($langs->trans('FireWatchErrorWorkEndIncomplete'), null, 'errors');
+		} elseif ($dateWorkEnd > dol_now() + FirePermitRound::EARLY_TOLERANCE) {
+			// The rounds follow a work that is over: a future end would plan them for nothing
+			setEventMessages($langs->trans('FireWatchErrorWorkEndInFuture'), null, 'errors');
+		} elseif ($object->declareWorkEnd($user, $dateWorkEnd, $fireWatchName, digiriskFirePermitGetRoundDelays()) > 0) {
+			digiriskFirePermitAddRoundEvent($db, $object, $user, 'FIREPERMIT_WORKEND', $langs->transnoentities('FireWatchWorkEndEvent', $object->ref), $langs->transnoentities('FireWatchName') . ' : ' . $object->firewatch_name);
+			setEventMessages($langs->trans('FireWatchWorkEndDeclared'), null);
+			header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '#firewatch');
+			exit;
+		} else {
+			setEventMessages($langs->trans($object->error), $object->errors, 'errors');
+		}
+	}
+
 	// Action to set status STATUS_ARCHIVED
 	if ($action == 'setArchived') {
 		$object->fetch($id);
+		// Closing the permit means the surveillance after the work is over
+		if ($object->countPendingRounds() > 0) {
+			setEventMessages($langs->trans('FireWatchArchiveBlocked'), null, 'errors');
+			$error++;
+		}
 		if ( ! $error) {
 			$result = $object->setArchived($user, false);
 			if ($result > 0) {
@@ -1151,8 +1181,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
             $displayButton = $onPhone ? '<i class="fas fa-envelope fa-2x"></i>' : '<i class="fas fa-envelope"></i>' . ' ' . $langs->trans('SendMail') . ' ';
             if ($object->status == FirePermit::STATUS_LOCKED) {
                 $fileParams = dol_most_recent_file($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref);
-                $file       = $fileParams['fullname'];
-                if (file_exists($file) && !strstr($fileParams['name'], 'specimen')) {
+                $file       = is_array($fileParams) ? $fileParams['fullname'] : '';
+                if (!empty($file) && file_exists($file) && !strstr($fileParams['name'], 'specimen')) {
                     $forcebuilddoc = 0;
                 } else {
                     $forcebuilddoc = 1;
@@ -1164,7 +1194,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			// Archive
 			$displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Archive');
-			if ($object->status == $object::STATUS_LOCKED) {
+			if ($object->status == $object::STATUS_LOCKED && $object->countPendingRounds() > 0) {
+				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('FireWatchArchiveBlocked')) . '">' . $displayButton . '</span>';
+			} elseif ($object->status == $object::STATUS_LOCKED) {
 				print '<a class="butAction" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=setArchived&token=' . newToken() . '">' . $displayButton . '</a>';
 			} else {
 				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLockedToArchive', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
@@ -1486,6 +1518,23 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	// Protections (EPI) and required certifications captured from the mobile quick-creation interface
 	require __DIR__ . '/../../core/tpl/digiriskdolibarr_mobile_protections_view.tpl.php';
+
+	// Surveillance after the hot work: end of the work, safety watcher and rounds
+	if ($object->id > 0) {
+		$fireWatchRound     = new FirePermitRound($db);
+		$fireWatchRounds    = $fireWatchRound->fetchFromFirePermit($object->id);
+		$fireWatchDelays    = digiriskFirePermitGetRoundDelays();
+		$fireWatchNow       = dol_now();
+		// The public interface only opens signed permits: no link to hand out before that
+		$fireWatchPublicUrl = ($object->status == FirePermit::STATUS_LOCKED) ? digiriskFirePermitRoundsPublicUrl($object->id) : '';
+		$fireWatchQrCode    = digiriskGetQrCodeSvg($fireWatchPublicUrl);
+		$fireWatchPhotos    = [];
+		foreach ($fireWatchRounds as $fireWatchRound) {
+			$fireWatchPhotos[$fireWatchRound->id] = digiriskFirePermitGetRoundPhotos($object, $fireWatchRound);
+		}
+
+		require __DIR__ . '/../../core/tpl/firepermit/firepermit_rounds_view.tpl.php';
+	}
 
 	// Document Generation -- Génération des documents
 	$includedocgeneration = 1;

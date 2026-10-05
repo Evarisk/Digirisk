@@ -91,6 +91,8 @@ class FirePermit extends SaturneObject
         'fk_user_modif'        => ['type' => 'integer:User:user/class/user.class.php',                                   'label' => 'UserModif',      'picto' => 'user',    'enabled' => 1,                         'position' => 150, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
         'fk_project'           => ['type' => 'integer:Project:projet/class/project.class.php:1',                         'label' => 'Project',        'picto' => 'project', 'enabled' => '$conf->project->enabled', 'position' => 85,  'notnull' => 1, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'projet.rowid'],
         'fk_preventionplan'    => ['type' => 'integer:PreventionPlan:digiriskdolibarr/class/preventionplan.class.php:1', 'label' => 'PreventionPlan', 'picto' => 'project', 'enabled' => 1,                         'position' => 160, 'notnull' => 1, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'preventionplan.rowid'],
+        'date_work_end'        => ['type' => 'datetime',     'label' => 'FireWatchWorkEnd',  'enabled' => 1, 'position' => 170, 'notnull' => 0, 'visible' => 0],
+        'firewatch_name'       => ['type' => 'varchar(255)', 'label' => 'FireWatchName',     'enabled' => 1, 'position' => 175, 'notnull' => 0, 'visible' => 0],
     ];
 
 	public $rowid;
@@ -107,6 +109,16 @@ class FirePermit extends SaturneObject
 	public $fk_user_creat;
 	public $fk_user_modif;
 	public $fk_preventionplan;
+
+	/**
+	 * @var int|string|null End of the hot work (timestamp), empty until it is declared
+	 */
+	public $date_work_end;
+
+	/**
+	 * @var string|null Safety watcher in charge of the rounds after the work
+	 */
+	public $firewatch_name;
 
     /**
      * @var string Name of subtable line
@@ -182,6 +194,9 @@ class FirePermit extends SaturneObject
         $object->ref           = $refFirePermitMod->getNextValue($object);
         $object->label         = $options['clone_label'];
         $object->status        = self::STATUS_DRAFT;
+        // The surveillance belongs to the work that took place: the clone starts without it
+        $object->date_work_end  = null;
+        $object->firewatch_name = null;
 
         // Create clone
         $object->context['createfromclone'] = 'createfromclone';
@@ -285,6 +300,123 @@ class FirePermit extends SaturneObject
 	{
 		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'FIREPERMIT_PENDINGSIGNATURE');
 	}
+
+    /**
+     * Declare the end of the hot work and plan the fire watch rounds that follow it.
+     *
+     * The surveillance starts when the work stops, not when the permit ends: each round is planned at
+     * its delay after the declared end. The rounds are written once, so changing the setup later does
+     * not rewrite the surveillance of a permit already under way.
+     *
+     * @param  User   $user          User declaring the end (an empty one from the public interface)
+     * @param  int    $dateWorkEnd   Timestamp the hot work stopped at
+     * @param  string $fireWatchName Name of the safety watcher in charge of the rounds
+     * @param  int[]  $roundDelays   Delays of the rounds, in minutes after the end of the work
+     * @return int                   >0 if OK, <0 if KO
+     * @throws Exception
+     */
+    public function declareWorkEnd(User $user, int $dateWorkEnd, string $fireWatchName, array $roundDelays): int
+    {
+        require_once __DIR__ . '/firepermitround.class.php';
+
+        if ($this->status != self::STATUS_LOCKED || !empty($this->date_work_end)) {
+            $this->error = 'FireWatchErrorWorkEndNotAllowed';
+            return -1;
+        }
+        if ($dateWorkEnd <= 0 || !dol_strlen(trim($fireWatchName))) {
+            $this->error = 'FireWatchErrorWorkEndIncomplete';
+            return -1;
+        }
+
+        $this->db->begin();
+
+        $this->date_work_end  = $dateWorkEnd;
+        $this->firewatch_name = dol_trunc(trim($fireWatchName), 255, 'right', 'UTF-8', 1);
+
+        $error = 0;
+        if ($this->update($user, 1) <= 0) {
+            $error++;
+        }
+
+        $position = 0;
+        foreach ($roundDelays as $roundDelay) {
+            if ($error) {
+                break;
+            }
+
+            $round                = new FirePermitRound($this->db);
+            $round->entity        = $this->entity;
+            $round->date_creation = dol_now();
+            $round->status        = FirePermitRound::STATUS_PLANNED;
+            $round->position      = ++$position;
+            $round->delay_minutes = (int) $roundDelay;
+            $round->date_planned  = $dateWorkEnd + ((int) $roundDelay) * 60;
+            $round->fk_firepermit = $this->id;
+            if ($round->create($user, 1) <= 0) {
+                $this->error  = $round->error;
+                $this->errors = $round->errors;
+                $error++;
+            }
+        }
+
+        if ($error) {
+            $this->db->rollback();
+            return -1;
+        }
+
+        $this->db->commit();
+        return 1;
+    }
+
+    /**
+     * Fire permits the safety watcher has to deal with: signed permits whose work is still expected,
+     * permits with rounds left to do, and the ones whose surveillance ended within the last day.
+     *
+     * Only locked permits are listed: before every party has signed, the hot work is not allowed.
+     *
+     * @return FirePermit[] Fire permits, keyed by id
+     * @throws Exception
+     */
+    public function fetchForFireWatch(): array
+    {
+        $now = dol_now();
+
+        $filter  = 't.status = ' . self::STATUS_LOCKED . ' AND (';
+        $filter .= "(t.date_work_end IS NULL AND (t.date_end IS NULL OR t.date_end >= '" . $this->db->idate(dol_time_plus_duree($now, -7, 'd')) . "'))";
+        $filter .= ' OR EXISTS (SELECT r.rowid FROM ' . $this->db->prefix() . 'digiriskdolibarr_firepermit_round as r WHERE r.fk_firepermit = t.rowid AND r.status = 0)';
+        $filter .= " OR t.date_work_end >= '" . $this->db->idate(dol_time_plus_duree($now, -1, 'd')) . "'";
+        $filter .= ')';
+
+        $records = $this->fetchAll('DESC', 'date_start', 0, 0, ['customsql' => $filter]);
+
+        $permits = [];
+        foreach (is_array($records) ? $records : [] as $record) {
+            if ($record instanceof self) {
+                $permits[$record->id] = $record;
+            }
+        }
+
+        return $permits;
+    }
+
+    /**
+     * Count the fire watch rounds still to be done: while one remains, the permit cannot be closed.
+     *
+     * @return int Number of planned rounds not recorded yet
+     */
+    public function countPendingRounds(): int
+    {
+        $sql  = 'SELECT COUNT(rowid) as nb FROM ' . $this->db->prefix() . 'digiriskdolibarr_firepermit_round';
+        $sql .= ' WHERE fk_firepermit = ' . ((int) $this->id) . ' AND status = 0';
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            return 0;
+        }
+        $obj = $this->db->fetch_object($resql);
+
+        return $obj ? (int) $obj->nb : 0;
+    }
 
     /**
      * Return the status

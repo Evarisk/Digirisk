@@ -33,6 +33,8 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/firepermit.class.php';
+require_once __DIR__ . '/../../class/firepermitround.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_firepermitround.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_pwa.lib.php';
 
 // Global variables definitions
@@ -45,6 +47,7 @@ saturne_check_access($canReadPreventionPlan || $canReadFirePermit);
 
 $listPreventionPlanUrl = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_preventionplan_list.php', 1);
 $listFirePermitUrl     = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_firepermit_list.php', 1);
+$listFireWatchUrl      = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_firepermit_rounds.php', 1);
 
 // Counters: one tile per status worth acting on, each linking to the matching filtered list
 $homeTiles = [];
@@ -86,6 +89,21 @@ if ($canReadFirePermit) {
         'label' => $langs->transnoentities('PwaTileFirePermitLocked') ?: 'Permis validÃ©s',
         'count' => digiriskPwaCountByStatus('FirePermit', FirePermit::STATUS_LOCKED),
         'url'   => $listFirePermitUrl . '?status=' . FirePermit::STATUS_LOCKED,
+    ];
+
+    // Surveillance after the hot work: the rounds screen lists the most urgent first
+    $fireWatchCounters = digiriskFirePermitRoundsCounters();
+    $homeTiles[]       = [
+        'icon'  => 'fa-walking',
+        'label' => $langs->transnoentities('PwaTileFireWatchToDo'),
+        'count' => $fireWatchCounters['toDo'],
+        'url'   => $listFireWatchUrl,
+    ];
+    $homeTiles[] = [
+        'icon'  => 'fa-user-shield',
+        'label' => $langs->transnoentities('PwaTileFireWatchPermits'),
+        'count' => $fireWatchCounters['watched'],
+        'url'   => $listFireWatchUrl,
     ];
 }
 
