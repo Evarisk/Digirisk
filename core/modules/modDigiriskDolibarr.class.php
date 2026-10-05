@@ -2276,10 +2276,11 @@ class modDigiriskdolibarr extends DolibarrModules
 		delDocumentModel('legaldisplay_odt', 'legaldisplay');
 		delDocumentModel('firepermitdocument_odt', 'firepermitdocument');
 		delDocumentModel('preventionplandocument_odt', 'preventionplandocument');
-		// Modele PDF natif : sans cette suppression, la reactivation du module rejoue son insertion
+		// Modeles PDF natifs : sans cette suppression, la reactivation du module rejoue leur insertion
 		// sur une ligne deja presente et addDocumentModel s'arrete sur une erreur de cle dupliquee,
 		// ce qui interrompt l'activation
 		delDocumentModel('preventionplandocument', 'preventionplandocument');
+		delDocumentModel('firepermitdocument', 'firepermitdocument');
 		delDocumentModel('preventionplandocument_specimen_odt', 'preventionplandocumentspecimen');
 		delDocumentModel('groupmentdocument_odt', 'groupmentdocument');
 		delDocumentModel('groupmentdocument', 'groupmentdocument');
@@ -2307,6 +2308,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		addDocumentModel('informationssharing_odt', 'informationssharing', 'ODT templates', 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
 		addDocumentModel('legaldisplay_odt', 'legaldisplay', 'ODT templates', 'DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
 		addDocumentModel('firepermitdocument_odt', 'firepermitdocument', 'ODT templates', 'DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH');
+        addDocumentModel('firepermitdocument', 'firepermitdocument', $langs->transnoentities('FirePermitDocumentPDF'));
 		addDocumentModel('preventionplandocument_odt', 'preventionplandocument', 'ODT templates', 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('preventionplandocument', 'preventionplandocument', $langs->transnoentities('PreventionPlanDocumentPDF'));
 		addDocumentModel('preventionplandocument_specimen_odt', 'preventionplandocumentspecimen', 'ODT templates', 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH');
