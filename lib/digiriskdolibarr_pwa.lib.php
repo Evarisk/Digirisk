@@ -266,3 +266,134 @@ function digiriskPwaFormatPeriod($dateStart, $dateEnd): string
 
     return $start . ' → ' . $end;
 }
+
+/**
+ * Tell where a start/end period stands today, for the badge of a PWA card.
+ *
+ * @param  int|string $dateStart Start timestamp
+ * @param  int|string $dateEnd   End timestamp
+ * @return array                 Badge ['text', 'class'], empty when both dates are missing
+ */
+function digiriskPwaPeriodState($dateStart, $dateEnd): array
+{
+    global $langs;
+
+    if (empty($dateStart) && empty($dateEnd)) {
+        return [];
+    }
+
+    $now = dol_now();
+    $end = (int) $dateEnd;
+    // A date typed without a time is stored at midnight: work still goes on during its last day
+    if ($end > 0 && dol_print_date($end, '%H%M%S', 'tzserver') === '000000') {
+        $end += 86399;
+    }
+
+    if (!empty($dateStart) && $now < $dateStart) {
+        return ['text' => $langs->transnoentities('PwaPeriodUpcoming'), 'class' => 'upcoming'];
+    }
+    if ($end > 0 && $now > $end) {
+        return ['text' => $langs->transnoentities('PwaPeriodFinished'), 'class' => 'finished'];
+    }
+
+    return ['text' => $langs->transnoentities('PwaPeriodOngoing'), 'class' => 'ongoing'];
+}
+
+/**
+ * Details shared by the prevention plan and fire permit cards of the PWA lists: who to call, where the
+ * work stands in time, whether the exterior company signed and which risks are involved, so a card
+ * answers these without being opened.
+ *
+ * @param  PreventionPlan|FirePermit $record            Prevention plan or fire permit of the card
+ * @param  DigiriskResources         $digiriskresources Resources helper
+ * @param  SaturneSignature          $signatory         Signatories helper
+ * @return array                                        ['lines' => card lines, 'pictos' => category pictos, 'foot' => creation text]
+ * @throws Exception
+ */
+function digiriskPwaCardDetails($record, DigiriskResources $digiriskresources, SaturneSignature $signatory): array
+{
+    global $db, $langs;
+
+    static $pictoCategories = [];
+    static $authorNames     = [];
+
+    $lines = [];
+
+    // fetchResourcesFromObject() returns the resolved Societe for a single match, and 0 when there is none
+    $extSociety = $digiriskresources->fetchResourcesFromObject('ExtSociety', $record);
+    if (is_object($extSociety) && $extSociety->id > 0) {
+        $lines[] = ['icon' => 'fa-industry', 'text' => $extSociety->name . (dol_strlen($extSociety->town) ? ' · ' . $extSociety->town : '')];
+    }
+
+    $signatories    = $signatory->fetchSignatory('', $record->id, $record->element);
+    $extResponsible = (is_array($signatories) && !empty($signatories['ExtSocietyResponsible'])) ? reset($signatories['ExtSocietyResponsible']) : null;
+    if (is_object($extResponsible)) {
+        $contact = dol_strlen($extResponsible->phone) ? $extResponsible->phone : $extResponsible->email;
+        $lines[] = ['icon' => 'fa-user', 'text' => trim($extResponsible->firstname . ' ' . $extResponsible->lastname) . (dol_strlen($contact) ? ' · ' . $contact : '')];
+    }
+
+    $lines[] = ['icon' => 'fa-calendar-alt', 'text' => digiriskPwaFormatPeriod($record->date_start, $record->date_end), 'badge' => digiriskPwaPeriodState($record->date_start, $record->date_end)];
+
+    // A draft has not asked the exterior company for its signature yet
+    if (is_object($extResponsible) && $record->status > $record::STATUS_DRAFT) {
+        if (dol_strlen($extResponsible->signature)) {
+            $lines[] = ['icon' => 'fa-check-circle', 'class' => 'success', 'text' => $langs->transnoentities('PwaCardExtSignedOn', dol_print_date($extResponsible->signature_date, 'day', 'tzuser'))];
+        } elseif (!empty($extResponsible->last_email_sent_date)) {
+            $lines[] = ['icon' => 'fa-hourglass-half', 'class' => 'warning', 'text' => $langs->transnoentities('PwaCardExtSignatureEmailSent', dol_print_date($extResponsible->last_email_sent_date, 'day', 'tzuser'))];
+        } else {
+            $lines[] = ['icon' => 'fa-hourglass-half', 'class' => 'warning', 'text' => $langs->transnoentities('PwaCardExtSignaturePending')];
+        }
+    }
+
+    $attendants = (is_array($signatories) && !empty($signatories['ExtSocietyAttendant'])) ? $signatories['ExtSocietyAttendant'] : [];
+    if (!empty($attendants)) {
+        $signedAttendants = count(array_filter($attendants, function ($attendant) {
+            return dol_strlen($attendant->signature) > 0;
+        }));
+        $lines[] = ['icon' => 'fa-users', 'text' => $langs->transnoentities('PwaCardAttendants', (string) count($attendants), (string) $signedAttendants)];
+    }
+
+    // One picto per category of the lines, in the order they were added: danger categories for a
+    // prevention plan, types of work for a fire permit
+    if (!isset($pictoCategories[$record->element])) {
+        $isFirePermit = ($record->element == 'firepermit');
+        $categories   = $isFirePermit ? (new Risk($db))->getFirePermitDangerCategories() : Risk::getDangerCategories();
+
+        $pictoCategories[$record->element] = [];
+        foreach ((is_array($categories) ? $categories : []) as $category) {
+            $category['src'] = dol_buildpath('/custom/digiriskdolibarr/img/' . ($isFirePermit ? 'typeDeTravaux' : 'categorieDangers') . '/' . $category['thumbnail_name'] . '.png', 1);
+
+            $pictoCategories[$record->element][$category['position']] = $category;
+        }
+    }
+    $pictos = [];
+    $sql    = 'SELECT category, MIN(rowid) AS first_line FROM ' . MAIN_DB_PREFIX . $record->table_element . 'det';
+    $sql   .= ' WHERE fk_' . $record->element . ' = ' . ((int) $record->id) . ' AND status >= 0';
+    $sql   .= ' GROUP BY category ORDER BY first_line';
+    $resql  = $db->query($sql);
+    if ($resql) {
+        while ($obj = $db->fetch_object($resql)) {
+            if (isset($pictoCategories[$record->element][$obj->category])) {
+                $pictos[] = [
+                    'src'   => $pictoCategories[$record->element][$obj->category]['src'],
+                    'title' => $pictoCategories[$record->element][$obj->category]['name'],
+                ];
+            }
+        }
+        $db->free($resql);
+    }
+
+    $foot = '';
+    if (!empty($record->date_creation)) {
+        $authorId = (int) $record->fk_user_creat;
+        if ($authorId > 0 && !array_key_exists($authorId, $authorNames)) {
+            $author                 = new User($db);
+            $authorNames[$authorId] = ($author->fetch($authorId) > 0) ? $author->getFullName($langs) : '';
+        }
+        $foot = !empty($authorNames[$authorId])
+            ? $langs->transnoentities('PwaCardCreatedOnBy', dol_print_date($record->date_creation, 'day', 'tzuser'), $authorNames[$authorId])
+            : $langs->transnoentities('PwaCardCreatedOn', dol_print_date($record->date_creation, 'day', 'tzuser'));
+    }
+
+    return ['lines' => $lines, 'pictos' => $pictos, 'foot' => $foot];
+}

@@ -203,6 +203,74 @@ body.digirisk-mobile-create {
         width: 14px;
         color: #94a3b8;
       }
+
+      &--success {
+        color: #15803d;
+
+        i {
+          color: #22c55e;
+        }
+      }
+
+      &--warning {
+        color: #b45309;
+
+        i {
+          color: #f59e0b;
+        }
+      }
+    }
+
+    &__badge {
+      display: inline-block;
+      margin-left: 4px;
+      padding: 0 6px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 16px;
+
+      &--upcoming {
+        background: #e0edff;
+        color: #1d4ed8;
+      }
+
+      &--ongoing {
+        background: #dcfce7;
+        color: #15803d;
+      }
+
+      &--finished {
+        background: #f1f5f9;
+        color: #64748b;
+      }
+    }
+
+    &__pictos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+
+      img {
+        width: 26px;
+        height: 26px;
+      }
+    }
+
+    &__foot {
+      margin-top: 6px;
+      padding-top: 5px;
+      border-top: 1px solid #f1f5f9;
+      font-size: 11px;
+      color: #94a3b8;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      i {
+        width: 14px;
+      }
     }
 
     &__edit {
