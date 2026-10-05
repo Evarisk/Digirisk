@@ -20,7 +20,8 @@
  * \ingroup digiriskdolibarr
  * \brief   Search bar, result cards and pagination shared by the PWA list screens.
  *          Expects:
- *            $langs, $listRows (array of ['url','editUrl','ref','title','lines'=>[['icon','text']],'statusHtml'])
+ *            $langs, $listRows (array of ['url','editUrl','ref','title','lines'=>[['icon','text','class'?,'badge'?=>['text','class']]],
+ *                                        'pictos'?=>[['src','title']],'foot'?,'statusHtml'])
  *            $listSearch, $listStatus, $listStatusOptions, $listPage, $listTotalPages, $listTotal
  *            $listCreateUrl (string, empty when the user may not create)
  */
@@ -82,7 +83,22 @@ $listPageUrl = function (int $page) use ($listBaseUrl, $listSearch, $listStatus)
                 </div>
                 <div class="digirisk-pwa-card__title"><?php print dol_escape_htmltag($listRow['title']); ?></div>
                 <?php foreach ($listRow['lines'] as $listRowLine) { ?>
-                    <div class="digirisk-pwa-card__line"><i class="fas <?php print dol_escape_htmltag($listRowLine['icon']); ?>"></i> <?php print dol_escape_htmltag($listRowLine['text']); ?></div>
+                    <div class="digirisk-pwa-card__line<?php print !empty($listRowLine['class']) ? ' digirisk-pwa-card__line--' . dol_escape_htmltag($listRowLine['class']) : ''; ?>">
+                        <i class="fas <?php print dol_escape_htmltag($listRowLine['icon']); ?>"></i> <?php print dol_escape_htmltag($listRowLine['text']); ?>
+                        <?php if (!empty($listRowLine['badge'])) { ?>
+                            <span class="digirisk-pwa-card__badge digirisk-pwa-card__badge--<?php print dol_escape_htmltag($listRowLine['badge']['class']); ?>"><?php print dol_escape_htmltag($listRowLine['badge']['text']); ?></span>
+                        <?php } ?>
+                    </div>
+                <?php } ?>
+                <?php if (!empty($listRow['pictos'])) { ?>
+                    <div class="digirisk-pwa-card__pictos">
+                        <?php foreach ($listRow['pictos'] as $listRowPicto) { ?>
+                            <img src="<?php print dol_escape_htmltag($listRowPicto['src']); ?>" alt="<?php print dol_escape_htmltag($listRowPicto['title']); ?>" title="<?php print dol_escape_htmltag($listRowPicto['title']); ?>" loading="lazy">
+                        <?php } ?>
+                    </div>
+                <?php } ?>
+                <?php if (!empty($listRow['foot'])) { ?>
+                    <div class="digirisk-pwa-card__foot"><i class="fas fa-clock"></i> <?php print dol_escape_htmltag($listRow['foot']); ?></div>
                 <?php } ?>
             </a>
         </div>
