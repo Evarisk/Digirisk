@@ -592,6 +592,18 @@ body.digirisk-mobile-create {
         opacity: 1;
       }
     }
+
+    // Icon on the left of its container (next to a card title): the bubble opens towards the
+    // right, otherwise it would leave the screen
+    &--start .digirisk-mobile-tooltip__bubble {
+      right: auto;
+      left: -6px;
+
+      &::before {
+        right: auto;
+        left: 10px;
+      }
+    }
   }
 
   /* Prior formalities */

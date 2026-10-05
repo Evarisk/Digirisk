@@ -392,7 +392,13 @@ foreach ($signalisationCategories as $signalisationItem) {
             $planTagOptions = is_array($planTagOptions) ? $planTagOptions : [];
         ?>
         <div class="digirisk-mobile-card digirisk-mobile-tags" data-tags-url="<?php print dol_escape_htmltag(dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_preventionplan_tags.php', 1)); ?>">
-            <div class="digirisk-mobile-card__title"><i class="fas fa-tags"></i> <?php print $langs->trans('Categories'); ?></div>
+            <div class="digirisk-mobile-card__title">
+                <i class="fas fa-tags"></i> <?php print $langs->trans('MobileTags'); ?>
+                <span class="digirisk-mobile-tooltip digirisk-mobile-tooltip--start" tabindex="0" aria-label="<?php print dol_escape_htmltag($langs->trans('MobileTagsInfo')); ?>">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="digirisk-mobile-tooltip__bubble" role="tooltip"><?php print $langs->trans('MobilePPTagsHelp'); ?></span>
+                </span>
+            </div>
             <?php print $form->multiselectarray('categories', $planTagOptions, $prefill['categories'], '', 0, 'digirisk-mobile-tags-select minwidth500 width100p'); ?>
             <div class="digirisk-mobile-empty digirisk-mobile-tags__empty<?php print !empty($planTagOptions) ? ' hidden' : ''; ?>">
                 <i class="fas fa-info-circle"></i>

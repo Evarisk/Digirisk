@@ -362,7 +362,13 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
             $permitTagOptions = is_array($permitTagOptions) ? $permitTagOptions : [];
         ?>
         <div class="digirisk-mobile-card">
-            <div class="digirisk-mobile-card__title"><i class="fas fa-tags"></i> <?php print $langs->trans('Categories'); ?></div>
+            <div class="digirisk-mobile-card__title">
+                <i class="fas fa-tags"></i> <?php print $langs->trans('MobileTags'); ?>
+                <span class="digirisk-mobile-tooltip digirisk-mobile-tooltip--start" tabindex="0" aria-label="<?php print dol_escape_htmltag($langs->trans('MobileTagsInfo')); ?>">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="digirisk-mobile-tooltip__bubble" role="tooltip"><?php print $langs->trans('MobileFPTagsHelp'); ?></span>
+                </span>
+            </div>
             <?php if (!empty($permitTagOptions)) {
                 print $form->multiselectarray('categories', $permitTagOptions, $prefill['categories'], '', 0, 'digirisk-mobile-tags-select minwidth500 width100p');
             } else { ?>
