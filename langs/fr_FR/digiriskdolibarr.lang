@@ -367,9 +367,9 @@ FirePermitMin  = permis de feu
 FirePermitsMin = permis de feu
 
 # Data - Donnée
-NewFirePermit                                     = Nouveau permis de feu
+NewFirepermit                                     = Nouveau permis de feu
 ModifyFirePermit                                  = Modifier le permis de feu
-FirePermitList                                    = Liste des permis de feu
+FirepermitList                                    = Liste des permis de feu
 FirePermit                                        = Permis de feu
 Firepermit                                        = Permis de feu
 TheFirepermit                                     = le permis de feu

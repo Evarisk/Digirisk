@@ -6385,66 +6385,6 @@ parameters:
 			path: view/firepermit/firepermit_card.php
 
 		-
-			message: '#^Comparison operation "\>" between non\-empty\-array and 0 results in an error\.$#'
-			identifier: greater.invalid
-			count: 1
-			path: view/firepermit/firepermit_list.php
-
-		-
-			message: '#^Function json_decode invoked with 4 parameters, 1\-2 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: view/firepermit/firepermit_list.php
-
-		-
-			message: '#^Negated boolean expression is always true\.$#'
-			identifier: booleanNot.alwaysTrue
-			count: 1
-			path: view/firepermit/firepermit_list.php
-
-		-
-			message: '#^Parameter \#2 \$array of method Form\:\:multiSelectArrayWithCheckbox\(\) expects array\<string, array\{label\: string, checked\?\: string, enabled\?\: string, type\?\: string, langfile\?\: string, position\?\: int, help\?\: string\}\>, non\-empty\-array\<non\-falsy\-string, array\{label\: ''ExtSociety''\|''ExtSocietyAttendant''\|''ExtSocietyResponsib…''\|''MasterWorker'', checked\: 1\}\|array\{label\: mixed, checked\: 0\|1, enabled\: bool, position\: mixed\}\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: view/firepermit/firepermit_list.php
-
-		-
-			message: '#^Ternary operator condition is always false\.$#'
-			identifier: ternary.alwaysFalse
-			count: 1
-			path: view/firepermit/firepermit_list.php
-
-		-
-			message: '#^Variable \$moduleNameLowerCase might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: view/firepermit/firepermit_list.php
-
-		-
-			message: '#^Variable \$param might not be defined\.$#'
-			identifier: variable.undefined
-			count: 3
-			path: view/firepermit/firepermit_list.php
-
-		-
-			message: '#^Variable \$resql might not be defined\.$#'
-			identifier: variable.undefined
-			count: 3
-			path: view/firepermit/firepermit_list.php
-
-		-
-			message: '#^Variable \$result might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: view/firepermit/firepermit_list.php
-
-		-
-			message: '#^Variable \$risk might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: view/firepermit/firepermit_list.php
-
-		-
 			message: '#^Function json_encode invoked with 2 parameters, 1 required\.$#'
 			identifier: arguments.count
 			count: 4
@@ -6719,66 +6659,6 @@ parameters:
 			identifier: variable.undefined
 			count: 1
 			path: view/preventionplan/preventionplan_card.php
-
-		-
-			message: '#^Comparison operation "\>" between non\-empty\-array and 0 results in an error\.$#'
-			identifier: greater.invalid
-			count: 1
-			path: view/preventionplan/preventionplan_list.php
-
-		-
-			message: '#^Function json_decode invoked with 4 parameters, 1\-2 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: view/preventionplan/preventionplan_list.php
-
-		-
-			message: '#^Negated boolean expression is always true\.$#'
-			identifier: booleanNot.alwaysTrue
-			count: 1
-			path: view/preventionplan/preventionplan_list.php
-
-		-
-			message: '#^Parameter \#2 \$array of method Form\:\:multiSelectArrayWithCheckbox\(\) expects array\<string, array\{label\: string, checked\?\: string, enabled\?\: string, type\?\: string, langfile\?\: string, position\?\: int, help\?\: string\}\>, non\-empty\-array\<non\-falsy\-string, array\{label\: ''ExtSociety'', checked\: 1, arrayofkeyval\: array, sortfield\: ''rs\.object_id''\}\|array\{label\: ''ExtSocietyAttendant''\|''ExtSocietyResponsib…''\|''MasterWorker'', checked\: 1\}\|array\{label\: mixed, checked\: 0\|1, enabled\: bool, position\: mixed, help\: mixed\}\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: view/preventionplan/preventionplan_list.php
-
-		-
-			message: '#^Ternary operator condition is always false\.$#'
-			identifier: ternary.alwaysFalse
-			count: 1
-			path: view/preventionplan/preventionplan_list.php
-
-		-
-			message: '#^Variable \$moduleNameLowerCase might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: view/preventionplan/preventionplan_list.php
-
-		-
-			message: '#^Variable \$param might not be defined\.$#'
-			identifier: variable.undefined
-			count: 4
-			path: view/preventionplan/preventionplan_list.php
-
-		-
-			message: '#^Variable \$resql might not be defined\.$#'
-			identifier: variable.undefined
-			count: 3
-			path: view/preventionplan/preventionplan_list.php
-
-		-
-			message: '#^Variable \$result might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: view/preventionplan/preventionplan_list.php
-
-		-
-			message: '#^Variable \$risk might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
-			path: view/preventionplan/preventionplan_list.php
 
 		-
 			message: '#^Function json_encode invoked with 2 parameters, 1 required\.$#'
@@ -7567,18 +7447,6 @@ parameters:
 			path: view/firepermit/firepermit_card.php
 
 		-
-			message: '#^Binary operation "\-" between string and 1 results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: view/firepermit/firepermit_list.php
-
-		-
-			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: view/firepermit/firepermit_list.php
-
-		-
 			message: '#^Parameter \#1 \$categories of method SaturneObject\:\:setCategories\(\) expects array\<int\>\|int, array\<string\> given\.$#'
 			identifier: argument.type
 			count: 2
@@ -7643,36 +7511,6 @@ parameters:
 			identifier: assign.propertyType
 			count: 2
 			path: view/preventionplan/preventionplan_card.php
-
-		-
-			message: '#^Binary operation "\-" between string and 1 results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: view/preventionplan/preventionplan_list.php
-
-		-
-			message: '#^Parameter \#1 \$id of method SaturneObject\:\:fetch\(\) expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: view/preventionplan/preventionplan_list.php
-
-		-
-			message: '#^Parameter \#4 \$month of function dol_mktime expects int, string given\.$#'
-			identifier: argument.type
-			count: 2
-			path: view/preventionplan/preventionplan_list.php
-
-		-
-			message: '#^Parameter \#5 \$day of function dol_mktime expects int, string given\.$#'
-			identifier: argument.type
-			count: 2
-			path: view/preventionplan/preventionplan_list.php
-
-		-
-			message: '#^Parameter \#6 \$year of function dol_mktime expects int, string given\.$#'
-			identifier: argument.type
-			count: 2
-			path: view/preventionplan/preventionplan_list.php
 
 		-
 			message: '#^Parameter \#1 \$categories of method SaturneObject\:\:setCategories\(\) expects array\<int\>\|int, array\<string\> given\.$#'
@@ -7907,3 +7745,15 @@ parameters:
 			identifier: property.phpDocType
 			count: 1
 			path: core/modules/modDigiriskDolibarr.class.php
+
+		-
+			message: '#^Negated boolean expression is always true\.$#'
+			identifier: booleanNot.alwaysTrue
+			count: 2
+			path: view/firepermit/firepermit_list.php
+
+		-
+			message: '#^Negated boolean expression is always true\.$#'
+			identifier: booleanNot.alwaysTrue
+			count: 2
+			path: view/preventionplan/preventionplan_list.php

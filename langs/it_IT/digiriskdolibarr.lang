@@ -275,12 +275,12 @@ ThePreventionplan                                     = il piano di prevenzione
 PreventionPlanDocument                                = Piano di prevenzione
 Preventionplandocument                                = Piano di prevenzione
 PreventionPlanDocumentGenerated                       = Generazione del piano di prevenzione
-PreventionPlanList                                    = Elenco dei piani di prevenzione
+PreventionplanList                                    = Elenco dei piani di prevenzione
 PreventionPlanLine                                    = rischio/i
 PreventionPlanLineCreated                             = Creazione di un rischio nel piano di prevenzione
 PreventionPlanLineModified                            = Modifica di un rischio nel piano di prevenzione
 PreventionPlanLineDeleted                             = Eliminazione di un rischio dal piano di prevenzione
-NewPreventionPlan                                     = Nuovo piano di prevenzione
+NewPreventionplan                                     = Nuovo piano di prevenzione
 PriorVisit                                            = Sopralluogo congiunto preliminare
 PriorVisitYesNo                                       = Visita preliminare effettuata
 PriorVisitText                                        = Nota del sopralluogo
@@ -365,9 +365,9 @@ FirePermitMin  = permesso di lavoro a caldo
 FirePermitsMin = permessi di lavoro a caldo
 
 # Dati
-NewFirePermit                                     = Nuovo permesso di lavoro a caldo
+NewFirepermit                                     = Nuovo permesso di lavoro a caldo
 ModifyFirePermit                                  = Modifica il permesso di lavoro a caldo
-FirePermitList                                    = Elenco dei permessi di lavoro a caldo
+FirepermitList                                    = Elenco dei permessi di lavoro a caldo
 FirePermit                                        = Permesso di lavoro a caldo
 Firepermit                                        = Permesso di lavoro a caldo
 TheFirepermit                                     = il permesso di lavoro a caldo

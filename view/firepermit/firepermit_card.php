@@ -660,7 +660,7 @@ $form        = new Form($db);
 $formproject = new FormProjets($db);
 
 $title       = $langs->trans("FirePermit");
-$titleCreate = $langs->trans("NewFirePermit");
+$titleCreate = $langs->trans("NewFirepermit");
 $titleEdit   = $langs->trans("ModifyFirePermit");
 
 $helpUrl = 'FR:Module_Digirisk#DigiRisk_-_Permis_de_feu';

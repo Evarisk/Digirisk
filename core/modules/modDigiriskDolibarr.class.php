@@ -442,6 +442,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				'contactcard',
 				'preventionplanschedules',
 				'preventionplanlist',
+				'firepermitlist',
 				'firepermitschedules',
 				'digiriskdolibarradmindocuments',
                 'digiriskelementview',
