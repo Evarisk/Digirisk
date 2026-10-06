@@ -1137,7 +1137,7 @@ class Accident extends SaturneObject
                     require_once __DIR__ . '/digiriskstandard.class.php';
                     $digiriskStandard = new DigiriskStandard($this->db);
                     $digiriskStandard->fetch($this->fk_standard);
-                    $accidentLocation = $digiriskStandard->ref . " - " . $conf->global->MAIN_INFO_SOCIETE_NOM;
+                    $accidentLocation = $digiriskStandard->ref . " - " . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
                 } else if (!empty($this->fk_element)) {
                     require_once __DIR__ . '/digiriskelement.class.php';
                     $digiriskElement  = new DigiriskElement($this->db);

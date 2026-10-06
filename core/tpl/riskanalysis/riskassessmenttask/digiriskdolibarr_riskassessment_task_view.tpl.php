@@ -323,7 +323,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 								<span class="riskassessment-task-reference" value="<?php echo $related_task->ref ?>"><?php echo $related_task->getNomUrl(0, 'withproject'); ?></span>
 								<span class="riskassessment-task-author">
 									<?php $userAuthor = $usersList[$related_task->fk_user_creat > 0 ? $related_task->fk_user_creat : $user->id];
-									echo getNomUrlUser($userAuthor); ?>
+									echo $userAuthor->getNomUrl(-1); ?>
 								</span>
 								<span class="riskassessment-task-date">
 									<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->dateo))) ? $related_task->dateo : $related_task->datec)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->datee))) ? ' - ' . date('d/m/Y', $related_task->datee) : ''); ?>
@@ -346,14 +346,11 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 							<div class="riskassessment-task-content">
 <!--								<span class="title">--><?php //echo $langs->trans('Label'); ?><!--</span>-->
 								<div class="riskassessment-task-title riskassessment-task-label">
-									<?php if (!$conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) : ?>
-										<span class="riskassessment-task-progress-checkbox">
-											<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id ?>" name="progress-checkbox" value="" <?php echo ($task_progress == 100) ? 'checked' : ''; ?>>
-										</span>
-									<?php endif; ?>
 									<input type="text" class="riskassessment-task-author-label riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label; ?>">
 								</div>
-								<div class="riskassessment-task-date wpeo-gridlayout grid-3">
+								<?php // The declared progress can only be edited when it is the value shown, not when it is computed from the time spent
+								$editDeclaredProgress = empty($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS); ?>
+								<div class="riskassessment-task-date wpeo-gridlayout grid-<?php echo $editDeclaredProgress ? 4 : 3 ?>">
 									<div>
 										<span class="title"><?php echo $langs->trans('DateStart'); ?></span>
                                         <?php print '<input type="datetime-local" id="RiskassessmentTaskDateStartEdit' . $related_task->id . '" name="RiskassessmentTaskDateStartEdit' . $related_task->id . '" value="' . ($related_task->dateo ? dol_print_date($related_task->dateo, '%Y-%m-%dT%H:%M:%S') : '') . '">'; ?>
@@ -366,6 +363,12 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 										<span class="title"><?php echo $langs->trans('Budget'); ?></span>
 										<input type="text" class="riskassessment-task-budget<?php echo $related_task->id ?>" name="budget" value="<?php echo price2num($related_task->budget_amount); ?>">
 									</div>
+									<?php if ($editDeclaredProgress) : ?>
+										<div class="riskassessment-task-declared-progress">
+											<span class="title"><?php echo $langs->trans('TaskDeclaredProgress'); ?></span>
+											<input type="number" min="0" max="100" step="1" class="riskassessment-task-declared-progress<?php echo $related_task->id ?>" name="progress" value="<?php echo (int) $related_task->progress; ?>">
+										</div>
+									<?php endif; ?>
 								</div>
 							<div class="flex flex-row items-center" style="margin-top: 1em;">
 								<i class="fas fa-user-tie" style="margin-right: 1em;"></i>
@@ -493,7 +496,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 														<div class="table-cell table-padding-0 riskassessment-task-timespent-single">
 															<span class="riskassessment-task-timespent-author">
 																<?php $userAuthor = $usersList[$time_spent->timespent_fk_user?:$user->id];
-																echo getNomUrlUser($userAuthor); ?>
+																echo $userAuthor->getNomUrl(-1); ?>
 															</span>
 															<span class="riskassessment-task-timespent-date">
 																<i class="fas fa-calendar-alt"></i> <?php echo dol_print_date($time_spent->timespent_datehour, 'dayhour'); ?>

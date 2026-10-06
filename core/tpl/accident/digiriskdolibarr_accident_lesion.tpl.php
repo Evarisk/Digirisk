@@ -36,21 +36,18 @@ if (!empty($accidentlines) && $accidentlines > 0) {
             print $item->ref;
             print '</td>';
 
-            $coldisplay++;
             //LesionLocalization -- Siège des lésions
             print '<td>';
             print saturne_select_dictionary('lesion_localization', 'c_lesion_localization', 'label', 'label', $item->lesion_localization);
             print '<a href="' . DOL_URL_ROOT . '/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="' . $langs->trans('ConfigDico') . '">' . ' ' . img_picto('', 'globe') . '</a>';
             print '</td>';
 
-            $coldisplay++;
             //LesionNature -- Nature des lésions
             print '<td>';
             print saturne_select_dictionary('lesion_nature', 'c_lesion_nature', 'label', 'label', $item->lesion_nature);
             print '<a href="' . DOL_URL_ROOT . '/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="' . $langs->trans('ConfigDico') . '">' . ' ' . img_picto('', 'globe') . '</a>';
             print '</td>';
 
-            $coldisplay += $colspan;
             print '<td class="center" colspan="' . $colspan . '">';
             print '<input type="submit" class="button" value="' . $langs->trans('Save') . '" name="updateLesion" id="updateLesion">';
             print ' &nbsp; <input type="submit" id ="cancelLesion" class="button" name="cancelLesion" value="' . $langs->trans("Cancel") . '">';
@@ -63,22 +60,18 @@ if (!empty($accidentlines) && $accidentlines > 0) {
             print $item->ref;
             print '</td>';
 
-            $coldisplay++;
             print '<td>';
             print $langs->transnoentities($item->lesion_localization);
             print '</td>';
 
-            $coldisplay++;
             print '<td>';
             print $langs->transnoentities($item->lesion_nature);
             print '</td>';
 
-            $coldisplay += $colspan;
 
             //Actions buttons
             if ($object->status == $object::STATUS_DRAFT) {
                 print '<td class="center">';
-                $coldisplay++;
                 print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editLesion&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
                 print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteLesion&amp;lineid=' . $item->id . '&token='. newToken(). '">';
                 print img_delete();
@@ -107,21 +100,18 @@ if ($object->status == $object::STATUS_DRAFT && $permissiontoadd) {
     print $accidentLesion->getNextNumRef();
     print '</td>';
 
-    $coldisplay++;
     //LesionLocalization -- Siège des lésions
     print '<td>';
     print saturne_select_dictionary('lesion_localization', 'c_lesion_localization', 'label');
     print '<a href="' . DOL_URL_ROOT . '/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="' . $langs->trans('ConfigDico') . '">' . ' ' . img_picto('', 'globe') . '</a>';
     print '</td>';
 
-    $coldisplay++;
     //LesionNature -- Nature des lésions
     print '<td>';
     print saturne_select_dictionary('lesion_nature', 'c_lesion_nature', 'label');
     print '<a href="' . DOL_URL_ROOT . '/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="' . $langs->trans('ConfigDico') . '">' . ' ' . img_picto('', 'globe') . '</a>';
     print '</td>';
 
-    $coldisplay += $colspan;
     print '<td class="center" colspan="' . $colspan . '">';
     print '<input type="submit" class="button" value="' . $langs->trans('Add') . '" name="addline" id="addline">';
     print '</td>';

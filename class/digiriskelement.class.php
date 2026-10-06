@@ -71,6 +71,12 @@ class DigiriskElement extends SaturneObject
      */
     public int $isCategoryManaged = 0;
 
+    /**
+     * The bin itself is a groupment kept out of the active tree by its own status. Do not
+     * confuse it with STATUS_TRASHED, which marks the elements that were put inside it.
+     */
+    public const STATUS_TRASH_ROOT = 0;
+
     public const STATUS_TRASHED   = -2;
     public const STATUS_DELETED   = -1;
     public const STATUS_VALIDATED = 1;
@@ -179,6 +185,32 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
+     * Return the id of the bin of the current entity, 0 when there is none usable
+     *
+     * The constant is not enough on its own: a failed creation used to leave -1 in it, and a conf
+     * cloned from another entity (multicompany) points to a groupment of that other entity.
+     *
+     * @return int<0, max> Id of the bin, 0 if the constant cannot be trusted
+     * @throws Exception
+     */
+    public function getTrashID(): int
+    {
+        global $conf;
+
+        $trashID = getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH');
+        if ($trashID <= 0) {
+            return 0;
+        }
+
+        $trash = new self($this->db);
+        if ($trash->fetch($trashID) <= 0 || $trash->entity != $conf->entity) {
+            return 0;
+        }
+
+        return $trashID;
+    }
+
+    /**
      * Delete object in database
      *
      * @param  User        $user       User that deletes
@@ -188,13 +220,23 @@ class DigiriskElement extends SaturneObject
      */
     public function delete(User $user, int $noTrigger = 0, bool $softDelete = true): int
     {
-        global $conf;
+        global $langs;
 
-        $this->fk_parent = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
+        // Without a usable bin the element would be reparented on a missing id: on an entity whose
+        // constant had been left at -1, deleting made it unreachable, out of the tree and out of every list
+        $trashID = $this->getTrashID();
+        if ($trashID <= 0) {
+            $langs->load('digiriskdolibarr@digiriskdolibarr');
+            $this->errors[] = $langs->trans('ErrorTrashNotFound');
+            dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
+            return -1;
+        }
+
+        $this->fk_parent = $trashID;
         $this->status    = self::STATUS_TRASHED;
 
         $result = $this->update($user, true);
-        if ($result > 0 && !empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_DELETE)) {
+        if ($result > 0 && getDolGlobalInt('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_DELETE') > 0) {
             $this->call_trigger('DIGIRISKELEMENT_DELETE', $user);
         }
 
@@ -202,9 +244,166 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
+     * Archive the element and all its descendants
+     *
+     * Archiving is not deleting: the element keeps its parent, its risks and its documents. It only
+     * leaves the active organization tree (every listing filters on STATUS_VALIDATED) to show up in
+     * the archive tab of its parent element.
+     *
+     * @param  User      $user      User that archives
+     * @param  int<0,1>  $noTrigger 0 = launch triggers after, 1 = disable triggers
+     * @return int<-1,1>            Return integer < 0 if KO, > 0 if OK
+     * @throws Exception
+     */
+    public function archive(User $user, int $noTrigger = 1): int
+    {
+        $this->db->begin();
+
+        // The whole subtree follows: a child left validated under an archived parent would be
+        // unreachable from the tree without ever showing up in an archive tab
+        foreach ($this->getDescendants() as $descendant) {
+            if ((int) $descendant->status !== self::STATUS_VALIDATED) {
+                continue;
+            }
+            if ($descendant->setArchived($user, $noTrigger) <= 0) {
+                $this->error  = $descendant->error;
+                $this->errors = $descendant->errors;
+                $this->db->rollback();
+                return -1;
+            }
+        }
+
+        if ($this->setArchived($user, $noTrigger) <= 0) {
+            $this->db->rollback();
+            return -1;
+        }
+
+        $this->db->commit();
+
+        return 1;
+    }
+
+    /**
+     * Restore the element and all its archived descendants
+     *
+     * @param  User      $user      User that unarchives
+     * @param  int<0,1>  $noTrigger 0 = launch triggers after, 1 = disable triggers
+     * @return int<-1,1>            Return integer < 0 if KO, > 0 if OK
+     * @throws Exception
+     */
+    public function unarchive(User $user, int $noTrigger = 1): int
+    {
+        $this->db->begin();
+
+        if ($this->setUnarchived($user, $noTrigger) <= 0) {
+            $this->db->rollback();
+            return -1;
+        }
+
+        foreach ($this->getDescendants() as $descendant) {
+            if ((int) $descendant->status !== self::STATUS_ARCHIVED) {
+                continue;
+            }
+            if ($descendant->setUnarchived($user, $noTrigger) <= 0) {
+                $this->error  = $descendant->error;
+                $this->errors = $descendant->errors;
+                $this->db->rollback();
+                return -1;
+            }
+        }
+
+        $this->db->commit();
+
+        return 1;
+    }
+
+    /**
+     * Return every descendant of the element, whatever its status
+     *
+     * @param  int                $depth Current recursion depth, guards against a corrupted fk_parent loop
+     * @return DigiriskElement[]         Descendants indexed by id
+     * @throws Exception
+     */
+    public function getDescendants(int $depth = 0): array
+    {
+        if ($this->id <= 0 || $depth > 20) {
+            return [];
+        }
+
+        $children = $this->fetchAll('', 'ranks', 0, 0, ['customsql' => 't.fk_parent = ' . (int) $this->id]);
+        if (!is_array($children) || empty($children)) {
+            return [];
+        }
+
+        $descendants = [];
+        foreach ($children as $child) {
+            $descendants[$child->id] = $child;
+            foreach ($child->getDescendants($depth + 1) as $descendantID => $descendant) {
+                $descendants[$descendantID] = $descendant;
+            }
+        }
+
+        return $descendants;
+    }
+
+    /**
+     * Return the direct children of the element that are archived
+     *
+     * Only direct children: an archived subtree shows up as its root, the rest of it lives in the
+     * archive tab of that root.
+     *
+     * @return DigiriskElement[] Archived children indexed by id
+     * @throws Exception
+     */
+    public function getArchivedChildren(): array
+    {
+        if ($this->id <= 0) {
+            return [];
+        }
+
+        $children = $this->fetchAll('', 'ranks', 0, 0, ['customsql' => 't.fk_parent = ' . (int) $this->id . ' AND t.status = ' . self::STATUS_ARCHIVED]);
+
+        return is_array($children) ? $children : [];
+    }
+
+    /**
+     * Return the archived risks of the element
+     *
+     * @param  string $riskType Risk type (risk, riskenvironmental), empty for all of them
+     * @return Risk[]           Archived risks indexed by id
+     * @throws Exception
+     */
+    public function getArchivedRisks(string $riskType = ''): array
+    {
+        if ($this->id <= 0) {
+            return [];
+        }
+
+        $risk  = new Risk($this->db);
+        $risks = $risk->fetchAll('', 'ref', 0, 0, ['customsql' => 't.fk_element = ' . (int) $this->id . ' AND t.status = ' . Risk::STATUS_ARCHIVED . (dol_strlen($riskType) > 0 ? ' AND t.type = \'' . $this->db->escape($riskType) . '\'' : '')]);
+
+        return is_array($risks) ? $risks : [];
+    }
+
+    /**
+     * Return how many archived items the element holds, for the tab badge
+     *
+     * @return int Number of archived risks and archived children
+     * @throws Exception
+     */
+    public function getArchiveCount(): int
+    {
+        return count($this->getArchivedRisks()) + count($this->getArchivedChildren());
+    }
+
+    /**
      * Load digirisk element infos
      *
-     * @param  array     $moreParam More param (tmparray)
+     * When a date range is given, only the elements created or modified inside it are counted:
+     * the audit report announces the GP/UT "added or modified" over the period, not the whole
+     * tree. The returned digiriskElements stay complete, the risk tables need them all — issue #4459
+     *
+     * @param  array     $moreParam More param (tmparray, dateStart, dateEnd)
      * @return array     $array     Array of current and shared digirisk elements
      * @throws Exception
      */
@@ -224,19 +423,113 @@ class DigiriskElement extends SaturneObject
             $array['shared']['digiriskElements'] = $this->fetchDigiriskElementFlat(0, [], 'shared');
         }
 
+        foreach (['current', 'shared'] as $entityScope) {
+            $array[$entityScope]['nbGroupment'] = 0;
+            $array[$entityScope]['nbWorkunit']  = 0;
+        }
+
         $digiriskElements = array_merge($array['current']['digiriskElements'], $array['shared']['digiriskElements']);
         foreach ($digiriskElements as $digiriskElement) {
+            if (!self::isInDateRange($digiriskElement['object'], $moreParam)) {
+                continue;
+            }
+
             $entity = ($digiriskElement['object']->entity == $conf->entity) ? 'current' : 'shared';
             if ($digiriskElement['object']->element_type == 'groupment') {
-                $array[$entity]['nbGroupment'] =
-                    ($array[$entity]['nbGroupment'] ?? 0) + 1;
+                $array[$entity]['nbGroupment']++;
             } else {
-                $array[$entity]['nbWorkunit'] =
-                    ($array[$entity]['nbWorkunit'] ?? 0) + 1;
+                $array[$entity]['nbWorkunit']++;
             }
         }
 
         return $array;
+    }
+
+    /**
+     * Load the GP/UT added, modified or deleted over a date range — issue #4459
+     *
+     * Deleted elements are read on purpose: an audit report is a historical trace, dropping the
+     * work units that disappeared during the period would hide precisely what the reader is
+     * looking for. They are soft deleted (status STATUS_TRASHED) so their row is still there.
+     *
+     * @param  array $moreParam More param (dateStart, dateEnd)
+     * @return array            Elements sorted by ref, each one as
+     *                          ['object' => DigiriskElement, 'state' => Added|Modified|Deleted, 'date' => timestamp]
+     * @throws Exception
+     */
+    public function loadDigiriskElementChanges(array $moreParam = []): array
+    {
+        global $conf;
+
+        if (empty($moreParam['dateStart']) || empty($moreParam['dateEnd'])) {
+            return [];
+        }
+
+        $startDate = $this->db->idate($moreParam['dateStart']);
+        $endDate   = $this->db->idate($moreParam['dateEnd']);
+
+        $statuses = [self::STATUS_VALIDATED, self::STATUS_TRASHED, self::STATUS_DELETED];
+
+        $filter  = 't.entity = ' . $conf->entity;
+        $filter .= ' AND t.status IN (' . implode(', ', $statuses) . ')';
+        $filter .= " AND (t.date_creation BETWEEN '" . $startDate . "' AND '" . $endDate . "'";
+        $filter .= " OR t.tms BETWEEN '" . $startDate . "' AND '" . $endDate . "')";
+
+        // The bin is a groupment like any other in database, it has nothing to do in an audit
+        $trashID = getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH');
+        if ($trashID > 0) {
+            $filter .= ' AND t.rowid != ' . $trashID;
+        }
+
+        $digiriskElements = $this->fetchAll('ASC', 'ref', 0, 0, ['customsql' => $filter]);
+        if (!is_array($digiriskElements) || empty($digiriskElements)) {
+            return [];
+        }
+
+        $changes = [];
+        foreach ($digiriskElements as $digiriskElement) {
+            $createdInRange = !empty($digiriskElement->date_creation)
+                && $digiriskElement->date_creation >= $moreParam['dateStart']
+                && $digiriskElement->date_creation <= $moreParam['dateEnd'];
+
+            if ($digiriskElement->status != self::STATUS_VALIDATED) {
+                $state = 'Deleted';
+            } elseif ($createdInRange) {
+                $state = 'Added';
+            } else {
+                $state = 'Modified';
+            }
+
+            // An element created during the period but touched again later would otherwise be
+            // dated after the audit window, which reads as an error in the report
+            $date = $state == 'Added' ? $digiriskElement->date_creation : $digiriskElement->tms;
+
+            $changes[] = ['object' => $digiriskElement, 'state' => $state, 'date' => $date];
+        }
+
+        return $changes;
+    }
+
+    /**
+     * Tell whether an element was created or modified inside the requested date range
+     *
+     * @param  DigiriskElement $digiriskElement Element to test
+     * @param  array           $moreParam       More param (dateStart, dateEnd)
+     * @return bool                             True when no range is requested or when the element falls in it
+     */
+    protected static function isInDateRange(DigiriskElement $digiriskElement, array $moreParam): bool
+    {
+        if (empty($moreParam['dateStart']) || empty($moreParam['dateEnd'])) {
+            return true;
+        }
+
+        foreach ([$digiriskElement->date_creation, $digiriskElement->tms] as $date) {
+            if (!empty($date) && $date >= $moreParam['dateStart'] && $date <= $moreParam['dateEnd']) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -264,14 +557,19 @@ class DigiriskElement extends SaturneObject
     {
         global $conf, $form, $langs;
 
+        // The filter used to be completed and then dropped: only the STATUS_VALIDATED condition of
+        // getActiveDigiriskElements() was ever applied, so a caller asking for the groupments of the
+        // other entities, or for anything but its own descendants, got the whole active tree instead
+        $customFilter = '';
         if (isset($filter['customsql']) && dol_strlen($filter['customsql'])) {
-            $filter['customsql'] .= ' AND t.rowid != ' . ($this->id ?? 0);
+            $customFilter = ' AND (' . $filter['customsql'] . ') AND t.rowid != ' . ($this->id ?? 0);
         }
 
-        $objectList = $this->fetchDigiriskElementFlat(0);
+        $digiriskElements = $this->getActiveDigiriskElements('all', ['filter' => $customFilter]);
+        $objectList       = $this->fetchDigiriskElementFlat(0, is_array($digiriskElements) ? $digiriskElements : []);
         $digiriskElementsData = [];
         if ($noroot == 0) {
-            $digiriskElementsData[0] = $langs->trans('Root') . ' : ' . $conf->global->MAIN_INFO_SOCIETE_NOM ;
+            $digiriskElementsData[0] = $langs->trans('Root') . ' : ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM') ;
         }
 
         if (is_array($objectList) && !empty($objectList)) {
@@ -385,8 +683,11 @@ class DigiriskElement extends SaturneObject
         $savedIsExtrafieldManaged   = $this->isextrafieldmanaged;
         $this->isextrafieldmanaged  = 0;
         $this->ismultientitymanaged = 0;
-        $objects = $this->fetchAll('',  'ranks', 0,0, array('customsql' => ' status > 0'));
-        $digiriskelement_trashes = $this->fetchAll('',  'ranks', 0,0, array('customsql' => ' status = 0'));
+        // The elements put in the bin carry STATUS_TRASHED: looking for the children of the bin among
+        // the active ones only left every genuinely deleted element out of the list, which is exactly
+        // what the callers exclude with it
+        $objects = $this->fetchAll('',  'ranks', 0,0, array('customsql' => 't.status <> ' . self::STATUS_TRASH_ROOT));
+        $digiriskelement_trashes = $this->fetchAll('',  'ranks', 0,0, array('customsql' => 't.status = ' . self::STATUS_TRASH_ROOT));
         $this->ismultientitymanaged = 1;
         $this->isextrafieldmanaged  = $savedIsExtrafieldManaged;
         if (is_array($digiriskelement_trashes) && !empty($digiriskelement_trashes)) {
@@ -467,7 +768,10 @@ class DigiriskElement extends SaturneObject
         // extrafields one row at a time (N+1). Cache the raw fetch per request, keyed by
         // everything that changes the result set (filter, entity scope).
         static $activeElementsCache = [];
-        $cacheKey = ($moreParams['filter'] ?? '') . '|' . (string) ($this->ismultientitymanaged ?? '') . '|' . getEntity($this->element);
+        // The column list comes from $this->fields, which a caller may have trimmed (the element card
+        // unsets fk_parent to shape its form): two objects must not share the same cache entry when
+        // they do not load the same columns
+        $cacheKey = ($moreParams['filter'] ?? '') . '|' . (string) ($this->ismultientitymanaged ?? '') . '|' . getEntity($this->element) . '|' . count($this->fields);
         if (!array_key_exists($cacheKey, $activeElementsCache)) {
             $activeElementsCache[$cacheKey] = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ($moreParams['filter'] ?? '')]);
         }
@@ -545,13 +849,17 @@ class DigiriskElement extends SaturneObject
             global $langs;
 
             $this->labelStatus[self::STATUS_VALIDATED]      = $langs->transnoentitiesnoconv('Validated');
+            $this->labelStatus[self::STATUS_ARCHIVED]       = $langs->transnoentitiesnoconv('Archived');
 
             $this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
+            $this->labelStatusShort[self::STATUS_ARCHIVED]  = $langs->transnoentitiesnoconv('Archived');
         }
 
         $statusType = 'status' . $status;
         if ($status == self::STATUS_VALIDATED) {
             $statusType = 'status4';
+        } elseif ($status == self::STATUS_ARCHIVED) {
+            $statusType = 'status8';
         }
 
         return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
@@ -656,7 +964,7 @@ class DigiriskElement extends SaturneObject
             $ret .= $langs->trans('ParentElement') . ' : ' .  $digiriskElement->ref . ' - ' . $digiriskElement->label . '<br/>';
         }
 
-        $ret .= $langs->trans('Standard') . ' : ' . $digiriskStandard->ref . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '<br/>';
+        $ret .= $langs->trans('Standard') . ' : ' . $digiriskStandard->ref . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM') . '<br/>';
         $ret .= $langs->trans('Photo') . ' : ' . (!empty($this->photo) ? $this->photo : 'N/A') . '<br>';
         $ret .= $langs->trans('ElementType') . ' : ' . $langs->trans($this->element_type) . '<br>';
         ($this->ranks != 0 ? $ret .= $langs->trans('Order') . ' : ' . $this->ranks . '<br>' : '');

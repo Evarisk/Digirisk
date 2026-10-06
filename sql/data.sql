@@ -2,6 +2,16 @@ INSERT INTO llx_c_email_templates (entity,module,type_template,lang,private,fk_u
 INSERT INTO llx_c_email_templates (entity,module,type_template,lang,private,fk_user,datec,label,position,enabled,active,topic,content,content_lines,joinfiles) VALUES (0,'digiriskdolibarr','firepermit','',0,null,null,'(FirePermitSubject)',85,'$conf->digiriskdolibarr->enabled',1,'[__[MAIN_INFO_SOCIETE_NOM]__] __(FirePermitLabel)__ __REF__','__(Hello)__,<br><br>\n\n__(FirePermitContent)__<br><br>\n__(WithKindRegards)__,<br><br>\n\n__(QHSEService)__<br>__MYCOMPANY_NAME__<br>\n__MYCOMPANY_FULLADDRESS__<br>\n__MYCOMPANY_EMAIL__',null, 1);
 INSERT INTO llx_c_email_templates (entity,module,type_template,lang,private,fk_user,datec,label,position,enabled,active,topic,content,content_lines,joinfiles) VALUES (0,'digiriskdolibarr','riskassessmentdocument','',0,null,null,'(RiskAssessmentDocumentSubject)',90,'$conf->digiriskdolibarr->enabled',1,'[__[MAIN_INFO_SOCIETE_NOM]__] __(RiskAssessmentDocumentLabel)__ __REF__','__(Hello)__,<br><br>\n\n__(RiskAssessmentDocumentContent)__<br><br>\n__(WithKindRegards)__,<br><br>\n\n__(QHSEService)__<br>__MYCOMPANY_NAME__<br>\n__MYCOMPANY_FULLADDRESS__<br>\n__MYCOMPANY_EMAIL__',null, 1);
 INSERT INTO llx_c_email_templates (entity,module,type_template,lang,private,fk_user,datec,label,position,enabled,active,topic,content,content_lines,joinfiles) VALUES (0,'ticket','ticket_send','',0,null,null,'(TicketCreationSubject)',95,'$conf->digiriskdolibarr->enabled',1,'[__[MAIN_INFO_SOCIETE_NOM]__] __(NewTicketSubmitted)__ __REF__','__(QHSEService)__<br>__MYCOMPANY_NAME__<br>\n__MYCOMPANY_FULLADDRESS__<br>\n__MYCOMPANY_EMAIL__',null, 1);
+-- Signature request sent to the exterior company of a prevention plan (PWA creation, resend button).
+-- This file is replayed on every module activation, hence the guard: without it a new copy of the
+-- template would pile up in the list each time the module is enabled again.
+INSERT INTO llx_c_email_templates (entity, module, type_template, lang, private, fk_user, datec, label, position, enabled, active, topic, content, content_lines, joinfiles)
+SELECT 0, 'digiriskdolibarr', 'preventionplan', '', 0, null, null, '(PreventionPlanSignatureRequest)', 81, "isModEnabled('digiriskdolibarr')", 1,
+       '__(PreventionPlanSignatureRequest)__ __PLAN_REF__',
+       '<p>__(Hello)__,</p><p>__(PreventionPlanSignatureRequestIntro)__ __COMPANY_NAME__.</p><p><a href="__SIGNATURE_URL__">__(PreventionPlanSignatureRequestLink)__</a></p><p>__(WithKindRegards)__,<br>__USER_FULLNAME__<br>__MYCOMPANY_NAME__</p>',
+       null, 0
+FROM DUAL
+WHERE NOT EXISTS (SELECT rowid FROM llx_c_email_templates WHERE type_template = 'preventionplan' AND label = '(PreventionPlanSignatureRequest)');
 
 INSERT INTO `llx_c_relative_location` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(1, 0, 'UsualWorkplace', 'UsualWorkplace', '', 1);
 INSERT INTO `llx_c_relative_location` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(2, 0, 'OccasionalWorkplace', 'OccasionalWorkplace', '', 1);
@@ -943,3 +953,14 @@ INSERT INTO llx_c_digiriskdolibarr_actionplan_column (rowid, entity, ref, label,
 INSERT INTO llx_c_digiriskdolibarr_actionplan_column (rowid, entity, ref, label, description, progress_min, progress_max, color, picto, active, position) VALUES (2, 0, 'PROGRESS', 'ColumnInProgress', '', 1,  80,  '#e9ad4f', 'fa-play',       1, 20);
 INSERT INTO llx_c_digiriskdolibarr_actionplan_column (rowid, entity, ref, label, description, progress_min, progress_max, color, picto, active, position) VALUES (3, 0, 'CONTROL',  'ColumnInControl',  '', 81, 99,  '#3085d6', 'fa-search',     1, 30);
 INSERT INTO llx_c_digiriskdolibarr_actionplan_column (rowid, entity, ref, label, description, progress_min, progress_max, color, picto, active, position) VALUES (4, 0, 'DONE',     'ColumnDone',       '', 100, 100, '#47e58e', 'fa-check',     1, 40);
+
+-- Default locations offered by the register form when the "list" input mode is on (issue #4732).
+-- The declared ticket keeps the label as text, so renaming a row here never rewrites past declarations.
+INSERT INTO llx_c_digiriskdolibarr_ticket_location (rowid, entity, ref, label, description, active, position) VALUES (1, 0, 'WORKSHOP',    'Atelier',                 '', 1, 10);
+INSERT INTO llx_c_digiriskdolibarr_ticket_location (rowid, entity, ref, label, description, active, position) VALUES (2, 0, 'OFFICE',      'Bureau',                  '', 1, 20);
+INSERT INTO llx_c_digiriskdolibarr_ticket_location (rowid, entity, ref, label, description, active, position) VALUES (3, 0, 'WAREHOUSE',   'Entrepôt / stockage',     '', 1, 30);
+INSERT INTO llx_c_digiriskdolibarr_ticket_location (rowid, entity, ref, label, description, active, position) VALUES (4, 0, 'LOADING_BAY', 'Quai de chargement',      '', 1, 40);
+INSERT INTO llx_c_digiriskdolibarr_ticket_location (rowid, entity, ref, label, description, active, position) VALUES (5, 0, 'CHANGING',    'Vestiaires / sanitaires', '', 1, 50);
+INSERT INTO llx_c_digiriskdolibarr_ticket_location (rowid, entity, ref, label, description, active, position) VALUES (6, 0, 'PARKING',     'Parking',                 '', 1, 60);
+INSERT INTO llx_c_digiriskdolibarr_ticket_location (rowid, entity, ref, label, description, active, position) VALUES (7, 0, 'VEHICLE',     'Véhicule',                '', 1, 70);
+INSERT INTO llx_c_digiriskdolibarr_ticket_location (rowid, entity, ref, label, description, active, position) VALUES (8, 0, 'OUTSIDE',     'Extérieur / voirie',      '', 1, 80);

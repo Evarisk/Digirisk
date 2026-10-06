@@ -120,8 +120,8 @@ $isEdit = false;
 // Default dates from admin config
 $defaultStartToday = getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_DATE_START_TODAY', 1);
 $defaultDuration   = getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_DURATION', 1);
-$defaultDateStart  = $defaultStartToday ? dol_print_date(dol_now(), '%Y-%m-%dT%H:%M') : '';
-$defaultDateEnd    = $defaultStartToday ? dol_print_date(dol_time_plus_duree(dol_now(), $defaultDuration, 'd'), '%Y-%m-%dT%H:%M') : '';
+$defaultDateStart  = $defaultStartToday ? dol_print_date(dol_now(), '%Y-%m-%dT%H:%M', 'tzuser') : '';
+$defaultDateEnd    = $defaultStartToday ? dol_print_date(dol_time_plus_duree(dol_now(), $defaultDuration, 'd'), '%Y-%m-%dT%H:%M', 'tzuser') : '';
 
 $prefill = [
     'label' => '',
@@ -823,15 +823,16 @@ if ($action == 'resend_ext_signature_email' && $permissiontoadd) {
     }
 
     // Le message est pose tel quel dans la page par le JS : les entites HTML de la traduction y
-    // apparaitraient en clair ("n'a pas pu &ecirc;tre envoye")
+    // apparaitraient en clair ("n'a pas pu &ecirc;tre envoye"). L'erreur de CMailFile arrive elle-meme
+    // en HTML (entites, <br>) : ramenee a du texte d'abord, sinon elle resterait encodee deux fois
     $resendMessage = $resendResult['sent']
-        ? $langs->trans('MobilePPSignatureEmailSentTo', $resendResult['email'])
-        : $langs->trans('MobilePPWarningEmailNotSentDetail', $errorMsg);
+        ? $langs->transnoentities('MobilePPSignatureEmailSentTo', $resendResult['email'])
+        : $langs->transnoentities('MobilePPWarningEmailNotSentDetail', dol_string_nohtmltag($errorMsg, 1));
 
     header('Content-Type: application/json');
     echo json_encode([
         'success' => $resendResult['sent'],
-        'message' => dol_html_entity_decode($resendMessage, ENT_QUOTES),
+        'message' => $resendMessage,
     ], JSON_INVALID_UTF8_SUBSTITUTE);
     exit;
 }
@@ -842,15 +843,15 @@ if ($action == 'resend_ext_signature_email' && $permissiontoadd) {
 
 $title    = mb_strtoupper($langs->transnoentities('firepermit'), 'UTF-8');
 $help_url = 'FR:Module_Digirisk';
-$moreJS   = saturne_asset_urls([
+$moreJS   = [
     '/custom/saturne/js/saturne.min.js',
     '/custom/digiriskdolibarr/js/signature-pad.min.js',
     '/custom/digiriskdolibarr/js/digiriskdolibarr.min.js',
-]);
-$moreCSS  = saturne_asset_urls([
+];
+$moreCSS  = [
     '/custom/saturne/css/saturne.min.css',
     '/custom/digiriskdolibarr/css/digiriskdolibarr.min.css',
-]);
+];
 
 $conf->dol_hide_topmenu         = 1;
 $conf->dol_hide_leftmenu        = 1;

@@ -1,0 +1,295 @@
+/* Modal d'ajout des risques psychosociaux : la grille des huit facteurs est saisie d'un bloc,
+   la mise en page doit donc rester lisible sur une largeur bien plus grande que celle des
+   modals standard du module. */
+.wpeo-modal .modal-container.modal-container-psychosocial {
+  max-width: 1400px;
+  width: 90%;
+  /* La modal se dimensionne sur sa grille plutôt que sur les pourcentages fixes de Saturne :
+     sans cela le tableau laisse un large vide au-dessus du pied de modal. */
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  max-height: calc(100% - 4em);
+
+  .modal-header,
+  .modal-footer {
+    height: auto;
+    flex: 0 0 auto;
+  }
+
+  /* min-height: 0 laisse l'élément flex passer sous la hauteur de son contenu, son propre
+     overflow-y prend alors le relais. */
+  .modal-content {
+    height: auto;
+    min-height: 0;
+    flex: 1 1 auto;
+  }
+}
+
+.psychosocial-risk-content {
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+.psychosocial-risk-wrapper {
+  padding: 0 4px 4px;
+}
+
+.psychosocial-risk-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 0;
+  table-layout: fixed;
+
+  /* L'en-tête reste visible pendant le défilement de la grille : sans lui, les huit lignes
+     saisies plus bas n'ont plus de repère de colonne. */
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f4f6f9;
+    border-bottom: 2px solid $color__primary;
+    color: $color__text-main;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    padding: 12px 10px;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  td {
+    border: none;
+    border-bottom: 1px solid #e6e9ee;
+    padding: 10px;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .psychosocial-select-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: normal;
+
+    input {
+      margin: 0;
+    }
+  }
+
+  .psychosocial-section-header td {
+    background: #eef3fb;
+    border-bottom: 1px solid #d7e2f2;
+    border-top: 1px solid #d7e2f2;
+    color: $color__secondary;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 12px 14px;
+    text-align: left;
+    text-transform: uppercase;
+
+    i {
+      color: $color__primary;
+      margin-right: 8px;
+    }
+  }
+
+  .psychosocial-risk-row {
+    transition: background 0.2s ease-out, opacity 0.2s ease-out;
+
+    &:hover {
+      background-color: #f7f9fc;
+    }
+
+    /* Une ligne décochée ne partira pas : l'estomper évite de la relire ligne à ligne pour
+       savoir ce qui sera réellement créé. */
+    &.psychosocial-risk-row-unselected {
+      opacity: 0.45;
+    }
+  }
+
+  .select-psychosocial-risk,
+  .select-all-risks {
+    accent-color: $color__primary;
+    cursor: pointer;
+    transform: scale(1.2);
+  }
+
+  .risk-category-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Les champs cachés de la cellule restent des input : sans cela ils décalent le picto. */
+    input {
+      display: none;
+    }
+  }
+
+  .risk-category-pic {
+    width: 46px;
+    height: 46px;
+    object-fit: contain;
+  }
+
+  .cotation-container {
+    display: flex;
+    justify-content: center;
+  }
+
+  .cotation-listing {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  /* Les trois paliers proposés reprennent la sémantique feu tricolore de la modal : le palier
+     retenu est mis en avant, les deux autres restent lisibles mais en retrait. */
+  .risk-evaluation-cotation.cotation {
+    height: 38px;
+    line-height: 38px;
+    min-width: 74px;
+    margin-right: 0;
+    padding: 0 12px;
+    font-size: 14px;
+    opacity: 0.55;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+
+    &[data-scale="1"] {
+      background: #2fa84f;
+      color: #fff;
+    }
+    &[data-scale="2"] {
+      background: $color__yellow;
+      color: #fff;
+    }
+    &[data-scale="3"] {
+      background: $color__red;
+      color: #fff;
+    }
+
+    &:hover {
+      opacity: 0.85;
+    }
+
+    &.selected-cotation {
+      border: none;
+      box-shadow: 0 0 0 2px #fff, 0 0 0 4px $color__primary;
+      opacity: 1;
+      transform: scale(1.04);
+    }
+  }
+
+  .psychosocial-cell-description,
+  .psychosocial-cell-actions {
+    /* .risk-description est bornée à 25% !important pour la colonne de la liste des risques :
+       dans une cellule de cette grille le champ doit occuper toute la largeur disponible. */
+    textarea {
+      width: 100% !important;
+      min-height: 46px;
+      padding: 8px 10px;
+      border: 1px solid #d5dbe3;
+      border-radius: 6px;
+      font-size: 13px;
+      line-height: 1.35;
+      resize: vertical;
+      transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out;
+
+      &:focus {
+        border-color: $color__primary;
+        box-shadow: 0 0 0 2px rgba(13, 138, 255, 0.15);
+        outline: none;
+      }
+    }
+  }
+
+  .riskassessment-date {
+    width: 100%;
+    max-width: 190px;
+    padding: 8px 10px;
+    border: 1px solid #d5dbe3;
+    border-radius: 6px;
+    font-size: 13px;
+    transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out;
+
+    &:focus {
+      border-color: $color__primary;
+      box-shadow: 0 0 0 2px rgba(13, 138, 255, 0.15);
+      outline: none;
+    }
+  }
+
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 11%;
+  }
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 11%;
+  }
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 24%;
+  }
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 19%;
+  }
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 16%;
+  }
+  th:nth-child(6),
+  td:nth-child(6) {
+    width: 19%;
+  }
+
+  /* Les trois paliers doivent tenir sur une seule ligne : passés à la ligne, ils doublent la
+     hauteur d'une ligne sur deux et la grille perd son alignement. */
+  @media (max-width: 1500px) {
+    .cotation-listing {
+      gap: 4px;
+    }
+
+    .risk-evaluation-cotation.cotation {
+      min-width: 60px;
+      padding: 0 8px;
+      font-size: 12px;
+    }
+  }
+
+  @media (max-width: $media__medium) {
+    .risk-evaluation-cotation.cotation {
+      height: 32px;
+      line-height: 32px;
+      min-width: 50px;
+      padding: 0 6px;
+      font-size: 11px;
+    }
+  }
+}
+
+.wpeo-modal .modal-container.modal-container-psychosocial .modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  .wpeo-button {
+    margin: 0;
+  }
+
+  .psychosocial-selected-count {
+    display: inline-block;
+    min-width: 24px;
+    margin-left: 6px;
+    padding: 1px 7px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.25);
+    font-weight: bold;
+  }
+}

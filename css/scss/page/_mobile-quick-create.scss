@@ -119,6 +119,26 @@ body.digirisk-mobile-create {
     }
   }
 
+  /* Confirmation right after the form was saved, on top of the success screen */
+  .digirisk-mobile-success-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #166534;
+    background: #dcfce7;
+    border: 1px solid #86efac;
+    border-radius: 10px;
+
+    i {
+      font-size: 20px;
+      color: #16a34a;
+    }
+  }
+
   /* Cards */
   .digirisk-mobile-card {
     background: #ffffff;
@@ -161,6 +181,11 @@ body.digirisk-mobile-create {
       font-weight: 600;
       color: #475569;
       margin-bottom: 2px;
+    }
+
+    /* Asterisk of a mandatory field, red like the Dolibarr forms */
+    .digirisk-mobile-required {
+      color: #dc2626;
     }
 
     input[type="text"],
@@ -517,6 +542,70 @@ body.digirisk-mobile-create {
     }
   }
 
+  /* Help bubble on an info icon: shown on hover, and on tap since the icon takes the focus */
+  .digirisk-mobile-tooltip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 2px;
+    font-size: 16px;
+    color: #94a3b8;
+    cursor: help;
+    outline: none;
+
+    &__bubble {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: -6px;
+      z-index: 10;
+      width: 220px;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.4;
+      color: #ffffff;
+      text-align: left;
+      background: #1e293b;
+      border-radius: 7px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.15s;
+
+      // Arrow pointing at the icon
+      &::before {
+        content: "";
+        position: absolute;
+        bottom: 100%;
+        right: 10px;
+        border: 6px solid transparent;
+        border-bottom-color: #1e293b;
+      }
+    }
+
+    &:hover,
+    &:focus {
+      color: #2b7de9;
+
+      .digirisk-mobile-tooltip__bubble {
+        visibility: visible;
+        opacity: 1;
+      }
+    }
+
+    // Icon on the left of its container (next to a card title): the bubble opens towards the
+    // right, otherwise it would leave the screen
+    &--start .digirisk-mobile-tooltip__bubble {
+      right: auto;
+      left: -6px;
+
+      &::before {
+        right: auto;
+        left: 10px;
+      }
+    }
+  }
+
   /* Prior formalities */
   .digirisk-mobile-check {
     display: flex;
@@ -595,6 +684,7 @@ body.digirisk-mobile-create {
     &__companies {
       flex: 0 0 auto;
       display: flex;
+      align-items: center;
       gap: 4px;
     }
 
@@ -805,6 +895,15 @@ body.digirisk-mobile-create {
     }
   }
 
+  /* Option of a picker modal already chosen: kept in place so the grid does not move, but greyed out
+     and inert, picking it again would add nothing */
+  .digirisk-mobile-picker-option--taken {
+    opacity: 0.35;
+    filter: grayscale(1);
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
   /* Protections (EPI) — same look as the risk list/modal, plus a mandatory checkbox */
   .digirisk-mobile-protection-add {
     display: inline-flex;
@@ -942,13 +1041,16 @@ body.digirisk-mobile-create {
       gap: 8px;
       padding: 0 14px 14px;
 
-      button {
+      // A confirmation that leads to another page is a link, styled like the buttons
+      button,
+      a {
         display: inline-flex;
         align-items: center;
         gap: 6px;
         padding: 8px 14px;
         font-size: 14px;
         font-weight: 600;
+        text-decoration: none;
         border: none;
         border-radius: 7px;
         cursor: pointer;
@@ -1189,6 +1291,16 @@ body.digirisk-mobile-create {
 
       .digirisk-mobile-success__button {
         flex: 1;
+      }
+
+      /* Four actions do not fit side by side on a phone: two per row. The basis stays under half
+         the width so that the padding of the buttons still lets two of them share a row */
+      &--wrap {
+        flex-wrap: wrap;
+
+        .digirisk-mobile-success__button {
+          flex: 1 1 40%;
+        }
       }
     }
 
@@ -1474,6 +1586,11 @@ body.digirisk-mobile-create {
       font-weight: 600;
       color: #2b7de9;
       text-decoration: none;
+    }
+
+    // The tags card keeps its message in the page, the list may fill up while the form is open
+    &.hidden {
+      display: none;
     }
   }
 

@@ -31,10 +31,12 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 }
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
+require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
 require_once __DIR__ . '/../../class/digiriskelement/workunit.class.php';
@@ -88,7 +90,11 @@ $permissiontoread   = $user->rights->digiriskdolibarr->digiriskelement->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->digiriskelement->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->digiriskelement->delete;
 
-saturne_check_access($permissiontoread, $object);
+// Les elements n'ont pas de liste, ils se parcourent dans l'arborescence : c'est la que renvoie
+// un element introuvable, plutot que sur l'accueil du module
+$elementTreeUrl = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=1', 1);
+
+saturne_check_access($permissiontoread, $object, false, $elementTreeUrl);
 
 /*
  * Actions
@@ -108,6 +114,16 @@ if (empty($reshook)) {
 			if (empty($object->id) && (($action != 'add' && $action != 'create') || $cancel)) $backtopage = $backurlforlist;
 			else $backtopage                                                                              = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php', 1) . '?id=' . ($object->id > 0 ? $object->id : '__ID__');
 		}
+	}
+
+	// Responsables de la prevention de l'element : enregistres avant l'inclusion ci-dessous, qui
+	// redirige des que l'objet est mis a jour. La creation ne les propose pas, l'element n'a pas
+	// encore d'identifiant auquel les rattacher
+	if ($action == 'update' && $object->id > 0 && $permissiontoadd && !$cancel) {
+		$digiriskResources = new DigiriskResources($db);
+		// setDigiriskResources concatene les identifiants dans son INSERT sans les quoter
+		$preventionOfficerIds = array_filter(array_map('intval', GETPOST('PreventionOfficer', 'array')));
+		$digiriskResources->setDigiriskResources($db, $user->id, 'PreventionOfficer', 'user', $preventionOfficerIds, $conf->entity, 'digiriskelement', $object->id);
 	}
 
 	// Action to add record
@@ -141,6 +157,40 @@ if (empty($reshook)) {
     require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
 
     $object->element = 'digiriskelement';
+
+	// Archiving is not deleting: the element leaves the organization tree but stays reachable from
+	// the archive tab of its parent, with its risks and its documents
+	if ($action == 'confirm_archive' && GETPOST('confirm') == 'yes' && $permissiontoadd) {
+		$object->fetch($id);
+		$result = $object->archive($user);
+
+		if ($result > 0) {
+			setEventMessages($langs->trans('ElementArchived', $object->ref), null);
+			// Back to the archive tab of the parent, where the element has just landed
+			$backToArchive = $object->fk_parent > 0
+				? dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_archive.php', 1) . '?id=' . $object->fk_parent
+				: $backurlforlist;
+			header('Location: ' . $backToArchive);
+			exit;
+		} else {
+			dol_syslog($object->error, LOG_DEBUG);
+			setEventMessages($object->error, $object->errors, 'errors');
+		}
+	}
+
+	if ($action == 'confirm_unarchive' && GETPOST('confirm') == 'yes' && $permissiontoadd) {
+		$object->fetch($id);
+		$result = $object->unarchive($user);
+
+		if ($result > 0) {
+			setEventMessages($langs->trans('ElementUnarchived', $object->ref), null);
+			header('Location: ' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php', 1) . '?id=' . $object->id);
+			exit;
+		} else {
+			dol_syslog($object->error, LOG_DEBUG);
+			setEventMessages($object->error, $object->errors, 'errors');
+		}
+	}
 
 	if ($action == 'confirm_delete' && GETPOST("confirm") == "yes") {
 		$object->fetch($id);
@@ -213,6 +263,7 @@ if ($action == 'create') {
 
 	unset($object->fields['ref']);
 	unset($object->fields['status']);
+	unset($object->fields['description']); // Saisie au WYSIWYG plus bas
 	unset($object->fields['element_type']);
 	unset($object->fields['fk_parent']);
 	unset($object->fields['last_main_doc']);
@@ -232,6 +283,13 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_add.tpl.php';
+
+	// La description est sortie des champs communs pour etre saisie au WYSIWYG comme partout
+	// ailleurs dans le module : elle est reprise telle quelle en tete du listing des risques
+	print '<tr><td><label for="description">' . $langs->trans('Description') . '</label></td><td>';
+	$doleditor = new DolEditor('description', GETPOST('description', 'restricthtml'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor->Create();
+	print '</td></tr>';
 
 	print '<input hidden class="flat" type="text" size="36" name="element_type" value="' . $element_type . '">';
 	print '<input hidden class="flat" type="text" size="36" name="fk_parent" value="' . $fkParent . '">';
@@ -270,6 +328,7 @@ if (($id || $ref) && $action == 'edit') {
 	print dol_get_fiche_head();
 
 	unset($object->fields['status']);
+	unset($object->fields['description']); // Saisie au WYSIWYG plus bas
 	unset($object->fields['element_type']);
 	unset($object->fields['fk_parent']);
 	unset($object->fields['last_main_doc']);
@@ -280,6 +339,23 @@ if (($id || $ref) && $action == 'edit') {
 
 	// Common attributes
 	include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_edit.tpl.php';
+
+	// La description est sortie des champs communs pour etre saisie au WYSIWYG comme partout
+	// ailleurs dans le module : elle est reprise telle quelle en tete du listing des risques
+	print '<tr><td><label for="description">' . $langs->trans('Description') . '</label></td><td>';
+	$doleditor = new DolEditor('description', GETPOSTISSET('description') ? GETPOST('description', 'restricthtml') : $object->description, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+	$doleditor->Create();
+	print '</td></tr>';
+
+	// * Prevention officers - Responsables de la prevention *
+
+	$digiriskResources    = new DigiriskResources($db);
+	$preventionOfficerIds = $digiriskResources->fetchResourcesIdsFromObject('PreventionOfficer', 'digiriskelement', $object->id);
+	$userList             = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', '', 0, 1);
+
+	print '<tr><td>' . $langs->trans('PreventionOfficers') . '</td><td>';
+	print img_picto('', 'user', 'class="pictofixedwidth"') . $form->multiselectarray('PreventionOfficer', $userList, $preventionOfficerIds, null, null, null, null, '300');
+	print '</td></tr>';
 
 	print '<tr><td>';
 	print $langs->trans("ShowInSelectOnPublicTicketInterface");
@@ -292,7 +368,14 @@ if (($id || $ref) && $action == 'edit') {
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_edit.tpl.php';
 
 	if ($id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
-        $children         = $object->fetchDigiriskElementFlat($id);
+        // The edit form unsets fk_parent and element_type from $object->fields to keep them out of
+        // the generic table, and fetchAll() builds its column list from there: queried through
+        // $object, every element came back without its parent, so the tree was flat and no
+        // descendant was ever excluded from the parent list
+        $parentSelector = new DigiriskElement($db);
+        $parentSelector->fetch($id);
+
+        $children         = $parentSelector->fetchDigiriskElementFlat($id);
         $childrenElements = [];
         if (is_array($children) && !empty($children)) {
             foreach ($children as $key => $value) {
@@ -300,7 +383,7 @@ if (($id || $ref) && $action == 'edit') {
             }
         }
         print '<tr><td>' . $langs->trans("ParentElement") . '</td><td>';
-		print $object->selectDigiriskElementList($object->fk_parent, 'fk_parent', ['customsql' => 'element_type="groupment" AND t.rowid NOT IN (' . rtrim(implode(',', $deletedElements) . ',' . implode(',', $childrenElements), ',') . ')'], 0, 0, [], 0, 0, 'minwidth100 maxwidth300', GETPOST('id'));
+		print $parentSelector->selectDigiriskElementList($object->fk_parent, 'fk_parent', ['customsql' => 't.element_type = \'groupment\' AND t.rowid NOT IN (' . rtrim(implode(',', $deletedElements) . ',' . implode(',', $childrenElements), ',') . ')'], 0, 0, [], 0, 0, 'minwidth100 maxwidth300', GETPOST('id'));
 	}
 
 	print '</td></tr>';
@@ -317,7 +400,7 @@ if (($id || $ref) && $action == 'edit') {
 }
 
 if ( ! $object->id) {
-	$object->ref    = $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$object->ref    = getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
 	$object->label  = $langs->trans('Society');
 	$object->entity = $conf->entity;
 	unset($object->fields['element_type']);
@@ -329,6 +412,16 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	// Confirmation to delete
 	if ($action == 'delete') {
 		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('DeleteObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmDeleteObject'), 'confirm_delete', '', 0, 1);
+	}
+
+	// Confirmation to archive
+	if ($action == 'archive') {
+		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ArchiveObject', $object->ref), $langs->trans('ConfirmArchiveDigiriskElement'), 'confirm_archive', '', 'yes', 1);
+	}
+
+	// Confirmation to unarchive
+	if ($action == 'unarchive') {
+		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('UnarchiveObject', $object->ref), $langs->trans('ConfirmUnarchiveDigiriskElement'), 'confirm_unarchive', '', 'yes', 1);
 	}
 
 
@@ -355,6 +448,22 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 
 	print '<tr><td class="titlefield tdtop">' . $langs->trans("Description") . '</td>';
 	print '<td>' . (dol_strlen($object->description) ? $object->description : '<span class="opacitymedium">&mdash;</span>') . '</td></tr>';
+
+	// * Prevention officers - Responsables de la prevention *
+
+	$digiriskResources    = new DigiriskResources($db);
+	$preventionOfficerIds = $digiriskResources->fetchResourcesIdsFromObject('PreventionOfficer', 'digiriskelement', $object->id);
+	$preventionOfficers   = [];
+	foreach ($preventionOfficerIds as $preventionOfficerId) {
+		// Un objet par ligne : un fetch en echec laisse l'objet sur les valeurs du precedent
+		$userTmp = new User($db);
+		if ($userTmp->fetch($preventionOfficerId) > 0) {
+			$preventionOfficers[] = $userTmp->getNomUrl(1);
+		}
+	}
+
+	print '<tr><td class="titlefield">' . $langs->trans('PreventionOfficers') . '</td>';
+	print '<td>' . (!empty($preventionOfficers) ? implode(', ', $preventionOfficers) : '<span class="opacitymedium">&mdash;</span>') . '</td></tr>';
 
 	print '<tr><td class="titlefield">';
 	print $langs->trans("ShowInSelectOnPublicTicketInterface");
@@ -400,11 +509,27 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 		if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 		if (empty($reshook)) {
-			// Modify
-			if ($permissiontoadd) {
+			// Modify - an archived element is read-only until it is restored
+			if ($object->status == $object::STATUS_ARCHIVED) {
+				print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans('ArchivedElementIsReadOnly')) . '">' . $langs->trans('Modify') . '</a>' . "\n";
+			} elseif ($permissiontoadd) {
 				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit">' . $langs->trans("Modify") . '</a>' . "\n";
 			} else {
 				print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
+			}
+
+			// Archive / Unarchive : reversible, unlike the delete button next to it
+			$isArchivable = ! array_key_exists($object->id, $trashList) && $object->id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH && $object->fk_parent > 0;
+			if ($object->status == $object::STATUS_ARCHIVED) {
+				if ($permissiontoadd) {
+					print '<a class="butAction" id="actionButtonUnarchive" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=unarchive&token=' . newToken() . '">' . $langs->trans('Unarchive') . '</a>' . "\n";
+				} else {
+					print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans('NotEnoughPermissions')) . '">' . $langs->trans('Unarchive') . '</a>' . "\n";
+				}
+			} elseif ($permissiontoadd && $isArchivable) {
+				print '<a class="butAction" id="actionButtonArchive" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=archive&token=' . newToken() . '">' . $langs->trans('Archive') . '</a>' . "\n";
+			} else {
+				print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans('CanNotDoThis')) . '">' . $langs->trans('Archive') . '</a>' . "\n";
 			}
 
 			if ($permissiontodelete && ! array_key_exists($object->id, $trashList) && $object->id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {

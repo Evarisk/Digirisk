@@ -220,7 +220,10 @@ class ActionsDigiriskdolibarr
                 }
             }
 
-            $this->resprints = '<link rel="manifest" href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/' . $manifestFile . '" />';
+            // The browser keeps a manifest 3 hours: the version makes an updated one reach it at once
+            $manifestVersion = (int) @filemtime(__DIR__ . '/../' . $manifestFile);
+
+            $this->resprints = '<link rel="manifest" href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/' . $manifestFile . '?v=' . $manifestVersion . '" />';
         }
 
         return 0; // or return 1 to replace standard code
@@ -242,16 +245,16 @@ class ActionsDigiriskdolibarr
 			?>
 			<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>
 			<?php
-			if ($conf->global->MAIN_INFO_SOCIETE_COUNTRY == '1:FR:France') {
+			if (getDolGlobalString('MAIN_INFO_SOCIETE_COUNTRY') == '1:FR:France') {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 				$form      = new Form($db);
                 $pictopath = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
                 $pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
-				$idcc_form = digirisk_select_dictionary('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE, 1, '', '', 'minwidth100');
-				$pee_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PEE_ENABLED" '. ($conf->global->DIGIRISKDOLIBARR_PEE_ENABLED ? 'checked' : '') .'>';
-				$perco_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PERCO_ENABLED" '. ($conf->global->DIGIRISKDOLIBARR_PERCO_ENABLED ? 'checked' : '') .'>';
-				$nbemployees_input = '<input type="number" name="DIGIRISKDOLIBARR_NB_EMPLOYEES" class="minwidth200" value="' . $conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES . '"' . ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES ? '' : 'disabled') . '>';
-				$nbworkedhours_input = '<input type="number" name="DIGIRISKDOLIBARR_NB_WORKED_HOURS" class="minwidth200" value="' . $conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS . '"' . ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS ? '' : 'disabled') . '>';
+				$idcc_form = digirisk_select_dictionary('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', getDolGlobalString('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE'), 1, '', '', 'minwidth100');
+				$pee_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PEE_ENABLED" '. (getDolGlobalInt('DIGIRISKDOLIBARR_PEE_ENABLED') ? 'checked' : '') .'>';
+				$perco_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PERCO_ENABLED" '. (getDolGlobalInt('DIGIRISKDOLIBARR_PERCO_ENABLED') ? 'checked' : '') .'>';
+				$nbemployees_input = '<input type="number" name="DIGIRISKDOLIBARR_NB_EMPLOYEES" class="minwidth200" value="' . getDolGlobalString('DIGIRISKDOLIBARR_NB_EMPLOYEES') . '"' . (getDolGlobalInt('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES') ? '' : 'disabled') . '>';
+				$nbworkedhours_input = '<input type="number" name="DIGIRISKDOLIBARR_NB_WORKED_HOURS" class="minwidth200" value="' . getDolGlobalString('DIGIRISKDOLIBARR_NB_WORKED_HOURS') . '"' . (getDolGlobalInt('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS') ? '' : 'disabled') . '>';
 				?>
 				<script>
 					let collectiveAgreementDictionary = $('<tr class="oddeven"><td><label for="selectidcc_id"><?php print $pictoDigirisk . $form->textwithpicto($langs->trans('IDCC'), $langs->trans('IDCCTooltip'));?></label></td>');
@@ -447,7 +450,7 @@ class ActionsDigiriskdolibarr
 				$object->fetch(GETPOSTINT('id'),'',GETPOST('track_id'));
 				require_once __DIR__ . '/digiriskelement.class.php';
 				$digiriskelement = new DigiriskElement($db);
-				$selectDigiriskElement = $digiriskelement->selectDigiriskElementList($object->array_options['options_digiriskdolibarr_ticket_service'], 'options_digiriskdolibarr_ticket_service', ['customsql' => ' t.status > 0'], 1, 0, array(), 0, 0, 'minwidth100 maxwidth300', 0, false, 1);
+				$selectDigiriskElement = $digiriskelement->selectDigiriskElementList($object->array_options['options_digiriskdolibarr_ticket_service'], 'options_digiriskdolibarr_ticket_service', ['customsql' => ' t.status > 0 AND t.status <> ' . DigiriskElement::STATUS_ARCHIVED], 1, 0, array(), 0, 0, 'minwidth100 maxwidth300', 0, false, 1);
                 ?>
 				<script>
 					jQuery('#options_digiriskdolibarr_ticket_service').remove()
@@ -565,7 +568,7 @@ class ActionsDigiriskdolibarr
 						let mailContent = $('#message').html()
 						let digiriskElementRefAndLabel = <?php echo json_encode($digiriskelement->ref . ' - ' . $digiriskelement->label); ?>;
 						let digiriskElementId = <?php echo json_encode($digiriskelement->id); ?>;
-						let mailContentWithDigiriskElementLabel = mailContent.replace('__EXTRAFIELD_DIGIRISKDOLIBARR_TICKET_SERVICE_NAME__ ', digiriskElementRefAndLabel);
+						let mailContentWithDigiriskElementLabel = mailContent.replace('__EXTRAFIELD_DIGIRISKDOLIBARR_TICKET_SERVICE_NAME__', digiriskElementRefAndLabel);
 						$('#message').html(mailContentWithDigiriskElementLabel);
 					</script>
 					<?php
@@ -752,6 +755,10 @@ class ActionsDigiriskdolibarr
 
                 $moduleNameLowerCase = 'digiriskdolibarr';
                 $permissiontoadd     = $user->rights->ticket->write;
+
+                // The ticket belongs to the Dolibarr core and carries no module : without this,
+                // documents_action.tpl.php builds its download link on an empty modulepart
+                $object->module = $moduleNameLowerCase;
             }
 
             if ($action == 'remove_file' && preg_match('/\/(ticketdocument)\/|\/(digiriskdolibarr)\//', GETPOST('file'))) {
@@ -1673,8 +1680,8 @@ class ActionsDigiriskdolibarr
 
             $digiriskResources = new DigiriskResources($this->db);
 
-            $extSociety  = $digiriskResources->fetchResourcesFromObject('ExtSociety', $object);
-            $moreHtmlRef = $langs->trans('ExtSociety') . ' : ' . $extSociety->getNomUrl(1);
+            $extSociety  = $digiriskResources->fetchSingleResourceFromObject('ExtSociety', $object);
+            $moreHtmlRef = $langs->trans('ExtSociety') . ' : ' . ($extSociety !== null ? $extSociety->getNomUrl(1) : $langs->trans('None'));
 
             $this->resprints = $moreHtmlRef;
         }

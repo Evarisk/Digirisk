@@ -107,10 +107,12 @@ function digiriskdolibarr_admin_prepare_head(): array
     $h    = 0;
     $head = [];
 
-    $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/riskassessmentdocument.php', 1);
-    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-exclamation-triangle pictofixedwidth"></i>' . $langs->trans('RiskAssessmentDocument') : '<i class="fas fa-exclamation-triangle"></i>';
-    $head[$h][2] = 'riskassessmentdocument';
-    $h++;
+    if (!getDolGlobalInt('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_MENU_HIDDEN') || !getDolGlobalInt('DIGIRISKDOLIBARR_RISKENVIRONMENTAL_MENU_HIDDEN')) {
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/riskassessmentdocument.php', 1);
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-exclamation-triangle pictofixedwidth"></i>' . $langs->trans('RiskAssessmentDocument') : '<i class="fas fa-exclamation-triangle"></i>';
+        $head[$h][2] = 'riskassessmentdocument';
+        $h++;
+    }
 
     $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/digiriskelement.php', 1);
     $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-network-wired pictofixedwidth"></i>' . $langs->trans('Organization') : '<i class="fas fa-network-wired"></i>';
@@ -127,20 +129,26 @@ function digiriskdolibarr_admin_prepare_head(): array
     $head[$h][2] = 'ticket_kanban';
     $h++;
 
-    $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/preventionplan.php', 1);
-    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-info pictofixedwidth"></i>' . $langs->trans('PreventionPlan') : '<i class="fas fa-info"></i>';
-    $head[$h][2] = 'preventionplan';
-    $h++;
+    if (!getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_MENU_HIDDEN')) {
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/preventionplan.php', 1);
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-info pictofixedwidth"></i>' . $langs->trans('PreventionPlan') : '<i class="fas fa-info"></i>';
+        $head[$h][2] = 'preventionplan';
+        $h++;
+    }
 
-    $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/firepermit.php', 1);
-    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-fire-alt pictofixedwidth"></i>' . $langs->trans('FirePermit') : '<i class="fas fa-fire-alt"></i>';
-    $head[$h][2] = 'firepermit';
-    $h++;
+    if (!getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_MENU_HIDDEN')) {
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/firepermit.php', 1);
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-fire-alt pictofixedwidth"></i>' . $langs->trans('FirePermit') : '<i class="fas fa-fire-alt"></i>';
+        $head[$h][2] = 'firepermit';
+        $h++;
+    }
 
-    $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/accident.php', 1);
-    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-user-injured pictofixedwidth"></i>' . $langs->trans('Accident') : '<i class="fas fa-user-injured"></i>';
-    $head[$h][2] = 'accident';
-    $h++;
+    if (!getDolGlobalInt('DIGIRISKDOLIBARR_ACCIDENT_MENU_HIDDEN') || !getDolGlobalInt('DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_MENU_HIDDEN')) {
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/accident.php', 1);
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-user-injured pictofixedwidth"></i>' . $langs->trans('Accident') : '<i class="fas fa-user-injured"></i>';
+        $head[$h][2] = 'accident';
+        $h++;
+    }
 
     $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/meteovigilance.php', 1);
     $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-cloud-sun-rain pictofixedwidth"></i>' . $langs->trans('MeteoVigilance') : '<i class="fas fa-cloud-sun-rain"></i>';

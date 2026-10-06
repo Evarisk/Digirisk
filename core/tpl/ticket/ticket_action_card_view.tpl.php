@@ -804,9 +804,27 @@ if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
                     $renderField('options_digiriskdolibarr_ticket_service', 'select', 'GP/UT',
                         $firstServiceId, $serviceDisplay, ['options' => $serviceOptions]);
 
-                    $renderField('options_digiriskdolibarr_ticket_location',  'text',     'Location',
-                        $extra['digiriskdolibarr_ticket_location']  ?? '',
-                        dol_escape_htmltag((string) ($extra['digiriskdolibarr_ticket_location']  ?? '')));
+                    // Location (#4732) — the dictionary of the register form when the list mode is on,
+                    // free text otherwise. The recorded value always stays in the options so that editing
+                    // a ticket declared before the switch can not silently rewrite its location
+                    $locationValue   = (string) ($extra['digiriskdolibarr_ticket_location'] ?? '');
+                    $locationOptions = digiriskdolibarr_ticket_location_input_mode() == 'list' ? digiriskdolibarr_ticket_location_dictionary() : [];
+                    if (!empty($locationOptions)) {
+                        if (dol_strlen($locationValue) && !isset($locationOptions[$locationValue])) {
+                            $locationOptions[$locationValue] = $locationValue;
+                        }
+
+                        $locationSelectOptions = [];
+                        foreach ($locationOptions as $locationLabel) {
+                            $locationSelectOptions[] = ['id' => $locationLabel, 'label' => $locationLabel];
+                        }
+
+                        $renderField('options_digiriskdolibarr_ticket_location', 'select',   'Location',
+                            $locationValue, dol_escape_htmltag($locationValue), ['options' => $locationSelectOptions]);
+                    } else {
+                        $renderField('options_digiriskdolibarr_ticket_location',  'text',     'Location',
+                            $locationValue, dol_escape_htmltag($locationValue));
+                    }
 
                     $dateDeclar = $extra['digiriskdolibarr_ticket_date'] ?? null;
                     $renderField('options_digiriskdolibarr_ticket_date',      'date',     'DeclarationDate',

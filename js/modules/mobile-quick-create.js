@@ -81,6 +81,7 @@ window.digiriskdolibarr.mobilequickcreate.init = function() {
     if (form.length) {
         window.digiriskdolibarr.mobilequickcreate.riskIndex = parseInt(form.data('risk-start-index'), 10) || 0;
         window.digiriskdolibarr.mobilequickcreate.certIndex = parseInt(form.data('cert-start-index'), 10) || 0;
+        window.digiriskdolibarr.mobilequickcreate.refreshCertificationPicker();
     }
 
     if (successBlock.length) {
@@ -602,7 +603,38 @@ window.digiriskdolibarr.mobilequickcreate.validateDatesForSubmit = function() {
  * @return {void}
  */
 window.digiriskdolibarr.mobilequickcreate.openRiskModal = function() {
+    var picked = $('.digirisk-mobile-risk-block').map(function() { return String($(this).attr('data-position')); }).get();
+
+    window.digiriskdolibarr.mobilequickcreate.markTakenOptions($('.digirisk-mobile-risk-option'), picked);
     $('.digirisk-mobile-risk-modal').removeClass('hidden');
+};
+
+/**
+ * Grey out the options of a picker modal already chosen: picking one again would add nothing, the
+ * option has to read as unavailable instead of silently doing nothing.
+ *
+ * @param  {jQuery}   options Options of the picker, each carrying its data-position
+ * @param  {string[]} picked  Positions already chosen
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.markTakenOptions = function(options, picked) {
+    options.each(function() {
+        var taken = picked.indexOf(String($(this).data('position'))) !== -1;
+        $(this).toggleClass('digirisk-mobile-picker-option--taken', taken).attr('aria-disabled', taken ? 'true' : 'false');
+    });
+};
+
+/**
+ * Disable in the certification picker the certifications already listed: select2 greys them out.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.refreshCertificationPicker = function() {
+    var picked = $('.digirisk-mobile-cert-item').map(function() { return String($(this).attr('data-code')); }).get();
+
+    $('.digirisk-mobile-cert-picker option').each(function() {
+        $(this).prop('disabled', this.value !== '' && picked.indexOf(this.value) !== -1);
+    });
 };
 
 /**
@@ -648,6 +680,10 @@ window.digiriskdolibarr.mobilequickcreate.addRisk = function() {
     var option   = $(this);
     var position = String(option.data('position'));
 
+    if (option.hasClass('digirisk-mobile-picker-option--taken')) {
+        return;
+    }
+
     // Avoid adding the same type of work twice.
     var exists = false;
     $('.digirisk-mobile-risk-block').each(function() {
@@ -671,6 +707,8 @@ window.digiriskdolibarr.mobilequickcreate.addRisk = function() {
     $('.digirisk-mobile-risk-list').append($block);
     window.digiriskdolibarr.mobilequickcreate.refreshRiskEmptyState();
     window.digiriskdolibarr.mobilequickcreate.closeRiskModal();
+    // Ready to describe the type of work just picked, without hunting for its field
+    $block.find('.digirisk-mobile-risk-block__description').trigger('focus');
 };
 
 /**
@@ -717,7 +755,11 @@ window.digiriskdolibarr.mobilequickcreate.removeRisk = function() {
  * @return {void}
  */
 window.digiriskdolibarr.mobilequickcreate.openProtectionModal = function() {
-    var riskIndex = $(this).closest('.digirisk-mobile-risk-block').attr('data-index');
+    var block     = $(this).closest('.digirisk-mobile-risk-block');
+    var riskIndex = block.attr('data-index');
+    var picked    = block.find('.digirisk-mobile-protection-item').map(function() { return String($(this).attr('data-position')); }).get();
+
+    window.digiriskdolibarr.mobilequickcreate.markTakenOptions($('.digirisk-mobile-protection-option'), picked);
     $('.digirisk-mobile-protection-modal').attr('data-risk-index', riskIndex).removeClass('hidden');
 };
 
@@ -738,6 +780,10 @@ window.digiriskdolibarr.mobilequickcreate.closeProtectionModal = function() {
 window.digiriskdolibarr.mobilequickcreate.addProtection = function() {
     var option    = $(this);
     var position  = String(option.data('position'));
+
+    if (option.hasClass('digirisk-mobile-picker-option--taken')) {
+        return;
+    }
     var riskIndex = $('.digirisk-mobile-protection-modal').attr('data-risk-index');
     var $block    = $('.digirisk-mobile-risk-block[data-index="' + riskIndex + '"]');
 
@@ -768,6 +814,7 @@ window.digiriskdolibarr.mobilequickcreate.addProtection = function() {
 
     $block.find('.digirisk-mobile-protection-list').append($row);
     window.digiriskdolibarr.mobilequickcreate.closeProtectionModal();
+    $row.find('.digirisk-mobile-protection-item-comment').trigger('focus');
 };
 
 /**
@@ -822,6 +869,7 @@ window.digiriskdolibarr.mobilequickcreate.addCertification = function() {
     $('<button type="button" class="digirisk-mobile-cert-item-delete"><i class="fas fa-trash"></i></button>').appendTo($row);
 
     $('.digirisk-mobile-cert-list').append($row);
+    window.digiriskdolibarr.mobilequickcreate.refreshCertificationPicker();
 
     // Reset the picker for the next pick.
     picker.val('').trigger('change');
@@ -834,6 +882,7 @@ window.digiriskdolibarr.mobilequickcreate.addCertification = function() {
  */
 window.digiriskdolibarr.mobilequickcreate.removeCertification = function() {
     $(this).closest('.digirisk-mobile-cert-item').remove();
+    window.digiriskdolibarr.mobilequickcreate.refreshCertificationPicker();
 };
 
 /**

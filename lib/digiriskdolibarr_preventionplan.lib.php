@@ -209,6 +209,39 @@ function digiriskGetPreventionPlanSignatureUrl(SaturneSignature $signatory): str
 }
 
 /**
+ * Modele d'email de la demande de signature d'un plan de prevention.
+ *
+ * Lu en SQL direct plutot que par CEmailTemplate::fetch() : sur Dolibarr 23, fetch() ajoute une
+ * condition sur le libelle meme quand l'identifiant est fourni et ne trouve alors jamais rien, sans
+ * erreur, si bien que le modele choisi etait ignore.
+ *
+ * @param  DoliDB      $db         Base de donnees
+ * @param  int         $templateId Modele choisi dans la configuration, 0 pour celui livre avec le module
+ * @return object|null             Ligne du modele (topic, content, joinfiles), null si aucun n'est actif
+ */
+function digiriskGetPreventionPlanSignatureEmailTemplate(DoliDB $db, int $templateId): ?object
+{
+    $sql  = 'SELECT rowid, topic, content, joinfiles FROM ' . MAIN_DB_PREFIX . 'c_email_templates';
+    $sql .= ' WHERE active = 1 AND entity IN (' . getEntity('c_email_templates') . ')';
+    if ($templateId > 0) {
+        $sql .= ' AND rowid = ' . $templateId;
+    } else {
+        $sql .= " AND type_template = 'preventionplan' AND label = '(PreventionPlanSignatureRequest)'";
+    }
+    $sql .= ' ORDER BY rowid ASC';
+    $sql .= $db->plimit(1);
+
+    $resql = $db->query($sql);
+    if (!$resql) {
+        return null;
+    }
+
+    $template = $db->fetch_object($resql);
+
+    return $template ?: null;
+}
+
+/**
  * Envoie a un signataire le lien de signature du plan de prevention.
  *
  * Rend compte de ce qui s'est passe au lieu de le passer sous silence : l'interface mobile affiche
@@ -224,6 +257,8 @@ function digiriskGetPreventionPlanSignatureUrl(SaturneSignature $signatory): str
  */
 function digiriskSendPreventionPlanSignatureEmail(DoliDB $db, PreventionPlan $plan, SaturneSignature $signatory, string $societyName, User $user, Translate $langs): array
 {
+    global $conf;
+
     require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
 
     $result = ['sent' => false, 'error' => '', 'email' => (string) $signatory->email];
@@ -251,7 +286,9 @@ function digiriskSendPreventionPlanSignatureEmail(DoliDB $db, PreventionPlan $pl
     $subject      = $langs->transnoentities('MobilePPSignatureEmailSubject', $plan->ref);
     $message      = $langs->transnoentities('MobilePPSignatureEmailContent', $societyName, $signatureUrl);
 
-    // Override with custom template if configured
+    // Modele d'email : celui choisi dans la configuration pour ce role, sinon celui livre avec le
+    // module. Le texte ci-dessus ne sert plus que si aucun des deux n'est disponible (module pas
+    // encore reactive depuis la livraison du modele, modele desactive).
     $templateId = 0;
     if ($signatory->role === 'ExtSocietyResponsible') {
         $templateId = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_TEMPLATE_EXT');
@@ -263,48 +300,35 @@ function digiriskSendPreventionPlanSignatureEmail(DoliDB $db, PreventionPlan $pl
     $mimetype = [];
     $filename = [];
 
-    if ($templateId > 0) {
-        require_once DOL_DOCUMENT_ROOT . '/core/class/cemailtemplate.class.php';
-        $emailTemplate = new CEmailTemplate($db);
-        if ($emailTemplate->fetch($templateId) > 0) {
-            
-            // Si la piece jointe est demandée, on genère et on cherche le document
-            if ($emailTemplate->joinfiles == 1) {
-                digiriskGeneratePreventionPlanDocument($plan->id);
-                $dir = $conf->digiriskdolibarr->dir_output . '/' . $plan->element . 'document/' . dol_sanitizeFileName($plan->ref);
-                $fileArray = dol_dir_list($dir, 'files', 0, '\.pdf$', 'date', 'DESC');
-                if (!empty($fileArray)) {
-                    $filepath[] = $dir . '/' . $fileArray[0]['name'];
-                    $mimetype[] = 'application/pdf';
-                    $filename[] = $fileArray[0]['name'];
-                }
+    $emailTemplate = digiriskGetPreventionPlanSignatureEmailTemplate($db, $templateId);
+    if (!empty($emailTemplate)) {
+        // Si la piece jointe est demandée, on genère et on cherche le document
+        if (!empty($emailTemplate->joinfiles)) {
+            digiriskRefreshPreventionPlanDocument($db, (int) $plan->id, $user, $langs);
+            $dir       = $conf->digiriskdolibarr->dir_output . '/' . $plan->element . 'document/' . dol_sanitizeFileName($plan->ref);
+            $fileArray = dol_dir_list($dir, 'files', 0, '\.pdf$', '', 'date', SORT_DESC);
+            if (!empty($fileArray)) {
+                $filepath[] = $dir . '/' . $fileArray[0]['name'];
+                $mimetype[] = 'application/pdf';
+                $filename[] = $fileArray[0]['name'];
             }
-
-            $userFullName = $user->getFullName($langs);
-            $userEmail = $user->email;
-            $userPhonePro = $user->office_phone;
-            $myCompanyName = $conf->global->MAIN_INFO_SOCIETE_NOM;
-            $myCompanyFullAddress = trim($conf->global->MAIN_INFO_SOCIETE_ADDRESS . ' ' . $conf->global->MAIN_INFO_SOCIETE_ZIP . ' ' . $conf->global->MAIN_INFO_SOCIETE_TOWN);
-
-            $subject = str_replace(
-                ['__PLAN_REF__', '__COMPANY_NAME__'], 
-                [$plan->ref, $societyName], 
-                $emailTemplate->topic
-            );
-            $message = str_replace(
-                [
-                    '__PLAN_REF__', '__COMPANY_NAME__', '__SIGNATURE_URL__',
-                    '__USER_FULLNAME__', '__USER_EMAIL__', '__USER_PHONEPRO__',
-                    '__MYCOMPANY_NAME__', '__MYCOMPANY_FULLADDRESS__'
-                ], 
-                [
-                    $plan->ref, $societyName, $signatureUrl,
-                    $userFullName, $userEmail, $userPhonePro,
-                    $myCompanyName, $myCompanyFullAddress
-                ], 
-                $emailTemplate->content
-            );
         }
+
+        // Jetons propres au plan, en plus des jetons communs de Dolibarr. make_substitutions() resout
+        // aussi les cles de traduction __(Cle)__ et les constantes __[CONSTANTE]__ du modele.
+        $substitutions = array_merge(getCommonSubstitutionArray($langs), [
+            '__PLAN_REF__'              => $plan->ref,
+            '__COMPANY_NAME__'          => $societyName,
+            '__SIGNATURE_URL__'         => $signatureUrl,
+            '__USER_FULLNAME__'         => $user->getFullName($langs),
+            '__USER_EMAIL__'            => $user->email,
+            '__USER_PHONEPRO__'         => $user->office_phone,
+            '__MYCOMPANY_NAME__'        => getDolGlobalString('MAIN_INFO_SOCIETE_NOM'),
+            '__MYCOMPANY_FULLADDRESS__' => trim(getDolGlobalString('MAIN_INFO_SOCIETE_ADDRESS') . ' ' . getDolGlobalString('MAIN_INFO_SOCIETE_ZIP') . ' ' . getDolGlobalString('MAIN_INFO_SOCIETE_TOWN')),
+        ]);
+
+        $subject = make_substitutions($emailTemplate->topic, $substitutions, $langs);
+        $message = make_substitutions($emailTemplate->content, $substitutions, $langs);
     }
 
     $mailfile = new CMailFile($subject, $signatory->email, $from, $message, $filepath, $mimetype, $filename, '', '', 0, -1, '', '', '', '', 'mail');

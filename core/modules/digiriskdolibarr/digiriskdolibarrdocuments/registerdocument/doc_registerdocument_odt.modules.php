@@ -295,7 +295,7 @@ class doc_registerdocument_odt extends SaturneDocumentModel
                                 $tmpArray['register_controller_id'] = $ticketController->id;
                                 $tmpArray['register_controller_lastname'] = $ticketController->lastname;
                                 $tmpArray['register_controller_firstname'] = $ticketController->firstname;
-                                $tmpArray['register_controller_society'] = $conf->global->MAIN_INFO_SOCIETE_NOM;
+                                $tmpArray['register_controller_society'] = getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
                                 $tmpArray['register_controller_date'] = dol_print_date($ticketControl->control_date);
                                 $encodedImage = explode(',', $ticketController->signature)[1];
                                 $decodedImage = base64_decode($encodedImage);
@@ -342,7 +342,7 @@ class doc_registerdocument_odt extends SaturneDocumentModel
 	 * @return int                               1 if OK, <=0 if KO.
 	 * @throws Exception
 	 */
-	public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
+	public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam = []): int
 	{
         global $langs;
 

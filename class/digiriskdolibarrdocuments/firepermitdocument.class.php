@@ -82,8 +82,10 @@ class FirePermitDocument extends DigiriskDocuments
             $firepermit->fetch($signatory->fk_object);
         }
 
-		$firepermitlines     = $firepermitline->fetchAll('', '', 0, 0, array(), 'AND', GETPOST('id'));
-		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, array(), 'AND', $firepermit->fk_preventionplan);
+		// fetchAll n'a pas de parametre d'identifiant parent : passe en 7e argument il etait ignore, et le
+		// document reprenait les lignes de TOUS les permis de feu et de TOUS les plans de prevention
+		$firepermitlines     = $firepermitline->fetchAll('', '', 0, 0, array('fk_firepermit' => $firepermit->id));
+		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, array('fk_preventionplan' => $firepermit->fk_preventionplan));
 		$digirisk_resources  = $resources->fetchDigiriskResources();
 
 		$extsociety          = $resources->fetchResourcesFromObject('ExtSociety', $firepermit);

@@ -25,7 +25,7 @@
 global $db, $langs, $signatory, $user, $digiriskresources;
 
 if (empty($digiriskresources)) {
-    require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskresources.class.php';
+    dol_include_once('/digiriskdolibarr/class/digiriskresources.class.php');
     $digiriskresources = new DigiriskResources($db);
 }
 
@@ -78,7 +78,7 @@ $successExtraInfoHtml .= '<div><div style="font-size: 0.7em; color: #666; font-w
 $successExtraInfoHtml .= '<div style="font-size: 0.9em; color: #4a55d1; font-weight: bold;">' . (!empty($object->date_end) ? dol_print_date($object->date_end, 'day') : '-') . '</div></div>';
 $successExtraInfoHtml .= '</div></div></div>';
 
-$euBadgeHtml = '<div style="font-size: 0.65em; background: #e6f2e9; color: #2d6a3c; padding: 4px 8px; border-radius: 15px; font-weight: bold; line-height: 1.2;"><i class="fas fa-check" style="margin-right: 5px;"></i> Signé le ' . dol_print_date($object->date_creation, 'dayhour') . '</div>';
+$euBadgeHtml = '<div style="font-size: 0.65em; background: #e6f2e9; color: #2d6a3c; padding: 4px 8px; border-radius: 15px; font-weight: bold; line-height: 1.2;"><i class="fas fa-check" style="margin-right: 5px;"></i> Signé le ' . dol_print_date($object->date_creation, 'dayhour', 'tzuser') . '</div>';
 
 $successEuBlockHtml = '<div class="digirisk-mobile-card digirisk-mobile-extsign" style="margin-top: 15px;">';
 $successEuBlockHtml .= '<div class="digirisk-mobile-extsign__title" style="display: flex; justify-content: space-between; align-items: center;">';
@@ -122,7 +122,7 @@ $steps = [
     [
         'title'   => $langs->trans('MobilePPStepCreated'),
         'status'  => $langs->transnoentities('MobileStepDone'),
-        'date'    => dol_print_date($object->date_creation, 'day'),
+        'date'    => dol_print_date($object->date_creation, 'day', 'tzuser'),
         'done'    => true,
         'viewBox' => $workflowIcons['created']['viewBox'],
         'svg'     => $workflowIcons['created']['svg'],
@@ -130,7 +130,7 @@ $steps = [
     [
         'title'   => $langs->trans('MobileStepUserCompanyResponsible'),
         'status'  => $langs->transnoentities('MobileStepSignedOn'),
-        'date'    => dol_print_date($object->date_creation, 'day'),
+        'date'    => dol_print_date($object->date_creation, 'day', 'tzuser'),
         'done'    => true,
         'viewBox' => $workflowIcons['user']['viewBox'],
         'svg'     => $workflowIcons['user']['svg'],
@@ -138,7 +138,7 @@ $steps = [
     [
         'title'   => $langs->trans('MobileStepExteriorCompanyResponsible'),
         'status'  => $ppExtSigned ? $langs->transnoentities('MobileStepSignedOn') : $langs->transnoentities('MobileStepTodo'),
-        'date'    => $ppExtSigned ? dol_print_date($ppExtSignatory->signature_date ?? dol_now(), 'day') : '',
+        'date'    => $ppExtSigned ? dol_print_date($ppExtSignatory->signature_date ?? dol_now(), 'day', 'tzuser') : '',
         'done'    => $ppExtSigned,
         'viewBox' => $workflowIcons['company']['viewBox'],
         'svg'     => $workflowIcons['company']['svg'],
@@ -198,7 +198,25 @@ if ($ppHasDocument) {
     $successViewUrl = dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php', 1) . '?id=' . $object->id;
     $successViewLabel  = $langs->trans('MobilePPViewPlan');
 }
+// Confirmation banner, only when arriving right after the form was saved (not when the plan is
+// opened from the list)
+$successSaved      = GETPOST('saved', 'aZ09');
+$successBannerText = '';
+if ($successSaved === 'created') {
+    $successBannerText = $langs->trans('MobilePPCreated', $object->ref);
+} elseif ($successSaved === 'updated') {
+    $successBannerText = $langs->trans('MobilePPUpdated', $object->ref);
+}
+
 $successAgainUrl   = $_SERVER['PHP_SELF'];
 $successAgainLabel = $langs->trans('MobilePPCreateAnother');
+
+// Derniere etape de la barre d'avancement, offerte une fois le plan verrouille (meme regle que la fiche Dolibarr)
+$successArchiveUrl = ($object->status == PreventionPlan::STATUS_LOCKED)
+    ? $_SERVER['PHP_SELF'] . '?action=setArchived&plan_id=' . $object->id . '&token=' . newToken()
+    : '';
+$successArchiveLabel        = $langs->transnoentities('MobileStepArchive');
+$successArchiveConfirmTitle = $langs->transnoentities('ArchiveObject', $langs->transnoentities('ThePreventionplan'));
+$successArchiveConfirmText  = $langs->transnoentities('ConfirmArchiveObject', $langs->transnoentities('ThePreventionplan') . ' ' . $object->ref);
 
 require __DIR__ . '/digiriskdolibarr_mobile_success.tpl.php';

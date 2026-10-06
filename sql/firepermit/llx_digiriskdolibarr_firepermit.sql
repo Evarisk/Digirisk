@@ -27,5 +27,7 @@ CREATE TABLE llx_digiriskdolibarr_firepermit(
   fk_user_creat     integer NOT NULL,
   fk_user_modif     integer,
   fk_project        integer NOT NULL,
-  fk_preventionplan integer NOT NULL
+  fk_preventionplan integer NOT NULL,
+  date_work_end     datetime NULL,
+  firewatch_name    varchar(255) NULL
 ) ENGINE=innodb;

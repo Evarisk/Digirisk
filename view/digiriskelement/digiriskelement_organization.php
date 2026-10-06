@@ -112,7 +112,8 @@ saturne_header(0, '', $title, $helpUrl);
 ?>
 <div id="cardContent" value="">
 <?php
-$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 'status > 0 AND t.entity = ' . $conf->entity));
+// Archived elements are out of the organization tree, they are listed in the archive tab of their parent
+$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 'status > 0 AND t.status <> ' . DigiriskElement::STATUS_ARCHIVED . ' AND t.entity = ' . $conf->entity));
 if (is_array($objects)) {
 	$results = recurse_tree(0, 0, $objects);
 } else {
@@ -127,7 +128,7 @@ if (!empty($results)) :
 ?>
     <div class="organization-page organization-tree">
         <div class="organization-header">
-            <h3 class='title' id='title0'><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></h3>
+            <h3 class='title' id='title0'><?php echo getDolGlobalString('MAIN_INFO_SOCIETE_NOM') ?></h3>
             <span class="unsaved-indicator"><i class="fas fa-exclamation-circle"></i> <?php echo $langs->trans('UnsavedChanges') ?></span>
         </div>
 

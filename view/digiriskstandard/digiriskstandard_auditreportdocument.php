@@ -28,9 +28,6 @@ if (!defined('DISABLE_CKEDITOR')) {
 if (!defined('DISABLE_JQUERY_TABLEDND')) {
     define('DISABLE_JQUERY_TABLEDND', 1);
 }
-if (!defined('DISABLE_JQUERY_JNOTIFY')) {
-    define('DISABLE_JQUERY_JNOTIFY', 1);
-}
 if (!defined('DISABLE_JS_GRAPH')) {
     define('DISABLE_JS_GRAPH', 1);
 }
@@ -61,7 +58,9 @@ global $conf, $db, $hookmanager, $langs, $user;
 saturne_load_langs();
 
 // Get parameters
-$id        = GETPOSTINT('id');
+// Toute la vue est sous if ($object->id > 0) : sans identifiant, la page ne rendait que son
+// en-tete. On retombe sur le standard actif, comme le font deja le document unique et le registre
+$id        = GETPOSTINT('id') ?: getDolGlobalInt('DIGIRISKDOLIBARR_ACTIVE_STANDARD');
 $action    = GETPOST('action', 'aZ09');
 $subaction = GETPOST('subaction', 'aZ09');
 
@@ -146,7 +145,7 @@ if ($object->id > 0) {
     print '</tr>';
 
     // DateRange -- Plage de date
-    $firstDayOfTheYear = dol_get_first_day(date('Y)'));
+    $firstDayOfTheYear = dol_get_first_day((int) date('Y'));
     print '<tr class="oddeven"><td>' . $langs->trans("DateRange") . '</td>';
     print '<td>' . $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'datestart');
     print $langs->trans('At') . $form->selectDate(dol_now(), 'dateend');

@@ -58,7 +58,14 @@ if (!defined('NOBROWSERNOTIF')) {
     define('NOBROWSERNOTIF', 1);
 }
 
-require_once __DIR__ . '/../../main.inc.php';
+// Load Dolibarr environment
+if (file_exists('../main.inc.php')) {
+    require_once __DIR__ . '/../main.inc.php';
+} elseif (file_exists('../../main.inc.php')) {
+    require_once __DIR__ . '/../../main.inc.php';
+} else {
+    die('Include of main fails');
+}
 
 top_httphead('text/json');
 

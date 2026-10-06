@@ -102,7 +102,7 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
                 [
                     'title'   => $langs->trans('MobileFPStepCreated'),
                     'status'  => !empty($isEdit) ? $langs->transnoentities('MobileStepDone') : $langs->transnoentities('MobileStepInProgress'),
-                    'date'    => dol_print_date(dol_now(), 'day'),
+                    'date'    => dol_print_date(dol_now(), 'day', 'tzuser'),
                     'done'    => !empty($isEdit),
                     'current' => empty($isEdit),
                     'viewBox' => $workflowIcons['created']['viewBox'],
@@ -150,7 +150,7 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
             ?>
 
             <div class="digirisk-mobile-field digirisk-mobile-field--spaced">
-                <label><?php print $langs->trans('MobileFPMotif'); ?> *</label>
+                <label><?php print $langs->trans('MobileFPMotif'); ?> <span class="digirisk-mobile-required">*</span></label>
                 <input type="text" name="label" class="digirisk-mobile-label" required placeholder="<?php print dol_escape_htmltag($langs->trans('MobileFPMotifPlaceholder')); ?>" value="<?php print dol_escape_htmltag($prefill['label']); ?>">
             </div>
 
@@ -161,11 +161,11 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
 
             <div class="digirisk-mobile-row">
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('DateStart'); ?> *</label>
+                    <label><?php print $langs->trans('DateStart'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="datetime-local" name="date_start" class="digirisk-mobile-date-start" value="<?php print dol_escape_htmltag($prefill["date_start"]); ?>">
                 </div>
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('DateEnd'); ?> *</label>
+                    <label><?php print $langs->trans('DateEnd'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="datetime-local" name="date_end" class="digirisk-mobile-date-end" value="<?php print dol_escape_htmltag($prefill["date_end"]); ?>">
                 </div>
             </div>
@@ -272,7 +272,7 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
         <div class="digirisk-mobile-card">
             <div class="digirisk-mobile-card__title"><i class="fas fa-project-diagram"></i> <?php print $langs->trans('PreventionPlanLinked'); ?></div>
             <div class="digirisk-mobile-field">
-                <label><?php print $langs->trans('PreventionPlan'); ?> *</label>
+                <label><?php print $langs->trans('PreventionPlan'); ?> <span class="digirisk-mobile-required">*</span></label>
                 <?php print $preventionplan->select_preventionplan_list($prefill['fk_preventionplan'], 'fk_preventionplan', [], '1', 0, [], 0, 0, 'digirisk-mobile-preventionplan-select'); ?>
             </div>
             <div class="digirisk-mobile-help"><?php print $langs->trans('MobileFPPreventionPlanHelp'); ?></div>
@@ -293,11 +293,11 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
 
             <div class="digirisk-mobile-row">
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('CompanyName'); ?> *</label>
+                    <label><?php print $langs->trans('CompanyName'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="text" name="ext_society_name" class="digirisk-mobile-ext-society-name" value="<?php print dol_escape_htmltag($prefill["ext_society_name"]); ?>">
                 </div>
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('MobileSirenOrSiret'); ?> *</label>
+                    <label><?php print $langs->trans('MobileSirenOrSiret'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="text" name="siren" class="digirisk-mobile-siren-input" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="<?php print dol_escape_htmltag($langs->trans('MobileSirenOrSiretPlaceholder')); ?>" value="<?php print dol_escape_htmltag($prefill["siren"]); ?>" pattern="[\d\s]{9,20}" title="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorInvalidSiren')); ?>">
                 </div>
             </div>
@@ -332,17 +332,17 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
             </div>
             <div class="digirisk-mobile-row">
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('Lastname'); ?> *</label>
+                    <label><?php print $langs->trans('Lastname'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="text" name="resp_lastname" class="digirisk-mobile-resp-lastname" value="<?php print dol_escape_htmltag($prefill["resp_lastname"]); ?>">
                 </div>
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('Firstname'); ?> *</label>
+                    <label><?php print $langs->trans('Firstname'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="text" name="resp_firstname" class="digirisk-mobile-resp-firstname" value="<?php print dol_escape_htmltag($prefill["resp_firstname"]); ?>">
                 </div>
             </div>
             <div class="digirisk-mobile-row">
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('Email'); ?> *</label>
+                    <label><?php print $langs->trans('Email'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="email" name="resp_email" class="digirisk-mobile-resp-email" autocomplete="off" value="<?php print dol_escape_htmltag($prefill["resp_email"]); ?>" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" title="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorInvalidEmail')); ?>">
                 </div>
                 <div class="digirisk-mobile-field">
@@ -362,7 +362,13 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
             $permitTagOptions = is_array($permitTagOptions) ? $permitTagOptions : [];
         ?>
         <div class="digirisk-mobile-card">
-            <div class="digirisk-mobile-card__title"><i class="fas fa-tags"></i> <?php print $langs->trans('Categories'); ?></div>
+            <div class="digirisk-mobile-card__title">
+                <i class="fas fa-tags"></i> <?php print $langs->trans('MobileTags'); ?>
+                <span class="digirisk-mobile-tooltip digirisk-mobile-tooltip--start" tabindex="0" aria-label="<?php print dol_escape_htmltag($langs->trans('MobileTagsInfo')); ?>">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="digirisk-mobile-tooltip__bubble" role="tooltip"><?php print $langs->trans('MobileFPTagsHelp'); ?></span>
+                </span>
+            </div>
             <?php if (!empty($permitTagOptions)) {
                 print $form->multiselectarray('categories', $permitTagOptions, $prefill['categories'], '', 0, 'digirisk-mobile-tags-select minwidth500 width100p');
             } else { ?>

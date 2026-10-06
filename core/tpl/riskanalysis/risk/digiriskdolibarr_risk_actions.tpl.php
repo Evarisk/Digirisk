@@ -187,6 +187,60 @@ if ( ! $error && $action == 'saveRisk' && $permissiontoadd) {
 	}
 }
 
+// Archiving keeps the risk and its assessments, it only moves them to the archive tab of the element
+if ( ! $error && $massaction == 'archive' && $permissiontoadd) {
+	if ( ! empty($toselect)) {
+		$archivedRiskCount = 0;
+
+		foreach ($toselect as $toSelectedId) {
+			if ($risk->fetch($toSelectedId) <= 0) {
+				continue;
+			}
+
+			if ($risk->setArchived($user, 1) > 0) {
+				$archivedRiskCount++;
+			} else {
+				if ( ! empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
+				else setEventMessages($risk->error, null, 'errors');
+			}
+		}
+
+		if ($archivedRiskCount > 0) {
+			setEventMessages($langs->trans('RisksArchived', $archivedRiskCount), null);
+		}
+
+		header('Location: ' . str_replace('__ID__', $id, $backtopage));
+		exit;
+	}
+}
+
+// Restoring an archived risk puts it back into the active list of its element
+if ( ! $error && $massaction == 'unarchive' && $permissiontoadd) {
+	if ( ! empty($toselect)) {
+		$unarchivedRiskCount = 0;
+
+		foreach ($toselect as $toSelectedId) {
+			if ($risk->fetch($toSelectedId) <= 0) {
+				continue;
+			}
+
+			if ($risk->setUnarchived($user, 1) > 0) {
+				$unarchivedRiskCount++;
+			} else {
+				if ( ! empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
+				else setEventMessages($risk->error, null, 'errors');
+			}
+		}
+
+		if ($unarchivedRiskCount > 0) {
+			setEventMessages($langs->trans('RisksUnarchived', $unarchivedRiskCount), null);
+		}
+
+		header('Location: ' . str_replace('__ID__', $id, $backtopage));
+		exit;
+	}
+}
+
 if ( ! $error && ($massaction == 'delete' || ($action == 'delete' && $confirm == 'yes')) && $permissiontodelete) {
 	if ( ! empty($toselect)) {
 
@@ -454,10 +508,9 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 	}
 	$task->budget_amount = is_numeric($budget) ? $budget : ($task->budget ?? 0);
 
-	if ($taskProgress == 1) {
-		$task->progress = 100;
-	} else {
-		$task->progress = 0;
+	// The declared progress is only sent when the modal shows it, the calculated progress mode leaves the stored value alone
+	if (is_numeric($taskProgress)) {
+		$task->progress = min(100, max(0, (int) $taskProgress));
 	}
 
 	$result = $task->update($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_MODIFY));

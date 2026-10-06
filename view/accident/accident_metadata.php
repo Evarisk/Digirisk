@@ -136,13 +136,13 @@ if (empty($reshook)) {
 		$fk_soc_responsible_insurance_society = GETPOST('fk_soc_responsible_insurance_society');
 		$fk_accident                          = GETPOST('id');
 
-		$workhours_morning_date_start   = dol_mktime(GETPOST('datewmshour', 'int'), GETPOST('datewmsmin', 'int'), 0, dol_print_date(dol_now(), '%m'), dol_print_date(dol_now(), '%d'), dol_print_date(dol_now(), '%Y'), 'tzuser');
-		$workhours_morning_date_end     = dol_mktime(GETPOST('datewmehour', 'int'), GETPOST('datewmemin', 'int'), 0, dol_print_date(dol_now(), '%m'), dol_print_date(dol_now(), '%d'), dol_print_date(dol_now(), '%Y'), 'tzuser');
-		$workhours_afternoon_date_start = dol_mktime(GETPOST('datewashour', 'int'), GETPOST('datewasmin', 'int'), 0, dol_print_date(dol_now(), '%m'), dol_print_date(dol_now(), '%d'), dol_print_date(dol_now(), '%Y'), 'tzuser');
-		$workhours_afternoon_date_end   = dol_mktime(GETPOST('datewaehour', 'int'), GETPOST('datewaemin', 'int'), 0, dol_print_date(dol_now(), '%m'), dol_print_date(dol_now(), '%d'), dol_print_date(dol_now(), '%Y'), 'tzuser');
+		$workhours_morning_date_start   = dol_mktime(GETPOSTINT('datewmshour'), GETPOSTINT('datewmsmin'), 0, (int) dol_print_date(dol_now(), '%m'), (int) dol_print_date(dol_now(), '%d'), (int) dol_print_date(dol_now(), '%Y'), 'tzuser');
+		$workhours_morning_date_end     = dol_mktime(GETPOSTINT('datewmehour'), GETPOSTINT('datewmemin'), 0, (int) dol_print_date(dol_now(), '%m'), (int) dol_print_date(dol_now(), '%d'), (int) dol_print_date(dol_now(), '%Y'), 'tzuser');
+		$workhours_afternoon_date_start = dol_mktime(GETPOSTINT('datewashour'), GETPOSTINT('datewasmin'), 0, (int) dol_print_date(dol_now(), '%m'), (int) dol_print_date(dol_now(), '%d'), (int) dol_print_date(dol_now(), '%Y'), 'tzuser');
+		$workhours_afternoon_date_end   = dol_mktime(GETPOSTINT('datewaehour'), GETPOSTINT('datewaemin'), 0, (int) dol_print_date(dol_now(), '%m'), (int) dol_print_date(dol_now(), '%d'), (int) dol_print_date(dol_now(), '%Y'), 'tzuser');
 
-		$accident_notice_date = dol_mktime(GETPOST('datenhour', 'int'), GETPOST('datenmin', 'int'), 0, GETPOST('datenmonth', 'int'), GETPOST('datenday', 'int'), GETPOST('datenyear', 'int'));
-		$register_date        = dol_mktime(GETPOST('daterhour', 'int'), GETPOST('datermin', 'int'), 0, GETPOST('datermonth', 'int'), GETPOST('daterday', 'int'), GETPOST('dateryear', 'int'));
+		$accident_notice_date = dol_mktime(GETPOSTINT('datenhour'), GETPOSTINT('datenmin'), 0, GETPOSTINT('datenmonth'), GETPOSTINT('datenday'), GETPOSTINT('datenyear'));
+		$register_date        = dol_mktime(GETPOSTINT('daterhour'), GETPOSTINT('datermin'), 0, GETPOSTINT('datermonth'), GETPOSTINT('daterday'), GETPOSTINT('dateryear'));
 
 		// Initialize object AccidentMetaData
 		$now                             = dol_now();

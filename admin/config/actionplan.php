@@ -46,7 +46,8 @@ $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 
 // Security check - Protection if external user
-$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
 /*
@@ -75,6 +76,9 @@ if ($action == 'update_kanban') {
     dolibarr_set_const($db, 'DIGIRISKDOLIBARR_KANBAN_COLUMN_SOURCE', $columnSource, 'chaine', 0, '', $conf->entity);
     setEventMessages($langs->trans('SetupSaved'), null, 'mesgs');
 }
+
+// Actions set_mod, update_mask and the set_/del_ switch of the module constants
+require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
 /*
  * View
@@ -129,7 +133,7 @@ foreach ($actionPlanLogs as $constName => $transKeys) {
     print digiriskdolibarr_tuto_image('actionplan', $transKeys[2], $langs->trans($transKeys[0]));
     print '</td>';
     print '<td class="center">';
-    print ajax_constantonoff($constName);
+    print saturne_constant_onoff($constName, $permissiontowrite);
     print '</td>';
     print '</tr>';
 }
@@ -138,6 +142,28 @@ print '</table>';
 
 // Click on a tuto image to display it full size
 digiriskdolibarr_tuto_overlay();
+
+// Yearly action plan settings
+print '<br>';
+print load_fiche_titre('<i class="fas fa-calendar-alt"></i> ' . $langs->trans("ActionPlanYearDisplay"), '', '');
+print '<hr>';
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans("Name") . '</td>';
+print '<td>' . $langs->trans("Description") . '</td>';
+print '<td class="center">' . $langs->trans("Status") . '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ActionPlanCarryOverLate');
+print '</td><td>';
+print $langs->trans('ActionPlanCarryOverLateDesc');
+print '</td><td class="center">';
+print saturne_constant_onoff('DIGIRISKDOLIBARR_ACTIONPLAN_CARRY_OVER_LATE', $permissiontowrite);
+print '</td></tr>';
+
+print '</table>';
 
 // Kanban display settings
 print '<br>';

@@ -57,27 +57,123 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskDolibarrDocument
      */
     public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
     {
-        global $conf;
-
         if (!empty($moreParam['dateStart']) && !empty($moreParam['dateEnd'])) {
             $digiriskElement = new DigiriskElement($this->db);
 
             $loadDigiriskElementInfos = $digiriskElement->loadDigiriskElementInfos($moreParam);
 
-            $startDate    = dol_print_date($moreParam['dateStart'], 'dayrfc');
-            $endDate      = dol_print_date($moreParam['dateEnd'], 'dayrfc');
-            $filter       = " AND (t.date_creation BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
-            $filterTicket = " AND (t.datec BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
+            $moreParam = $this->setDateRangeFilters($moreParam);
 
-            $moreParam['filter']          = $filter;
-            $moreParam['filterTicket']    = $filterTicket;
-            $moreParam['filterEvaluator'] = ' AND t.entity = ' . $conf->entity;
-
-            $moreParam['entity']           = 'current';
-            $moreParam['digiriskElements'] = $loadDigiriskElementInfos[$moreParam['entity']]['digiriskElements'];
+            $moreParam['entity']                 = 'current';
+            $moreParam['digiriskElements']       = $loadDigiriskElementInfos[$moreParam['entity']]['digiriskElements'];
+            $moreParam['digiriskElementChanges'] = $digiriskElement->loadDigiriskElementChanges($moreParam);
         }
 
-        return parent::fillTagsLines($odfHandler, $outputLangs, $moreParam);
+        $result = parent::fillTagsLines($odfHandler, $outputLangs, $moreParam);
+        if ($result < 0) {
+            return $result;
+        }
+
+        try {
+            static::setDigiriskElementChangesSegment($odfHandler, $outputLangs, $moreParam);
+        } catch (OdfException $e) {
+            $this->error = $e->getMessage();
+            dol_syslog($this->error, LOG_WARNING);
+            return -1;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Set digirisk element changes segment
+     *
+     * Lists the GP/UT added, modified or deleted over the period. The synthesis only ever gave a
+     * count, which does not tell the reader which work unit moved, and the deleted ones vanished
+     * from the report entirely. The segment only exists in the audit report template, so the
+     * method lives here and not in the parent class where its name collided with the risk
+     * assessment document one.
+     *
+     * @param Odf       $odfHandler  Object builder odf library
+     * @param Translate $outputLangs Lang object to use for output
+     * @param array     $moreParam   More param (digiriskElementChanges)
+     *
+     * @throws OdfException
+     * @throws Exception
+     */
+    private static function setDigiriskElementChangesSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
+    {
+        $foundTagForLines = 1;
+        try {
+            $listLines = $odfHandler->setSegment('digiriskElements');
+        } catch (OdfExceptionSegmentNotFound $e) {
+            // We may arrive here if tags for lines not present into template
+            $foundTagForLines = 0;
+            $listLines        = '';
+            dol_syslog($e->getMessage());
+        }
+
+        if ($foundTagForLines) {
+            $digiriskElementChanges = $moreParam['digiriskElementChanges'] ?? [];
+            if (empty($digiriskElementChanges)) {
+                $tmpArray = [
+                    'digiriskElementRefLabel' => ' ',
+                    'digiriskElementType'     => ' ',
+                    'digiriskElementState'    => $outputLangs->transnoentities('NoDigiriskElementChange'),
+                    'digiriskElementDate'     => ' '
+                ];
+
+                static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                $odfHandler->mergeSegment($listLines);
+                return;
+            }
+
+            foreach ($digiriskElementChanges as $digiriskElementChange) {
+                $digiriskElement = $digiriskElementChange['object'];
+                $typeKey         = $digiriskElement->element_type == 'groupment' ? 'Groupment' : 'WorkUnit';
+
+                $tmpArray = [
+                    'digiriskElementRefLabel' => 'S' . $digiriskElement->entity . ' - ' . $digiriskElement->ref . ' - ' . $digiriskElement->label,
+                    'digiriskElementType'     => $outputLangs->transnoentities($typeKey),
+                    'digiriskElementState'    => $outputLangs->transnoentities('DigiriskElement' . $digiriskElementChange['state']),
+                    'digiriskElementDate'     => dol_print_date($digiriskElementChange['date'], 'day', 'tzuser')
+                ];
+
+                static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+            }
+            $odfHandler->mergeSegment($listLines);
+        }
+    }
+
+    /**
+     * Add the date range conditions every "added or modified over the period" list relies on
+     *
+     * Each loader gets its own key because they do not share the same aliases: filterRiskDate
+     * also looks at the riskassessment table so a re-evaluated risk shows up, and filterEvaluator
+     * carries the dates because the generic filter is dropped before the evaluator segment is
+     * built (see ModeleODTDigiriskDolibarrDocument::fillTagsLines) — issue #4459
+     *
+     * @param  array $moreParam More param (dateStart, dateEnd)
+     * @return array            Same array completed with the filter keys
+     */
+    protected function setDateRangeFilters(array $moreParam): array
+    {
+        global $conf;
+
+        $startDate = dol_print_date($moreParam['dateStart'], 'dayrfc');
+        $endDate   = dol_print_date($moreParam['dateEnd'], 'dayrfc');
+
+        $filter       = " AND (t.date_creation BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
+        $filterRisk   = " AND (t.date_creation BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate'";
+        $filterRisk  .= " OR ra.date_creation BETWEEN '$startDate' AND '$endDate' OR ra.tms BETWEEN '$startDate' AND '$endDate')";
+        $filterTicket = " AND (t.datec BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
+
+        $moreParam['filter']          = $filter;
+        $moreParam['filterRiskDate']  = $filterRisk;
+        $moreParam['filterTicket']    = $filterTicket;
+        $moreParam['filterEvaluator'] = ' AND t.entity = ' . $conf->entity . $filter;
+
+        return $moreParam;
     }
 
     /**
@@ -95,7 +191,7 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskDolibarrDocument
      */
     public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam = []): int
     {
-        global $conf, $mysoc;
+        global $mysoc;
 
         // Load DigiriskDolibarr libraries
         require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
@@ -121,19 +217,12 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskDolibarrDocument
         $objectDocument->element = $previousObjectDocumentElement;
 
         if (!empty($moreParam['dateStart']) && !empty($moreParam['dateEnd'])) {
-            $startDate    = dol_print_date($moreParam['dateStart'], 'dayrfc');
-            $endDate      = dol_print_date($moreParam['dateEnd'], 'dayrfc');
-            $filter       = " AND (t.date_creation BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
-            $filterTicket = " AND (t.datec BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
-
             $tmpArray['dateAudit'] = dol_print_date($moreParam['dateStart'], 'day') . ' - ' . dol_print_date($moreParam['dateEnd'], 'day');
 
-            $moreParam['filter']          = $filter;
-            $moreParam['filterTicket']    =  $filterTicket;
-            $moreParam['filterEvaluator'] = ' AND t.entity = ' . $conf->entity;
+            $moreParam = $this->setDateRangeFilters($moreParam);
         }
 
-        if (is_array($moreParam['recipient']) && !empty($moreParam['recipient'])) {
+        if (!empty($moreParam['recipient']) && is_array($moreParam['recipient'])) {
             $userRecipient = $moreParam['recipient'];
 
             $tmpArray['destinataireDUER'] = '';
@@ -156,7 +245,7 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskDolibarrDocument
         $loadTicketInfos          = load_ticket_infos($moreParam);
 
         $tmpArray['nb_new_or_edit_groupments'] = $loadDigiriskElementInfos['current']['nbGroupment'];
-        $tmpArray['nb_new_or_edit_workunits']  = $loadDigiriskElementInfos['current']['nbWorkUnit'];
+        $tmpArray['nb_new_or_edit_workunits']  = $loadDigiriskElementInfos['current']['nbWorkunit'];
         $tmpArray['nb_new_or_edit_risks']      = count($loadRiskInfos['risks']);
         $tmpArray['nb_new_or_edit_risksigns']  = $loadRiskSignInfos['nbRiskSigns'];
         $tmpArray['nb_new_or_edit_evaluators'] = $loadEvaluatorInfos['nbEvaluators'];

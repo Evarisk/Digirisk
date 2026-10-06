@@ -285,3 +285,34 @@ DELETE FROM llx_const WHERE name = 'MAIN_MODULE_DIGIRISKDOLIBARR_TABS';
 
 -- 23.1.x - index used by the per-risk loading of risk assessments on the risk lists
 ALTER TABLE llx_digiriskdolibarr_riskassessment ADD INDEX idx_digiriskdolibarr_riskassessment_fk_risk (fk_risk);
+
+-- 23.1.x - enable the prefill of the risk description with the danger category name on every entity
+UPDATE llx_const SET value = 1 WHERE name = 'DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL';
+
+-- 23.1.x - product association with digiriskelement (issue #5103)
+CREATE TABLE llx_digiriskdolibarr_digiriskelement_product(
+	rowid            integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+	entity           integer DEFAULT 1 NOT NULL,
+	date_creation    datetime NOT NULL,
+	tms              timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	fk_user_creat    integer NOT NULL,
+	fk_user_modif    integer,
+	fk_digiriskelement integer NOT NULL,
+	fk_product       integer NOT NULL
+) ENGINE=innodb;
+
+ALTER TABLE llx_digiriskdolibarr_digiriskelement_product ADD INDEX idx_digiriskelement_product_fk_digiriskelement (fk_digiriskelement);
+ALTER TABLE llx_digiriskdolibarr_digiriskelement_product ADD INDEX idx_digiriskelement_product_fk_product (fk_product);
+ALTER TABLE llx_digiriskdolibarr_digiriskelement_product ADD CONSTRAINT fk_digiriskelement_product_digiriskelement FOREIGN KEY (fk_digiriskelement) REFERENCES llx_digiriskdolibarr_digiriskelement (rowid);
+ALTER TABLE llx_digiriskdolibarr_digiriskelement_product ADD CONSTRAINT fk_digiriskelement_product_product FOREIGN KEY (fk_product) REFERENCES llx_product (rowid);
+
+-- 23.3.x - ITAMAMI analysis fields on the accident investigation (issue #4624)
+ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD itamami_individual text NULL AFTER circumstances;
+ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD itamami_task text NULL AFTER itamami_individual;
+ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD itamami_activity text NULL AFTER itamami_task;
+ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD itamami_material text NULL AFTER itamami_activity;
+ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD itamami_environment text NULL AFTER itamami_material;
+
+-- 23.5.x - fire watch rounds after hot work (issue #4835)
+ALTER TABLE llx_digiriskdolibarr_firepermit ADD date_work_end datetime NULL AFTER fk_preventionplan;
+ALTER TABLE llx_digiriskdolibarr_firepermit ADD firewatch_name varchar(255) NULL AFTER date_work_end;

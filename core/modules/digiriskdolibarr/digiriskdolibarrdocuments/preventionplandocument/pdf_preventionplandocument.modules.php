@@ -98,6 +98,16 @@ class pdf_preventionplandocument extends SaturneDocumentModel
     protected string $footerText = '';
 
     /**
+     * @var string Cle de traduction de l'intitule des photos d'un bloc de risque
+     */
+    protected string $riskPhotosLabelKey = 'PreventionPlanRiskPhotos';
+
+    /**
+     * @var string Prefixe des cles de la phrase de periode d'intervention ('Sentence' avec horaires, 'Only' sans)
+     */
+    protected string $interventionPeriodKey = 'InterventionPeriod';
+
+    /**
      * @var float Taille de police du pied de page
      */
     protected float $footerFontSize = 7;
@@ -441,7 +451,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $pdf->SetFont('', 'B', $size + 6);
         $pdf->SetTextColor($this->accent[0], $this->accent[1], $this->accent[2]);
         $pdf->SetXY($this->marge_gauche, $posY + 2);
-        $pdf->Cell($this->contentWidth($pdf), 9, $outputLangs->transnoentities('PreventionPlan'), 0, 1, 'C');
+        $pdf->Cell($this->contentWidth($pdf), 9, $this->documentTitle($outputLangs), 0, 1, 'C');
         $pdf->SetTextColor(0, 0, 0);
 
         $pdf->SetFont('', '', $size);
@@ -538,6 +548,8 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
         require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_mobile.lib.php';
 
+        $moreParam = self::getMoreParam($objectDocument, $moreParam);
+
         $object = $moreParam['object'];
 
         $outputLangs->loadLangs(['companies', 'projects', 'other', 'digiriskdolibarr@digiriskdolibarr']);
@@ -565,12 +577,9 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $parameters = ['file' => $file, 'object' => $object, 'outputlangs' => $outputLangs];
         $hookmanager->executeHooks('beforePDFCreation', $parameters, $object, $action);
 
-        // Meme source de donnees que le modele ODT
-        $objectDocument->DigiriskFillJSON();
-        $json = json_decode($objectDocument->json);
-        $data = (is_object($json) && isset($json->PreventionPlan)) ? (array) $json->PreventionPlan : [];
+        $data = $this->documentData($objectDocument);
 
-        $this->tmpDir = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/preventionplandocument/tmp';
+        $this->tmpDir = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $this->document_type . '/tmp';
         dol_mkdir($this->tmpDir);
 
         $pdf  = pdf_getInstance($this->format);
@@ -586,7 +595,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $pdf->SetDrawColor(190, 190, 190);
         $pdf->SetLineWidth(0.2);
         $pdf->SetTitle($outputLangs->convToOutputCharset($object->ref));
-        $pdf->SetSubject($outputLangs->transnoentities('PreventionPlan'));
+        $pdf->SetSubject($this->documentTitle($outputLangs));
         $pdf->SetCreator('Dolibarr ' . DOL_VERSION);
         $pdf->SetAuthor($outputLangs->convToOutputCharset($user->getFullName($outputLangs)));
         $pdf->SetMargins($this->marge_gauche, $this->marge_haute, $this->marge_droite);
@@ -601,16 +610,9 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $this->_pagehead($pdf, $object, $outputLangs, $size);
 
         // Rappel reglementaire, en tete de document comme dans le gabarit
-        $this->paragraph($pdf, $outputLangs->transnoentities('PreventionPlanLegalNotice'), $size - 2, 'I', [110, 110, 110]);
+        $this->paragraph($pdf, $this->legalNotice($outputLangs), $size - 2, 'I', [110, 110, 110]);
 
-        $this->sectionCompanies($pdf, $data, $outputLangs, $size);
-        $this->sectionEmergency($pdf, $data, $outputLangs, $size);
-        $this->sectionMeansAndRules($pdf, $data, $outputLangs, $size);
-        $this->sectionPriorVisit($pdf, $object, $data, $outputLangs, $size);
-        $this->sectionIntervention($pdf, $object, $outputLangs, $size);
-        $this->sectionRisks($pdf, $object, $outputLangs, $size);
-        $this->sectionCertifications($pdf, $object, $outputLangs, $size);
-        $this->sectionSignatures($pdf, $object, $outputLangs, $size);
+        $this->writeSections($pdf, $object, $data, $outputLangs, $size);
 
         $this->_pagefooter($pdf, $object, $outputLangs, $size);
 
@@ -628,6 +630,67 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $this->result = ['fullpath' => $file];
 
         return 1;
+    }
+
+    /**
+     * Titre du document, en tete de page et dans les proprietes du PDF.
+     *
+     * Le permis de feu reprend la mise en page du plan de prevention : ce qui les distingue passe
+     * par cette methode et les trois suivantes, qu'il redefinit.
+     *
+     * @param  Translate $outputLangs Lang object
+     * @return string                 Titre traduit
+     */
+    protected function documentTitle(Translate $outputLangs): string
+    {
+        return $outputLangs->transnoentities('PreventionPlan');
+    }
+
+    /**
+     * Rappel reglementaire imprime sous le titre.
+     *
+     * @param  Translate $outputLangs Lang object
+     * @return string                 Texte traduit
+     */
+    protected function legalNotice(Translate $outputLangs): string
+    {
+        return $outputLangs->transnoentities('PreventionPlanLegalNotice');
+    }
+
+    /**
+     * Donnees du document, lues dans le JSON qui alimente aussi le modele ODT.
+     *
+     * @param  SaturneDocuments $objectDocument Document source
+     * @return array                            Donnees du plan de prevention
+     */
+    protected function documentData($objectDocument): array
+    {
+        $objectDocument->DigiriskFillJSON();
+        $json = json_decode($objectDocument->json);
+
+        return (is_object($json) && isset($json->PreventionPlan)) ? (array) $json->PreventionPlan : [];
+    }
+
+    /**
+     * Sections du document, dans l'ordre du gabarit ODT.
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  object    $object      Plan de prevention
+     * @param  array     $data        Donnees du document
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @return void
+     */
+    protected function writeSections($pdf, $object, array $data, Translate $outputLangs, float $size)
+    {
+        $this->sectionCompanies($pdf, $data, $outputLangs, $size);
+        $this->sectionEmergency($pdf, $data, $outputLangs, $size);
+        $this->sectionMeansAndRules($pdf, $data, $outputLangs, $size);
+        $this->sectionPriorVisit($pdf, $object, $data, $outputLangs, $size);
+        $this->sectionIntervention($pdf, $object, $outputLangs, $size);
+        $this->sectionRisks($pdf, $object, $outputLangs, $size);
+        $this->sectionCertifications($pdf, $object, $outputLangs, $size);
+        $this->sectionSignatures($pdf, $object, $outputLangs, $size);
     }
 
     /**
@@ -884,8 +947,8 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         }
         // La phrase n'annonce des horaires que s'il y en a : sinon elle laissait un vide
         $sentence = $hasSchedule
-            ? $outputLangs->transnoentities('InterventionPeriodSentence', $start, $end)
-            : $outputLangs->transnoentities('InterventionPeriodOnly', $start, $end);
+            ? $outputLangs->transnoentities($this->interventionPeriodKey . 'Sentence', $start, $end)
+            : $outputLangs->transnoentities($this->interventionPeriodKey . 'Only', $start, $end);
         $this->paragraph($pdf, $sentence, $size - 1, '', [40, 40, 40]);
 
         if (!$hasSchedule) {
@@ -1210,7 +1273,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
 
         $this->checkPageBreak($pdf, 8 + $rowCount * ($photoHeight + 4));
 
-        $this->blockLabel($pdf, $outputLangs->transnoentities('PreventionPlanRiskPhotos'), $size);
+        $this->blockLabel($pdf, $outputLangs->transnoentities($this->riskPhotosLabelKey), $size);
 
         $index = 0;
         while ($index < count($photos)) {

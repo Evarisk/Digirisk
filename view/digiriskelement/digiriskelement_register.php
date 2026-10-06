@@ -53,6 +53,23 @@ $subaction  = GETPOST('subaction', 'aZ09');
 $cancel     = GETPOST('cancel', 'aZ09');
 $backtopage = GETPOST('backtopage', 'alpha');
 
+// Get list parameters
+$massaction                                 = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
+$toselect                                   = [];
+[$confirm, $contextpage, $optioncss, $mode] = ['', '', '', ''];
+$listParameters                             = saturne_load_list_parameters('digiriskelementregister');
+foreach ($listParameters as $listParameterKey => $listParameter) {
+    $$listParameterKey = $listParameter;
+}
+
+// Get pagination parameters
+[$limit, $page, $offset] = [0, 0, 0];
+[$sortfield, $sortorder] = ['', ''];
+$paginationParameters    = saturne_load_pagination_parameters();
+foreach ($paginationParameters as $paginationParameterKey => $paginationParameter) {
+    $$paginationParameterKey = $paginationParameter;
+}
+
 // Initialize technical objects
 $object           = new DigiriskElement($db);
 $extrafields      = new ExtraFields($db);
@@ -112,6 +129,7 @@ if ($object->id > 0) {
 	$search_array_options = $extrafields->getOptionalsFromPost($object->table_element, '', 'search_');
 	$search_array_options['search_options_digiriskdolibarr_ticket_service'] = $id;
 
+	$searchCategories = [];
 	if (isModEnabled('categorie')) {
 		$searchCategories = GETPOST('search_category_' . $object->element . '_list', 'array');
 	}

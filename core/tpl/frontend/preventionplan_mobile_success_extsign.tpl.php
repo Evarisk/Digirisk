@@ -40,7 +40,7 @@ $ppExtName = trim($ppExtSignatory->firstname . ' ' . $ppExtSignatory->lastname);
         <div><i class="fas fa-hard-hat"></i> Entreprise Extérieure ( EE )</div>
         <?php if ($ppExtSigned) { ?>
         <div style="font-size: 0.65em; background: #e6f2e9; color: #2d6a3c; padding: 4px 8px; border-radius: 15px; font-weight: bold; line-height: 1.2;">
-            <i class="fas fa-check"></i> Signé le <?php print dol_print_date($ppExtSignatory->signature_date, 'dayhour'); ?>
+            <i class="fas fa-check"></i> Signé le <?php print dol_print_date($ppExtSignatory->signature_date, 'dayhour', 'tzuser'); ?>
         </div>
         <?php } ?>
     </div>
@@ -69,7 +69,7 @@ $ppExtName = trim($ppExtSignatory->firstname . ' ' . $ppExtSignatory->lastname);
         <span>
             <?php
             print $ppExtEmailSent
-                ? $langs->trans('MobilePPExtEmailSentOn', dol_escape_htmltag($ppExtSignatory->email), dol_print_date($ppExtSignatory->last_email_sent_date, 'dayhour'))
+                ? $langs->trans('MobilePPExtEmailSentOn', dol_escape_htmltag($ppExtSignatory->email), dol_print_date($ppExtSignatory->last_email_sent_date, 'dayhour', 'tzuser'))
                 : $langs->trans('MobilePPExtEmailNotSent');
             ?>
         </span>

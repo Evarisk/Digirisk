@@ -177,6 +177,8 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTDigiriskDolibarrDoc
 
 		global $conf;
 
+		$moreParam = self::getMoreParam($objectDocument, $moreParam);
+
 		$object           = $moreParam['object'];
 		$accident         = new Accident($this->db);
 		$accidentMetadata = new AccidentMetaData($this->db);
@@ -241,7 +243,7 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTDigiriskDolibarrDoc
 			} else {
 				$element = new DigiriskStandard($this->db);
 				$element->fetch($accident->fk_standard);
-				$tmpArray['gp_ut'] = $element->ref . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+				$tmpArray['gp_ut'] = $element->ref . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
 			}
 		} else if ($accident->external_accident == 2) {
 			$societe = new Societe($this->db);
@@ -255,6 +257,11 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTDigiriskDolibarrDoc
 		$tmpArray['collective_equipment'] = $object->collective_equipment;
 		$tmpArray['individual_equipment'] = $object->individual_equipment;
 		$tmpArray['circumstances']        = $object->circumstances;
+		$tmpArray['itamami_individual']   = $object->itamami_individual;
+		$tmpArray['itamami_task']         = $object->itamami_task;
+		$tmpArray['itamami_activity']     = $object->itamami_activity;
+		$tmpArray['itamami_material']     = $object->itamami_material;
+		$tmpArray['itamami_environment']  = $object->itamami_environment;
 		$tmpArray['public_note']          = $object->note_public;
 		$tmpArray['relative_location']    = $accidentMetadata->relative_location;
 

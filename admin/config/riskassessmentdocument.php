@@ -70,6 +70,17 @@ saturne_check_access($permissiontoread);
 // Actions update_mask
 require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
+// Les deux méthodes d'évaluation des RPS restent proposées tant que leur constante n'existe pas :
+// sans cette création, une installation mise à jour sans réactivation du module afficherait deux
+// commutateurs éteints alors que les deux méthodes sont bien proposées dans la liste des risques
+if (saturne_check_admin_write_access()) {
+    foreach (['DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_METHOD', 'DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_GRID_METHOD'] as $psychosocialRiskMethodConst) {
+        if (!isset($conf->global->$psychosocialRiskMethodConst)) {
+            dolibarr_set_const($db, $psychosocialRiskMethodConst, 1, 'integer', 0, '', $conf->entity);
+        }
+    }
+}
+
 if (GETPOST('action') == 'setmod') {
     $value = GETPOST('value');
     $valueArray = explode('_', $value);
@@ -234,6 +245,16 @@ $constArray[$moduleNameLowerCase] = [
 		'code'        => 'DIGIRISKDOLIBARR_SHOW_SHARED_RISKS',
         'disabled'    => !$areRisksSharable
 	],
+    'PsychosocialRiskMethod' => [
+        'name'        => 'PsychosocialRiskMethod',
+        'description' => 'PsychosocialRiskMethodDescription',
+        'code'        => 'DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_METHOD',
+    ],
+    'PsychosocialRiskGridMethod' => [
+        'name'        => 'PsychosocialRiskGridMethod',
+        'description' => 'PsychosocialRiskGridMethodDescription',
+        'code'        => 'DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_GRID_METHOD',
+    ],
 ];
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';
@@ -332,11 +353,13 @@ $constArray[$moduleNameLowerCase] = [
 		'name'        => 'ShowTaskStartDate',
 		'description' => 'ShowTaskStartDateDescription',
 		'code'        => 'DIGIRISKDOLIBARR_SHOW_TASK_START_DATE',
+		'tutoImage'   => digiriskdolibarr_tuto_image('riskassessmentdocument', 'date_start', $langs->trans('ShowTaskStartDate')),
 	],
 	'ShowTaskEndDate' => [
 		'name'        => 'ShowTaskEndDate',
 		'description' => 'ShowTaskEndDateDescription',
 		'code'        => 'DIGIRISKDOLIBARR_SHOW_TASK_END_DATE',
+		'tutoImage'   => digiriskdolibarr_tuto_image('riskassessmentdocument', 'date_end', $langs->trans('ShowTaskEndDate')),
 	],
 	'ShowTasksDone' => [
 		'name'        => 'ShowTasksDone',
@@ -347,6 +370,7 @@ $constArray[$moduleNameLowerCase] = [
 		'name'        => 'ShowTaskCalculatedProgress',
 		'description' => 'ShowTaskCalculatedProgressDescription',
 		'code'        => 'DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS',
+		'tutoImage'   => digiriskdolibarr_tuto_image('riskassessmentdocument', 'progress', $langs->trans('ShowTaskCalculatedProgress')),
 	],
 	'ShowAllTasks' => [
 		'name'        => 'ShowAllTasks',
@@ -357,25 +381,32 @@ $constArray[$moduleNameLowerCase] = [
         'name'        => 'TaskHideRefInDocument',
         'description' => 'TaskHideRefInDocumentDescription',
         'code'        => 'DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT',
+        'tutoImage'   => digiriskdolibarr_tuto_image('riskassessmentdocument', 'ref', $langs->trans('TaskHideRefInDocument')),
     ],
     'TaskHideResponsibleInDocument' => [
         'name'        => 'TaskHideResponsibleInDocument',
         'description' => 'TaskHideResponsibleInDocumentDescription',
         'code'        => 'DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT',
+        'tutoImage'   => digiriskdolibarr_tuto_image('riskassessmentdocument', 'responsible', $langs->trans('TaskHideResponsibleInDocument')),
     ],
     'TaskHideDateInDocument' => [
         'name'        => 'TaskHideDateInDocument',
         'description' => 'TaskHideDateInDocumentDescription',
         'code'        => 'DIGIRISKDOLIBARR_TASK_HIDE_DATE_IN_DOCUMENT',
+        'tutoImage'   => digiriskdolibarr_tuto_image('riskassessmentdocument', 'date', $langs->trans('TaskHideDateInDocument')),
     ],
     'TaskHideBudgetInDocument' => [
         'name'        => 'TaskHideBudgetInDocument',
         'description' => 'TaskHideBudgetInDocumentDescription',
         'code'        => 'DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT',
+        'tutoImage'   => digiriskdolibarr_tuto_image('riskassessmentdocument', 'budget', $langs->trans('TaskHideBudgetInDocument')),
     ]
 ];
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';
+
+// Click on a tuto image to display it full size
+digiriskdolibarr_tuto_overlay();
 
 print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';

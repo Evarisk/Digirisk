@@ -23,6 +23,10 @@
  *          QR code to hand round on site so the people involved can join the spread.
  *          Expects: $langs, $successTitle, $successRef, $successLabel, $successFacts, $successShareUrl,
  *                   $successViewUrl, $successViewLabel, $successAgainUrl, $successAgainLabel.
+ *          Optional: $successArchiveUrl, $successArchiveLabel, $successArchiveConfirmTitle, $successArchiveConfirmText
+ *                    (archive button and its confirmation, shown when the URL is set),
+ *                    $successBannerText (confirmation banner on top, ready to print),
+ *                    $successExtraBlockFile (template, or list of templates, of the blocks proper to the object).
  */
 
 global $langs;
@@ -30,6 +34,13 @@ global $langs;
 $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successShareUrl) : '';
 ?>
 <div class="pwa-container digirisk-mobile">
+    <?php if (!empty($successBannerText)) { ?>
+    <!-- Confirmation right after the form was saved: stays on screen, unlike a notification -->
+    <div class="digirisk-mobile-success-banner" role="status">
+        <i class="fas fa-check-circle"></i>
+        <span><?php print $successBannerText; ?></span>
+    </div>
+    <?php } ?>
     <div class="digirisk-mobile-card digirisk-mobile-success">
         <?php if (!empty($successTitle)) { ?>
         <div class="digirisk-mobile-success__eyebrow">
@@ -84,10 +95,12 @@ $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successSha
     } ?>
 
     <?php
-    // Bloc propre a l'objet cree (signature de l'entreprise exterieure pour un plan de prevention),
-    // insere ici pour que l'ecran commun reste identique d'un objet a l'autre
-    if (!empty($successExtraBlockFile) && file_exists($successExtraBlockFile)) {
-        require $successExtraBlockFile;
+    // Blocs propres a l'objet cree (signature de l'entreprise exterieure, surveillance apres travaux du
+    // permis de feu), inseres ici pour que l'ecran commun reste identique d'un objet a l'autre
+    foreach ((array) ($successExtraBlockFile ?? []) as $successExtraBlock) {
+        if (file_exists($successExtraBlock)) {
+            require $successExtraBlock;
+        }
     }
     ?>
 
@@ -134,11 +147,29 @@ $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successSha
         <i class="fas fa-exclamation-triangle"></i> Module DoliLetter manquant pour la diffusion - Contacter votre administrateur
     </div>
     <?php } ?>
-    <div class="digirisk-mobile-success__actions">
+    <div class="digirisk-mobile-success__actions<?php print !empty($successArchiveUrl) ? ' digirisk-mobile-success__actions--wrap' : ''; ?>">
         <a class="digirisk-mobile-success__button" href="<?php print $successViewUrl; ?>"><?php print dol_escape_htmltag($successViewLabel); ?></a>
+        <?php if (!empty($successArchiveUrl)) { ?>
+        <a class="digirisk-mobile-success__button digirisk-mobile-archive-open" href="<?php print $successArchiveUrl; ?>"><?php print dol_escape_htmltag($successArchiveLabel); ?></a>
+        <?php } ?>
         <a class="digirisk-mobile-success__button" href="<?php print $successAgainUrl; ?>"><?php print dol_escape_htmltag($successAgainLabel); ?></a>
-        <a class="digirisk-mobile-success__button" href="<?php print $diffusionModDisabled ? '#' : $successShareUrl; ?>" <?php print $diffusionModDisabled ? 'style="opacity: 0.5; pointer-events: none;"' : 'target="_blank"'; ?>>
-            Diffusion
-        </a>
     </div>
+
+    <?php if (!empty($successArchiveUrl)) { ?>
+    <!-- Archive confirmation: the application offers no way back, and a mistap on a phone is easy -->
+    <div class="digirisk-mobile-confirm-modal digirisk-mobile-archive-modal hidden">
+        <div class="digirisk-mobile-confirm-modal__overlay digirisk-mobile-confirm-cancel"></div>
+        <div class="digirisk-mobile-risk-modal__dialog">
+            <div class="digirisk-mobile-risk-modal__header">
+                <span><?php print dol_escape_htmltag($successArchiveConfirmTitle); ?></span>
+                <button type="button" class="digirisk-mobile-confirm-cancel"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="digirisk-mobile-confirm-modal__body"><?php print dol_escape_htmltag($successArchiveConfirmText); ?></div>
+            <div class="digirisk-mobile-confirm-modal__actions">
+                <button type="button" class="digirisk-mobile-confirm-cancel wpeo-button button-grey"><?php print $langs->trans('Cancel'); ?></button>
+                <a class="wpeo-button button-blue" href="<?php print $successArchiveUrl; ?>"><i class="fas fa-archive"></i> <?php print dol_escape_htmltag($successArchiveLabel); ?></a>
+            </div>
+        </div>
+    </div>
+    <?php } ?>
 </div>

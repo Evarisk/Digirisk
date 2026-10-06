@@ -478,12 +478,15 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 						$element = $signatory->fetchSignatory('MasterWorker', $object->id, 'firepermit');
 						if (is_array($element)) {
 							$element = array_shift($element);
-							$usertmp->fetch($element->element_id);
-							print $usertmp->getNomUrl(1);
+							// array_shift() rend null quand la liste est vide : le signataire peut manquer
+							if (is_object($element)) {
+								$usertmp->fetch($element->element_id);
+								print $usertmp->getNomUrl(1);
+							}
 						}
 					} elseif ($resource['label'] == 'ExtSociety') {
-						$extSociety = $digiriskresources->fetchResourcesFromObject('ExtSociety', $object);
-						if ($extSociety > 0) {
+						$extSociety = $digiriskresources->fetchSingleResourceFromObject('ExtSociety', $object);
+						if ($extSociety !== null) {
 							print $extSociety->getNomUrl(1);
 						}
 					}
@@ -491,8 +494,11 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 						$element = $signatory->fetchSignatory('ExtSocietyResponsible', $object->id, 'firepermit');
 						if (is_array($element)) {
 							$element = array_shift($element);
-							$contact->fetch($element->element_id);
-							print $contact->getNomUrl(1);
+							// array_shift() rend null quand la liste est vide : le signataire peut manquer
+							if (is_object($element)) {
+								$contact->fetch($element->element_id);
+								print $contact->getNomUrl(1);
+							}
 						}
 					}
 					if ($resource['label'] == 'ExtSocietyAttendant') {

@@ -43,27 +43,23 @@
 
 .riskassessment-task-content {
   .riskassessment-task-author {
-    display: inline-block;
-    width: 20px;
-    min-width: 20px;
-    height: 20px;
-    line-height: 20px;
-    overflow: hidden;
-    text-transform: uppercase;
-    font-size: 12px;
-    font-weight: 600;
-    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
     vertical-align: middle;
-    text-align: center;
-    transition: all 0.3s ease;
-    background: #C993B4;
 
+    // Le lien natif enveloppe l'avatar et le nom : sans flex ici, les deux se coupent en fin de ligne
     a {
-      color: #fff !important;
+      display: inline-flex;
+      align-items: center;
     }
-    &:hover {
-      z-index: 10;
-      transform: scale(1.3);
+
+    // Avatar rond a gauche du nom, rendu par User::getNomUrl(-1)
+    img {
+      display: block;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      object-fit: cover;
     }
   }
   .riskassessment-task-author-label {

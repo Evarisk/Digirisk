@@ -78,7 +78,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		}
 
 		// *** JSON FILLING ***
-		$json['RiskAssessmentDocument']['nomEntreprise']  = $conf->global->MAIN_INFO_SOCIETE_NOM;
+		$json['RiskAssessmentDocument']['nomEntreprise']  = getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
 		$json['RiskAssessmentDocument']['dateAudit']      = dol_print_date($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE, 'day', 'tzuser') . ' - ' . dol_print_date($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE, 'day', 'tzuser');
 		$json['RiskAssessmentDocument']['emetteurDUER']   = $user->lastname . ' ' . $user->firstname;
 		$json['RiskAssessmentDocument']['dateGeneration'] = dol_print_date($now, 'dayhour', 'tzuser');
@@ -120,10 +120,22 @@ class RiskAssessmentDocument extends DigiriskDocuments
      */
     public function generateArchiveWithDigiriskElementDocuments($moreparams, $outputLangs, $hideDetails, $hideDesc, $hideRef)
     {
-        global $langs, $user;
+        global $conf, $langs, $user;
 
         if (!getDolGlobalInt('DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS')) {
             return 0;
+        }
+
+        // Both values come from the caller. An empty one turns every path below into a relative
+        // one, and dol_copy() then fails on a truncated name instead of naming the real cause.
+        if (!dol_strlen($moreparams['uploadDir'] ?? '')) {
+            $this->error = $langs->trans('ErrorDirNotFound', $this->module . ' (entity ' . (int) $conf->entity . ')');
+            return -1;
+        }
+
+        if (!dol_strlen($this->last_main_doc)) {
+            $this->error = $langs->trans('ErrorFileNotFound', $this->ref);
+            return -1;
         }
 
         $digiriskElements = $moreparams['digiriskElement']->fetchDigiriskElementFlat(0);

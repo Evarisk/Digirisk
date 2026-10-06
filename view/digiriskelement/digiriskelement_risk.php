@@ -235,9 +235,11 @@ $form    = new Form($db);
 $title   = digirisk_trans_risk_type('', $riskType, 's');
 $helpUrl = 'FR:Module_Digirisk#.C3.89valuation_des_Risques';
 
-// classforhorizontalscrolloftabs constrains #id-right width so the wide risk list table
-// scrolls inside its own .div-table-responsive instead of widening the whole page
-digirisk_header($title, $helpUrl, [], [], '', 'classforhorizontalscrolloftabs');
+// digirisk-horizontal-scroll bounds #id-right to the viewport so the wide risk list table
+// scrolls inside its own .div-table-responsive instead of widening the whole page. Dolibarr
+// answers this with classforhorizontalscrolloftabs, but that one also reserves the width of
+// the standard left menu, which these pages do not show
+digirisk_header($title, $helpUrl, [], [], '', 'digirisk-horizontal-scroll');
 
 if ($conf->browser->layout == 'phone') {
     $onPhone = 1;
@@ -424,7 +426,15 @@ if ($object->id > 0) {
 		require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_sharedrisklist_view.tpl.php';
 	}
 
-	require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_psychosocial_risk_modal.tpl.php';
+	// Chaque méthode d'évaluation des risques psychosociaux s'active depuis la configuration des
+	// risques, la grille RPS-DU n'étant de surcroît proposée que sur les risques professionnels
+	if (getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_METHOD', 1)) {
+		require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_psychosocial_risk_modal.tpl.php';
+	}
+
+	if ($riskType == 'risk' && getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_GRID_METHOD', 1)) {
+		require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_psychosocial_risk_grid_modal.tpl.php';
+	}
 }
 
 ?>

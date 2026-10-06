@@ -79,99 +79,19 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
         $this->height      = 6;
         $this->orientation = 'P';
         $this->version     = '1.0.0';
+
+        // Table style of this document, drawTable() itself living in SaturneDocumentModel
+        $this->tableTitleColor         = [211, 89, 104];
+        $this->tableTitleHeight        = 7;
+        $this->tableTitleAlign         = 'L';
+        $this->tableLabelFillColor     = [245, 245, 245];
+        $this->tableDefaultAlign       = 'L';
+        $this->tableCellFontSizeOffset = 1;
+        $this->tableSpaceAfter         = 3;
+        $this->keepTableTogether       = true;
+        $this->tableFillEmptyCells     = true;
     }
 
-    /**
-     * Add a page when the block about to be written would not fit on the current one.
-     *
-     * @param  TCPDF $pdf          PDF handler
-     * @param  float $neededHeight Height the next block needs
-     * @return void
-     */
-    public function checkPageBreak($pdf, float $neededHeight)
-    {
-        if ($pdf->GetY() + $neededHeight + $pdf->getBreakMargin() > $pdf->getPageHeight()) {
-            $pdf->AddPage();
-            $pdf->SetY($this->marge_haute);
-        }
-    }
-
-    /**
-     * Draw one titled table.
-     *
-     * Rows are arrays of cells, a cell being either a string or ['text' => string, 'label' => 1]
-     * for the bold left column. Same contract as the ticket document model.
-     *
-     * @param  TCPDF $pdf             PDF handler
-     * @param  array $table           Table definition: title, widths, rows
-     * @param  float $tableWidth      Total width of the table
-     * @param  float $lineHeight      Height of a single line
-     * @param  float $defaultFontSize Font size of the document
-     * @return void
-     */
-    public function drawTable($pdf, array $table, float $tableWidth, float $lineHeight, float $defaultFontSize)
-    {
-        global $langs;
-
-        if (!isset($table['rows'], $table['widths']) || empty($table['rows'])) {
-            return;
-        }
-
-        $this->checkPageBreak($pdf, $lineHeight * (count($table['rows']) + 1));
-
-        if (!empty($table['title'])) {
-            $pdf->SetFont('', 'B', $defaultFontSize);
-            $pdf->SetFillColor(211, 89, 104);
-            $pdf->SetTextColor(255, 255, 255);
-            $pdf->SetX($this->marge_gauche);
-            $pdf->Cell($tableWidth, 7, $table['title'], 1, 1, 'L', true);
-            $pdf->SetTextColor(0, 0, 0);
-        }
-
-        $widths = $table['widths'];
-
-        foreach ($table['rows'] as $cells) {
-            // A row is as tall as its tallest cell, otherwise a long text overlaps the next line
-            $maxHeight = $lineHeight;
-            foreach ($cells as $index => $cellData) {
-                if (!isset($widths[$index])) {
-                    continue;
-                }
-                $cell   = is_array($cellData) ? ($cellData['text'] ?? '') : $cellData;
-                $height = $pdf->getNumLines((string) $cell, $widths[$index]) * $lineHeight;
-                if ($height > $maxHeight) {
-                    $maxHeight = $height;
-                }
-            }
-
-            $this->checkPageBreak($pdf, $maxHeight);
-            $pdf->SetX($this->marge_gauche);
-
-            foreach ($cells as $index => $cellData) {
-                if (!isset($widths[$index])) {
-                    continue;
-                }
-                $isLabel = is_array($cellData) && !empty($cellData['label']);
-                $cell    = is_array($cellData) ? ($cellData['text'] ?? '') : $cellData;
-                if (!dol_strlen((string) $cell)) {
-                    $cell = $langs->transnoentities('NoData');
-                }
-
-                $pdf->SetFont('', $isLabel ? 'B' : '', $defaultFontSize - 1);
-                if ($isLabel) {
-                    $pdf->SetFillColor(245, 245, 245);
-                }
-
-                $x = $pdf->GetX();
-                $y = $pdf->GetY();
-                $pdf->MultiCell($widths[$index], $maxHeight, (string) $cell, 1, 'L', $isLabel, 0, $x, $y, true, 0, false, true, $maxHeight, 'M');
-                $pdf->SetXY($x + $widths[$index], $y);
-            }
-            $pdf->Ln($maxHeight);
-        }
-
-        $pdf->Ln(3);
-    }
 
     /**
      * Show the top header of the page: company logo, document title and object ref.
@@ -294,6 +214,26 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
             ],
         ];
 
+        // The ITAMAMI grid stays out of the report when the investigation does not use the
+        // method : an investigation filled before it existed would show five empty lines
+        $itamamiFields = ['ItamamiIndividual' => 'itamami_individual', 'ItamamiTask' => 'itamami_task', 'ItamamiActivity' => 'itamami_activity', 'ItamamiMaterial' => 'itamami_material', 'ItamamiEnvironment' => 'itamami_environment'];
+        $itamamiRows   = [];
+        $itamamiFilled = 0;
+        foreach ($itamamiFields as $itamamiLabel => $itamamiKey) {
+            $itamamiRows[] = [['text' => $outputLangs->transnoentities($itamamiLabel), 'label' => 1], $data[$itamamiKey]];
+            if (dol_strlen((string) $data[$itamamiKey]) > 0) {
+                $itamamiFilled = 1;
+            }
+        }
+
+        if (!empty($itamamiFilled)) {
+            $tables[] = [
+                'title'  => $outputLangs->transnoentities('ItamamiMethod'),
+                'widths' => $widths,
+                'rows'   => $itamamiRows,
+            ];
+        }
+
         $tables[] = [
             'title'  => $outputLangs->transnoentities('ActionsTab'),
             'widths' => $widths,
@@ -343,6 +283,8 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
         require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_accidentinvestigation.lib.php';
         require_once __DIR__ . '/../../../../../../saturne/class/task/saturnetask.class.php';
 
+        $moreParam = self::getMoreParam($objectDocument, $moreParam);
+
         $object = $moreParam['object'];
 
         // Lastname / Firstname live in companies, the action labels in projects: without this the
@@ -385,7 +327,9 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
         $pdf->SetAuthor($outputLangs->convToOutputCharset($user->getFullName($outputLangs)));
         $pdf->SetMargins($this->marge_gauche, $this->marge_haute, $this->marge_droite);
         $pdf->setPageOrientation($this->orientation, 1, $this->marge_basse);
-        $pdf->SetAutoPageBreak(1, $this->marge_basse);
+        // The footer is written in the band above marge_basse, so its height belongs to the
+        // break margin : without it the body of a long report is drawn over the footer
+        $pdf->SetAutoPageBreak(1, $this->marge_basse + $this->height);
 
         $pdf->AddPage();
         $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $defaultFontSize);
@@ -412,7 +356,8 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
             $pdf->Image($data['causality_tree_photo'], $this->marge_gauche, $pdf->GetY(), $tableWidth);
         }
 
-        $this->_pagefooter($pdf, $object, $outputLangs, $defaultFontSize);
+        // An investigation spreads over several pages : each one gets its footer
+        $this->drawFooterOnEveryPage($pdf, $object, $outputLangs, $defaultFontSize);
 
         try {
             $pdf->Output($file, 'F');
@@ -465,6 +410,11 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
             'collective_equipment'     => $object->collective_equipment,
             'individual_equipment'     => $object->individual_equipment,
             'circumstances'            => $object->circumstances,
+            'itamami_individual'       => $object->itamami_individual,
+            'itamami_task'             => $object->itamami_task,
+            'itamami_activity'         => $object->itamami_activity,
+            'itamami_material'         => $object->itamami_material,
+            'itamami_environment'      => $object->itamami_environment,
             'public_note'              => $object->note_public,
             'relative_location'        => $accidentMetadata->relative_location,
             'accident_date'            => dol_print_date($accident->accident_date, 'day'),

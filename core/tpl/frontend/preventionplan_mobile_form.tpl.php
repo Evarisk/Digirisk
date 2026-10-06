@@ -62,7 +62,7 @@ foreach ($signalisationCategories as $signalisationItem) {
           data-risk-comment-label="<?php print dol_escape_htmltag($langs->trans('MobilePPRiskComment')); ?>"
           data-mandatory-label="<?php print dol_escape_htmltag($langs->trans('MobilePPMandatory')); ?>"
           data-risk-start-index="<?php print count($prefill['risks']); ?>"
-          data-delete-risk-label="<?php print dol_escape_htmltag($langs->trans('MobilePPDeleteRiskConfirm')); ?>"
+          data-delete-risk-label="<?php print dol_escape_htmltag($langs->trans('MobilePPDeleteRiskConfirm', '%s')); ?>"
           data-cert-start-index="<?php print count($prefill['certifications']); ?>">
         <input type="hidden" name="token" value="<?php print newToken(); ?>">
         <input type="hidden" name="action" value="add_mobile">
@@ -83,7 +83,7 @@ foreach ($signalisationCategories as $signalisationItem) {
                 [
                     'title'   => $langs->trans('MobilePPStepCreated'),
                     'status'  => !empty($isEdit) ? $langs->transnoentities('MobileStepDone') : $langs->transnoentities('MobileStepInProgress'),
-                    'date'    => dol_print_date(dol_now(), 'day'),
+                    'date'    => dol_print_date(dol_now(), 'day', 'tzuser'),
                     'done'    => !empty($isEdit),
                     'current' => empty($isEdit),
                     'viewBox' => $workflowIcons['created']['viewBox'],
@@ -131,17 +131,17 @@ foreach ($signalisationCategories as $signalisationItem) {
             ?>
             
             <div class="digirisk-mobile-field" style="margin-bottom: 15px;">
-                <label><?php print $langs->trans('MobilePPMotif') != 'MobilePPMotif' ? $langs->trans('MobilePPMotif') : 'Motif de l\'intervention'; ?> *</label>
+                <label><?php print $langs->trans('MobilePPMotif') != 'MobilePPMotif' ? $langs->trans('MobilePPMotif') : 'Motif de l\'intervention'; ?> <span class="digirisk-mobile-required">*</span></label>
                 <input type="text" name="label" class="digirisk-mobile-label" required placeholder="Ex: Maintenance annuelle" value="<?php print dol_escape_htmltag($prefill['label'] ?? ''); ?>">
             </div>
 
             <div class="digirisk-mobile-row">
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('DateStart'); ?> *</label>
+                    <label><?php print $langs->trans('DateStart'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="date" name="date_start" class="digirisk-mobile-date-start" value="<?php print dol_escape_htmltag($prefill["date_start"]); ?>">
                 </div>
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('DateEnd'); ?> *</label>
+                    <label><?php print $langs->trans('DateEnd'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="date" name="date_end" class="digirisk-mobile-date-end" value="<?php print dol_escape_htmltag($prefill["date_end"]); ?>">
                 </div>
             </div>
@@ -297,11 +297,11 @@ foreach ($signalisationCategories as $signalisationItem) {
 
             <div class="digirisk-mobile-row">
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('CompanyName'); ?> *</label>
+                    <label><?php print $langs->trans('CompanyName'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="text" name="ext_society_name" class="digirisk-mobile-ext-society-name" value="<?php print dol_escape_htmltag($prefill["ext_society_name"]); ?>">
                 </div>
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('MobileSirenOrSiret'); ?> *</label>
+                    <label><?php print $langs->trans('MobileSirenOrSiret'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="text" name="siren" class="digirisk-mobile-siren-input" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="<?php print dol_escape_htmltag($langs->trans('MobileSirenOrSiretPlaceholder')); ?>" value="<?php print dol_escape_htmltag($prefill["siren"]); ?>" pattern="[\d\s]{9,20}" title="SIREN/SIRET (9 ou 14 chiffres)">
                 </div>
             </div>
@@ -336,17 +336,17 @@ foreach ($signalisationCategories as $signalisationItem) {
             </div>
             <div class="digirisk-mobile-row">
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('Lastname'); ?> *</label>
+                    <label><?php print $langs->trans('Lastname'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="text" name="resp_lastname" class="digirisk-mobile-resp-lastname" value="<?php print dol_escape_htmltag($prefill["resp_lastname"]); ?>">
                 </div>
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('Firstname'); ?> *</label>
+                    <label><?php print $langs->trans('Firstname'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="text" name="resp_firstname" class="digirisk-mobile-resp-firstname" value="<?php print dol_escape_htmltag($prefill["resp_firstname"]); ?>">
                 </div>
             </div>
             <div class="digirisk-mobile-row">
                 <div class="digirisk-mobile-field">
-                    <label><?php print $langs->trans('Email'); ?> *</label>
+                    <label><?php print $langs->trans('Email'); ?> <span class="digirisk-mobile-required">*</span></label>
                     <input type="email" name="resp_email" class="digirisk-mobile-resp-email" autocomplete="off" value="<?php print dol_escape_htmltag($prefill["resp_email"]); ?>" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" title="<?php print $langs->trans('MobilePPErrorInvalidEmail') ?: 'Veuillez saisir une adresse email valide.'; ?>">
                 </div>
                 <div class="digirisk-mobile-field">
@@ -385,23 +385,28 @@ foreach ($signalisationCategories as $signalisationItem) {
         // Tags of the plan (native preventionplan category type). Tant qu'aucune categorie n'est
         // declaree, le multiselect s'affichait vide sans rien dire : on annonce l'absence et on
         // donne le lien pour en creer une plutot que de laisser chercher.
+        // Le lien reste propose quand des tags existent deja, et la liste est toujours rendue, meme
+        // vide : un tag cree dans l'autre onglet y est ajoute au retour, sans recharger le formulaire.
         if (isModEnabled('categorie')) {
             $planTagOptions = $form->select_all_categories('digiriskpreventionplan', '', 'parent', 64, 0, 1);
             $planTagOptions = is_array($planTagOptions) ? $planTagOptions : [];
         ?>
-        <div class="digirisk-mobile-card">
-            <div class="digirisk-mobile-card__title"><i class="fas fa-tags"></i> <?php print $langs->trans('Categories'); ?></div>
-            <?php if (!empty($planTagOptions)) {
-                print $form->multiselectarray('categories', $planTagOptions, $prefill['categories'], '', 0, 'digirisk-mobile-tags-select minwidth500 width100p');
-            } else { ?>
-            <div class="digirisk-mobile-empty">
+        <div class="digirisk-mobile-card digirisk-mobile-tags" data-tags-url="<?php print dol_escape_htmltag(dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_preventionplan_tags.php', 1)); ?>">
+            <div class="digirisk-mobile-card__title">
+                <i class="fas fa-tags"></i> <?php print $langs->trans('MobileTags'); ?>
+                <span class="digirisk-mobile-tooltip digirisk-mobile-tooltip--start" tabindex="0" aria-label="<?php print dol_escape_htmltag($langs->trans('MobileTagsInfo')); ?>">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="digirisk-mobile-tooltip__bubble" role="tooltip"><?php print $langs->trans('MobilePPTagsHelp'); ?></span>
+                </span>
+            </div>
+            <?php print $form->multiselectarray('categories', $planTagOptions, $prefill['categories'], '', 0, 'digirisk-mobile-tags-select minwidth500 width100p'); ?>
+            <div class="digirisk-mobile-empty digirisk-mobile-tags__empty<?php print !empty($planTagOptions) ? ' hidden' : ''; ?>">
                 <i class="fas fa-info-circle"></i>
                 <span><?php print $langs->trans('MobilePPNoTagAvailable'); ?></span>
             </div>
             <a class="digirisk-mobile-empty__action" href="<?php print DOL_URL_ROOT . '/categories/card.php?action=create&type=digiriskpreventionplan'; ?>" target="_blank">
                 <i class="fas fa-plus-circle"></i> <?php print $langs->trans('MobilePPCreateTag'); ?>
             </a>
-            <?php } ?>
         </div>
         <?php } ?>
 

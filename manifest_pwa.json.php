@@ -60,7 +60,14 @@ if (!defined('NOBROWSERNOTIF')) {
     define('NOBROWSERNOTIF', 1);
 }
 
-require_once __DIR__ . '/../../main.inc.php';
+// Load Dolibarr environment
+if (file_exists('../main.inc.php')) {
+    require_once __DIR__ . '/../main.inc.php';
+} elseif (file_exists('../../main.inc.php')) {
+    require_once __DIR__ . '/../../main.inc.php';
+} else {
+    die('Include of main fails');
+}
 
 top_httphead('text/json');
 
@@ -95,7 +102,15 @@ $img->type         = 'image/png';
 $img->sizes        = '512x512';
 $manifest->icons[] = $img;
 
-$manifest->id               = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_home.php', 1);
+// Android crops the home screen icon to its own shape: this one keeps the logo inside the safe zone
+$img               = new stdClass();
+$img->src          = dol_buildpath('/custom/digiriskdolibarr/img/pwa/icon-maskable-512.png', 1);
+$img->type         = 'image/png';
+$img->sizes        = '512x512';
+$img->purpose      = 'maskable';
+$manifest->icons[] = $img;
+
+$manifest->id              = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_home.php', 1);
 $manifest->start_url        = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_home.php', 1);
 $manifest->background_color = '#ffffff';
 $manifest->display          = 'standalone';
@@ -103,12 +118,14 @@ $manifest->display_override = ['window-controls-overlay'];
 // The mobile creation screens live outside view/frontend/, so the scope covers the whole module
 $manifest->scope            = dol_buildpath('/custom/digiriskdolibarr/', 1);
 $manifest->theme_color      = '#2b7de9';
-$manifest->description      = 'Consultez et creez vos plans de prevention et vos permis de feu depuis votre telephone';
+$manifest->description      = 'Consultez et créez vos plans de prévention et vos permis de feu depuis votre téléphone.';
+$manifest->lang             = 'fr';
+$manifest->categories       = ['business', 'productivity'];
 
 // Shortcuts offered by a long press on the installed application icon.
 // They open the lists, which are the single entry point to the creation screens.
 $shortcut              = new stdClass();
-$shortcut->name        = 'Plans de prevention';
+$shortcut->name        = 'Plans de prévention';
 $shortcut->short_name  = 'Plans';
 $shortcut->url         = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_preventionplan_list.php', 1);
 $manifest->shortcuts[] = $shortcut;
@@ -119,19 +136,37 @@ $shortcut->short_name  = 'Permis';
 $shortcut->url         = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_firepermit_list.php', 1);
 $manifest->shortcuts[] = $shortcut;
 
-$img                     = new stdClass();
-$img->src                = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr_color_512.png', 1);
-$img->type               = 'image/png';
-$img->sizes              = '512x512';
-$img->form_factor        = 'narrow';
-$manifest->screenshots[] = $img;
+$shortcut              = new stdClass();
+$shortcut->name        = 'Rondes apres travaux';
+$shortcut->short_name  = 'Rondes';
+$shortcut->url         = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_firepermit_rounds.php', 1);
+$manifest->shortcuts[] = $shortcut;
 
-$img                     = new stdClass();
-$img->src                = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr_color_512.png', 1);
-$img->type               = 'image/png';
-$img->sizes              = '512x512';
-$img->form_factor        = 'wide';
-$manifest->screenshots[] = $img;
+// Pictures of the install dialog, in display order: the presentation visual first, then one per screen.
+// Chrome shows the portrait (narrow) ones on a phone and the landscape (wide) ones on a computer, at most
+// 8 entries in all, and drops a picture whose aspect ratio differs from the first one shown.
+// Made from a demo data set, they are the same for every entity.
+$screenshots = [
+    'narrow' => ['file_prefix' => 'pwa-narrow', 'sizes' => '720x1560'],
+    'wide'   => ['file_prefix' => 'pwa-wide', 'sizes' => '1920x1080'],
+];
+$screenshotLabels = [
+    ''        => 'Digirisk : plans de prévention et permis de feu sur votre téléphone',
+    '-create' => 'Un plan de prévention en quelques minutes',
+    '-list'   => 'Retrouvez chaque plan en un instant',
+    '-home'   => 'Tout ce qui vous attend, dès l\'ouverture',
+];
+foreach ($screenshots as $formFactor => $screenshot) {
+    foreach ($screenshotLabels as $fileSuffix => $label) {
+        $img                     = new stdClass();
+        $img->src                = dol_buildpath('/custom/digiriskdolibarr/img/pwa/' . $screenshot['file_prefix'] . $fileSuffix . '.jpg', 1);
+        $img->type               = 'image/jpeg';
+        $img->sizes              = $screenshot['sizes'];
+        $img->form_factor        = $formFactor;
+        $img->label              = $label;
+        $manifest->screenshots[] = $img;
+    }
+}
 
 print json_encode($manifest);
 

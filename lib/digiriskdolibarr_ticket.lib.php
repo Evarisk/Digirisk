@@ -261,29 +261,130 @@ function ticketstats_prepare_head(): array
 /**
  * Load ticket infos
  *
+ * The GP/UT a ticket belongs to used to be resolved with an INNER JOIN on the
+ * digiriskdolibarr_ticket_service extrafield. That field is a chkbxlst, so it holds a
+ * comma-separated list of ids: the join silently dropped every ticket carrying several
+ * GP/UT and every ticket carrying none. Combined with the "d.status = validated"
+ * condition, a ticket whose GP/UT had been deleted disappeared too. The elements are now
+ * resolved in PHP, so a register is always listed whatever its GP/UT — issue #4459.
+ *
  * @param  array     $moreParam More param (filterTicket)
  * @return array     $array     Array of tickets
  * @throws Exception
  */
 function load_ticket_infos(array $moreParam = []): array
 {
-    // Load DigiriskDolibarr libraries
-    require_once __DIR__ . '/../class/digiriskelement.class.php';
-
     $array = [];
 
-    $select           = ', d.ref AS digiriskElementRef, d.label AS digiriskElementLabel';
-    $moreSelects      = ['digiriskElementRef', 'digiriskElementLabel'];
-    $join             = ' INNER JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement AS d ON d.rowid = eft.digiriskdolibarr_ticket_service';
-    $filter           = 't.fk_project = ' . getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PROJECT') . ' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ($moreParam['filterTicket'] ?? '');
-    $array['tickets'] = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  ['customsql' => $filter], 'AND', true, true, false, $join, [], $select, $moreSelects);
+    $filter           = 't.fk_project = ' . getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PROJECT') . ($moreParam['filterTicket'] ?? '');
+    $array['tickets'] = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => $filter], 'AND', true, true);
     if (!is_array($array['tickets']) || empty($array['tickets'])) {
         $array['tickets'] = [];
     }
 
+    digiriskdolibarr_ticket_set_digirisk_elements($array['tickets']);
+    digiriskdolibarr_ticket_set_status($array['tickets']);
+
     $array['nbTickets'] = count($array['tickets']);
 
     return $array;
+}
+
+/**
+ * Mirror the fk_statut column onto the status property of each ticket — issue #5235
+ *
+ * Ticket declares its status column as fk_statut but reads it from $status everywhere,
+ * Ticket::fetch() being the only place that copies one onto the other. A ticket loaded
+ * through the generic setVarsFromFetchObj() of saturne_fetch_all_object_type() therefore
+ * keeps a null $status, Ticket::LibStatut() matches its case 0 on that null, returns an
+ * empty label, and the register lists of the documents print "N/A" in their status column.
+ *
+ * @param  array $tickets Tickets to complete, each one gets its status property set
+ * @return void
+ */
+function digiriskdolibarr_ticket_set_status(array $tickets): void
+{
+    foreach ($tickets as $ticket) {
+        if (!isset($ticket->status) && isset($ticket->fk_statut)) {
+            $ticket->status = (int) $ticket->fk_statut;
+        }
+    }
+}
+
+/**
+ * Set on each ticket the "REF - Label" list of the GP/UT it is attached to — issue #4459
+ *
+ * The digiriskdolibarr_ticket_service extrafield is a chkbxlst, so its raw value is a
+ * comma-separated list of digirisk element ids. Every element is read in a single query,
+ * deleted ones included: a register must keep naming where the event happened even once
+ * the GP/UT is gone.
+ *
+ * @param  array $tickets Tickets to complete, each one gets a digiriskElementRefLabel property
+ * @return void
+ */
+function digiriskdolibarr_ticket_set_digirisk_elements(array $tickets): void
+{
+    global $db;
+
+    $elementIds = [];
+    foreach ($tickets as $ticket) {
+        $ticket->digiriskElementRefLabel = '';
+        foreach (digiriskdolibarr_ticket_service_ids($ticket) as $elementId) {
+            $elementIds[$elementId] = $elementId;
+        }
+    }
+
+    if (empty($elementIds)) {
+        return;
+    }
+
+    $sql   = 'SELECT rowid, ref, label FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement';
+    $sql  .= ' WHERE rowid IN (' . $db->sanitize(implode(',', $elementIds)) . ')';
+    $resql = $db->query($sql);
+    if (!$resql) {
+        dol_syslog(__FUNCTION__ . ' ' . $db->lasterror(), LOG_ERR);
+        return;
+    }
+
+    $elements = [];
+    while ($obj = $db->fetch_object($resql)) {
+        $elements[(int) $obj->rowid] = $obj->ref . ' - ' . $obj->label;
+    }
+    $db->free($resql);
+
+    foreach ($tickets as $ticket) {
+        $refLabels = [];
+        foreach (digiriskdolibarr_ticket_service_ids($ticket) as $elementId) {
+            if (!empty($elements[$elementId])) {
+                $refLabels[] = $elements[$elementId];
+            }
+        }
+
+        $ticket->digiriskElementRefLabel = implode(', ', $refLabels);
+    }
+}
+
+/**
+ * Read the digirisk element ids stored in the chkbxlst ticket_service extrafield
+ *
+ * @param  object $ticket Ticket carrying the extrafield
+ * @return int[]          Digirisk element ids, empty when no GP/UT is set
+ */
+function digiriskdolibarr_ticket_service_ids($ticket): array
+{
+    $rawValue = $ticket->array_options['options_digiriskdolibarr_ticket_service'] ?? '';
+    if (is_array($rawValue)) {
+        $rawValue = implode(',', $rawValue);
+    }
+
+    $elementIds = [];
+    foreach (explode(',', (string) $rawValue) as $elementId) {
+        if ((int) $elementId > 0) {
+            $elementIds[] = (int) $elementId;
+        }
+    }
+
+    return $elementIds;
 }
 
 /**
@@ -391,4 +492,201 @@ function digiriskdolibarr_ticket_conversation_bubble($langs, $conf, stdClass $m,
     $out .= '</div></li>';
 
     return $out;
+}
+
+/**
+ * Input mode of the Location field on the register form (issue #4732)
+ *
+ * @return string free : free text (historical behaviour), list : dictionary only,
+ *                listfree : dictionary plus an "Other" entry opening a free text field
+ */
+function digiriskdolibarr_ticket_location_input_mode(): string
+{
+    $mode = getDolGlobalString('DIGIRISKDOLIBARR_TICKET_LOCATION_INPUT_MODE', 'free');
+
+    return in_array($mode, ['free', 'list', 'listfree']) ? $mode : 'free';
+}
+
+/**
+ * Locations offered by the register form, read from the c_digiriskdolibarr_ticket_location dictionary
+ *
+ * The declared ticket stores the label as plain text, never the row id : renaming or
+ * deactivating a row must not rewrite the locations already recorded in the register.
+ * The array is therefore keyed by label, which is also the posted value.
+ *
+ * @return array<string,string> Labels of the active rows of the entity, ordered by position
+ */
+function digiriskdolibarr_ticket_location_dictionary(): array
+{
+    global $langs;
+
+    $locations = [];
+    foreach (digiriskdolibarr_ticket_location_records() as $record) {
+        // A row seeded with a translation key shows up translated, a row typed by the customer stays as typed
+        $label             = $langs->transnoentities($record->label);
+        $locations[$label] = $label;
+    }
+
+    return $locations;
+}
+
+/**
+ * Active rows of the location dictionary, ordered by position
+ *
+ * saturne_fetch_dictionary() selects a fixed list of columns that leaves out fk_digiriskelement,
+ * the column the GP/UT filtering of the register form is built on, hence this reader (issue #5176)
+ *
+ * @return stdClass[] Rows carrying rowid, label and fk_digiriskelement
+ */
+function digiriskdolibarr_ticket_location_records(): array
+{
+    global $db;
+
+    $sql  = 'SELECT t.rowid, t.label, t.fk_digiriskelement';
+    $sql .= ' FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_ticket_location as t';
+    $sql .= ' WHERE t.active = 1';
+    $sql .= ' AND t.entity IN (0, ' . getEntity('c_digiriskdolibarr_ticket_location') . ')';
+    $sql .= $db->order('t.position', 'ASC');
+
+    $resql = $db->query($sql);
+    if (!$resql) {
+        return [];
+    }
+
+    $records = [];
+    while ($obj = $db->fetch_object($resql)) {
+        if (!dol_strlen($obj->label)) {
+            continue;
+        }
+
+        $records[] = $obj;
+    }
+    $db->free($resql);
+
+    return $records;
+}
+
+/**
+ * GP/UT each location of the dictionary is offered on (issue #5176)
+ *
+ * A location attached to a site or to a GP stays offered on everything underneath, otherwise it
+ * would have to be declared again on each work unit. A location attached to nothing, or attached
+ * to an element of another entity, is offered everywhere and carries an empty list.
+ *
+ * @return array<string,int[]> Label => digirisk element ids, empty array when offered everywhere
+ */
+function digiriskdolibarr_ticket_location_element_map(): array
+{
+    global $db, $langs;
+
+    $records = digiriskdolibarr_ticket_location_records();
+    if (empty($records)) {
+        return [];
+    }
+
+    require_once __DIR__ . '/../class/digiriskelement.class.php';
+
+    $digiriskElement  = new DigiriskElement($db);
+    $digiriskElements = $digiriskElement->getActiveDigiriskElements();
+    if (!is_array($digiriskElements)) {
+        $digiriskElements = [];
+    }
+
+    $childrenByParent = [];
+    foreach ($digiriskElements as $element) {
+        $childrenByParent[(int) $element->fk_parent][] = (int) $element->id;
+    }
+
+    $map = [];
+    foreach ($records as $record) {
+        $label     = $langs->transnoentities($record->label);
+        $elementID = (int) $record->fk_digiriskelement;
+
+        // An element that the current entity cannot see leaves the location offered everywhere,
+        // rather than filtered out of every GP/UT of that entity
+        $map[$label] = isset($digiriskElements[$elementID]) ? digiriskdolibarr_element_with_descendants($elementID, $childrenByParent) : [];
+    }
+
+    return $map;
+}
+
+/**
+ * An element id followed by the ids of everything below it
+ *
+ * @param  int               $elementID        Digirisk element to walk down from
+ * @param  array<int,int[]>  $childrenByParent Element ids indexed by their parent id
+ * @return int[]                               The element id and its descendants
+ */
+function digiriskdolibarr_element_with_descendants(int $elementID, array $childrenByParent): array
+{
+    $elementIDs = [$elementID];
+    $toVisit    = [$elementID];
+
+    // Walked iteratively and guarded against ids already seen : a corrupted parent chain
+    // must not turn into an infinite loop on the public form
+    while (!empty($toVisit)) {
+        $currentID = array_pop($toVisit);
+        foreach ($childrenByParent[$currentID] ?? [] as $childID) {
+            if (in_array($childID, $elementIDs)) {
+                continue;
+            }
+
+            $elementIDs[] = $childID;
+            $toVisit[]    = $childID;
+        }
+    }
+
+    return $elementIDs;
+}
+
+/**
+ * Tell whether the register form must offer the dictionary for the Location field
+ *
+ * An empty dictionary falls back to the free text field : a list mode must never
+ * leave the declarant with no way to fill a required field.
+ *
+ * @param  array<string,string> $locations Result of digiriskdolibarr_ticket_location_dictionary()
+ * @return bool                            True when the select must be rendered
+ */
+function digiriskdolibarr_ticket_location_use_list(array $locations): bool
+{
+    return !empty($locations) && digiriskdolibarr_ticket_location_input_mode() !== 'free';
+}
+
+/**
+ * Modèles d'email utilisables pour un ticket, pour un sélecteur de configuration — issue #5235
+ *
+ * Même périmètre que le socle : les types de modèle ticket, ticket_send et all, actifs et
+ * visibles depuis l'entité courante. L'entrée vide est celle qui conserve le contenu écrit
+ * en dur, de sorte qu'une configuration jamais touchée ne change rien aux envois en place.
+ *
+ * @return array Libellé du modèle en clé, libellé affiché en valeur
+ */
+function digiriskdolibarr_ticket_mail_models(): array
+{
+    global $db, $langs;
+
+    $mailModels = ['' => $langs->transnoentities('TicketSubmittedMailModelDefault')];
+
+    $sql  = 'SELECT label, lang FROM ' . MAIN_DB_PREFIX . 'c_email_templates';
+    $sql .= " WHERE type_template IN ('ticket', 'ticket_send', 'all')";
+    $sql .= ' AND entity IN (' . getEntity('c_email_templates') . ')';
+    $sql .= ' AND active = 1';
+    $sql .= $db->order('position, label', 'ASC, ASC');
+
+    $resql = $db->query($sql);
+    if (!$resql) {
+        dol_syslog(__FUNCTION__ . ' ' . $db->lasterror(), LOG_ERR);
+        return $mailModels;
+    }
+
+    while ($obj = $db->fetch_object($resql)) {
+        if (empty($obj->label)) {
+            continue;
+        }
+        $mailModels[$obj->label] = $obj->label . (!empty($obj->lang) ? ' (' . $obj->lang . ')' : '');
+    }
+    $db->free($resql);
+
+    return $mailModels;
 }

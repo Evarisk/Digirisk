@@ -46,7 +46,8 @@ $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 
 // Security check
-$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
 /*
@@ -79,6 +80,9 @@ if ($action == 'set_closed_limit') {
     header('Location: ' . $_SERVER['PHP_SELF']);
     exit;
 }
+
+// Actions set_mod, update_mask and the set_/del_ switch of the module constants
+require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
 /*
  * View
@@ -136,7 +140,7 @@ foreach ($ticketKanbanLogs as $constName => $transKeys) {
     }
     print '</td>';
     print '<td class="center">';
-    print ajax_constantonoff($constName);
+    print saturne_constant_onoff($constName, $permissiontowrite);
     print '</td>';
     print '</tr>';
 }

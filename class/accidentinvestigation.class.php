@@ -120,6 +120,11 @@ class AccidentInvestigation extends SaturneObject
         'collective_equipment'  => ['type' => 'html',         'label' => 'CollectiveEquipment',    'enabled' => 1, 'position' => 140, 'notnull' => 0, 'visible' => -1,],
         'individual_equipment'  => ['type' => 'html',         'label' => 'IndividualEquipment',    'enabled' => 1, 'position' => 150, 'notnull' => 0, 'visible' => -1,],
         'circumstances'         => ['type' => 'html',         'label' => 'Circumstances',          'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => -1,],
+        'itamami_individual'    => ['type' => 'text',         'label' => 'ItamamiIndividual',      'enabled' => 1, 'position' => 161, 'notnull' => 0, 'visible' => -1, 'help' => 'ItamamiIndividualHelp'],
+        'itamami_task'          => ['type' => 'text',         'label' => 'ItamamiTask',            'enabled' => 1, 'position' => 162, 'notnull' => 0, 'visible' => -1, 'help' => 'ItamamiTaskHelp'],
+        'itamami_activity'      => ['type' => 'text',         'label' => 'ItamamiActivity',        'enabled' => 1, 'position' => 163, 'notnull' => 0, 'visible' => -1, 'help' => 'ItamamiActivityHelp'],
+        'itamami_material'      => ['type' => 'text',         'label' => 'ItamamiMaterial',        'enabled' => 1, 'position' => 164, 'notnull' => 0, 'visible' => -1, 'help' => 'ItamamiMaterialHelp'],
+        'itamami_environment'   => ['type' => 'text',         'label' => 'ItamamiEnvironment',     'enabled' => 1, 'position' => 165, 'notnull' => 0, 'visible' => -1, 'help' => 'ItamamiEnvironmentHelp'],
         'causality_tree'        => ['type' => 'text',         'label' => 'CausalityTree',          'enabled' => 1, 'position' => 170, 'notnull' => 0, 'visible' => 0,],
         'fk_accident'           => ['type' => 'integer:Accident:digiriskdolibarr/class/accident/accident.class.php', 'label' => 'Accident', 'picto' => 'fontawesome_fa-user-injured_fas' ,'enabled' => 1, 'position' => 11, 'notnull' => 1, 'visible' => 1, 'foreignkey' => 'digiriskdolibarr_accident.rowid', 'css' => 'maxwidth300'],
         'fk_task'               => ['type' => 'integer:Task:projet/class/task.class.php',       'label' => 'Task',       'picto' => 'task',    'enabled' => 1, 'position' => 12,  'notnull' => 0, 'visible' => 5,  'noteditable' => 1, 'default' => null, 'foreignkey' => 'projet_task.rowid', 'help' => 'TaskWillBeCreatedAfterValidation'],
@@ -162,6 +167,31 @@ class AccidentInvestigation extends SaturneObject
      * @var string|null Circumstances
      */
     public ?string $circumstances = '';
+
+    /**
+     * @var string|null ITAMAMI - Individual factors
+     */
+    public ?string $itamami_individual = '';
+
+    /**
+     * @var string|null ITAMAMI - Prescribed task
+     */
+    public ?string $itamami_task = '';
+
+    /**
+     * @var string|null ITAMAMI - Real activity
+     */
+    public ?string $itamami_activity = '';
+
+    /**
+     * @var string|null ITAMAMI - Material
+     */
+    public ?string $itamami_material = '';
+
+    /**
+     * @var string|null ITAMAMI - Environment
+     */
+    public ?string $itamami_environment = '';
 
     /**
      * @var string|null Causality tree
@@ -258,6 +288,11 @@ class AccidentInvestigation extends SaturneObject
         $ret .= (dol_strlen($this->collective_equipment) > 0 ? $langs->transnoentities('CollectiveEquipment') . ' : ' . $this->collective_equipment . '<br>' : '');
         $ret .= (dol_strlen($this->individual_equipment) > 0 ? $langs->transnoentities('IndividualEquipment') . ' : ' . $this->individual_equipment . '<br>' : '');
         $ret .= (dol_strlen($this->circumstances) > 0 ? $langs->transnoentities('Circumstances') . ' : ' . $this->circumstances . '<br>' : '');
+        $ret .= (dol_strlen($this->itamami_individual) > 0 ? $langs->transnoentities('ItamamiIndividual') . ' : ' . $this->itamami_individual . '<br>' : '');
+        $ret .= (dol_strlen($this->itamami_task) > 0 ? $langs->transnoentities('ItamamiTask') . ' : ' . $this->itamami_task . '<br>' : '');
+        $ret .= (dol_strlen($this->itamami_activity) > 0 ? $langs->transnoentities('ItamamiActivity') . ' : ' . $this->itamami_activity . '<br>' : '');
+        $ret .= (dol_strlen($this->itamami_material) > 0 ? $langs->transnoentities('ItamamiMaterial') . ' : ' . $this->itamami_material . '<br>' : '');
+        $ret .= (dol_strlen($this->itamami_environment) > 0 ? $langs->transnoentities('ItamamiEnvironment') . ' : ' . $this->itamami_environment . '<br>' : '');
         $ret .= (dol_strlen($this->causality_tree) > 0 ? $langs->transnoentities('CausalityTree') . ' : ' . $this->causality_tree . '<br>' : '');
 
         return $ret;

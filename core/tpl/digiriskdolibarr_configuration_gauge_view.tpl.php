@@ -1,3 +1,29 @@
+<?php
+/**
+ * \file    core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php
+ * \ingroup digiriskdolibarr
+ * \brief   Template page for the configuration advancement gauge
+ */
+
+/**
+ * The following vars must be defined:
+ * Variables : $counter, $maxnumber
+ * Optional  : $kCounter (gauge suffix), $morecssGauge, $move_title_gauge
+ */
+
+// Aucune page appelante ne fournit ces variables : sans valeur par defaut, PHP emet un warning
+// pour chacune et, display_errors actif, son HTML est ecrit dans le <script> ci-dessous, qui
+// devient invalide. La jauge n'est alors jamais dessinee
+$morecssGauge     = $morecssGauge ?? '';
+$move_title_gauge = $move_title_gauge ?? 0;
+
+// Le suffixe rend uniques l'identifiant du canevas et les const du script : deux jauges sur une
+// meme page redeclareraient les memes const et le script s'arreterait
+if (!isset($kCounter)) {
+    $GLOBALS['digiriskGaugeCounter'] = ($GLOBALS['digiriskGaugeCounter'] ?? 0) + 1;
+    $kCounter                        = $GLOBALS['digiriskGaugeCounter'];
+}
+?>
 <div class="chart-container <?php echo $morecssGauge ?>" style=" width:50px">
 	<div class="wpeo-gridlayout grid-2">
 		<canvas class="" id="advancementGauge<?php echo $kCounter?>" width="40" height="40" style="width:50px !important"></canvas>

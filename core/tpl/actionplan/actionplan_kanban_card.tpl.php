@@ -19,6 +19,13 @@
     <div class="kanban-card-header">
         <a href="<?= $t['url'] ?>" class="kanban-card-ref" target="_blank"><?= dol_escape_htmltag($t['ref']) ?></a>
 
+        <?php // A late action of a past year, shown here because the carry over option is on ?>
+        <?php if (!empty($t['carried_over_from'])) : ?>
+            <span class="kanban-card-carried" title="<?= dol_escape_htmltag($langs->trans('ActionPlanCarriedOverHelp')) ?>">
+                <i class="fas fa-history"></i> <?= $langs->trans('ActionPlanCarriedOverFrom', $t['carried_over_from']) ?>
+            </span>
+        <?php endif; ?>
+
         <span class="kanban-meta-item kanban-editable-meta" data-field="planned_workload" data-task-id="<?= $t['id'] ?>"
               data-raw="<?= $t['planned_workload'] > 0 ? round($t['planned_workload'] / 3600, 2) : 0 ?>"
               title="<?= dol_escape_htmltag($langs->trans('PlannedWorkload')) ?>">
@@ -37,7 +44,19 @@
             $riskUrl = !empty($rd['fk_element']) ? DOL_URL_ROOT . '/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php?id=' . $rd['fk_element'] : '';
         ?>
             <a href="<?= $riskUrl ?>" class="kanban-card-risk kanban-risk-tooltip-trigger" style="background:<?= $cotColor ?>;color:<?= $textColor ?>" target="_blank">
-                <i class="fas fa-exclamation-triangle"></i> <?= dol_escape_htmltag($t['risk_ref']) ?>
+                <?php // The danger category thumbnail names the kind of risk, where the warning sign was the same for all — issue #5235 ?>
+                <?php if (!empty($rd['category_picto'])) : ?>
+                    <img class="kanban-risk-picto" src="<?= DOL_URL_ROOT ?>/custom/digiriskdolibarr/img/categorieDangers/<?= dol_escape_htmltag($rd['category_picto']) ?>.png" alt="" title="<?= dol_escape_htmltag($rd['category_name']) ?>">
+                <?php else : ?>
+                    <i class="fas fa-exclamation-triangle"></i>
+                <?php endif; ?>
+                <?= dol_escape_htmltag($t['risk_ref']) ?>
+                <?php // Cotation of the last assessment, until now only readable by hovering the card.
+                      // Keyed on that assessment rather than on the figure itself, so a risk that has
+                      // never been assessed shows nothing instead of a misleading 0 — issue #5235 ?>
+                <?php if (!empty($rd['ra_ref'])) : ?>
+                    <span class="kanban-risk-cotation"><?= (int) $rd['cotation'] ?></span>
+                <?php endif; ?>
                 <?php if (!empty($rd)) : ?>
                 <div class="kanban-risk-tooltip">
                     <div class="krt-header">
