@@ -277,12 +277,12 @@ ThePreventionplan                                     = le plan de prévention
 PreventionPlanDocument                                = Plan de prévention
 Preventionplandocument                                = Plan de prévention
 PreventionPlanDocumentGenerated                       = Génération du plan de prévention
-PreventionPlanList                                    = Liste des plans de prévention
+PreventionplanList                                    = Liste des plans de prévention
 PreventionPlanLine                                    = risque(s)
 PreventionPlanLineCreated                             = Création de risque dans Plan de Prévention
 PreventionPlanLineModified                            = Modification de risque dans Plan de Prévention
 PreventionPlanLineDeleted                             = Suppression de risque dans Plan de Prévention
-NewPreventionPlan                                     = Nouveau plan de prévention
+NewPreventionplan                                     = Nouveau plan de prévention
 PriorVisit                                            = Inspection commune préalable
 PriorVisitYesNo                                       = Visite préliminaire effectuée
 PriorVisitText                                        = Note de l'inspection
@@ -367,9 +367,9 @@ FirePermitMin  = permis de feu
 FirePermitsMin = permis de feu
 
 # Data - Donnée
-NewFirePermit                                     = Nouveau permis de feu
+NewFirepermit                                     = Nouveau permis de feu
 ModifyFirePermit                                  = Modifier le permis de feu
-FirePermitList                                    = Liste des permis de feu
+FirepermitList                                    = Liste des permis de feu
 FirePermit                                        = Permis de feu
 Firepermit                                        = Permis de feu
 TheFirepermit                                     = le permis de feu
