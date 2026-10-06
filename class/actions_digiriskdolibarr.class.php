@@ -1186,6 +1186,33 @@ class ActionsDigiriskdolibarr
     }
 
     /**
+     * Overloading the printFieldListSearch function : replacing the parent's function with the one below
+     *
+     * When enabled in the setup of the object (off by default), a number alone in the reference filter of the
+     * prevention plan and fire permit lists finds the record carrying that number, not every reference
+     * containing it: 1 gives PP1, not PP11 or PP21. Any other text keeps the standard "contains" search.
+     *
+     * @param  array        $parameters Hook metadata (context, key and value of the search criteria)
+     * @param  CommonObject $object     Listed object
+     * @return int                      0 to keep the standard criteria, 1 to replace it
+     */
+    public function printFieldListSearch(array $parameters, $object): int
+    {
+        $this->resprints = '';
+
+        if (preg_match('/preventionplanlist|firepermitlist/', $parameters['context']) && $parameters['key'] == 'ref'
+            && getDolGlobalInt('DIGIRISKDOLIBARR_' . dol_strtoupper($object->element) . '_SEARCH_REF_BY_NUMBER')
+            && preg_match('/^\s*0*(\d+)\s*$/', (string) $parameters['val'], $matches)) {
+            // The number closes the reference, after its prefix (PP, FP or a custom mask) and any leading zero
+            $this->resprints = ' AND ' . $this->db->regexpsql('t.ref', '(^|[^0-9])0*' . $matches[1] . '$', 1);
+
+            return 1;
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
      * Overloading the saturneSetVarsFromFetchObj function : replacing the parent's function with the one below
      *
      * @param  array  $parameters Hook metadata (context, etc...)

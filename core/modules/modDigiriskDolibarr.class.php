@@ -645,6 +645,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON', 'chaine', 'mod_preventionplan_standard', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE', 'integer', 0, '', 0, 'current'],
+			// A number alone in the reference filter of the list finds that number exactly (1 gives PP1, not PP11)
+			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLAN_SEARCH_REF_BY_NUMBER', 'integer', 0, '', 0, 'current'],
 
 			// CONST PREVENTION PLAN DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
@@ -666,6 +668,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ADDON', 'chaine', 'mod_firepermit_standard', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_PROJECT', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE', 'integer', 0, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_SEARCH_REF_BY_NUMBER', 'integer', 0, '', 0, 'current'],
 
 			// CONST FIRE PERMIT ROUNDS (fire watch after hot work: delays in minutes, then 0 = disabled, 1 = optional, 2 = required)
 			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_DELAYS', 'chaine', '30,60,120', '', 0, 'current'],
