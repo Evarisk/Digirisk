@@ -54,10 +54,11 @@ function digiriskGetUserElectronicSignature(DoliDB $db, int $userId): string
 
     require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
 
+    // Saturne reads the record in every entity : with multicompany, the signature drawn in another
+    // entity was not found here
     $signatory = new SaturneSignature($db);
-    $result    = $signatory->fetch(0, '', ' AND fk_object = ' . ((int) $userId) . ' AND status > 0 AND object_type = "user" AND role = "UserSignature"');
 
-    return ($result > 0) ? (string) $signatory->signature : '';
+    return $signatory->fetchUserSignature($userId);
 }
 
 /**
@@ -78,21 +79,11 @@ function digiriskSaveUserElectronicSignature(DoliDB $db, User $user, int $userId
 
     require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
 
+    // Saturne updates the single record of the user and retires the copies left in other entities,
+    // instead of creating one record per entity
     $signatory = new SaturneSignature($db);
-    $result    = $signatory->fetch(0, '', ' AND fk_object = ' . ((int) $userId) . ' AND status > 0 AND object_type = "user" AND role = "UserSignature"');
-    if ($result <= 0) {
-        $signatory->setSignatory($userId, 'user', 'user', [$userId], 'UserSignature');
-    }
 
-    $signatory->signature      = $signature;
-    $signatory->signature_date = dol_now();
-
-    if ($signatory->update($user, true) > 0) {
-        $signatory->setSigned($user, true);
-        return 1;
-    }
-
-    return -1;
+    return $signatory->saveUserSignature($user, $userId, $signature, 1) > 0 ? 1 : -1;
 }
 
 /**
@@ -103,7 +94,9 @@ function digiriskSaveUserElectronicSignature(DoliDB $db, User $user, int $userId
  */
 function digiriskIsValidSignature(string $signature): bool
 {
-    return (bool) preg_match('#^data:image/(png|jpeg|jpg);base64,[A-Za-z0-9+/=\s]+$#', $signature);
+    require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+    return SaturneSignature::isValidSignatureData($signature);
 }
 
 /**
