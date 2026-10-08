@@ -125,6 +125,8 @@ window.digiriskdolibarr.mobilequickcreate.event = function() {
     $(document).on('click', '.digirisk-mobile-cert-add', window.digiriskdolibarr.mobilequickcreate.addCertification);
     $(document).on('click', '.digirisk-mobile-cert-item-delete', window.digiriskdolibarr.mobilequickcreate.removeCertification);
     $(document).on('submit', '.digirisk-mobile-form', window.digiriskdolibarr.mobilequickcreate.submitForm);
+    $(document).on('click', '.digirisk-mobile-submit', window.digiriskdolibarr.mobilequickcreate.clickSubmit);
+    $(window).on('pageshow', window.digiriskdolibarr.mobilequickcreate.reloadFromCache);
     $(document).on('click', '.digirisk-mobile-extsign__resend', window.digiriskdolibarr.mobilequickcreate.resendExtSignatureEmail);
     $(document).on('input blur', '.digirisk-mobile-form input', window.digiriskdolibarr.mobilequickcreate.checkRealTimeValidity);
 };
@@ -941,6 +943,10 @@ window.digiriskdolibarr.mobilequickcreate.submitForm = function(event) {
         dataType: 'json',
         success: function(resp) {
             if (resp && resp.success && resp.redirect) {
+                // Chrome offers to save as the user's own address the one still typed in the form when
+                // the page navigates away: empty it, the request has already carried it
+                form.find('[name="ext_society_address"], [name="ext_society_zip"], [name="ext_society_town"]').val('');
+                window.digiriskdolibarr.mobilequickcreate.addressCleared = true;
                 window.location.href = resp.redirect; // keep the spinner during navigation
                 return;
             }
@@ -952,6 +958,29 @@ window.digiriskdolibarr.mobilequickcreate.submitForm = function(event) {
             resetSubmit();
         }
     });
+};
+
+/**
+ * The submit button is a plain button (see the form template): hand the form to submitForm through a
+ * jQuery submit, which dispatches no native submit event for Chrome to read the address from.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.clickSubmit = function() {
+    $(this).closest('.digirisk-mobile-form').trigger('submit');
+};
+
+/**
+ * The address fields are emptied when a save leaves the form (see submitForm): if the browser brings
+ * that page back from its cache, reload it so the fields show the saved values again.
+ *
+ * @param  {Event} event pageshow event
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.reloadFromCache = function(event) {
+    if (event.originalEvent && event.originalEvent.persisted && window.digiriskdolibarr.mobilequickcreate.addressCleared) {
+        window.location.reload();
+    }
 };
 
 /**
