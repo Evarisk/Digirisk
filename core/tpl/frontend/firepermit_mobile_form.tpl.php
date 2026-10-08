@@ -281,7 +281,7 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
         <!-- Card 4: exterior company, asked to sign by email. Three ways to fill it in: pick it in
              the third party list, resolve it by SIREN, or type everything for a company to create -->
         <div class="digirisk-mobile-card">
-            <div class="digirisk-mobile-card__title"><i class="fas fa-industry"></i> <?php print $langs->trans('MobilePPExteriorCompany'); ?></div>
+            <div class="digirisk-mobile-card__title"><i class="fas fa-building"></i> <?php print $langs->trans('MobilePPExteriorCompany'); ?></div>
             <div class="digirisk-mobile-field">
                 <label><?php print $langs->trans('MobilePPChooseExistingCompany'); ?></label>
                 <div class="digirisk-mobile-picker-row">
