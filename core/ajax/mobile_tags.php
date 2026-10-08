@@ -16,11 +16,11 @@
  */
 
 /**
- * \file    core/ajax/mobile_preventionplan_tags.php
+ * \file    core/ajax/mobile_tags.php
  * \ingroup digiriskdolibarr
- * \brief   AJAX endpoint listing the prevention plan tags, so the mobile form can offer a tag created
- *          in another tab as soon as the user comes back, without reloading the page and losing what
- *          was already typed.
+ * \brief   AJAX endpoint listing the prevention plan or fire permit tags (?object_type=), so the mobile
+ *          form can offer a tag created in another tab as soon as the user comes back, without
+ *          reloading the page and losing what was already typed.
  */
 
 // Load DigiriskDolibarr environment
@@ -43,7 +43,19 @@ if (empty($user->id)) {
     exit;
 }
 
-if (!$user->hasRight('digiriskdolibarr', 'preventionplan', 'write')) {
+// Category type registered by the constructCategory hook for each object
+$tagTypes = [
+    'preventionplan' => 'digiriskpreventionplan',
+    'firepermit'     => 'digiriskfirepermit',
+];
+
+$objectType = GETPOST('object_type', 'aZ09');
+if (!isset($tagTypes[$objectType])) {
+    echo json_encode(['success' => false, 'error' => 'BadObjectType']);
+    exit;
+}
+
+if (!$user->hasRight('digiriskdolibarr', $objectType, 'write')) {
     echo json_encode(['success' => false, 'error' => 'Forbidden']);
     exit;
 }
@@ -52,7 +64,7 @@ $tags = [];
 if (isModEnabled('categorie')) {
     // Same call as the form, so both list the tags with the same labels
     $form       = new Form($db);
-    $tagOptions = $form->select_all_categories('digiriskpreventionplan', '', 'parent', 64, 0, 1);
+    $tagOptions = $form->select_all_categories($tagTypes[$objectType], '', 'parent', 64, 0, 1);
 
     foreach ((is_array($tagOptions) ? $tagOptions : []) as $tagId => $tagLabel) {
         $tags[] = ['id' => (int) $tagId, 'label' => (string) $tagLabel];

@@ -391,7 +391,7 @@ foreach ($signalisationCategories as $signalisationItem) {
             $planTagOptions = $form->select_all_categories('digiriskpreventionplan', '', 'parent', 64, 0, 1);
             $planTagOptions = is_array($planTagOptions) ? $planTagOptions : [];
         ?>
-        <div class="digirisk-mobile-card digirisk-mobile-tags" data-tags-url="<?php print dol_escape_htmltag(dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_preventionplan_tags.php', 1)); ?>">
+        <div class="digirisk-mobile-card digirisk-mobile-tags" data-tags-url="<?php print dol_escape_htmltag(dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_tags.php', 1) . '?object_type=preventionplan'); ?>">
             <div class="digirisk-mobile-card__title">
                 <i class="fas fa-tags"></i> <?php print $langs->trans('MobileTags'); ?>
                 <span class="digirisk-mobile-tooltip digirisk-mobile-tooltip--start" tabindex="0" aria-label="<?php print dol_escape_htmltag($langs->trans('MobileTagsInfo')); ?>">
