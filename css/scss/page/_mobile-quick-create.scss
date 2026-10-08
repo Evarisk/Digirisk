@@ -606,6 +606,98 @@ body.digirisk-mobile-create {
     }
   }
 
+  /* Templates ("trames"): start a new plan from one, or save a plan as one */
+  .digirisk-mobile-template-picker {
+    &__applied {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      padding: 8px 10px;
+      font-size: 12px;
+      line-height: 1.4;
+      color: #1d4ed8;
+      background: #eff6ff;
+      border-radius: 7px;
+
+      i {
+        margin-top: 2px;
+      }
+    }
+
+    &__delete {
+      margin-top: 6px;
+      text-align: right;
+    }
+
+    &__delete-btn {
+      padding: 4px 0;
+      font-size: 12px;
+      color: #dc2626;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+  }
+
+  /* Secondary action under the buttons of the success screen: a grey link until it is opened */
+  .digirisk-mobile-template-save {
+    margin: 4px 0 10px;
+    text-align: center;
+
+    &__toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 4px;
+      font-size: 13px;
+      color: #64748b;
+      cursor: pointer;
+      list-style: none;
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+    }
+
+    &[open] .digirisk-mobile-template-save__toggle {
+      color: #2b7de9;
+    }
+
+    &__form {
+      margin-top: 4px;
+      padding: 10px 12px;
+      text-align: left;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    &__help {
+      margin-bottom: 8px;
+      font-size: 12px;
+      line-height: 1.4;
+      color: #64748b;
+    }
+
+    &__row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 0;
+
+      input[type="text"] {
+        flex: 1;
+        min-width: 0;
+      }
+    }
+
+    // Takes the height of the field next to it rather than the large padding of wpeo-button
+    &__submit {
+      flex: 0 0 auto;
+      padding: 0 14px;
+      font-size: 14px;
+    }
+  }
+
   /* Prior formalities */
   .digirisk-mobile-check {
     display: flex;

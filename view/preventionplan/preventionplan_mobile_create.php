@@ -45,6 +45,7 @@ require_once __DIR__ . '/../../../saturne/lib/medias.lib.php';
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/preventionplan.class.php';
+require_once __DIR__ . '/../../class/preventionplantemplate.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
@@ -124,7 +125,10 @@ if ($id > 0 && $object->fetch($id) > 0) {
     $isEdit = true;
     $object->fetch_optionals();
 
-    $prefill['label']      = $object->label;
+    // Motif, tags, risques et leurs protections, certifications, horaires : le meme contenu que
+    // celui d'une trame
+    $prefill = array_merge($prefill, digiriskPreventionPlanReusableContent($db, $object));
+
     $prefill['date_start'] = $object->date_start ? dol_print_date($object->date_start, '%Y-%m-%d') : '';
     $prefill['date_end']   = $object->date_end   ? dol_print_date($object->date_end, '%Y-%m-%d')   : '';
 
@@ -134,17 +138,6 @@ if ($id > 0 && $object->fetch($id) > 0) {
     $prefill['prior_visit_date'] = $object->prior_visit_date ? dol_print_date($object->prior_visit_date, '%Y-%m-%d') : '';
 
     $prefill['cssct_intervention'] = (int) $object->cssct_intervention;
-
-    // Tags already set on the plan
-    if (isModEnabled('categorie')) {
-        $editCategory   = new Categorie($db);
-        $editCategories = $editCategory->containing($object->id, 'preventionplan');
-        if (is_array($editCategories)) {
-            foreach ($editCategories as $editCategoryItem) {
-                $prefill['categories'][] = $editCategoryItem->id;
-            }
-        }
-    }
 
     // Exterior company: fetchResourcesFromObject() returns the resolved object itself (an already
     // fetched Societe) for a single match, and 0 when there is none.
@@ -170,57 +163,6 @@ if ($id > 0 && $object->fetch($id) > 0) {
         $prefill['resp_email']        = $editSignatory->email;
         $prefill['resp_phone']        = $editSignatory->phone;
     }
-
-    // Protections are stored flat in the extrafield, each one carrying the risk it belongs to
-    $storedProtections = !empty($object->array_options['options_mobile_protections']) ? json_decode($object->array_options['options_mobile_protections'], true) : [];
-    if (!is_array($storedProtections)) {
-        $storedProtections = [];
-    }
-
-    // Which company each risk concerns, keyed by danger category
-    $storedRiskCompanies = !empty($object->array_options['options_mobile_risk_companies']) ? json_decode($object->array_options['options_mobile_risk_companies'], true) : [];
-    if (!is_array($storedRiskCompanies)) {
-        $storedRiskCompanies = [];
-    }
-
-    // Risks (existing lines), with the protections and the photos attached to each of them
-    $existingLines = $preventionplandet->fetchAll('', '', 0, 0, ['fk_preventionplan' => $object->id]);
-    if (is_array($existingLines)) {
-        foreach ($existingLines as $existingLine) {
-            $lineProtections = [];
-            foreach ($storedProtections as $storedProtection) {
-                // Plans created before the protections moved inside the risks have no risk_category:
-                // keep them on the first risk rather than dropping them silently
-                $storedRiskCategory = isset($storedProtection['risk_category']) ? (int) $storedProtection['risk_category'] : 0;
-                if ($storedRiskCategory === (int) $existingLine->category || (empty($storedRiskCategory) && empty($prefill['risks']))) {
-                    $lineProtections[] = $storedProtection;
-                }
-            }
-            // Plans created before the concerned companies existed have nothing stored: both are ticked
-            $lineCompanies = $storedRiskCompanies[(string) $existingLine->category] ?? ['eu' => 1, 'ee' => 1];
-
-            $prefill['risks'][] = [
-                'category'    => $existingLine->category,
-                'description' => $existingLine->description,
-                'company_eu'  => !empty($lineCompanies['eu']) ? 1 : 0,
-                'company_ee'  => !empty($lineCompanies['ee']) ? 1 : 0,
-                'protections' => $lineProtections,
-            ];
-        }
-    }
-
-    $prefill['certifications'] = !empty($object->array_options['options_mobile_certifications']) ? json_decode($object->array_options['options_mobile_certifications'], true) : [];
-
-    // Fetch schedules
-    require_once __DIR__ . '/../../../saturne/class/saturneschedules.class.php';
-    $saturneSchedules = new SaturneSchedules($db);
-    $saturneSchedules->fetch(0, '', ' AND element_type = "preventionplan" AND element_id = ' . $object->id . ' AND status = 1');
-    
-    foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as $day) {
-        $parts = explode(' ', $saturneSchedules->$day);
-        $prefill['schedule_' . $day . '_am'] = $parts[0] ?? 'N/A';
-        $prefill['schedule_' . $day . '_pm'] = $parts[1] ?? 'N/A';
-    }
 } else {
     // Default values for new plan
     $defaultDays = [
@@ -236,6 +178,21 @@ if ($id > 0 && $object->fetch($id) > 0) {
         $parts = explode(' ', trim($val));
         $prefill['schedule_' . $day . '_am'] = !empty($parts[0]) ? $parts[0] : 'N/A';
         $prefill['schedule_' . $day . '_pm'] = !empty($parts[1]) ? $parts[1] : 'N/A';
+    }
+}
+
+// Partir d'une trame : le formulaire d'un nouveau plan reprend son contenu, tout reste modifiable.
+// Les valeurs par defaut ci-dessus restent pour ce que la trame ne porte pas (dates, entreprise)
+$planTemplates   = [];
+$appliedTemplate = null;
+if (!$isEdit) {
+    $planTemplate  = new PreventionPlanTemplate($db);
+    $planTemplates = $planTemplate->fetchTemplates();
+
+    $templateId = GETPOSTINT('template');
+    if ($templateId > 0 && $planTemplate->fetch($templateId) > 0 && (int) $planTemplate->status === PreventionPlanTemplate::STATUS_ACTIVE) {
+        $prefill         = array_merge($prefill, $planTemplate->getContent());
+        $appliedTemplate = $planTemplate;
     }
 }
 
@@ -869,6 +826,55 @@ if ($action == 'setArchived' && $permissiontoadd) {
     }
 
     header('Location: ' . $_SERVER['PHP_SELF'] . '?created=' . $planId);
+    exit;
+}
+
+/*
+ * Trame : le contenu reutilisable du plan, enregistre sous un nom pour partir de la au prochain plan.
+ * Un nom deja pris met a jour la trame qui le porte plutot que d'en creer une seconde du meme nom.
+ */
+if ($action == 'saveTemplate' && $permissiontoadd) {
+    $planId        = GETPOSTINT('plan_id');
+    $templateLabel = dol_trunc(trim(GETPOST('template_label', 'alphanohtml')), 255, 'right', 'UTF-8', 1);
+    $templatePlan  = new PreventionPlan($db);
+    $redirect      = $_SERVER['PHP_SELF'] . '?created=' . $planId;
+
+    if (!dol_strlen($templateLabel)) {
+        setEventMessages($langs->trans('MobilePPTemplateErrorName'), [], 'errors');
+    } elseif ($planId > 0 && $templatePlan->fetch($planId) > 0) {
+        $template = new PreventionPlanTemplate($db);
+        $replaced = $template->fetchByLabel($templateLabel) > 0;
+
+        $template->label  = $templateLabel;
+        $template->status = PreventionPlanTemplate::STATUS_ACTIVE;
+        $template->setContentFromPlan($db, $templatePlan);
+
+        if (($replaced ? $template->update($user) : $template->create($user)) > 0) {
+            $redirect .= '&saved=' . ($replaced ? 'template_updated' : 'template_saved') . '&template=' . $template->id;
+        } else {
+            setEventMessages($template->error, $template->errors, 'errors');
+        }
+    }
+
+    header('Location: ' . $redirect);
+    exit;
+}
+
+/*
+ * Suppression d'une trame devenue inutile, depuis le formulaire d'un nouveau plan qui l'applique.
+ * Les plans deja crees avec elle ne changent pas : la trame n'est qu'un point de depart.
+ */
+if ($action == 'deleteTemplate' && $permissiontoadd) {
+    $template = new PreventionPlanTemplate($db);
+    if ($template->fetch(GETPOSTINT('template_id')) > 0) {
+        if ($template->delete($user) > 0) {
+            setEventMessages($langs->trans('MobilePPTemplateDeleted', $template->label), []);
+        } else {
+            setEventMessages($template->error, $template->errors, 'errors');
+        }
+    }
+
+    header('Location: ' . $_SERVER['PHP_SELF']);
     exit;
 }
 
