@@ -2231,6 +2231,7 @@ MobilePPMandatory = Obligatoire
 MobileProtections = Protections (mobile)
 MobilePPCertifications = Certifications obligatoires
 MobilePPAddCertification = Ajouter une certification
+MobilePPChooseCertification = Choisir une certification
 MobileCertifications = Certifications (mobile)
 MobilePPUploadCertPhoto = Envoyer une photo
 MobilePPErrorCreatingThirdparty = Erreur lors de la création du tiers.
