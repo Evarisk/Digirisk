@@ -283,14 +283,13 @@ foreach ($signalisationCategories as $signalisationItem) {
         <!-- Card 2: exterior company, asked to sign by email. Three ways to fill it in: pick it in
              the third party list, resolve it by SIREN, or type everything for a company to create -->
         <div class="digirisk-mobile-card">
-            <div class="digirisk-mobile-card__title"><i class="fas fa-industry"></i> <?php print $langs->trans('MobilePPExteriorCompany'); ?></div>
+            <div class="digirisk-mobile-card__title"><i class="fas fa-building"></i> <?php print $langs->trans('MobilePPExteriorCompany'); ?></div>
             <div class="digirisk-mobile-field">
                 <label><?php print $langs->trans('MobilePPChooseExistingCompany'); ?></label>
-                <!-- La loupe accompagne le choix du tiers : elle resout l'entreprise, que son
-                     identifiant vienne de la liste ou du SIREN saisi plus bas -->
+                <!-- Le + ouvre la creation d'un tiers dans un nouvel onglet -->
                 <div class="digirisk-mobile-picker-row">
                     <?php print $form->select_company($prefill['ext_society_id'], 'ext_society_picker', '', '&nbsp;', 0, 0, [], 0, 'digirisk-mobile-society-select maxwidth500'); ?>
-                    <a href="<?php print dol_buildpath('/societe/card.php', 1) . '?action=create'; ?>" target="_blank" class="wpeo-button button-blue" title="<?php print dol_escape_htmltag($langs->trans('NewThirdParty')); ?>"><i class="fas fa-plus"></i></a>
+                    <a href="<?php print dol_buildpath('/societe/card.php', 1) . '?action=create'; ?>" target="_blank" class="wpeo-button button-blue digirisk-mobile-picker-row__add" title="<?php print dol_escape_htmltag($langs->trans('NewThirdParty')); ?>"><i class="fas fa-plus"></i></a>
                 </div>
             </div>
             <div class="digirisk-mobile-separator"><span><?php print $langs->trans('MobilePPOrFillManually'); ?></span></div>
@@ -391,7 +390,7 @@ foreach ($signalisationCategories as $signalisationItem) {
             $planTagOptions = $form->select_all_categories('digiriskpreventionplan', '', 'parent', 64, 0, 1);
             $planTagOptions = is_array($planTagOptions) ? $planTagOptions : [];
         ?>
-        <div class="digirisk-mobile-card digirisk-mobile-tags" data-tags-url="<?php print dol_escape_htmltag(dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_preventionplan_tags.php', 1)); ?>">
+        <div class="digirisk-mobile-card digirisk-mobile-tags" data-tags-url="<?php print dol_escape_htmltag(dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_tags.php', 1) . '?object_type=preventionplan'); ?>">
             <div class="digirisk-mobile-card__title">
                 <i class="fas fa-tags"></i> <?php print $langs->trans('MobileTags'); ?>
                 <span class="digirisk-mobile-tooltip digirisk-mobile-tooltip--start" tabindex="0" aria-label="<?php print dol_escape_htmltag($langs->trans('MobileTagsInfo')); ?>">
@@ -460,8 +459,8 @@ foreach ($signalisationCategories as $signalisationItem) {
         <div class="digirisk-mobile-card">
             <div class="digirisk-mobile-card__title"><i class="fas fa-id-badge"></i> <?php print $langs->trans('MobilePPCertifications'); ?></div>
             <div class="digirisk-mobile-cert-picker-row">
-                <select id="digirisk_cert_picker" class="digirisk-mobile-cert-picker">
-                    <option value=""><?php print $langs->trans('Select'); ?></option>
+                <select id="digirisk_cert_picker" class="digirisk-mobile-cert-picker" data-placeholder="<?php print dol_escape_htmltag($langs->trans('MobilePPChooseCertification')); ?>">
+                    <option></option>
                     <?php foreach (digiriskGetCertificationOptions() as $certCode => $certLabel) { ?>
                         <option value="<?php print dol_escape_htmltag($certCode); ?>"><?php print dol_escape_htmltag($certLabel); ?></option>
                     <?php } ?>

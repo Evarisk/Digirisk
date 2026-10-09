@@ -44,6 +44,9 @@
     align-items: center;
     justify-content: flex-end;
     gap: 8px;
+    /* Shrink to the buttons: a full width toolbar pulled over the tab row would swallow the tab clicks */
+    width: fit-content;
+    margin-left: auto;
     /* Pull the toolbar up to sit on the tab row, top-right */
     margin-top: -56px;
     margin-bottom: 18px;

@@ -203,13 +203,18 @@ class ActionsDigiriskdolibarr
             $this->resprints = $out;
         }
 
-        if (strpos($_SERVER['PHP_SELF'], 'digiriskdolibarr') !== false) {
-            ?>
-            <script>
-                $('link[rel="manifest"]').remove();
-            </script>
-            <?php
+        return 0; // or return 1 to replace standard code
+    }
 
+    /**
+     * Overloading the hookSetManifest function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function hookSetManifest(array $parameters): int
+    {
+        if (strpos($_SERVER['PHP_SELF'], 'digiriskdolibarr') !== false) {
             // The internal application (prevention plans and fire permits) declares its own manifest,
             // so it installs separately from the public ticket declaration app.
             $manifestFile = 'manifest.json.php';
@@ -223,7 +228,8 @@ class ActionsDigiriskdolibarr
             // The browser keeps a manifest 3 hours: the version makes an updated one reach it at once
             $manifestVersion = (int) @filemtime(__DIR__ . '/../' . $manifestFile);
 
-            $this->resprints = '<link rel="manifest" href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/' . $manifestFile . '?v=' . $manifestVersion . '" />';
+            $this->resprints = dol_buildpath('/digiriskdolibarr/' . $manifestFile, 1) . '?v=' . $manifestVersion;
+            return 1; // Replace the manifest of Dolibarr
         }
 
         return 0; // or return 1 to replace standard code

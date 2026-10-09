@@ -62,7 +62,7 @@ $listStateBadges = [
                     </div>
                     <div class="digirisk-firewatch__permit-title"><?php print dol_escape_htmltag($listRow['label']); ?></div>
                     <?php if (dol_strlen($listRow['society'])) { ?>
-                        <div class="digirisk-firewatch__line"><i class="fas fa-industry"></i> <?php print dol_escape_htmltag($listRow['society']); ?></div>
+                        <div class="digirisk-firewatch__line"><i class="fas fa-building"></i> <?php print dol_escape_htmltag($listRow['society']); ?></div>
                     <?php } ?>
                     <div class="digirisk-firewatch__line">
                         <?php if ($listRow['state'] === 'working') { ?>
