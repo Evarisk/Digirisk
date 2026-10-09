@@ -2177,6 +2177,7 @@ MobilePPSpreadShowName = Show the first name and the last name
 MobilePPSpreadShowContact = Show the phone and the email
 MobilePPSpreadHidePublicNote = Do not show the public note
 MobilePPExtAlreadySigned = Signed on %s
+MobileNotSignedYet = Not signed yet
 MobilePPExtSignNow = Sign now
 MobilePPExtResendEmail = Send the email again
 MobilePPNoTagAvailable = No prevention plan tag is available.

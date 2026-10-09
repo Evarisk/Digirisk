@@ -357,8 +357,23 @@ if (empty($reshook)) {
 				$digiriskresources->setDigiriskResources($db, $user->id, 'LabourInspector', 'societe', array($labourInspectorId), $conf->entity, 'firepermit', $object->id, 0);
 				$digiriskresources->setDigiriskResources($db, $user->id, 'LabourInspectorAssigned', 'socpeople', array($labourInspectorContactId), $conf->entity, 'firepermit', $object->id, 0);
 
-				$signatory->setSignatory($object->id, 'firepermit', 'user', array($masterWorkerId), 'MasterWorker');
-				$signatory->setSignatory($object->id, 'firepermit', 'socpeople', array($extResponsibleId), 'ExtSocietyResponsible');
+				// A responsible saved unchanged keeps their row: setSignatory() would add an unsigned one next to
+				// the signed one, and the documents could then show the unsigned row, without the signature
+				$signatoriesChanged  = false;
+				$currentMasterWorker = digiriskGetCurrentSignatory($signatory, 'MasterWorker', (int) $object->id, 'firepermit');
+				if (!is_object($currentMasterWorker) || $currentMasterWorker->element_id != $masterWorkerId) {
+					$signatory->setSignatory($object->id, 'firepermit', 'user', array($masterWorkerId), 'MasterWorker');
+					$signatoriesChanged = true;
+				}
+				$currentExtResponsible = digiriskGetCurrentSignatory($signatory, 'ExtSocietyResponsible', (int) $object->id, 'firepermit');
+				if (!is_object($currentExtResponsible) || is_array($extResponsibleId) || $currentExtResponsible->element_id != $extResponsibleId) {
+					$signatory->setSignatory($object->id, 'firepermit', 'socpeople', array($extResponsibleId), 'ExtSocietyResponsible');
+					$signatoriesChanged = true;
+				}
+				// The update trigger regenerated the document before the responsibles changed
+				if ($signatoriesChanged) {
+					digiriskRefreshFirePermitDocument($db, (int) $object->id, $user, $langs, true);
+				}
 
 				// Update fire permit OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -846,7 +861,9 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td></tr>';
 
 	//Maitre d'oeuvre
-	$masterWorker = is_array($objectSignatories['MasterWorker'] ?? null) ? array_shift($objectSignatories['MasterWorker'])->element_id : '';
+	// Not the first row returned: a role can hold several rows, in no fixed order
+	$currentMasterWorker = digiriskGetCurrentSignatory($signatory, 'MasterWorker', (int) $object->id, 'firepermit');
+	$masterWorker = is_object($currentMasterWorker) ? $currentMasterWorker->element_id : '';
 	$userlist     = $form->select_dolusers($masterWorker, '', 1, null, 0, '', '', 0, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth100imp widthcentpercentminusxx maxwidth400', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MasterWorker', 'MaitreOeuvre_id', '', $object, 0) . '</td>';
@@ -872,7 +889,8 @@ if (($id || $ref) && $action == 'edit') {
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '</td></tr>';
 
-	$extSocietyResponsibleId = is_array($objectSignatories['ExtSocietyResponsible'] ?? null) ? array_shift($objectSignatories['ExtSocietyResponsible'])->element_id : GETPOST('ext_society_responsible');
+	$currentExtResponsible   = digiriskGetCurrentSignatory($signatory, 'ExtSocietyResponsible', (int) $object->id, 'firepermit');
+	$extSocietyResponsibleId = is_object($currentExtResponsible) ? $currentExtResponsible->element_id : GETPOST('ext_society_responsible');
 
 	if ($extSocietyResponsibleId > 0) {
 		$contact->fetch($extSocietyResponsibleId);

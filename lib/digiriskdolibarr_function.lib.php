@@ -3167,3 +3167,41 @@ function digiriskdolibarr_taken_refs(string $table, string $where)
 
     return $refs;
 }
+
+/**
+ * Current holder of a single-person signatory role of an object (EU or EE responsible).
+ *
+ * fetchSignatory() lists the rows of a role in no fixed order. Saving a plan or a permit from its
+ * Dolibarr card used to add a new unsigned row for the same person next to the signed one
+ * (setSignatory() only retires unsigned rows): depending on the order the database returned them,
+ * the document showed the unsigned row and lost the signature. The latest row is the current holder,
+ * but when an older row of that same person is signed, the signed one is kept.
+ *
+ * @param  SaturneSignature      $signatory  Signatory handler
+ * @param  string                $role       Role (MasterWorker, ExtSocietyResponsible)
+ * @param  int                   $objectId   Object id
+ * @param  string                $objectType Object type (preventionplan, firepermit)
+ * @return SaturneSignature|null             Current holder, null when the role has none
+ */
+function digiriskGetCurrentSignatory(SaturneSignature $signatory, string $role, int $objectId, string $objectType): ?SaturneSignature
+{
+    $signatories = $signatory->fetchSignatory($role, $objectId, $objectType);
+    if (!is_array($signatories) || empty($signatories)) {
+        return null;
+    }
+
+    usort($signatories, function ($a, $b) {
+        return $b->id <=> $a->id;
+    });
+    $current = $signatories[0];
+
+    if (empty($current->signature)) {
+        foreach ($signatories as $other) {
+            if (!empty($other->signature) && $other->element_type == $current->element_type && $other->element_id == $current->element_id) {
+                return $other;
+            }
+        }
+    }
+
+    return $current;
+}

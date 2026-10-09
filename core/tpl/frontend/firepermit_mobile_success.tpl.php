@@ -68,11 +68,19 @@ $successExtraInfoHtml .= '<div><div style="font-size: 0.7em; color: #666; font-w
 $successExtraInfoHtml .= '<div style="font-size: 0.9em; color: #4a55d1; font-weight: bold;">' . (!empty($object->date_end) ? dol_print_date($object->date_end, 'dayhour') : '-') . '</div></div>';
 $successExtraInfoHtml .= '</div></div></div>';
 
-// Interior company: signed the moment the permit was created, with the reusable user signature
+// Interior company: its actual responsible and the actual state of their signature. The block used to
+// say "signed" at the creation date with the connected user, even when the document had no interior
+// signature (responsible changed from Dolibarr, not signed yet)
+$fpEuSignatory = digiriskGetCurrentSignatory($signatory, 'MasterWorker', (int) $object->id, 'firepermit');
+$fpEuSigned    = is_object($fpEuSignatory) && !empty($fpEuSignatory->signature);
+$fpEuName      = is_object($fpEuSignatory) ? trim($fpEuSignatory->firstname . ' ' . $fpEuSignatory->lastname) : '';
+
 $successEuBlockHtml  = '<div class="digirisk-mobile-card digirisk-mobile-extsign" style="margin-top: 15px;">';
 $successEuBlockHtml .= '<div class="digirisk-mobile-extsign__title digirisk-mobile-extsign__title--split">';
 $successEuBlockHtml .= '<div><i class="fas fa-user-tie"></i> ' . $langs->trans('FirePermitUserCompany') . '</div>';
-$successEuBlockHtml .= '<div class="digirisk-mobile-extsign__signed"><i class="fas fa-check"></i> ' . $langs->trans('MobilePPExtAlreadySigned', dol_print_date($object->date_creation, 'dayhour', 'tzuser')) . '</div>';
+$successEuBlockHtml .= $fpEuSigned
+    ? '<div class="digirisk-mobile-extsign__signed"><i class="fas fa-check"></i> ' . $langs->trans('MobilePPExtAlreadySigned', dol_print_date($fpEuSignatory->signature_date, 'dayhour', 'tzuser')) . '</div>'
+    : '<div class="digirisk-mobile-extsign__signed digirisk-mobile-extsign__signed--not"><i class="fas fa-hourglass-half"></i> ' . $langs->trans('MobileNotSignedYet') . '</div>';
 $successEuBlockHtml .= '</div>';
 $successEuBlockHtml .= '<div class="digirisk-mobile-extsign__who">';
 $successEuBlockHtml .= '<div class="digirisk-mobile-extsign__line">';
@@ -80,22 +88,18 @@ $successEuBlockHtml .= '<div><span>' . $langs->trans('ThirdParty') . ' :</span> 
 $successEuBlockHtml .= '<div><span>' . $langs->transcountry('ProfId1Short', $mysoc->country_code) . ' :</span> ' . dol_escape_htmltag($mysoc->idprof1) . '</div>';
 $successEuBlockHtml .= '</div>';
 $successEuBlockHtml .= '<div class="digirisk-mobile-extsign__line">';
-$successEuBlockHtml .= '<div><span>' . $langs->trans('MobileResponsibleShort') . '</span> <strong>' . dol_escape_htmltag($user->getFullName($langs)) . '</strong></div>';
-$successEuBlockHtml .= '<div><span>' . $langs->trans('PhoneShort') . ' :</span> ' . dol_escape_htmltag($user->office_phone) . '</div>';
+$successEuBlockHtml .= '<div><span>' . $langs->trans('MobileResponsibleShort') . '</span> <strong>' . dol_escape_htmltag($fpEuName) . '</strong></div>';
+$successEuBlockHtml .= '<div><span>' . $langs->trans('PhoneShort') . ' :</span> ' . dol_escape_htmltag(is_object($fpEuSignatory) ? $fpEuSignatory->phone : '') . '</div>';
 $successEuBlockHtml .= '</div>';
 $successEuBlockHtml .= '<div class="digirisk-mobile-extsign__line">';
-$successEuBlockHtml .= '<div><span>' . $langs->trans('Email') . ' :</span> ' . dol_escape_htmltag($user->email) . '</div>';
-$successEuBlockHtml .= '<div><span>' . $langs->trans('PostOrFunction') . ' :</span> ' . dol_escape_htmltag($user->job ?? '') . '</div>';
+$successEuBlockHtml .= '<div><span>' . $langs->trans('Email') . ' :</span> ' . dol_escape_htmltag(is_object($fpEuSignatory) ? $fpEuSignatory->email : '') . '</div>';
+$successEuBlockHtml .= '<div><span>' . $langs->trans('PostOrFunction') . ' :</span> ' . dol_escape_htmltag(is_object($fpEuSignatory) ? (string) $fpEuSignatory->job : '') . '</div>';
 $successEuBlockHtml .= '</div>';
 $successEuBlockHtml .= '</div></div>';
 
 // Entreprise exterieure : etat reel de la demande de signature. L'envoi peut avoir echoue et
 // personne ne devait s'en apercevoir : l'ecran l'affiche et propose d'y remedier.
-$fpExtSignatory   = null;
-$fpExtSignatories = $signatory->fetchSignatory('ExtSocietyResponsible', $object->id, 'firepermit');
-if (is_array($fpExtSignatories) && !empty($fpExtSignatories)) {
-    $fpExtSignatory = array_shift($fpExtSignatories);
-}
+$fpExtSignatory = digiriskGetCurrentSignatory($signatory, 'ExtSocietyResponsible', (int) $object->id, 'firepermit');
 
 $fpExtSigned       = !empty($fpExtSignatory) && !empty($fpExtSignatory->signature);
 $fpExtEmailSent    = !empty($fpExtSignatory) && !empty($fpExtSignatory->last_email_sent_date);
@@ -130,9 +134,9 @@ $steps = [
     ],
     [
         'title'   => $langs->trans('MobileStepUserCompanyResponsible'),
-        'status'  => $langs->transnoentities('MobileStepSignedOn'),
-        'date'    => dol_print_date($object->date_creation, 'day', 'tzuser'),
-        'done'    => true,
+        'status'  => $fpEuSigned ? $langs->transnoentities('MobileStepSignedOn') : $langs->transnoentities('MobileStepTodo'),
+        'date'    => $fpEuSigned ? dol_print_date($fpEuSignatory->signature_date, 'day', 'tzuser') : '',
+        'done'    => $fpEuSigned,
         'viewBox' => $workflowIcons['user']['viewBox'],
         'svg'     => $workflowIcons['user']['svg'],
     ],
