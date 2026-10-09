@@ -284,7 +284,7 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
             <div class="digirisk-mobile-card__title"><i class="fas fa-building"></i> <?php print $langs->trans('MobilePPExteriorCompany'); ?></div>
             <div class="digirisk-mobile-field">
                 <label><?php print $langs->trans('MobilePPChooseExistingCompany'); ?></label>
-                <div class="digirisk-mobile-picker-row">
+                <div class="digirisk-mobile-picker-row" data-thirdparties-url="<?php print dol_escape_htmltag(dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_thirdparties.php', 1) . '?object_type=firepermit'); ?>">
                     <?php print $form->select_company($prefill['ext_society_id'], 'ext_society_picker', '', '&nbsp;', 0, 0, [], 0, 'digirisk-mobile-society-select maxwidth500'); ?>
                     <a href="<?php print dol_buildpath('/societe/card.php', 1) . '?action=create'; ?>" target="_blank" class="wpeo-button button-blue digirisk-mobile-picker-row__add" title="<?php print dol_escape_htmltag($langs->trans('NewThirdParty')); ?>"><i class="fas fa-plus"></i></a>
                 </div>
