@@ -294,31 +294,31 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
             <div class="digirisk-mobile-row">
                 <div class="digirisk-mobile-field">
                     <label><?php print $langs->trans('CompanyName'); ?> <span class="digirisk-mobile-required">*</span></label>
-                    <input type="text" name="ext_society_name" class="digirisk-mobile-ext-society-name" value="<?php print dol_escape_htmltag($prefill["ext_society_name"]); ?>">
+                    <input type="text" name="ext_society_name" autocomplete="digirisk-off" class="digirisk-mobile-ext-society-name" value="<?php print dol_escape_htmltag($prefill["ext_society_name"]); ?>">
                 </div>
                 <div class="digirisk-mobile-field">
                     <label><?php print $langs->trans('MobileSirenOrSiret'); ?> <span class="digirisk-mobile-required">*</span></label>
-                    <input type="text" name="siren" class="digirisk-mobile-siren-input" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="<?php print dol_escape_htmltag($langs->trans('MobileSirenOrSiretPlaceholder')); ?>" value="<?php print dol_escape_htmltag($prefill["siren"]); ?>" pattern="[\d\s]{9,20}" title="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorInvalidSiren')); ?>">
+                    <input type="text" name="siren" autocomplete="digirisk-off" class="digirisk-mobile-siren-input" inputmode="numeric" maxlength="20" placeholder="<?php print dol_escape_htmltag($langs->trans('MobileSirenOrSiretPlaceholder')); ?>" value="<?php print dol_escape_htmltag($prefill["siren"]); ?>" pattern="[\d\s]{9,20}" title="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorInvalidSiren')); ?>">
                 </div>
             </div>
             <div class="digirisk-mobile-siren-result"></div>
 
             <div class="digirisk-mobile-field">
                 <label><?php print $langs->trans('Email'); ?></label>
-                <input type="email" name="ext_society_email" class="digirisk-mobile-ext-society-email" autocomplete="off" value="<?php print dol_escape_htmltag($prefill["ext_society_email"]); ?>" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}">
+                <input type="email" name="ext_society_email" autocomplete="digirisk-off" class="digirisk-mobile-ext-society-email" value="<?php print dol_escape_htmltag($prefill["ext_society_email"]); ?>" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}">
             </div>
             <div class="digirisk-mobile-field">
                 <label><?php print $langs->trans('Address'); ?></label>
-                <textarea name="ext_society_address" class="digirisk-mobile-ext-society-address" rows="2"><?php print dol_escape_htmltag($prefill["ext_society_address"]); ?></textarea>
+                <textarea name="ext_society_address" autocomplete="digirisk-off" class="digirisk-mobile-ext-society-address" rows="2"><?php print dol_escape_htmltag($prefill["ext_society_address"]); ?></textarea>
             </div>
             <div class="digirisk-mobile-row">
                 <div class="digirisk-mobile-field">
                     <label><?php print $langs->trans('Zip'); ?></label>
-                    <input type="text" name="ext_society_zip" class="digirisk-mobile-ext-society-zip" inputmode="numeric" autocomplete="off" value="<?php print dol_escape_htmltag($prefill["ext_society_zip"]); ?>">
+                    <input type="text" name="ext_society_zip" autocomplete="digirisk-off" class="digirisk-mobile-ext-society-zip" inputmode="numeric" value="<?php print dol_escape_htmltag($prefill["ext_society_zip"]); ?>">
                 </div>
                 <div class="digirisk-mobile-field">
                     <label><?php print $langs->trans('Town'); ?></label>
-                    <input type="text" name="ext_society_town" class="digirisk-mobile-ext-society-town" autocomplete="off" value="<?php print dol_escape_htmltag($prefill["ext_society_town"]); ?>">
+                    <input type="text" name="ext_society_town" autocomplete="digirisk-off" class="digirisk-mobile-ext-society-town" value="<?php print dol_escape_htmltag($prefill["ext_society_town"]); ?>">
                 </div>
             </div>
 
@@ -333,21 +333,21 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
             <div class="digirisk-mobile-row">
                 <div class="digirisk-mobile-field">
                     <label><?php print $langs->trans('Lastname'); ?> <span class="digirisk-mobile-required">*</span></label>
-                    <input type="text" name="resp_lastname" class="digirisk-mobile-resp-lastname" value="<?php print dol_escape_htmltag($prefill["resp_lastname"]); ?>">
+                    <input type="text" name="resp_lastname" autocomplete="digirisk-off" class="digirisk-mobile-resp-lastname" value="<?php print dol_escape_htmltag($prefill["resp_lastname"]); ?>">
                 </div>
                 <div class="digirisk-mobile-field">
                     <label><?php print $langs->trans('Firstname'); ?> <span class="digirisk-mobile-required">*</span></label>
-                    <input type="text" name="resp_firstname" class="digirisk-mobile-resp-firstname" value="<?php print dol_escape_htmltag($prefill["resp_firstname"]); ?>">
+                    <input type="text" name="resp_firstname" autocomplete="digirisk-off" class="digirisk-mobile-resp-firstname" value="<?php print dol_escape_htmltag($prefill["resp_firstname"]); ?>">
                 </div>
             </div>
             <div class="digirisk-mobile-row">
                 <div class="digirisk-mobile-field">
                     <label><?php print $langs->trans('Email'); ?> <span class="digirisk-mobile-required">*</span></label>
-                    <input type="email" name="resp_email" class="digirisk-mobile-resp-email" autocomplete="off" value="<?php print dol_escape_htmltag($prefill["resp_email"]); ?>" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" title="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorInvalidEmail')); ?>">
+                    <input type="email" name="resp_email" autocomplete="digirisk-off" class="digirisk-mobile-resp-email" value="<?php print dol_escape_htmltag($prefill["resp_email"]); ?>" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" title="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorInvalidEmail')); ?>">
                 </div>
                 <div class="digirisk-mobile-field">
                     <label><?php print $langs->trans('Phone'); ?></label>
-                    <input type="tel" name="resp_phone" class="digirisk-mobile-resp-phone" autocomplete="off" value="<?php print dol_escape_htmltag($prefill["resp_phone"]); ?>" pattern="^(\+?\d{1,3}[\-.\s]?)?(\(?\d{1,4}\)?[\-.\s]?)?[\d\-.\s]{5,15}$" title="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorInvalidPhone')); ?>">
+                    <input type="tel" name="resp_phone" autocomplete="digirisk-off" class="digirisk-mobile-resp-phone" value="<?php print dol_escape_htmltag($prefill["resp_phone"]); ?>" pattern="^(\+?\d{1,3}[\-.\s]?)?(\(?\d{1,4}\)?[\-.\s]?)?[\d\-.\s]{5,15}$" title="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorInvalidPhone')); ?>">
                 </div>
             </div>
             <div class="digirisk-mobile-help"><?php print $langs->trans('MobilePPEmailForSignatureHelp'); ?></div>
@@ -460,7 +460,11 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
             </div>
         </div>
 
-        <button type="submit" class="digirisk-mobile-submit wpeo-button button-blue no-load">
+        <!-- Pas de submit natif : le JS poste le formulaire en AJAX, et un submit laisserait Chrome
+
+             proposer d'enregistrer l'adresse de l'entreprise exterieure comme celle de l'utilisateur -->
+
+        <button type="button" class="digirisk-mobile-submit wpeo-button button-blue no-load">
             <i class="fas <?php print !empty($isEdit) ? 'fa-save' : 'fa-plus-circle'; ?>"></i>
             <?php print !empty($isEdit) ? $langs->trans('Save') : $langs->trans('MobileFPSubmit'); ?>
         </button>
