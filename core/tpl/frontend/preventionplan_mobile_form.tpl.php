@@ -286,11 +286,10 @@ foreach ($signalisationCategories as $signalisationItem) {
             <div class="digirisk-mobile-card__title"><i class="fas fa-building"></i> <?php print $langs->trans('MobilePPExteriorCompany'); ?></div>
             <div class="digirisk-mobile-field">
                 <label><?php print $langs->trans('MobilePPChooseExistingCompany'); ?></label>
-                <!-- La loupe accompagne le choix du tiers : elle resout l'entreprise, que son
-                     identifiant vienne de la liste ou du SIREN saisi plus bas -->
+                <!-- Le + ouvre la creation d'un tiers dans un nouvel onglet -->
                 <div class="digirisk-mobile-picker-row">
                     <?php print $form->select_company($prefill['ext_society_id'], 'ext_society_picker', '', '&nbsp;', 0, 0, [], 0, 'digirisk-mobile-society-select maxwidth500'); ?>
-                    <a href="<?php print dol_buildpath('/societe/card.php', 1) . '?action=create'; ?>" target="_blank" class="wpeo-button button-blue" title="<?php print dol_escape_htmltag($langs->trans('NewThirdParty')); ?>"><i class="fas fa-plus"></i></a>
+                    <a href="<?php print dol_buildpath('/societe/card.php', 1) . '?action=create'; ?>" target="_blank" class="wpeo-button button-blue digirisk-mobile-picker-row__add" title="<?php print dol_escape_htmltag($langs->trans('NewThirdParty')); ?>"><i class="fas fa-plus"></i></a>
                 </div>
             </div>
             <div class="digirisk-mobile-separator"><span><?php print $langs->trans('MobilePPOrFillManually'); ?></span></div>
