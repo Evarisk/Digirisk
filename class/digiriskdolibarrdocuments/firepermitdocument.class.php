@@ -27,6 +27,7 @@ require_once __DIR__ . '/../../../saturne/class/saturnedocuments.class.php';
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../digiriskdocuments.class.php';
 require_once __DIR__ . '/../digiriskresources.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
 /**
  * Class for FirePermitDocument.
@@ -92,11 +93,9 @@ class FirePermitDocument extends DigiriskDocuments
 		if ($extsociety < 1) {
 			$extsociety = new stdClass();
 		}
-		$maitreoeuvre           = $signatory->fetchSignatory('MasterWorker', $firepermit->id, 'firepermit');
-		$maitreoeuvre           = is_array($maitreoeuvre) ? array_shift($maitreoeuvre) : $maitreoeuvre;
-
-		$extsocietyresponsible  = $signatory->fetchSignatory('ExtSocietyResponsible', $firepermit->id, 'firepermit');
-		$extsocietyresponsible  = is_array($extsocietyresponsible) ? array_shift($extsocietyresponsible) : $extsocietyresponsible;
+		// Not the first row returned: a role can hold several rows, in no fixed order
+		$maitreoeuvre          = digiriskGetCurrentSignatory($signatory, 'MasterWorker', (int) $firepermit->id, 'firepermit');
+		$extsocietyresponsible = digiriskGetCurrentSignatory($signatory, 'ExtSocietyResponsible', (int) $firepermit->id, 'firepermit');
 
 		$extsocietyintervenants = $signatory->fetchSignatory('ExtSocietyAttendant', $firepermit->id, 'firepermit');
 		$labourinspector        = $resources->fetchResourcesFromObject('LabourInspector', $firepermit);

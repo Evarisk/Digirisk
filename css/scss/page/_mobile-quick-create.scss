@@ -1629,6 +1629,12 @@ body.digirisk-mobile-create {
     border-radius: 15px;
     text-transform: none;
     letter-spacing: 0;
+
+    /* Pas encore signe : meme pastille, en attente */
+    &--not {
+      color: #92400e;
+      background: #fef3c7;
+    }
   }
 
   /* Coordonnees du signataire : deux colonnes qui passent l'une sous l'autre sur un petit ecran */
