@@ -127,6 +127,51 @@ window.digiriskdolibarr.mobilequickcreate.event = function() {
     $(document).on('submit', '.digirisk-mobile-form', window.digiriskdolibarr.mobilequickcreate.submitForm);
     $(document).on('click', '.digirisk-mobile-extsign__resend', window.digiriskdolibarr.mobilequickcreate.resendExtSignatureEmail);
     $(document).on('input blur', '.digirisk-mobile-form input', window.digiriskdolibarr.mobilequickcreate.checkRealTimeValidity);
+    // Coming back from the tag creation tab
+    $(document).on('visibilitychange', window.digiriskdolibarr.mobilequickcreate.refreshTags);
+};
+
+/**
+ * Pick up the tags created in another tab (the "Create a tag" link opens one) as soon as the form is
+ * back on screen: the list is built with the page, and reloading it would lose what was typed.
+ * The list is rebuilt in the server order, the tags already selected staying selected.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.refreshTags = function() {
+    var card = $('.digirisk-mobile-tags');
+
+    if (document.visibilityState !== 'visible' || !card.length) {
+        return;
+    }
+
+    $.ajax({
+        url: card.data('tags-url'),
+        type: 'GET',
+        dataType: 'json',
+        success: function(resp) {
+            if (!resp || !resp.success) {
+                return;
+            }
+
+            var select   = card.find('select.digirisk-mobile-tags-select');
+            var selected = select.val() || [];
+            var current  = select.find('option').map(function() { return this.value; }).get().join(',');
+            var fresh    = $.map(resp.tags, function(tag) { return String(tag.id); }).join(',');
+
+            if (current !== fresh) {
+                select.empty();
+                $.each(resp.tags, function(index, tag) {
+                    var isSelected = selected.indexOf(String(tag.id)) !== -1;
+                    select.append(new Option(tag.label, tag.id, isSelected, isSelected));
+                });
+                // select2 rebuilds its dropdown and its chips from the options
+                select.trigger('change');
+            }
+
+            card.find('.digirisk-mobile-tags__empty').toggleClass('hidden', resp.tags.length > 0);
+        }
+    });
 };
 
 /**
