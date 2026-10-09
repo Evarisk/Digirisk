@@ -459,8 +459,8 @@ foreach ($signalisationCategories as $signalisationItem) {
         <div class="digirisk-mobile-card">
             <div class="digirisk-mobile-card__title"><i class="fas fa-id-badge"></i> <?php print $langs->trans('MobilePPCertifications'); ?></div>
             <div class="digirisk-mobile-cert-picker-row">
-                <select id="digirisk_cert_picker" class="digirisk-mobile-cert-picker">
-                    <option value=""><?php print $langs->trans('Select'); ?></option>
+                <select id="digirisk_cert_picker" class="digirisk-mobile-cert-picker" data-placeholder="<?php print dol_escape_htmltag($langs->trans('MobilePPChooseCertification')); ?>">
+                    <option></option>
                     <?php foreach (digiriskGetCertificationOptions() as $certCode => $certLabel) { ?>
                         <option value="<?php print dol_escape_htmltag($certCode); ?>"><?php print dol_escape_htmltag($certLabel); ?></option>
                     <?php } ?>
