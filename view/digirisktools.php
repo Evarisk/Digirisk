@@ -567,6 +567,8 @@ if ((GETPOST('dataMigrationExportGlobal', 'alpha') || GETPOST('dataMigrationExpo
 							$tasksExportArray['rowid']              = $tasksingle->id;
 							$tasksExportArray['dateo']              = $tasksingle->date_start;
 							$tasksExportArray['datee']              = $tasksingle->date_end;
+							$tasksExportArray['date_start']         = $tasksingle->date_start;
+							$tasksExportArray['date_end']           = $tasksingle->date_end;
 							$tasksExportArray['label']              = $tasksingle->label;
 							$tasksExportArray['description']        = $tasksingle->description;
 							$tasksExportArray['duration_effective'] = $tasksingle->duration_effective;
@@ -690,7 +692,7 @@ if ($action == 'import_global_dolibarr' && ! empty($conf->global->MAIN_UPLOAD_DO
                         $digiriskElement->array_options['wp_digi_id'] = $digiriskelementsingle['rowid'];
                         $digiriskElement->array_options['entity'] = $conf->entity;
 
-                        $digiriskElement->fk_parent = $digiriskElement->fetch_id_from_wp_digi_id($digiriskelementsingle['fk_parent']) ?: 0;
+                        $digiriskElement->fk_parent = !empty($digiriskelementsingle['fk_parent']) ? ($digiriskElement->fetch_id_from_wp_digi_id($digiriskelementsingle['fk_parent']) ?: 0) : 0;
 
                         $digiriskelementid = $digiriskElement->create($user);
 
@@ -739,18 +741,18 @@ if ($action == 'import_global_dolibarr' && ! empty($conf->global->MAIN_UPLOAD_DO
                                         if (array_key_exists('tasks', $digiriskExportRisk)) {
                                             foreach ($digiriskExportRisk['tasks'] as $digiriskExportTask) {
                                                 $task->ref = $refTaskMod->getNextValue('', $task);
-                                                $task->date_start = $digiriskExportTask['date_start'];
-                                                $task->date_end = $digiriskExportTask['date_end'];
-                                                $task->label = $digiriskExportTask['label'];
-                                                $task->description = $digiriskExportTask['description'];
-                                                $task->duration_effective = $digiriskExportTask['duration_effective'];
-                                                $task->planned_workload = $digiriskExportTask['planned_workload'];
-                                                $task->progress = $digiriskExportTask['progress'];
-                                                $task->priority = $digiriskExportTask['priority'];
-                                                $task->budget_amount = $digiriskExportTask['budget_amount'];
+                                                $task->date_start = $digiriskExportTask['date_start'] ?? $digiriskExportTask['dateo'] ?? null;
+                                                $task->date_end = $digiriskExportTask['date_end'] ?? $digiriskExportTask['datee'] ?? null;
+                                                $task->label = $digiriskExportTask['label'] ?? '';
+                                                $task->description = $digiriskExportTask['description'] ?? '';
+                                                $task->duration_effective = $digiriskExportTask['duration_effective'] ?? 0;
+                                                $task->planned_workload = $digiriskExportTask['planned_workload'] ?? 0;
+                                                $task->progress = $digiriskExportTask['progress'] ?? 0;
+                                                $task->priority = $digiriskExportTask['priority'] ?? 0;
+                                                $task->budget_amount = $digiriskExportTask['budget_amount'] ?? 0;
                                                 //	$task->fk_statut                = $digiriskExportTask['fk_statut'];
-                                                $task->note_public = $digiriskExportTask['note_public'];
-                                                $task->note_private = $digiriskExportTask['note_private'];
+                                                $task->note_public = $digiriskExportTask['note_public'] ?? '';
+                                                $task->note_private = $digiriskExportTask['note_private'] ?? '';
                                                 $task->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
                                                 $task->array_options['fk_risk'] = $risk->id;
 

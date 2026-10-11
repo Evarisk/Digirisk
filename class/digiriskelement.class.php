@@ -644,25 +644,27 @@ class DigiriskElement extends SaturneObject
 
         dol_syslog(__METHOD__, LOG_DEBUG);
 
-        $sql  = 'SELECT ';
-        $sql .= ' *';
+        $wp_digi_id = (int) $wp_digi_id;
+        if ($wp_digi_id <= 0) {
+            return 0;
+        }
+
+        $sql  = 'SELECT fk_object';
         $sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . '_extrafields as t';
-        $sql .= ' WHERE wp_digi_id =' . $wp_digi_id;
-        $sql .= ' AND entity =' . $conf->entity;
+        $sql .= ' WHERE wp_digi_id = ' . $wp_digi_id;
+        $sql .= ' AND entity = ' . ((int) $conf->entity);
 
         $resql = $this->db->query($sql);
 
         if ($resql) {
-            $num = $this->db->num_rows($resql);
-            $i   = 0;
-            $obj = new stdClass();
-            while ($i < $num) {
-                $obj = $this->db->fetch_object($resql);
-                $i++;
-            }
+            $obj = $this->db->fetch_object($resql);
             $this->db->free($resql);
 
-            return $obj->fk_object;
+            if ($obj && isset($obj->fk_object)) {
+                return (int) $obj->fk_object;
+            }
+
+            return 0;
         } else {
             $this->errors[] = 'Error ' . $this->db->lasterror();
             dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
