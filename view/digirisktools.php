@@ -52,6 +52,8 @@ $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
 
 $error = 0;
+$exportDownloadUrl = '';
+$exportDownloadName = '';
 
 // Initialize technical objects
 $digiriskStandard     = new DigiriskStandard($db);
@@ -621,6 +623,7 @@ if ((GETPOST('dataMigrationExportGlobal', 'alpha') || GETPOST('dataMigrationExpo
 		$zip->addFile($filename, basename($filename));
 		$zip->close();
 		$filenamezip = $exportName . '.zip';
+		$filepath = DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&file=' . urlencode('temp/' . $filenamezip);
 		$exportDownloadUrl = $filepath;
 		$exportDownloadName = $filenamezip;
 		$fileExportGlobals = dol_dir_list($filedir, "files", 0, '', '', '', '', 1);
@@ -969,7 +972,7 @@ if (!empty($actionError)) {
     echo '<input name="success" value="' . $actionSuccess . '" data-title="' . $langs->transnoentities('Success') . '" type="hidden">';
 }
 
-if (!empty($exportDownloadUrl)) {
+if (!empty($exportDownloadUrl) && !empty($exportDownloadName)) {
     print '<script>
         var alink = document.createElement("a");
         alink.setAttribute("href", ' . json_encode($exportDownloadUrl) . ');
