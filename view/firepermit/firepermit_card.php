@@ -115,7 +115,7 @@ $extrafields->fetch_name_optionals_label($objectLine->table_element);
 $hookmanager->initHooks(array('firepermitcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Get files upload dir
-$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+$upload_dir = $conf->digiriskdolibarr->multidir_output[!empty($object->entity) ? $object->entity : $conf->entity] ?? $conf->digiriskdolibarr->dir_output;
 
 // Security check - Protection if external user
 $permissiontoread   = $user->rights->digiriskdolibarr->firepermit->read;
