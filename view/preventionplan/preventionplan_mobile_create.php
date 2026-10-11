@@ -48,6 +48,7 @@ require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
 
 // Global variables definitions
@@ -65,7 +66,8 @@ $id      = GETPOSTINT('id'); // > 0 => edit an existing prevention plan with the
 $object            = new PreventionPlan($db);
 
 if ($id > 0 && $object->fetch($id) > 0) {
-    if ($object->status == PreventionPlan::STATUS_LOCKED) {
+    // Locked or archived: read-only, the plan is only shown by the success screen
+    if ($object->status >= PreventionPlan::STATUS_LOCKED) {
         accessforbidden($langs->trans('ErrorRecordIsLocked'));
     }
 }
@@ -105,8 +107,8 @@ $isEdit  = false;
 // Default dates from admin config
 $defaultStartToday = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DATE_START_TODAY', 1);
 $defaultDuration   = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_DEFAULT_DURATION', 30);
-$defaultDateStart  = $defaultStartToday ? dol_print_date(dol_now(), '%Y-%m-%d') : '';
-$defaultDateEnd    = $defaultStartToday ? dol_print_date(dol_time_plus_duree(dol_now(), $defaultDuration, 'd'), '%Y-%m-%d') : '';
+$defaultDateStart  = $defaultStartToday ? dol_print_date(dol_now(), '%Y-%m-%d', 'tzuser') : '';
+$defaultDateEnd    = $defaultStartToday ? dol_print_date(dol_time_plus_duree(dol_now(), $defaultDuration, 'd'), '%Y-%m-%d', 'tzuser') : '';
 
 $prefill = [
     'label' => '',
@@ -617,7 +619,12 @@ if ($action == 'add_mobile' && $permissiontoadd) {
 
                 // Replace the linked exterior company and its responsible
                 $digiriskresources->setDigiriskResources($db, $user->id, 'ExtSociety', 'societe', [$extSocietyId], $conf->entity, 'preventionplan', $object->id, 0);
-                $signatory->setSignatory($object->id, 'preventionplan', 'socpeople', [$respContactId], 'ExtSocietyResponsible');
+                // Unchanged, the responsible keeps their row: a new one would take a pending or signed
+                // responsible's place with an unsigned row and a new signature link
+                $currentExtResponsible = digiriskGetCurrentSignatory($signatory, 'ExtSocietyResponsible', (int) $object->id, 'preventionplan');
+                if (!is_object($currentExtResponsible) || $currentExtResponsible->element_id != $respContactId) {
+                    $signatory->setSignatory($object->id, 'preventionplan', 'socpeople', [$respContactId], 'ExtSocietyResponsible');
+                }
 
                 // Replace the risk lines by the ones currently in the form
                 $oldLines = $preventionplandet->fetchAll('', '', 0, 0, ['fk_preventionplan' => $object->id]);
@@ -666,8 +673,9 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                 // ligne cesse de presenter la version d'avant modification
                 digiriskRefreshPreventionPlanDocument($db, (int) $object->id, $user, $langs, true);
 
-                $redirect = $_SERVER['PHP_SELF'] . '?created=' . $object->id;
-                setEventMessages($langs->trans('MobilePPUpdated', $object->ref), null, 'mesgs');
+                // The success screen shows the confirmation in a banner that stays, rather than a
+                // notification gone in a few seconds
+                $redirect = $_SERVER['PHP_SELF'] . '?created=' . $object->id . '&saved=updated';
                 if ($isAjax) {
                     while (ob_get_level()) {
                         ob_end_clean();
@@ -795,8 +803,9 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                 }
 
                 $db->commit();
-                $redirect = $_SERVER['PHP_SELF'] . '?created=' . $object->id;
-                setEventMessages($langs->trans('MobilePPCreated', $object->ref), null, 'mesgs');
+                // The success screen shows the confirmation in a banner that stays, rather than a
+                // notification gone in a few seconds
+                $redirect = $_SERVER['PHP_SELF'] . '?created=' . $object->id . '&saved=created';
                 if ($isAjax) {
                     while (ob_get_level()) {
                         ob_end_clean();
@@ -852,6 +861,24 @@ if ($action == 'lock_mobile' && $permissiontoadd) {
 }
 
 /*
+ * Archivage du plan de prevention depuis l'ecran de succes, derniere etape de la barre d'avancement.
+ * Meme regle que la fiche Dolibarr : seul un plan verrouille s'archive.
+ */
+if ($action == 'setArchived' && $permissiontoadd) {
+    $planId      = GETPOSTINT('plan_id');
+    $archivePlan = new PreventionPlan($db);
+
+    if ($planId > 0 && $archivePlan->fetch($planId) > 0 && $archivePlan->status == PreventionPlan::STATUS_LOCKED) {
+        if ($archivePlan->setArchived($user) <= 0) {
+            setEventMessages($archivePlan->error, $archivePlan->errors, 'errors');
+        }
+    }
+
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?created=' . $planId);
+    exit;
+}
+
+/*
  * Renvoi du lien de signature a l'entreprise exterieure depuis l'ecran de succes.
  *
  * L'envoi automatique de la creation peut avoir echoue, ou le destinataire ne jamais l'avoir recu :
@@ -889,10 +916,17 @@ if ($action == 'resend_ext_signature_email' && $permissiontoadd) {
         $errorMsg = mb_convert_encoding($errorMsg, 'UTF-8', 'ISO-8859-1');
     }
 
+    // Le JS pose le message en texte dans le bandeau : trans() y laisserait ses entites HTML en clair
+    // ("envoy&eacute;e"). L'erreur de CMailFile arrive elle-meme en HTML (entites, <br>) : ramenee a
+    // du texte d'abord
+    $resendMessage = $resendResult['sent']
+        ? $langs->transnoentities('MobilePPSignatureEmailSentTo', $resendResult['email'])
+        : $langs->transnoentities('MobilePPWarningEmailNotSentDetail', dol_string_nohtmltag($errorMsg, 1));
+
     header('Content-Type: application/json');
     echo json_encode([
         'success' => $resendResult['sent'],
-        'message' => $resendResult['sent'] ? $langs->trans('MobilePPSignatureEmailSentTo', $resendResult['email']) : $langs->trans('MobilePPWarningEmailNotSentDetail', $errorMsg),
+        'message' => $resendMessage,
     ], JSON_INVALID_UTF8_SUBSTITUTE);
     exit;
 }

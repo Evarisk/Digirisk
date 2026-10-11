@@ -312,3 +312,7 @@ ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD itamami_task text NU
 ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD itamami_activity text NULL AFTER itamami_task;
 ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD itamami_material text NULL AFTER itamami_activity;
 ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD itamami_environment text NULL AFTER itamami_material;
+
+-- 23.5.x - fire watch rounds after hot work (issue #4835)
+ALTER TABLE llx_digiriskdolibarr_firepermit ADD date_work_end datetime NULL AFTER fk_preventionplan;
+ALTER TABLE llx_digiriskdolibarr_firepermit ADD firewatch_name varchar(255) NULL AFTER date_work_end;

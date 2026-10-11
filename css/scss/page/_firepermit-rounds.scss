@@ -1,0 +1,493 @@
+/* Fire watch rounds after hot work:
+   - the "Surveillance after the work" block of the fire permit card (and the link block of the setup page),
+   - the screens of the safety watcher, served both by the public interface (public/firepermit/firepermit_rounds.php)
+     and by the application (view/frontend/pwa_firepermit_rounds.php): same palette as the other PWA screens,
+   - the surveillance card of the mobile screen of a signed fire permit. */
+
+/* ---- Fire permit card and setup page ---- */
+
+.firepermit-firewatch {
+  margin-top: 20px;
+
+  &__intro {
+    margin-bottom: 10px;
+  }
+
+  &__actions {
+    margin-top: 10px;
+  }
+
+  &__summary {
+    margin-bottom: 10px;
+  }
+
+  &__photo {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin: 2px;
+  }
+
+  &__signature {
+    max-width: 120px;
+    max-height: 48px;
+  }
+}
+
+.firepermit-firewatch__public {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.firepermit-firewatch__qr {
+  flex: 0 0 110px;
+  width: 110px;
+  height: 110px;
+  background: #ffffff;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.firepermit-firewatch__url {
+  margin-top: 6px;
+  word-break: break-all;
+}
+
+/* ---- Screens of the safety watcher ---- */
+
+body.digirisk-firewatch-public {
+  background: #f1f5f9;
+
+  #id-container,
+  #id-right,
+  .fiche {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+}
+
+.digirisk-firewatch {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 12px;
+  box-sizing: border-box;
+  color: #1e293b;
+  font-size: 15px;
+
+  // Inside the application the PWA container already pads the screen
+  .pwa-container > & {
+    padding: 0;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+
+    > i {
+      font-size: 30px;
+      color: #d35968;
+    }
+  }
+
+  &__title {
+    font-size: 19px;
+    font-weight: 700;
+  }
+
+  &__subtitle,
+  &__muted {
+    color: #64748b;
+    font-size: 13px;
+  }
+
+  // Inside the application the title sits in the header: only what to do is left, as the count of a list
+  &__lead {
+    margin-bottom: 8px;
+    color: #64748b;
+    font-size: 12px;
+  }
+
+  &__back {
+    display: inline-block;
+    margin-bottom: 10px;
+    color: #2b7de9;
+    text-decoration: none;
+  }
+
+  &__empty,
+  &__closed {
+    padding: 40px 16px;
+    text-align: center;
+    color: #64748b;
+
+    i {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 40px;
+      color: #94a3b8;
+    }
+  }
+
+  &__permits {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__permit,
+  &__card {
+    display: block;
+    padding: 12px 14px;
+    border-left: 4px solid #cbd5e1;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  // The coloured edge tells the state of a permit in the list: a block of the permit screen has none
+  &__card {
+    margin-bottom: 12px;
+    border-left: none;
+  }
+
+  &__permit--late {
+    border-left-color: #dc2626;
+  }
+
+  &__permit--due {
+    border-left-color: #f59e0b;
+  }
+
+  &__permit--upcoming {
+    border-left-color: #2b7de9;
+  }
+
+  &__permit--done {
+    border-left-color: #16a34a;
+  }
+
+  &__permit-head,
+  &__round-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  // Reference, title and lines read like the cards of the PWA lists
+  &__ref {
+    font-size: 14px;
+    font-weight: 700;
+    color: #2b7de9;
+  }
+
+  &__permit-title {
+    margin: 2px 0 4px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  &__line {
+    margin-top: 4px;
+    font-size: 13px;
+    color: #475569;
+
+    i {
+      width: 18px;
+      color: #94a3b8;
+      text-align: center;
+    }
+  }
+
+  &__countdown {
+    color: #64748b;
+    font-size: 13px;
+  }
+
+  &__badge {
+    flex: 0 0 auto;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    &--late {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    &--due {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    &--upcoming {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    &--done {
+      background: #dcfce7;
+      color: #166534;
+    }
+  }
+
+  // Same block title as the cards of the mobile screens (.digirisk-mobile-card__title)
+  &__section-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 14px;
+    font-weight: 700;
+
+    i {
+      color: #2b7de9;
+    }
+  }
+
+  &__rounds {
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__round {
+    padding: 10px 0 10px 14px;
+    border-left: 3px solid #cbd5e1;
+
+    & + & {
+      margin-top: 4px;
+    }
+
+    &--done {
+      border-left-color: #16a34a;
+    }
+
+    &--due {
+      border-left-color: #f59e0b;
+    }
+
+    &--late {
+      border-left-color: #dc2626;
+    }
+
+    &--upcoming {
+      border-left-color: #2b7de9;
+    }
+  }
+
+  &__round-name {
+    font-weight: 600;
+  }
+
+  &__banner {
+    margin: 10px 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #e0f2fe;
+    color: #075985;
+    font-size: 14px;
+
+    ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    &--success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    &--error {
+      background: #fef2f2;
+      color: #b91c1c;
+    }
+  }
+
+  &__label {
+    display: block;
+    margin: 12px 0 4px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  &__required {
+    color: #dc2626;
+  }
+
+  &__input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    font-size: 16px;
+  }
+
+  &__geoloc-retry {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #334155;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  // Saturne media block (photo and gallery buttons, count badge), laid out on its own line
+  &__medias {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__geoloc {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  &__geoloc-status {
+    color: #64748b;
+    font-size: 14px;
+
+    &.is-done {
+      color: #166534;
+    }
+
+    &.is-error {
+      color: #b91c1c;
+    }
+  }
+
+  // Saturne signature pad: its own styles only apply on the Saturne signature page
+  // (.page-signature .public-card__content), so the same layout is given here
+  &__signature {
+    position: relative;
+
+    .canvas-container {
+      display: block;
+      width: 100%;
+      height: 180px;
+      box-sizing: border-box;
+      border: 1px dashed #94a3b8;
+      border-radius: 8px;
+      background: #ffffff;
+      touch-action: none;
+    }
+
+    .signature-erase {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+    }
+  }
+
+  &__form-error {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 14px;
+  }
+
+  &__submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 16px;
+    padding: 14px;
+    border: none;
+    border-radius: 9px;
+    background: #2b7de9;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.6;
+    }
+  }
+}
+
+/* ---- Surveillance card of the mobile screen of a signed fire permit ---- */
+
+body.digirisk-mobile-create .digirisk-mobile-firewatch {
+  // In the title of the card, sized like the "signed on" pill of the other cards and kept out of
+  // the uppercase of that title
+  .digirisk-firewatch__badge {
+    flex-shrink: 0;
+    padding: 4px 8px;
+    font-size: 10px;
+    line-height: 1.2;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  &__text {
+    font-size: 13px;
+    line-height: 1.45;
+    color: #64748b;
+  }
+
+  &__facts {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #334155;
+
+      + li {
+        margin-top: 4px;
+      }
+    }
+
+    i {
+      flex-shrink: 0;
+      width: 16px;
+      color: #94a3b8;
+      text-align: center;
+    }
+
+    span {
+      color: #64748b;
+    }
+  }
+}

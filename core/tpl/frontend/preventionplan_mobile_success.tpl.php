@@ -78,7 +78,16 @@ $successExtraInfoHtml .= '<div><div style="font-size: 0.7em; color: #666; font-w
 $successExtraInfoHtml .= '<div style="font-size: 0.9em; color: #4a55d1; font-weight: bold;">' . (!empty($object->date_end) ? dol_print_date($object->date_end, 'day') : '-') . '</div></div>';
 $successExtraInfoHtml .= '</div></div></div>';
 
-$euBadgeHtml = '<div style="font-size: 0.65em; background: #e6f2e9; color: #2d6a3c; padding: 4px 8px; border-radius: 15px; font-weight: bold; line-height: 1.2;"><i class="fas fa-check" style="margin-right: 5px;"></i> Signé le ' . dol_print_date($object->date_creation, 'dayhour') . '</div>';
+// Entreprise utilisatrice : son responsable reel et l'etat reel de sa signature. Le bloc annoncait
+// « Signe » a la date de creation, avec l'utilisateur connecte, meme quand le document n'avait pas
+// de signature EU (responsable change depuis Dolibarr, pas encore signe)
+$ppEuSignatory = digiriskGetCurrentSignatory($signatory, 'MasterWorker', (int) $object->id, 'preventionplan');
+$ppEuSigned    = is_object($ppEuSignatory) && !empty($ppEuSignatory->signature);
+$ppEuName      = is_object($ppEuSignatory) ? trim($ppEuSignatory->firstname . ' ' . $ppEuSignatory->lastname) : '';
+
+$euBadgeHtml = $ppEuSigned
+    ? '<div class="digirisk-mobile-extsign__signed"><i class="fas fa-check"></i> ' . $langs->trans('MobilePPExtAlreadySigned', dol_print_date($ppEuSignatory->signature_date, 'dayhour', 'tzuser')) . '</div>'
+    : '<div class="digirisk-mobile-extsign__signed digirisk-mobile-extsign__signed--not"><i class="fas fa-hourglass-half"></i> ' . $langs->trans('MobileNotSignedYet') . '</div>';
 
 $successEuBlockHtml = '<div class="digirisk-mobile-card digirisk-mobile-extsign" style="margin-top: 15px;">';
 $successEuBlockHtml .= '<div class="digirisk-mobile-extsign__title" style="display: flex; justify-content: space-between; align-items: center;">';
@@ -91,22 +100,18 @@ $successEuBlockHtml .= '<div><span style="color: #666;">Tiers :</span> <span sty
 $successEuBlockHtml .= '<div><span style="color: #666;">Siren :</span> <span style="color: #000;">' . dol_escape_htmltag($mysoc->idprof1) . '</span></div>';
 $successEuBlockHtml .= '</div>';
 $successEuBlockHtml .= '<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;">';
-$successEuBlockHtml .= '<div><span style="color: #666;">Resp.</span> <span style="color: #000; font-weight: 500;">' . dol_escape_htmltag($user->getFullName($langs)) . '</span></div>';
-$successEuBlockHtml .= '<div><span style="color: #666;">Tél :</span> <span style="color: #000;">' . dol_escape_htmltag($user->office_phone) . '</span></div>';
+$successEuBlockHtml .= '<div><span style="color: #666;">Resp.</span> <span style="color: #000; font-weight: 500;">' . dol_escape_htmltag($ppEuName) . '</span></div>';
+$successEuBlockHtml .= '<div><span style="color: #666;">Tél :</span> <span style="color: #000;">' . dol_escape_htmltag(is_object($ppEuSignatory) ? $ppEuSignatory->phone : '') . '</span></div>';
 $successEuBlockHtml .= '</div>';
 $successEuBlockHtml .= '<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;">';
-$successEuBlockHtml .= '<div><span style="color: #666;">Mail :</span> <span style="color: #000;">' . dol_escape_htmltag($user->email) . '</span></div>';
-$successEuBlockHtml .= '<div><span style="color: #666;">Poste :</span> <span style="color: #000;">' . dol_escape_htmltag($user->job ?? '') . '</span></div>';
+$successEuBlockHtml .= '<div><span style="color: #666;">Mail :</span> <span style="color: #000;">' . dol_escape_htmltag(is_object($ppEuSignatory) ? $ppEuSignatory->email : '') . '</span></div>';
+$successEuBlockHtml .= '<div><span style="color: #666;">Poste :</span> <span style="color: #000;">' . dol_escape_htmltag(is_object($ppEuSignatory) ? (string) $ppEuSignatory->job : '') . '</span></div>';
 $successEuBlockHtml .= '</div>';
 $successEuBlockHtml .= '</div></div>';
 
 // Entreprise exterieure : etat reel de la demande de signature. L'envoi automatique peut avoir
 // echoue et personne ne devait s'en apercevoir : l'ecran l'affiche et propose d'y remedier.
-$ppExtSignatory   = null;
-$ppExtSignatories = $signatory->fetchSignatory('ExtSocietyResponsible', $object->id, 'preventionplan');
-if (is_array($ppExtSignatories) && !empty($ppExtSignatories)) {
-    $ppExtSignatory = array_shift($ppExtSignatories);
-}
+$ppExtSignatory = digiriskGetCurrentSignatory($signatory, 'ExtSocietyResponsible', (int) $object->id, 'preventionplan');
 
 $ppExtSigned       = !empty($ppExtSignatory) && !empty($ppExtSignatory->signature);
 $ppExtEmailSent    = !empty($ppExtSignatory) && !empty($ppExtSignatory->last_email_sent_date);
@@ -122,23 +127,23 @@ $steps = [
     [
         'title'   => $langs->trans('MobilePPStepCreated'),
         'status'  => $langs->transnoentities('MobileStepDone'),
-        'date'    => dol_print_date($object->date_creation, 'day'),
+        'date'    => dol_print_date($object->date_creation, 'day', 'tzuser'),
         'done'    => true,
         'viewBox' => $workflowIcons['created']['viewBox'],
         'svg'     => $workflowIcons['created']['svg'],
     ],
     [
         'title'   => $langs->trans('MobileStepUserCompanyResponsible'),
-        'status'  => $langs->transnoentities('MobileStepSignedOn'),
-        'date'    => dol_print_date($object->date_creation, 'day'),
-        'done'    => true,
+        'status'  => $ppEuSigned ? $langs->transnoentities('MobileStepSignedOn') : $langs->transnoentities('MobileStepTodo'),
+        'date'    => $ppEuSigned ? dol_print_date($ppEuSignatory->signature_date, 'day', 'tzuser') : '',
+        'done'    => $ppEuSigned,
         'viewBox' => $workflowIcons['user']['viewBox'],
         'svg'     => $workflowIcons['user']['svg'],
     ],
     [
         'title'   => $langs->trans('MobileStepExteriorCompanyResponsible'),
         'status'  => $ppExtSigned ? $langs->transnoentities('MobileStepSignedOn') : $langs->transnoentities('MobileStepTodo'),
-        'date'    => $ppExtSigned ? dol_print_date($ppExtSignatory->signature_date ?? dol_now(), 'day') : '',
+        'date'    => $ppExtSigned ? dol_print_date($ppExtSignatory->signature_date ?? dol_now(), 'day', 'tzuser') : '',
         'done'    => $ppExtSigned,
         'viewBox' => $workflowIcons['company']['viewBox'],
         'svg'     => $workflowIcons['company']['svg'],
@@ -198,7 +203,25 @@ if ($ppHasDocument) {
     $successViewUrl = dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php', 1) . '?id=' . $object->id;
     $successViewLabel  = $langs->trans('MobilePPViewPlan');
 }
+// Confirmation banner, only when arriving right after the form was saved (not when the plan is
+// opened from the list)
+$successSaved      = GETPOST('saved', 'aZ09');
+$successBannerText = '';
+if ($successSaved === 'created') {
+    $successBannerText = $langs->trans('MobilePPCreated', $object->ref);
+} elseif ($successSaved === 'updated') {
+    $successBannerText = $langs->trans('MobilePPUpdated', $object->ref);
+}
+
 $successAgainUrl   = $_SERVER['PHP_SELF'];
 $successAgainLabel = $langs->trans('MobilePPCreateAnother');
+
+// Derniere etape de la barre d'avancement, offerte une fois le plan verrouille (meme regle que la fiche Dolibarr)
+$successArchiveUrl = ($object->status == PreventionPlan::STATUS_LOCKED)
+    ? $_SERVER['PHP_SELF'] . '?action=setArchived&plan_id=' . $object->id . '&token=' . newToken()
+    : '';
+$successArchiveLabel        = $langs->transnoentities('MobileStepArchive');
+$successArchiveConfirmTitle = $langs->transnoentities('ArchiveObject', $langs->transnoentities('ThePreventionplan'));
+$successArchiveConfirmText  = $langs->transnoentities('ConfirmArchiveObject', $langs->transnoentities('ThePreventionplan') . ' ' . $object->ref);
 
 require __DIR__ . '/digiriskdolibarr_mobile_success.tpl.php';

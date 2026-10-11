@@ -44,7 +44,7 @@ $fpExtName = trim($fpExtSignatory->firstname . ' ' . $fpExtSignatory->lastname);
         <div><i class="fas fa-hard-hat"></i> <?php print $langs->trans('FirePermitExteriorCompany'); ?></div>
         <?php if ($fpExtSigned) { ?>
         <div class="digirisk-mobile-extsign__signed">
-            <i class="fas fa-check"></i> <?php print $langs->trans('MobilePPExtAlreadySigned', dol_print_date($fpExtSignatory->signature_date, 'dayhour')); ?>
+            <i class="fas fa-check"></i> <?php print $langs->trans('MobilePPExtAlreadySigned', dol_print_date($fpExtSignatory->signature_date, 'dayhour', 'tzuser')); ?>
         </div>
         <?php } ?>
     </div>
@@ -72,7 +72,7 @@ $fpExtName = trim($fpExtSignatory->firstname . ' ' . $fpExtSignatory->lastname);
         <span>
             <?php
             print $fpExtEmailSent
-                ? $langs->trans('MobilePPExtEmailSentOn', dol_escape_htmltag($fpExtSignatory->email), dol_print_date($fpExtSignatory->last_email_sent_date, 'dayhour'))
+                ? $langs->trans('MobilePPExtEmailSentOn', dol_escape_htmltag($fpExtSignatory->email), dol_print_date($fpExtSignatory->last_email_sent_date, 'dayhour', 'tzuser'))
                 : $langs->trans('MobilePPExtEmailNotSent');
             ?>
         </span>

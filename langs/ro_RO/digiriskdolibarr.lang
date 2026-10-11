@@ -275,12 +275,12 @@ ThePreventionplan                                     = planul de prevenire
 PreventionPlanDocument                                = Plan de prevenire
 Preventionplandocument                                = Plan de prevenire
 PreventionPlanDocumentGenerated                       = Generarea planului de prevenire
-PreventionPlanList                                    = Lista planurilor de prevenire
+PreventionplanList                                    = Lista planurilor de prevenire
 PreventionPlanLine                                    = risc(uri)
 PreventionPlanLineCreated                             = Crearea unui risc în planul de prevenire
 PreventionPlanLineModified                            = Modificarea unui risc în planul de prevenire
 PreventionPlanLineDeleted                             = Ștergerea unui risc din planul de prevenire
-NewPreventionPlan                                     = Plan de prevenire nou
+NewPreventionplan                                     = Plan de prevenire nou
 PriorVisit                                            = Inspecție comună prealabilă
 PriorVisitYesNo                                       = Vizită preliminară efectuată
 PriorVisitText                                        = Nota inspecției
@@ -365,9 +365,9 @@ FirePermitMin  = permis de lucru cu foc
 FirePermitsMin = permise de lucru cu foc
 
 # Date
-NewFirePermit                                     = Permis de lucru cu foc nou
+NewFirepermit                                     = Permis de lucru cu foc nou
 ModifyFirePermit                                  = Modificați permisul de lucru cu foc
-FirePermitList                                    = Lista permiselor de lucru cu foc
+FirepermitList                                    = Lista permiselor de lucru cu foc
 FirePermit                                        = Permis de lucru cu foc
 Firepermit                                        = Permis de lucru cu foc
 TheFirepermit                                     = permisul de lucru cu foc
