@@ -431,3 +431,92 @@ function digiriskShareGeneratedFile(DoliDB $db, string $fileName, string $tableE
 
     return $ecmFile->update($user) > 0 ? 1 : -1;
 }
+
+/**
+ * Contenu reutilisable d'un plan de prevention, sous la forme ou le formulaire de la PWA le
+ * pre-remplit : motif, tags, risques (description, entreprises concernees, protections),
+ * certifications et horaires.
+ *
+ * Sert a la modification d'un plan et aux trames : ce qui est propre a une intervention
+ * (entreprise exterieure, responsable, dates, visite prealable, signatures, photos) n'en fait pas
+ * partie.
+ *
+ * @param  DoliDB         $db   Base de donnees
+ * @param  PreventionPlan $plan Plan de prevention charge
+ * @return array                Cles du pre-remplissage : label, categories, risks, certifications, schedule_<jour>_am/pm
+ * @throws Exception
+ */
+function digiriskPreventionPlanReusableContent(DoliDB $db, PreventionPlan $plan): array
+{
+    require_once __DIR__ . '/../../saturne/class/saturneschedules.class.php';
+
+    $plan->fetch_optionals();
+
+    $content = [
+        'label'          => (string) $plan->label,
+        'categories'     => [],
+        'risks'          => [],
+        'certifications' => [],
+    ];
+
+    if (isModEnabled('categorie')) {
+        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+
+        $category   = new Categorie($db);
+        $categories = $category->containing($plan->id, 'preventionplan');
+        if (is_array($categories)) {
+            foreach ($categories as $categoryItem) {
+                $content['categories'][] = $categoryItem->id;
+            }
+        }
+    }
+
+    // Protections are stored flat in the extrafield, each one carrying the risk it belongs to
+    $storedProtections = !empty($plan->array_options['options_mobile_protections']) ? json_decode($plan->array_options['options_mobile_protections'], true) : [];
+    if (!is_array($storedProtections)) {
+        $storedProtections = [];
+    }
+
+    // Which company each risk concerns, keyed by danger category
+    $storedRiskCompanies = !empty($plan->array_options['options_mobile_risk_companies']) ? json_decode($plan->array_options['options_mobile_risk_companies'], true) : [];
+    if (!is_array($storedRiskCompanies)) {
+        $storedRiskCompanies = [];
+    }
+
+    $planLine = new PreventionPlanLine($db);
+    $lines    = $planLine->fetchAll('', '', 0, 0, ['fk_preventionplan' => $plan->id]);
+    foreach (is_array($lines) ? $lines : [] as $line) {
+        $lineProtections = [];
+        foreach ($storedProtections as $storedProtection) {
+            // Plans created before the protections moved inside the risks have no risk_category:
+            // keep them on the first risk rather than dropping them silently
+            $storedRiskCategory = isset($storedProtection['risk_category']) ? (int) $storedProtection['risk_category'] : 0;
+            if ($storedRiskCategory === (int) $line->category || (empty($storedRiskCategory) && empty($content['risks']))) {
+                $lineProtections[] = $storedProtection;
+            }
+        }
+        // Plans created before the concerned companies existed have nothing stored: both are ticked
+        $lineCompanies = $storedRiskCompanies[(string) $line->category] ?? ['eu' => 1, 'ee' => 1];
+
+        $content['risks'][] = [
+            'category'    => $line->category,
+            'description' => $line->description,
+            'company_eu'  => !empty($lineCompanies['eu']) ? 1 : 0,
+            'company_ee'  => !empty($lineCompanies['ee']) ? 1 : 0,
+            'protections' => $lineProtections,
+        ];
+    }
+
+    $certifications = !empty($plan->array_options['options_mobile_certifications']) ? json_decode($plan->array_options['options_mobile_certifications'], true) : [];
+    $content['certifications'] = is_array($certifications) ? $certifications : [];
+
+    $schedules = new SaturneSchedules($db);
+    $schedules->fetch(0, '', ' AND element_type = "preventionplan" AND element_id = ' . ((int) $plan->id) . ' AND status = 1');
+    foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as $day) {
+        $parts = explode(' ', (string) $schedules->$day);
+        $content['schedule_' . $day . '_am'] = $parts[0] ?? 'N/A';
+        $content['schedule_' . $day . '_pm'] = $parts[1] ?? 'N/A';
+    }
+
+    return $content;
+}
