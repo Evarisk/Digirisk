@@ -26,7 +26,7 @@ use Luracast\Restler\RestException;
 require_once __DIR__ . '/../core/modules/modDigiriskDolibarr.class.php';
 
 require_once __DIR__ . '/riskanalysis/risk.class.php';
-require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
+dol_include_once('/saturne/class/task/saturnetask.class.php');
 require_once __DIR__ . '/digiriskdolibarrdocuments/riskassessmentdocument.class.php';
 require_once __DIR__ . '/accident.class.php';
 require_once __DIR__ . '/digiriskresources.class.php';

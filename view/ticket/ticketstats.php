@@ -37,7 +37,7 @@ if (isModEnabled('category')) {
 }
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../saturne/class/saturnedashboard.class.php';
+dol_include_once('/saturne/class/saturnedashboard.class.php');
 
 // Load DigiriskDolibarr librairies
 require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
@@ -90,7 +90,7 @@ if ($resHook < 0) {
 
 if (empty($resHook)) {
     // Actions adddashboardinfo, closedashboardinfo, generate_csv
-    require_once __DIR__ . '/../../../saturne/core/tpl/actions/dashboard_actions.tpl.php';
+    require_once dol_buildpath('/saturne/core/tpl/actions/dashboard_actions.tpl.php');
 }
 
 /*

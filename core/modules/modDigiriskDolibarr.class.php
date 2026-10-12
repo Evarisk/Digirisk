@@ -361,10 +361,10 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$this->db = $db;
 
-		$this->saturneAvailable = file_exists(__DIR__ . '/../../../saturne/lib/saturne_functions.lib.php');
+		$this->saturneAvailable = file_exists(dol_buildpath('/saturne/lib/saturne_functions.lib.php'));
 
 		if ($this->saturneAvailable) {
-			require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
+			dol_include_once('/saturne/lib/saturne_functions.lib.php');
 			saturne_load_langs(['digiriskdolibarr@digiriskdolibarr']);
 		} else {
 			$this->error++;
@@ -2236,7 +2236,7 @@ class modDigiriskdolibarr extends DolibarrModules
         if (empty($conf->global->DIGIRISKDOLIBARR_ACCIDENT_REMOVE_FK_USER_VICTIM)) {
 
             require_once __DIR__ . '/../../class/accident.class.php';
-            require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+            dol_include_once('/saturne/class/saturnesignature.class.php');
 
             $accident  = new Accident($this->db);
             $signatory = new SaturneSignature($this->db);
@@ -2570,7 +2570,7 @@ class modDigiriskdolibarr extends DolibarrModules
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 2, 'integer', 0, '', $conf->entity);
         }
 		if (getDolGlobalInt('DIGIRISKDOLIBARR_THIRDPARTY_UPDATED') == 2) {
-			require_once __DIR__ . '/../../../saturne/class/saturneschedules.class.php';
+			dol_include_once('/saturne/class/saturneschedules.class.php');
 
 			$labourDoctorID = $resources->fetchDigiriskResource('LabourDoctorSociety');
 			$societe->fetch($labourDoctorID);

@@ -40,8 +40,8 @@ require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
-require_once __DIR__ . '/../../../saturne/lib/medias.lib.php';
+dol_include_once('/saturne/class/saturnesignature.class.php');
+dol_include_once('/saturne/lib/medias.lib.php');
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/preventionplan.class.php';
@@ -610,7 +610,7 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                 $db->commit();
 
                 // Save schedules
-                require_once __DIR__ . '/../../../saturne/class/saturneschedules.class.php';
+                dol_include_once('/saturne/class/saturneschedules.class.php');
                 $saturneSchedules = new SaturneSchedules($db);
                 $saturneSchedules->fetch(0, '', ' AND element_type = "preventionplan" AND element_id = ' . $object->id . ' AND status = 1');
                 $saturneSchedules->element_type = 'preventionplan';
@@ -729,7 +729,7 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                 }
 
                 // Save schedules
-                require_once __DIR__ . '/../../../saturne/class/saturneschedules.class.php';
+                dol_include_once('/saturne/class/saturneschedules.class.php');
                 $saturneSchedules = new SaturneSchedules($db);
                 $saturneSchedules->element_type = 'preventionplan';
                 $saturneSchedules->element_id = $object->id;

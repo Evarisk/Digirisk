@@ -26,11 +26,11 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/pdf.lib.php';
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
-require_once __DIR__ . '/../../../../../../saturne/class/saturnesignature.class.php';
-require_once __DIR__ . '/../../../../../../saturne/lib/medias.lib.php';
+dol_include_once('/saturne/core/modules/saturne/modules_saturne.php');
+dol_include_once('/saturne/class/saturnesignature.class.php');
+dol_include_once('/saturne/lib/medias.lib.php');
 // saturne_get_thumb_name() falls back on saturne_vignette() when the thumb is missing
-require_once __DIR__ . '/../../../../../../saturne/lib/dolibarr.lib.php';
+dol_include_once('/saturne/lib/dolibarr.lib.php');
 
 /**
  * Class to build the accident investigation document as a PDF.
@@ -281,7 +281,7 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
         require_once __DIR__ . '/../../../../../class/digiriskstandard.class.php';
         // get_recursive_task_budget() lives there, the ODT flow gets it from the card
         require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_accidentinvestigation.lib.php';
-        require_once __DIR__ . '/../../../../../../saturne/class/task/saturnetask.class.php';
+        dol_include_once('/saturne/class/task/saturnetask.class.php');
 
         $moreParam = self::getMoreParam($objectDocument, $moreParam);
 

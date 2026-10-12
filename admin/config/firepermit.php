@@ -82,7 +82,7 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 }
 
 // Actions set_mod, update_mask
-require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
+require_once dol_buildpath('/saturne/core/tpl/actions/admin_conf_actions.tpl.php');
 
 if ($action == 'setMaitreOeuvre') {
 	$masterWorkerId = GETPOST('maitre_oeuvre');
@@ -212,11 +212,11 @@ if (isModEnabled('project')) {
 
 $objectModSubdir = 'digiriskelement';
 
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php');
 
 $object = new FirePermitLine($db);
 
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php');
 
 print load_fiche_titre($langs->trans("FirePermitData"), '', '');
 
