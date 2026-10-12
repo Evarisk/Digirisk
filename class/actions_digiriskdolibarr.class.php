@@ -1460,6 +1460,67 @@ class ActionsDigiriskdolibarr
     }
 
     /**
+     * Overloading the showInputExtraField function : replacing the parent's function with the one below
+     *
+     * A risk has no label: the task risk selector only showed "RK1", and the same ref of two shared entities
+     * could not be told apart. Each option is labelled with its danger category and its parent element instead.
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function showInputExtraField(array $parameters): int
+    {
+        global $form;
+
+        if ($parameters['key'] != 'fk_risk' || $parameters['extrafieldsobjectkey'] != 'projet_task' || $parameters['mode'] == 1 || !is_object($form)) {
+            return 0;
+        }
+
+        require_once __DIR__ . '/riskanalysis/risk.class.php';
+
+        $value = (int) $parameters['value'];
+
+        $sql  = 'SELECT r.rowid, r.ref, r.category, r.type, e.ref AS element_ref, e.label AS element_label';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_risk AS r';
+        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement AS e ON e.rowid = r.fk_element';
+        $sql .= ' WHERE r.entity IN (' . getEntity('risk') . ')';
+        $sql .= ' AND (r.status > ' . Risk::STATUS_DELETED . ($value > 0 ? ' OR r.rowid = ' . $value : '') . ')';
+        $sql .= ' ORDER BY r.rowid';
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            return 0; // Fall back on the standard selector
+        }
+
+        $dangerCategories = [];
+        $risks            = [];
+        while ($obj = $this->db->fetch_object($resql)) {
+            if (!isset($dangerCategories[$obj->type])) {
+                $dangerCategories[$obj->type] = array_column(Risk::getDangerCategories($obj->type), 'name', 'position');
+            }
+
+            $label = $obj->ref;
+            if (isset($dangerCategories[$obj->type][$obj->category])) {
+                $label .= ' - ' . $dangerCategories[$obj->type][$obj->category];
+            }
+            if (!empty($obj->element_ref)) {
+                $label .= ' (' . $obj->element_ref . ' - ' . $obj->element_label . ')';
+            }
+            $risks[$obj->rowid] = $label;
+        }
+        $this->db->free($resql);
+
+        $keyPrefix = $parameters['keyprefix'];
+        if (!preg_match('/options_$/', $keyPrefix)) {
+            $keyPrefix .= 'options_';
+        }
+
+        $this->resprints = $form->selectarray($keyPrefix . $parameters['key'] . $parameters['keysuffix'], $risks, $value, 1, 0, 0, '', 0, 0, 0, '', $parameters['morecss'], 1);
+
+        return 1;
+    }
+
+    /**
      * Overloading the printFieldListOption function : replacing the parent's function with the one below
      *
      * @param  array        $parameters Hook metadata (context, etc...)
