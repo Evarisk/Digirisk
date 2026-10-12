@@ -141,8 +141,9 @@ $onPhone = $onPhone ?? ($conf->browser->layout == 'phone');
                                                     <div class="table-cell"><?php echo $critere['name'] ; ?></div>
                                                     <?php foreach ($critere['option']['survey']['request'] as $request) : ?>
                                                         <div class="table-cell can-select cell-<?php echo $lastEvaluation->id ? $lastEvaluation->id : 0;
-                                                        if ( ! empty($request['seuil'])) {
-                                                            echo $request['seuil'] == $lastEvaluation->$key ? " active" : "" ;
+                                                        // Gravity and exposure start at level 0: empty() never preselected it, and a loose == matched an unset criterion
+                                                        if (isset($request['seuil'], $lastEvaluation->$key) && (int) $request['seuil'] === (int) $lastEvaluation->$key) {
+                                                            echo ' active';
                                                         } ?>"
                                                              data-type="<?php echo $name ?>"
                                                              data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
