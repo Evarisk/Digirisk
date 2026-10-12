@@ -505,15 +505,16 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $totalPages  = $pdf->getNumPages();
         $halfWidth   = $this->contentWidth($pdf) / 2;
 
-        $pdf->SetFont('', '', $this->footerFontSize);
-        $pdf->SetTextColor(140, 140, 140);
-
         for ($page = 1; $page <= $totalPages; $page++) {
             $pdf->setPage($page);
             // Le pied s'ecrit dans la bande basse, sous le seuil de rupture : sans couper la
             // rupture automatique son Cell serait reporte en haut de la page suivante. A recouper
             // apres chaque setPage, qui restaure les reglages memorises de la page.
             $pdf->SetAutoPageBreak(false);
+            // La police aussi, page par page : posee une seule fois, elle ne s'ecrivait que sur la
+            // page courante, et les autres pieds reprenaient la derniere police de leur contenu
+            $pdf->SetFont('', '', $this->footerFontSize);
+            $pdf->SetTextColor(140, 140, 140);
             $pdf->SetXY($this->marge_gauche, $pdf->getPageHeight() - 12);
             $pdf->Cell($halfWidth, 5, $this->footerText, 0, 0, 'L');
             $pdf->Cell($halfWidth, 5, 'Page ' . $page . ' / ' . $totalPages, 0, 0, 'R');
@@ -686,13 +687,119 @@ class pdf_preventionplandocument extends SaturneDocumentModel
     protected function writeSections($pdf, $object, array $data, Translate $outputLangs, float $size)
     {
         $this->sectionCompanies($pdf, $data, $outputLangs, $size);
+        $this->sectionImages($pdf, 'companies');
         $this->sectionEmergency($pdf, $data, $outputLangs, $size);
+        $this->sectionImages($pdf, 'emergency');
         $this->sectionMeansAndRules($pdf, $data, $outputLangs, $size);
+        $this->sectionSiteTraffic($pdf, $outputLangs, $size);
         $this->sectionPriorVisit($pdf, $object, $data, $outputLangs, $size);
+        $this->sectionImages($pdf, 'priorvisit');
         $this->sectionIntervention($pdf, $object, $outputLangs, $size);
+        $this->sectionImages($pdf, 'intervention');
         $this->sectionRisks($pdf, $object, $outputLangs, $size);
+        $this->sectionImages($pdf, 'risks');
         $this->sectionCertifications($pdf, $object, $outputLangs, $size);
         $this->sectionSignatures($pdf, $object, $outputLangs, $size);
+        $this->sectionImages($pdf, 'signatures');
+    }
+
+    /**
+     * Images envoyees dans la configuration pour une partie du document.
+     *
+     * Le permis de feu reprend la mise en page du plan de prevention mais pas ses images : il
+     * redefinit cette methode.
+     *
+     * @param  string   $part Partie du document, cle de digiriskPreventionPlanDocumentImageParts()
+     * @return string[]       Chemins des images
+     */
+    protected function documentImages(string $part): array
+    {
+        return digiriskPreventionPlanDocumentImages($part);
+    }
+
+    /**
+     * Dimensionne des images, une par ligne : chacune prend toute la largeur utile, comme les
+     * panneaux et les plans que les modeles ODT collaient sur toute la page, sans jamais depasser
+     * une page avec le titre de sa partie. Une image n'est pas agrandie au-dela de sa taille a
+     * 96 dpi, ce qui ne ferait que la rendre floue.
+     *
+     * @param  TCPDF    $pdf    PDF handler
+     * @param  string[] $images Chemins des images
+     * @return array            Lignes : ['path' => string, 'width' => float, 'height' => float]
+     */
+    protected function imageRows($pdf, array $images): array
+    {
+        $maxWidth  = $this->contentWidth($pdf);
+        $maxHeight = $pdf->getPageHeight() - $this->marge_haute - self::FOOTER_BAND - 24;
+
+        $rows = [];
+        foreach ($images as $path) {
+            // TCPDF n'embarque surement que le JPEG et le PNG : un autre format ferait echouer tout le document
+            $imageSize = is_readable($path) ? getimagesize($path) : false;
+            if (!is_array($imageSize) || $imageSize[0] <= 0 || $imageSize[1] <= 0 || !in_array($imageSize[2], [IMAGETYPE_JPEG, IMAGETYPE_PNG], true)) {
+                continue;
+            }
+
+            $width  = min($maxWidth, $imageSize[0] * 25.4 / 96);
+            $height = $width * $imageSize[1] / $imageSize[0];
+            if ($height > $maxHeight) {
+                $height = $maxHeight;
+                $width  = $height * $imageSize[0] / $imageSize[1];
+            }
+            $rows[] = ['path' => $path, 'width' => $width, 'height' => $height];
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Pose des images, une par ligne et centrees. Une image n'est jamais coupee par un saut de page.
+     *
+     * @param  TCPDF $pdf  PDF handler
+     * @param  array $rows Lignes rendues par imageRows()
+     * @return void
+     */
+    protected function drawImageRows($pdf, array $rows)
+    {
+        foreach ($rows as $row) {
+            $this->checkPageBreak($pdf, $row['height'] + 3);
+
+            $x = $this->marge_gauche + ($this->contentWidth($pdf) - $row['width']) / 2;
+            $y = $pdf->GetY();
+            $pdf->Image($row['path'], $x, $y, $row['width'], $row['height'], '', '', '', false, 300, '', false, false, 0, false, false, false);
+            $pdf->Rect($x, $y, $row['width'], $row['height']);
+
+            $pdf->SetY($y + $row['height'] + 3);
+        }
+    }
+
+    /**
+     * Images d'une partie, sous son contenu.
+     *
+     * @param  TCPDF  $pdf  PDF handler
+     * @param  string $part Partie du document
+     * @return void
+     */
+    protected function sectionImages($pdf, string $part)
+    {
+        $this->drawImageRows($pdf, $this->imageRows($pdf, $this->documentImages($part)));
+    }
+
+    /**
+     * Partie qui n'a que des images : son titre reste avec la premiere ligne, sinon il finirait seul
+     * en bas de la page precedente.
+     *
+     * @param  TCPDF  $pdf   PDF handler
+     * @param  string $title Titre de la partie
+     * @param  array  $rows  Lignes rendues par imageRows(), au moins une
+     * @param  float  $size  Taille de police
+     * @return void
+     */
+    protected function imagesOnlySection($pdf, string $title, array $rows, float $size)
+    {
+        $this->reserveSpace($pdf, 18 + $rows[0]['height'] + 3);
+        $this->sectionTitle($pdf, $title, $size);
+        $this->drawImageRows($pdf, $rows);
     }
 
     /**
@@ -785,17 +892,42 @@ class pdf_preventionplandocument extends SaturneDocumentModel
     protected function sectionMeansAndRules($pdf, array $data, Translate $outputLangs, float $size)
     {
         $blocks = [
-            'GeneralMeansAtDisposal' => $data['moyen_generaux_mis_disposition'] ?? '',
-            'GeneralInstructions'    => $data['consigne_generale']              ?? '',
-            'FirstAid'               => $data['premiers_secours']               ?? '',
+            'means'        => ['GeneralMeansAtDisposal', $data['moyen_generaux_mis_disposition'] ?? ''],
+            'instructions' => ['GeneralInstructions', $data['consigne_generale'] ?? ''],
+            'firstaid'     => ['FirstAid', $data['premiers_secours'] ?? ''],
         ];
 
-        foreach ($blocks as $titleKey => $html) {
+        foreach ($blocks as $part => [$titleKey, $html]) {
+            $rows = $this->imageRows($pdf, $this->documentImages($part));
+
+            // Sans texte, la partie ne s'imprime que pour ses images
             if (!dol_strlen($html)) {
+                if (!empty($rows)) {
+                    $this->imagesOnlySection($pdf, $outputLangs->transnoentities($titleKey), $rows, $size);
+                }
                 continue;
             }
+
             $this->sectionTitle($pdf, $outputLangs->transnoentities($titleKey), $size);
             $this->htmlBlock($pdf, $html, $size - 1);
+            $this->drawImageRows($pdf, $rows);
+        }
+    }
+
+    /**
+     * Circulation sur le site : une partie faite seulement des images envoyees dans la
+     * configuration, absente du document quand il n'y en a pas.
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @return void
+     */
+    protected function sectionSiteTraffic($pdf, Translate $outputLangs, float $size)
+    {
+        $rows = $this->imageRows($pdf, $this->documentImages('sitetraffic'));
+        if (!empty($rows)) {
+            $this->imagesOnlySection($pdf, $outputLangs->transnoentities('PreventionPlanSiteTraffic'), $rows, $size);
         }
     }
 
@@ -1315,7 +1447,12 @@ class pdf_preventionplandocument extends SaturneDocumentModel
     protected function sectionCertifications($pdf, $object, Translate $outputLangs, float $size)
     {
         $mobileCertifications = !empty($object->array_options['options_mobile_certifications']) ? json_decode($object->array_options['options_mobile_certifications'], true) : [];
+        $imageRows            = $this->imageRows($pdf, $this->documentImages('certifications'));
         if (empty($mobileCertifications)) {
+            // Sans certification, la partie ne s'imprime que pour ses images
+            if (!empty($imageRows)) {
+                $this->imagesOnlySection($pdf, $outputLangs->transnoentities('MobilePPCertifications'), $imageRows, $size);
+            }
             return;
         }
 
@@ -1342,6 +1479,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         }
 
         $this->table($pdf, $header, $rows, $widths, $size);
+        $this->drawImageRows($pdf, $imageRows);
     }
 
     /**
