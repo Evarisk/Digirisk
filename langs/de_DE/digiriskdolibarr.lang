@@ -1744,6 +1744,10 @@ CharRemaining                       = Verbleibende Zeichen
 NumberOfLinkedFiles                 = Anzahl der Dateianhänge
 ChooseAnImage                       = Ein Bild auswählen
 
+# Action Plan - Rights
+ReadActionPlan                      = PAPRIPACT einsehen
+WriteActionPlan                     = Korrekturmaßnahmen im PAPRIPACT bearbeiten
+
 # Action Plan - Gantt / Kanban
 ActionPlanGantt                     = Gantt-Diagramm
 ActionPlanKanban                    = Kanban

@@ -112,8 +112,10 @@ if ($projectId > 0 && ($isExplicitChoice || (int) ($_COOKIE[$projectCookieName] 
     $_COOKIE[$projectCookieName] = (string) $projectId;
 }
 
-// Security check
-$permissiontoread = $user->hasRight('digiriskdolibarr', 'riskassessmentdocument', 'read');
+// Security check: the action plan belongs to the Document Unique, its readers keep reading it
+$permissiontoread = $user->hasRight('digiriskdolibarr', 'actionplan', 'read') || $user->hasRight('digiriskdolibarr', 'riskassessmentdocument', 'read');
+// The corrective actions are project tasks: the users allowed to modify the tasks keep editing them from the board
+$permissiontoedit = $user->hasRight('digiriskdolibarr', 'actionplan', 'write') || $user->hasRight('projet', 'creer');
 saturne_check_access($permissiontoread);
 
 // Displayed corrective actions criteria (GP/UT, risk level, tags) — shared by the Kanban, the Gantt and the exports
@@ -164,6 +166,16 @@ function createActionPlanEvent($db, $user, $langs, $task, $constName, $label, $n
 /*
  * Actions
  */
+
+// Every AJAX action of the board modifies a corrective action: refuse them all without the right to edit the action plan
+$boardEditActions = ['updateTaskProgress', 'updateTaskLabel', 'updateTaskResponsible', 'addTaskContributor', 'removeTaskContributor', 'updateTaskMeta', 'updateTaskDate', 'addTaskCategory', 'removeTaskCategory'];
+if (in_array($action, $boardEditActions) && !$permissiontoedit) {
+    header('Content-Type: application/json');
+    http_response_code(403);
+    print json_encode(['success' => 0, 'error' => $langs->transnoentities('NotEnoughPermissions')]);
+    $db->close();
+    exit;
+}
 
 // AJAX action to update task progress from Kanban drag & drop
 if ($action == 'updateTaskProgress' && !empty(GETPOSTINT('task_id'))) {

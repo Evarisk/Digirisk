@@ -33,6 +33,15 @@ window.digiriskdolibarr.actionplanKanban.deferredCards = {};
 window.digiriskdolibarr.actionplanKanban.chunkSize = 30;
 
 /**
+ * Whether the board is only browsed: without the right to edit the action plan, no drag & drop nor inline edit
+ *
+ * @return {boolean}
+ */
+window.digiriskdolibarr.actionplanKanban.isReadOnly = function() {
+    return $('.kanban-board').hasClass('kanban-board-readonly');
+};
+
+/**
  * Register delegated events
  */
 window.digiriskdolibarr.actionplanKanban.event = function() {
@@ -43,6 +52,23 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
     $(document).on('mouseleave', '.kanban-card', function() {
         $(this).removeClass('kanban-card-hover');
     });
+
+    // Lazy-load: "load more" button injects the next chunk of deferred cards
+    $(document).on('click', '.kanban-load-more', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.digiriskdolibarr.actionplanKanban.loadMore($(this).data('column'));
+    });
+
+    // Prevent card drag when clicking the load-more button
+    $(document).on('mousedown', '.kanban-load-more', function(e) {
+        e.stopPropagation();
+    });
+
+    // Every event below edits a corrective action
+    if (window.digiriskdolibarr.actionplanKanban.isReadOnly()) {
+        return;
+    }
 
     // Inline edit: click on label to edit
     $(document).on('click', '.kanban-card-label', function(e) {
@@ -688,25 +714,13 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
     $(document).on('mousedown', '.kanban-remove-contact, .kanban-initial-wrapper', function(e) {
         e.stopPropagation();
     });
-
-    // Lazy-load: "load more" button injects the next chunk of deferred cards
-    $(document).on('click', '.kanban-load-more', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        window.digiriskdolibarr.actionplanKanban.loadMore($(this).data('column'));
-    });
-
-    // Prevent card drag when clicking the load-more button
-    $(document).on('mousedown', '.kanban-load-more', function(e) {
-        e.stopPropagation();
-    });
 };
 
 /**
  * Initialize jQuery UI sortable on Kanban columns
  */
 window.digiriskdolibarr.actionplanKanban.initSortable = function() {
-    if ($('.kanban-sortable').length === 0) {
+    if ($('.kanban-sortable').length === 0 || window.digiriskdolibarr.actionplanKanban.isReadOnly()) {
         return;
     }
 
@@ -811,7 +825,9 @@ window.digiriskdolibarr.actionplanKanban.loadMore = function(colKey) {
     }
 
     // Make the freshly injected cards draggable
-    $('.kanban-sortable').sortable('refresh');
+    if (!window.digiriskdolibarr.actionplanKanban.isReadOnly()) {
+        $('.kanban-sortable').sortable('refresh');
+    }
 };
 
 /**
