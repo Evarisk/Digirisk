@@ -139,6 +139,18 @@ class pdf_firepermitdocument extends pdf_preventionplandocument
     }
 
     /**
+     * Les images envoyees dans la configuration du plan de prevention lui sont propres : le permis
+     * de feu n'en a pas.
+     *
+     * @param  string   $part Partie du document
+     * @return string[]       Aucune image
+     */
+    protected function documentImages(string $part): array
+    {
+        return [];
+    }
+
+    /**
      * Travaux par point chaud : un bloc par type de travaux, comme les risques du plan de prevention
      * (picto, description et materiel employe, protections, photos prises sur le terrain).
      *
