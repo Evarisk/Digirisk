@@ -202,19 +202,21 @@ $firstDayOfTheYear = dol_get_first_day((int) date('Y'));
 print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksShowRegisters') . '</td>';
 print '<td><input type="checkbox" id="showregisters" name="showregisters" checked></td></tr>';
 print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksRegistersDateRange') . '</td>';
-print '<td>' . $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'registerdatestart');
+print '<td><input type="checkbox" id="registerdaterange" name="registerdaterange">';
+print '<label for="registerdaterange" class="marginrightonly">' . $langs->trans('UseDateRange') . '</label> ';
+print $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'registerdatestart');
 print $langs->trans('At') . $form->selectDate(dol_now(), 'registerdateend');
-print $langs->trans('UseDateRange');
-print '<input type="checkbox" id="registerdaterange" name="registerdaterange"></td></tr>';
+print '</td></tr>';
 
 // Accidents, et la plage de dates qui les borne
 print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksShowAccidents') . '</td>';
 print '<td><input type="checkbox" id="showaccidents" name="showaccidents" checked></td></tr>';
 print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksAccidentsDateRange') . '</td>';
-print '<td>' . $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'accidentdatestart');
+print '<td><input type="checkbox" id="accidentdaterange" name="accidentdaterange">';
+print '<label for="accidentdaterange" class="marginrightonly">' . $langs->trans('UseDateRange') . '</label> ';
+print $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'accidentdatestart');
 print $langs->trans('At') . $form->selectDate(dol_now(), 'accidentdateend');
-print $langs->trans('UseDateRange');
-print '<input type="checkbox" id="accidentdaterange" name="accidentdaterange"></td></tr>';
+print '</td></tr>';
 
 // Photo des evaluations : cochee par defaut, soit le rendu historique
 print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksShowPhoto') . '</td>';

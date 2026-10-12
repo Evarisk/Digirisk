@@ -147,10 +147,10 @@ if ($object->id > 0) {
     // DateRange -- Plage de date
     $firstDayOfTheYear = dol_get_first_day((int) date('Y'));
     print '<tr class="oddeven"><td>' . $langs->trans("DateRange") . '</td>';
-    print '<td>' . $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'datestart');
+    print '<td><input type="checkbox" id="daterange" name="daterange" checked>';
+    print '<label for="daterange" class="marginrightonly">' . $langs->trans('UseDateRange') . '</label> ';
+    print $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'datestart');
     print $langs->trans('At') . $form->selectDate(dol_now(), 'dateend');
-    print $langs->trans('UseDateRange');
-    print '<input type="checkbox" id="daterange" name="daterange" checked>';
     print '</td></tr>';
 
     // Destinataire
