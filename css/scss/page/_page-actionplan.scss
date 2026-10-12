@@ -753,6 +753,35 @@
     }
 }
 
+/* Read-only board: the action plan is browsed without the right to edit it, nothing invites to drag or edit */
+.kanban-board-readonly {
+    .kanban-card,
+    .kanban-card:active,
+    .kanban-card-label,
+    .kanban-editable-meta,
+    .kanban-date,
+    .kanban-initial-responsible,
+    .kanban-progress-bar {
+        cursor: default;
+    }
+
+    .kanban-card-label:hover,
+    .kanban-editable-meta:hover,
+    .kanban-date:hover {
+        background: none;
+        outline: none;
+    }
+
+    .kanban-initial-responsible:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .kanban-progress-bar:hover {
+        height: 8px;
+    }
+}
+
 .kanban-card-placeholder {
     background: rgba(13, 138, 255, 0.08);
     border: 2px dashed #0d8aff;

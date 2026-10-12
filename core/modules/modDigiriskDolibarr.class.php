@@ -1480,6 +1480,20 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'categoryconfig';
 		$r++;
 
+		/* ACTION PLAN (PAPRIPACT) PERMISSIONS */
+		// Kept last: a permission id derives from its position, inserting it higher would shift the ids already granted.
+		// They open the action plan to the users who only follow up the corrective actions, without the other Digirisk rights.
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
+		$this->rights[$r][1] = $langs->transnoentities('ReadActionPlan');
+		$this->rights[$r][4] = 'actionplan';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
+		$this->rights[$r][1] = $langs->transnoentities('WriteActionPlan');
+		$this->rights[$r][4] = 'actionplan';
+		$this->rights[$r][5] = 'write';
+		$r++;
+
 		// The mobile interfaces and the application create the very same objects as the classic cards:
 		// they rely on preventionplan/write and firepermit/write rather than on rights of their own.
 
@@ -1576,7 +1590,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
             'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'projet\') && !getDolGlobalInt(\'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_MENU_HIDDEN\')',
-            'perms'    => '$user->rights->projet->lire',
+            'perms'    => '$user->rights->digiriskdolibarr->actionplan->read || $user->rights->digiriskdolibarr->riskassessmentdocument->read',
             'target'   => '',
             'user'     => 0,
         ];
@@ -1592,6 +1606,25 @@ class modDigiriskdolibarr extends DolibarrModules
             'position' => 100 + $r,
             'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'categorie\') && $user->rights->digiriskdolibarr->risk->read && getDolGlobalString(\'DIGIRISKDOLIBARR_CATEGORY_ON_RISK\') && !getDolGlobalInt(\'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_MENU_HIDDEN\')',
             'perms'    => '$user->rights->digiriskdolibarr->risk->read',
+            'target'   => '',
+            'user'     => 0,
+        ];
+
+        // The menu shows no entry under a forbidden parent: a user who follows up the action plan without reading the
+        // Document Unique reaches the PAPRIPACT from this top entry. Its own leftmenu keeps it out of the URL rewrites
+        // made on the 'digiriskactionplan' entry above.
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',
+            'type'     => 'left',
+            'titre'    => $langs->trans('PAPRIPACT'),
+            'prefix'   => '<i class="fas fa-tasks pictofixedwidth"></i>',
+            'mainmenu' => 'digiriskdolibarr',
+            'leftmenu' => 'digiriskdolibarr_actionplan',
+            'url'      => '/digiriskdolibarr/view/digiriskstandard/actionplan_list.php?view=kanban',
+            'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+            'position' => 100 + $r,
+            'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'projet\') && !getDolGlobalInt(\'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_MENU_HIDDEN\') && $user->rights->digiriskdolibarr->actionplan->read && !$user->rights->digiriskdolibarr->riskassessmentdocument->read',
+            'perms'    => '$user->rights->digiriskdolibarr->actionplan->read',
             'target'   => '',
             'user'     => 0,
         ];

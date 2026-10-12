@@ -10,6 +10,7 @@
  * - $allUsers               array  Internal users (responsible / contributor selectors)
  * - $allContacts            array  External contacts (contributor selector)
  * - $allAvailableCategories array  Categories (tag selector)
+ * - $permissiontoedit       bool   Whether the user may edit the corrective action (selectors and remove buttons)
  * - $langs                  Translate
  */
 ?>
@@ -133,6 +134,7 @@
                   style="background: <?= dol_escape_htmltag($cardColor) ?>">
                 <?= $respInitial ?: '?' ?>
             </span>
+            <?php if ($permissiontoedit) : ?>
             <!-- Hidden searchable dropdown, shown on click (same UI as contributor selector) -->
             <div class="kanban-responsible-dropdown" data-task-id="<?= $t['id'] ?>">
                 <input type="text" class="kanban-responsible-search" placeholder="<?= dol_escape_htmltag($langs->trans('Search')) ?>..." autocomplete="off">
@@ -152,6 +154,7 @@
                     <?php endforeach; ?>
                 </div>
             </div>
+            <?php endif; ?>
         </div>
 
         <span class="kanban-separator">|</span>
@@ -164,12 +167,15 @@
                           title="<?= dol_escape_htmltag($contrib['fullname']) ?>">
                         <?= !empty($contrib['initials']) ? $contrib['initials'] : strtoupper(mb_substr($contrib['fullname'], 0, 2)) ?>
                     </span>
-                    <span class="kanban-remove-contact" title="<?= dol_escape_htmltag($langs->trans('RemoveContact')) ?>">&times;</span>
+                    <?php if ($permissiontoedit) : ?>
+                        <span class="kanban-remove-contact" title="<?= dol_escape_htmltag($langs->trans('RemoveContact')) ?>">&times;</span>
+                    <?php endif; ?>
                 </span>
             <?php endforeach; ?>
         <?php endif; ?>
 
         <!-- Add contributor -->
+        <?php if ($permissiontoedit) : ?>
         <div class="kanban-add-contributor-wrapper">
             <button class="kanban-add-contributor-btn" title="<?= dol_escape_htmltag($langs->trans('AddContributor')) ?>">
                 <i class="fas fa-user-plus"></i>
@@ -211,6 +217,7 @@
                 </div>
             </div>
         </div>
+        <?php endif; ?>
     </div>
 
     <!-- Dates row -->
@@ -244,10 +251,13 @@
             <?php foreach ($t['categories'] as $cat) : ?>
                 <span class="kanban-tag" data-cat-id="<?= $cat['id'] ?>" style="background: <?= !empty($cat['color']) ? '#' . dol_escape_htmltag($cat['color']) : '#8c8c8c' ?>">
                     <?= dol_escape_htmltag($cat['label']) ?>
-                    <span class="kanban-tag-remove" title="<?= dol_escape_htmltag($langs->trans('Remove')) ?>">&times;</span>
+                    <?php if ($permissiontoedit) : ?>
+                        <span class="kanban-tag-remove" title="<?= dol_escape_htmltag($langs->trans('Remove')) ?>">&times;</span>
+                    <?php endif; ?>
                 </span>
             <?php endforeach; ?>
         <?php endif; ?>
+        <?php if ($permissiontoedit) : ?>
         <div class="kanban-tag-dropdown-wrapper">
             <button class="kanban-add-tag-btn" title="<?= dol_escape_htmltag($langs->trans('AddCategory')) ?>">
                 <i class="fas fa-tag"></i><i class="fas fa-plus" style="font-size:7px;margin-left:1px"></i>
@@ -275,6 +285,7 @@
                 <?php endforeach; ?>
             </div>
         </div>
+        <?php endif; ?>
     </div>
 
 </div>

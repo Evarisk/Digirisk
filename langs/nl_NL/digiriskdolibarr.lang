@@ -1744,6 +1744,10 @@ CharRemaining                       = Resterende tekens
 NumberOfLinkedFiles                 = Aantal bijlagen
 ChooseAnImage                       = Een afbeelding kiezen
 
+# Action Plan - Rights
+ReadActionPlan                      = Het PAPRIPACT raadplegen
+WriteActionPlan                     = De corrigerende acties wijzigen vanuit het PAPRIPACT
+
 # Action Plan - Gantt / Kanban
 ActionPlanGantt                     = Gantt-diagram
 ActionPlanKanban                    = Kanban

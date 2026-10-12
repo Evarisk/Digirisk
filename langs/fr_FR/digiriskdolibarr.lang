@@ -1818,6 +1818,10 @@ CharRemaining                       = Caractères restants
 NumberOfLinkedFiles                 = Nombre de fichiers joints
 ChooseAnImage                       = Choisir une image
 
+# Action Plan - Rights - Droits
+ReadActionPlan                      = Consulter le PAPRIPACT
+WriteActionPlan                     = Modifier les actions correctives depuis le PAPRIPACT
+
 # Action Plan - Gantt / Kanban
 ActionPlanGantt                     = Diagramme de Gantt
 ActionPlanKanban                    = Kanban
