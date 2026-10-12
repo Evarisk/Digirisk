@@ -53,6 +53,7 @@ require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_firepermit.lib.php';
 
 // Global variables definitions
@@ -594,7 +595,12 @@ if ($action == 'add_mobile' && $permissiontoadd) {
 
                 // Replace the linked exterior company and its responsible
                 $digiriskresources->setDigiriskResources($db, $user->id, 'ExtSociety', 'societe', [$extSocietyId], $conf->entity, 'firepermit', $object->id, 0);
-                $signatory->setSignatory($object->id, 'firepermit', 'socpeople', [$respContactId], 'ExtSocietyResponsible');
+                // Unchanged, the responsible keeps their row: a new one would take a pending or signed
+                // responsible's place with an unsigned row and a new signature link
+                $currentExtResponsible = digiriskGetCurrentSignatory($signatory, 'ExtSocietyResponsible', (int) $object->id, 'firepermit');
+                if (!is_object($currentExtResponsible) || $currentExtResponsible->element_id != $respContactId) {
+                    $signatory->setSignatory($object->id, 'firepermit', 'socpeople', [$respContactId], 'ExtSocietyResponsible');
+                }
 
                 // Replace the lines by the ones currently in the form
                 $oldLines = $firepermitdet->fetchAll('', '', 0, 0, ['fk_firepermit' => $object->id]);

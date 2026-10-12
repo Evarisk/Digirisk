@@ -31,6 +31,8 @@ require_once __DIR__ . '/../../../../../../saturne/class/saturneschedules.class.
 require_once __DIR__ . '/../../../../../../saturne/lib/medias.lib.php';
 require_once __DIR__ . '/../../../../../../saturne/lib/dolibarr.lib.php';
 
+require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_function.lib.php';
+
 /**
  * Class to build the prevention plan document as a PDF.
  */
@@ -1374,12 +1376,10 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         global $conf;
 
         $signatory = new SaturneSignature($this->db, $this->module, $object->element);
-        
-        $masters   = $signatory->fetchSignatory('MasterWorker', $object->id, $object->element);
-        $exteriors = $signatory->fetchSignatory('ExtSocietyResponsible', $object->id, $object->element);
 
-        $master   = (is_array($masters) && !empty($masters)) ? array_shift($masters) : null;
-        $exterior = (is_array($exteriors) && !empty($exteriors)) ? array_shift($exteriors) : null;
+        // Not the first row returned: a role can hold several rows, in no fixed order
+        $master   = digiriskGetCurrentSignatory($signatory, 'MasterWorker', (int) $object->id, $object->element);
+        $exterior = digiriskGetCurrentSignatory($signatory, 'ExtSocietyResponsible', (int) $object->id, $object->element);
 
         $gap       = 6;
         $boxWidth  = ($this->contentWidth($pdf) - $gap) / 2;
@@ -1415,8 +1415,8 @@ class pdf_preventionplandocument extends SaturneDocumentModel
 
             $labelWidth = $boxWidth * 0.34;
             $rows       = [
-                [$outputLangs->transnoentities('Lastname'), is_object($signatory) ? dol_strtoupper($signatory->lastname ?? '') : ''],
-                [$outputLangs->transnoentities('Firstname'), is_object($signatory) ? ucfirst($signatory->firstname ?? '') : ''],
+                [$outputLangs->transnoentities('Lastname'), (is_object($signatory) && !empty($signatory->lastname)) ? dol_strtoupper($signatory->lastname) : ''],
+                [$outputLangs->transnoentities('Firstname'), (is_object($signatory) && !empty($signatory->firstname)) ? ucfirst($signatory->firstname) : ''],
                 [$outputLangs->transnoentities('Email'), is_object($signatory) ? ($signatory->email ?? '') : ''],
                 [$outputLangs->transnoentities('Phone'), is_object($signatory) ? ($signatory->phone ?? '') : ''],
                 [$outputLangs->transnoentities('Date'), (is_object($signatory) && !empty($signatory->signature_date)) ? dol_print_date($signatory->signature_date, 'day', 'tzuser') : ''],

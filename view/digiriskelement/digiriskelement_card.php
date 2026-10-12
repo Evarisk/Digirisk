@@ -83,7 +83,7 @@ $extrafields->fetch_name_optionals_label($object->table_element);
 
 $hookmanager->initHooks(array('digiriskelementcard', 'digiriskelementview','globalcard')); // Note that conf->hooks_modules contains array
 
-$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+$upload_dir = $conf->digiriskdolibarr->multidir_output[!empty($object->entity) ? $object->entity : $conf->entity] ?? $conf->digiriskdolibarr->dir_output;
 
 // Security check - Protection if external user
 $permissiontoread   = $user->rights->digiriskdolibarr->digiriskelement->read;

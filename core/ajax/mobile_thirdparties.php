@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2025 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2026 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,11 @@
  */
 
 /**
- * \file    core/ajax/mobile_preventionplan_tags.php
+ * \file    core/ajax/mobile_thirdparties.php
  * \ingroup digiriskdolibarr
- * \brief   AJAX endpoint listing the prevention plan tags, so the mobile form can offer a tag created
- *          in another tab as soon as the user comes back, without reloading the page and losing what
- *          was already typed.
+ * \brief   AJAX endpoint listing the third parties of the exterior company picker (?object_type=), so the
+ *          mobile form can offer a third party created in another tab as soon as the user comes back,
+ *          without reloading the page and losing what was already typed.
  */
 
 // Load DigiriskDolibarr environment
@@ -43,21 +43,26 @@ if (empty($user->id)) {
     exit;
 }
 
-if (!$user->hasRight('digiriskdolibarr', 'preventionplan', 'write')) {
+$objectType = GETPOST('object_type', 'aZ09');
+if (!in_array($objectType, ['preventionplan', 'firepermit'])) {
+    echo json_encode(['success' => false, 'error' => 'BadObjectType']);
+    exit;
+}
+
+if (!$user->hasRight('digiriskdolibarr', $objectType, 'write')) {
     echo json_encode(['success' => false, 'error' => 'Forbidden']);
     exit;
 }
 
-$tags = [];
-if (isModEnabled('categorie')) {
-    // Same call as the form, so both list the tags with the same labels
-    $form       = new Form($db);
-    $tagOptions = $form->select_all_categories('digiriskpreventionplan', '', 'parent', 64, 0, 1);
+// Same call as the form (select_company), so both list the third parties in the same order and with the
+// same labels
+$form              = new Form($db);
+$thirdpartyOptions =$form->select_thirdparty_list('', 'ext_society_picker', '', '&nbsp;', 0, 0, [], '', 1);
 
-    foreach ((is_array($tagOptions) ? $tagOptions : []) as $tagId => $tagLabel) {
-        $tags[] = ['id' => (int) $tagId, 'label' => (string) $tagLabel];
-    }
+$thirdparties = [];
+foreach ((is_array($thirdpartyOptions) ? $thirdpartyOptions : []) as $thirdpartyOption) {
+    $thirdparties[] = ['id' => (int) $thirdpartyOption['key'], 'label' => (string) $thirdpartyOption['label'], 'labelhtml' => (string) $thirdpartyOption['labelhtml']];
 }
 
-echo json_encode(['success' => true, 'tags' => $tags]);
+echo json_encode(['success' => true, 'thirdparties' => $thirdparties]);
 exit;

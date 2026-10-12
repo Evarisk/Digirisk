@@ -114,10 +114,64 @@ window.digiriskdolibarr.preventionplanmobile.event = function() {
     $(document).on('click', '.digirisk-mobile-cert-add', window.digiriskdolibarr.preventionplanmobile.addCertification);
     $(document).on('click', '.digirisk-mobile-cert-item-delete', window.digiriskdolibarr.preventionplanmobile.removeCertification);
     $(document).on('submit', '.digirisk-mobile-form', window.digiriskdolibarr.preventionplanmobile.submitForm);
+    $(document).on('click', '.digirisk-mobile-submit', window.digiriskdolibarr.preventionplanmobile.clickSubmit);
+    $(window).on('pageshow', window.digiriskdolibarr.preventionplanmobile.reloadFromCache);
     $(document).on('click', '.digirisk-mobile-extsign__resend', window.digiriskdolibarr.preventionplanmobile.resendExtSignatureEmail);
     $(document).on('input blur', '.digirisk-mobile-form input', window.digiriskdolibarr.preventionplanmobile.checkRealTimeValidity);
     // Coming back from the tag creation tab
     $(document).on('visibilitychange', window.digiriskdolibarr.preventionplanmobile.refreshTags);
+    // Coming back from the third party creation tab
+    $(document).on('visibilitychange', window.digiriskdolibarr.preventionplanmobile.refreshThirdparties);
+};
+
+/**
+ * Pick up the third parties created in another tab (the "+" next to the picker opens one) as soon as
+ * the form is back on screen: the list is built with the page, and reloading it would lose what was
+ * typed. A single new third party is the one just created: it is selected, which fills the company and
+ * its contacts like a manual choice. Otherwise the current choice stays, without refilling the fields.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.preventionplanmobile.refreshThirdparties = function() {
+    var row    = $('.digirisk-mobile-picker-row[data-thirdparties-url]');
+    var select = row.find('select#ext_society_picker');
+
+    // With COMPANY_USE_SEARCH_TO_SELECT the picker is a live search: a new third party is found at once
+    if (document.visibilityState !== 'visible' || !select.length) {
+        return;
+    }
+
+    $.ajax({
+        url: row.data('thirdparties-url'),
+        type: 'GET',
+        dataType: 'json',
+        success: function(resp) {
+            if (!resp || !resp.success) {
+                return;
+            }
+
+            var known = select.find('option').filter(function() { return parseInt(this.value, 10) > 0; }).map(function() { return this.value; }).get();
+            var fresh = $.map(resp.thirdparties, function(thirdparty) { return String(thirdparty.id); });
+            if (known.join(',') === fresh.join(',')) {
+                return;
+            }
+
+            var added    = fresh.filter(function(id) { return known.indexOf(id) === -1; });
+            var selected = select.val();
+
+            // The empty choice stays first, the third parties follow in the server order
+            select.find('option').filter(function() { return parseInt(this.value, 10) > 0; }).remove();
+            $.each(resp.thirdparties, function(index, thirdparty) {
+                $(new Option(thirdparty.label, thirdparty.id)).attr('data-html', thirdparty.labelhtml).appendTo(select);
+            });
+
+            if (added.length === 1) {
+                select.val(added[0]).trigger('change');
+            } else {
+                select.val(fresh.indexOf(String(selected)) !== -1 ? selected : '-1').trigger('change.select2');
+            }
+        }
+    });
 };
 
 /**
@@ -946,6 +1000,10 @@ window.digiriskdolibarr.preventionplanmobile.submitForm = function(event) {
         dataType: 'json',
         success: function(resp) {
             if (resp && resp.success && resp.redirect) {
+                // Chrome offers to save as the user's own address the one still typed in the form when
+                // the page navigates away: empty it, the request has already carried it
+                form.find('[name="ext_society_address"], [name="ext_society_zip"], [name="ext_society_town"]').val('');
+                window.digiriskdolibarr.preventionplanmobile.addressCleared = true;
                 window.location.href = resp.redirect; // keep the spinner during navigation
                 return;
             }
@@ -957,6 +1015,29 @@ window.digiriskdolibarr.preventionplanmobile.submitForm = function(event) {
             resetSubmit();
         }
     });
+};
+
+/**
+ * The submit button is a plain button (see the form template): hand the form to submitForm through a
+ * jQuery submit, which dispatches no native submit event for Chrome to read the address from.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.preventionplanmobile.clickSubmit = function() {
+    $(this).closest('.digirisk-mobile-form').trigger('submit');
+};
+
+/**
+ * The address fields are emptied when a save leaves the form (see submitForm): if the browser brings
+ * that page back from its cache, reload it so the fields show the saved values again.
+ *
+ * @param  {Event} event pageshow event
+ * @return {void}
+ */
+window.digiriskdolibarr.preventionplanmobile.reloadFromCache = function(event) {
+    if (event.originalEvent && event.originalEvent.persisted && window.digiriskdolibarr.preventionplanmobile.addressCleared) {
+        window.location.reload();
+    }
 };
 
 /**

@@ -322,7 +322,7 @@ function digiriskPwaCardDetails($record, DigiriskResources $digiriskresources, S
     // fetchResourcesFromObject() returns the resolved Societe for a single match, and 0 when there is none
     $extSociety = $digiriskresources->fetchResourcesFromObject('ExtSociety', $record);
     if (is_object($extSociety) && $extSociety->id > 0) {
-        $lines[] = ['icon' => 'fa-industry', 'text' => $extSociety->name . (dol_strlen($extSociety->town) ? ' · ' . $extSociety->town : '')];
+        $lines[] = ['icon' => 'fa-building', 'text' => $extSociety->name . (dol_strlen($extSociety->town) ? ' · ' . $extSociety->town : '')];
     }
 
     $signatories    = $signatory->fetchSignatory('', $record->id, $record->element);

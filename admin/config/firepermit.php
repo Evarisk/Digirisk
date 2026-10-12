@@ -61,7 +61,8 @@ if (isModEnabled('project')) {
 $form = new Form($db);
 
 // Security check - Protection if external user
-$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
 /*
@@ -242,6 +243,27 @@ print '</td></tr>';
 
 print '</table>';
 print '</form>';
+
+// --- List ---
+print load_fiche_titre($langs->trans('FirepermitList'), '', '');
+
+print '<table class="noborder centpercent editmode">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans('Name') . '</td>';
+print '<td>' . $langs->trans('Description') . '</td>';
+print '<td class="center">' . $langs->trans('Status') . '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_FIREPERMIT_SEARCH_REF_BY_NUMBER">' . $langs->trans('ListSearchRefByNumber') . '</label></td>';
+// What the switch changes, shown on fire permit references
+print '<td>' . $langs->trans('ListSearchRefByNumberDescription');
+print '<div class="opacitymedium paddingtop">' . $langs->trans('ListSearchRefByNumberExample');
+print '<br>' . $langs->trans('ListSearchRefByNumberExampleOff', 'FP1, FP11, FP12, FP21…');
+print '<br>' . $langs->trans('ListSearchRefByNumberExampleOn', 'FP1') . '</div></td>';
+print '<td class="center">' . saturne_constant_onoff('DIGIRISKDOLIBARR_FIREPERMIT_SEARCH_REF_BY_NUMBER', $permissiontowrite) . '</td>';
+print '</tr>';
+
+print '</table>';
 
 // --- Mobile creation defaults ---
 print load_fiche_titre($langs->trans('MobilePPDefaultsTitle'), '', '');

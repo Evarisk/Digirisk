@@ -87,7 +87,7 @@ foreach ($rounds as $round) {
         </div>
         <div class="digirisk-firewatch__permit-title"><?php print dol_escape_htmltag($object->label); ?></div>
         <?php if (dol_strlen($societyName)) { ?>
-            <div class="digirisk-firewatch__line"><i class="fas fa-industry"></i> <?php print dol_escape_htmltag($societyName); ?></div>
+            <div class="digirisk-firewatch__line"><i class="fas fa-building"></i> <?php print dol_escape_htmltag($societyName); ?></div>
         <?php } ?>
         <?php if (dol_strlen($workLocation)) { ?>
             <div class="digirisk-firewatch__line"><i class="fas fa-map-marker-alt"></i> <?php print dol_escape_htmltag($workLocation); ?></div>

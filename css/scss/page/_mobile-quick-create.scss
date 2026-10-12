@@ -311,7 +311,7 @@ body.digirisk-mobile-create {
   }
 
   /* SIREN */
-  /* Choix du tiers et sa loupe de resolution sur une seule ligne */
+  /* Choix du tiers et son bouton de creation sur une seule ligne */
   .digirisk-mobile-picker-row {
     display: flex;
     align-items: stretch;
@@ -326,7 +326,8 @@ body.digirisk-mobile-create {
       max-width: none;
     }
 
-    .digirisk-mobile-siren-search {
+    /* A la hauteur du select ; lien, il prendrait sinon la couleur des liens du theme */
+    .digirisk-mobile-picker-row__add {
       flex: 0 0 auto;
       display: inline-flex;
       align-items: center;
@@ -338,6 +339,7 @@ body.digirisk-mobile-create {
       padding: 0;
       font-size: 13px;
       line-height: 1;
+      color: #fff;
     }
   }
 
@@ -1719,6 +1721,12 @@ body.digirisk-mobile-create {
     border-radius: 15px;
     text-transform: none;
     letter-spacing: 0;
+
+    /* Pas encore signe : meme pastille, en attente */
+    &--not {
+      color: #92400e;
+      background: #fef3c7;
+    }
   }
 
   /* Coordonnees du signataire : deux colonnes qui passent l'une sous l'autre sur un petit ecran */

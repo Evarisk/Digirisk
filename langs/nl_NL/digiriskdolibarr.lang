@@ -275,12 +275,12 @@ ThePreventionplan                                     = het preventieplan
 PreventionPlanDocument                                = Preventieplan
 Preventionplandocument                                = Preventieplan
 PreventionPlanDocumentGenerated                       = Genereren van het preventieplan
-PreventionPlanList                                    = Lijst van de preventieplannen
+PreventionplanList                                    = Lijst van de preventieplannen
 PreventionPlanLine                                    = risico('s)
 PreventionPlanLineCreated                             = Aanmaken van een risico in het preventieplan
 PreventionPlanLineModified                            = Wijzigen van een risico in het preventieplan
 PreventionPlanLineDeleted                             = Verwijderen van een risico uit het preventieplan
-NewPreventionPlan                                     = Nieuw preventieplan
+NewPreventionplan                                     = Nieuw preventieplan
 PriorVisit                                            = Gezamenlijke voorinspectie
 PriorVisitYesNo                                       = Voorbereidend bezoek uitgevoerd
 PriorVisitText                                        = Notitie van de inspectie
@@ -365,9 +365,9 @@ FirePermitMin  = vuurvergunning
 FirePermitsMin = vuurvergunningen
 
 # Gegevens
-NewFirePermit                                     = Nieuwe vuurvergunning
+NewFirepermit                                     = Nieuwe vuurvergunning
 ModifyFirePermit                                  = De vuurvergunning wijzigen
-FirePermitList                                    = Lijst van de vuurvergunningen
+FirepermitList                                    = Lijst van de vuurvergunningen
 FirePermit                                        = Vuurvergunning
 Firepermit                                        = Vuurvergunning
 TheFirepermit                                     = de vuurvergunning
