@@ -91,7 +91,7 @@ $ppExtName = trim($ppExtSignatory->firstname . ' ' . $ppExtSignatory->lastname);
 
         <?php if ($object->status < PreventionPlan::STATUS_LOCKED) { ?>
             <?php if ($ppExtSigned) { ?>
-                <a href="<?php print $_SERVER['PHP_SELF']; ?>?action=lock_mobile&plan_id=<?php print $object->id; ?>" class="digirisk-mobile-success__button digirisk-mobile-success__button--primary">
+                <a href="<?php print $_SERVER['PHP_SELF']; ?>?action=lock_mobile&plan_id=<?php print $object->id; ?>&token=<?php print newToken(); ?>" class="digirisk-mobile-success__button digirisk-mobile-success__button--primary">
                     <i class="fas fa-lock"></i> Verrouiller
                 </a>
             <?php } else { ?>
