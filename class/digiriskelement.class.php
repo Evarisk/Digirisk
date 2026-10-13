@@ -754,6 +754,49 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
+     * Return the ids of the validated elements reachable from the root through validated ancestors only
+     *
+     * An element under a trashed or archived groupment, or whose parent no longer exists, is out of the
+     * active tree even with STATUS_VALIDATED. The read covers every entity and ignores the caller's filter,
+     * otherwise a filtered caller would lose the ancestors needed to reach its elements.
+     *
+     * @return array<int, int>|int Ids indexed by id, int < 0 if KO
+     * @throws Exception
+     */
+    public function getReachableDigiriskElementIds()
+    {
+        // A fresh object: a caller may have trimmed $this->fields (the element card unsets fk_parent)
+        $digiriskElement                       = new self($this->db);
+        $digiriskElement->isextrafieldmanaged  = 0;
+        $digiriskElement->ismultientitymanaged = 0;
+
+        $digiriskElements = $digiriskElement->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED]);
+        if (!is_array($digiriskElements)) {
+            return -1;
+        }
+
+        $childrenByParent = [];
+        foreach ($digiriskElements as $digiriskElementId => $digiriskElementObject) {
+            $childrenByParent[(int) $digiriskElementObject->fk_parent][] = (int) $digiriskElementId;
+        }
+
+        $reachableIds = [];
+        $queue        = $childrenByParent[0] ?? [];
+        while (!empty($queue)) {
+            $digiriskElementId = array_pop($queue);
+            if (isset($reachableIds[$digiriskElementId])) {
+                continue;
+            }
+            $reachableIds[$digiriskElementId] = $digiriskElementId;
+            foreach ($childrenByParent[$digiriskElementId] ?? [] as $childId) {
+                $queue[] = $childId;
+            }
+        }
+
+        return $reachableIds;
+    }
+
+    /**
      * Get active digirisk elements without trash
      *
      * @param  string    $multiEntityManagement                        Multi entity management (all, current, shared, entities)
@@ -775,7 +818,14 @@ class DigiriskElement extends SaturneObject
         // they do not load the same columns
         $cacheKey = ($moreParams['filter'] ?? '') . '|' . (string) ($this->ismultientitymanaged ?? '') . '|' . getEntity($this->element) . '|' . count($this->fields);
         if (!array_key_exists($cacheKey, $activeElementsCache)) {
-            $activeElementsCache[$cacheKey] = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ($moreParams['filter'] ?? '')]);
+            $digiriskElements = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ($moreParams['filter'] ?? '')]);
+            // The status alone is not enough: delete() only moves the deleted GP to the bin, its descendants
+            // keep STATUS_VALIDATED and their risks used to stay in every list built on this method
+            $reachableIds = $this->getReachableDigiriskElementIds();
+            if (is_array($digiriskElements) && is_array($reachableIds)) {
+                $digiriskElements = array_intersect_key($digiriskElements, $reachableIds);
+            }
+            $activeElementsCache[$cacheKey] = $digiriskElements;
         }
         $digiriskElements = $activeElementsCache[$cacheKey];
         if (!is_array($digiriskElements) || empty($digiriskElements)) {
