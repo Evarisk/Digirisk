@@ -328,20 +328,14 @@ if (empty($deletedElements)) {
 
 // Build and execute select
 // --------------------------------------------------------------------
-// A sort on a field of the assessments reads the last validated assessment of each risk, joined to the risk:
-// the list used to be read from the assessments in that case, so the risks still to assess had no row to
-// come from and the sort alone took them out of the list
-$sortOnRiskAssessment = (bool) preg_match('/^evaluation\./', $sortfield);
-$sortOnRiskTasks      = ($sortfield == 'evaluation.has_tasks');
+// A sort on a field of the assessments joins the last validated assessment of each risk, see Risk::getListSortSql()
+$listSortSql = $risk->getListSortSql($sortfield, $sortorder);
 
 $sql = 'SELECT DISTINCT ';
 foreach ($risk->fields as $key => $val) {
     $sql .= 'r.' . $key . ', ';
 }
-if ($sortOnRiskAssessment) {
-    // A DISTINCT query can only be sorted on a column it selects
-    $sql .= ($sortOnRiskTasks ? 'taskextrafields.fk_object' : preg_replace('/[^0-9a-z_\.]/i', '', $sortfield)) . ' as sortvalue, ';
-}
+$sql .= $listSortSql['select'];
 // Add fields from extrafields
 if ( ! empty($extrafields->attributes[$risk->table_element]['label'])) {
     foreach ($extrafields->attributes[$risk->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$risk->table_element]['type'][$key] != 'separate' ? "ef." . $key . ' as options_' . $key . ', ' : '');
@@ -354,18 +348,7 @@ $sql                                                                            
 $sql                                                                                                                                          .= " FROM " . MAIN_DB_PREFIX . $risk->table_element . " as r";
 $sql                                                                                                                                          .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
 if (isset($extrafields->attributes[$risk->table_element]) && is_array($extrafields->attributes[$risk->table_element]['label']) && count($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . "_extrafields as ef on (r.rowid = ef.fk_object)";
-if ($sortOnRiskAssessment) {
-    // The last validated assessment of every risk is picked in one pass, as Risk::getRiskCountsByCotationLevel()
-    // does: correlating that subquery to each risk costs a full scan of the assessments per risk
-    $sql .= ' LEFT JOIN (SELECT ra.fk_risk as fk_risk, MAX(ra.rowid) as rowid FROM ' . MAIN_DB_PREFIX . $evaluation->table_element . ' as ra';
-    $sql .= ' WHERE ra.status = ' . RiskAssessment::STATUS_VALIDATED . ' GROUP BY ra.fk_risk) as lastevaluation ON lastevaluation.fk_risk = r.rowid';
-    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $evaluation->table_element . ' as evaluation ON evaluation.rowid = lastevaluation.rowid';
-    // One row per risk, a join on every task would repeat the risk once per task
-    if ($sortOnRiskTasks) {
-        $sql .= ' LEFT JOIN (SELECT pte.fk_risk as fk_risk, MAX(pte.fk_object) as fk_object FROM ' . MAIN_DB_PREFIX . 'projet_task_extrafields as pte';
-        $sql .= ' WHERE pte.fk_risk > 0 GROUP BY pte.fk_risk) as taskextrafields ON taskextrafields.fk_risk = r.rowid';
-    }
-}
+$sql .= $listSortSql['join'];
 if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0)                                  $sql .= Categorie::getFilterJoinQuery('risk', "r.rowid");
 if ($risk->ismultientitymanaged == 1) $sql                                                                                                    .= " WHERE r.entity IN (" . getEntity($risk->element) . ")";
 else $sql                                                                                                                                     .= " WHERE 1 = 1";
@@ -428,13 +411,7 @@ $parameters = array();
 $reshook    = $hookmanager->executeHooks('printFieldListWhere', $parameters, $risk); // Note that $action and $risk may have been modified by hook
 $sql       .= $hookmanager->resPrint;
 
-if ($sortOnRiskAssessment) {
-    // Many risks share a cotation: the id breaks the ties, or a risk could show on two pages and another on none.
-    // The risks still to assess have no value to sort on, they come last in a descending sort
-    $sql .= $db->order(($sortOnRiskTasks ? 'taskextrafields.fk_object' : $sortfield) . ',r.rowid', $sortorder . ',' . $sortorder);
-} else {
-    $sql .= $db->order($sortfield, $sortorder);
-}
+$sql .= $listSortSql['order'];
 
 // Count total nb of records
 $nbtotalofrecords = '';

@@ -1355,8 +1355,7 @@ class Risk extends SaturneObject
         // The last validated assessment of every risk is picked in one pass: correlating that subquery to each
         // risk costs a full scan of the assessments per risk, seconds long on a base of a few thousand risks
         return ' AND r.rowid ' . $operator . ' (SELECT lastid.fk_risk'
-             . ' FROM (SELECT ra.fk_risk as fk_risk, MAX(ra.rowid) as rowid FROM ' . $riskAssessmentTable . ' as ra'
-             . ' WHERE ra.status = ' . RiskAssessment::STATUS_VALIDATED . ' GROUP BY ra.fk_risk) as lastid'
+             . ' FROM ' . $this->getLastRiskAssessmentSqlTable() . ' as lastid'
              . ' INNER JOIN ' . $riskAssessmentTable . ' as lastra ON lastra.rowid = lastid.rowid'
              . $cotationFilter . ')';
     }
@@ -1396,6 +1395,61 @@ class Risk extends SaturneObject
         }
 
         return empty($criterias) ? '' : ' AND (' . implode(' OR ', $criterias) . ')';
+    }
+
+    /**
+     * Get the SQL derived table giving the last validated assessment of every risk
+     *
+     * Its columns are fk_risk and rowid, the id of that assessment. The assessments are read in one pass:
+     * correlating a subquery to each risk costs a full scan of the assessments per risk, seconds long on a
+     * base of a few thousand risks.
+     *
+     * @return string SQL derived table, between parentheses and without alias
+     */
+    public function getLastRiskAssessmentSqlTable(): string
+    {
+        return '(SELECT ra.fk_risk as fk_risk, MAX(ra.rowid) as rowid'
+             . ' FROM ' . MAIN_DB_PREFIX . (new RiskAssessment($this->db))->table_element . ' as ra'
+             . ' WHERE ra.status = ' . RiskAssessment::STATUS_VALIDATED . ' GROUP BY ra.fk_risk)';
+    }
+
+    /**
+     * Get the SQL parts sorting a risk list, whose risks are read from the table aliased "r"
+     *
+     * A sort on a field of the assessments ("evaluation." prefixed) reads the last validated assessment of each
+     * risk, joined to the risk under the alias "evaluation": a list read from the assessments instead had no row
+     * for a risk still to assess, so the sort alone took it out. Such a risk has no value to sort on and comes
+     * last in a descending sort. The sort on the tasks reads the last task of the risk, one row per risk.
+     *
+     * @param  string $sortField Sort field of the list
+     * @param  string $sortOrder Sort order of the list
+     * @return array{select: string, join: string, order: string} Column to add to the select list (with its
+     *                                                             trailing comma), joins and ORDER BY clause;
+     *                                                             select and join are empty for a field of the risk
+     */
+    public function getListSortSql(string $sortField, string $sortOrder): array
+    {
+        if (!preg_match('/^evaluation\./', $sortField)) {
+            return ['select' => '', 'join' => '', 'order' => $this->db->order($sortField, $sortOrder)];
+        }
+
+        $join = ' LEFT JOIN ' . $this->getLastRiskAssessmentSqlTable() . ' as lastevaluation ON lastevaluation.fk_risk = r.rowid'
+              . ' LEFT JOIN ' . MAIN_DB_PREFIX . (new RiskAssessment($this->db))->table_element . ' as evaluation ON evaluation.rowid = lastevaluation.rowid';
+        if ($sortField == 'evaluation.has_tasks') {
+            $sortColumn = 'taskextrafields.fk_object';
+            $join      .= ' LEFT JOIN (SELECT pte.fk_risk as fk_risk, MAX(pte.fk_object) as fk_object FROM ' . MAIN_DB_PREFIX . 'projet_task_extrafields as pte'
+                        . ' WHERE pte.fk_risk > 0 GROUP BY pte.fk_risk) as taskextrafields ON taskextrafields.fk_risk = r.rowid';
+        } else {
+            $sortColumn = preg_replace('/[^0-9a-z_\.]/i', '', $sortField);
+        }
+
+        return [
+            // A DISTINCT query can only be sorted on a column it selects
+            'select' => $sortColumn . ' as sortvalue, ',
+            'join'   => $join,
+            // Many risks share a cotation: the id breaks the ties, or a risk could show on two pages and another on none
+            'order'  => $this->db->order($sortColumn . ',r.rowid', $sortOrder . ',' . $sortOrder),
+        ];
     }
 
     /**
@@ -1453,8 +1507,7 @@ class Risk extends SaturneObject
         $sql .= ' AND e.rowid IN (' . implode(',', array_map('intval', array_keys($activeElements))) . ') AND e.entity = ' . (int) $conf->entity;
         // The last assessment of every risk is picked in one pass: correlating that subquery to each risk
         // costs a full scan of the assessments per risk, seconds long on a document unique of a few thousand
-        $sql .= ' LEFT JOIN (SELECT ra.fk_risk as fk_risk, MAX(ra.rowid) as rowid FROM ' . $riskAssessmentTable . ' as ra';
-        $sql .= ' WHERE ra.status = ' . RiskAssessment::STATUS_VALIDATED . ' GROUP BY ra.fk_risk) as lastid ON lastid.fk_risk = r.rowid';
+        $sql .= ' LEFT JOIN ' . $this->getLastRiskAssessmentSqlTable() . ' as lastid ON lastid.fk_risk = r.rowid';
         $sql .= ' LEFT JOIN ' . $riskAssessmentTable . ' as lastra ON lastra.rowid = lastid.rowid';
         $sql .= ' WHERE r.entity IN (' . getEntity($this->element) . ')';
         $sql .= " AND r.type = '" . $this->db->escape($riskType) . "'";
