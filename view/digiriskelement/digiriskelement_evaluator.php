@@ -103,7 +103,7 @@ $pagenext = $page + 1;
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array();
 foreach ($evaluator->fields as $key => $val) {
-	if ($val['searchall']) $fieldstosearchall['t.' . $key] = $val['label'];
+	if (!empty($val['searchall'])) $fieldstosearchall['t.' . $key] = $val['label'];
 }
 
 // Definition of fields for list
@@ -607,13 +607,13 @@ if ($object->id > 0 || $fromid > 0) {
 		if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
 		if ( ! empty($arrayfields['t.' . $key]['checked'])) {
 			print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
-			if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
+			if (isset($val['arrayofkeyval']) && is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key] ?? '', $val['notnull'] ?? 0, 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 			elseif (strpos($val['type'], 'integer:') === 0) {
 				if ($key == 'fk_user' && $fromid > 0) {
 					$search[$key] = $fromid;
 				}
-				print $evaluator->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
-			} elseif ( ! preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
+				print $evaluator->showInputField($val, $key, $search[$key] ?? '', '', '', 'search_', 'maxwidth150', 1);
+			} elseif ( ! preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key] ?? '') . '">';
 			print '</td>';
 		}
 	}
