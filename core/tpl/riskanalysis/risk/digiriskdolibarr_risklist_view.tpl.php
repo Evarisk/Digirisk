@@ -344,7 +344,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
     $sql                                                                                                                                           = preg_replace('/,\s*$/', '', $sql);
     $sql                                                                                                                                          .= " FROM " . MAIN_DB_PREFIX . $risk->table_element . " as r";
     $sql                                                                                                                                          .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
-    if (is_array($extrafields->attributes[$risk->table_element]['label']) && count($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . "_extrafields as ef on (r.rowid = ef.fk_object)";
+    if (isset($extrafields->attributes[$risk->table_element]) && is_array($extrafields->attributes[$risk->table_element]['label']) && count($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . "_extrafields as ef on (r.rowid = ef.fk_object)";
     if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0)                                  $sql .= Categorie::getFilterJoinQuery('risk', "r.rowid");
     if ($risk->ismultientitymanaged == 1) $sql                                                                                                    .= " WHERE r.entity IN (" . getEntity($risk->element) . ")";
     else $sql                                                                                                                                     .= " WHERE 1 = 1";
@@ -1061,7 +1061,8 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
     if (empty($obj)) break; // Should not happen
 
     // Si on trie avec un champ d'une évaluation, on fetch le risque et non l'évaluation
-    if ($obj->fk_risk > 0) {
+    // (only that query selects fk_risk, the one sorted on a field of the risk returns the risk itself)
+    if (isset($obj->fk_risk) && $obj->fk_risk > 0) {
         $risk->fetch($obj->fk_risk);
     } else {
         // Store properties in $risk
