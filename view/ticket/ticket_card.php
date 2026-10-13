@@ -971,7 +971,7 @@ if (!empty($object->fk_project) && $permissionToWrite) {
         $tasksHeaderActions .= '<span style="margin-left:5px;">' . $parentTask->getNomUrl(2) . '</span>';
         $tasksHeaderActions .= '<a style="margin-left:5px; cursor:pointer;" class="modal-open wpeo-tooltip-event" title="' . dol_escape_htmltag($langs->trans('NewTask')) . '"><input type="hidden" class="modal-options" data-modal-to-open="ticket_task_add_modal" />' . img_picto('', 'plus') . '</a>';
     } else {
-        $tasksHeaderActions .= '<a style="margin-left:5px" href="' . dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . $object->id . '&action=create_parent_task" title="' . dol_escape_htmltag($langs->trans('Add')) . '">' . img_picto('', 'plus') . '</a>';
+        $tasksHeaderActions .= '<a style="margin-left:5px" href="' . dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . $object->id . '&action=create_parent_task&token=' . newToken() . '" title="' . dol_escape_htmltag($langs->trans('Add')) . '">' . img_picto('', 'plus') . '</a>';
     }
 }
 print '<th>' . $langs->trans('RefTask') . $tasksHeaderActions . '</th>';

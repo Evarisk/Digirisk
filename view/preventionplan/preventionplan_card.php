@@ -1559,7 +1559,7 @@ print '<input type="hidden" name="fk_element" value="0">';
 					if ($object->status == 1) {
 						print '<td class="center">';
 						$coldisplay++;
-						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&action=editline&lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
+						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&action=editline&token=' . newToken() . '&lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
 						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&action=deleteline&lineid=' . $item->id . '&token=' . newToken() . '">';
 						print img_delete();
 						print '</a>';

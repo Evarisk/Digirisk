@@ -427,7 +427,7 @@ if (empty($reshook)) {
 		// Check parameters
 		if ($workstop_days < 0) {
 			setEventMessages($langs->trans('ErrorFieldMustBeGreaterOrEqualZero', $langs->transnoentitiesnoconv('WorkStopDays')), [], 'errors');
-			header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&action=editline&lineid=' .  $lineid);
+			header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&action=editline&token=' . newToken() . '&lineid=' .  $lineid);
 			exit;
 			$error++;
 		}
