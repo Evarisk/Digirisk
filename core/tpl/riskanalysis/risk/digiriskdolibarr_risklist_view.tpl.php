@@ -328,248 +328,149 @@ if (empty($deletedElements)) {
 
 // Build and execute select
 // --------------------------------------------------------------------
-if ( ! preg_match('/(evaluation)/', $sortfield)) {
-    $sql = 'SELECT DISTINCT ';
-    foreach ($risk->fields as $key => $val) {
-        $sql .= 'r.' . $key . ', ';
+// A sort on a field of the assessments reads the last validated assessment of each risk, joined to the risk:
+// the list used to be read from the assessments in that case, so the risks still to assess had no row to
+// come from and the sort alone took them out of the list
+$sortOnRiskAssessment = (bool) preg_match('/^evaluation\./', $sortfield);
+$sortOnRiskTasks      = ($sortfield == 'evaluation.has_tasks');
+
+$sql = 'SELECT DISTINCT ';
+foreach ($risk->fields as $key => $val) {
+    $sql .= 'r.' . $key . ', ';
+}
+if ($sortOnRiskAssessment) {
+    // A DISTINCT query can only be sorted on a column it selects
+    $sql .= ($sortOnRiskTasks ? 'taskextrafields.fk_object' : preg_replace('/[^0-9a-z_\.]/i', '', $sortfield)) . ' as sortvalue, ';
+}
+// Add fields from extrafields
+if ( ! empty($extrafields->attributes[$risk->table_element]['label'])) {
+    foreach ($extrafields->attributes[$risk->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$risk->table_element]['type'][$key] != 'separate' ? "ef." . $key . ' as options_' . $key . ', ' : '');
+}
+// Add fields from hooks
+$parameters                                                                                                                                    = array();
+$reshook                                                                                                                                       = $hookmanager->executeHooks('printFieldListSelect', $parameters, $risk); // Note that $action and $risk may have been modified by hook
+$sql                                                                                                                                          .= preg_replace('/^,/', '', $hookmanager->resPrint);
+$sql                                                                                                                                           = preg_replace('/,\s*$/', '', $sql);
+$sql                                                                                                                                          .= " FROM " . MAIN_DB_PREFIX . $risk->table_element . " as r";
+$sql                                                                                                                                          .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
+if (isset($extrafields->attributes[$risk->table_element]) && is_array($extrafields->attributes[$risk->table_element]['label']) && count($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . "_extrafields as ef on (r.rowid = ef.fk_object)";
+if ($sortOnRiskAssessment) {
+    // The last validated assessment of every risk is picked in one pass, as Risk::getRiskCountsByCotationLevel()
+    // does: correlating that subquery to each risk costs a full scan of the assessments per risk
+    $sql .= ' LEFT JOIN (SELECT ra.fk_risk as fk_risk, MAX(ra.rowid) as rowid FROM ' . MAIN_DB_PREFIX . $evaluation->table_element . ' as ra';
+    $sql .= ' WHERE ra.status = ' . RiskAssessment::STATUS_VALIDATED . ' GROUP BY ra.fk_risk) as lastevaluation ON lastevaluation.fk_risk = r.rowid';
+    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $evaluation->table_element . ' as evaluation ON evaluation.rowid = lastevaluation.rowid';
+    // One row per risk, a join on every task would repeat the risk once per task
+    if ($sortOnRiskTasks) {
+        $sql .= ' LEFT JOIN (SELECT pte.fk_risk as fk_risk, MAX(pte.fk_object) as fk_object FROM ' . MAIN_DB_PREFIX . 'projet_task_extrafields as pte';
+        $sql .= ' WHERE pte.fk_risk > 0 GROUP BY pte.fk_risk) as taskextrafields ON taskextrafields.fk_risk = r.rowid';
     }
-    // Add fields from extrafields
-    if ( ! empty($extrafields->attributes[$risk->table_element]['label'])) {
-        foreach ($extrafields->attributes[$risk->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$risk->table_element]['type'][$key] != 'separate' ? "ef." . $key . ' as options_' . $key . ', ' : '');
-    }
-    // Add fields from hooks
-    $parameters                                                                                                                                    = array();
-    $reshook                                                                                                                                       = $hookmanager->executeHooks('printFieldListSelect', $parameters, $risk); // Note that $action and $risk may have been modified by hook
-    $sql                                                                                                                                          .= preg_replace('/^,/', '', $hookmanager->resPrint);
-    $sql                                                                                                                                           = preg_replace('/,\s*$/', '', $sql);
-    $sql                                                                                                                                          .= " FROM " . MAIN_DB_PREFIX . $risk->table_element . " as r";
-    $sql                                                                                                                                          .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
-    if (isset($extrafields->attributes[$risk->table_element]) && is_array($extrafields->attributes[$risk->table_element]['label']) && count($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . "_extrafields as ef on (r.rowid = ef.fk_object)";
-    if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0)                                  $sql .= Categorie::getFilterJoinQuery('risk', "r.rowid");
-    if ($risk->ismultientitymanaged == 1) $sql                                                                                                    .= " WHERE r.entity IN (" . getEntity($risk->element) . ")";
-    else $sql                                                                                                                                     .= " WHERE 1 = 1";
+}
+if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0)                                  $sql .= Categorie::getFilterJoinQuery('risk', "r.rowid");
+if ($risk->ismultientitymanaged == 1) $sql                                                                                                    .= " WHERE r.entity IN (" . getEntity($risk->element) . ")";
+else $sql                                                                                                                                     .= " WHERE 1 = 1";
 
-    if ( ! $allRisks) {
-        $sql .= " AND fk_element = " . $id;
-    } else {
-        if (is_array($activeDigiriskElementList) && !empty($activeDigiriskElementList)) {
-            $digiriskElementSqlFilter = '(';
-            foreach (array_keys($activeDigiriskElementList) as $elementId) {
-                $digiriskElementSqlFilter .= $elementId . ', ';
-            }
-            if (preg_match('/, /', $digiriskElementSqlFilter)) {
-                $digiriskElementSqlFilter = rtrim($digiriskElementSqlFilter, ', ');
-            }
-            $digiriskElementSqlFilter .= ')';
-            $sql .= " AND r.fk_element IN " . $digiriskElementSqlFilter;
-        }
-        $sql .= " AND fk_element IN " . $digiriskElementSqlFilter;
-        $sql .= " AND fk_element > 0 ";
-        $sql .= " AND e.entity IN (" . $conf->entity . ") ";
-    }
-    $sql .= ' AND r.type = "' . $riskType . '"';
-    // Archived risks live in the archive tab of the element, they are out of the active list
-    // unless the status filter explicitly asks for them
-    if ($search['status'] === '' || $search['status'] == -1) {
-        $sql .= ' AND r.status <> ' . Risk::STATUS_ARCHIVED;
-    }
-
-    foreach ($search as $key => $val) {
-        if ($key == 'status' && $search[$key] == -1) continue;
-        $mode_search = (($risk->isInt($risk->fields[$key]) || $risk->isFloat($risk->fields[$key])) ? 1 : 0);
-        if (strpos($risk->fields[$key]['type'], 'integer:') === 0) {
-            if ($search[$key] == '-1') $search[$key] = '';
-            $mode_search                             = 2;
-        }
-        if ($key == 'category') {
-            $mode_search = 1;
-        }
-        if($search[$key] == '-1') {
-            $search[$key] = '';
-        }
-        if ($search[$key] != '') {
-            if ($key == 'ref') {
-                $sql .= " AND (r.ref = '$search[$key]')";
-            } else {
-                $sql .= natural_search('r.'.$key, $search[$key], (($key == 'status') ? 2 : $mode_search));
-            }
-        }
-    }
-    if ($search_all) $sql .= $risk->getSearchAllSqlFilter($fieldstosearchall, $search_all);
-    if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
-        $sql .= Categorie::getFilterSelectQuery('risk', 'r.rowid', $search_category_array);
-    }
-    $sql .= $risk->getCotationSqlFilter($searchCotation);
-    // Add where from extra fields
-    include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
-    // Add where from hooks
-    $parameters = array();
-    $reshook    = $hookmanager->executeHooks('printFieldListWhere', $parameters, $risk); // Note that $action and $risk may have been modified by hook
-    $sql       .= $hookmanager->resPrint;
-
-    $sql .= $db->order($sortfield, $sortorder);
-
-    // Count total nb of records
-    $nbtotalofrecords = '';
-    if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST)) {
-        $resql = $db->query($sql);
-
-        $nbtotalofrecords = $db->num_rows($resql);
-
-        if (($page * $limit) > $nbtotalofrecords) {	// if total of record found is smaller than page * limit, goto and load page 0
-            $page   = 0;
-            $offset = 0;
-        }
-    }
-
-    // if total of record found is smaller than limit, no need to do paging and to restart another select with limits set.
-    if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit))) {
-        $num = $nbtotalofrecords;
-    } else {
-        if ($limit) $sql .= $db->plimit($limit + 1, $offset);
-
-        $resql = $db->query($sql);
-        if ( ! $resql) {
-            dol_print_error($db);
-            exit;
-        }
-
-        $num = $db->num_rows($resql);
-    }
-
-    // Direct jump if only one record found, out of reach once the page header has been printed : the redirect
-    // would only raise a "headers already sent" warning and leave the list truncated
-    if ($num == 1 && !headers_sent() && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
-        $obj = $db->fetch_object($resql);
-        $id  = $obj->rowid;
-        header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $id);
-        exit;
-    }
+if ( ! $allRisks) {
+    $sql .= " AND fk_element = " . $id;
 } else {
-    $sql = 'SELECT DISTINCT ';
-    foreach ($evaluation->fields as $key => $val) {
-        $sql .= 'evaluation.' . $key . ', ';
-    }
-    // Add fields from extrafields
-    if ( ! empty($extrafields->attributes[$evaluation->table_element]['label'])) {
-        foreach ($extrafields->attributes[$evaluation->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$evaluation->table_element]['type'][$key] != 'separate' ? "ef." . $key . ' as options_' . $key . ', ' : '');
-    }
-    // Add fields from hooks
-    $parameters                                                                                                                                                = array();
-    $reshook                                                                                                                                                   = $hookmanager->executeHooks('printFieldListSelect', $parameters, $evaluation); // Note that $action and $evaluation may have been modified by hook
-    $sql                                                                                                                                                      .= preg_replace('/^,/', '', $hookmanager->resPrint);
-    $sql                                                                                                                                                       = preg_replace('/,\s*$/', '', $sql);
-    $sql                                                                                                                                                      .= " FROM " . MAIN_DB_PREFIX . $evaluation->table_element . " as evaluation";
-    $sql                                                                                                                                                      .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . " as r on (evaluation.fk_risk = r.rowid)";
-    $sql                                                                                                                                                      .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
-    if (isset($extrafields->attributes[$evaluation->table_element]) &&
-        is_array($extrafields->attributes[$evaluation->table_element]['label']) && count($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $evaluation->table_element . "_extrafields as ef on (evaluation.rowid = ef.fk_object)";
-    if ($sortfield == 'evaluation.has_tasks')                                                                                                            $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'projet_task_extrafields as taskextrafields ON (taskextrafields.fk_risk = r.rowid)';
-    if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0)                                               $sql .= Categorie::getFilterJoinQuery('risk', "r.rowid");
-    if ($evaluation->ismultientitymanaged == 1) $sql                                                                                                          .= " WHERE evaluation.entity IN (" . getEntity($evaluation->element) . ")";
-    else $sql                                                                                                                                                 .= " WHERE 1 = 1";
-    $sql                                                                                                                                                      .= " AND evaluation.status = 1";
-    if ( ! $allRisks) {
-        $sql .= " AND r.fk_element = " . $id;
-    } else {
-        if (is_array($activeDigiriskElementList) && !empty($activeDigiriskElementList)) {
-            $digiriskElementSqlFilter = '(';
-            foreach (array_keys($activeDigiriskElementList) as $elementId) {
-                $digiriskElementSqlFilter .= $elementId . ', ';
-            }
-            if (preg_match('/, /', $digiriskElementSqlFilter)) {
-                $digiriskElementSqlFilter = rtrim($digiriskElementSqlFilter, ', ');
-            }
-            $digiriskElementSqlFilter .= ')';
-            $sql .= " AND r.fk_element IN " . $digiriskElementSqlFilter;
+    if (is_array($activeDigiriskElementList) && !empty($activeDigiriskElementList)) {
+        $digiriskElementSqlFilter = '(';
+        foreach (array_keys($activeDigiriskElementList) as $elementId) {
+            $digiriskElementSqlFilter .= $elementId . ', ';
         }
-        $sql .= " AND r.fk_element > 0";
-        $sql .= " AND e.entity IN (" . $conf->entity . ")";
+        if (preg_match('/, /', $digiriskElementSqlFilter)) {
+            $digiriskElementSqlFilter = rtrim($digiriskElementSqlFilter, ', ');
+        }
+        $digiriskElementSqlFilter .= ')';
+        $sql .= " AND r.fk_element IN " . $digiriskElementSqlFilter;
     }
-    $sql .= ' AND r.type = "' . $riskType . '"';
-    // Archived risks live in the archive tab of the element, they are out of the active list
-    // unless the status filter explicitly asks for them
-    if ($search['status'] === '' || $search['status'] == -1) {
-        $sql .= ' AND r.status <> ' . Risk::STATUS_ARCHIVED;
-    }
+    $sql .= " AND fk_element IN " . $digiriskElementSqlFilter;
+    $sql .= " AND fk_element > 0 ";
+    $sql .= " AND e.entity IN (" . $conf->entity . ") ";
+}
+$sql .= ' AND r.type = "' . $riskType . '"';
+// Archived risks live in the archive tab of the element, they are out of the active list
+// unless the status filter explicitly asks for them
+if ($search['status'] === '' || $search['status'] == -1) {
+    $sql .= ' AND r.status <> ' . Risk::STATUS_ARCHIVED;
+}
 
-    foreach ($search as $key => $val) {
-        if ($key == 'status' && $search[$key] == -1) continue;
-        $mode_search = (($risk->isInt($risk->fields[$key]) || $risk->isFloat($risk->fields[$key])) ? 1 : 0);
-        if (strpos($risk->fields[$key]['type'], 'integer:') === 0) {
-            if ($search[$key] == '-1') $search[$key] = '';
-            $mode_search                             = 2;
-        }
-        if ($key == 'category') {
-            $mode_search = 1;
-        }
-        if($search[$key] == '-1') {
-            $search[$key] = '';
-        }
-        if ($search[$key] != '') {
-            if ($key == 'ref') {
-                $sql .= " AND (r.ref = '$search[$key]')";
-            } else {
-                $sql .= natural_search('r.'.$key, $search[$key], (($key == 'status') ? 2 : $mode_search));
-            }
+foreach ($search as $key => $val) {
+    if ($key == 'status' && $search[$key] == -1) continue;
+    $mode_search = (($risk->isInt($risk->fields[$key]) || $risk->isFloat($risk->fields[$key])) ? 1 : 0);
+    if (strpos($risk->fields[$key]['type'], 'integer:') === 0) {
+        if ($search[$key] == '-1') $search[$key] = '';
+        $mode_search                             = 2;
+    }
+    if ($key == 'category') {
+        $mode_search = 1;
+    }
+    if($search[$key] == '-1') {
+        $search[$key] = '';
+    }
+    if ($search[$key] != '') {
+        if ($key == 'ref') {
+            $sql .= " AND (r.ref = '$search[$key]')";
+        } else {
+            $sql .= natural_search('r.'.$key, $search[$key], (($key == 'status') ? 2 : $mode_search));
         }
     }
-    if ($search_all) $sql .= $risk->getSearchAllSqlFilter($fieldstosearchall, $search_all);
+}
+if ($search_all) $sql .= $risk->getSearchAllSqlFilter($fieldstosearchall, $search_all);
+if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
+    $sql .= Categorie::getFilterSelectQuery('risk', 'r.rowid', $search_category_array);
+}
+$sql .= $risk->getCotationSqlFilter($searchCotation);
+// Add where from extra fields
+include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
+// Add where from hooks
+$parameters = array();
+$reshook    = $hookmanager->executeHooks('printFieldListWhere', $parameters, $risk); // Note that $action and $risk may have been modified by hook
+$sql       .= $hookmanager->resPrint;
 
-    if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
-        $sql .= Categorie::getFilterSelectQuery('risk', 'r.rowid', $search_category_array);
+if ($sortOnRiskAssessment) {
+    // Many risks share a cotation: the id breaks the ties, or a risk could show on two pages and another on none.
+    // The risks still to assess have no value to sort on, they come last in a descending sort
+    $sql .= $db->order(($sortOnRiskTasks ? 'taskextrafields.fk_object' : $sortfield) . ',r.rowid', $sortorder . ',' . $sortorder);
+} else {
+    $sql .= $db->order($sortfield, $sortorder);
+}
+
+// Count total nb of records
+$nbtotalofrecords = '';
+if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST)) {
+    $resql = $db->query($sql);
+
+    $nbtotalofrecords = $db->num_rows($resql);
+
+    if (($page * $limit) > $nbtotalofrecords) {	// if total of record found is smaller than page * limit, goto and load page 0
+        $page   = 0;
+        $offset = 0;
     }
-    $sql .= $risk->getCotationSqlFilter($searchCotation);
+}
 
-    // Add where from extra fields
-    include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
-    // Add where from hooks
-    $parameters = array();
-    $reshook    = $hookmanager->executeHooks('printFieldListWhere', $parameters, $evaluation); // Note that $action and $evaluation may have been modified by hook
-    $sql       .= $hookmanager->resPrint;
+// if total of record found is smaller than limit, no need to do paging and to restart another select with limits set.
+if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit))) {
+    $num = $nbtotalofrecords;
+} else {
+    if ($limit) $sql .= $db->plimit($limit + 1, $offset);
 
-    if ($sortfield == 'evaluation.has_tasks') {
-        $sql .= ' ORDER BY ' . 'taskextrafields.fk_object ' . $sortorder;
-    } else {
-        $sql .= $db->order($sortfield, $sortorder);
-    }
-
-    // Count total nb of records
-    $nbtotalofrecords = '';
-    if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST)) {
-        $resql = $db->query($sql);
-
-        $nbtotalofrecords = $db->num_rows($resql);
-
-        if (($page * $limit) > $nbtotalofrecords) {	// if total of record found is smaller than page * limit, goto and load page 0
-            $page   = 0;
-            $offset = 0;
-        }
-    }
-
-    // if total of record found is smaller than limit, no need to do paging and to restart another select with limits set.
-    if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit))) {
-        $num = $nbtotalofrecords;
-    } else {
-        if ($limit) $sql .= $db->plimit($limit + 1, $offset);
-
-        $resql = $db->query($sql);
-        if ( ! $resql) {
-            dol_print_error($db);
-            exit;
-        }
-
-        $num = $db->num_rows($resql);
-    }
-
-    // Direct jump if only one record found, out of reach once the page header has been printed : the redirect
-    // would only raise a "headers already sent" warning and leave the list truncated
-    if ($num == 1 && !headers_sent() && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
-        $obj = $db->fetch_object($resql);
-        $id  = $obj->rowid;
-        header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $id);
+    $resql = $db->query($sql);
+    if ( ! $resql) {
+        dol_print_error($db);
         exit;
     }
+
+    $num = $db->num_rows($resql);
+}
+
+// Direct jump if only one record found, out of reach once the page header has been printed : the redirect
+// would only raise a "headers already sent" warning and leave the list truncated
+if ($num == 1 && !headers_sent() && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && ! $page) {
+    $obj = $db->fetch_object($resql);
+    $id  = $obj->rowid;
+    header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $id);
+    exit;
 }
 
 $arrayofselected = is_array($toselect) ? $toselect : array();
@@ -1060,14 +961,8 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 
     if (empty($obj)) break; // Should not happen
 
-    // Si on trie avec un champ d'une évaluation, on fetch le risque et non l'évaluation
-    // (only that query selects fk_risk, the one sorted on a field of the risk returns the risk itself)
-    if (isset($obj->fk_risk) && $obj->fk_risk > 0) {
-        $risk->fetch($obj->fk_risk);
-    } else {
-        // Store properties in $risk
-        $risk->setVarsFromFetchObj($obj);
-    }
+    // Store properties in $risk
+    $risk->setVarsFromFetchObj($obj);
 
     // Show here line of result
     print '<tr class="oddeven risk-row risk_row_' . $risk->id . ' risk-row-content-' . $risk->id . '" id="risk_row_' . $risk->id . '">';
