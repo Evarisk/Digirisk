@@ -1,12 +1,12 @@
 <?php
-$allRiskAssessment = $riskAssessmentsOrderedByRisk[$risk->id];
-$lastRiskAssessment    = array_filter($allRiskAssessment, function($lastRiskAssessment) {
-	return $lastRiskAssessment->status == 1;
+$allRiskAssessment  = $riskAssessmentsOrderedByRisk[$risk->id];
+$lastRiskAssessment = array_filter($allRiskAssessment, function($riskAssessment) {
+	return $riskAssessment->status == 1;
 });
 
-if (is_array($lastRiskAssessment) && !empty($lastRiskAssessment)) {
-    $lastRiskAssessment = array_shift($lastRiskAssessment);
-}
+// The last validated assessment of the risk, or a blank one when the risk is still to assess: the add modal
+// below reads it either way, and an empty array left there raised a warning on every one of its properties
+$lastRiskAssessment = !empty($lastRiskAssessment) ? array_shift($lastRiskAssessment) : new RiskAssessment($db);
 
 $defaultCotation = [0 => '0-47', 48 => '48-50', 51 => '51-80', 100 => '81-100'];
 
@@ -191,7 +191,7 @@ else : ?>
 	<div class="table-cell-header-actions">
 		<?php if ($permissiontoread) : ?>
 			<div class="risk-evaluation-list risk-evaluation-button wpeo-button button-square-40 button-grey wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('RiskAssessmentList') ?>" value="<?php echo $risk->id ?>">
-				<input type="hidden" class="modal-options" data-modal-to-open="risk_evaluation_list<?php echo $risk->id; ?>" data-from-id="<?php echo $lastEvaluation->id; ?>" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="" data-photo-class="riskassessment-from-riskassessment-edit-<?php echo $lastEvaluation->id; ?>"/>
+				<input type="hidden" class="modal-options" data-modal-to-open="risk_evaluation_list<?php echo $risk->id; ?>" data-from-id="<?php echo $lastRiskAssessment->id; ?>" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="" data-photo-class="riskassessment-from-riskassessment-edit-<?php echo $lastRiskAssessment->id; ?>"/>
 				<i class="fas fa-list button-icon"></i>
 			</div>
 		<?php else : ?>
