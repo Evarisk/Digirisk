@@ -1511,8 +1511,8 @@ class Risk extends SaturneObject
         $sql .= ' LEFT JOIN ' . $riskAssessmentTable . ' as lastra ON lastra.rowid = lastid.rowid';
         $sql .= ' WHERE r.entity IN (' . getEntity($this->element) . ')';
         $sql .= " AND r.type = '" . $this->db->escape($riskType) . "'";
-        // Archived risks are out of the list unless its status filter asks for them
-        $sql .= ' AND r.status <> ' . self::STATUS_ARCHIVED;
+        // Deleted risks (soft delete) are never listed, archived ones only when the status filter asks for them
+        $sql .= ' AND r.status NOT IN (' . self::STATUS_DELETED . ', ' . self::STATUS_ARCHIVED . ')';
         $sql .= ' GROUP BY lastra.cotation';
 
         $resql = $this->db->query($sql);

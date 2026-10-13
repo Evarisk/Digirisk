@@ -98,6 +98,13 @@
 			$sql .= " AND e.entity IN (" . getEntity($risk->element) . ") ";
 		}
 		$sql .= ' AND r.type = "' . $riskType . '"';
+		// Deleting a risk is a soft delete (SaturneObject::delete()): the row stays with STATUS_DELETED
+		$sql .= ' AND r.status <> ' . Risk::STATUS_DELETED;
+		// Archived risks live in the archive tab of their element, out of this list as out of the main one
+		// unless the status filter explicitly asks for them
+		if (($search['status'] ?? '') === '' || $search['status'] == -1) {
+			$sql .= ' AND r.status <> ' . Risk::STATUS_ARCHIVED;
+		}
 
 		foreach ($search as $key => $val) {
 			if ($key == 'status' && $search[$key] == -1) continue;

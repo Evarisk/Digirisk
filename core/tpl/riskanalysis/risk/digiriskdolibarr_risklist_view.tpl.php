@@ -372,6 +372,8 @@ if ( ! $allRisks) {
     $sql .= " AND e.entity IN (" . $conf->entity . ") ";
 }
 $sql .= ' AND r.type = "' . $riskType . '"';
+// Deleting a risk is a soft delete (SaturneObject::delete()): the row stays with STATUS_DELETED
+$sql .= ' AND r.status <> ' . Risk::STATUS_DELETED;
 // Archived risks live in the archive tab of the element, they are out of the active list
 // unless the status filter explicitly asks for them
 if ($search['status'] === '' || $search['status'] == -1) {
