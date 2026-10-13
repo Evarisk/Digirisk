@@ -1436,13 +1436,21 @@ class Risk extends SaturneObject
             $counts[$cotationLevel] = 0;
         }
 
+        // The same elements as the list: the status of the element alone kept counting the work units of a
+        // groupment put in the bin, whose descendants stay validated
+        $digiriskElement = new DigiriskElement($this->db);
+        $activeElements  = $digiriskElement->getActiveDigiriskElements();
+        if (!is_array($activeElements) || empty($activeElements)) {
+            return $counts;
+        }
+
         $riskAssessmentTable = MAIN_DB_PREFIX . (new RiskAssessment($this->db))->table_element;
-        $elementTable        = MAIN_DB_PREFIX . (new DigiriskElement($this->db))->table_element;
+        $elementTable        = MAIN_DB_PREFIX . $digiriskElement->table_element;
 
         $sql  = 'SELECT lastra.cotation as cotation, COUNT(r.rowid) as nb';
         $sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as r';
         $sql .= ' INNER JOIN ' . $elementTable . ' as e ON e.rowid = r.fk_element';
-        $sql .= ' AND e.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND e.entity = ' . (int) $conf->entity;
+        $sql .= ' AND e.rowid IN (' . implode(',', array_map('intval', array_keys($activeElements))) . ') AND e.entity = ' . (int) $conf->entity;
         // The last assessment of every risk is picked in one pass: correlating that subquery to each risk
         // costs a full scan of the assessments per risk, seconds long on a document unique of a few thousand
         $sql .= ' LEFT JOIN (SELECT ra.fk_risk as fk_risk, MAX(ra.rowid) as rowid FROM ' . $riskAssessmentTable . ' as ra';
@@ -1450,6 +1458,8 @@ class Risk extends SaturneObject
         $sql .= ' LEFT JOIN ' . $riskAssessmentTable . ' as lastra ON lastra.rowid = lastid.rowid';
         $sql .= ' WHERE r.entity IN (' . getEntity($this->element) . ')';
         $sql .= " AND r.type = '" . $this->db->escape($riskType) . "'";
+        // Archived risks are out of the list unless its status filter asks for them
+        $sql .= ' AND r.status <> ' . self::STATUS_ARCHIVED;
         $sql .= ' GROUP BY lastra.cotation';
 
         $resql = $this->db->query($sql);
