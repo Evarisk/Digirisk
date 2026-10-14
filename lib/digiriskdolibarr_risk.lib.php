@@ -145,7 +145,7 @@ function digiriskRiskAssessmentMediaActions(string $action): void
             }
 
             if ($favoritePhoto != $riskAssessment->photo) {
-                $riskAssessment->setValueFrom('photo', $favoritePhoto, '', '', 'text', '', $user);
+                $riskAssessment->setValueFrom('photo', $favoritePhoto, '', null, 'text', '', $user);
                 $riskAssessment->photo = $favoritePhoto;
             }
         }
