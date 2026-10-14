@@ -2340,6 +2340,7 @@ MobileFPNoTagAvailable = Er is geen tag voor vuurvergunningen beschikbaar.
 MobileFPErrorUpdatingPermit = Fout bij het bijwerken van de vuurvergunning.
 MobileFPErrorCreatingPermit = Fout bij het aanmaken van de vuurvergunning.
 MobileFPLockNeedsSignature = De vergunning moet ondertekend zijn voordat deze kan worden vergrendeld.
+MobilePPLockNeedsSignature = Het plan moet ondertekend zijn voordat het kan worden vergrendeld.
 MobileFPSpreadAvailableOnceSignedAndLocked = De verspreiding is beschikbaar zodra de vergunning door de verantwoordelijken is ondertekend en vergrendeld.
 MobileFPDefaultDateStartToday = Begindatum = datum van vandaag
 MobileFPDefaultDuration = Standaardduur van de periode (dagen)

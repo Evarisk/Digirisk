@@ -93,7 +93,7 @@ $fpExtName = trim($fpExtSignatory->firstname . ' ' . $fpExtSignatory->lastname);
 
         <?php if ($object->status < FirePermit::STATUS_LOCKED) { ?>
             <?php if ($fpExtSigned) { ?>
-                <a href="<?php print $_SERVER['PHP_SELF']; ?>?action=lock_mobile&plan_id=<?php print $object->id; ?>&token=<?php print newToken(); ?>" class="digirisk-mobile-success__button digirisk-mobile-success__button--primary">
+                <a href="<?php print $_SERVER['PHP_SELF']; ?>?created=<?php print $object->id; ?>&action=lock_mobile&plan_id=<?php print $object->id; ?>&token=<?php print newToken(); ?>" class="digirisk-mobile-success__button digirisk-mobile-success__button--primary">
                     <i class="fas fa-lock"></i> <?php print $langs->trans('MobileLock'); ?>
                 </a>
             <?php } else { ?>

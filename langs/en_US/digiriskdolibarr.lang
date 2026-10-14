@@ -2458,6 +2458,7 @@ MobileFPNoTagAvailable = No fire permit tag is available.
 MobileFPErrorUpdatingPermit = Error while updating the fire permit.
 MobileFPErrorCreatingPermit = Error while creating the fire permit.
 MobileFPLockNeedsSignature = The permit must be signed before it can be locked.
+MobilePPLockNeedsSignature = The plan must be signed before it can be locked.
 MobileFPSpreadAvailableOnceSignedAndLocked = Sharing will be available as soon as the permit is signed by the responsibles and locked.
 MobileFPDefaultDateStartToday = Start date = today
 MobileFPDefaultDuration = Default period duration (days)
