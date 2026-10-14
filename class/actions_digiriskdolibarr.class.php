@@ -2166,9 +2166,40 @@ class ActionsDigiriskdolibarr
         $objectsMetadata['digiriskdolibarr_evaluator']['class_path'] = 'custom/digiriskdolibarr/class/evaluator.class.php';
         $objectsMetadata['digiriskdolibarr_evaluator']['lib_path']   = 'custom/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php';
 
+        // A risk has no label: its description tells it apart when medias are assigned to it
+        $objectsMetadata['digiriskdolibarr_risk']['label_field'] = 'description';
+
         $this->results = $objectsMetadata;
 
         return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the saturneMediaAssignTarget function : a risk shows the photos of its last
+     * assessment, so the medias assigned to it from the library must land there
+     *
+     * @param  array  $parameters Hook metadata (context, etc...)
+     * @param  object $object     Record picked in the list of the library medias
+     * @return int                0 to keep that record, 1 to hand over the one holding its medias
+     * @throws Exception
+     */
+    public function saturneMediaAssignTarget(array $parameters, $object): int
+    {
+        if (!($object instanceof Risk)) {
+            return 0;
+        }
+
+        require_once __DIR__ . '/riskanalysis/riskassessment.class.php';
+
+        $riskAssessment  = new RiskAssessment($this->db);
+        $riskAssessments = $riskAssessment->fetchFromParent($object->id, 1, 'DESC');
+        if (!is_array($riskAssessments) || empty($riskAssessments)) {
+            return 0;
+        }
+
+        $this->results = ['object' => array_shift($riskAssessments)];
+
+        return 1;
     }
 
 	public function saturneAddAttendantRow($parameters)

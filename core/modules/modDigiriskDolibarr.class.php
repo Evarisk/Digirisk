@@ -458,6 +458,7 @@ class modDigiriskdolibarr extends DolibarrModules
                 'elementproperties',
                 'main',
                 'saturnegetobjectsmetadata',
+                'saturnemediaassign',
                 'digiriskdolibarrindex'
 			],
 
