@@ -64,8 +64,10 @@ window.digiriskdolibarr.mobilequickcreate.init = function() {
     // document: bind only when the fire permit form or success screen is the one on screen.
     var form         = $('.digirisk-mobile-form--firepermit');
     var successBlock = $('.digirisk-mobile-extsign--firepermit');
+    // A permit locked from Dolibarr may have no exterior signatory block, it can still be closed here
+    var archiveModal = $('.digirisk-mobile-archive-modal--firepermit');
 
-    if (!form.length && !successBlock.length) {
+    if (!form.length && !successBlock.length && !archiveModal.length) {
         return;
     }
 
@@ -118,6 +120,7 @@ window.digiriskdolibarr.mobilequickcreate.event = function() {
     $(document).on('click', '.digirisk-mobile-risk-block__delete', window.digiriskdolibarr.mobilequickcreate.confirmRemoveRisk);
     $(document).on('click', '.digirisk-mobile-confirm-cancel', window.digiriskdolibarr.mobilequickcreate.closeConfirmModal);
     $(document).on('click', '.digirisk-mobile-confirm-delete', window.digiriskdolibarr.mobilequickcreate.removeRisk);
+    $(document).on('click', '.digirisk-mobile-archive-open', window.digiriskdolibarr.mobilequickcreate.confirmArchive);
     $(document).on('click', '.digirisk-mobile-protection-add', window.digiriskdolibarr.mobilequickcreate.openProtectionModal);
     $(document).on('click', '.digirisk-mobile-protection-modal-close, .digirisk-mobile-protection-modal__overlay', window.digiriskdolibarr.mobilequickcreate.closeProtectionModal);
     $(document).on('click', '.digirisk-mobile-protection-option', window.digiriskdolibarr.mobilequickcreate.addProtection);
@@ -824,6 +827,18 @@ window.digiriskdolibarr.mobilequickcreate.confirmRemoveRisk = function() {
     $modal.attr('data-risk-index', $block.attr('data-index'));
     $modal.find('.digirisk-mobile-confirm-modal__body').text(message.replace('%s', $block.find('.digirisk-mobile-risk-block__name').text()));
     $modal.removeClass('hidden');
+};
+
+/**
+ * Ask before closing the permit from the success screen: the application offers no way back.
+ * The button keeps its archive URL, so the permit is still closed when JavaScript is off.
+ *
+ * @param  {Event} event Click on the close button
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.confirmArchive = function(event) {
+    event.preventDefault();
+    $('.digirisk-mobile-archive-modal').removeClass('hidden');
 };
 
 /**

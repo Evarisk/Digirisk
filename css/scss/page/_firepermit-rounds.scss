@@ -438,6 +438,15 @@ body.digirisk-firewatch-public {
     &:disabled {
       opacity: 0.6;
     }
+
+    // Also a link (closing the permit, once the surveillance is over): the a:link of the theme
+    // would turn its text blue and underline it, and unlike a button its padding would widen it
+    &:link,
+    &:visited {
+      box-sizing: border-box;
+      color: #ffffff;
+      text-decoration: none;
+    }
   }
 }
 

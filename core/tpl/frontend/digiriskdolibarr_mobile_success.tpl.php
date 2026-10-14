@@ -25,6 +25,7 @@
  *                   $successViewUrl, $successViewLabel, $successAgainUrl, $successAgainLabel.
  *          Optional: $successArchiveUrl, $successArchiveLabel, $successArchiveConfirmTitle, $successArchiveConfirmText
  *                    (archive button and its confirmation, shown when the URL is set),
+ *                    $successArchiveDisabledText (archive button shown greyed out with this reason, when there is no URL yet),
  *                    $successBannerText (confirmation banner on top, ready to print),
  *                    $successExtraBlockFile (template, or list of templates, of the blocks proper to the object),
  *                    $successFooterBlockFile (same, for discreet secondary actions under the buttons).
@@ -148,10 +149,12 @@ $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successSha
         <i class="fas fa-exclamation-triangle"></i> Module DoliLetter manquant pour la diffusion - Contacter votre administrateur
     </div>
     <?php } ?>
-    <div class="digirisk-mobile-success__actions<?php print !empty($successArchiveUrl) ? ' digirisk-mobile-success__actions--wrap' : ''; ?>">
+    <div class="digirisk-mobile-success__actions<?php print (!empty($successArchiveUrl) || !empty($successArchiveDisabledText)) ? ' digirisk-mobile-success__actions--wrap' : ''; ?>">
         <a class="digirisk-mobile-success__button" href="<?php print $successViewUrl; ?>"><?php print dol_escape_htmltag($successViewLabel); ?></a>
         <?php if (!empty($successArchiveUrl)) { ?>
-        <a class="digirisk-mobile-success__button digirisk-mobile-archive-open" href="<?php print $successArchiveUrl; ?>"><?php print dol_escape_htmltag($successArchiveLabel); ?></a>
+        <a id="digirisk-mobile-archive" class="digirisk-mobile-success__button digirisk-mobile-archive-open" href="<?php print $successArchiveUrl; ?>"><?php print dol_escape_htmltag($successArchiveLabel); ?></a>
+        <?php } elseif (!empty($successArchiveDisabledText)) { ?>
+        <span class="digirisk-mobile-success__button digirisk-mobile-success__button--disabled" title="<?php print dol_escape_htmltag($successArchiveDisabledText); ?>"><?php print dol_escape_htmltag($successArchiveLabel); ?></span>
         <?php } ?>
         <a class="digirisk-mobile-success__button" href="<?php print $successAgainUrl; ?>"><?php print dol_escape_htmltag($successAgainLabel); ?></a>
     </div>
@@ -167,7 +170,7 @@ $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successSha
 
     <?php if (!empty($successArchiveUrl)) { ?>
     <!-- Archive confirmation: the application offers no way back, and a mistap on a phone is easy -->
-    <div class="digirisk-mobile-confirm-modal digirisk-mobile-archive-modal hidden">
+    <div class="digirisk-mobile-confirm-modal digirisk-mobile-archive-modal digirisk-mobile-archive-modal--<?php print $object->element; ?> hidden">
         <div class="digirisk-mobile-confirm-modal__overlay digirisk-mobile-confirm-cancel"></div>
         <div class="digirisk-mobile-risk-modal__dialog">
             <div class="digirisk-mobile-risk-modal__header">

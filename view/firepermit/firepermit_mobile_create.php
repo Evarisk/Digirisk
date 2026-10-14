@@ -791,6 +791,27 @@ if ($action == 'lock_mobile' && $permissiontoadd) {
 }
 
 /*
+ * Cloture (archivage) du permis de feu depuis l'ecran de succes, derniere etape de la barre d'avancement.
+ * Jamais automatique : l'utilisateur la demande, une fois le permis verrouille et la surveillance apres
+ * travaux terminee (fin des travaux declaree, plus aucune ronde en attente, comme sur la fiche Dolibarr).
+ */
+if ($action == 'setArchived' && $permissiontoadd) {
+    $permitId      = GETPOSTINT('plan_id');
+    $archivePermit = new FirePermit($db);
+
+    if ($permitId > 0 && $archivePermit->fetch($permitId) > 0 && $archivePermit->status == FirePermit::STATUS_LOCKED) {
+        if (empty($archivePermit->date_work_end) || $archivePermit->countPendingRounds() > 0) {
+            setEventMessages($langs->trans('FireWatchArchiveBlocked'), [], 'errors');
+        } elseif ($archivePermit->setArchived($user) <= 0) {
+            setEventMessages($archivePermit->error, $archivePermit->errors, 'errors');
+        }
+    }
+
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?created=' . $permitId);
+    exit;
+}
+
+/*
  * Renvoi du lien de signature a l'entreprise exterieure depuis l'ecran de succes.
  *
  * L'envoi automatique de la creation peut avoir echoue, ou le destinataire ne jamais l'avoir recu :
