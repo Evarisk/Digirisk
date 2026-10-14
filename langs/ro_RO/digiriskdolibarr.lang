@@ -2340,6 +2340,7 @@ MobileFPNoTagAvailable = Nicio etichetă de permis de lucru cu foc nu este dispo
 MobileFPErrorUpdatingPermit = Eroare la actualizarea permisului de lucru cu foc.
 MobileFPErrorCreatingPermit = Eroare la crearea permisului de lucru cu foc.
 MobileFPLockNeedsSignature = Permisul trebuie semnat înainte de a putea fi blocat.
+MobilePPLockNeedsSignature = Planul trebuie semnat înainte de a putea fi blocat.
 MobileFPSpreadAvailableOnceSignedAndLocked = Difuzarea va fi disponibilă de îndată ce permisul va fi semnat de responsabili și blocat.
 MobileFPDefaultDateStartToday = Data de început = data de azi
 MobileFPDefaultDuration = Durata implicită a perioadei (zile)

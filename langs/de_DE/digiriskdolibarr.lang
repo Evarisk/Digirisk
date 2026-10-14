@@ -2340,6 +2340,7 @@ MobileFPNoTagAvailable = Es ist kein Tag für Feuererlaubnisscheine verfügbar.
 MobileFPErrorUpdatingPermit = Fehler beim Aktualisieren des Feuererlaubnisscheins.
 MobileFPErrorCreatingPermit = Fehler beim Anlegen des Feuererlaubnisscheins.
 MobileFPLockNeedsSignature = Der Erlaubnisschein muss unterschrieben sein, bevor er gesperrt werden kann.
+MobilePPLockNeedsSignature = Der Präventionsplan muss unterschrieben sein, bevor er gesperrt werden kann.
 MobileFPSpreadAvailableOnceSignedAndLocked = Die Verteilung steht zur Verfügung, sobald der Erlaubnisschein von den Verantwortlichen unterschrieben und gesperrt ist.
 MobileFPDefaultDateStartToday = Anfangsdatum = heutiges Datum
 MobileFPDefaultDuration = Standarddauer des Zeitraums (Tage)

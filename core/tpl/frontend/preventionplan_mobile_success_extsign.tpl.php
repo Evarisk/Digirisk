@@ -91,12 +91,12 @@ $ppExtName = trim($ppExtSignatory->firstname . ' ' . $ppExtSignatory->lastname);
 
         <?php if ($object->status < PreventionPlan::STATUS_LOCKED) { ?>
             <?php if ($ppExtSigned) { ?>
-                <a href="<?php print $_SERVER['PHP_SELF']; ?>?action=lock_mobile&plan_id=<?php print $object->id; ?>&token=<?php print newToken(); ?>" class="digirisk-mobile-success__button digirisk-mobile-success__button--primary">
-                    <i class="fas fa-lock"></i> Verrouiller
+                <a href="<?php print $_SERVER['PHP_SELF']; ?>?created=<?php print $object->id; ?>&action=lock_mobile&plan_id=<?php print $object->id; ?>&token=<?php print newToken(); ?>" class="digirisk-mobile-success__button digirisk-mobile-success__button--primary">
+                    <i class="fas fa-lock"></i> <?php print $langs->trans('MobileLock'); ?>
                 </a>
             <?php } else { ?>
-                <button type="button" class="digirisk-mobile-success__button" style="opacity: 0.5; cursor: not-allowed;" disabled title="Le plan doit être signé avant d'être verrouillé">
-                    <i class="fas fa-lock"></i> Verrouiller
+                <button type="button" class="digirisk-mobile-success__button digirisk-mobile-success__button--disabled" disabled title="<?php print dol_escape_htmltag($langs->trans('MobilePPLockNeedsSignature')); ?>">
+                    <i class="fas fa-lock"></i> <?php print $langs->trans('MobileLock'); ?>
                 </button>
             <?php } ?>
         <?php } ?>

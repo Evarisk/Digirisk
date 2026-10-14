@@ -39,6 +39,41 @@ if (!defined('DIGIRISK_MOBILE_UPLOAD_DIR')) {
 }
 
 /**
+ * Cancel an action of the mobile interfaces that does not carry the anti CSRF token of the session.
+ *
+ * Dolibarr checks the token only when MAIN_SECURITY_CSRF_WITH_TOKEN is set, and on a GET request only
+ * for the action names it deems sensitive (set*, add*, del*... from level 2, every action from level 3):
+ * the lock_mobile link went through without any token below level 3. Every action of these screens
+ * changes data, so the token is required here whatever the setting.
+ *
+ * @param  string $action Requested action, emptied when the token is missing or wrong (as Dolibarr does)
+ * @return void           Ends an AJAX request with an HTTP 403 JSON answer instead
+ */
+function digiriskMobileCheckToken(string &$action): void
+{
+    global $langs;
+
+    $token = GETPOST('token', 'alpha');
+    if (!dol_strlen($action) || (dol_strlen($token) && $token === currentToken())) {
+        return;
+    }
+
+    dol_syslog(__FUNCTION__ . ' ' . $_SERVER['PHP_SELF'] . ' action ' . $action . ' refused: anti CSRF token missing or invalid', LOG_WARNING);
+
+    $message = $langs->transnoentities('SecurityTokenHasExpiredSoActionHasBeenCanceledPleaseRetry');
+    // The AJAX calls (jQuery) expect JSON, not the page the canceled action falls back to
+    if (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest') {
+        http_response_code(403);
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'error' => $message, 'errors' => [$message], 'message' => $message]);
+        exit;
+    }
+
+    setEventMessages($message, [], 'warnings');
+    $action = '';
+}
+
+/**
  * Get the reusable electronic signature (base64 data URL) of a user.
  * Reads the "UserSignature" SaturneSignature record (the ElectronicSignature shown on the user card).
  *

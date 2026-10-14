@@ -88,6 +88,9 @@ if ($id > 0) {
  * Actions
  */
 
+// Fin des travaux, ronde, photos : jeton anti-CSRF exige, quel que soit le reglage
+digiriskMobileCheckToken($action);
+
 $parameters = [];
 $resHook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action);
 if ($resHook < 0) {

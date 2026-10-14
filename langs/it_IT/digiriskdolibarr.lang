@@ -2340,6 +2340,7 @@ MobileFPNoTagAvailable = Nessun tag di permesso di lavoro a caldo è disponibile
 MobileFPErrorUpdatingPermit = Errore durante l'aggiornamento del permesso di lavoro a caldo.
 MobileFPErrorCreatingPermit = Errore durante la creazione del permesso di lavoro a caldo.
 MobileFPLockNeedsSignature = Il permesso deve essere firmato prima di poter essere bloccato.
+MobilePPLockNeedsSignature = Il piano deve essere firmato prima di poter essere bloccato.
 MobileFPSpreadAvailableOnceSignedAndLocked = La diffusione sarà disponibile non appena il permesso sarà firmato dai responsabili e bloccato.
 MobileFPDefaultDateStartToday = Data di inizio = data odierna
 MobileFPDefaultDuration = Durata predefinita del periodo (giorni)
