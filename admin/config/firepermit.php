@@ -336,7 +336,6 @@ print '</form>';
 // --- Fire watch rounds after the hot work ---
 print '<div id="firewatch"></div>';
 print load_fiche_titre('<i class="fas fa-walking pictofixedwidth"></i>' . $langs->trans('FireWatchSetupTitle'), '', '');
-print '<div class="opacitymedium marginbottomonly">' . $langs->trans('FireWatchSetupDescription') . '</div>';
 
 $roundItemLevels = [
 	DIGIRISK_FIREPERMIT_ROUND_ITEM_DISABLED => $langs->trans('Disabled'),

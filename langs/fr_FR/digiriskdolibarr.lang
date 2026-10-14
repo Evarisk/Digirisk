@@ -2700,7 +2700,6 @@ FireWatchWorkEndDeclared         = Fin des travaux enregistrée : les rondes son
 FireWatchRoundEvent              = Ronde n°%s effectuée sur le permis de feu %s
 FireWatchRoundSaved              = Ronde enregistrée, merci
 FireWatchSetupTitle              = Rondes après travaux (surveillant de sécurité)
-FireWatchSetupDescription        = Après des travaux par points chauds, une surveillance d'au moins 2 heures est recommandée (INRS ED 6030) : le surveillant de sécurité effectue des rondes régulières et les consigne. Les rondes sont planifiées à la déclaration de la fin des travaux et le permis de feu ne peut être clôturé qu'une fois toutes effectuées.
 FireWatchRoundCount              = Nombre de rondes
 FireWatchRoundCountHelp          = Rondes planifiées à la déclaration de la fin des travaux, %s au maximum
 FireWatchRoundInterval           = Une ronde toutes les

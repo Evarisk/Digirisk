@@ -2688,7 +2688,6 @@ FireWatchWorkEndDeclared         = End of the work recorded: the rounds are plan
 FireWatchRoundEvent              = Round #%s done on fire permit %s
 FireWatchRoundSaved              = Round recorded, thank you
 FireWatchSetupTitle              = Rounds after the work (fire watcher)
-FireWatchSetupDescription        = After hot work, a surveillance of at least 2 hours is recommended (INRS ED 6030): the fire watcher walks regular rounds and records them. The rounds are planned when the end of the work is declared, and the fire permit can only be closed once they are all done.
 FireWatchRoundCount              = Number of rounds
 FireWatchRoundCountHelp          = Rounds planned when the end of the work is declared, %s at most
 FireWatchRoundInterval           = One round every
