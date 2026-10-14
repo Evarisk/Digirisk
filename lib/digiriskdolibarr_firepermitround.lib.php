@@ -368,6 +368,11 @@ function digiriskFirePermitMoveRoundPhotos(FirePermit $permit, FirePermitRound $
             if (!dol_move($photo['fullname'], $photoDir . '/' . $photo['name'], '0', 1, 0, 0)) {
                 return -1;
             }
+
+            // The gallery lists the media library: a photo kept on the round joins it
+            if (function_exists('saturne_add_media_to_library')) {
+                saturne_add_media_to_library('digiriskdolibarr', $photoDir . '/' . $photo['name'], (int) ($permit->entity ?: $conf->entity));
+            }
         }
     }
 

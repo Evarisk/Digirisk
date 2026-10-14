@@ -386,6 +386,11 @@ function digiriskMobileMoveRiskPhotos(string $elementType, string $objectRef, in
     foreach ($uploadedPhotos as $uploadedPhoto) {
         if (dol_move($uploadedPhoto['fullname'], $photoDir . '/' . $uploadedPhoto['name'], '0', 1, 0, 0)) {
             $moved++;
+
+            // The gallery lists the media library: a photo kept on the object joins it
+            if (function_exists('saturne_add_media_to_library')) {
+                saturne_add_media_to_library('digiriskdolibarr', $photoDir . '/' . $uploadedPhoto['name']);
+            }
         }
     }
 
