@@ -620,36 +620,9 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                                 <input class="risk-evaluation-method" type="hidden" value="standard">
                                 <input class="risk-evaluation-multiple-method" type="hidden" value="1">
                             </div>
-                            <div class="risk-evaluation-header-right riskassessment-medias linked-medias photo">
-                                <div class="element-linked-medias element-linked-medias-0 risk-new">
-                                    <table class="add-medias">
-                                        <tr>
-                                            <td>
-                                                <input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
-                                                <label for="fast-upload-photo-default">
-                                                    <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?>">
-                                                        <i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
-                                                    </div>
-                                                </label>
-                                                <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
-                                            </td>
-                                            <td>
-                                                <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="0">
-                                                    <input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir=""/>
-                                                    <i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="element-linked-medias-list">
-                                                    <?php
-                                                    $relativepath = 'digiriskdolibarr/medias/thumbs';
-                                                    print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0', 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0', null, 'photo', 1, 1, 0, 0, '', 1, ['hideNoPhoto' => 1]);
-                                                    ?>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
+                            <div class="risk-evaluation-header-right riskassessment-medias">
+                                <?php // The risk does not exist yet: its creation moves these photos into its first assessment
+                                print digiriskRiskAssessmentMediaBlock('riskassessment/tmp/RA0'); ?>
                             </div>
                         </div>
 
