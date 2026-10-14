@@ -671,8 +671,10 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_SEARCH_REF_BY_NUMBER', 'integer', 0, '', 0, 'current'],
 
-			// CONST FIRE PERMIT ROUNDS (fire watch after hot work: delays in minutes, then 0 = disabled, 1 = optional, 2 = required)
-			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_DELAYS', 'chaine', '30,60,120', '', 0, 'current'],
+			// CONST FIRE PERMIT ROUNDS (fire watch after hot work: number of rounds, minutes between two, first one at the end of the work, then 0 = disabled, 1 = optional, 2 = required)
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COUNT', 'integer', 3, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_INTERVAL', 'integer', 60, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_AT_WORK_END', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COMMENT', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_PHOTO', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_GEOLOC', 'integer', 1, '', 0, 'current'],
