@@ -44,9 +44,8 @@
     }
   }
 
-  /** saturne_show_medias_linked() falls back to nophoto.png: next to the two upload buttons that
-      placeholder reads as a third, disabled one */
-  .element-linked-medias-list img[src*="nophoto"],
+  /** saturne_show_medias_linked() falls back to nophoto.png: next to the media block that
+      placeholder reads as a disabled button */
   .last-risk-assessment .photo img[src*="nophoto"] {
     display: none;
   }
