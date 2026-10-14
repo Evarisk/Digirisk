@@ -205,4 +205,17 @@ if (!empty($fpPdfFiles)) {
 $successAgainUrl   = $_SERVER['PHP_SELF'];
 $successAgainLabel = $langs->trans('MobileFPCreateAnother');
 
+// Derniere etape de la barre d'avancement : clore le permis, a la demande, une fois la surveillance apres
+// travaux terminee. Avant, le bouton reste visible mais grise, pour dire qu'il viendra
+if ($object->status == FirePermit::STATUS_LOCKED) {
+    $successArchiveLabel        = $langs->transnoentities('FireWatchClosePermit');
+    $successArchiveConfirmTitle = $langs->transnoentities('FireWatchClosePermit');
+    $successArchiveConfirmText  = $langs->transnoentities('FireWatchClosePermitConfirm', $object->ref);
+    if ($fpFireWatchDone) {
+        $successArchiveUrl = $_SERVER['PHP_SELF'] . '?created=' . $object->id . '&action=setArchived&plan_id=' . $object->id . '&token=' . newToken();
+    } else {
+        $successArchiveDisabledText = $langs->transnoentities('FireWatchArchiveBlocked');
+    }
+}
+
 require __DIR__ . '/digiriskdolibarr_mobile_success.tpl.php';

@@ -25,6 +25,7 @@
  *   $langs, $now
  *   $roundsCanRecord   bool            False when the reader may only follow the surveillance
  *   $roundsDefaultName string          Name of the watcher filled in the forms, empty to let them type it
+ *   $roundsCloseUrl    string          Optional: where the reader closes the permit once every round is done (application only)
  *   $object          FirePermit (locked)
  *   $societyName     string
  *   $workLocation    string
@@ -168,7 +169,11 @@ foreach ($rounds as $round) {
             </ol>
 
             <?php if ($doneCount === count($rounds)) { ?>
-                <div class="digirisk-firewatch__banner digirisk-firewatch__banner--success"><i class="fas fa-shield-alt"></i> <?php print $langs->trans('FireWatchAllRoundsDoneHelp'); ?></div>
+                <!-- Closing the permit is never automatic: someone in charge asks for it, from the application -->
+                <div class="digirisk-firewatch__banner digirisk-firewatch__banner--success"><i class="fas fa-shield-alt"></i> <?php print $langs->trans(!empty($roundsCloseUrl) ? 'FireWatchAllRoundsDoneHelp' : 'FireWatchAllRoundsDonePublic'); ?></div>
+                <?php if (!empty($roundsCloseUrl)) { ?>
+                    <a class="digirisk-firewatch__submit" href="<?php print dol_escape_htmltag($roundsCloseUrl); ?>"><i class="fas fa-archive"></i> <?php print $langs->trans('FireWatchClosePermit'); ?></a>
+                <?php } ?>
             <?php } elseif ($roundToRecord === null) { ?>
                 <div class="digirisk-firewatch__banner"><i class="far fa-clock"></i> <?php print $langs->trans('FireWatchNextRoundLater'); ?></div>
             <?php } ?>
