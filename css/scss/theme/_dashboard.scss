@@ -1,0 +1,176 @@
+/* Digirisk modern theme: dashboards (Saturne infobox widgets and graphs) and notices */
+
+#{$dr-scope} {
+  /* ---- Widgets ---- */
+
+  .wpeo-infobox-container.box-flex-container {
+    gap: 16px;
+  }
+
+  .wpeo-infobox {
+    padding: 18px 20px;
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius-lg;
+    box-shadow: $dr-shadow-sm;
+    transition: box-shadow $dr-transition;
+
+    &:hover {
+      box-shadow: $dr-shadow;
+    }
+
+    .wpeo-infobox__header {
+      gap: 10px;
+
+      .header__icon-container {
+        width: 36px;
+        min-width: 36px;
+        height: 36px;
+        line-height: 36px;
+        border-radius: $dr-radius;
+
+        .header__icon-background {
+          opacity: 0.12;
+        }
+
+        .header__icon {
+          font-size: 15px;
+          line-height: 36px;
+        }
+      }
+
+      .header__title {
+        font-size: 15px;
+        color: $dr-text;
+      }
+
+      .header__close {
+        color: $dr-border-strong;
+        font-size: 13px;
+
+        &:hover {
+          color: $dr-text;
+        }
+      }
+    }
+
+    .wpeo-infobox__body {
+      margin-top: 12px;
+
+      .body__row-container .body__row {
+        margin: 0;
+        padding: 7px 0;
+        border-top: 1px solid #eef2f6;
+
+        &:first-child {
+          border-top: none;
+        }
+
+        .row__libelle {
+          font-size: 13px;
+          color: $dr-muted;
+
+          .fa-info-circle {
+            color: $dr-faint;
+          }
+        }
+
+        .row__data-container .row__data {
+          margin: 0;
+          padding: 2px 10px;
+          border-radius: $dr-radius-pill;
+          background: $dr-bg;
+          color: $dr-text;
+          font-size: 13px;
+          font-weight: 700;
+          font-variant-numeric: tabular-nums;
+        }
+      }
+
+      .body__content {
+        color: $dr-muted;
+      }
+    }
+  }
+
+  /* ---- Graphs ---- */
+
+  .graph-filter-container {
+    margin: 22px 0 12px;
+  }
+
+  .graph-dashboard.wpeo-grid {
+    gap: 16px;
+
+    > div {
+      box-sizing: border-box;
+      padding: 14px 18px 18px;
+      @include dr-card;
+    }
+
+    table.table-fiche-title .titre {
+      font-size: 15px;
+    }
+  }
+
+  /* ---- Notices ---- */
+
+  .wpeo-notice {
+    border: 1px solid $dr-border;
+    border-left-width: 4px;
+    border-radius: $dr-radius-lg;
+    background: $dr-surface;
+    box-shadow: $dr-shadow-sm;
+
+    .notice-title {
+      color: $dr-text;
+      font-weight: 700;
+    }
+
+    .notice-subtitle {
+      color: $dr-text-soft;
+    }
+
+    .notice-close {
+      color: $dr-faint;
+    }
+
+    &.notice-info {
+      border-color: rgba(13, 138, 255, 0.3);
+      border-left-color: $dr-primary;
+      background: linear-gradient(90deg, rgba(13, 138, 255, 0.06), $dr-surface 60%);
+    }
+
+    &.notice-success {
+      border-color: rgba(22, 163, 74, 0.3);
+      border-left-color: $dr-success;
+      background: linear-gradient(90deg, rgba(22, 163, 74, 0.06), $dr-surface 60%);
+    }
+
+    &.notice-warning {
+      border-color: rgba(233, 173, 79, 0.45);
+      border-left-color: $color__yellow;
+      background: linear-gradient(90deg, rgba(233, 173, 79, 0.08), $dr-surface 60%);
+    }
+
+    &.notice-error {
+      border-color: rgba(224, 83, 83, 0.35);
+      border-left-color: $dr-danger;
+      background: linear-gradient(90deg, rgba(224, 83, 83, 0.06), $dr-surface 60%);
+    }
+  }
+
+  /* Dolibarr info / warning / error boxes */
+  div.info,
+  div.warning,
+  div.error {
+    border-radius: $dr-radius;
+    border-left-width: 4px;
+  }
+
+  div.info {
+    border-color: rgba(13, 138, 255, 0.3);
+    border-left-color: $dr-primary;
+    background: rgba(13, 138, 255, 0.06);
+    color: $dr-text;
+  }
+}
