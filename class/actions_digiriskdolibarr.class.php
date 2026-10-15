@@ -203,6 +203,12 @@ class ActionsDigiriskdolibarr
             $this->resprints = $out;
         }
 
+        // The schedules tab Digirisk adds on the third parties is the Saturne view opened for the
+        // "societe" module: it only loads the stylesheet of that module, which does not exist
+        if (strpos($_SERVER['PHP_SELF'], '/saturne/view/saturne_schedules.php') !== false && GETPOST('module_name', 'alpha') === 'societe') {
+            $this->resprints .= '<link rel="stylesheet" type="text/css" href="' . dol_buildpath('/digiriskdolibarr/css/digiriskdolibarr.min.css', 1) . '">';
+        }
+
         return 0; // or return 1 to replace standard code
     }
 

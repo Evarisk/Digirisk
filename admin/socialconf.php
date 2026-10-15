@@ -124,7 +124,7 @@ $help_url = 'FR:Module_Digirisk#L.27onglet_Social';
 $title    = $langs->trans("CompanyFoundation") . ' - ' . $langs->trans("Social");
 
 $morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css", "/digiriskdolibarr/css/digiriskdolibarr.min.css");
 
 $counter = 0;
 
