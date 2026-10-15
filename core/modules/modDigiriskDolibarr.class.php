@@ -459,6 +459,7 @@ class modDigiriskdolibarr extends DolibarrModules
                 'main',
                 'saturnegetobjectsmetadata',
                 'saturnemediaassign',
+                'saturnemedialibrary',
                 'digiriskdolibarrindex'
 			],
 
@@ -3017,15 +3018,22 @@ class modDigiriskdolibarr extends DolibarrModules
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_REMOVE_TICKET_PUBLIC_INTERFACE_CONST', 1, 'integer', 0, '', $conf->entity);
         }
 
+        $result = $this->_init($sql, $options);
+
         // Photos sent straight to a record never reached the media library, where the gallery lists
         // them: they join it, the work folders of the mobile forms and the certificates of the
-        // external workers aside. Only what is still missing is copied
-        require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
-        if (function_exists('saturne_sync_media_library')) {
-            saturne_sync_media_library('digiriskdolibarr', [DIGIRISK_MOBILE_UPLOAD_DIR, 'certifications']);
+        // external workers aside. Only what is still missing is copied. Once the module is active,
+        // and for a while only: a large catch up must not leave it disabled by running out of time,
+        // the button of the gallery finishes it
+        if ($result > 0) {
+            require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
+            if (function_exists('saturne_sync_media_library')) {
+                $librarySettings = digiriskMediaLibrarySettings();
+                saturne_sync_media_library('digiriskdolibarr', $librarySettings['excluded'], $librarySettings['folders'], microtime(true) + 20);
+            }
         }
 
-        return $this->_init($sql, $options);
+        return $result;
 	}
 
 	/**
