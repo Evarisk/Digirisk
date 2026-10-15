@@ -661,7 +661,7 @@ if ($object->id > 0 || $fromid > 0) {
 
 	// contenu
 	$i          = 0;
-	$totalarray = array();
+	$totalarray = array('nbfield' => 0);
 
 	while ($i < ($limit ? min($num, $limit) : $num)) {
 		$obj = $db->fetch_object($resql);
