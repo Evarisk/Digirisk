@@ -39,6 +39,29 @@ if (!defined('DIGIRISK_MOBILE_UPLOAD_DIR')) {
 }
 
 /**
+ * Settings of the Digirisk media library, as the saturneMediaLibraryFolders hook gives them to Saturne
+ *
+ * The photos of the tickets sit in the ticket folder of Dolibarr. The work folders of the mobile forms
+ * hold photos still on their way to an object, and the certificates of the external workers are
+ * personal documents: both stay out of a library everyone can browse.
+ *
+ * @param  int   $entity Entity, the current one when left out
+ * @return array         'folders': element => folder holding one <ref>/ folder per record, 'excluded': folder names
+ */
+function digiriskMediaLibrarySettings(int $entity = 0): array
+{
+    global $conf;
+
+    $entity = $entity > 0 ? $entity : (int) $conf->entity;
+
+    return [
+        // The default layout stands in while Digirisk is being activated, before its configuration is loaded
+        'folders'  => ['ticket' => $conf->ticket->multidir_output[$entity] ?? DOL_DATA_ROOT . ($entity > 1 ? '/' . $entity : '') . '/ticket'],
+        'excluded' => [DIGIRISK_MOBILE_UPLOAD_DIR, 'certifications'],
+    ];
+}
+
+/**
  * Cancel an action of the mobile interfaces that does not carry the anti CSRF token of the session.
  *
  * Dolibarr checks the token only when MAIN_SECURITY_CSRF_WITH_TOKEN is set, and on a GET request only

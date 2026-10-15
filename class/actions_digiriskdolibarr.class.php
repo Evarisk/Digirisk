@@ -2202,6 +2202,27 @@ class ActionsDigiriskdolibarr
         return 1;
     }
 
+    /**
+     * Overloading the saturneMediaLibraryFolders function : the media library of Digirisk also holds the
+     * photos of the tickets, and keeps out the work folders of the mobile forms and the certificates of
+     * the external workers
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0, the settings are in the results
+     */
+    public function saturneMediaLibraryFolders(array $parameters): int
+    {
+        if (($parameters['moduleName'] ?? '') !== 'digiriskdolibarr') {
+            return 0;
+        }
+
+        require_once __DIR__ . '/../lib/digiriskdolibarr_mobile.lib.php';
+
+        $this->results = digiriskMediaLibrarySettings();
+
+        return 0;
+    }
+
 	public function saturneAddAttendantRow($parameters)
 	{
 		if ($parameters['signatoryRole'] == 'Victim' && !empty($parameters['signatories'])) {
