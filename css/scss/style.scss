@@ -71,3 +71,6 @@ tr.liste_titre th.liste_titre:not(.maxwidthsearch), tr.liste_titre td.liste_titr
 .ui-dialog.ui-corner-all.ui-widget.ui-widget-content.ui-front.ui-dialog-buttons.ui-draggable {
   //z-index: 1500 !important;
 }
+
+// Modern back office theme, imported last so that it wins over the legacy rules above
+@import "theme/theme";

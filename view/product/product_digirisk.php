@@ -161,7 +161,7 @@ if ($action == 'delete_risk_photo' && $permissiontoadd) {
 // â”€â”€ Page output â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $form  = new Form($db);
 $title = $langs->trans('Product') . ' - DigiRisk';
-llxHeader('', $title, '');
+llxHeader('', $title, '', '', 0, 0, [], ['/digiriskdolibarr/css/digiriskdolibarr.min.css']);
 
 $head  = product_prepare_head($object);
 $titre = $langs->trans('CardProduct' . $object->type);
@@ -215,38 +215,6 @@ $digirisk_sections = [
 ];
 
 $currentEditField = ($action == 'edit_extras' && $permissiontoadd) ? $editfield : '';
-
-print '<style>
-.digirisk-section { border: 1px solid #ddd; border-radius: 6px; margin-bottom: 18px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.07); }
-.digirisk-section-header { display:flex; align-items:center; justify-content:space-between; padding:9px 14px; border-bottom-width:3px; border-bottom-style:solid; font-size:.95em; font-weight:bold; }
-.digirisk-section-title { display:flex; align-items:center; gap:8px; }
-.digirisk-section-body { padding:12px 15px; min-height:40px; font-size:.92em; line-height:1.5; }
-.digirisk-section-body.empty { color:#aaa; font-style:italic; cursor:pointer; }
-.digirisk-edit-icon { opacity:.5; transition:opacity .2s; }
-.digirisk-edit-icon:hover { opacity:1; }
-
-/* Risk block */
-.dr-risk-block { border:1px solid #ddd; border-radius:6px; margin-bottom:14px; overflow:hidden; }
-.dr-risk-header { display:flex; align-items:center; gap:10px; padding:8px 12px; background:#f7f7f7; border-bottom:1px solid #e0e0e0; font-weight:bold; }
-.dr-risk-header img { width:28px; height:28px; object-fit:contain; }
-.dr-risk-header .dr-risk-name { flex:1; font-size:.93em; }
-.dr-risk-body { padding:10px 12px; }
-.dr-risk-desc { width:100%; min-height:60px; border:1px solid #ccc; border-radius:4px; padding:6px 8px; font-size:.9em; resize:vertical; }
-.dr-risk-actions { display:flex; gap:6px; align-items:flex-start; margin-top:6px; }
-.dr-risk-photos { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
-.dr-risk-photo-thumb { position:relative; width:70px; height:70px; border-radius:4px; overflow:hidden; border:1px solid #ddd; }
-.dr-risk-photo-thumb img { width:100%; height:100%; object-fit:cover; }
-.dr-risk-photo-del { position:absolute; top:2px; right:2px; background:rgba(180,0,0,.8); color:#fff; border:none; border-radius:50%; width:18px; height:18px; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; text-decoration:none; }
-.dr-protection-row { display:flex; gap:6px; align-items:center; margin-top:6px; }
-.dr-protection-row select { flex:0 0 220px; }
-.dr-protection-row input[type=text] { flex:1; }
-.dr-add-protection { margin-top:4px; font-size:.85em; cursor:pointer; color:#1a5fa8; background:none; border:none; padding:0; }
-.dr-btn { border:none; border-radius:4px; cursor:pointer; padding:6px 10px; font-size:.85em; color:#fff; }
-.dr-btn-orange { background:#e68a00; }
-.dr-btn-green  { background:#1a7a3c; }
-.dr-btn-red    { background:#b72020; }
-.dr-btn-blue   { background:#1a5fa8; }
-</style>';
 
 // ── 1. WYSIWYG extrafields ──────────────────────────────────────
 foreach ($digirisk_sections as $fieldkey => $section) {

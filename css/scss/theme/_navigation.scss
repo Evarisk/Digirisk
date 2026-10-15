@@ -1,0 +1,250 @@
+/* Digirisk modern theme: Dolibarr left menu and GP/UT navigation tree */
+
+#{$dr-scope} {
+  /* ---- Dolibarr left menu, as a sidebar of rounded items ---- */
+
+
+  > #id-container > .side-nav {
+    border-right: 1px solid $dr-border;
+    border-bottom: none;
+    background: $dr-surface;
+    box-shadow: none;
+  }
+
+  div.vmenu {
+    .blockvmenu {
+      padding: 6px 8px;
+      border: none;
+      background: transparent;
+    }
+
+    .blockvmenu + .blockvmenu {
+      border-top: 1px solid #eef2f6;
+    }
+
+    div.menu_titre {
+      padding: 0;
+    }
+
+    a.vmenu:link,
+    a.vmenu:visited,
+    a.vsmenu:link,
+    a.vsmenu:visited,
+    a.help:link {
+      display: block;
+      padding: 6px 10px;
+      border-radius: $dr-radius-sm;
+      transition: background-color $dr-transition, color $dr-transition;
+    }
+
+    a.vmenu:link,
+    a.vmenu:visited {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: $dr-text;
+    }
+
+    a.vsmenu:link,
+    a.vsmenu:visited {
+      font-size: 13px;
+      font-weight: 500;
+      color: $dr-text-soft;
+    }
+
+    a.vmenu:hover,
+    a.vsmenu:hover {
+      background: $dr-bg;
+      color: $dr-primary-strong;
+      text-decoration: none;
+    }
+
+    a.vmenu .pictofixedwidth,
+    a.vsmenu .pictofixedwidth {
+      color: $dr-faint;
+    }
+
+    a.vmenu:hover .pictofixedwidth,
+    a.vsmenu:hover .pictofixedwidth {
+      color: $dr-primary;
+    }
+
+    div.menu_contenu {
+      padding: 0;
+    }
+
+    /* The entries are blocks now: the line breaks between them would add empty lines */
+    div.menu_contenu > br {
+      display: none;
+    }
+
+    .blockvmenusearch {
+      padding: 0 8px 8px;
+      border: none;
+    }
+  }
+
+  /* ---- GP/UT navigation tree (digirisk_header) ---- */
+
+  /* Large screens: the tree is a white panel along the content */
+  @media (min-width: $media__large + 1) {
+    .page-ut-gp-list .side-nav {
+      border-right: 1px solid $dr-border;
+      background: $dr-surface;
+
+      #id-left {
+        background: transparent;
+      }
+    }
+  }
+
+  /* Smaller screens: the tree is a dropdown opened by the "Navigation UT/GP" button */
+  @media (max-width: $media__large) {
+    /* The -40px that pulls the content under the tree panel pushed it out of the screen
+       once the panel is folded into its button */
+    #id-container.page-ut-gp-list {
+      margin-left: 0;
+    }
+
+    #id-container.page-ut-gp-list .side-nav {
+      .side-nav-responsive {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: $dr-radius;
+        background: $dr-navy;
+        box-shadow: $dr-shadow-sm;
+      }
+
+      #id-left {
+        border: 1px solid $dr-border;
+        border-radius: $dr-radius-lg;
+        background: $dr-surface;
+        box-shadow: $dr-shadow-lg;
+      }
+    }
+  }
+
+  .page-ut-gp-list .side-nav {
+    .society-header {
+      padding: 22px 14px 0;
+
+      .linkElement {
+        align-items: center;
+        gap: 8px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid $dr-border;
+        color: $dr-text;
+        font-size: 14px;
+      }
+
+      .icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: $dr-radius-sm;
+        background: rgba(38, 60, 92, 0.1);
+        color: $dr-navy;
+        font-size: 13px;
+      }
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 4px;
+      padding: 8px 14px 6px;
+
+      .toggle-plus,
+      .toggle-minus {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        padding: 0;
+        border: 1px solid $dr-border;
+        border-radius: $dr-radius-sm;
+        color: $dr-muted;
+
+        &:hover {
+          border-color: $dr-primary;
+          color: $dr-primary;
+          opacity: 1;
+        }
+      }
+    }
+
+    .workunit-list {
+      padding: 0 10px 10px;
+
+      li.route {
+        margin-bottom: 2px;
+      }
+
+      .row-container {
+        margin-bottom: 0;
+        padding: 6px 8px;
+        border: 1px solid transparent;
+        border-radius: $dr-radius;
+        background: transparent;
+        box-shadow: none;
+
+        &:hover {
+          background: $dr-surface-soft;
+          box-shadow: none;
+        }
+
+        .drag-handle {
+          color: $dr-border-strong;
+        }
+
+        .toggle-unit,
+        .chevron {
+          color: $dr-faint;
+        }
+
+        .photo-container {
+          border: none;
+          border-radius: $dr-radius-sm;
+          background: $dr-bg;
+          color: $dr-faint;
+        }
+
+        .ref-badge {
+          border-radius: 6px;
+          letter-spacing: 0.02em;
+        }
+
+        .title.element-label {
+          font-weight: 600;
+          color: $dr-text;
+        }
+
+        .actions {
+          background: $dr-surface-soft;
+        }
+      }
+
+      .unit.active > .unit-container.row-container {
+        border-color: rgba(13, 138, 255, 0.35);
+        background: $dr-primary-soft;
+        box-shadow: none;
+
+        .title.element-label {
+          color: $dr-primary-strong;
+        }
+
+        .actions {
+          background: #e7f2ff;
+        }
+      }
+
+      .unit > .sub-list {
+        margin-left: 12px;
+        padding-left: 8px;
+        border-left: 1px dashed $dr-border;
+      }
+    }
+  }
+}

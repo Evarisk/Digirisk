@@ -394,7 +394,7 @@ if ($num == 1 && !headers_sent() && ! empty($conf->global->MAIN_SEARCH_DIRECT_OP
 $title    = $langs->trans("ListOfUsers");
 $help_url = 'FR:Module_Digirisk';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css", "/digiriskdolibarr/css/digiriskdolibarr.min.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 

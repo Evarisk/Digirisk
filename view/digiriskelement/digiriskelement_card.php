@@ -379,7 +379,7 @@ if (($id || $ref) && $action == 'edit') {
         $childrenElements = [];
         if (is_array($children) && !empty($children)) {
             foreach ($children as $key => $value) {
-                $childrenElements[$key] .= $key;
+                $childrenElements[$key] = $key;
             }
         }
         print '<tr><td>' . $langs->trans("ParentElement") . '</td><td>';
