@@ -191,7 +191,7 @@ class DigiriskDolibarr extends SaturneApi
 			IMAGETYPE_GIF  => '.gif',
 			IMAGETYPE_WEBP => '.webp',
 		];
-		$extension = $extensionMap[$image[2]] ?? '.jpg';
+		$extension = $extensionMap[$image[2]];
 
 		if ($preferredName !== '') {
 			$sanitized = dol_sanitizeFileName(dol_basename($preferredName));
