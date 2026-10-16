@@ -172,6 +172,7 @@ function digiriskRiskAssessmentMovePhotos(string $workDir, RiskAssessment $riskA
 
     require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
     require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+    require_once __DIR__ . '/../../saturne/lib/medias.lib.php';
 
     $photoDir = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $riskAssessment->ref;
     $moved    = [];
