@@ -1308,6 +1308,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         if (!empty($protections)) {
             $perRow  = max(1, (int) floor($width / 20));
             $height += 5 + ((int) ceil(count($protections) / $perRow)) * 18;
+            $height += $this->measureProtectionComments($pdf, $protections, $size);
         }
 
         if (!empty($photos)) {
@@ -1337,7 +1338,8 @@ class pdf_preventionplandocument extends SaturneDocumentModel
     }
 
     /**
-     * Bandeau des moyens de protection d'un risque : le picto EPI et son nom dessous.
+     * Bandeau des moyens de protection d'un risque : les pictos EPI, puis le commentaire de chaque
+     * protection qui en a un.
      *
      * @param  TCPDF     $pdf         PDF handler
      * @param  array     $protections Protections du risque
@@ -1358,7 +1360,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $perRow    = max(1, (int) floor($width / $cellWidth));
         $rowCount  = (int) ceil(count($protections) / $perRow);
 
-        $this->checkPageBreak($pdf, 8 + $rowCount * $rowHeight);
+        $this->checkPageBreak($pdf, 8 + $rowCount * $rowHeight + $this->measureProtectionComments($pdf, $protections, $size));
 
         $this->blockLabel($pdf, $outputLangs->transnoentities('MobilePPProtections'), $size);
 
@@ -1382,6 +1384,44 @@ class pdf_preventionplandocument extends SaturneDocumentModel
             $pdf->SetY($startY + $rowHeight);
             $index += $perRow;
         }
+
+        // Le commentaire saisi sur la protection (« Gants anti-coupure », ce que recouvre un
+        // « Divers obligation »...) : le picto seul ne le dit pas, une ligne par protection commentee
+        foreach ($protections as $protection) {
+            if (!dol_strlen($protection['comment'])) {
+                continue;
+            }
+            $pdf->SetFont('', '', $size - 2);
+            $pdf->SetTextColor(40, 40, 40);
+            $html = '<b>' . dol_escape_htmltag($protection['name']) . '</b> : ' . dol_escape_htmltag($protection['comment']);
+            $pdf->writeHTMLCell($width - 4, $this->height, $this->marge_gauche + 2, $pdf->GetY(), $html, 0, 1, false, true, 'L');
+            $pdf->SetTextColor(0, 0, 0);
+        }
+    }
+
+    /**
+     * Hauteur des commentaires de protection imprimes sous les pictos.
+     *
+     * getNumLines ne sait pas mesurer du HTML : la hauteur est estimee sur le texte brut, en gras
+     * pour ne pas la sous-estimer.
+     *
+     * @param  TCPDF $pdf         PDF handler
+     * @param  array $protections Protections du risque
+     * @param  float $size        Taille de police
+     * @return float              Hauteur en mm
+     */
+    protected function measureProtectionComments($pdf, array $protections, float $size): float
+    {
+        $height = 0;
+
+        $pdf->SetFont('', 'B', $size - 2);
+        foreach ($protections as $protection) {
+            if (dol_strlen($protection['comment'])) {
+                $height += $pdf->getNumLines($protection['name'] . ' : ' . $protection['comment'], $this->contentWidth($pdf) - 4) * $this->height;
+            }
+        }
+
+        return $height;
     }
 
     /**
