@@ -1208,11 +1208,12 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         // Un risque ne doit pas etre coupe : on mesure le bloc entier avant de le poser
         $this->checkPageBreak($pdf, $this->measureRiskBlock($pdf, $riskLine, $protections, $photos, $size));
 
-        // Bandeau du risque : picto a gauche, nom et reference a droite
-        $headY = $pdf->GetY();
+        // Bandeau du risque : picto a gauche, nom et reference a droite, puis le commentaire du
+        // risque dans le meme cadre
+        $headY      = $pdf->GetY();
+        $headHeight = 14 + $this->measureRiskComment($pdf, $riskLine, $size);
         $pdf->SetFillColor(248, 249, 250);
-        $pdf->SetX($this->marge_gauche);
-        $pdf->Cell($width, 14, '', 1, 1, 'L', true);
+        $pdf->Rect($this->marge_gauche, $headY, $width, $headHeight, 'DF');
 
         if (dol_strlen($pictoPath) && is_readable($pictoPath)) {
             $pdf->Image($pictoPath, $this->marge_gauche + 2, $headY + 1, 0, 12);
@@ -1244,17 +1245,22 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $pdf->Cell($width - 20, 4, $subTitle, 0, 1, 'L');
         $pdf->SetTextColor(0, 0, 0);
 
-        $pdf->SetY($headY + 14);
-        $pdf->Ln(1.5);
-
-        // Description, sans cadre : le bandeau suffit a delimiter le bloc
+        // Commentaire du risque, sous la reference et aligne sur le nom. L'intitule dit ce qu'est
+        // ce texte, comme pour les protections et les photos
         if (dol_strlen($riskLine->description)) {
+            $pdf->SetXY($this->marge_gauche + 17, $headY + 13);
+            $pdf->SetFont('', 'B', $size - 3);
+            $pdf->SetTextColor(130, 130, 130);
+            $pdf->Cell($width - 20, 4, dol_strtoupper($outputLangs->transnoentities('MobilePPRiskComment')), 0, 1, 'L');
             $pdf->SetFont('', '', $size - 1);
             $pdf->SetTextColor(40, 40, 40);
-            $pdf->SetX($this->marge_gauche + 2);
-            $pdf->MultiCell($width - 4, $this->height, $riskLine->description, 0, 'L');
+            $pdf->SetX($this->marge_gauche + 17);
+            $pdf->MultiCell($width - 20, $this->height, $riskLine->description, 0, 'L');
             $pdf->SetTextColor(0, 0, 0);
         }
+
+        $pdf->SetY($headY + $headHeight);
+        $pdf->Ln(1.5);
 
         // Moyens de prevention saisis sur la fiche, quand il y en a
         if (dol_strlen($riskLine->prevention_method)) {
@@ -1295,12 +1301,9 @@ class pdf_preventionplandocument extends SaturneDocumentModel
     protected function measureRiskBlock($pdf, $riskLine, array $protections, array $photos, float $size): float
     {
         $width  = $this->contentWidth($pdf);
-        $height = 14 + 1.5; // bandeau + interligne
+        $height = 14 + 1.5 + $this->measureRiskComment($pdf, $riskLine, $size); // bandeau + interligne
 
         $pdf->SetFont('', '', $size - 1);
-        if (dol_strlen($riskLine->description)) {
-            $height += $pdf->getNumLines($riskLine->description, $width - 4) * $this->height;
-        }
         if (dol_strlen($riskLine->prevention_method)) {
             $height += 5 + $pdf->getNumLines($riskLine->prevention_method, $width - 4) * $this->height;
         }
@@ -1317,6 +1320,31 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         }
 
         return $height + 5; // filet de separation
+    }
+
+    /**
+     * Hauteur que le commentaire du risque ajoute au cadre du bandeau.
+     *
+     * L'intitule part 1 mm au-dessus du bas du bandeau seul (14 mm) : 4 mm d'intitule, le texte,
+     * puis 2,5 mm de marge basse, soit 5,5 mm de plus que le texte.
+     * Sert aussi a la mesure du bloc entier : les deux ne doivent pas diverger.
+     *
+     * @param  TCPDF  $pdf      PDF handler
+     * @param  object $riskLine Ligne de plan de prevention
+     * @param  float  $size     Taille de police
+     * @return float            Hauteur en mm, 0 sans commentaire
+     */
+    protected function measureRiskComment($pdf, $riskLine, float $size): float
+    {
+        if (!dol_strlen($riskLine->description)) {
+            return 0;
+        }
+
+        // Le cadre doit coller au texte : MultiCell n'impose sa hauteur qu'a une ligne seule, au-dela
+        // chaque ligne prend la hauteur de la police, que getStringHeight mesure
+        $pdf->SetFont('', '', $size - 1);
+
+        return 5.5 + max($this->height, $pdf->getStringHeight($this->contentWidth($pdf) - 20, $riskLine->description));
     }
 
     /**
