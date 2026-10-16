@@ -57,7 +57,7 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+dol_include_once('/saturne/class/saturnesignature.class.php');
 
 global $conf, $db, $hookmanager, $langs, $mc, $user;
 
@@ -834,8 +834,8 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
             }
 
             // Load Saturne libraries
-            require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
-            require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+            dol_include_once('/saturne/lib/saturne_functions.lib.php');
+            dol_include_once('/saturne/class/saturnesignature.class.php');
 
             $signatory = new SaturneSignature($db, $moduleNameLowerCase, $object->element);
 
@@ -843,7 +843,7 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
             $object->status        = $object::STATUS_READ; // Special case because public answer need draft status object to complete question
             $moreParams['moreCSS'] = 'hidden';             // Needed for prevent click on signature button action
             print '<div style="margin-top: 2em;">';
-            require_once __DIR__ . '/../../../saturne/core/tpl/signature/public_signature_view.tpl.php';
+            require_once dol_buildpath('/saturne/core/tpl/signature/public_signature_view.tpl.php');
             print '</div>';
             $object->status = $previousStatus;
             print '<input type="hidden" name="signature" value="">';

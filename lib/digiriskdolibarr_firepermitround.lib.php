@@ -273,7 +273,7 @@ function digiriskFirePermitRoundUploadContext(FirePermitRound $round): string
  */
 function digiriskFirePermitRoundUploadSubDir(FirePermitRound $round): string
 {
-    require_once __DIR__ . '/../../saturne/lib/medias.lib.php';
+    dol_include_once('/saturne/lib/medias.lib.php');
     require_once __DIR__ . '/digiriskdolibarr_mobile.lib.php';
 
     return DIGIRISK_MOBILE_UPLOAD_DIR . '/' . saturne_get_upload_token(digiriskFirePermitRoundUploadContext($round));
@@ -429,7 +429,7 @@ function digiriskFirePermitMoveRoundPhotos(FirePermit $permit, FirePermitRound $
  */
 function digiriskFirePermitGetRoundPhotos(FirePermit $permit, FirePermitRound $round): array
 {
-    require_once __DIR__ . '/../../saturne/lib/medias.lib.php';
+    dol_include_once('/saturne/lib/medias.lib.php');
 
     return saturne_get_media_files('digiriskdolibarr', $round->getPhotoSubDir($permit->ref), '', '', ['type' => 'image', 'sort_order' => 'asc']);
 }

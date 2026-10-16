@@ -191,12 +191,12 @@ if ($object->id > 0) {
 	$arrayfields    = dol_sort_array($arrayfields, 'position');
 
 	$conf->global->MAIN_DISABLE_FULL_SCANLIST = 1;
-	require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_build_sql_select.tpl.php';
-	require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_header.tpl.php';
-	require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_search_input.tpl.php';
-	require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_search_title.tpl.php';
-	require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_loop_object.tpl.php';
-	require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_footer.tpl.php';
+	require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_build_sql_select.tpl.php');
+	require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_header.tpl.php');
+	require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_search_input.tpl.php');
+	require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_search_title.tpl.php');
+	require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_loop_object.tpl.php');
+	require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_footer.tpl.php');
 
 }
 

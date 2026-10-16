@@ -122,7 +122,7 @@ $title  = $langs->trans('MyPage');
 $object = new MyObject($db);
 $object->fetch($id);
 saturne_header(0, '', $title, $help_url);
-require_once __DIR__ . '/../../saturne/core/tpl/banner_actions.tpl.php';
+require_once dol_buildpath('/saturne/core/tpl/banner_actions.tpl.php'); // never __DIR__ . '/../saturne/…': breaks when the module is a symlink
 ```
 
 **Security rules** — always:

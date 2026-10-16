@@ -3283,7 +3283,7 @@ function digiriskPreventionPlanDocumentImagesSubDir(string $part): string
  */
 function digiriskPreventionPlanDocumentImages(string $part): array
 {
-    require_once __DIR__ . '/../../saturne/lib/medias.lib.php';
+    dol_include_once('/saturne/lib/medias.lib.php');
 
     $files = saturne_get_media_files('digiriskdolibarr', digiriskPreventionPlanDocumentImagesSubDir($part), '', '', ['type' => 'image', 'sort_field' => 'name', 'sort_order' => 'asc']);
 
@@ -3299,7 +3299,7 @@ function digiriskPreventionPlanDocumentImages(string $part): array
  */
 function digiriskPreventionPlanDocumentImagesBlock(string $part, bool $canWrite): string
 {
-    require_once __DIR__ . '/../../saturne/lib/medias.lib.php';
+    dol_include_once('/saturne/lib/medias.lib.php');
 
     return saturne_render_media_block('digiriskdolibarr', digiriskPreventionPlanDocumentImagesSubDir($part), 'documentimages-' . $part, 'digiriskdolibarr,adminpage,write', ['show_photo' => true, 'show_audio' => false, 'show_file' => false, 'show_upload' => $canWrite]);
 }

@@ -465,7 +465,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
             case 'TICKET_PUBLIC_INTERFACE_CREATE' :
-                require_once __DIR__ . '/../../../saturne/class/saturnemail.class.php';
+                dol_include_once('/saturne/class/saturnemail.class.php');
 
                 $categories = $object->getCategoriesCommon('ticket');
                 if (is_array($categories) && !empty($categories)) {

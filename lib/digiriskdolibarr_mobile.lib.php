@@ -28,7 +28,7 @@
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 // Load Saturne libraries — photos are captured through the Saturne media block
-require_once __DIR__ . '/../../saturne/lib/medias.lib.php';
+dol_include_once('/saturne/lib/medias.lib.php');
 
 /**
  * Directory, relative to the module output directory, holding the photos of the mobile
@@ -110,7 +110,7 @@ function digiriskGetUserElectronicSignature(DoliDB $db, int $userId): string
         return '';
     }
 
-    require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+    dol_include_once('/saturne/class/saturnesignature.class.php');
 
     // Saturne reads the record in every entity : with multicompany, the signature drawn in another
     // entity was not found here
@@ -135,7 +135,7 @@ function digiriskSaveUserElectronicSignature(DoliDB $db, User $user, int $userId
         return -1;
     }
 
-    require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+    dol_include_once('/saturne/class/saturnesignature.class.php');
 
     // Saturne updates the single record of the user and retires the copies left in other entities,
     // instead of creating one record per entity
@@ -152,7 +152,7 @@ function digiriskSaveUserElectronicSignature(DoliDB $db, User $user, int $userId
  */
 function digiriskIsValidSignature(string $signature): bool
 {
-    require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+    dol_include_once('/saturne/class/saturnesignature.class.php');
 
     return SaturneSignature::isValidSignatureData($signature);
 }
@@ -232,7 +232,7 @@ function digiriskMobileCreateFirePermitLines(DoliDB $db, User $user, int $firePe
  */
 function digiriskMobileSaveSchedules(DoliDB $db, User $user, string $elementType, int $elementId, array $schedules): int
 {
-    require_once __DIR__ . '/../../saturne/class/saturneschedules.class.php';
+    dol_include_once('/saturne/class/saturneschedules.class.php');
 
     $saturneSchedules = new SaturneSchedules($db);
     $saturneSchedules->fetch(0, '', ' AND element_type = "' . $db->escape($elementType) . '" AND element_id = ' . $elementId . ' AND status = 1');
@@ -332,7 +332,7 @@ function digiriskMobileFindThirdparty(DoliDB $db, string $idProf = '', string $n
  */
 function digiriskMobileGetSignatureState(DoliDB $db, $object): array
 {
-    require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+    dol_include_once('/saturne/class/saturnesignature.class.php');
 
     $signatory   = new SaturneSignature($db, 'digiriskdolibarr', $object->element);
     $signatories = $signatory->fetchSignatory('', (int) $object->id, $object->element);

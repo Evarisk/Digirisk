@@ -189,7 +189,7 @@ if (empty($reshook)) {
     require_once DOL_DOCUMENT_ROOT . '/core/actions_massactions.inc.php';
 
     // Mass actions archive
-    require_once __DIR__ . '/../../../saturne/core/tpl/actions/list_massactions.tpl.php';
+    require_once dol_buildpath('/saturne/core/tpl/actions/list_massactions.tpl.php');
 }
 
 /*
@@ -206,12 +206,12 @@ $helpUrl = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accide
 
 saturne_header(0,'', $title, $helpUrl, '', 0, 0, [], [], '', 'mod-' . $object->module . '-' . $object->element . ' page-list bodyforlist');
 
-require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_build_sql_select.tpl.php';
-require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_header.tpl.php';
-require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_search_input.tpl.php';
-require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_search_title.tpl.php';
-require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_loop_object.tpl.php';
-require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_footer.tpl.php';
+require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_build_sql_select.tpl.php');
+require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_header.tpl.php');
+require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_search_input.tpl.php');
+require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_search_title.tpl.php');
+require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_loop_object.tpl.php');
+require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_footer.tpl.php');
 
 // End of page
 llxFooter();
