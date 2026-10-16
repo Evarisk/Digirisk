@@ -359,8 +359,7 @@ if (!dolibarr_get_const($db, 'DIGIRISKDOLIBARR_USERAPI_SET', 0)) {
 		$apiUser = new User($db);
 		$apiUser->fetch($user_id);
 		//Rights digiriskdolibarr api
-		$apiUser->addrights(43630236);
-		$apiUser->addrights(43630237);
+		$apiUser->addrights(0, 'digiriskdolibarr', 'api');
 	}
 
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERAPI_SET', $user_id, 'integer', 0, '', 0);
@@ -489,6 +488,7 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_USERGROUP_UPDATED') >= 0 && getDolGlobalIn
                 $userGroup->addrights(43630250, 'digiriskdolibarr');  // Accident create
                 $userGroup->addrights(43630252, 'digiriskdolibarr');  // AccidentInvestigation read
                 $userGroup->addrights(43630253, 'digiriskdolibarr');  // AccidentInvestigation create
+                $userGroup->addrights(0, 'digiriskdolibarr', 'api');  // API read and write
 
                 $userGroup->addrights('', 'saturne', 'lire');
                 $userGroup->addrights('', 'saturne', 'read');
