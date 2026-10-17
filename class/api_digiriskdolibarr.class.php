@@ -68,6 +68,16 @@ class DigiriskDolibarr extends SaturneApi
 		$this->module = 'digiriskdolibarr';
 
 		$this->entities = [
+			'digiriskelements' => [
+				'class'       => DigiriskElement::class,
+				'fields'      => ['label', 'element_type'],
+				'permissions' => [
+					'read'   => 'digiriskelement->read',
+					'create' => 'digiriskelement->write',
+					'write'  => 'digiriskelement->write',
+					'delete' => 'digiriskelement->delete',
+				],
+			],
 			'risks' => [
 				'class'       => Risk::class,
 				'fields'      => ['fk_element', 'category'],
@@ -80,7 +90,7 @@ class DigiriskDolibarr extends SaturneApi
 			],
 			'riskassessments' => [
 				'class'       => RiskAssessment::class,
-				'fields'      => ['fk_risk', 'cotation'],
+				'fields'      => ['fk_risk'],
 				'permissions' => [
 					'read'   => 'risk->read',
 					'create' => 'risk->write',
@@ -92,16 +102,32 @@ class DigiriskDolibarr extends SaturneApi
 	}
 
 	/**
-	 * Set conf entity
+	 * Set conf entity from HTTP header (DOLENTITY / DOLAPIENTITY), query/body parameter, or explicit argument.
 	 *
-	 * @param  integer $entity Entity ID
-	 *
+	 * @param  integer $entity Fallback Entity ID
+	 * @return void
 	 */
-	public function setConfEntity($entity)
+	public function setConfEntity($entity = 0)
 	{
 		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
+
+		$requestedEntity = 0;
+		if (!empty($_SERVER['HTTP_DOLENTITY'])) {
+			$requestedEntity = (int) $_SERVER['HTTP_DOLENTITY'];
+		} elseif (!empty($_SERVER['HTTP_DOLAPIENTITY'])) {
+			$requestedEntity = (int) $_SERVER['HTTP_DOLAPIENTITY'];
+		} elseif (GETPOSTISSET('DOLENTITY')) {
+			$requestedEntity = GETPOSTINT('DOLENTITY');
+		} elseif (GETPOSTISSET('entity')) {
+			$requestedEntity = GETPOSTINT('entity');
+		} elseif ((int) $entity > 0) {
+			$requestedEntity = (int) $entity;
+		}
+
+		if ($requestedEntity > 0 && (int) $conf->entity !== $requestedEntity) {
+			$conf->setEntityValues($this->db, $requestedEntity);
+			DigiriskElement::clearActiveElementsCache();
+		}
 	}
 
 	/**
@@ -116,6 +142,8 @@ class DigiriskDolibarr extends SaturneApi
 	protected function _checkPermission(string $entityKey, string $action): void
 	{
 		global $conf;
+
+		$this->setConfEntity((int) $conf->entity);
 
 		$user = DolibarrApiAccess::$user;
 		if (!empty($user->socid) || ((int) $user->entity > 0 && (int) $user->entity !== (int) $conf->entity)) {
@@ -193,16 +221,24 @@ class DigiriskDolibarr extends SaturneApi
 		];
 		$extension = $extensionMap[$image[2]];
 
+		if (!dol_is_dir($targetDir)) {
+			dol_mkdir($targetDir);
+		}
+
 		if ($preferredName !== '') {
 			$sanitized = dol_sanitizeFileName(dol_basename($preferredName));
 			$baseName  = pathinfo($sanitized, PATHINFO_FILENAME);
-			$filename  = ($baseName !== '' ? $baseName : 'api-' . bin2hex(random_bytes(16))) . $extension;
+			if ($baseName === '') {
+				$baseName = 'api-' . bin2hex(random_bytes(16));
+			}
+			$filename = $baseName . $extension;
+			$counter  = 2;
+			while (dol_is_file($targetDir . '/' . $filename)) {
+				$filename = $baseName . '-' . $counter . $extension;
+				$counter++;
+			}
 		} else {
 			$filename = 'api-' . bin2hex(random_bytes(16)) . $extension;
-		}
-
-		if (!dol_is_dir($targetDir)) {
-			dol_mkdir($targetDir);
 		}
 
 		$photoPath = $targetDir . '/' . $filename;
@@ -222,6 +258,102 @@ class DigiriskDolibarr extends SaturneApi
 		}
 
 		return $filename;
+	}
+
+	/**
+	 * Extract and normalize one or more base64 media payloads from request data.
+	 * Supports single 'photo_base64' (with optional 'filename') as well as arrays in
+	 * 'photos_base64', 'photos', or 'medias' (each item can be a base64 string or
+	 * an associative array with 'photo_base64'|'base64'|'content' and optional 'filename'|'name').
+	 *
+	 * @param array $data Request payload
+	 *
+	 * @return array<int, array{photo_base64: string, filename: string}>
+	 *
+	 * @throws RestException 400
+	 */
+	private function extractMediaPayloads(array $data): array
+	{
+		$items = [];
+
+		if (isset($data['photo_base64'])) {
+			if (!is_string($data['photo_base64']) || trim($data['photo_base64']) === '') {
+				throw new RestException(400, 'photo_base64 must be a non-empty string');
+			}
+			$items[] = [
+				'photo_base64' => $data['photo_base64'],
+				'filename'     => isset($data['filename']) && is_string($data['filename']) ? trim($data['filename']) : '',
+			];
+		}
+
+		foreach (['photos_base64', 'photos', 'medias'] as $key) {
+			if (!isset($data[$key])) {
+				continue;
+			}
+			if (!is_array($data[$key])) {
+				throw new RestException(400, $key . ' must be an array');
+			}
+			foreach ($data[$key] as $index => $entry) {
+				if (is_string($entry)) {
+					if (trim($entry) === '') {
+						throw new RestException(400, $key . '[' . $index . '] must be a non-empty base64 string');
+					}
+					$items[] = [
+						'photo_base64' => $entry,
+						'filename'     => '',
+					];
+				} elseif (is_array($entry)) {
+					$b64 = $entry['photo_base64'] ?? ($entry['base64'] ?? ($entry['content'] ?? null));
+					if (!is_string($b64) || trim($b64) === '') {
+						throw new RestException(400, $key . '[' . $index . '].photo_base64 must be a non-empty string');
+					}
+					$fname   = $entry['filename'] ?? ($entry['name'] ?? '');
+					$items[] = [
+						'photo_base64' => $b64,
+						'filename'     => is_string($fname) ? trim($fname) : '',
+					];
+				} else {
+					throw new RestException(400, 'Invalid media entry in ' . $key . '[' . $index . ']');
+				}
+			}
+		}
+
+		return $items;
+	}
+
+	/**
+	 * List all saved media filenames for a given risk assessment reference.
+	 *
+	 * @param string $assessmentRef Risk assessment reference (e.g. RA1)
+	 *
+	 * @return array<int, string>
+	 */
+	private function listAssessmentPhotos(string $assessmentRef): array
+	{
+		global $conf;
+
+		if ($assessmentRef === '' || !preg_match('/^[A-Za-z0-9_-]+$/D', $assessmentRef)) {
+			return [];
+		}
+
+		$root = $conf->digiriskdolibarr->multidir_output[$conf->entity] ?? ($conf->digiriskdolibarr->dir_output ?? '');
+		if ($root === '') {
+			return [];
+		}
+
+		require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+
+		$assessmentDir = $root . '/riskassessment/' . $assessmentRef;
+		if (!dol_is_dir($assessmentDir)) {
+			return [];
+		}
+
+		$photos = [];
+		foreach (dol_dir_list($assessmentDir, 'files', 0, '', '(\.meta|_preview.*\.png)$', 'date', SORT_ASC) as $file) {
+			$photos[] = $file['name'];
+		}
+
+		return $photos;
 	}
 
 	/**
@@ -273,12 +405,638 @@ class DigiriskDolibarr extends SaturneApi
 		return $cleaned;
 	}
 
+	/**
+	 * Verify that a fetched DigiriskElement belongs to the current entity, has STATUS_VALIDATED,
+	 * and is reachable from the root (not the trash bin itself and not inside a trashed/archived groupment).
+	 *
+	 * @param DigiriskElement $element Fetched organization element
+	 *
+	 * @return bool
+	 */
+	private function isActiveNonTrashedElement(DigiriskElement $element): bool
+	{
+		global $conf;
+
+		if (
+			(int) $element->id <= 0 ||
+			($element->entity !== null && (int) $element->entity !== (int) $conf->entity) ||
+			(int) $element->status !== DigiriskElement::STATUS_VALIDATED
+		) {
+			return false;
+		}
+
+		$reachableIds = $element->getReachableDigiriskElementIds();
+		return is_array($reachableIds) && isset($reachableIds[(int) $element->id]);
+	}
+
+	/**
+	 * Load the Evarisk advanced evaluation configuration and transfer matrix from js/json/default.json.
+	 *
+	 * @return array{matrix: array<string, int>, risk_variable: array, riskenvironmental_variable: array}
+	 *
+	 * @throws RestException 500
+	 */
+	private function loadAdvancedCotationConfig(): array
+	{
+		static $cachedConfig = null;
+		if ($cachedConfig !== null) {
+			return $cachedConfig;
+		}
+
+		$jsonPath = __DIR__ . '/../js/json/default.json';
+		if (!is_file($jsonPath)) {
+			throw new RestException(500, 'Evaluation transfer file (default.json) is missing');
+		}
+
+		$rawJson = file_get_contents($jsonPath);
+		$decoded = is_string($rawJson) ? json_decode($rawJson, true) : null;
+		if (!is_array($decoded) || empty($decoded[0]['option']['matrix']) || !is_array($decoded[0]['option']['matrix'])) {
+			throw new RestException(500, 'Evaluation transfer file (default.json) is invalid');
+		}
+
+		$matrix = [];
+		foreach ($decoded[0]['option']['matrix'] as $product => $score) {
+			$matrix[(string) $product] = (int) $score;
+		}
+
+		$cachedConfig = [
+			'matrix'                     => $matrix,
+			'risk_variable'              => (array) ($decoded[0]['option']['risk_variable'] ?? []),
+			'riskenvironmental_variable' => (array) ($decoded[0]['option']['riskenvironmental_variable'] ?? []),
+		];
+
+		return $cachedConfig;
+	}
+
+	/**
+	 * Validate and resolve the risk assessment method, 0-100 cotation, and 5 advanced criteria.
+	 * Enforces mutual exclusivity between:
+	 * - Simple evaluation ('standard'): 4 thresholds (0 [0-47], 48 [48-50], 51 [51-80], 100 [81-100] or scale 1..4), no advanced criteria allowed.
+	 * - Advanced evaluation ('advanced'): 5 criteria (gravite 0..4, exposition/frequence 0..4, occurrence/historique 1..4, formation/maitrise 1..4, protection/milieu 1..4) transferred to 0..100 via default.json matrix.
+	 *
+	 * @param array               $data     Request payload
+	 * @param RiskAssessment|null $existing Existing assessment when updating (null when creating)
+	 *
+	 * @return array{method: string, cotation: int, gravite: int|null, exposition: int|null, occurrence: int|null, formation: int|null, protection: int|null}
+	 *
+	 * @throws RestException 400, 500
+	 */
+	private function resolveAndValidateAssessmentCotation(array $data, ?RiskAssessment $existing = null): array
+	{
+		$criterionMapping = [
+			'gravite'    => ['keys' => ['gravite'], 'min' => 0, 'max' => 4],
+			'exposition' => ['keys' => ['exposition', 'frequence'], 'min' => 0, 'max' => 4],
+			'occurrence' => ['keys' => ['occurrence', 'historique'], 'min' => 1, 'max' => 4],
+			'formation'  => ['keys' => ['formation', 'maitrise'], 'min' => 1, 'max' => 4],
+			'protection' => ['keys' => ['protection', 'milieu'], 'min' => 1, 'max' => 4],
+		];
+
+		$criteresBag = isset($data['criteres']) && is_array($data['criteres']) ? $data['criteres'] : [];
+		$extractedCriteria = [];
+		foreach ($criterionMapping as $canonical => $meta) {
+			foreach ($meta['keys'] as $alias) {
+				if (array_key_exists($alias, $data) && $data[$alias] !== null && $data[$alias] !== '') {
+					$extractedCriteria[$canonical] = $data[$alias];
+					break;
+				}
+				if (array_key_exists($alias, $criteresBag) && $criteresBag[$alias] !== null && $criteresBag[$alias] !== '') {
+					$extractedCriteria[$canonical] = $criteresBag[$alias];
+					break;
+				}
+			}
+		}
+
+		$hasAnyCriteria   = !empty($extractedCriteria);
+		$cotationProvided = array_key_exists('cotation', $data) && $data['cotation'] !== null && $data['cotation'] !== '';
+		$seuilProvided    = array_key_exists('seuil', $data) && $data['seuil'] !== null && $data['seuil'] !== '';
+		$scaleProvided    = array_key_exists('scale', $data) && $data['scale'] !== null && $data['scale'] !== '';
+
+		$rawMethod = isset($data['method']) && is_string($data['method']) ? strtolower(trim($data['method'])) : '';
+		if ($rawMethod === 'simple') {
+			$rawMethod = 'standard';
+		}
+
+		if ($rawMethod !== '' && !in_array($rawMethod, ['standard', 'advanced'], true)) {
+			throw new RestException(400, 'Invalid evaluation method (standard or advanced expected)');
+		}
+
+		// Determine effective method
+		if ($rawMethod !== '') {
+			$method = $rawMethod;
+		} elseif ($hasAnyCriteria) {
+			$method = 'advanced';
+		} elseif ($cotationProvided || $seuilProvided || $scaleProvided) {
+			$method = 'standard';
+		} elseif ($existing !== null && !empty($existing->method)) {
+			$method = ($existing->method === 'advanced') ? 'advanced' : 'standard';
+		} else {
+			$method = 'standard';
+		}
+
+		if ($method === 'standard') {
+			if ($hasAnyCriteria) {
+				throw new RestException(400, 'Cannot provide advanced evaluation criteria (gravite, exposition, occurrence, formation, protection) when using standard (simple) evaluation method');
+			}
+
+			$scaleToCotation = [
+				1 => 0,
+				2 => 48,
+				3 => 51,
+				4 => 100,
+			];
+
+			if ($cotationProvided) {
+				if (!is_int($data['cotation']) && !(is_string($data['cotation']) && preg_match('/^\d+$/', $data['cotation']))) {
+					throw new RestException(400, 'cotation must be an integer');
+				}
+				$cotation = (int) $data['cotation'];
+			} elseif ($seuilProvided || $scaleProvided) {
+				$rawScale = $seuilProvided ? $data['seuil'] : $data['scale'];
+				if (!is_int($rawScale) && !(is_string($rawScale) && preg_match('/^\d+$/', $rawScale))) {
+					throw new RestException(400, 'seuil/scale must be an integer between 1 and 4');
+				}
+				$scaleVal = (int) $rawScale;
+				if (!isset($scaleToCotation[$scaleVal])) {
+					throw new RestException(400, 'Invalid simple threshold scale (1, 2, 3, or 4 expected)');
+				}
+				$cotation = $scaleToCotation[$scaleVal];
+			} elseif ($existing !== null && $existing->method !== 'advanced' && $existing->cotation !== null) {
+				$cotation = (int) $existing->cotation;
+			} else {
+				throw new RestException(400, 'cotation (0, 48, 51, 100) or seuil/scale (1, 2, 3, 4) is required for standard evaluation');
+			}
+
+			if (!in_array($cotation, [0, 48, 51, 100], true)) {
+				throw new RestException(400, 'Invalid standard cotation: must be one of the 4 thresholds (0 [0-47], 48 [48-50], 51 [51-80], 100 [81-100])');
+			}
+
+			return [
+				'method'     => 'standard',
+				'cotation'   => $cotation,
+				'gravite'    => null,
+				'exposition' => null,
+				'occurrence' => null,
+				'formation'  => null,
+				'protection' => null,
+			];
+		}
+
+		// Advanced evaluation ('advanced')
+		if ($seuilProvided || $scaleProvided) {
+			throw new RestException(400, 'Cannot provide simple threshold (seuil/scale) when using advanced evaluation method');
+		}
+
+		$resolvedCriteria = [];
+		foreach ($criterionMapping as $canonical => $meta) {
+			if (array_key_exists($canonical, $extractedCriteria)) {
+				$rawVal = $extractedCriteria[$canonical];
+			} elseif ($existing !== null && $existing->method === 'advanced' && $existing->{$canonical} !== null && $existing->{$canonical} !== '') {
+				$rawVal = $existing->{$canonical};
+			} else {
+				throw new RestException(400, 'Missing criterion "' . $canonical . '": all 5 criteria (gravite, exposition, occurrence, formation, protection) are required for advanced evaluation');
+			}
+
+			if (!is_int($rawVal) && !(is_string($rawVal) && preg_match('/^-?\d+$/', (string) $rawVal))) {
+				throw new RestException(400, 'Criterion "' . $canonical . '" must be an integer');
+			}
+
+			$intVal = (int) $rawVal;
+			if ($intVal < $meta['min'] || $intVal > $meta['max']) {
+				throw new RestException(400, 'Criterion "' . $canonical . '" must be between ' . $meta['min'] . ' and ' . $meta['max']);
+			}
+
+			$resolvedCriteria[$canonical] = $intVal;
+		}
+
+		$product = $resolvedCriteria['gravite']
+			* $resolvedCriteria['exposition']
+			* $resolvedCriteria['occurrence']
+			* $resolvedCriteria['formation']
+			* $resolvedCriteria['protection'];
+
+		$config = $this->loadAdvancedCotationConfig();
+		$matrix = $config['matrix'];
+		if (!array_key_exists((string) $product, $matrix)) {
+			throw new RestException(400, 'Calculated criteria product (' . $product . ') does not exist in transfer matrix');
+		}
+
+		$transferredCotation = (int) $matrix[(string) $product];
+
+		if ($cotationProvided) {
+			if (!is_int($data['cotation']) && !(is_string($data['cotation']) && preg_match('/^-?\d+$/', (string) $data['cotation']))) {
+				throw new RestException(400, 'cotation must be an integer');
+			}
+			if ((int) $data['cotation'] !== $transferredCotation) {
+				throw new RestException(
+					400,
+					'Provided cotation (' . (int) $data['cotation'] . ') does not match the transfer matrix score (' . $transferredCotation . ') for the 5 advanced criteria (product = ' . $product . ')'
+				);
+			}
+		}
+
+		return [
+			'method'     => 'advanced',
+			'cotation'   => $transferredCotation,
+			'gravite'    => $resolvedCriteria['gravite'],
+			'exposition' => $resolvedCriteria['exposition'],
+			'occurrence' => $resolvedCriteria['occurrence'],
+			'formation'  => $resolvedCriteria['formation'],
+			'protection' => $resolvedCriteria['protection'],
+		];
+	}
+
+	// =================================================================
+	// DIGIRISK ELEMENTS (GP / UT) API ROUTES
+	// =================================================================
+
+	/**
+	 * List active organization elements (Groupments GP and Work Units UT) in the current entity
+	 * that are not in the trash (excludes GP0, trashed elements, and children of trashed groupments).
+	 *
+	 * @param string $sortfield    Sort field
+	 * @param string $sortorder    Sort order (ASC or DESC)
+	 * @param int    $limit        Page size (0 = no limit)
+	 * @param int    $page         Page index, starting at 0
+	 * @param string $element_type Optional filter by element type ('groupment' or 'workunit')
+	 * @param string $sqlfilters   Universal Search filter
+	 *
+	 * @return array<int, object>
+	 *
+	 * @url GET digiriskelements
+	 *
+	 * @throws RestException 400, 403, 503
+	 */
+	public function listDigiriskElements($sortfield = 't.ranks', $sortorder = 'ASC', $limit = 100, $page = 0, $element_type = '', $sqlfilters = '')
+	{
+		global $conf;
+
+		$this->_checkPermission('digiriskelements', 'read');
+
+		$elementType = is_string($element_type) ? trim($element_type) : '';
+		if ($elementType !== '' && !in_array($elementType, ['groupment', 'workunit'], true)) {
+			throw new RestException(400, 'Invalid element_type (groupment or workunit expected)');
+		}
+
+		$digiriskElement = new DigiriskElement($this->db);
+		$reachableIds    = $digiriskElement->getReachableDigiriskElementIds();
+		if (!is_array($reachableIds) || empty($reachableIds)) {
+			return [];
+		}
+
+		$filterSql  = 't.entity = ' . ((int) $conf->entity);
+		$filterSql .= ' AND t.status = ' . DigiriskElement::STATUS_VALIDATED;
+		$filterSql .= ' AND t.rowid IN (' . implode(',', array_map('intval', $reachableIds)) . ')';
+
+		if ($elementType !== '') {
+			$filterSql .= " AND t.element_type = '" . $this->db->escape($elementType) . "'";
+		}
+
+		if (!empty($sqlfilters)) {
+			$errorMessage = '';
+			$customSql    = forgeSQLFromUniversalSearchCriteria($sqlfilters, $errorMessage, 1);
+			if ($errorMessage !== '') {
+				throw new RestException(400, 'Error when validating parameter sqlfilters -> ' . $errorMessage);
+			}
+			if ($customSql !== '') {
+				$filterSql .= ' AND (' . $customSql . ')';
+			}
+		}
+
+		$offset  = $limit > 0 ? $limit * max(0, (int) $page) : 0;
+		$records = $digiriskElement->fetchAll($sortorder, $sortfield, (int) $limit, (int) $offset, ['customsql' => $filterSql]);
+		if (!is_array($records)) {
+			throw new RestException(503, 'Error when retrieving digiriskelements: ' . implode(',', (array) $digiriskElement->errors));
+		}
+
+		$cleaned = [];
+		foreach ($records as $record) {
+			$cleaned[] = $this->_cleanObjectDatas($record);
+		}
+
+		return $cleaned;
+	}
+
+	/**
+	 * Get the hierarchical ordered list of active organization elements (GP/UT) not in the trash
+	 * for the current entity, with their tree depth.
+	 *
+	 * @param string $element_type Optional filter by element type ('groupment' or 'workunit')
+	 *
+	 * @return array<int, object>
+	 *
+	 * @url GET digiriskelements/tree
+	 *
+	 * @throws RestException 400, 403
+	 */
+	public function getDigiriskElementsTree($element_type = '')
+	{
+		$this->_checkPermission('digiriskelements', 'read');
+
+		$elementType = is_string($element_type) ? trim($element_type) : '';
+		if ($elementType !== '' && !in_array($elementType, ['groupment', 'workunit'], true)) {
+			throw new RestException(400, 'Invalid element_type (groupment or workunit expected)');
+		}
+
+		$digiriskElement = new DigiriskElement($this->db);
+		$activeElements  = $digiriskElement->getActiveDigiriskElements('current');
+		if (!is_array($activeElements) || empty($activeElements)) {
+			return [];
+		}
+
+		$trashID = getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH');
+		if ($trashID > 0) {
+			$trashedElements = $digiriskElement->fetchDigiriskElementFlat($trashID, $activeElements, 'current', true);
+			$activeElements  = array_diff_key($activeElements, $trashedElements);
+			if (empty($activeElements)) {
+				return [];
+			}
+		}
+
+		$flatEntries = $digiriskElement->fetchDigiriskElementFlat(0, $activeElements, 'current');
+		$result      = [];
+		foreach ($flatEntries as $flatEntry) {
+			if (empty($flatEntry['object']) || !($flatEntry['object'] instanceof DigiriskElement)) {
+				continue;
+			}
+			if ($elementType !== '' && $flatEntry['object']->element_type !== $elementType) {
+				continue;
+			}
+			$cleaned        = $this->_cleanObjectDatas($flatEntry['object']);
+			$cleaned->depth = (int) ($flatEntry['depth'] ?? 0);
+			$result[]       = $cleaned;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Get one active organization element (GP/UT) by ID if it belongs to the current entity and is not in the trash.
+	 *
+	 * @param int $id DigiriskElement ID
+	 *
+	 * @return object Cleaned DigiriskElement
+	 *
+	 * @url GET digiriskelements/{id}
+	 *
+	 * @throws RestException 403, 404
+	 */
+	public function getDigiriskElement($id)
+	{
+		global $conf;
+
+		$this->_checkPermission('digiriskelements', 'read');
+
+		$element = new DigiriskElement($this->db);
+		if (
+			$element->fetch((int) $id, '', ' AND t.entity = ' . ((int) $conf->entity)) <= 0 ||
+			!$this->isActiveNonTrashedElement($element)
+		) {
+			throw new RestException(404, 'digiriskelements not found');
+		}
+
+		return $this->_cleanObjectDatas($element);
+	}
+
+	/**
+	 * Create a new organization element (Groupment GP or Work Unit UT) in the current entity.
+	 *
+	 * @param array $request_data JSON body: label, element_type ('groupment'|'workunit'), optional fk_parent, description, show_in_selector, ranks {@from body}
+	 *
+	 * @return int New DigiriskElement ID
+	 *
+	 * @url POST digiriskelements
+	 *
+	 * @throws RestException 400, 403, 404, 500
+	 */
+	public function createDigiriskElement($request_data = null)
+	{
+		global $conf;
+
+		$this->_checkPermission('digiriskelements', 'create');
+		$this->_validate('digiriskelements', $request_data);
+
+		$data        = (array) $request_data;
+		$label       = isset($data['label']) && is_string($data['label']) ? trim($data['label']) : '';
+		$elementType = isset($data['element_type']) && is_string($data['element_type']) ? trim($data['element_type']) : '';
+
+		if ($label === '' || strlen($label) > 255) {
+			throw new RestException(400, 'A label of 1 to 255 bytes is required');
+		}
+		if (!in_array($elementType, ['groupment', 'workunit'], true)) {
+			throw new RestException(400, 'Invalid element_type (groupment or workunit expected)');
+		}
+
+		$fkParent = isset($data['fk_parent']) ? (int) $data['fk_parent'] : 0;
+		if ($fkParent < 0) {
+			throw new RestException(400, 'Invalid fk_parent');
+		}
+		if ($fkParent > 0) {
+			$parent = new DigiriskElement($this->db);
+			if (
+				$parent->fetch($fkParent, '', ' AND t.entity = ' . ((int) $conf->entity)) <= 0 ||
+				!$this->isActiveNonTrashedElement($parent) ||
+				$parent->element_type !== 'groupment'
+			) {
+				throw new RestException(404, 'Active parent groupment not found in current entity');
+			}
+		}
+
+		$element = new DigiriskElement($this->db);
+		$this->_assignRequestData($element, $data);
+		$element->entity           = (int) $conf->entity;
+		$element->label            = $label;
+		$element->element_type     = $elementType;
+		$element->fk_parent        = $fkParent;
+		$element->show_in_selector = isset($data['show_in_selector']) ? (int) (bool) $data['show_in_selector'] : 1;
+		$element->ranks            = isset($data['ranks']) ? (int) $data['ranks'] : 1;
+
+		if ($element->create(DolibarrApiAccess::$user) <= 0) {
+			throw new RestException(500, 'Error creating digiriskelements', $this->_collectErrors($element));
+		}
+
+		return (int) $element->id;
+	}
+
+	/**
+	 * Update an existing active organization element (GP/UT).
+	 *
+	 * @param int   $id           DigiriskElement ID
+	 * @param array $request_data Fields to update (label, description, fk_parent, show_in_selector, ranks) {@from body}
+	 *
+	 * @return object Cleaned updated DigiriskElement
+	 *
+	 * @url PUT digiriskelements/{id}
+	 *
+	 * @throws RestException 400, 403, 404, 500
+	 */
+	public function updateDigiriskElement($id, $request_data = null)
+	{
+		global $conf;
+
+		$this->_checkPermission('digiriskelements', 'write');
+
+		$element = new DigiriskElement($this->db);
+		if (
+			$element->fetch((int) $id, '', ' AND t.entity = ' . ((int) $conf->entity)) <= 0 ||
+			!$this->isActiveNonTrashedElement($element)
+		) {
+			throw new RestException(404, 'digiriskelements not found');
+		}
+
+		$data = (array) $request_data;
+		if (isset($data['label'])) {
+			if (!is_string($data['label']) || trim($data['label']) === '' || strlen(trim($data['label'])) > 255) {
+				throw new RestException(400, 'A label of 1 to 255 bytes is required');
+			}
+			$data['label'] = trim($data['label']);
+		}
+
+		if (isset($data['element_type']) && !in_array($data['element_type'], ['groupment', 'workunit'], true)) {
+			throw new RestException(400, 'Invalid element_type (groupment or workunit expected)');
+		}
+
+		if (array_key_exists('fk_parent', $data)) {
+			$fkParent = (int) $data['fk_parent'];
+			if ($fkParent < 0 || $fkParent === (int) $element->id) {
+				throw new RestException(400, 'Invalid fk_parent');
+			}
+			if ($fkParent > 0) {
+				$parent = new DigiriskElement($this->db);
+				if (
+					$parent->fetch($fkParent, '', ' AND t.entity = ' . ((int) $conf->entity)) <= 0 ||
+					!$this->isActiveNonTrashedElement($parent) ||
+					$parent->element_type !== 'groupment'
+				) {
+					throw new RestException(404, 'Active parent groupment not found in current entity');
+				}
+				$descendants = $element->getDescendants();
+				if (isset($descendants[$fkParent])) {
+					throw new RestException(400, 'Cannot move an element inside one of its own descendants');
+				}
+			}
+			$data['fk_parent'] = $fkParent;
+		}
+
+		unset($data['status'], $data['entity']);
+
+		$updated = $this->_put('digiriskelements', (int) $id, $data);
+		DigiriskElement::clearActiveElementsCache();
+
+		return $updated;
+	}
+
+	/**
+	 * Soft-delete an organization element (GP/UT) by moving it to the entity trash bin (GP0).
+	 *
+	 * @param int $id DigiriskElement ID
+	 *
+	 * @return array
+	 *
+	 * @url DELETE digiriskelements/{id}
+	 *
+	 * @throws RestException 403, 404, 500
+	 */
+	public function deleteDigiriskElement($id)
+	{
+		global $conf;
+
+		$this->_checkPermission('digiriskelements', 'delete');
+
+		$element = new DigiriskElement($this->db);
+		if (
+			$element->fetch((int) $id, '', ' AND t.entity = ' . ((int) $conf->entity)) <= 0 ||
+			!$this->isActiveNonTrashedElement($element)
+		) {
+			throw new RestException(404, 'digiriskelements not found');
+		}
+
+		if ($element->delete(DolibarrApiAccess::$user) <= 0) {
+			throw new RestException(500, 'Error deleting digiriskelements', $this->_collectErrors($element));
+		}
+
+		return [
+			'success' => [
+				'code'    => 200,
+				'message' => 'Digiriskelements deleted',
+			],
+		];
+	}
+
+	/**
+	 * Archive an organization element (GP/UT) and all its validated descendants.
+	 *
+	 * @param int $id DigiriskElement ID
+	 *
+	 * @return object Cleaned archived DigiriskElement
+	 *
+	 * @url POST digiriskelements/{id}/archive
+	 *
+	 * @throws RestException 403, 404, 500
+	 */
+	public function archiveDigiriskElement($id)
+	{
+		global $conf;
+
+		$this->_checkPermission('digiriskelements', 'write');
+
+		$element = new DigiriskElement($this->db);
+		if (
+			$element->fetch((int) $id, '', ' AND t.entity = ' . ((int) $conf->entity)) <= 0 ||
+			!$this->isActiveNonTrashedElement($element)
+		) {
+			throw new RestException(404, 'digiriskelements not found');
+		}
+
+		if ($element->archive(DolibarrApiAccess::$user) <= 0) {
+			throw new RestException(500, 'Error archiving digiriskelements', $this->_collectErrors($element));
+		}
+
+		$element->fetch((int) $id);
+		return $this->_cleanObjectDatas($element);
+	}
+
+	/**
+	 * Restore an archived organization element (GP/UT) and its archived descendants.
+	 *
+	 * @param int $id DigiriskElement ID
+	 *
+	 * @return object Cleaned restored DigiriskElement
+	 *
+	 * @url POST digiriskelements/{id}/unarchive
+	 *
+	 * @throws RestException 400, 403, 404, 500
+	 */
+	public function unarchiveDigiriskElement($id)
+	{
+		global $conf;
+
+		$this->_checkPermission('digiriskelements', 'write');
+
+		$element = new DigiriskElement($this->db);
+		if (
+			$element->fetch((int) $id, '', ' AND t.entity = ' . ((int) $conf->entity)) <= 0 ||
+			($element->entity !== null && (int) $element->entity !== (int) $conf->entity)
+		) {
+			throw new RestException(404, 'digiriskelements not found');
+		}
+		if ((int) $element->status !== DigiriskElement::STATUS_ARCHIVED) {
+			throw new RestException(400, 'Element is not archived');
+		}
+
+		if ($element->unarchive(DolibarrApiAccess::$user) <= 0) {
+			throw new RestException(500, 'Error unarchiving digiriskelements', $this->_collectErrors($element));
+		}
+
+		$element->fetch((int) $id);
+		return $this->_cleanObjectDatas($element);
+	}
+
 	// =================================================================
 	// RISKS & TEMPORARY PHOTOS API ROUTES
 	// =================================================================
 
 	/**
-	 * List active organization elements and native danger categories for risk creation.
+	 * List active organization elements (excluding trash) and native danger categories for risk creation.
 	 *
 	 * @return array
 	 *
@@ -297,33 +1055,47 @@ class DigiriskDolibarr extends SaturneApi
 			$this->_checkPermission('risks', 'write');
 		}
 
-		$sqlQuery  = 'SELECT rowid, ref, label, element_type, fk_parent FROM ' . $this->db->prefix() . 'digiriskdolibarr_digiriskelement';
-		$sqlQuery .= ' WHERE entity = ' . ((int) $conf->entity) . ' AND status = 1 ORDER BY ref';
-		$result    = $this->db->query($sqlQuery);
-		if (!$result) {
-			throw new RestException(500, 'Unable to load organization elements');
-		}
+		$digiriskElement = new DigiriskElement($this->db);
+		$visibleElements = $digiriskElement->getVisibleElements();
 
 		$elements = [];
-		while ($row = $this->db->fetch_object($result)) {
+		foreach ($visibleElements as $element) {
 			$elements[] = [
-				'id'        => (int) $row->rowid,
-				'ref'       => $row->ref,
-				'label'     => $row->label,
-				'type'      => $row->element_type,
-				'fk_parent' => (int) $row->fk_parent,
+				'id'        => (int) $element->id,
+				'ref'       => $element->ref,
+				'label'     => $element->label,
+				'type'      => $element->element_type,
+				'fk_parent' => (int) $element->fk_parent,
 			];
 		}
 
+		$advancedConfig = $this->loadAdvancedCotationConfig();
+
 		return [
-			'entity'          => (int) $conf->entity,
-			'elements'        => $elements,
-			'categories'      => Risk::getDangerCategories('risk'),
-			'sub_categories'  => Risk::getDangerSubCategories(),
-			'method'          => 'simple',
-			'cotations'       => [0, 48, 51, 100],
-			'photo_max_bytes' => 5 * 1024 * 1024,
-			'temp_photo_dir'  => 'riskassessment/tmp/RA0',
+			'entity'             => (int) $conf->entity,
+			'du_project_id'      => getDolGlobalInt('DIGIRISKDOLIBARR_DU_PROJECT'),
+			'elements'           => $elements,
+			'categories'         => Risk::getDangerCategories('risk'),
+			'sub_categories'     => Risk::getDangerSubCategories(),
+			'method'             => 'standard',
+			'methods'            => ['standard', 'advanced'],
+			'cotations'          => [0, 48, 51, 100],
+			'cotation_scales'    => [
+				1 => ['scale' => 1, 'cotation' => 0,   'min' => 0,  'max' => 47,  'color' => 'grey'],
+				2 => ['scale' => 2, 'cotation' => 48,  'min' => 48, 'max' => 50,  'color' => 'orange'],
+				3 => ['scale' => 3, 'cotation' => 51,  'min' => 51, 'max' => 80,  'color' => 'red'],
+				4 => ['scale' => 4, 'cotation' => 100, 'min' => 81, 'max' => 100, 'color' => 'black'],
+			],
+			'advanced_criteria'  => [
+				'gravite'    => ['min' => 0, 'max' => 4, 'values' => $advancedConfig['risk_variable']['gravite'] ?? []],
+				'exposition' => ['min' => 0, 'max' => 4, 'alias' => 'frequence', 'values' => $advancedConfig['risk_variable']['exposition'] ?? []],
+				'occurrence' => ['min' => 1, 'max' => 4, 'alias' => 'historique', 'values' => $advancedConfig['risk_variable']['occurrence'] ?? []],
+				'formation'  => ['min' => 1, 'max' => 4, 'alias' => 'maitrise', 'values' => $advancedConfig['risk_variable']['formation'] ?? []],
+				'protection' => ['min' => 1, 'max' => 4, 'alias' => 'milieu', 'values' => $advancedConfig['risk_variable']['protection'] ?? []],
+			],
+			'transfer_matrix'    => $advancedConfig['matrix'],
+			'photo_max_bytes'    => 5 * 1024 * 1024,
+			'temp_photo_dir'     => 'riskassessment/tmp/RA0',
 		];
 	}
 
@@ -494,8 +1266,9 @@ class DigiriskDolibarr extends SaturneApi
 		$activeEval   = null;
 		if (is_array($evaluations)) {
 			foreach ($evaluations as $eval) {
-				$cleaned = $this->_cleanObjectDatas($eval);
-				$cleanedEvals[] = $cleaned;
+				$cleaned         = $this->_cleanObjectDatas($eval);
+				$cleaned->photos = $this->listAssessmentPhotos((string) ($eval->ref ?? ''));
+				$cleanedEvals[]  = $cleaned;
 				if ((int) $eval->status === RiskAssessment::STATUS_VALIDATED && $activeEval === null) {
 					$activeEval = $cleaned;
 				}
@@ -528,10 +1301,10 @@ class DigiriskDolibarr extends SaturneApi
 	}
 
 	/**
-	 * Create a risk and its assessment, optionally using a base64 photo or photos pre-uploaded
-	 * into the temporary work directory (riskassessment/tmp/RA0).
+	 * Create a risk and its assessment, optionally attaching one or multiple medias via base64
+	 * (photo_base64, photos_base64, photos, medias) or photos pre-uploaded into riskassessment/tmp/RA0.
 	 *
-	 * @param array $request_data JSON body: fk_element, category, description, cotation, optional method, comment, photo, photo_base64 {@from body}
+	 * @param array $request_data JSON body: fk_element, category, description, cotation, optional method, comment, photo, photo_base64, photos, photos_base64, medias {@from body}
 	 *
 	 * @return array
 	 *
@@ -545,10 +1318,10 @@ class DigiriskDolibarr extends SaturneApi
 	}
 
 	/**
-	 * Create a risk and its simple or advanced assessment, optionally with one JPEG/PNG/GIF/WEBP photo
-	 * or moving pre-uploaded temporary photos from riskassessment/tmp/RA0.
+	 * Create a risk and its simple or advanced assessment, optionally with one or multiple JPEG/PNG/GIF/WEBP medias
+	 * (photo_base64, photos_base64, photos, medias) or moving pre-uploaded temporary photos from riskassessment/tmp/RA0.
 	 *
-	 * @param array $request_data JSON body: fk_element, category, description, cotation, optional photo_base64 {@from body}
+	 * @param array $request_data JSON body: fk_element, category, description, cotation, optional photo_base64, photos, photos_base64, medias {@from body}
 	 *
 	 * @return array
 	 *
@@ -568,29 +1341,19 @@ class DigiriskDolibarr extends SaturneApi
 			throw new RestException(400, 'Expected a JSON object');
 		}
 
-		$cotationProvided = array_key_exists('cotation', $data);
-		$requiredInts     = $cotationProvided ? ['fk_element', 'category', 'cotation'] : ['fk_element', 'category'];
-		foreach ($requiredInts as $field) {
+		foreach (['fk_element', 'category'] as $field) {
 			if (!isset($data[$field]) || !is_int($data[$field])) {
 				throw new RestException(400, $field . ' must be an integer');
 			}
 		}
 
-		$method = isset($data['method']) && is_string($data['method']) ? $data['method'] : 'simple';
-		if (!in_array($method, ['simple', 'advanced'], true)) {
-			throw new RestException(400, 'Invalid evaluation method (simple or advanced expected)');
-		}
-
-		$cotation = $cotationProvided ? $data['cotation'] : 0;
 		if ($data['fk_element'] <= 0) {
 			throw new RestException(400, 'Invalid element');
 		}
-		if ($method === 'simple' && !in_array($cotation, [0, 48, 51, 100], true)) {
-			throw new RestException(400, 'Invalid element or simple score (0, 48, 51, 100 expected)');
-		}
-		if ($method === 'advanced' && ($cotation < 0 || $cotation > 100)) {
-			throw new RestException(400, 'Invalid advanced score (0 to 100 expected)');
-		}
+
+		$resolvedEval = $this->resolveAndValidateAssessmentCotation($data);
+		$method       = $resolvedEval['method'];
+		$cotation     = $resolvedEval['cotation'];
 
 		if (
 			!isset($data['description']) ||
@@ -610,40 +1373,12 @@ class DigiriskDolibarr extends SaturneApi
 		$element = new DigiriskElement($this->db);
 		if (
 			$element->fetch($data['fk_element'], '', ' AND t.entity = ' . ((int) $conf->entity)) <= 0 ||
-			($element->entity !== null && (int) $element->entity !== (int) $conf->entity) ||
-			(int) $element->status !== 1
+			!$this->isActiveNonTrashedElement($element)
 		) {
 			throw new RestException(404, 'Active organization element not found in current entity');
 		}
 
-		$photo     = null;
-		$extension = '';
-		if (isset($data['photo_base64'])) {
-			if (!is_string($data['photo_base64'])) {
-				throw new RestException(400, 'photo_base64 must be a string');
-			}
-			$rawBase64 = $data['photo_base64'];
-			if (preg_match('/^data:image\/[a-zA-Z0-9.+-]+;base64,(.*)$/s', $rawBase64, $matches)) {
-				$rawBase64 = $matches[1];
-			}
-			if (strlen($rawBase64) > 6990508) {
-				throw new RestException(400, 'Photo exceeds 5 MiB');
-			}
-			$photo = base64_decode($rawBase64, true);
-			$image = $photo !== false ? @getimagesizefromstring($photo) : false;
-			if (
-				$photo === false ||
-				strlen($photo) > 5 * 1024 * 1024 ||
-				!$image ||
-				!in_array($image[2], [IMAGETYPE_JPEG, IMAGETYPE_PNG], true) ||
-				$image[0] > 12000 ||
-				$image[1] > 12000 ||
-				$image[0] * $image[1] > 40000000
-			) {
-				throw new RestException(400, 'Expected a valid JPEG or PNG photo, at most 5 MiB and 40 megapixels');
-			}
-			$extension = $image[2] === IMAGETYPE_JPEG ? '.jpg' : '.png';
-		}
+		$mediaPayloads = $this->extractMediaPayloads($data);
 
 		$duProjectId = $riskType === 'riskenvironmental'
 			? (int) ($conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT ?? 0)
@@ -660,7 +1395,6 @@ class DigiriskDolibarr extends SaturneApi
 		];
 		list($riskNumbering, $assessmentNumbering) = saturne_require_objects_mod($modules, 'digiriskdolibarr');
 
-		$photoPath     = null;
 		$assessmentDir = null;
 		$this->db->begin();
 		try {
@@ -692,40 +1426,26 @@ class DigiriskDolibarr extends SaturneApi
 				? (int) $data['date_riskassessment']
 				: dol_now();
 
-			if ($method === 'advanced') {
-				foreach (['gravite', 'exposition', 'occurrence', 'formation', 'protection'] as $criterion) {
-					if (isset($data[$criterion]) && is_numeric($data[$criterion])) {
-						$assessment->{$criterion} = (int) $data[$criterion];
-					}
-				}
+			foreach (['gravite', 'exposition', 'occurrence', 'formation', 'protection'] as $criterion) {
+				$assessment->{$criterion} = $resolvedEval[$criterion];
 			}
 
 			if (!empty($data['photo']) && is_string($data['photo'])) {
 				$assessment->photo = dol_sanitizeFileName(dol_basename($data['photo']));
 			}
 
-			$root    = $conf->digiriskdolibarr->multidir_output[$conf->entity] ?? '';
+			$root    = $conf->digiriskdolibarr->multidir_output[$conf->entity] ?? ($conf->digiriskdolibarr->dir_output ?? '');
 			$workDir = $root !== '' ? $root . '/riskassessment/tmp/RA0' : '';
 
-			if ($photo !== null) {
+			if (!empty($mediaPayloads)) {
 				if (!$root || !preg_match('/^[A-Za-z0-9_-]+$/D', $assessment->ref)) {
 					throw new RuntimeException('Invalid assessment media directory');
 				}
 				$assessmentDir = $root . '/riskassessment/' . $assessment->ref;
-				dol_mkdir($assessmentDir);
-				$assessment->photo = 'api-' . bin2hex(random_bytes(16)) . $extension;
-				$photoPath         = $assessmentDir . '/' . $assessment->photo;
-				if (file_put_contents($photoPath, $photo, LOCK_EX) !== strlen($photo)) {
-					throw new RuntimeException('Photo could not be saved');
-				}
-				if (function_exists('image_format_supported') && function_exists('saturne_vignette') && image_format_supported($assessment->photo) >= 0) {
-					foreach (['mini', 'small', 'medium', 'large'] as $size) {
-						saturne_vignette(
-							$photoPath,
-							getDolGlobalInt('SATURNE_MEDIA_MAX_WIDTH_' . dol_strtoupper($size)),
-							getDolGlobalInt('SATURNE_MEDIA_MAX_HEIGHT_' . dol_strtoupper($size)),
-							'_' . $size
-						);
+				foreach ($mediaPayloads as $mediaItem) {
+					$savedName = $this->saveValidatedPhotoToDir($mediaItem['photo_base64'], $assessmentDir, $mediaItem['filename'], true);
+					if (empty($assessment->photo)) {
+						$assessment->photo = $savedName;
 					}
 				}
 			}
@@ -743,15 +1463,17 @@ class DigiriskDolibarr extends SaturneApi
 			}
 		} catch (Throwable $error) {
 			$this->db->rollback();
-			if ($photoPath !== null && is_file($photoPath)) {
-				dol_delete_file($photoPath);
-			}
 			if ($assessmentDir !== null && function_exists('dol_delete_dir_recursive') && is_dir($assessmentDir)) {
 				dol_delete_dir_recursive($assessmentDir);
+			}
+			if ($error instanceof RestException) {
+				throw $error;
 			}
 			dol_syslog(__METHOD__ . ': ' . $error->getMessage(), LOG_ERR);
 			throw new RestException(500, 'Risk creation failed; consult server logs');
 		}
+
+		$savedPhotos = $this->listAssessmentPhotos((string) $assessment->ref);
 
 		return [
 			'id'             => (int) $risk->id,
@@ -759,7 +1481,10 @@ class DigiriskDolibarr extends SaturneApi
 			'risk_ref'       => $risk->ref,
 			'assessment_id'  => (int) $assessment->id,
 			'assessment_ref' => $assessment->ref,
+			'method'         => $assessment->method,
+			'cotation'       => (int) $assessment->cotation,
 			'photo'          => $assessment->photo ?? '',
+			'photos'         => $savedPhotos,
 			'url'            => dol_buildpath('/digiriskdolibarr/view/risk/risk_card.php', 2) . '?id=' . (int) $risk->id,
 		];
 	}
@@ -793,8 +1518,7 @@ class DigiriskDolibarr extends SaturneApi
 			if (
 				(int) $data['fk_element'] <= 0 ||
 				$element->fetch((int) $data['fk_element'], '', ' AND t.entity = ' . ((int) $conf->entity)) <= 0 ||
-				($element->entity !== null && (int) $element->entity !== (int) $conf->entity) ||
-				(int) $element->status !== 1
+				!$this->isActiveNonTrashedElement($element)
 			) {
 				throw new RestException(404, 'Active organization element not found in current entity');
 			}
@@ -949,6 +1673,8 @@ class DigiriskDolibarr extends SaturneApi
 			throw new RestException(404, 'riskassessments not found');
 		}
 
+		$assessment->photos = $this->listAssessmentPhotos((string) ($assessment->ref ?? ''));
+
 		return $assessment;
 	}
 
@@ -974,9 +1700,10 @@ class DigiriskDolibarr extends SaturneApi
 
 	/**
 	 * Create a risk assessment on an existing risk, moving any temporary photos from
-	 * riskassessment/tmp/RA0/{risk_ref} or riskassessment/tmp/RA0, or saving photo_base64.
+	 * riskassessment/tmp/RA0/{risk_ref} or riskassessment/tmp/RA0, or saving one or multiple medias
+	 * passed via photo_base64, photos_base64, photos, or medias.
 	 *
-	 * @param array $request_data Risk assessment data (fk_risk, cotation, optional method, comment, photo_base64) {@from body}
+	 * @param array $request_data Risk assessment data (fk_risk, cotation, optional method, comment, photo_base64, photos, photos_base64, medias) {@from body}
 	 *
 	 * @return int New risk assessment ID
 	 *
@@ -997,27 +1724,60 @@ class DigiriskDolibarr extends SaturneApi
 			throw new RestException(404, 'Parent risk not found in current entity');
 		}
 
+		$resolvedEval  = $this->resolveAndValidateAssessmentCotation($data);
+		$mediaPayloads = $this->extractMediaPayloads($data);
+		unset(
+			$data['photo_base64'],
+			$data['photos_base64'],
+			$data['photos'],
+			$data['medias'],
+			$data['filename'],
+			$data['scale'],
+			$data['seuil'],
+			$data['criteres'],
+			$data['frequence'],
+			$data['historique'],
+			$data['maitrise'],
+			$data['milieu'],
+			$data['method'],
+			$data['cotation'],
+			$data['gravite'],
+			$data['exposition'],
+			$data['occurrence'],
+			$data['formation'],
+			$data['protection']
+		);
+
 		$assessment = new RiskAssessment($this->db);
 		$modules    = [
 			'riskanalysis/' . $assessment->element => $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON ?? 'mod_riskassessment_standard',
 		];
 		list($assessmentNumbering) = saturne_require_objects_mod($modules, 'digiriskdolibarr');
 
-		$photoBase64 = isset($data['photo_base64']) && is_string($data['photo_base64']) ? $data['photo_base64'] : '';
-		unset($data['photo_base64']);
-
 		$this->_assignRequestData($assessment, $data);
 		$assessment->entity              = (int) $conf->entity;
 		$assessment->fk_risk             = (int) $risk->id;
 		$assessment->ref                 = !empty($assessment->ref) ? $assessment->ref : $assessmentNumbering->getNextValue($assessment);
-		$assessment->method              = !empty($assessment->method) ? $assessment->method : 'simple';
+		$assessment->method              = $resolvedEval['method'];
+		$assessment->cotation            = $resolvedEval['cotation'];
+		foreach (['gravite', 'exposition', 'occurrence', 'formation', 'protection'] as $criterion) {
+			$assessment->{$criterion} = $resolvedEval[$criterion];
+		}
+		if (empty($assessment->comment) && !empty($risk->description)) {
+			$assessment->comment = $risk->description;
+		}
 		$assessment->status              = isset($data['status']) ? (int) $data['status'] : RiskAssessment::STATUS_VALIDATED;
 		$assessment->date_riskassessment = !empty($assessment->date_riskassessment) ? $assessment->date_riskassessment : dol_now();
 
-		$root = $conf->digiriskdolibarr->multidir_output[$conf->entity] ?? '';
-		if ($photoBase64 !== '' && $root !== '') {
-			$targetDir         = $root . '/riskassessment/' . $assessment->ref;
-			$assessment->photo = $this->saveValidatedPhotoToDir($photoBase64, $targetDir, '', true);
+		$root = $conf->digiriskdolibarr->multidir_output[$conf->entity] ?? ($conf->digiriskdolibarr->dir_output ?? '');
+		if (!empty($mediaPayloads) && $root !== '') {
+			$targetDir = $root . '/riskassessment/' . $assessment->ref;
+			foreach ($mediaPayloads as $mediaItem) {
+				$savedName = $this->saveValidatedPhotoToDir($mediaItem['photo_base64'], $targetDir, $mediaItem['filename'], true);
+				if (empty($assessment->photo)) {
+					$assessment->photo = $savedName;
+				}
+			}
 		}
 
 		if ($root !== '' && function_exists('digiriskRiskAssessmentMovePhotos')) {
@@ -1038,7 +1798,7 @@ class DigiriskDolibarr extends SaturneApi
 	}
 
 	/**
-	 * Update a risk assessment (and optionally upload a new photo via photo_base64).
+	 * Update a risk assessment (and optionally upload one or multiple new medias via photo_base64, photos_base64, photos, or medias).
 	 *
 	 * @param int   $id           Risk assessment ID
 	 * @param array $request_data Fields to update {@from body}
@@ -1060,17 +1820,77 @@ class DigiriskDolibarr extends SaturneApi
 			throw new RestException(404, 'riskassessments not found');
 		}
 
-		$data        = (array) $request_data;
-		$photoBase64 = isset($data['photo_base64']) && is_string($data['photo_base64']) ? $data['photo_base64'] : '';
-		unset($data['photo_base64']);
-
-		$root = $conf->digiriskdolibarr->multidir_output[$conf->entity] ?? '';
-		if ($photoBase64 !== '' && $root !== '') {
-			$targetDir      = $root . '/riskassessment/' . $assessment->ref;
-			$data['photo']  = $this->saveValidatedPhotoToDir($photoBase64, $targetDir, '', true);
+		if ($assessment->method === 'simple' || empty($assessment->method)) {
+			$assessment->method = 'standard';
 		}
 
-		return $this->_put('riskassessments', $id, $data);
+		$data          = (array) $request_data;
+		$evalKeys      = ['method', 'cotation', 'scale', 'seuil', 'criteres', 'gravite', 'exposition', 'occurrence', 'formation', 'protection', 'frequence', 'historique', 'maitrise', 'milieu'];
+		$touchesEval   = false;
+		foreach ($evalKeys as $evalKey) {
+			if (array_key_exists($evalKey, $data)) {
+				$touchesEval = true;
+				break;
+			}
+		}
+
+		$resolvedEval = null;
+		if ($touchesEval) {
+			$resolvedEval = $this->resolveAndValidateAssessmentCotation($data, $assessment);
+		}
+
+		$mediaPayloads = $this->extractMediaPayloads($data);
+		unset(
+			$data['photo_base64'],
+			$data['photos_base64'],
+			$data['photos'],
+			$data['medias'],
+			$data['filename'],
+			$data['scale'],
+			$data['seuil'],
+			$data['criteres'],
+			$data['frequence'],
+			$data['historique'],
+			$data['maitrise'],
+			$data['milieu'],
+			$data['method'],
+			$data['cotation'],
+			$data['gravite'],
+			$data['exposition'],
+			$data['occurrence'],
+			$data['formation'],
+			$data['protection']
+		);
+
+		$root = $conf->digiriskdolibarr->multidir_output[$conf->entity] ?? ($conf->digiriskdolibarr->dir_output ?? '');
+		if (!empty($mediaPayloads) && $root !== '') {
+			$targetDir = $root . '/riskassessment/' . $assessment->ref;
+			foreach ($mediaPayloads as $mediaItem) {
+				$savedName = $this->saveValidatedPhotoToDir($mediaItem['photo_base64'], $targetDir, $mediaItem['filename'], true);
+				if (empty($data['photo']) && empty($assessment->photo)) {
+					$data['photo'] = $savedName;
+				}
+			}
+		}
+
+		$this->_assignRequestData($assessment, $data);
+		if ($resolvedEval !== null) {
+			$assessment->method   = $resolvedEval['method'];
+			$assessment->cotation = $resolvedEval['cotation'];
+			foreach (['gravite', 'exposition', 'occurrence', 'formation', 'protection'] as $criterion) {
+				$assessment->{$criterion} = $resolvedEval[$criterion];
+			}
+		}
+
+		if ($assessment->update(DolibarrApiAccess::$user) <= 0) {
+			throw new RestException(500, 'Error updating riskassessments', $this->_collectErrors($assessment));
+		}
+
+		$assessment->fetch((int) $id);
+		$updated         = $this->_cleanObjectDatas($assessment);
+		$updated->photos = $this->listAssessmentPhotos((string) ($assessment->ref ?? ''));
+
+		return $updated;
 	}
 
 	/**
