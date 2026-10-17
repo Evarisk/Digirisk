@@ -75,7 +75,7 @@ foreach ($risksData as $riskData) {
     $eval->ref                 = $refEvaluationMod->getNextValue($eval);
     $eval->cotation            = $riskData['cotation'];
     $eval->status              = 1;
-    $eval->method              = $riskData['method'] ?? 'simple';
+    $eval->method              = (!empty($riskData['method']) && $riskData['method'] !== 'simple') ? $riskData['method'] : 'standard';
     $eval->comment             = $riskData['description'] ?? '';
     $eval->date_riskassessment = $riskData['riskassessment_date'] ? strtotime($riskData['riskassessment_date']) : dol_now();
 
