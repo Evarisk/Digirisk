@@ -1815,7 +1815,7 @@ class DigiriskDolibarr extends SaturneApi
 
 		$this->_checkPermission('riskassessments', 'write');
 
-		$assessment = $this->_getObject('riskassessments');
+		$assessment = new RiskAssessment($this->db);
 		if ($assessment->fetch((int) $id, '', ' AND t.entity = ' . ((int) $conf->entity)) <= 0 || ($assessment->entity !== null && (int) $assessment->entity !== (int) $conf->entity)) {
 			throw new RestException(404, 'riskassessments not found');
 		}
