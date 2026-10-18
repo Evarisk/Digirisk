@@ -1330,8 +1330,9 @@ class Risk extends SaturneObject
         }
 
         $riskAssessmentTable = MAIN_DB_PREFIX . (new RiskAssessment($this->db))->table_element;
-        $sql                 = 'SELECT r.rowid, r.ref, r.category, r.description, r.fk_element, r.type,';
-        $sql                .= ' lastra.ref as ra_ref, lastra.cotation as cotation, lastra.method as ra_method, lastra.photo as ra_photo, lastra.comment as ra_comment';
+        $sql                 = 'SELECT r.rowid, r.ref, r.date_creation, r.category, r.description, r.fk_element, r.type,';
+        $sql                .= ' lastra.ref as ra_ref, lastra.date_creation as ra_date_creation, lastra.date_riskassessment as date_riskassessment,';
+        $sql                .= ' lastra.cotation as cotation, lastra.method as ra_method, lastra.photo as ra_photo, lastra.comment as ra_comment';
         $sql                .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as r';
         $sql                .= ' LEFT JOIN ' . $this->getLastRiskAssessmentSqlTable() . ' as lastid ON lastid.fk_risk = r.rowid';
         $sql                .= ' LEFT JOIN ' . $riskAssessmentTable . ' as lastra ON lastra.rowid = lastid.rowid';
@@ -1369,15 +1370,17 @@ class Risk extends SaturneObject
                 ? DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . rawurlencode($categoryThumb) . '.png'
                 : DOL_URL_ROOT . '/public/theme/common/nophoto.png';
 
-            // 2. Risk assessment photo (or fallback to parent DigiriskElement photo)
+            // 2. Risk assessment photo (or default nophoto placeholder when the assessment has no photo)
             $photoUrl = $this->resolveDashboardRiskPhotoUrl(
                 (string) $baseOutputDir,
                 (string) ($obj->ra_ref ?? ''),
-                (string) ($obj->ra_photo ?? ''),
-                $elementObj instanceof DigiriskElement ? $elementObj : null
+                (string) ($obj->ra_photo ?? '')
             );
 
-            // 3. Text lines: Line 1 = RKxx (UTx - Label), Line 2 = Category name, Line 3 = Description / Evaluation comment
+            // 3. Text lines:
+            // - Line 1: RKxx (UTx - Label) - dd/mm/yyyy
+            // - Line 2: Custom risk description (only if different from the danger category name)
+            // - Line 3: RAxx : <assessment comment> (if present)
             $riskUrl     = dol_buildpath('/' . $this->module . '/view/risk/risk_card.php', 1) . '?id=' . ((int) $obj->rowid);
             $elementHtml = '';
             if ($elementObj instanceof DigiriskElement) {
@@ -1386,22 +1389,27 @@ class Risk extends SaturneObject
                 $elementHtml  = ' (<a href="' . $elementUrl . '" style="color:inherit; text-decoration:none;" title="' . dol_escape_htmltag($elementTitle) . '">' . dol_escape_htmltag(dol_trunc($elementTitle, 32)) . '</a>)';
             }
 
-            $cleanDesc    = trim( html_entity_decode(dol_string_nohtmltag((string) $obj->description), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-            $cleanComment = trim(html_entity_decode(dol_string_nohtmltag((string) ($obj->ra_comment ?? '')), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-            $cleanCatName = trim(html_entity_decode((string) $categoryName, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            $dateRaw = (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE') && !empty($obj->date_riskassessment))
+                ? $obj->date_riskassessment
+                : (!empty($obj->ra_date_creation) ? $obj->ra_date_creation : $obj->date_creation);
+            $dateTimestamp = $this->db->jdate($dateRaw);
+            $dateHtml      = $dateTimestamp > 0 ? ' - ' . dol_print_date($dateTimestamp, 'day') : '';
 
-            $detailText = ($cleanDesc !== '' && $cleanDesc !== $cleanCatName) ? $cleanDesc : $cleanComment;
+            $cleanDesc    = trim(html_entity_decode(dol_string_nohtmltag((string) $obj->description), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            $cleanComment = trim(html_entity_decode(dol_string_nohtmltag((string) ($obj->ra_comment ?? '')), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            $cleanCatName = trim(html_entity_decode($categoryName, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 
             $rowHtml  = '<span style="display:flex; align-items:center; gap:12px;">';
             $rowHtml .= '<img src="' . $categoryPictoUrl . '" alt="' . dol_escape_htmltag($cleanCatName) . '" title="' . dol_escape_htmltag($cleanCatName) . '" style="width:52px; height:52px; min-width:52px; border-radius:10px; object-fit:cover; flex-shrink:0;">';
-            $rowHtml .= '<img src="' . $photoUrl . '" alt="" style="width:52px; height:52px; min-width:52px; border-radius:10px; object-fit:cover; background:#f1f5f9; flex-shrink:0;">';
+            $rowHtml .= '<img src="' . $photoUrl . '" alt="" title="' . dol_escape_htmltag(!empty($obj->ra_photo) ? (string) $obj->ra_photo : $langs->transnoentities('NoPhotoYet')) . '" style="width:52px; height:52px; min-width:52px; border-radius:10px; object-fit:cover; background:#f1f5f9; flex-shrink:0;">';
             $rowHtml .= '<span style="display:flex; flex-direction:column; gap:2px; min-width:0; line-height:1.35;">';
-            $rowHtml .= '<span style="font-weight:700; font-size:14px; color:#0f172a;"><a href="' . $riskUrl . '" style="color:inherit; text-decoration:none;">' . dol_escape_htmltag((string) $obj->ref) . '</a>' . $elementHtml . '</span>';
-            if ($cleanCatName !== '') {
-                $rowHtml .= '<span style="font-size:13px; color:#475569;">' . dol_escape_htmltag($cleanCatName) . '</span>';
+            $rowHtml .= '<span style="font-weight:700; font-size:14px; color:#0f172a;"><a href="' . $riskUrl . '" style="color:inherit; text-decoration:none;">' . dol_escape_htmltag((string) $obj->ref) . '</a>' . $elementHtml . dol_escape_htmltag($dateHtml) . '</span>';
+            if ($cleanDesc !== '' && $cleanDesc !== $cleanCatName) {
+                $rowHtml .= '<span style="font-size:13px; color:#475569;" title="' . dol_escape_htmltag($cleanDesc) . '">' . dol_escape_htmltag(dol_trunc($cleanDesc, 80)) . '</span>';
             }
-            if ($detailText !== '') {
-                $rowHtml .= '<span style="font-size:13px; color:#64748b;" title="' . dol_escape_htmltag($detailText) . '">' . dol_escape_htmltag(dol_trunc($detailText, 80)) . '</span>';
+            if ($cleanComment !== '') {
+                $raPrefix = !empty($obj->ra_ref) ? dol_escape_htmltag((string) $obj->ra_ref) . ' : ' : '';
+                $rowHtml .= '<span style="font-size:13px; color:#64748b;" title="' . dol_escape_htmltag($cleanComment) . '">' . $raPrefix . dol_escape_htmltag(dol_trunc($cleanComment, 80)) . '</span>';
             }
             $rowHtml .= '</span>';
             $rowHtml .= '</span>';
@@ -1435,53 +1443,38 @@ class Risk extends SaturneObject
     }
 
     /**
-     * Resolve the thumbnail URL of a risk assessment photo or fall back to its parent DigiriskElement photo.
+     * Resolve the thumbnail URL of a risk assessment photo, or return the default nophoto placeholder.
      *
-     * @param  string               $baseOutputDir Module multidir_output for current entity
-     * @param  string               $raRef         RiskAssessment reference
-     * @param  string               $raPhoto       RiskAssessment favorite photo filename
-     * @param  DigiriskElement|null $elementObj    Parent DigiriskElement object
-     * @return string                              URL to serve the image
+     * @param  string $baseOutputDir Module multidir_output for current entity
+     * @param  string $raRef         RiskAssessment reference
+     * @param  string $raPhoto       RiskAssessment favorite photo filename
+     * @return string                URL to serve the image
      */
-    private function resolveDashboardRiskPhotoUrl(string $baseOutputDir, string $raRef, string $raPhoto, ?DigiriskElement $elementObj): string
+    private function resolveDashboardRiskPhotoUrl(string $baseOutputDir, string $raRef, string $raPhoto): string
     {
         global $conf;
 
-        $candidates = [];
         if ($raRef !== '') {
             $raSubDir = 'riskassessment/' . $raRef;
-            if ($raPhoto !== '') {
-                $candidates[] = ['subdir' => $raSubDir, 'file' => $raPhoto];
-            } else {
+            $fileName = $raPhoto;
+            if ($fileName === '') {
                 $files = dol_dir_list($baseOutputDir . '/' . $raSubDir, 'files', 0, '\.(jpg|jpeg|png|gif|webp)$', '(\.meta|_preview.*\.png)$', 'date', SORT_DESC, 1);
                 if (!empty($files[0]['name'])) {
-                    $candidates[] = ['subdir' => $raSubDir, 'file' => (string) $files[0]['name']];
+                    $fileName = (string) $files[0]['name'];
                 }
             }
-        }
 
-        if ($elementObj instanceof DigiriskElement && !empty($elementObj->element_type) && !empty($elementObj->ref)) {
-            $elSubDir = $elementObj->element_type . '/' . $elementObj->ref;
-            if (!empty($elementObj->photo)) {
-                $candidates[] = ['subdir' => $elSubDir, 'file' => (string) $elementObj->photo];
-            } else {
-                $files = dol_dir_list($baseOutputDir . '/' . $elSubDir, 'files', 0, '\.(jpg|jpeg|png|gif|webp)$', '(\.meta|_preview.*\.png)$', 'date', SORT_DESC, 1);
-                if (!empty($files[0]['name'])) {
-                    $candidates[] = ['subdir' => $elSubDir, 'file' => (string) $files[0]['name']];
+            if ($fileName !== '') {
+                $fullPath = $baseOutputDir . '/' . $raSubDir . '/' . $fileName;
+                if (dol_is_file($fullPath)) {
+                    $thumbName = basename(getImageFileNameForSize($fullPath, '_small'));
+                    $thumbPath = $baseOutputDir . '/' . $raSubDir . '/thumbs/' . $thumbName;
+                    $relFile   = dol_is_file($thumbPath)
+                        ? $raSubDir . '/thumbs/' . $thumbName
+                        : $raSubDir . '/' . $fileName;
+
+                    return DOL_URL_ROOT . '/custom/saturne/utils/viewimage.php?modulepart=digiriskdolibarr&entity=' . ((int) $conf->entity) . '&file=' . urlencode($relFile);
                 }
-            }
-        }
-
-        foreach ($candidates as $candidate) {
-            $fullPath = $baseOutputDir . '/' . $candidate['subdir'] . '/' . $candidate['file'];
-            if (dol_is_file($fullPath)) {
-                $thumbName = basename(getImageFileNameForSize($fullPath, '_small'));
-                $thumbPath = $baseOutputDir . '/' . $candidate['subdir'] . '/thumbs/' . $thumbName;
-                $relFile   = dol_is_file($thumbPath)
-                    ? $candidate['subdir'] . '/thumbs/' . $thumbName
-                    : $candidate['subdir'] . '/' . $candidate['file'];
-
-                return DOL_URL_ROOT . '/custom/saturne/utils/viewimage.php?modulepart=digiriskdolibarr&entity=' . ((int) $conf->entity) . '&file=' . urlencode($relFile);
             }
         }
 
