@@ -2734,3 +2734,4 @@ FireWatchGeolocError             = Position unavailable
 FireWatchGeolocRetry             = Try again
 FireWatchClearSignature          = Clear
 FireWatchValidateRound           = Validate round #%s
+LastRisksAdded                   = Last 3 added risks
