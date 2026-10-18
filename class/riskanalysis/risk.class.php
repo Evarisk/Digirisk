@@ -1260,6 +1260,18 @@ class Risk extends SaturneObject
         $dangerCategories                         = static::getDangerCategories($riskType);
         $riskByDangerCategoriesAndRiskAssessments = $this->getRiskByDangerCategoriesAndRiskAssessments($dangerCategories, $riskType);
 
+        $lastRisksWidgetData = $this->getLastRisksForDashboard($riskType, 3);
+        $array['widgets']    = [
+            'lastrisks' => [
+                'title'      => $langs->transnoentities('LastRisksAdded'),
+                'picto'      => 'fas fa-exclamation-triangle',
+                'pictoColor' => '#D35968',
+                'label'      => $lastRisksWidgetData['labels'],
+                'content'    => $lastRisksWidgetData['contents'],
+                'widgetName' => $langs->transnoentities('LastRisksAdded'),
+            ],
+        ];
+
         $array['graphsFilters'] = [
             'riskType' => [
                 'title'        => $langs->transnoentities('ShowSelectedRiskTypes'),
@@ -1291,6 +1303,95 @@ class Risk extends SaturneObject
         }
 
         return $array;
+    }
+
+    /**
+     * Get the last added validated risks (outside trash) for the dashboard widget.
+     *
+     * @param  string $riskType Risk type ('risk' or 'riskenvironmental')
+     * @param  int    $limit    Maximum number of risks to return
+     * @return array{labels: array<int, string>, contents: array<int, string>}
+     * @throws Exception
+     */
+    public function getLastRisksForDashboard(string $riskType = 'risk', int $limit = 3): array
+    {
+        global $conf, $langs;
+
+        $digiriskElement = new DigiriskElement($this->db);
+        $activeElements  = $digiriskElement->getActiveDigiriskElements('current');
+        if (!is_array($activeElements) || empty($activeElements)) {
+            return [
+                'labels'   => [$langs->transnoentities('NoData')],
+                'contents' => ['N/A'],
+            ];
+        }
+
+        $riskAssessmentTable = MAIN_DB_PREFIX . (new RiskAssessment($this->db))->table_element;
+        $sql                 = 'SELECT r.rowid, r.ref, r.category, r.description, r.fk_element, r.type, lastra.cotation as cotation';
+        $sql                .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as r';
+        $sql                .= ' LEFT JOIN ' . $this->getLastRiskAssessmentSqlTable() . ' as lastid ON lastid.fk_risk = r.rowid';
+        $sql                .= ' LEFT JOIN ' . $riskAssessmentTable . ' as lastra ON lastra.rowid = lastid.rowid';
+        $sql                .= ' WHERE r.entity = ' . ((int) $conf->entity);
+        $sql                .= ' AND r.status = ' . self::STATUS_VALIDATED;
+        $sql                .= " AND r.type = '" . $this->db->escape($riskType) . "'";
+        $sql                .= ' AND r.fk_element IN (' . implode(',', array_map('intval', array_keys($activeElements))) . ')';
+        $sql                .= ' ORDER BY r.date_creation DESC, r.rowid DESC';
+        $sql                .= $this->db->plimit($limit);
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            dol_syslog(__METHOD__ . ' ' . $this->db->lasterror(), LOG_ERR);
+            return [
+                'labels'   => [$langs->transnoentities('NoData')],
+                'contents' => ['N/A'],
+            ];
+        }
+
+        $labels   = [];
+        $contents = [];
+        while ($obj = $this->db->fetch_object($resql)) {
+            $riskUrl  = dol_buildpath('/' . $this->module . '/view/risk/risk_card.php', 1) . '?id=' . ((int) $obj->rowid);
+            $riskLink = '<a href="' . $riskUrl . '">' . img_picto('', $this->picto, 'class="pictofixedwidth"') . dol_escape_htmltag((string) $obj->ref) . '</a>';
+
+            $elementObj  = $activeElements[(int) $obj->fk_element] ?? null;
+            $elementHtml = '';
+            if ($elementObj instanceof DigiriskElement) {
+                $elementUrl   = dol_buildpath('/' . $this->module . '/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . ((int) $elementObj->id) . '&risk_type=' . urlencode($riskType);
+                $elementTitle = trim($elementObj->ref . ' - ' . $elementObj->label);
+                $elementHtml  = ' <a href="' . $elementUrl . '" title="' . dol_escape_htmltag($elementTitle) . '">(' . dol_escape_htmltag(dol_trunc($elementTitle, 24)) . ')</a>';
+            }
+
+            $cleanDesc = trim(dol_string_nohtmltag((string) $obj->description));
+            if ($cleanDesc === '') {
+                $cleanDesc = $this->getDangerCategoryName((int) $obj->category, $riskType);
+            }
+            $descHtml = $cleanDesc !== ''
+                ? ' - <span title="' . dol_escape_htmltag($cleanDesc) . '">' . dol_escape_htmltag(dol_trunc($cleanDesc, 45)) . '</span>'
+                : '';
+
+            $labels[] = $riskLink . $elementHtml . $descHtml;
+
+            if ($obj->cotation !== null) {
+                $cotationVal = (int) $obj->cotation;
+                $level       = $this->getCotationLevel((float) $cotationVal);
+                $bgColor     = $this->cotations[$level]['color'] ?? '#ececec';
+                $textColor   = $level === 1 ? '#2b2b2b' : '#ffffff';
+                $contents[]  = '<span class="risk-evaluation-cotation" data-scale="' . $level . '" style="display:inline-block; margin:-2px -10px; padding:2px 10px; border-radius:999px; background:' . $bgColor . '; color:' . $textColor . '; font-weight:700;">' . $cotationVal . '</span>';
+            } else {
+                $contents[] = 'N/A';
+            }
+        }
+        $this->db->free($resql);
+
+        if (empty($labels)) {
+            $labels[]   = $langs->transnoentities('NoData');
+            $contents[] = 'N/A';
+        }
+
+        return [
+            'labels'   => $labels,
+            'contents' => $contents,
+        ];
     }
 
     /**

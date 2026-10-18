@@ -2746,3 +2746,4 @@ FireWatchGeolocError             = Position indisponible
 FireWatchGeolocRetry             = Réessayer
 FireWatchClearSignature          = Effacer
 FireWatchValidateRound           = Valider la ronde n°%s
+LastRisksAdded                   = 3 derniers risques ajoutés
