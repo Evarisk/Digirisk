@@ -941,7 +941,8 @@ class DigiriskElement extends SaturneObject
             $statusType = 'status8';
         }
 
-        return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
+        // The bin and the elements put in it (negative statuses) have no label of their own
+        return dolGetStatus($this->labelStatus[$status] ?? '', $this->labelStatusShort[$status] ?? '', '', $statusType, $mode);
     }
 
     /**

@@ -1,0 +1,130 @@
+/* Digirisk modern theme: Saturne modals, dropdowns, tooltips and jQuery UI dialogs */
+
+#{$dr-scope} {
+  /* ---- Modals ---- */
+
+  .wpeo-modal {
+    background: rgba(15, 23, 42, 0.55);
+
+    .modal-container {
+      border: 1px solid $dr-border;
+      box-shadow: $dr-shadow-lg;
+    }
+
+    &.modal-active {
+      backdrop-filter: blur(3px);
+    }
+
+    &.modal-active .modal-container {
+      border-radius: 18px;
+    }
+
+    .modal-container .modal-header {
+      align-items: center;
+      border-bottom: 1px solid #eef2f6;
+
+      .modal-title {
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        text-transform: none;
+        color: $dr-text;
+      }
+
+      .modal-close:not(.wpeo-button) {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border-radius: 50%;
+        color: $dr-faint;
+        transition: background-color $dr-transition, color $dr-transition;
+
+        &:hover {
+          background: $dr-bg;
+          color: $dr-text;
+        }
+      }
+    }
+
+    .modal-container .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      border-top: 1px solid #eef2f6;
+    }
+  }
+
+  /* ---- Dropdowns ---- */
+
+  .wpeo-dropdown .saturne-dropdown-content,
+  .wpeo-dropdown .dropdown-content {
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius;
+    box-shadow: $dr-shadow-hover;
+  }
+
+  .wpeo-dropdown .dropdown-item:hover {
+    background: $dr-surface-soft;
+  }
+
+  /* Dolibarr dropdowns (top right menus, list column selector) */
+  .dropdown-menu {
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius;
+    box-shadow: $dr-shadow-hover;
+  }
+
+  /* ---- Tooltips ---- */
+
+  .wpeo-tooltip {
+    border-radius: $dr-radius-sm;
+    background: $dr-text;
+    font-family: $dr-font;
+    font-size: 12px;
+    box-shadow: $dr-shadow-hover;
+  }
+
+  .ui-tooltip,
+  #tiptip_content,
+  .classfortooltip + .ui-tooltip {
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius;
+    box-shadow: $dr-shadow-hover;
+  }
+
+  /* ---- jQuery UI dialogs (confirmations) ---- */
+
+  .ui-dialog {
+    border: 1px solid $dr-border !important;
+    border-radius: 16px !important;
+    box-shadow: $dr-shadow-lg;
+    overflow: hidden;
+
+    .ui-dialog-titlebar {
+      border: none;
+      border-bottom: 1px solid #eef2f6;
+      border-radius: 0;
+      background: $dr-surface;
+      color: $dr-text;
+      font-weight: 700;
+    }
+
+    .ui-dialog-buttonpane {
+      border-top: 1px solid #eef2f6;
+      background: $dr-surface-soft;
+    }
+
+    .ui-dialog-buttonpane button {
+      border-radius: $dr-radius;
+    }
+  }
+
+  .ui-widget-overlay {
+    background: rgba(15, 23, 42, 0.55);
+    opacity: 1;
+  }
+}
