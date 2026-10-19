@@ -1071,8 +1071,31 @@ class DigiriskDolibarr extends SaturneApi
 
 		$advancedConfig = $this->loadAdvancedCotationConfig();
 
+		$entityName    = getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
+		$entityLogoUri = '';
+		$logoDir       = $conf->mycompany->dir_output ?? '';
+		if ($logoDir !== '') {
+			$logoCandidates = array_filter([
+				getDolGlobalString('MAIN_INFO_SOCIETE_LOGO_SMALL') ? $logoDir . '/logos/thumbs/' . getDolGlobalString('MAIN_INFO_SOCIETE_LOGO_SMALL') : '',
+				getDolGlobalString('MAIN_INFO_SOCIETE_LOGO_MINI') ? $logoDir . '/logos/thumbs/' . getDolGlobalString('MAIN_INFO_SOCIETE_LOGO_MINI') : '',
+				getDolGlobalString('MAIN_INFO_SOCIETE_LOGO') ? $logoDir . '/logos/' . getDolGlobalString('MAIN_INFO_SOCIETE_LOGO') : '',
+			]);
+			foreach ($logoCandidates as $logoPath) {
+				if (is_file($logoPath) && is_readable($logoPath) && filesize($logoPath) <= 2 * 1024 * 1024) {
+					$rawLogo = @file_get_contents($logoPath);
+					$imgInfo = $rawLogo !== false ? @getimagesizefromstring($rawLogo) : false;
+					if ($rawLogo !== false && $imgInfo && !empty($imgInfo['mime'])) {
+						$entityLogoUri = 'data:' . $imgInfo['mime'] . ';base64,' . base64_encode($rawLogo);
+						break;
+					}
+				}
+			}
+		}
+
 		return [
 			'entity'             => (int) $conf->entity,
+			'entity_name'        => $entityName,
+			'entity_logo'        => $entityLogoUri,
 			'du_project_id'      => getDolGlobalInt('DIGIRISKDOLIBARR_DU_PROJECT'),
 			'elements'           => $elements,
 			'categories'         => Risk::getDangerCategories('risk'),
