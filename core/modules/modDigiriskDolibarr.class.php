@@ -649,6 +649,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE', 'integer', 0, '', 0, 'current'],
 			// A number alone in the reference filter of the list finds that number exactly (1 gives PP1, not PP11)
 			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLAN_SEARCH_REF_BY_NUMBER', 'integer', 0, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLAN_TAGS_SET', 'integer', 0, '', 0, 'current'],
 
 			// CONST PREVENTION PLAN DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
@@ -2756,6 +2757,21 @@ class modDigiriskdolibarr extends DolibarrModules
             $tags->create($user);
 
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 4, 'integer', 0, '', $conf->entity);
+        }
+
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_TAGS_SET') == 0) {
+            // The constructCategory hook that registers this type is not loaded yet on the very first activation, and
+            // without it Categorie would fall back on type 0 and create product tags : the id it declares is used instead
+            $preventionPlanTagType = isset($tags->MAP_ID['digiriskpreventionplan']) ? 'digiriskpreventionplan' : '436302002';
+
+            foreach (['PreventionPlanTag400Hours', 'PreventionPlanTagSeriousImminentDanger'] as $tagLabel) {
+                $preventionPlanTag        = new Categorie($this->db);
+                $preventionPlanTag->label = $langs->transnoentities($tagLabel);
+                $preventionPlanTag->type  = $preventionPlanTagType;
+                $preventionPlanTag->create($user);
+            }
+
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_TAGS_SET', 1, 'integer', 0, '', $conf->entity);
         }
 
 		if (empty($conf->global->DIGIRISKDOLIBARR_TRIGGERS_UPDATED)) {
