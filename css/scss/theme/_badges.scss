@@ -1,110 +1,11 @@
-/* Digirisk modern theme: status badges, as tinted pills (same recipe as the DigiQuali PWA) */
+/* Digirisk modern theme: status badges. The tinted pills come from the shared theme of Saturne. */
 
 #{$dr-scope} {
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 9px;
-    border-radius: $dr-radius-pill;
-    font-size: 11.5px;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    line-height: 1.4;
-    text-shadow: none;
-  }
-
-  /* Status dots (dolGetStatus mode 3) keep their round shape */
-  .badge.badge-dot {
-    width: 10px;
-    height: 10px;
-    padding: 0;
-    border-radius: 50%;
-  }
-
-  /* Draft */
-  .badge-status0 {
-    background: $dr-bg !important;
-    border: 1px solid $dr-border-strong !important;
-    color: $dr-muted !important;
-  }
-
-  /* Validated, approved, waiting for a signature (Dolibarr amber statuses) */
-  .badge-status1,
-  .badge-status1b,
-  .badge-status2,
-  .badge-status3 {
-    background: $dr-warning-soft !important;
-    border: 1px solid rgba(233, 173, 79, 0.45) !important;
-    color: #a16207 !important;
-  }
-
-  /* Done (Dolibarr green statuses) */
-  .badge-status4,
-  .badge-status4b,
-  .badge-status7,
-  .badge-status11 {
-    background: $dr-success-soft !important;
-    border: 1px solid rgba(22, 163, 74, 0.3) !important;
-    color: #15803d !important;
-  }
-
-  /* Closed, cancelled */
-  .badge-status5,
-  .badge-status6,
-  .badge-status9 {
-    background: $dr-bg !important;
-    border: 1px solid $dr-border-strong !important;
-    color: $dr-text-soft !important;
-  }
-
   /* Locked and archived: Digirisk puts its frozen documents in status 8, a final state rather
-     than an error, hence the navy tint */
+     than an error, hence the navy tint instead of the red of the shared theme */
   .badge-status8 {
     background: rgba(38, 60, 92, 0.1) !important;
     border: 1px solid rgba(38, 60, 92, 0.25) !important;
     color: $dr-navy !important;
-  }
-
-  /* Refused */
-  .badge-status10 {
-    background: $dr-danger-soft !important;
-    border: 1px solid rgba(224, 83, 83, 0.3) !important;
-    color: #b91c1c !important;
-  }
-
-  .badge-info,
-  .badge-secondary {
-    background: $dr-bg;
-    border: 1px solid $dr-border;
-    color: $dr-text-soft !important;
-  }
-
-  .badge-primary {
-    background: $dr-primary;
-    color: #ffffff;
-  }
-
-  .badge-danger {
-    background: $dr-danger;
-    color: #ffffff;
-  }
-
-  .badge-success {
-    background: $dr-success;
-    color: #ffffff;
-  }
-
-  .badge-warning {
-    background: $color__yellow;
-    color: #ffffff;
-  }
-
-  /* Tags / categories */
-  ul.select2-choices li,
-  span.categtextwhite,
-  li.select2-search-choice,
-  .noborderoncategories {
-    border-radius: $dr-radius-pill !important;
   }
 }

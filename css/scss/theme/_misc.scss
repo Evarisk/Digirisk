@@ -73,16 +73,4 @@
   .config-tuto {
     border-radius: $dr-radius;
   }
-
-  h2 {
-    color: $dr-text;
-    letter-spacing: -0.01em;
-  }
-
-  /* ---- Legacy Digirisk tabs and tables (css/digiriskdolibarr.css, users page) ---- */
-
-  .wpeo-tab .tab-list .tab-element.tab-active {
-    border-color: $dr-primary;
-    color: $dr-primary-strong;
-  }
 }

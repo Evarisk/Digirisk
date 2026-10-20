@@ -2,9 +2,11 @@
    Same palette as the PWAs of Digirisk, DigiQuali and ReedCRM (Tailwind slate greys
    plus the Saturne blue), so that the back office and the mobile screens look alike. */
 
-/* digiriskdolibarr.min.css is only loaded on Digirisk pages, but the PWA screens and the
-   public pages already have their own design: the theme stays away from them */
-$dr-scope: 'body#mainbody:not(.template-pwa):not(.digirisk-mobile-create):not(.page-public-card):not(.digirisk-firewatch-public)';
+/* The generic restyle of the back office (titles, tabs, lists, forms, buttons, modals) is the shared
+   theme of Saturne. saturne_header() puts its saturne-theme class on the logged-in pages only: the
+   PWA screens and the public pages, which have their own design, never get it. The Digirisk
+   components below aim at the same scope. */
+$dr-scope: 'body#mainbody.saturne-theme';
 
 $dr-bg: #f1f5f9;
 $dr-surface: #ffffff;
