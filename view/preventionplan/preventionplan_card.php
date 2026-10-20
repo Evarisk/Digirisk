@@ -48,6 +48,7 @@ require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/preventionplandocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
 
 // Global variables definitions
@@ -138,6 +139,11 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($reshook)) {
 	$error = 0;
+
+	// Photo added or removed from the media block of a risk being edited: answered without redirection
+	if ($permissiontoadd) {
+		digiriskPreventionPlanRiskMediaActions($action, $object);
+	}
 
 	$backurlforlist = dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_list.php', 1);
 
@@ -551,6 +557,13 @@ if (empty($reshook)) {
 				if ($oldCategoryId != $riskCategoryId) {
 					$protections = array_filter($protections, function($p) use ($oldCategoryId) { return $p['risk_category'] != $oldCategoryId; });
 					unset($riskCompanies[$oldCategoryId]);
+
+					// The photos are keyed by category as well, they follow the risk. A risk added twice
+					// before the uniqueness check keeps them: they are its photos too
+					$sameCategoryLines = $preventionplandet->fetchAll('', '', 0, 0, ['fk_preventionplan' => $object->id, 'category' => $oldCategoryId]);
+					if (empty($sameCategoryLines)) {
+						digiriskMobileMoveRiskPhotoDir($object->element, $object->ref, (int) $oldCategoryId, (int) $riskCategoryId);
+					}
 				}
 
 				$protections = array_filter($protections, function($p) use ($riskCategoryId) { return $p['risk_category'] != $riskCategoryId; });
@@ -594,6 +607,12 @@ if (empty($reshook)) {
 		$preventionplandet->fetch($lineid);
 		$result = $preventionplandet->delete($user, false, false);
 		if ($result > 0) {
+			// The photos of the risk go with it, unless the same risk was added twice before the uniqueness check
+			$sameCategoryLines = $preventionplandet->fetchAll('', '', 0, 0, ['fk_preventionplan' => $preventionplandet->fk_preventionplan, 'category' => $preventionplandet->category]);
+			if ($preventionplandet->fk_preventionplan == $object->id && empty($sameCategoryLines)) {
+				dol_delete_dir_recursive(digiriskMobileRiskPhotoDir($object->element, $object->ref, (int) $preventionplandet->category));
+			}
+
 			// Delete prevention plan line OK
 			setEventMessages($langs->trans('DeletePreventionPlanLine') . ' ' . $preventionplandet->ref . ' ' . $langs->trans('PreventionPlanMessage'), array());
 			$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -1467,9 +1486,9 @@ print '<input type="hidden" name="fk_element" value="0">';
 
 					$coldisplay++;
 					print '<td>';
-					// Photo upload block
-					$blockUploadSubDir = $object->ref . '/risk-' . $item->category;
-					print saturne_render_media_block('digiriskdolibarr', $blockUploadSubDir, 'risk-' . $item->category, 'digiriskdolibarr,preventionplan,write', ['show_photo' => true, 'show_audio' => false, 'show_file' => false]);
+					// Photo upload block, and the editor a selected photo opens in before its upload
+					print digiriskPreventionPlanRiskMediaBlock($object, (int) $item->category);
+					print saturne_photo_editor_modal();
 					print '</td>';
 
 					$coldisplay += $colspan;
@@ -1536,17 +1555,11 @@ print '<input type="hidden" name="fk_element" value="0">';
 
 					$coldisplay++;
 					print '<td class="center">';
-					// Display photos
-					$riskDir = $conf->digiriskdolibarr->dir_output . '/preventionplan/' . $object->ref . '/risk-' . $item->category;
-					if (dol_is_dir($riskDir)) {
-						$files = dol_dir_list($riskDir, 'files', 0, '\.(png|jpg|jpeg|gif)$', 'name', 'ASC');
-						if (!empty($files)) {
-							foreach ($files as $file) {
-								$url = DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&entity=1&file=preventionplan/' . $object->ref . '/risk-' . $item->category . '/' . urlencode($file['name']);
-								print '<a href="'.$url.'" target="_blank"><img src="'.$url.'" style="height:40px; margin:2px; border-radius:4px; border:1px solid #ccc;"></a>';
-							}
-						} else {
-							print '<span class="opacitymedium">&mdash;</span>';
+					// Display photos, from the folder the mobile interface and the document use
+					$riskPhotos = digiriskMobileGetRiskPhotos($object->element, $object->ref, (int) $item->category);
+					if (!empty($riskPhotos)) {
+						foreach ($riskPhotos as $riskPhoto) {
+							print '<a href="' . $riskPhoto['url'] . '&attachment=0" target="_blank"><img src="' . $riskPhoto['url'] . '" style="height:40px; margin:2px; border-radius:4px; border:1px solid #ccc;"></a>';
 						}
 					} else {
 						print '<span class="opacitymedium">&mdash;</span>';
@@ -1690,8 +1703,6 @@ print '<input type="hidden" name="fk_element" value="0">';
 			// Read-only risk list, styled like the protections block for theme consistency.
 			// Each risk shows what the mobile interface captured for it: photos and protections (EPI).
 			if (is_array($preventionplandets) && !empty($preventionplandets)) {
-				require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
-
 				$mobileRiskProtections = !empty($object->array_options['options_mobile_protections'])    ? json_decode($object->array_options['options_mobile_protections'], true)    : [];
 				$mobileRiskCompanies   = !empty($object->array_options['options_mobile_risk_companies']) ? json_decode($object->array_options['options_mobile_risk_companies'], true) : [];
 				$signalisationFile     = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json';

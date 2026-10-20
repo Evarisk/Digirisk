@@ -381,7 +381,60 @@ function digiriskMobileRiskPhotoDir(string $elementType, string $objectRef, int 
     global $conf;
 
     // dir_output, like the Saturne media helpers reading those photos back
-    return $conf->digiriskdolibarr->dir_output . '/' . $elementType . '/' . dol_sanitizeFileName($objectRef) . '/risks/' . $category;
+    return $conf->digiriskdolibarr->dir_output . '/' . digiriskMobileRiskPhotoSubDir($elementType, $objectRef, $category);
+}
+
+/**
+ * Sub directory, relative to the module output directory, of the photos of one risk.
+ * See digiriskMobileRiskPhotoDir().
+ *
+ * @param  string $elementType Object element (preventionplan, firepermit...)
+ * @param  string $objectRef   Object reference
+ * @param  int    $category    Danger category position
+ * @return string              Sub directory, without leading nor trailing slash
+ */
+function digiriskMobileRiskPhotoSubDir(string $elementType, string $objectRef, int $category): string
+{
+    return $elementType . '/' . dol_sanitizeFileName($objectRef) . '/risks/' . $category;
+}
+
+/**
+ * Hand the photos of a risk over to its new danger category, thumbs included.
+ *
+ * Photos are keyed by category: left behind, they would sit in a folder nothing reads any more.
+ * No other risk of the object holds the new category, so whatever its folder still holds belongs to
+ * a removed risk and goes away.
+ *
+ * @param  string $elementType  Object element (preventionplan, firepermit...)
+ * @param  string $objectRef    Object reference
+ * @param  int    $fromCategory Former danger category position
+ * @param  int    $toCategory   New danger category position
+ * @return void
+ */
+function digiriskMobileMoveRiskPhotoDir(string $elementType, string $objectRef, int $fromCategory, int $toCategory)
+{
+    $fromDir = digiriskMobileRiskPhotoDir($elementType, $objectRef, $fromCategory);
+    $toDir   = digiriskMobileRiskPhotoDir($elementType, $objectRef, $toCategory);
+
+    if ($fromCategory === $toCategory || !dol_is_dir($fromDir)) {
+        return;
+    }
+
+    if (dol_is_dir($toDir)) {
+        dol_delete_dir_recursive($toDir);
+    }
+    dol_mkdir($toDir);
+
+    // One file at a time so the file index follows them: dol_move_dir() would also rename every
+    // file whose name holds the former category
+    foreach (dol_dir_list($fromDir, 'files') as $photoFile) {
+        dol_move($photoFile['fullname'], $toDir . '/' . $photoFile['name']);
+    }
+    if (dol_is_dir($fromDir . '/thumbs')) {
+        dol_move_dir($fromDir . '/thumbs', $toDir . '/thumbs', 1, 0, 0);
+    }
+
+    dol_delete_dir_recursive($fromDir);
 }
 
 /**
@@ -410,9 +463,7 @@ function digiriskMobileRiskUploadSubDir(string $uploadToken, $blockIndex): strin
  */
 function digiriskMobileGetRiskPhotos(string $elementType, string $objectRef, int $category): array
 {
-    $photoSubDir = $elementType . '/' . dol_sanitizeFileName($objectRef) . '/risks/' . $category;
-
-    return saturne_get_media_files('digiriskdolibarr', $photoSubDir, '', '', ['type' => 'image', 'sort_order' => 'asc']);
+    return saturne_get_media_files('digiriskdolibarr', digiriskMobileRiskPhotoSubDir($elementType, $objectRef, $category), '', '', ['type' => 'image', 'sort_order' => 'asc']);
 }
 
 /**
