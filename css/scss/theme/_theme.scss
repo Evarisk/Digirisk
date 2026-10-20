@@ -1,18 +1,9 @@
-/* Digirisk modern theme: back office restyle, imported last so that it wins over the
-   legacy partials. Every rule is scoped by $dr-scope (see _tokens.scss). */
+/* Digirisk modern theme: the Digirisk components on top of the shared theme of Saturne, imported
+   last so that it wins over the legacy partials. Every rule is scoped by $dr-scope (see _tokens.scss). */
 
 @import "tokens";
-@import "base";
-@import "title";
-@import "tabs";
-@import "banner";
-@import "buttons";
-@import "tables";
-@import "forms";
 @import "badges";
 @import "navigation";
-@import "dashboard";
-@import "modal";
 @import "risk";
 @import "product";
 @import "misc";

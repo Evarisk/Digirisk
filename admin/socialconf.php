@@ -124,7 +124,7 @@ $help_url = 'FR:Module_Digirisk#L.27onglet_Social';
 $title    = $langs->trans("CompanyFoundation") . ' - ' . $langs->trans("Social");
 
 $morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css", "/digiriskdolibarr/css/digiriskdolibarr.min.css");
+$morecss = array("/saturne/css/saturne.min.css", "/digiriskdolibarr/css/digiriskdolibarr.css", "/digiriskdolibarr/css/digiriskdolibarr.min.css");
 
 $counter = 0;
 
@@ -144,7 +144,7 @@ foreach ($socialResources as $socialResource) {
 	}
 }
 
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss, '', 'saturne-theme');
 
 print load_fiche_titre($title, '', 'title_setup');
 

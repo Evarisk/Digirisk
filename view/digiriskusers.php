@@ -394,9 +394,9 @@ if ($num == 1 && !headers_sent() && ! empty($conf->global->MAIN_SEARCH_DIRECT_OP
 $title    = $langs->trans("ListOfUsers");
 $help_url = 'FR:Module_Digirisk';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css", "/digiriskdolibarr/css/digiriskdolibarr.min.css");
+$morecss  = array("/saturne/css/saturne.min.css", "/digiriskdolibarr/css/digiriskdolibarr.css", "/digiriskdolibarr/css/digiriskdolibarr.min.css");
 
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss, '', 'saturne-theme');
 
 $param                                                                      = '';
 if ( ! empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&amp;contextpage=' . urlencode($contextpage);

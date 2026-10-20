@@ -161,7 +161,7 @@ if ($action == 'delete_risk_photo' && $permissiontoadd) {
 // â”€â”€ Page output â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $form  = new Form($db);
 $title = $langs->trans('Product') . ' - DigiRisk';
-llxHeader('', $title, '', '', 0, 0, [], ['/digiriskdolibarr/css/digiriskdolibarr.min.css']);
+llxHeader('', $title, '', '', 0, 0, [], ['/saturne/css/saturne.min.css', '/digiriskdolibarr/css/digiriskdolibarr.min.css'], '', 'saturne-theme');
 
 $head  = product_prepare_head($object);
 $titre = $langs->trans('CardProduct' . $object->type);
