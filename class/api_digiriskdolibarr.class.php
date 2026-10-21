@@ -2536,8 +2536,9 @@ class DigiriskDolibarr extends SaturneApi
 
 		$this->setConfEntity($entity);
 
-		$accident = new Accident($this->db);
-		return $accident->getNbDaysWithoutAccident();
+		$accident           = new Accident($this->db);
+		$dashboardAccidents = $accident->getDashboardAccidents();
+		return $accident->getNbDaysWithoutAccident($dashboardAccidents['accidents']);
 	}
 
 	/**
@@ -2564,8 +2565,9 @@ class DigiriskDolibarr extends SaturneApi
 
 		$this->setConfEntity($entity);
 
-		$accident = new Accident($this->db);
-		return $accident->getNbAccidents()['data'];
+		$accident           = new Accident($this->db);
+		$dashboardAccidents = $accident->getDashboardAccidents();
+		return $accident->getNbAccidents($dashboardAccidents['accidents'], $dashboardAccidents['accidentsWithWorkStops'])['data'];
 	}
 
 	/**
@@ -2592,8 +2594,9 @@ class DigiriskDolibarr extends SaturneApi
 
 		$this->setConfEntity($entity);
 
-		$accident = new Accident($this->db);
-		return $accident->getNbWorkstopDays();
+		$accident           = new Accident($this->db);
+		$dashboardAccidents = $accident->getDashboardAccidents();
+		return $accident->getNbWorkstopDays($dashboardAccidents['accidentsWithWorkStops']);
 	}
 
 	/**
@@ -2620,8 +2623,10 @@ class DigiriskDolibarr extends SaturneApi
 
 		$this->setConfEntity($entity);
 
-		$accident = new Accident($this->db);
-		return $accident->getNbAccidentsByEmployees();
+		$accident           = new Accident($this->db);
+		$dashboardAccidents = $accident->getDashboardAccidents();
+		$employees          = (new Evaluator($this->db))->getNbEmployees();
+		return $accident->getNbAccidentsByEmployees($dashboardAccidents['accidents'], $dashboardAccidents['accidentsWithWorkStops'], $employees);
 	}
 
 	/**
@@ -2704,8 +2709,10 @@ class DigiriskDolibarr extends SaturneApi
 
 		$this->setConfEntity($entity);
 
-		$accident = new Accident($this->db);
-		return $accident->getFrequencyIndex();
+		$accident           = new Accident($this->db);
+		$dashboardAccidents = $accident->getDashboardAccidents();
+		$employees          = (new Evaluator($this->db))->getNbEmployees();
+		return $accident->getFrequencyIndex($dashboardAccidents['accidentsWithWorkStops'], $employees);
 	}
 
 	/**
@@ -2732,8 +2739,9 @@ class DigiriskDolibarr extends SaturneApi
 
 		$this->setConfEntity($entity);
 
-		$accident = new Accident($this->db);
-		return $accident->getFrequencyRate();
+		$accident           = new Accident($this->db);
+		$dashboardAccidents = $accident->getDashboardAccidents();
+		return $accident->getFrequencyRate($dashboardAccidents['accidentsWithWorkStops']);
 	}
 
 	/**
@@ -2760,8 +2768,9 @@ class DigiriskDolibarr extends SaturneApi
 
 		$this->setConfEntity($entity);
 
-		$accident = new Accident($this->db);
-		return $accident->getGravityRate();
+		$accident           = new Accident($this->db);
+		$dashboardAccidents = $accident->getDashboardAccidents();
+		return $accident->getGravityRate($dashboardAccidents['accidentsWithWorkStops']);
 	}
 
 	// DIGIRISKRESOURCES
