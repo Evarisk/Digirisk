@@ -1237,12 +1237,6 @@ parameters:
 			path: class/api_digiriskdolibarr.class.php
 
 		-
-			message: '#^Method Risk\:\:getRisksByCotation\(\) invoked with 0 parameters, 1 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: class/api_digiriskdolibarr.class.php
-
-		-
 			message: '#^Method SaturneTask\:\:load_dashboard\(\) invoked with 0 parameters, 1 required\.$#'
 			identifier: arguments.count
 			count: 1

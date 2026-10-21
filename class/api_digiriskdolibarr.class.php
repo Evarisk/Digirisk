@@ -2360,8 +2360,10 @@ class DigiriskDolibarr extends SaturneApi
 		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
 		$conf->setEntityValues($db, $entity);
 
-		$risk = new Risk($db);
-		return $risk->getRisksByCotation()['data'];
+		// Same counts as the graph of the dashboard: the risks of each danger category, by level of the cotation scale
+		$risk                                     = new Risk($db);
+		$riskByDangerCategoriesAndRiskAssessments = $risk->getRiskByDangerCategoriesAndRiskAssessments(Risk::getDangerCategories());
+		return $risk->getRisksByCotation($riskByDangerCategoriesAndRiskAssessments)['data'];
 	}
 
 	// TASK
