@@ -394,6 +394,37 @@ class Accident extends SaturneObject
     }
 
     /**
+     * Get the accidents and the work stops the dashboard counts
+     *
+     * The accidents past the draft status and the work stops that started between two dates, or all of them when
+     * no range is given. Every count of the dashboard is made on them, the API routes included.
+     *
+     * @param  int   $startDate Start of the range, included (0 for no range)
+     * @param  int   $endDate   End of the range, excluded (0 for no range)
+     * @return array            Accidents ('accidents') and work stops of accidents ('accidentsWithWorkStops')
+     * @throws Exception
+     */
+    public function getDashboardAccidents(int $startDate = 0, int $endDate = 0): array
+    {
+        $workStopFilter = [];
+        $accidentFilter = ' t.status > ' . self::STATUS_DRAFT;
+        if ($startDate > 0 && $endDate > 0) {
+            $workStopFilter  = ['customsql' => ' t.date_start_workstop >= \'' . dol_print_date($startDate, '%Y/%m/%d') . '\' AND t.date_start_workstop < \'' . dol_print_date($endDate, '%Y/%m/%d') . '\''];
+            $accidentFilter .= ' AND t.accident_date >= \'' . dol_print_date($startDate, '%Y/%m/%d') . '\' AND t.accident_date < \'' . dol_print_date($endDate, '%Y/%m/%d') . '\'';
+        }
+
+        $join                   = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as a ON a.rowid = t.fk_accident';
+        $accidentsWithWorkStops = saturne_fetch_all_object_type('AccidentWorkStop', 'DESC', 't.rowid', 0, 0, $workStopFilter, 'AND', false, true, false, $join);
+        $accidents              = $this->fetchAll('', '', 0, 0, ['customsql' => $accidentFilter]);
+
+        // A failed fetch returns -1, which the counts can not take
+        return [
+            'accidents'              => is_array($accidents) ? $accidents : [],
+            'accidentsWithWorkStops' => is_array($accidentsWithWorkStops) ? $accidentsWithWorkStops : [],
+        ];
+    }
+
+    /**
      * Load dashboard info accident
      *
      * @return array
@@ -424,18 +455,11 @@ class Accident extends SaturneObject
         $this->dashboardDateStart = $year == -1 ? 0 : $startDate;
         $this->dashboardDateEnd   = $year == -1 ? 0 : dol_time_plus_duree($endDate, -1, 'd');
 
-        $join                   = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as a ON a.rowid = t.fk_accident';
-        $accidentsWithWorkStops = saturne_fetch_all_object_type('AccidentWorkStop', 'DESC', 't.rowid', 0, 0, $year == -1 ? [] : ['customsql' => ' t.date_start_workstop >= \'' . dol_print_date($startDate, '%Y/%m/%d') . '\' AND t.date_start_workstop < \'' . dol_print_date($endDate, '%Y/%m/%d') . '\''], 'AND', false, true, false, $join);
-        $accidents              = $this->fetchAll('', '', 0, 0, ['customsql' => ' t.status > ' . self::STATUS_DRAFT . ($year == -1 ? '' : ' AND t.accident_date >= \'' . dol_print_date($startDate, '%Y/%m/%d') . '\' AND t.accident_date < \'' . dol_print_date($endDate, '%Y/%m/%d') . '\'')]);
+        $dashboardAccidents     = $year == -1 ? $this->getDashboardAccidents() : $this->getDashboardAccidents($startDate, $endDate);
+        $accidents              = $dashboardAccidents['accidents'];
+        $accidentsWithWorkStops = $dashboardAccidents['accidentsWithWorkStops'];
         $digiriskElement        = new DigiriskElement($db);
         $digiriskElements       = $digiriskElement->fetchDigiriskElementFlat(0);
-
-        if (empty($accidents) && !is_array($accidents)) {
-            $accidents = [];
-        }
-        if (empty($accidentsWithWorkStops) && !is_array($accidentsWithWorkStops)) {
-            $accidentsWithWorkStops = [];
-        }
 
         $arrayNbDaysWithoutAccident = $this->getNbDaysWithoutAccident($accidents);
         $arrayNbWorkstopDays        = $this->getNbWorkstopDays($accidentsWithWorkStops);
