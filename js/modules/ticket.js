@@ -78,8 +78,6 @@ window.digiriskdolibarr.ticket.event = function() {
 
 
   $(document).on( 'click', '.public-ticket-validate', window.digiriskdolibarr.ticket.addSignature);
-  $(document).on( 'submit', '#sendFile', window.digiriskdolibarr.ticket.tmpStockFile);
-  $(document).on( 'click', '.linked-file-delete', window.digiriskdolibarr.ticket.removeFile);
   $(document).on( 'change', '.add-dashboard-info', window.digiriskdolibarr.ticket.addDashBoardTicketInfo);
   $(document).on( 'click', '.close-dashboard-info', window.digiriskdolibarr.ticket.closeDashBoardTicketInfo);
   $(document).on( 'keyup', '#email', window.digiriskdolibarr.ticket.checkValidEmail);
@@ -217,68 +215,6 @@ window.digiriskdolibarr.ticket.addSignature = function() {
       $('input[name="signature"]').val(JSON.stringify(signature));
     }
   }
-};
-
-/**
- * Upload automatiquement le(s) fichier(s) séelectionnés dans ecm/digiriskdolibarr/ticket/tmp/__REF__
- *
- * @since   1.1.0
- * @version 1.1.0
- *
- * @return {void}
- */
-window.digiriskdolibarr.ticket.tmpStockFile = function( ) {
-
-	event.preventDefault()
-
-	let files = $('#sendfile').prop('files');
-	let parentCategory = $('#parentCategory').val();
-	let subCategory = $('#subCategory').val();
-
-
-	const formData = new FormData();
-	for (let i = 0; i < files.length; i++) {
-		let file = files[i]
-		formData.append('files[]', file)
-	}
-	var ticket_id      = $('#ticket_id').val()
-	let querySeparator = window.saturne.toolbox.getQuerySeparator(document.URL)
-
-	window.saturne.loader.display($('.files-uploaded'));
-
-	fetch(document.URL + querySeparator + 'action=sendfile&ticket_id='+ticket_id, {
-		method: 'POST',
-		body: formData,
-	}).then((resp) => {
-
-		let errorMessage = $(resp).find('.file-error').val();
-		if (errorMessage) {
-			$.jnotify(errorMessage, 'error');
-		}
-
-		$('#sendFileForm').load(document.URL+ querySeparator + 'ticket_id='+ticket_id + '&parentCategory='+parentCategory + '&subCategory='+subCategory + ' #fileLinkedTable')
-	})
-};
-
-/**
- * Upload automatiquement le(s) fichier(s) séelectionnés dans ecm/digiriskdolibarr/ticket/tmp/__REF__
- *
- * @since   1.1.0
- * @version 1.1.0
- *
- * @return {void}
- */
-window.digiriskdolibarr.ticket.removeFile = function( event ) {
-	let filetodelete   = $(this).attr('value');
-	filetodelete       = filetodelete.replace('_mini', '')
-	let ticket_id      = $('#ticket_id').val()
-	let querySeparator = window.saturne.toolbox.getQuerySeparator(document.URL)
-
-	fetch(document.URL + querySeparator + 'action=removefile&filetodelete='+filetodelete+'&ticket_id='+ticket_id, {
-		method: 'POST',
-	}).then((resp) => {
-		$(this).parent().parent().hide()
-	})
 };
 
 /**
