@@ -560,9 +560,10 @@ class Accident extends SaturneObject
      */
     public function getNbDaysWithoutAccident(array $accidents = []): array
     {
-        $lastAccident = end($accidents);
-        if ($lastAccident != null) {
-            $lastTimeAccident            = dol_now() - $lastAccident->accident_date;
+        // The accidents come unsorted: the last one recorded may be an old one entered afterwards
+        $accidentDates = array_filter(array_column($accidents, 'accident_date'));
+        if (!empty($accidentDates)) {
+            $lastTimeAccident            = dol_now() - max($accidentDates);
             $array['daywithoutaccident'] = abs(round($lastTimeAccident / 86400));
         } else {
             $array['daywithoutaccident'] = 'N/A';
