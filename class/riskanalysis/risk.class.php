@@ -1742,7 +1742,8 @@ class Risk extends SaturneObject
         $array['width']      = '100%';
         $array['height']     = 400;
         $array['type']       = 'pie';
-        $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
+        // No layout without a User-Agent, which an API client may not send
+        $array['showlegend'] = ($conf->browser->layout ?? '') == 'phone' ? 1 : 2;
         $array['dataset']    = 1;
         $array['labels']     = $this->cotations;
 
