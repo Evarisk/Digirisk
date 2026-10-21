@@ -43,6 +43,7 @@ require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_media.lib.php';
 
 global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $mysoc, $user;
 
@@ -130,6 +131,10 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($reshook)) {
 	$error = 0;
+
+	// Photo sent, taken from the media library or removed from the media block of the card
+	$canEditPhotos = $object->status <= Accident::STATUS_DRAFT;
+	digiriskObjectMediaActions($object, $action, 'accident/' . $object->ref . '/photos', 'photo', $permissiontoadd && $canEditPhotos, $permissiontodelete && $canEditPhotos);
 
 	$backurlforlist = dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . (!empty($fromiduser) ? '?fromiduser=' . $fromiduser : '');
 
@@ -1065,26 +1070,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
     print '<div class="underbanner clearboth"></div>';
     print '<table class="border centpercent tableforfield">';
 
-    print '<tr class="linked-medias photo gallery-table"> <td class=""><label for="photo">' . $langs->trans("Photos") . '</label></td>';
-    print '<td class="linked-medias-list">';
-    $pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/photos';
-    ?>
-    <span class="add-medias" <?php echo ($object->status <= Accident::STATUS_DRAFT) ? '' : 'style="display:none"' ?>>
-		<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
-		<label for="fast-upload-photo-default">
-			<div title="<?php echo $langs->trans('AddPhotoFromComputer') ?>" class="wpeo-button button-square-50">
-				<i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
-			</div>
-		</label>
-		<input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
-		<div title="<?php echo $langs->trans('AddPhotoFromMediaGallery') ?>" class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="0">
-			<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="<?php echo $object->id?>" data-from-type="accident" data-from-subtype="photo" data-from-subdir="photos"/>
-			<i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
-		</div>
-	</span>
-    <?php
-    $relativepath = 'digiriskdolibarr/medias/thumbs';
-    print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 0, 0, 0, 0, 50, 50, 0, 0, 0, 'accident/'. $object->ref . '/photos/', $object, 'photo', $permissiontoadd, $permissiontodelete && $object->status <= Accident::STATUS_DRAFT);
+    print '<tr><td class="titlefield">' . $langs->trans('Photos') . '</td><td>';
+    print digiriskObjectMediaBlock($object, 'accident/' . $object->ref . '/photos', 'photo', $permissiontoadd && $object->status <= Accident::STATUS_DRAFT);
 	print '</td></tr>';
 
     //Fk Ticket -- Fk Ticket
