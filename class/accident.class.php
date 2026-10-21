@@ -971,7 +971,7 @@ class Accident extends SaturneObject
 
         $nbAccidensWithWorkStop = [];
         foreach ($accidentsWithWorkStop as $workstop) {
-            $days = abs($workstop->date_end_workstop - $workstop->date_start_workstop) / 86400;
+            $days = $this->getWorkStopDuration($workstop);
 
             $array['data'][$this->getWorkStopDurationBucket($days)]++;
             $nbAccidensWithWorkStop[$workstop->fk_accident] = $workstop->fk_accident;
@@ -1015,6 +1015,24 @@ class Accident extends SaturneObject
     }
 
     /**
+     * Get the duration of a work stop, in days
+     *
+     * Its dates give it. The end date only exists since 2022: the work stops recorded before have none, and their
+     * declared number of days stands in for it, the same way getWorkStopSqlFilter() does for the lists
+     *
+     * @param  object $workStop Work stop
+     * @return float            Duration of the work stop, in days
+     */
+    public function getWorkStopDuration(object $workStop): float
+    {
+        if (empty($workStop->date_start_workstop) || empty($workStop->date_end_workstop)) {
+            return (float) $workStop->workstop_days;
+        }
+
+        return abs($workStop->date_end_workstop - $workStop->date_start_workstop) / 86400;
+    }
+
+    /**
      * Get the work stop duration bucket a duration falls in
      *
      * @param  float  $nbDays Duration of the work stop, in days
@@ -1050,7 +1068,8 @@ class Accident extends SaturneObject
 
         $durationFilter = '';
         if ($isBucketOfDuration) {
-            $duration   = 'ABS(TIMESTAMPDIFF(SECOND, ws.date_start_workstop, ws.date_end_workstop)) / 86400';
+            // Same duration as getWorkStopDuration(): the declared number of days when a date is missing
+            $duration   = 'COALESCE(ABS(TIMESTAMPDIFF(SECOND, ws.date_start_workstop, ws.date_end_workstop)) / 86400, ws.workstop_days)';
             $lowerBound = 0;
             foreach (self::WORK_STOP_DURATION_LIMITS as $currentBucket => $limit) {
                 if ($currentBucket == $bucket) {
@@ -1100,7 +1119,7 @@ class Accident extends SaturneObject
                 if (empty($array['data'][$accident->fk_element])) {
                     $array['data'][$accident->fk_element] = 0;
                 }
-                $array['data'][$accident->fk_element] += abs($workstop->date_end_workstop - $workstop->date_start_workstop) / 86400;
+                $array['data'][$accident->fk_element] += $this->getWorkStopDuration($workstop);
             }
         }
         unset($array['data'][null]);
