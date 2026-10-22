@@ -201,6 +201,8 @@
 
         .toggle-unit,
         .chevron {
+          /* Same value as the row padding: the toggle keeps the full row height */
+          margin: -6px 0;
           color: $dr-faint;
         }
 

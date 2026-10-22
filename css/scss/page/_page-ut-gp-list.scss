@@ -167,6 +167,8 @@ body.digirisk-horizontal-scroll > #id-container {
     .chevron {
       min-width: 20px;
       width: 20px;
+      /* Same value as the row padding: the toggle keeps the full row height */
+      margin: -5px 0;
       color: rgba(0, 0, 0, 0.6);
       display: flex;
       align-items: center;

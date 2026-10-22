@@ -51,7 +51,7 @@ window.digiriskdolibarr.organization.init = function() {
  * @return {void}
  */
 window.digiriskdolibarr.organization.event = function() {
-	$(document).on('click', '.organization-tree .toggle-children', window.digiriskdolibarr.organization.toggleChildren);
+	$(document).on('click', '.organization-tree .chevron', window.digiriskdolibarr.organization.toggleChildren);
 	$(document).on('click', '.organization-tree .quick-add-btn', window.digiriskdolibarr.organization.openQuickAdd);
 	$(document).on('click', '.quick-add-cancel', window.digiriskdolibarr.organization.closeQuickAdd);
 	$(document).on('click', '.organization-tree .delete-element-btn', window.digiriskdolibarr.organization.openDelete);
@@ -206,7 +206,12 @@ window.digiriskdolibarr.organization.saveOrganization = function() {
  * @return {void}
  */
 window.digiriskdolibarr.organization.toggleChildren = function() {
-	let $icon     = $(this);
+	// The click is caught on the whole chevron column, wider and taller than the arrow itself
+	let $icon = $(this).find('.toggle-children');
+	if (!$icon.length) {
+		return;
+	}
+
 	let $children = $icon.closest('.row-container').siblings('.space');
 
 	$children.slideToggle(200, function() {
