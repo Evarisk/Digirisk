@@ -2148,9 +2148,9 @@ class ActionsDigiriskdolibarr
                 'label_field'    => 'label',
                 'hook_name_card' => $objectName . 'list',
                 'hook_name_list' => $objectName . 'card',
-                'create_url'     => 'custom/digiriskdolibarr/view/' . $objectName . '/' . $objectName . '_card.php?action=create',
-                'class_path'     => 'custom/digiriskdolibarr/class/' . $objectName . '.class.php',
-                'lib_path'       => 'custom/digiriskdolibarr/lib/digiriskdolibarr_' . $objectName . '.lib.php'
+                'create_url'     => 'digiriskdolibarr/view/' . $objectName . '/' . $objectName . '_card.php?action=create',
+                'class_path'     => 'digiriskdolibarr/class/' . $objectName . '.class.php',
+                'lib_path'       => 'digiriskdolibarr/lib/digiriskdolibarr_' . $objectName . '.lib.php'
             ];
         }
 
@@ -2158,19 +2158,19 @@ class ActionsDigiriskdolibarr
         $objects = ['risk', 'riskassessment', 'risksign'];
         foreach ($objects as $objectName) {
             $objectsMetadata['digiriskdolibarr_' . $objectName]['create_url'] = '';
-            $objectsMetadata['digiriskdolibarr_' . $objectName]['class_path'] = 'custom/digiriskdolibarr/class/riskanalysis/' . $objectName . '.class.php';
-            $objectsMetadata['digiriskdolibarr_' . $objectName]['lib_path']   = 'custom/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php';
+            $objectsMetadata['digiriskdolibarr_' . $objectName]['class_path'] = 'digiriskdolibarr/class/riskanalysis/' . $objectName . '.class.php';
+            $objectsMetadata['digiriskdolibarr_' . $objectName]['lib_path']   = 'digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php';
         }
         // La table de l'enquete accident ne suit pas la regle de nommage des autres objets : sans
         // cette correction, la metadonnee pointe une table inexistante et plus rien ne matche
         // (les fichiers lies, donc la diffusion, cherchent sur src_object_type = table_element)
         $objectsMetadata['digiriskdolibarr_accidentinvestigation']['table_element'] = 'digiriskdolibarr_accident_investigation';
 
-        $objectsMetadata['digiriskdolibarr_digiriskelement']['create_url'] = 'custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0';
+        $objectsMetadata['digiriskdolibarr_digiriskelement']['create_url'] = 'digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0';
 
         $objectsMetadata['digiriskdolibarr_evaluator']['create_url'] = '';
-        $objectsMetadata['digiriskdolibarr_evaluator']['class_path'] = 'custom/digiriskdolibarr/class/evaluator.class.php';
-        $objectsMetadata['digiriskdolibarr_evaluator']['lib_path']   = 'custom/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php';
+        $objectsMetadata['digiriskdolibarr_evaluator']['class_path'] = 'digiriskdolibarr/class/evaluator.class.php';
+        $objectsMetadata['digiriskdolibarr_evaluator']['lib_path']   = 'digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php';
 
         // A risk has no label: its description tells it apart when medias are assigned to it
         $objectsMetadata['digiriskdolibarr_risk']['label_field'] = 'description';
