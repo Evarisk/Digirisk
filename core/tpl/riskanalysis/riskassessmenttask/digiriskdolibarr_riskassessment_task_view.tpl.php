@@ -174,7 +174,8 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
                                 <div>
                                     <div class="flex flex-row items-center justify-center">
                                         <i class="fas fa-user-tie 100" style="margin-right: 1em;"></i>
-                                        <?php print saturne_select_users('executive_id', 0, 1, 'executiveSelect minwidth200'); ?>
+                                        <?php // One id per risk: with the id of the risk add modal, each of these selects re-initialised its select2, closing it if it was open
+                                        print saturne_select_users('executive_id' . $risk->id, 0, 1, 'executiveSelect minwidth200'); ?>
                                     </div>
                                 </div>
                             </div>
