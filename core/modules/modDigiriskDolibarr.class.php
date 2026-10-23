@@ -2254,6 +2254,11 @@ class modDigiriskdolibarr extends DolibarrModules
             return 0;
         }
 
+        // Dolibarr runs init() before activating $this->depends : activate them first, their tables (saturne_schedules, ticket...) are filled below
+        if (function_exists('saturne_activate_module_dependencies') && saturne_activate_module_dependencies($this) < 0) {
+            return 0;
+        }
+
         if (empty($conf->global->DIGIRISKDOLIBARR_ACCIDENT_REMOVE_FK_USER_VICTIM)) {
 
             require_once __DIR__ . '/../../class/accident.class.php';
