@@ -119,7 +119,7 @@ $title = $langs->trans('PublicTicket');
 $conf->dol_hide_topmenu  = 1;
 $conf->dol_hide_leftmenu = 1;
 
-saturne_header(0,'', $title, '', '', 0, 0, [], [], '', 'page-public-card');
+saturne_header(0,'', $title, '', '', 0, 0, [], [], '', 'page-public-card page-public-ticket');
 
 if (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
     print $langs->transnoentities('TicketPublicInterfaceForbidden');
