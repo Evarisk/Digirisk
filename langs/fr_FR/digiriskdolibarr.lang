@@ -123,6 +123,7 @@ DigiriskMenu          = Ajoutez des informations sur votre société/organisatio
 DigiriskConfigSociety = Configuration société
 PermissionDenied      = Permission refusée
 AddUser               = Créer un utilisateur
+UserCreateEmailHint   = L'adresse e-mail est proposée à partir du prénom et du nom, vous pouvez la modifier.
 StartDate             = Date de début
 EndDate               = Date de fin
 NoPhoneNumber         = Pas de numéro de téléphone
