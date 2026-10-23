@@ -340,7 +340,7 @@ if ($action == 'create') {
 
 	// The accident and its victim open the left column, the findings of the investigation go to the right one
 	print '<tr class="field_fk_accident"><td class="titlefieldmiddle fieldname_fk_accident">' . $langs->trans($object->fields['fk_accident']['label']) . '</td>';
-	print '<td class="valuefield fieldname_fk_accident">' . $object->showOutputField($object->fields['fk_accident'], 'fk_accident', $object->fk_accident, '', '', '', 0) . '</td></tr>';
+	print '<td class="valuefield fieldname_fk_accident">' . $object->showOutputField($object->fields['fk_accident'], 'fk_accident', (string) $object->fk_accident, '', '', '', 0) . '</td></tr>';
 	print '<tr class="field_user_victim"><td class="titlefieldmiddle">' . $langs->trans('UserVictim') . '</td>';
 	print '<td class="valuefield">' . ($victim->id > 0 ? $victim->getNomUrl(1) : '') . '</td></tr>';
 	$object->fields['fk_accident']['visible'] = 0;
