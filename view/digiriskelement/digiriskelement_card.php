@@ -448,7 +448,6 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true, $moreParams);
 
 	print '<div class="fichecenter">';
-	print '<div class="fichehalfleft">';
 	print '<table class="border centpercent tableforfield">';
 
 	print '<tr><td class="titlefield tdtop">' . $langs->trans("Description") . '</td>';
@@ -485,7 +484,6 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_view.tpl.php';
 
 	print '</table>';
-	print '</div>';
 
 	print '<div class="clearboth"></div>';
 
