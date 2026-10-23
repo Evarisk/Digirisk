@@ -1,5 +1,25 @@
 @import "../theme/tokens";
 
+// Fields of the accident investigation card on two columns down to tablet width, where the module stacks them from
+// 1600px: the identification of the investigation on the left, its findings on the right
+#{$dr-scope} .fichecenter.accidentinvestigation-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+  align-items: start;
+
+  > .fichehalfleft,
+  > .fichehalfright {
+    float: none;
+    width: auto;
+    margin-top: 0;
+  }
+
+  @media (max-width: 1000px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 // ITAMAMI schema of the accident investigation card: the individual, the prescribed task, the material and the
 // environment sit at the corners of a cross whose middle is the real activity, then an arrow leads to the accident
 $itamami-colors: (
