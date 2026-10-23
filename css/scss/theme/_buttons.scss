@@ -177,6 +177,20 @@
     font-weight: 600;
     transition: background-color $dr-transition, border-color $dr-transition, box-shadow $dr-transition, color $dr-transition;
 
+    /* Saturne centres the content of the square buttons with a line-height sized for its 3px
+       border: with the 1px border above, every icon sat 1 to 2px too high. The icon is aligned on
+       the top of the line, the baseline moved it down when its font is smaller than the button's */
+    @each $size in 30, 40, 50, 60 {
+      &.button-square-#{$size},
+      &.button-square-#{$size} .button-icon {
+        line-height: #{$size - 2}px;
+      }
+    }
+
+    &[class*="button-square-"] .button-icon {
+      vertical-align: top;
+    }
+
     &:hover {
       box-shadow: inset 0 -2.6em rgba(255, 255, 255, 0.14);
     }
