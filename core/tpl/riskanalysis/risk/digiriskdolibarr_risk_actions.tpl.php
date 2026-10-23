@@ -71,7 +71,7 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 			if ($result2 > 0) {
 				$tasktitle = $data['task'];
 				$dateStart = dol_stringtotime($data['dateStart']);
-                $dateEnd   = dol_stringtotime($data['dateEnd']);
+                $dateEnd   = digiriskTaskDeadlineToTimestamp((string) ($data['dateEnd'] ?? ''));
 				$budget    = $data['budget'];
 				$executive_id = isset($data['executiveId']) ? $data['executiveId'] : 0;
 				if ( ! empty($tasktitle) && $tasktitle !== 'undefined') {
@@ -390,7 +390,7 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 	$riskID        = $data['riskToAssign'];
 	$tasktitle     = $data['tasktitle'];
     $dateStart     = dol_stringtotime($data['dateStart']);
-    $dateEnd       = dol_stringtotime($data['dateEnd']);
+    $dateEnd       = digiriskTaskDeadlineToTimestamp((string) ($data['dateEnd'] ?? ''));
 	$budget        = $data['budget'];
     $executiveUser = $data['executiveId'];
 	$extrafields->fetch_name_optionals_label($task->table_element);
@@ -436,7 +436,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 	$riskAssessmentTaskID = $data['riskAssessmentTaskID'];
 	$tasktitle            = $data['tasktitle'];
     $dateStart            = dol_stringtotime($data['dateStart']);
-    $dateEnd              = dol_stringtotime($data['dateEnd']);
+    $dateEnd              = digiriskTaskDeadlineToTimestamp((string) ($data['dateEnd'] ?? ''));
 	$budget               = $data['budget'];
 	$taskProgress         = $data['taskProgress'];
 	$executiveUser        = $data['executiveId'];

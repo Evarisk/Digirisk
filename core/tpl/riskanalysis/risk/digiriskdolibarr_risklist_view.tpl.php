@@ -721,7 +721,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                                 <div>
                                     <div class="riskassessment-task-field has-icon">
                                         <i class="far fa-calendar-check fa-fw riskassessment-task-field-icon"></i>
-                                        <?php print '<input type="datetime-local" id="RiskassessmentTaskDateEndModalRisk" class="widthcentpercent" name="RiskassessmentTaskDateEndModalRisk">'; ?>
+                                        <?php print '<input type="date" id="RiskassessmentTaskDateEndModalRisk" class="widthcentpercent" name="RiskassessmentTaskDateEndModalRisk">'; ?>
                                         <?php print '<input type="hidden" id="RiskassessmentTaskDateEndModalRiskhour" name="RiskassessmentTaskDateEndModalRiskhour" value="">'; ?>
                                         <?php print '<input type="hidden" id="RiskassessmentTaskDateEndModalRiskmin" name="RiskassessmentTaskDateEndModalRiskmin" value="">'; ?>
                                     </div>

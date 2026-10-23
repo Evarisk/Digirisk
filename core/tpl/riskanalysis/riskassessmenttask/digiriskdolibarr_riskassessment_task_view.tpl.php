@@ -164,7 +164,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
                                     </div>
                                     <div class="flex flex-row items-center">
                                         <i class="fas fa-calendar-check" style="margin-right: 1em;"></i>
-                                        <?php print '<input type="datetime-local" id="RiskassessmentTaskDateEnd' . $risk->id . '" name="RiskassessmentTaskDateEnd' . $risk->id . '">'; ?>
+                                        <?php print '<input type="date" id="RiskassessmentTaskDateEnd' . $risk->id . '" name="RiskassessmentTaskDateEnd' . $risk->id . '">'; ?>
                                     </div>
                                     <div class="flex flex-row items-center paddingright">
                                         <i class="fas fa-euro-sign" style="margin-right: 1em;"></i>
@@ -358,7 +358,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 									</div>
 									<div>
 										<span class="title"><?php echo $langs->trans('Deadline'); ?></span>
-                                        <?php print '<input type="datetime-local" id="RiskassessmentTaskDateEndEdit' . $related_task->id . '" name="RiskassessmentTaskDateEndEdit' . $related_task->id . '" value="' . ($related_task->datee ? dol_print_date($related_task->datee, '%Y-%m-%dT%H:%M:%S') : '') . '">'; ?>
+                                        <?php print '<input type="date" id="RiskassessmentTaskDateEndEdit' . $related_task->id . '" name="RiskassessmentTaskDateEndEdit' . $related_task->id . '" value="' . ($related_task->datee ? dol_print_date($related_task->datee, '%Y-%m-%d') : '') . '">'; ?>
 									</div>
 									<div class="riskassessment-task-budget">
 										<span class="title"><?php echo $langs->trans('Budget'); ?></span>
