@@ -193,6 +193,10 @@ LegalDisplay             = Affichage légal
 Legaldisplay             = Affichage légal
 HowToSetDataLegalDisplay = Pour configurer les données sur l'affichage légal, aller dans Accueil - Configuration - Société/Organisation - Sécurité
 
+LegalDisplayCompanyDataNotice = Ces informations viennent des %s de la société et servent à tous les documents qui les reprennent. Les modifier ici les modifie pour toute la société.
+CompanySecurityData           = données sécurité
+CompanySocialData             = données sociales
+
 LegalDisplayDocumentGenerated       = Génération de l'affichage légal
 LabourDoctor                        = Médecin du travail
 LabourInspector                     = Inspecteur du travail
@@ -235,7 +239,7 @@ InformationsSharing                  = Diffusion d'informations
 Informationssharing                  = Diffusion d'informations
 InformationsSharingDocumentGenerated = Génération de Diffusion d'Informations
 HowToSetDataInformationsSharing      = Pour configurer les données sur la diffusion d'informations, aller dans Accueil - Configuration - Société/Organisation - Social
-ConfigureSecurityAndSocialData       = Configurer les données de la société
+InformationsSharingCompanyDataNotice = Ces informations viennent des %s et des %s de la société et servent à tous les documents qui les reprennent. Les modifier ici les modifie pour toute la société.
 LastMainDoc                          = Dernier document généré
 
 ParticipationAgreement      = Accords de participation

@@ -191,6 +191,10 @@ LegalDisplay             = Legal display
 Legaldisplay             = Legal display
 HowToSetDataLegalDisplay = To configure the legal display data, go to Home - Setup - Company/Organization - Security
 
+LegalDisplayCompanyDataNotice = This information comes from the company %s and is used by every document that includes it. Editing it here changes it for the whole company.
+CompanySecurityData           = security data
+CompanySocialData             = social data
+
 LegalDisplayDocumentGenerated       = Legal display generation
 LabourDoctor                        = Occupational physician
 LabourInspector                     = Labor inspector
@@ -233,7 +237,7 @@ InformationsSharing                  = Information sharing
 Informationssharing                  = Information sharing
 InformationsSharingDocumentGenerated = Information sharing generation
 HowToSetDataInformationsSharing      = To configure the information sharing data, go to Home - Setup - Company/Organization - Social
-ConfigureSecurityAndSocialData       = Configure the company data
+InformationsSharingCompanyDataNotice = This information comes from the company %s and %s and is used by every document that includes it. Editing it here changes it for the whole company.
 LastMainDoc                          = Last generated document
 
 ParticipationAgreement      = Profit-sharing agreements
