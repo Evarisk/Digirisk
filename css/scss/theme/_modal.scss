@@ -86,6 +86,26 @@
     font-family: $dr-font;
     font-size: 12px;
     box-shadow: $dr-shadow-hover;
+
+    /* data-color="light": Saturne gives it a dark text, which the dark background above made
+       unreadable (black on black). Light background again, arrow included */
+    &.tooltip-light {
+      background: $dr-surface;
+      color: $dr-text;
+
+      &.tooltip-top::before {
+        border-top-color: $dr-surface;
+      }
+      &.tooltip-bottom::before {
+        border-bottom-color: $dr-surface;
+      }
+      &.tooltip-left::before {
+        border-left-color: $dr-surface;
+      }
+      &.tooltip-right::before {
+        border-right-color: $dr-surface;
+      }
+    }
   }
 
   .ui-tooltip,
