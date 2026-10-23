@@ -2737,3 +2737,6 @@ FireWatchGeolocRetry             = Try again
 FireWatchClearSignature          = Clear
 FireWatchValidateRound           = Validate round #%s
 LastRisksAdded                   = Last 3 added risks
+DigiriskElementRiskKeyFigures    = Risk key figures
+LastRiskAssessmentDate           = Date of the last assessment
+RisksNotReassessedForOneYear     = Not reassessed for over a year
