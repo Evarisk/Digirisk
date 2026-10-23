@@ -272,7 +272,8 @@ if (empty($reshook)) {
 
 		$db->begin();
 
-		$actionNewUserId = $user->create($userTmp);
+		// The new user is the one created, the logged-in user is its author
+		$actionNewUserId = $userTmp->create($user);
 		if ($actionNewUserId > 0) {
 			$userTmp->SetInGroup($data['groupid'], $conf->entity);
 
@@ -281,7 +282,7 @@ if (empty($reshook)) {
 		} else {
 			$langs->load("errors");
 			$db->rollback();
-			$actionMessage = $langs->trans($object->error);
+			$actionMessage = $langs->trans($userTmp->error);
 		}
 	}
 	$action = '';
@@ -500,56 +501,60 @@ if ($object->id > 0 || $fromid > 0) {
 				</div>
 				<!-- Modal-ADD Evaluator Content-->
 				<div class="modal-content" id="#modalContent">
-					<div class="evaluator-content wpeo-gridlayout grid-2">
-						<div class="evaluator-user">
-							<span class="title"><?php echo $langs->trans('SelectUser'); ?><required>*</required></span>
+					<div class="evaluator-content">
+						<div class="evaluator-field evaluator-user">
+							<label class="title" for="fk_user_employer"><?php echo $langs->trans('SelectUser'); ?><required>*</required></label>
 							<input type="hidden" class="user-selected" value="<?php echo $user->id ?>">
-							<?php
-							$userlist = $form->select_dolusers(GETPOST('responsible_socid'), '', 0, null, 0, '', '', 0, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300', 0, 1);
-							print '<table><tr>';
-							print '<td>';
-							print $form->selectarray('fk_user_employer', $userlist, (GETPOST('userid') ? GETPOST('userid') : $usertmp->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
-							print '<span class="fa fa-plus-circle valignmiddle paddingleft" id="openCreateUser" title="' . $langs->trans("AddUser") . '"></span>';
-							print '</td></tr></table>';
-							?>
-						</div>
-						<div class="evaluator-assignment wpeo-gridlayout grid-3">
-							<div class="evaluator-duration">
-								<span class="title"><?php echo $langs->trans('Duration'); ?></span>
-								<span class="time"><?php print '<input type="number" class="duration" name="evaluatorDuration" rows="' . ROWS_2 . '" value="' . $conf->global->DIGIRISKDOLIBARR_EVALUATOR_DURATION . '"> min'; ?></span>
-							</div>
-							<div class="evaluator-date">
-								<span class="title"><?php echo $langs->trans('Date'); ?></span>
-								<?php print $form->selectDate('', 'EvaluatorDate', 0, 0, 0, 'evaluator_form', 1, 1,'','','','','',1,'','','tzuserrel'); ?>
-							</div>
-							<div class="evaluator-job">
-								<span class="title"><?php echo $langs->trans('PostOrFunction'); ?></span>
-								<span class=""><input type="text" class="evaluatorJob" name="evaluatorJob" value="<?php echo (!empty(GETPOST('job')) ? GETPOST('job') : $usertmp->job) ?>"></span>
+							<div class="evaluator-user-select">
+								<?php
+								$userlist = $form->select_dolusers(GETPOST('responsible_socid'), '', 0, null, 0, '', '', 0, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300', 0, 1);
+								print $form->selectarray('fk_user_employer', $userlist, (GETPOST('userid') ? GETPOST('userid') : $usertmp->id), $langs->trans('SelectUser'), 0, 0, '', 0, 0, 0, '', 'evaluator-user-list', 1);
+								?>
+								<div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event" id="openCreateUser" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('AddUser'); ?>">
+									<i class="button-icon fas fa-user-plus"></i>
+								</div>
 							</div>
 						</div>
-					</div>
 
-					<div class="user-create wpeo-gridlayout grid-6" style="display: none;">
-						<input type="hidden" name="action" value="create_user" />
-						<div class="table-cell table-150">
-							<input type="text" id="lastname" placeholder="<?php echo $langs->trans('LastName'); ?>" name="lastname" value="<?php echo dol_escape_htmltag(GETPOST('lastname')); ?>" />
+						<!-- Shown by the "+" button: the user created here is selected right away -->
+						<div class="user-create">
+							<input type="hidden" name="action" value="create_user" />
+							<span class="section-title"><?php echo $langs->trans('NewUser'); ?></span>
+							<div class="user-create-fields wpeo-gridlayout grid-2">
+								<input type="text" id="lastname" placeholder="<?php echo $langs->trans('LastName'); ?>" name="lastname" value="<?php echo dol_escape_htmltag(GETPOST('lastname')); ?>" />
+								<input type="text" id="firstname" placeholder="<?php echo $langs->trans('FirstName'); ?>" name="firstname" value="<?php echo dol_escape_htmltag(GETPOST('firstname')); ?>" />
+								<input type="email" id="email" class="email" placeholder="<?php echo $langs->trans('Email'); ?>" name="email" value="<?php echo dol_escape_htmltag(GETPOST('email')); ?>" />
+								<input type="text" id="job" placeholder="<?php echo $langs->trans('PostOrFunction'); ?>" name="job" value="<?php echo dol_escape_htmltag(GETPOST('job')); ?>" />
+							</div>
+							<div class="user-create-footer">
+								<label class="user-create-group">
+									<span><?php echo $langs->trans('Group'); ?></span>
+									<?php echo $form->select_dolgroups(getDolGlobalInt('DIGIRISKDOLIBARR_READERGROUP_SET'), 'groupid', 1, '', 0, '', array(), (string) $conf->entity, false, 'groupselectcontact'); ?>
+								</label>
+								<button type="button" class="wpeo-button button-blue">
+									<i class="fas fa-plus"></i> <?php echo $langs->trans('CreateUser'); ?>
+								</button>
+							</div>
 						</div>
-						<div class="table-cell table-150">
-							<input type="text" id="firstname" placeholder="<?php echo $langs->trans('FirstName'); ?>" name="firstname" value="<?php echo dol_escape_htmltag(GETPOST('firstname')); ?>" />
-						</div>
-						<div class="table-cell table-300">
-							<input style="width:100%" type="email" id="email" class="email" placeholder="<?php echo $langs->trans('Email') ; ?>" name="email" value="<?php echo GETPOST('email'); ?>" />
-						</div>
-						<div class="table-cell table-150">
-							<input type="text" id="job" placeholder="<?php echo $langs->trans('PostOrFunction'); ?>" name="job" value="<?php echo dol_escape_htmltag(GETPOST('job')); ?>" />
-						</div>
-						<div class="table-cell table-300">
-							<?php echo $form->select_dolgroups(getDolGlobalInt('DIGIRISKDOLIBARR_READERGROUP_SET'), 'groupid', 1, '', 0, '', array(), (string) $conf->entity, false, 'minwidth100imp widthcentpercentminusxx groupselectcontact'); ?>
-						</div>
-						<div class="table-cell">
-							<button type="button" class="wpeo-button button-square-50 button-blue wpeo-tooltip-event" aria-label="<?php echo $langs->trans('CreateUser'); ?>">
-								<i class="button-icon fas fa-plus"></i>
-							</button>
+
+						<div class="evaluator-assignment wpeo-gridlayout grid-3">
+							<div class="evaluator-field evaluator-duration">
+								<label class="title" for="evaluatorDuration"><?php echo $langs->trans('Duration'); ?></label>
+								<span class="time">
+									<input type="number" class="duration" id="evaluatorDuration" name="evaluatorDuration" min="0" value="<?php echo getDolGlobalInt('DIGIRISKDOLIBARR_EVALUATOR_DURATION'); ?>">
+									<span class="time-unit">min</span>
+								</span>
+							</div>
+							<div class="evaluator-field evaluator-date">
+								<label class="title" for="EvaluatorDate"><?php echo $langs->trans('Date'); ?></label>
+								<div class="evaluator-date-input">
+									<?php print $form->selectDate('', 'EvaluatorDate', 0, 0, 0, 'evaluator_form', 1, 1,'','','','','',1,'','','tzuserrel'); ?>
+								</div>
+							</div>
+							<div class="evaluator-field evaluator-job">
+								<label class="title" for="evaluatorJob"><?php echo $langs->trans('PostOrFunction'); ?></label>
+								<input type="text" class="evaluatorJob" id="evaluatorJob" name="evaluatorJob" value="<?php echo dol_escape_htmltag(!empty(GETPOST('job')) ? GETPOST('job') : $usertmp->job); ?>">
+							</div>
 						</div>
 					</div>
 

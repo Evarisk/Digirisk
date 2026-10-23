@@ -1,6 +1,176 @@
+/** Evaluator add modal. It hugs its content like the risk add modal: the generic 560px
+    left two thirds of it empty. Labels sit above the fields, every field on the same height. */
 .evaluator-add-modal {
+  .modal-container {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    max-height: calc(100% - 4em);
+
+    .modal-header,
+    .modal-footer {
+      height: auto;
+      flex: 0 0 auto;
+    }
+    .modal-header {
+      padding-bottom: 1em;
+    }
+    /** min-height: 0 lets the flex item shrink below its content so its own overflow-y takes over */
+    .modal-content {
+      height: auto;
+      min-height: 0;
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding-top: 1em;
+      padding-bottom: 1.5em;
+    }
+    .modal-footer {
+      padding-top: 1em;
+    }
+  }
+
+  .evaluator-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2em;
+  }
+
+  .title {
+    display: block;
+    margin-bottom: 0.5em;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.8);
+
+    required {
+      margin-left: 2px;
+      color: $color__primary;
+    }
+  }
+
+  .section-title {
+    display: block;
+    margin-bottom: 0.8em;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.8);
+  }
+
+  /** 32px: the height the theme gives to the select2 of the user list */
+  input[type="text"],
+  input[type="email"],
+  input[type="number"] {
+    box-sizing: border-box;
+    width: 100%;
+    height: 32px;
+  }
+
+  /** select2 writes its width inline while the modal is still hidden: let the flex row size it */
+  .evaluator-user-select,
+  .user-create-group {
+    .select2-container {
+      flex: 1 1 auto;
+      min-width: 0;
+      width: auto !important;
+    }
+  }
+
+  .evaluator-user-select {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    /** Down to the 32px of the select: centred by flex, the 34px line-height of button-square-40
+        pushed the icon 2px down */
+    #openCreateUser {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      width: 32px;
+      height: 32px;
+
+      .button-icon {
+        line-height: 1;
+      }
+    }
+  }
+
+  /** Hidden until the "+" button fades it in (evaluator.openCreateUser) */
+  .user-create {
+    display: none;
+    padding: 1em;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.02);
+
+    .user-create-fields {
+      grid-gap: 10px;
+    }
+
+    .user-create-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1em;
+      margin-top: 10px;
+    }
+
+    .user-create-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1 1 auto;
+      min-width: 0;
+      max-width: 360px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .wpeo-button {
+      flex: 0 0 auto;
+    }
+  }
+
+  .evaluator-assignment {
+    align-items: start;
+  }
+
   .time {
     display: flex;
     align-items: center;
+    gap: 8px;
+
+    .time-unit {
+      color: rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  /** selectDate() prints the field with its picker icon, hidden inputs, then the "Now" link: one line */
+  .evaluator-date-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .divfordateinput {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    #EvaluatorDate {
+      flex: 1 1 auto;
+      min-width: 0;
+      max-width: none;
+      text-align: left;
+    }
+
+    .datenowlink {
+      flex: 0 0 auto;
+      padding: 0;
+      white-space: nowrap;
+    }
   }
 }
