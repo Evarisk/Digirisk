@@ -1031,6 +1031,7 @@ DigiriskStandardInformation = Information
 Digiriskstandard            = Digirisk standard
 DigiriskStandardMin         = Digirisk standards
 TheDigiriskstandard         = the Digirisk standard
+AgendaTitleDigiriskstandard = Events
 
 
 #
@@ -1119,6 +1120,7 @@ RiskDeleted                              = The risk %s has been deleted
 RiskSharedWithEntityRefLabel             = Sharing of the risk %s with
 RiskUnlinkedFromEntityRefLabel           = Unlinking of the risk %s from
 TheDigiriskelement                       = the Digirisk element
+AgendaTitleDigiriskelement               = Events
 DefaultProjectContactType                = Default role assigned to the risk assessment document project
 DefaultTaskContactType                   = Default role assigned to the risk assessment document project tasks
 RiskListParentView                       = Show all the parent elements

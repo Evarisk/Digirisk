@@ -1033,6 +1033,7 @@ DigiriskStandardInformation = Information
 Digiriskstandard            = Standard Digirisk
 DigiriskStandardMin         = standards Digirisk
 TheDigiriskstandard         = le standard Digirisk
+AgendaTitleDigiriskstandard = Événements
 
 
 #
@@ -1121,6 +1122,7 @@ RiskDeleted                              = Le risque %s a été supprimé
 RiskSharedWithEntityRefLabel             = Partage du risque %s avec
 RiskUnlinkedFromEntityRefLabel           = Dissociation du risque %s avec
 TheDigiriskelement                       = l'élément Digirisk
+AgendaTitleDigiriskelement               = Événements
 DefaultProjectContactType                = Rôle par défaut attribué au projet Document Unique
 DefaultTaskContactType                   = Rôle par défaut attribué aux tâches du projet Document Unique
 RiskListParentView                       = Afficher tous les éléments parents
