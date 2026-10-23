@@ -209,6 +209,13 @@ class ActionsDigiriskdolibarr
             $this->resprints .= '<link rel="stylesheet" type="text/css" href="' . dol_buildpath('/digiriskdolibarr/css/digiriskdolibarr.min.css', 1) . '">';
         }
 
+        // The tabs other modules add on the Digirisk objects (DoliLetter spread, DigiQuali controls and surveys)
+        // are pages of those modules: they only load their own stylesheet, so the Digirisk theme is missing on
+        // the menu, banner and tabs of the object
+        if (strpos($_SERVER['PHP_SELF'], '/digiriskdolibarr/') === false && strpos(GETPOST('fromtype', 'alpha'), 'digiriskdolibarr_') === 0) {
+            $this->resprints .= '<link rel="stylesheet" type="text/css" href="' . dol_buildpath('/digiriskdolibarr/css/digiriskdolibarr.min.css', 1) . '">';
+        }
+
         return 0; // or return 1 to replace standard code
     }
 
