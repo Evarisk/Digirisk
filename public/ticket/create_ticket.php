@@ -404,7 +404,7 @@ $moreJS = ['/saturne/js/includes/signature-pad.min.js'];
 $conf->dol_hide_topmenu  = 1;
 $conf->dol_hide_leftmenu = 1;
 
-saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card page-signature'); ?>
+saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card page-public-ticket page-signature'); ?>
 
 <script>
     $(document).ready(function() {
