@@ -1681,6 +1681,7 @@ window.digiriskdolibarr.ticketPickerKanban.init = function() {
     window.digiriskdolibarr.ticketPickerKanban.initSortable();
     window.digiriskdolibarr.ticketPickerKanban.initSettings();
     window.digiriskdolibarr.ticketPickerKanban.initQuickCreate();
+    window.digiriskdolibarr.ticketPickerKanban.initTagFilter();
     window.digiriskdolibarr.ticketPickerKanban.restoreTagFilter();
 
     // Restore the last active tab from localStorage.
@@ -1825,15 +1826,13 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
         e.stopPropagation();
     });
 
-    // Tag filter — toggling a chip filters every board at once
-    $(document).on('click', '#tacPickerTagFilter .tac-picker-tagfilter__chip', function() {
-        $(this).toggleClass('selected');
+    // Tag filter — changing the selection filters every board at once
+    $(document).on('change', '#tacPickerTagFilterSelect', function() {
         window.digiriskdolibarr.ticketPickerKanban.applyTagFilter();
     });
 
     $(document).on('click', '#tacPickerTagFilterReset', function() {
-        $('#tacPickerTagFilter .tac-picker-tagfilter__chip').removeClass('selected');
-        window.digiriskdolibarr.ticketPickerKanban.applyTagFilter();
+        $('#tacPickerTagFilterSelect').val(null).trigger('change');
     });
 
     // Tab switching — persist active dim in localStorage so F5 keeps the current tab.
@@ -2041,17 +2040,98 @@ window.digiriskdolibarr.ticketPickerKanban.updateCounts = function() {
 };
 
 /**
+ * Turn the tag filter into a select2 showing the tags as a tree. While searching, the tree guides of the
+ * matching tags would no longer connect anything: each one shows the path of its parents instead, which also
+ * tells apart the tags sharing a label ("Autres" under two different parents).
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.initTagFilter = function() {
+    var $select    = $('#tacPickerTagFilterSelect');
+    var searchTerm = '';
+
+    if (!$select.length || !$.fn.select2) {
+        return;
+    }
+
+    $select.select2({
+        width:             '100%',
+        // The field is narrow: a long parents path widens the list instead of wrapping
+        dropdownAutoWidth: true,
+        placeholder:       $select.data('placeholder'),
+        dropdownCssClass:  'tac-tagtree-dropdown',
+        // select2 renders the results right after matching them, so the term seen here is the one being displayed
+        matcher: function(params, data) {
+            searchTerm = $.trim(params.term || '');
+            if (!searchTerm || !data.element) {
+                return data;
+            }
+            var haystack = window.digiriskdolibarr.ticketPickerKanban.normalizeTagText($(data.element).attr('data-path') + ' ' + data.text);
+
+            return haystack.indexOf(window.digiriskdolibarr.ticketPickerKanban.normalizeTagText(searchTerm)) !== -1 ? data : null;
+        },
+        templateResult: function(data) {
+            return window.digiriskdolibarr.ticketPickerKanban.renderTagOption(data, searchTerm !== '');
+        },
+        templateSelection: function(data) {
+            return window.digiriskdolibarr.ticketPickerKanban.renderTagOption(data, false, true);
+        }
+    });
+};
+
+/**
+ * Lower case a tag text without its accents, so "securite" finds "Sécurité".
+ *
+ * @param  {string} text Text to normalize
+ * @return {string}      Normalized text
+ */
+window.digiriskdolibarr.ticketPickerKanban.normalizeTagText = function(text) {
+    return String(text).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+};
+
+/**
+ * Markup of a tag in the filter: tree guides, colour dot and label.
+ *
+ * @param  {Object}  data      select2 item
+ * @param  {boolean} searching True while a search term filters the list: the parents path replaces the guides
+ * @param  {boolean} selection True for the chip of a selected tag, which keeps only the dot and the label
+ * @return {jQuery|string}     Rendered item
+ */
+window.digiriskdolibarr.ticketPickerKanban.renderTagOption = function(data, searching, selection) {
+    if (!data.element) {
+        return data.text;
+    }
+
+    // attr() and not data(): jQuery would turn a colour like "123456" or a path made of digits into a number
+    var $option = $(data.element);
+    var color   = $option.attr('data-color') ? '#' + $option.attr('data-color') : '#8c8c8c';
+    var branch  = $option.attr('data-branch');
+    var $row    = $('<span class="tac-tagtree"></span>').toggleClass('tac-tagtree--root', !branch && !selection);
+
+    if (searching && $option.attr('data-path')) {
+        $row.append($('<span class="tac-tagtree__path"></span>').text($option.attr('data-path') + ' ›'));
+    } else if (!searching && !selection && branch) {
+        String($option.attr('data-guides') || '').split(',').forEach(function(guide) {
+            if (guide) {
+                $row.append('<span class="tac-tagtree__guide tac-tagtree__guide--' + guide + '"></span>');
+            }
+        });
+        $row.append('<span class="tac-tagtree__branch tac-tagtree__branch--' + branch + '"></span>');
+    }
+
+    $row.append($('<span class="tac-tagtree__dot"></span>').css('background', color));
+    $row.append($('<span class="tac-tagtree__label"></span>').text($.trim(data.text)));
+
+    return $row;
+};
+
+/**
  * Tag ids currently selected in the filter bar.
  *
  * @return {Array} Category ids, as strings
  */
 window.digiriskdolibarr.ticketPickerKanban.getFilteredTags = function() {
-    var catIds = [];
-    $('#tacPickerTagFilter .tac-picker-tagfilter__chip.selected').each(function() {
-        catIds.push(String($(this).data('cat-id')));
-    });
-
-    return catIds;
+    return $('#tacPickerTagFilterSelect').val() || [];
 };
 
 /**
@@ -2103,11 +2183,8 @@ window.digiriskdolibarr.ticketPickerKanban.restoreTagFilter = function() {
         return;
     }
 
-    savedTags.forEach(function(catId) {
-        $('#tacPickerTagFilter .tac-picker-tagfilter__chip[data-cat-id="' + catId + '"]').addClass('selected');
-    });
-
-    window.digiriskdolibarr.ticketPickerKanban.applyTagFilter();
+    // A tag deleted since the previous visit has no option left: the select drops it
+    $('#tacPickerTagFilterSelect').val(savedTags).trigger('change');
 };
 
 /**
