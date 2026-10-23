@@ -121,6 +121,7 @@ DigiriskMenu          = Add information about your company/organization. Click t
 DigiriskConfigSociety = Company setup
 PermissionDenied      = Permission denied
 AddUser               = Create a user
+UserCreateEmailHint   = The email address is suggested from the first name and the last name, you can change it.
 StartDate             = Start date
 EndDate               = End date
 NoPhoneNumber         = No phone number
