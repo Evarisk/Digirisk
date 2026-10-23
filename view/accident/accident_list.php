@@ -544,7 +544,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 		if ($key == 'status') $cssforfield          .= ($cssforfield ? ' ' : '') . 'center';
         elseif ($key == 'progress') $cssforfield    .= ($cssforfield ? ' ' : '') . 'center';
         elseif ($key == 'ref') $cssforfield         .= ($cssforfield ? ' ' : '') . 'nowrap';
-		elseif ($key == 'description') $cssforfield .= ($cssforfield ? ' ' : '') . 'accidentdocument-description';
+		elseif ($key == 'description') $cssforfield .= ($cssforfield ? ' ' : '') . 'accidentdocument-description minwidth300';
 
         if (!empty($arrayfields['t.' . $key]['checked'])) {
 			print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="width:2%">';
