@@ -26,7 +26,8 @@
  *   $conf, $db, $langs, $user
  *   $pickerAllUsers           array  Active internal users
  *   $pickerAllCategories      array  All ticket tag categories
- *   $pickerTicketsJson        array  All ticket data (flat)
+ *   $pickerTagFilterOptions   array  Ticket tags in tree order, for the tag filter
+ *   $pickerTicketsJson       array  All ticket data (flat)
  *   $pickerTypeColumns        array  Column defs for Type dimension
  *   $pickerTypeTickets        array  Tickets grouped by type_code
  *   $pickerGroupColumns       array  Column defs for Group dimension
@@ -247,18 +248,22 @@ function renderDimKanban($columns, $colTickets, $dim, $allUsers, $allCats, $allS
 
 
     <!-- Tag filter, applied client side on every board at once -->
-    <?php if (!empty($pickerAllCategories)) : ?>
+    <?php if (!empty($pickerTagFilterOptions)) : ?>
         <div class="tac-picker-tagfilter" id="tacPickerTagFilter">
             <span class="tac-picker-tagfilter__label"><i class="fas fa-tags"></i> <?= $langs->trans('ActionPlanFilterTags') ?></span>
-            <div class="tac-picker-tagfilter__chips">
-                <?php foreach ($pickerAllCategories as $pickerCategory) :
-                    $chipColor = !empty($pickerCategory['color']) ? '#' . dol_escape_htmltag($pickerCategory['color']) : '#8c8c8c';
-                ?>
-                    <button type="button" class="tac-picker-tagfilter__chip" data-cat-id="<?= (int) $pickerCategory['id'] ?>" style="border-color: <?= $chipColor ?>">
-                        <span class="tac-picker-tagfilter__dot" style="background: <?= $chipColor ?>"></span>
-                        <?= dol_escape_htmltag($pickerCategory['label']) ?>
-                    </button>
-                <?php endforeach; ?>
+            <div class="tac-picker-tagfilter__select">
+                <select id="tacPickerTagFilterSelect" multiple data-placeholder="<?= dol_escape_htmltag($langs->transnoentitiesnoconv('Categories')) ?>">
+                    <?php foreach ($pickerTagFilterOptions as $tagOption) : ?>
+                        <option value="<?= (int) $tagOption['id'] ?>"
+                                title="<?= dol_escape_htmltag(implode(' › ', array_merge($tagOption['ancestors'], [$tagOption['label']]))) ?>"
+                                data-color="<?= dol_escape_htmltag($tagOption['color']) ?>"
+                                data-path="<?= dol_escape_htmltag($tagOption['path']) ?>"
+                                data-guides="<?= implode(',', $tagOption['guides']) ?>"
+                                data-branch="<?= $tagOption['branch'] ?>">
+                            <?= dol_escape_htmltag($tagOption['label']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
             <button type="button" class="tac-picker-tagfilter__reset" id="tacPickerTagFilterReset">
                 <i class="fas fa-eraser"></i> <?= $langs->trans('RemoveFilter') ?>
