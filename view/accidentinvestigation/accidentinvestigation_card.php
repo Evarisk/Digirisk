@@ -338,6 +338,11 @@ if ($action == 'create') {
 	print '<div class="fichehalfleft">';
 	print '<table class="border centpercent tableforfield">';
 
+	// The ITAMAMI axes are shown by the schema under the fields, they stay in the create and edit forms
+	foreach (['itamami_individual', 'itamami_task', 'itamami_activity', 'itamami_material', 'itamami_environment'] as $itamamiField) {
+		$object->fields[$itamamiField]['visible'] = 0;
+	}
+
 	require_once DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
 
     print '<td class="titlefield">' . $langs->trans("UserVictim") . '</td>';
@@ -350,6 +355,8 @@ if ($action == 'create') {
 	print '</table></div>';
 
 	print '<div class="clearboth"></div>';
+
+	include __DIR__ . '/../../core/tpl/accidentinvestigation/digiriskdolibarr_accidentinvestigation_itamami_schema.tpl.php';
 
 	if ($action != 'presend') {
         $allSigned = $signatory->checkSignatoriesSignatures($id, $object->element);
