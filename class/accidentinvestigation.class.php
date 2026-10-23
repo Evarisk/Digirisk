@@ -205,8 +205,10 @@ class AccidentInvestigation extends SaturneObject
 
     /**
      * @var int Accident ID
+     *          No native type: core/actions_addupdatedelete.inc.php assigns '' when the select is left
+     *          empty, which would raise a TypeError instead of the "field required" message.
      */
-    public int $fk_accident = 0;
+    public $fk_accident = 0;
 
     /**
      * Constructor
