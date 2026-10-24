@@ -334,22 +334,36 @@ if ($action == 'create') {
 	// Print form confirm.
 	print $formConfirm;
 
-	print '<div class="fichecenter">';
+	print '<div class="fichecenter accidentinvestigation-fields">';
 	print '<div class="fichehalfleft">';
 	print '<table class="border centpercent tableforfield">';
 
+	// The accident and its victim open the left column, the findings of the investigation go to the right one
+	print '<tr class="field_fk_accident"><td class="titlefieldmiddle fieldname_fk_accident">' . $langs->trans($object->fields['fk_accident']['label']) . '</td>';
+	print '<td class="valuefield fieldname_fk_accident">' . $object->showOutputField($object->fields['fk_accident'], 'fk_accident', (string) $object->fk_accident, '', '', '', 0) . '</td></tr>';
+	print '<tr class="field_user_victim"><td class="titlefieldmiddle">' . $langs->trans('UserVictim') . '</td>';
+	print '<td class="valuefield">' . ($victim->id > 0 ? $victim->getNomUrl(1) : '') . '</td></tr>';
+	$object->fields['fk_accident']['visible'] = 0;
+	$keyforbreak = 'note_public';
+
+	// The ITAMAMI axes are shown by the schema under the fields, they stay in the create and edit forms
+	foreach (['itamami_individual', 'itamami_task', 'itamami_activity', 'itamami_material', 'itamami_environment'] as $itamamiField) {
+		$object->fields[$itamamiField]['visible'] = 0;
+	}
+
 	require_once DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
 
-    print '<td class="titlefield">' . $langs->trans("UserVictim") . '</td>';
-    print '<td>' . ($victim->id > 0 ? $victim->getNomUrl(1) : '') . '</td>';
 	// The investigation document shows the image picked as favorite in the editor
 	print '<tr><td class="titlefield">' . $langs->trans('CausalityTree') . '</td><td>';
 	print digiriskObjectMediaBlock($object, 'accidentinvestigation/' . $object->ref . '/causality_tree', 'causality_tree', $permissiontoadd && $object->status < AccidentInvestigation::STATUS_VALIDATED);
 	print '</td></tr>';
 
 	print '</table></div>';
+	print '</div>';
 
 	print '<div class="clearboth"></div>';
+
+	include __DIR__ . '/../../core/tpl/accidentinvestigation/digiriskdolibarr_accidentinvestigation_itamami_schema.tpl.php';
 
 	if ($action != 'presend') {
         $allSigned = $signatory->checkSignatoriesSignatures($id, $object->element);
