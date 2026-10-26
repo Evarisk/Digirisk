@@ -322,3 +322,101 @@ $itamami-colors: (
     width: 24%;
   }
 }
+
+// Progress of the actions of the actions tab: a rounded slider filled up to the progress (--progress, set by
+// accidentinvestigation.js) and dragged to change it, green once the action is done. Without the right to change it,
+// the slider is disabled and loses its thumb
+#{$dr-scope} .accidentinvestigation-progress {
+  --progress-color: #{$dr-primary};
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  &--done {
+    --progress-color: #{$dr-success};
+  }
+
+  &__slider {
+    flex: 1 1 auto;
+    min-width: 100px;
+    height: 8px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: $dr-radius-pill;
+    background: linear-gradient(to right, var(--progress-color) var(--progress, 0%), $dr-border var(--progress, 0%));
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+
+    &::-webkit-slider-thumb {
+      box-sizing: border-box;
+      width: 18px;
+      height: 18px;
+      border: 3px solid var(--progress-color);
+      border-radius: 50%;
+      background: $dr-surface;
+      box-shadow: $dr-shadow-sm;
+      -webkit-appearance: none;
+      appearance: none;
+      transition: transform 0.15s ease;
+    }
+
+    &::-moz-range-thumb {
+      box-sizing: border-box;
+      width: 18px;
+      height: 18px;
+      border: 3px solid var(--progress-color);
+      border-radius: 50%;
+      background: $dr-surface;
+      box-shadow: $dr-shadow-sm;
+      transition: transform 0.15s ease;
+    }
+
+    &::-moz-range-track {
+      height: 8px;
+      border-radius: $dr-radius-pill;
+      background: transparent;
+    }
+
+    &:hover::-webkit-slider-thumb,
+    &:active::-webkit-slider-thumb {
+      transform: scale(1.15);
+    }
+
+    &:hover::-moz-range-thumb,
+    &:active::-moz-range-thumb {
+      transform: scale(1.15);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: $dr-ring;
+    }
+
+    &:disabled {
+      cursor: default;
+
+      &::-webkit-slider-thumb {
+        visibility: hidden;
+      }
+
+      &::-moz-range-thumb {
+        visibility: hidden;
+      }
+    }
+  }
+
+  &__value {
+    min-width: 40px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: $dr-text;
+    text-align: right;
+    transition: opacity 0.15s ease;
+  }
+
+  &--saving .accidentinvestigation-progress__value {
+    opacity: 0.4;
+  }
+}
