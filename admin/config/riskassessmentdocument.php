@@ -44,6 +44,8 @@ require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../class/evaluator.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/riskassessment.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risksign.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_riskoverview.lib.php';
 
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
@@ -79,6 +81,27 @@ if (saturne_check_admin_write_access()) {
             dolibarr_set_const($db, $psychosocialRiskMethodConst, 1, 'integer', 0, '', $conf->entity);
         }
     }
+}
+
+// Public overview of the risks: the link handed out carries a key, created the first time it is opened
+if ($action == 'setRiskOverviewPublic' && saturne_check_admin_write_access()) {
+    $riskOverviewPublic = GETPOSTINT('DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE') ? 1 : 0;
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE', $riskOverviewPublic, 'integer', 0, '', $conf->entity);
+    if ($riskOverviewPublic && !dol_strlen(getDolGlobalString('DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_KEY'))) {
+        dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_KEY', bin2hex(random_bytes(24)), 'chaine', 0, '', $conf->entity);
+    }
+
+    setEventMessages($langs->trans('SetupSaved'), null, 'mesgs');
+    header('Location: ' . $_SERVER['PHP_SELF'] . '#riskoverview');
+    exit;
+}
+
+// A new key cuts off every link handed out so far
+if ($action == 'setNewRiskOverviewKey' && saturne_check_admin_write_access()) {
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_KEY', bin2hex(random_bytes(24)), 'chaine', 0, '', $conf->entity);
+    setEventMessages($langs->trans('RiskOverviewPublicKeyRenewed'), null, 'mesgs');
+    header('Location: ' . $_SERVER['PHP_SELF'] . '#riskoverview');
+    exit;
 }
 
 if (GETPOST('action') == 'setmod') {
@@ -487,6 +510,40 @@ $constArray[$moduleNameLowerCase] = [
     ],
 ];
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';
+
+// Public overview of the risks of the groupments and work units
+print '<div id="riskoverview"></div>';
+print load_fiche_titre('<i class="fas fa-th pictofixedwidth"></i>' . $langs->trans('RiskOverviewPublicConfig'), '', '');
+
+print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '" name="riskoverview_form">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="setRiskOverviewPublic">';
+print '<table class="noborder centpercent editmode">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans('Option') . '</td>';
+print '<td>' . $langs->trans('Value') . '</td>';
+print '<td>' . $langs->trans('Action') . '</td>';
+print '</tr>';
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE">' . $langs->trans('RiskOverviewPublicInterface') . '</label>';
+print '<div class="opacitymedium small">' . $langs->trans('RiskOverviewPublicInterfaceHelp') . '</div></td>';
+print '<td><input type="checkbox" name="DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE" id="DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE" value="1"' . (getDolGlobalInt('DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE') ? ' checked' : '') . '> ' . $langs->trans('Yes') . '</td>';
+print '<td><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '"></td>';
+print '</tr>';
+print '</table>';
+print '</form>';
+
+$riskOverviewPublicUrl = digiriskRiskOverviewPublicUrl();
+if (dol_strlen($riskOverviewPublicUrl)) {
+    print '<div class="risk-overview-public-link">';
+    print '<div class="risk-overview-public-link__qr">' . digiriskGetQrCodeSvg($riskOverviewPublicUrl) . '</div>';
+    print '<div>';
+    print '<div><strong>' . $langs->trans('RiskOverviewPublicLink') . '</strong></div>';
+    print '<div class="opacitymedium small">' . $langs->trans('RiskOverviewPublicLinkAdminHelp') . '</div>';
+    print '<div class="risk-overview-public-link__url"><a href="' . dol_escape_htmltag($riskOverviewPublicUrl) . '" target="_blank" rel="noopener">' . dol_escape_htmltag($riskOverviewPublicUrl) . '</a> ' . showValueWithClipboardCPButton($riskOverviewPublicUrl, 0, 'none') . '</div>';
+    print '<div class="margintoponly"><a class="button smallpaddingimp" href="' . $_SERVER['PHP_SELF'] . '?action=setNewRiskOverviewKey&token=' . newToken() . '">' . $langs->trans('RiskOverviewRenewPublicKey') . '</a></div>';
+    print '</div>';
+    print '</div>';
+}
 
 // Page end
 print dol_get_fiche_end();

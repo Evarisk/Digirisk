@@ -2769,3 +2769,37 @@ LastRisksAdded                   = Last 3 added risks
 DigiriskElementRiskKeyFigures    = Risk key figures
 LastRiskAssessmentDate           = Date of the last assessment
 RisksNotReassessedForOneYear     = Not reassessed for over a year
+
+#
+# Public risk overview
+#
+
+RiskOverviewPublicConfig                 = Public risk overview
+RiskOverviewPublicInterface              = Publish the risk overview
+RiskOverviewPublicInterfaceHelp          = Table of the risks of every groupment and work unit, viewable through a secure link without a Dolibarr account
+RiskOverviewPublicLink                   = Link of the risk overview
+RiskOverviewPublicLinkAdminHelp          = Anyone with this link sees, for every groupment and work unit, the number of risks per category and the psychosocial risk rating, without the details of the risks.
+RiskOverviewRenewPublicKey               = Generate a new link
+RiskOverviewPublicKeyRenewed             = New link generated: the previous links no longer work
+RiskOverviewPublicTitle                  = Risk overview
+RiskOverviewPublicSubtitle               = %s groupments and work units · as of %s
+RiskOverviewPublicClosed                 = This link is not valid or the risk overview is not published.
+RiskOverviewTabRisks                     = Risks
+RiskOverviewTabPenibility                = Arduousness
+RiskOverviewTabPsychosocial              = Psychosocial risks
+RiskOverviewElement                      = Groupment / work unit
+RiskOverviewRiskCount                    = Number of risks
+RiskOverviewRiskCountHelp                = Risks of the element itself in the categories of the tab, psychosocial risks excluded
+RiskOverviewPsychosocialAverage          = PSR average
+RiskOverviewPsychosocialAverageHelp      = Average of the rated psychosocial factors, out of 4
+RiskOverviewPsychosocialNotConcerned     = Unit not exposed to psychosocial risks
+RiskOverviewNotConcerned                 = N/A
+RiskOverviewNotConcernedHelp             = no risk in this category
+RiskOverviewNotAssessed                  = Exposed, not assessed yet
+RiskOverviewToQualify                    = Exposure to be qualified
+RiskOverviewNoWorkUnit                   = No work unit
+RiskOverviewFactorNotRated               = Factor not rated
+RiskOverviewEmpty                        = No groupment nor work unit.
+RiskOverviewLegendRisks                  = Each cell gives the number of risks of the category, on the colour of the most severe one.
+RiskOverviewLegendRisksPsychosocial      = The psychosocial risk column gives the average of the rated factors, out of 4.
+RiskOverviewLegendPsychosocial           = Level of each factor and average of the rated factors, out of 4. A groupment shows the average of its assessed work units.

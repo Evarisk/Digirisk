@@ -2781,3 +2781,37 @@ LastRisksAdded                   = 3 derniers risques ajoutés
 DigiriskElementRiskKeyFigures    = Chiffres clés des risques
 LastRiskAssessmentDate           = Date de la dernière évaluation
 RisksNotReassessedForOneYear     = Non réévalués depuis plus d'un an
+
+#
+# Synthèse publique des risques - Public risk overview
+#
+
+RiskOverviewPublicConfig                 = Synthèse publique des risques
+RiskOverviewPublicInterface              = Publier la synthèse des risques
+RiskOverviewPublicInterfaceHelp          = Tableau des risques de chaque groupement et unité de travail, consultable via un lien sécurisé sans compte Dolibarr
+RiskOverviewPublicLink                   = Lien de la synthèse des risques
+RiskOverviewPublicLinkAdminHelp          = Toute personne disposant de ce lien voit, pour chaque groupement et unité de travail, le nombre de risques par catégorie et la cotation des risques psychosociaux, sans le détail des risques.
+RiskOverviewRenewPublicKey               = Générer un nouveau lien
+RiskOverviewPublicKeyRenewed             = Nouveau lien généré : les liens précédents ne fonctionnent plus
+RiskOverviewPublicTitle                  = Synthèse des risques
+RiskOverviewPublicSubtitle               = %s groupements et unités de travail · état au %s
+RiskOverviewPublicClosed                 = Ce lien n'est pas valide ou la synthèse des risques n'est pas publiée.
+RiskOverviewTabRisks                     = Risques
+RiskOverviewTabPenibility                = Pénibilité
+RiskOverviewTabPsychosocial              = Risques psychosociaux
+RiskOverviewElement                      = Groupement / unité de travail
+RiskOverviewRiskCount                    = Nombre de risques
+RiskOverviewRiskCountHelp                = Risques de l'élément lui-même dans les catégories de l'onglet, hors risques psychosociaux
+RiskOverviewPsychosocialAverage          = Moyenne RPS
+RiskOverviewPsychosocialAverageHelp      = Moyenne des facteurs psychosociaux cotés, sur 4
+RiskOverviewPsychosocialNotConcerned     = Unité non concernée par les risques psychosociaux
+RiskOverviewNotConcerned                 = NC
+RiskOverviewNotConcernedHelp             = aucun risque de cette catégorie
+RiskOverviewNotAssessed                  = Concernée, pas encore évaluée
+RiskOverviewToQualify                    = Exposition à qualifier
+RiskOverviewNoWorkUnit                   = Aucune unité de travail
+RiskOverviewFactorNotRated               = Facteur non coté
+RiskOverviewEmpty                        = Aucun groupement ni unité de travail.
+RiskOverviewLegendRisks                  = Chaque case donne le nombre de risques de la catégorie, sur la couleur du plus grave.
+RiskOverviewLegendRisksPsychosocial      = La colonne des risques psychosociaux donne la moyenne des facteurs cotés, sur 4.
+RiskOverviewLegendPsychosocial           = Niveau de chaque facteur et moyenne des facteurs cotés, sur 4. Un groupement reprend la moyenne de ses unités de travail évaluées.

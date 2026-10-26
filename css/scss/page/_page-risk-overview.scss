@@ -1,0 +1,431 @@
+@import "../theme/tokens";
+
+// Public overview of the risks of the groupments and work units
+// (public/digiriskelement/digiriskelement_risk_overview.php): one row per GP/UT, one column per
+// danger category. A cell takes the colour of the Digirisk cotation chips (grey, yellow, red, black).
+$risk-overview-scales: (
+  1: ($color__grey, rgba(0, 0, 0, 0.8)),
+  2: ($color__yellow, #ffffff),
+  3: ($color__red, #ffffff),
+  4: ($color__dark, #ffffff),
+);
+$risk-overview-element-width: 260px;
+$risk-overview-element-width-sm: 170px;
+$risk-overview-total-width: 76px;
+$risk-overview-cell-width: 46px;
+
+@mixin risk-overview-scale-fill {
+  @each $level, $colors in $risk-overview-scales {
+    &[data-scale="#{$level}"] {
+      background: nth($colors, 1);
+      color: nth($colors, 2);
+    }
+  }
+}
+
+// Link and QR code of the overview, in the risk assessment document setup
+.risk-overview-public-link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid $dr-border;
+  border-radius: $dr-radius-sm;
+  background: $dr-surface-soft;
+
+  &__qr {
+    flex: 0 0 110px;
+    box-sizing: border-box;
+    width: 110px;
+    height: 110px;
+    padding: 4px;
+    background: $dr-surface;
+  }
+
+  &__url {
+    margin-top: 6px;
+    word-break: break-all;
+  }
+}
+
+body#mainbody.digirisk-risk-overview-public {
+  // The public theme centres a narrow card: the table needs the whole width of the screen
+  padding-left: 12px;
+  padding-right: 12px;
+
+  .risk-overview {
+    box-sizing: border-box;
+    max-width: 1480px;
+    margin: 0 auto;
+    color: $dr-text;
+    font-family: $dr-font;
+  }
+
+  // ---- Header and tabs ----
+
+  .risk-overview__header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .risk-overview__icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: $dr-radius;
+    background: $dr-primary-soft;
+    color: $dr-primary;
+    font-size: 19px;
+  }
+
+  .risk-overview__title {
+    margin: 0;
+    color: $dr-text;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .risk-overview__subtitle {
+    margin-top: 2px;
+    color: $dr-muted;
+    font-size: 13px;
+  }
+
+  .risk-overview__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 18px 0 14px;
+  }
+
+  .risk-overview__tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius-pill;
+    background: $dr-surface;
+    color: $dr-text-soft;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color $dr-transition, border-color $dr-transition, color $dr-transition;
+
+    &:hover {
+      border-color: $dr-primary;
+      color: $dr-primary;
+    }
+
+    &.is-active {
+      border-color: $dr-primary;
+      background: $dr-primary;
+      color: #ffffff;
+    }
+  }
+
+  // ---- The table ----
+
+  // As wide as its table: the six factors of the psychosocial tab do not stretch across the screen
+  .risk-overview__card {
+    @include dr-card;
+    width: fit-content;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  // Both directions scroll inside the card, so that the heads and the element column stay in view
+  .risk-overview__scroll {
+    max-height: calc(100vh - 220px);
+    min-height: 240px;
+    overflow: auto;
+  }
+
+  .risk-overview__table {
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13px;
+
+    th,
+    td {
+      box-sizing: border-box;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding: 10px 2px 8px;
+      border-bottom: 1px solid $dr-border;
+      background: $dr-surface;
+      vertical-align: bottom;
+    }
+  }
+
+  // Name of the groupment or work unit, kept on the left while the categories scroll
+  .risk-overview__element {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    width: $risk-overview-element-width;
+    min-width: $risk-overview-element-width;
+    max-width: $risk-overview-element-width;
+    padding: 6px 12px;
+    border-right: 1px solid $dr-border;
+    background: $dr-surface;
+    font-weight: 600;
+    text-align: left;
+
+    @for $depth from 1 through 5 {
+      &[data-depth="#{$depth}"] {
+        padding-left: 12px + $depth * 14px;
+      }
+    }
+  }
+
+  thead .risk-overview__element {
+    z-index: 3;
+    @include dr-label;
+    padding-left: 12px;
+  }
+
+  .risk-overview__total {
+    position: sticky;
+    left: $risk-overview-element-width;
+    z-index: 1;
+    width: $risk-overview-total-width;
+    min-width: $risk-overview-total-width;
+    border-right: 1px solid $dr-border;
+    background: $dr-surface;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  thead .risk-overview__total {
+    z-index: 3;
+    @include dr-label;
+    font-size: 10px;
+    line-height: 1.3;
+  }
+
+  .risk-overview__ref {
+    display: inline-block;
+    margin-right: 7px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: $dr-primary;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    vertical-align: 1px;
+  }
+
+  .risk-overview__label {
+    color: $dr-text;
+  }
+
+  .risk-overview__row--groupment {
+    .risk-overview__element,
+    .risk-overview__total {
+      background: $dr-surface-soft;
+    }
+
+    .risk-overview__ref {
+      background: $dr-navy;
+    }
+
+    .risk-overview__label {
+      font-weight: 700;
+    }
+  }
+
+  .risk-overview__row + .risk-overview__row > * {
+    border-top: 1px solid #eef2f6;
+  }
+
+  // Category heads: the name read from the bottom up, to keep the columns narrow, and the
+  // pictograms on one line just above the cells
+  .risk-overview__head {
+    width: $risk-overview-cell-width;
+    min-width: $risk-overview-cell-width;
+    text-align: center;
+  }
+
+  .risk-overview__picto {
+    display: block;
+    width: 30px;
+    height: 30px;
+    margin: 6px auto 0;
+  }
+
+  // Six factors only: their names fit across
+  .risk-overview__table--rps {
+    .risk-overview__head {
+      width: 112px;
+      min-width: 112px;
+      padding-left: 6px;
+      padding-right: 6px;
+    }
+
+    .risk-overview__head-name {
+      max-height: none;
+      text-align: center;
+      writing-mode: horizontal-tb;
+      transform: none;
+    }
+  }
+
+  .risk-overview__factor {
+    display: block;
+    margin-bottom: 6px;
+    color: $dr-primary;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .risk-overview__head-name {
+    display: inline-block;
+    max-height: 150px;
+    color: $dr-text-soft;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.15;
+    text-align: left;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+
+  // Cells: the number of risks (or the level) on the colour of the worst one
+  .risk-overview__cell {
+    height: 38px;
+    border: 2px solid $dr-surface;
+    border-radius: $dr-radius-sm;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    @include risk-overview-scale-fill;
+
+    &.is-empty {
+      background: rgba(22, 163, 74, 0.1);
+      color: #15803d;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    &.is-pending {
+      background: $dr-bg;
+      color: $dr-faint;
+    }
+  }
+
+  // The total keeps its sticky white background, the colour only shows when it carries a level
+  .risk-overview__total.risk-overview__cell {
+    border-radius: 0;
+    border-width: 0 1px 0 0;
+    border-right-color: $dr-border;
+  }
+
+  .risk-overview__state {
+    padding: 0 12px;
+    color: $dr-muted;
+    font-size: 12px;
+  }
+
+  .risk-overview__reason {
+    color: $dr-faint;
+  }
+
+  // ---- Legend, empty and closed states ----
+
+  // The legend wraps at the width of the table instead of widening the card
+  .risk-overview__legend {
+    box-sizing: border-box;
+    width: 0;
+    min-width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 18px;
+    padding: 12px 16px;
+    border-top: 1px solid $dr-border;
+    background: $dr-surface-soft;
+    color: $dr-muted;
+    font-size: 12px;
+  }
+
+  .risk-overview__legend-text {
+    flex: 1 1 320px;
+  }
+
+  .risk-overview__keys {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+  }
+
+  .risk-overview__key {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .risk-overview__swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+    @include risk-overview-scale-fill;
+
+    &.is-empty {
+      background: rgba(22, 163, 74, 0.25);
+    }
+  }
+
+  .risk-overview__empty,
+  .risk-overview__closed {
+    padding: 40px 20px;
+    color: $dr-muted;
+    text-align: center;
+  }
+
+  .risk-overview__closed {
+    @include dr-card;
+    max-width: 520px;
+    margin: 40px auto 0;
+
+    .fas {
+      margin-bottom: 12px;
+      color: $dr-faint;
+      font-size: 28px;
+    }
+  }
+
+  // Phone: a narrower element column, the categories scroll under it
+  @media (max-width: 700px) {
+    .risk-overview__title {
+      font-size: 18px;
+    }
+
+    .risk-overview__element {
+      width: $risk-overview-element-width-sm;
+      min-width: $risk-overview-element-width-sm;
+      max-width: $risk-overview-element-width-sm;
+      font-size: 12px;
+    }
+
+    // Only the name stays in view: the categories get the rest of the screen
+    .risk-overview__total {
+      position: static;
+      left: auto;
+    }
+  }
+}
