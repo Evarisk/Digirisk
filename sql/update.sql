@@ -319,3 +319,7 @@ ALTER TABLE llx_digiriskdolibarr_firepermit ADD firewatch_name varchar(255) NULL
 
 -- 23.5.x - Restore the level 0 of gravity and exposure that PHP 7 saved as NULL (0 != '' was false): a factor 0 gives a cotation of 0 (issue #5384)
 UPDATE llx_digiriskdolibarr_riskassessment SET gravite = COALESCE(gravite, 0), exposition = COALESCE(exposition, 0), cotation = 0 WHERE method = 'advanced' AND cotation IS NULL AND (gravite IS NULL OR exposition IS NULL) AND occurrence IS NOT NULL AND formation IS NOT NULL AND protection IS NOT NULL;
+
+-- 23.5.1
+CREATE TABLE IF NOT EXISTS llx_digiriskdolibarr_rpsscope(rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL, entity integer DEFAULT 1 NOT NULL, date_creation datetime NOT NULL, tms timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, fk_element integer NOT NULL, concerned smallint DEFAULT -1 NOT NULL, reason text, fk_user_modif integer) ENGINE=innodb;
+CREATE TABLE IF NOT EXISTS llx_digiriskdolibarr_rpsanswer(rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL, entity integer DEFAULT 1 NOT NULL, date_creation datetime NOT NULL, tms timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, fk_riskassessment integer NOT NULL, criterion integer NOT NULL, criterion_label varchar(255), sub_category integer NOT NULL, scale smallint NOT NULL, cotation integer NOT NULL, comment text, fk_user_creat integer NOT NULL) ENGINE=innodb;
