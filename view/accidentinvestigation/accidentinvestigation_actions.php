@@ -199,17 +199,53 @@ if ($id > 0 || !empty($ref)) {
             }
 
             $formId = 'digirisk-add-action-form-' . $type;
-            $linkId = 'digirisk-add-action-link-' . $type;
 
             print '<div class="div-table-responsive" style="margin-bottom:24px">';
 
-            // Section header
-            print '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
-            print '<span class="titre">' . $langs->trans($cfg['titleKey']);
-            print ' <span class="badge badge-secondary marginleftonlyshort">';
-            print $langs->trans('XActionsOfY', $done, $total);
-            print '</span></span>';
-            print '</div>';
+            // Section header, with the add button on the right like the lists of Dolibarr
+            $sectionTitle  = $langs->trans($cfg['titleKey']);
+            $sectionTitle .= ' <span class="badge badge-secondary marginleftonlyshort">' . $langs->trans('XActionsOfY', $done, $total) . '</span>';
+            $addButtonParams = ['forcenohideoftext' => 1];
+            if ($permissiontoadd) {
+                $addButtonParams['attr'] = ['class' => 'accidentinvestigation-action-add', 'data-form' => $formId];
+            }
+            print load_fiche_titre($sectionTitle, dolGetButtonTitle($langs->trans($cfg['addKey']), '', 'fa fa-plus-circle', '#', '', $permissiontoadd ? 1 : 0, $addButtonParams), '');
+
+            // Add-action form, opened by the add button of the header
+            if ($permissiontoadd) {
+                print '<div id="' . $formId . '" class="accidentinvestigation-action-form hideobject">';
+                print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '">';
+                print '<input type="hidden" name="token" value="' . newToken() . '">';
+                print '<input type="hidden" name="action" value="addAction">';
+                print '<input type="hidden" name="action_type" value="' . $type . '">';
+                print '<table class="centpercent"><tr>';
+
+                print '<td class="accidentinvestigation-action-form__label">';
+                print '<label>' . $langs->trans('ActionLabel') . ' *</label><br>';
+                print '<input type="text" name="action_label" class="minwidth300" required>';
+                print '</td>';
+
+                print '<td class="accidentinvestigation-action-form__deadline">';
+                print '<label>' . $langs->trans('ActionDeadline') . '</label><br>';
+                // Prefix suffixed with the type: both sections are rendered on the same page and
+                // the datepicker fills its hidden day/month/year fields through getElementById
+                print $form->selectDate('', 'actiondeadline' . $type, 0, 0, 1, 'addActionForm' . $type);
+                print '</td>';
+
+                print '<td class="accidentinvestigation-action-form__assignee">';
+                print '<label>' . $langs->trans('ActionAssignedTo') . '</label><br>';
+                print $form->select_dolusers('', 'assigned_user' . $type, 1, null, 0, '', '', 0, 0, 0, '', 0, '', 'minwidth200 maxwidth300');
+                print '</td>';
+
+                print '<td class="accidentinvestigation-action-form__buttons nowraponall">';
+                print '<button type="submit" class="butAction butActionShort">' . $langs->trans('Add') . '</button>';
+                print '<button type="button" class="butActionDelete butActionShort accidentinvestigation-action-form__cancel">' . $langs->trans('Cancel') . '</button>';
+                print '</td>';
+
+                print '</tr></table>';
+                print '</form>';
+                print '</div>';
+            }
 
             // Table
             print '<table class="tagtable liste" width="100%">';
@@ -311,59 +347,6 @@ if ($id > 0 || !empty($ref)) {
             }
 
             print '</tbody></table>';
-
-            // Inline add-action form (JS toggle, no AJAX)
-            if ($permissiontoadd) {
-                print '<div style="margin-top:6px">';
-
-                // Toggle link
-                print '<span id="' . $linkId . '">';
-                print '<a href="#" style="font-size:0.9em"';
-                print ' onclick="document.getElementById(\'' . $formId . '\').style.display=\'block\';';
-                print 'document.getElementById(\'' . $linkId . '\').style.display=\'none\';return false;">';
-                print '<i class="fas fa-plus-circle"></i>&nbsp;' . $langs->trans($cfg['addKey']);
-                print '</a></span>';
-
-                // Hidden form
-                print '<div id="' . $formId . '" style="display:none;margin-top:8px;padding:12px;background:#f8f9fa;border-radius:4px">';
-                print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '">';
-                print '<input type="hidden" name="token" value="' . newToken() . '">';
-                print '<input type="hidden" name="action" value="addAction">';
-                print '<input type="hidden" name="action_type" value="' . $type . '">';
-                print '<table class="noborder" width="100%"><tr class="oddeven">';
-
-                print '<td style="width:36%">';
-                print '<label>' . $langs->trans('ActionLabel') . ' *</label><br>';
-                print '<input type="text" name="action_label" class="minwidth300" required>';
-                print '</td>';
-
-                print '<td style="width:20%">';
-                print '<label>' . $langs->trans('ActionDeadline') . '</label><br>';
-                // Prefix suffixed with the type: both sections are rendered on the same page and
-                // the datepicker fills its hidden day/month/year fields through getElementById
-                print $form->selectDate('', 'actiondeadline' . $type, 0, 0, 1, 'addActionForm' . $type);
-                print '</td>';
-
-                print '<td style="width:24%">';
-                print '<label>' . $langs->trans('ActionAssignedTo') . '</label><br>';
-                print $form->select_dolusers('', 'assigned_user' . $type, 1, null, 0, '', '', 0, 0, 0, '', 0, '', 'maxwidth200');
-                print '</td>';
-
-                print '<td style="vertical-align:bottom;white-space:nowrap">';
-                print '<button type="submit" class="butAction butActionShort">' . $langs->trans('Add') . '</button>';
-                print '&nbsp;';
-                // Cancel: hide form, restore toggle link
-                print '<a href="#" class="butActionDelete butActionShort"';
-                print ' onclick="document.getElementById(\'' . $formId . '\').style.display=\'none\';';
-                print 'document.getElementById(\'' . $linkId . '\').style.display=\'inline\';return false;">';
-                print $langs->trans('Cancel') . '</a>';
-                print '</td>';
-
-                print '</tr></table>';
-                print '</form>';
-                print '</div>'; // #formId
-                print '</div>'; // margin-top wrapper
-            }
 
             print '</div>'; // div-table-responsive
         }
