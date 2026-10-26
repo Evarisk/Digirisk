@@ -49,59 +49,29 @@ $risk-overview-cell-width: 46px;
   }
 }
 
+// The page is a public card like the other public interfaces (theme/_public.scss), only wider for its
+// table, as the ticket register is: same selector weight as the public theme, plus this page
+body#mainbody.page-public-card.digirisk-risk-overview-public .public-card__container {
+  max-width: 1440px;
+
+  // A closed link only holds a message
+  &.risk-overview--closed {
+    max-width: 560px;
+  }
+}
+
 body#mainbody.digirisk-risk-overview-public {
-  // The public theme centres a narrow card: the table needs the whole width of the screen
-  padding-left: 12px;
-  padding-right: 12px;
-
   .risk-overview {
-    box-sizing: border-box;
-    max-width: 1480px;
-    margin: 0 auto;
     color: $dr-text;
-    font-family: $dr-font;
   }
 
-  // ---- Header and tabs ----
-
-  .risk-overview__header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .risk-overview__icon {
-    display: inline-flex;
-    flex-shrink: 0;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: $dr-radius;
-    background: $dr-primary-soft;
-    color: $dr-primary;
-    font-size: 19px;
-  }
-
-  .risk-overview__title {
-    margin: 0;
-    color: $dr-text;
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-  }
-
-  .risk-overview__subtitle {
-    margin-top: 2px;
-    color: $dr-muted;
-    font-size: 13px;
-  }
+  // ---- Tabs ----
 
   .risk-overview__tabs {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    margin: 18px 0 14px;
+    margin: 0 0 14px;
   }
 
   .risk-overview__tab {
@@ -132,17 +102,20 @@ body#mainbody.digirisk-risk-overview-public {
 
   // ---- The table ----
 
-  // As wide as its table: the six factors of the psychosocial tab do not stretch across the screen
+  // A framed area of the card, as wide as its table: the six factors of the psychosocial tab do not
+  // stretch across the card
   .risk-overview__card {
-    @include dr-card;
     width: fit-content;
     max-width: 100%;
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius-lg;
     overflow: hidden;
   }
 
-  // Both directions scroll inside the card, so that the heads and the element column stay in view
+  // Both directions scroll inside the card, so that the heads and the element column stay in view:
+  // the header, the tabs and the legend of the card stay on screen around it
   .risk-overview__scroll {
-    max-height: calc(100vh - 220px);
+    max-height: calc(100vh - 340px);
     min-height: 240px;
     overflow: auto;
   }
@@ -382,24 +355,14 @@ body#mainbody.digirisk-risk-overview-public {
     text-align: center;
   }
 
-  .risk-overview__closed {
-    @include dr-card;
-    max-width: 520px;
-    margin: 40px auto 0;
-
-    .fas {
-      margin-bottom: 12px;
-      color: $dr-faint;
-      font-size: 28px;
-    }
+  .risk-overview__closed .fas {
+    margin-bottom: 12px;
+    color: $dr-faint;
+    font-size: 28px;
   }
 
   // Phone: a narrower element column, the categories scroll under it
   @media (max-width: 700px) {
-    .risk-overview__title {
-      font-size: 18px;
-    }
-
     .risk-overview__element {
       width: $risk-overview-element-width-sm;
       min-width: $risk-overview-element-width-sm;

@@ -54,20 +54,26 @@ $rpsStateTitle = function (array $rps) use ($langs): string {
 };
 
 ?>
-<div class="risk-overview">
+<div class="public-card__container risk-overview<?php echo $accessAllowed ? '' : ' risk-overview--closed'; ?>" data-public-interface="true">
     <?php if (!$accessAllowed) : ?>
         <div class="risk-overview__closed">
             <i class="fas fa-lock"></i>
             <div><?php echo $langs->trans('RiskOverviewPublicClosed'); ?></div>
         </div>
     <?php else : ?>
-        <div class="risk-overview__header">
-            <span class="risk-overview__icon"><i class="fas fa-th"></i></span>
-            <div>
-                <h1 class="risk-overview__title"><?php echo $langs->trans('RiskOverviewPublicTitle'); ?></h1>
-                <div class="risk-overview__subtitle">
-                    <?php echo dol_escape_htmltag($mysoc->name); ?> &middot;
-                    <?php echo $langs->trans('RiskOverviewPublicSubtitle', count($overviewRows), dol_print_date(dol_now(), 'day')); ?>
+        <!-- Same header as the other public interfaces (electronic signature, registers): what the page is,
+             for whom, and the object it is about -->
+        <div class="public-card__header wpeo-gridlayout grid-2 grid-gap-2">
+            <div class="header-information">
+                <div class="information-title"><?php echo $langs->trans('RiskOverviewPublicTitle'); ?></div>
+                <div class="information-user"><?php echo dol_escape_htmltag($mysoc->name); ?></div>
+            </div>
+            <div class="header-objet">
+                <div class="objet-container">
+                    <div class="objet-info">
+                        <div class="objet-type"><?php echo $langs->trans('RiskAssessmentDocument'); ?></div>
+                        <div class="objet-label"><?php echo $langs->trans('RiskOverviewPublicSubtitle', count($overviewRows), dol_print_date(dol_now(), 'day')); ?></div>
+                    </div>
                 </div>
             </div>
         </div>
