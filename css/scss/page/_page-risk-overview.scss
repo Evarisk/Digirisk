@@ -65,6 +65,17 @@ body#mainbody.digirisk-risk-overview-public {
     color: $dr-text;
   }
 
+  // The export button of the header box is a link: the Dolibarr link colour (a:link) outranked the
+  // white of the Saturne button and painted the icon dark blue
+  .objet-actions a.wpeo-button {
+    &,
+    &:link,
+    &:visited,
+    &:hover {
+      color: #ffffff;
+    }
+  }
+
   // ---- Tabs, fold and unfold ----
 
   .risk-overview__toolbar {
