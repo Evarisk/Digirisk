@@ -2799,6 +2799,7 @@ RiskOverviewNotAssessed                  = Exposed, not assessed yet
 RiskOverviewToQualify                    = Exposure to be qualified
 RiskOverviewNoWorkUnit                   = No work unit
 RiskOverviewFactorNotRated               = Factor not rated
+RiskOverviewNoRatingHelp                 = no rating (hover the cell for details)
 RiskOverviewEmpty                        = No groupment nor work unit.
 RiskOverviewLegendRisks                  = Each cell gives the number of risks of the category, on the colour of the most severe one.
 RiskOverviewLegendRisksPsychosocial      = The psychosocial risk column gives the average of the rated factors, out of 4.

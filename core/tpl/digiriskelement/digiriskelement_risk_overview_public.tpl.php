@@ -34,22 +34,23 @@ $overviewTabs = [
 $riskLevelLabels = [1 => 'GreyRisk', 2 => 'OrangeRisk', 3 => 'RedRisk', 4 => 'BlackRisk'];
 
 /**
- * Psychosocial state of an element that holds no average, as text of a cell.
+ * Why a psychosocial cell holds nothing: the cell reads NC like any empty cell, the state goes
+ * in its tooltip.
  *
  * @param  array $rps Psychosocial assessment of the row
- * @return array      [css class, text, tooltip]
+ * @return string     Tooltip of the cell
  */
-$rpsStateCell = function (array $rps) use ($langs): array {
+$rpsStateTitle = function (array $rps) use ($langs): string {
     if ($rps['state'] === 0) {
-        return ['is-empty', $langs->trans('RiskOverviewNotConcerned'), $langs->trans('RiskOverviewPsychosocialNotConcerned')];
+        return $langs->trans('RiskOverviewPsychosocialNotConcerned') . (dol_strlen($rps['reason']) ? ' : ' . $rps['reason'] : '');
     }
     if ($rps['state'] === 1) {
-        return ['is-pending', '—', $langs->trans('RiskOverviewNotAssessed')];
+        return $langs->trans('RiskOverviewNotAssessed');
     }
     if ($rps['state'] === -1) {
-        return ['is-pending', '?', $langs->trans('RiskOverviewToQualify')];
+        return $langs->trans('RiskOverviewToQualify');
     }
-    return ['is-empty', $langs->trans('RiskOverviewNotConcerned'), $langs->trans('RiskOverviewNoWorkUnit')];
+    return $langs->trans('RiskOverviewNoWorkUnit');
 };
 
 ?>
@@ -120,34 +121,29 @@ $rpsStateCell = function (array $rps) use ($langs): array {
                                     <span class="risk-overview__label"><?php echo dol_escape_htmltag($overviewRow['label']); ?></span>
                                 </th>
 
-                                <?php if ($tab == 'rps') : ?>
+                                <?php if ($tab == 'rps') :
+                                    // A cell without a level reads NC, whatever the reason: not concerned, to qualify, not assessed, factor not rated
+                                    $rpsEmptyTitle = $rps['average'] !== null ? $langs->trans('RiskOverviewFactorNotRated') : $rpsStateTitle($rps); ?>
                                     <?php if ($rps['average'] !== null) : ?>
                                         <td class="risk-overview__total risk-overview__cell" data-scale="<?php echo (int) $rps['band']; ?>"
                                             title="<?php echo dol_escape_htmltag($rpsScale[$rps['band']]['range'] . ' · ' . $rpsScale[$rps['band']]['label']); ?>">
                                             <?php echo digiriskRiskOverviewFormatLevel($rps['average']); ?>
                                         </td>
-                                        <?php foreach ($rpsSubCategories as $rpsPosition => $rpsSub) :
-                                            $rpsLevel = $rps['levels'][$rpsPosition] ?? null; ?>
-                                            <?php if ($rpsLevel === null) : ?>
-                                                <td class="risk-overview__cell is-pending" title="<?php echo dol_escape_htmltag($langs->trans('RiskOverviewFactorNotRated')); ?>">—</td>
-                                            <?php else :
-                                                $rpsLevelScale = rps_scope_band((float) $rpsLevel); ?>
-                                                <td class="risk-overview__cell" data-scale="<?php echo $rpsLevelScale; ?>"
-                                                    title="<?php echo dol_escape_htmltag($langs->trans($rpsSub['label']) . ' — ' . $rpsScale[$rpsLevelScale]['label']); ?>">
-                                                    <?php echo digiriskRiskOverviewFormatLevel((float) $rpsLevel); ?>
-                                                </td>
-                                            <?php endif; ?>
-                                        <?php endforeach; ?>
-                                    <?php else :
-                                        list($rpsClass, $rpsText, $rpsTitle) = $rpsStateCell($rps); ?>
-                                        <td class="risk-overview__total risk-overview__cell <?php echo $rpsClass; ?>" title="<?php echo dol_escape_htmltag($rpsTitle); ?>"><?php echo dol_escape_htmltag($rpsText); ?></td>
-                                        <td class="risk-overview__state" colspan="<?php echo count($rpsSubCategories); ?>">
-                                            <?php echo dol_escape_htmltag($rpsTitle); ?>
-                                            <?php if (dol_strlen($rps['reason'])) : ?>
-                                                <span class="risk-overview__reason">&middot; <?php echo dol_escape_htmltag($rps['reason']); ?></span>
-                                            <?php endif; ?>
-                                        </td>
+                                    <?php else : ?>
+                                        <td class="risk-overview__total risk-overview__cell is-empty" title="<?php echo dol_escape_htmltag($rpsEmptyTitle); ?>"><?php echo $langs->trans('RiskOverviewNotConcerned'); ?></td>
                                     <?php endif; ?>
+                                    <?php foreach ($rpsSubCategories as $rpsPosition => $rpsSub) :
+                                        $rpsLevel = $rps['levels'][$rpsPosition] ?? null; ?>
+                                        <?php if ($rpsLevel === null) : ?>
+                                            <td class="risk-overview__cell is-empty" title="<?php echo dol_escape_htmltag($rpsEmptyTitle); ?>"><?php echo $langs->trans('RiskOverviewNotConcerned'); ?></td>
+                                        <?php else :
+                                            $rpsLevelScale = rps_scope_band((float) $rpsLevel); ?>
+                                            <td class="risk-overview__cell" data-scale="<?php echo $rpsLevelScale; ?>"
+                                                title="<?php echo dol_escape_htmltag($langs->trans($rpsSub['label']) . ' — ' . $rpsScale[$rpsLevelScale]['label']); ?>">
+                                                <?php echo digiriskRiskOverviewFormatLevel((float) $rpsLevel); ?>
+                                            </td>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
                                 <?php else :
                                     $riskCount = 0;
                                     foreach ($columns as $column) {
@@ -164,9 +160,8 @@ $rpsStateCell = function (array $rps) use ($langs): array {
                                                     title="<?php echo dol_escape_htmltag($langs->trans('RiskOverviewPsychosocialAverageHelp')); ?>">
                                                     <?php echo digiriskRiskOverviewFormatLevel($rps['average']); ?>
                                                 </td>
-                                            <?php else :
-                                                list($rpsClass, $rpsText, $rpsTitle) = $rpsStateCell($rps); ?>
-                                                <td class="risk-overview__cell <?php echo $rpsClass; ?>" title="<?php echo dol_escape_htmltag($rpsTitle); ?>"><?php echo dol_escape_htmltag($rpsText); ?></td>
+                                            <?php else : ?>
+                                                <td class="risk-overview__cell is-empty" title="<?php echo dol_escape_htmltag($rpsStateTitle($rps)); ?>"><?php echo $langs->trans('RiskOverviewNotConcerned'); ?></td>
                                             <?php endif; ?>
                                         <?php elseif (!empty($cell['count'])) : ?>
                                             <td class="risk-overview__cell" data-scale="<?php echo (int) $cell['scale']; ?>"
@@ -191,6 +186,7 @@ $rpsStateCell = function (array $rps) use ($langs): array {
                             <?php foreach ($rpsScale as $rpsLevel => $rpsMeta) : ?>
                                 <span class="risk-overview__key"><i class="risk-overview__swatch" data-scale="<?php echo (int) $rpsLevel; ?>"></i><?php echo $rpsLevel . ' ' . dol_escape_htmltag($rpsMeta['label']); ?></span>
                             <?php endforeach; ?>
+                            <span class="risk-overview__key"><i class="risk-overview__swatch is-empty"></i><?php echo $langs->trans('RiskOverviewNotConcerned') . ' : ' . $langs->trans('RiskOverviewNoRatingHelp'); ?></span>
                         </span>
                     <?php else : ?>
                         <span class="risk-overview__legend-text">

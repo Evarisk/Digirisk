@@ -2811,6 +2811,7 @@ RiskOverviewNotAssessed                  = Concernée, pas encore évaluée
 RiskOverviewToQualify                    = Exposition à qualifier
 RiskOverviewNoWorkUnit                   = Aucune unité de travail
 RiskOverviewFactorNotRated               = Facteur non coté
+RiskOverviewNoRatingHelp                 = aucune cotation (le détail s'affiche au survol de la case)
 RiskOverviewEmpty                        = Aucun groupement ni unité de travail.
 RiskOverviewLegendRisks                  = Chaque case donne le nombre de risques de la catégorie, sur la couleur du plus grave.
 RiskOverviewLegendRisksPsychosocial      = La colonne des risques psychosociaux donne la moyenne des facteurs cotés, sur 4.
