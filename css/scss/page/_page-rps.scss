@@ -1037,8 +1037,11 @@ $rps-actions-width: 200px;
     line-height: 1.5;
   }
 
+  // Fixed columns: the action fields line up whatever the length of the factor, "à traiter"
+  // goes under the factor instead of pushing them
   .rps-action-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 28px 240px minmax(0, 1fr) 170px 150px;
     align-items: center;
     gap: 10px;
     padding: 6px 8px;
@@ -1052,27 +1055,40 @@ $rps-actions-width: 200px;
       background: rgba(224, 83, 83, 0.06);
 
       .rps-action-factor::after {
-        content: ' · à traiter';
+        content: 'à traiter';
+        display: block;
         color: #b91c1c;
+        font-size: 11px;
+      }
+    }
+
+    :is(.rps-action-input, .rps-action-owner, .rps-action-due) {
+      width: 100%;
+      min-width: 0;
+    }
+
+    // Narrow window: the action under the factor, then the owner and the due date side by side
+    @media (max-width: 900px) {
+      grid-template-columns: 28px minmax(0, 1fr) minmax(0, 1fr);
+
+      :is(.rps-action-factor, .rps-action-input) {
+        grid-column: 2 / -1;
+      }
+
+      .rps-action-owner {
+        grid-column: 2;
+      }
+
+      .rps-action-due {
+        grid-column: 3;
       }
     }
   }
 
   .rps-action-factor {
-    min-width: 210px;
+    min-width: 0;
     font-weight: 600;
-  }
-
-  .rps-action-input {
-    flex: 1;
-  }
-
-  .rps-action-owner {
-    max-width: 170px;
-  }
-
-  .rps-action-due {
-    max-width: 150px;
+    line-height: 1.35;
   }
 
   .rps-actions-more {
