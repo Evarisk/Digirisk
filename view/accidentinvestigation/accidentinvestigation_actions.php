@@ -204,7 +204,7 @@ if ($id > 0 || !empty($ref)) {
 
             // Section header, with the add button on the right like the lists of Dolibarr
             $sectionTitle  = $langs->trans($cfg['titleKey']);
-            $sectionTitle .= ' <span class="badge badge-secondary marginleftonlyshort">' . $langs->trans('XActionsOfY', $done, $total) . '</span>';
+            $sectionTitle .= ' <span id="accidentinvestigation-actions-counter-' . $type . '" class="badge badge-secondary marginleftonlyshort">' . $langs->trans('XActionsOfY', $done, $total) . '</span>';
             $addButtonParams = ['forcenohideoftext' => 1];
             if ($permissiontoadd) {
                 $addButtonParams['attr'] = ['class' => 'accidentinvestigation-action-add', 'data-form' => $formId];
@@ -255,7 +255,7 @@ if ($id > 0 || !empty($ref)) {
             print '<th class="liste_titre">' . $langs->trans('ActionLabel') . '</th>';
             print '<th class="liste_titre">' . $langs->trans('ActionAssignedTo') . '</th>';
             print '<th class="liste_titre">' . $langs->trans('ActionDeadline') . '</th>';
-            print '<th class="liste_titre" width="140">' . $langs->trans('ActionProgress') . '</th>';
+            print '<th class="liste_titre" width="200">' . $langs->trans('ActionProgress') . '</th>';
             print '<th class="liste_titre">' . $langs->trans('Status') . '</th>';
             print '<th class="liste_titre" width="40">&nbsp;</th>';
             print '</tr></thead>';
@@ -270,7 +270,7 @@ if ($id > 0 || !empty($ref)) {
             foreach ($actions as $row) {
                 $pct    = max(0, min(100, (int) $row->progress));
                 $isDone = ($pct >= 100);
-                print '<tr class="oddeven">';
+                print '<tr id="accidentinvestigation-action-' . ((int) $row->rowid) . '" class="oddeven">';
 
                 // Checkbox to close action
                 print '<td class="center">';
@@ -310,26 +310,13 @@ if ($id > 0 || !empty($ref)) {
                 }
                 print '</td>';
 
-                // Progress bar + inline edit
-                $barClass = $isDone ? 'progress-bar-success' : 'progress-bar-info';
-                print '<td style="padding:4px 8px">';
-                print '<div class="progress sm" style="margin-bottom:4px">';
-                print '<div class="progress-bar ' . $barClass . '" style="width:' . $pct . '%" title="' . $pct . '%"></div>';
+                // Progress: the slider is dragged to change it and saved on release by accidentinvestigation.js
+                print '<td>';
+                print '<div class="accidentinvestigation-progress' . ($isDone ? ' accidentinvestigation-progress--done' : '') . '">';
+                print '<input type="range" class="accidentinvestigation-progress__slider" min="0" max="100" step="1" value="' . $pct . '"';
+                print ' data-task-id="' . ((int) $row->rowid) . '" aria-label="' . dol_escape_htmltag($langs->trans('ActionProgress')) . '"' . ($permissiontoadd ? '' : ' disabled') . '>';
+                print '<span class="accidentinvestigation-progress__value">' . $pct . ' %</span>';
                 print '</div>';
-                if ($permissiontoadd) {
-                    print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '" style="display:flex;align-items:center;gap:4px;margin:0">';
-                    print '<input type="hidden" name="token" value="' . newToken() . '">';
-                    print '<input type="hidden" name="action" value="updateProgress">';
-                    print '<input type="hidden" name="taskid" value="' . ((int) $row->rowid) . '">';
-                    print '<input type="number" name="progress_value" value="' . $pct . '" min="0" max="100" style="width:52px;padding:1px 4px;font-size:0.85em">';
-                    print '<span style="font-size:0.85em;color:#666">%</span>';
-                    print '<button type="submit" class="butActionShort" style="padding:1px 6px;font-size:0.8em;min-width:0">';
-                    print '<i class="fas fa-check"></i>';
-                    print '</button>';
-                    print '</form>';
-                } else {
-                    print '<span style="font-size:0.8em;color:#666">' . $pct . ' %</span>';
-                }
                 print '</td>';
 
                 // Status
