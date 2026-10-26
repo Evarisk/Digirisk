@@ -85,11 +85,17 @@ function digiriskRiskOverviewPublicUrl(string $tab = ''): string
  * the overview leads. Only a user logged in to Dolibarr reaches it, a visitor gets the login page.
  *
  * @param  int    $elementId Groupment or work unit
+ * @param  int    $category  Danger category the list is filtered on, -1 for the whole list
  * @return string            URL of digiriskelement_risk.php sorted by descending cotation
  */
-function digiriskRiskOverviewElementUrl(int $elementId): string
+function digiriskRiskOverviewElementUrl(int $elementId, int $category = -1): string
 {
-    return dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?' . http_build_query(['id' => $elementId, 'sortfield' => 'evaluation.cotation', 'sortorder' => 'DESC']);
+    $params = ['id' => $elementId, 'sortfield' => 'evaluation.cotation', 'sortorder' => 'DESC'];
+    if ($category >= 0) {
+        $params['search_category'] = $category;
+    }
+
+    return dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?' . http_build_query($params);
 }
 
 /**
@@ -154,60 +160,82 @@ function digiriskRiskOverviewFactorColumns(array $rpsSubCategories): array
  * psychosocial cell the level of a factor or the average of the factors. A cell without anything
  * reads NC, its state telling why.
  *
+ * A number leads to the risk list of the element, so it must count what the list shows: a category
+ * cell opens the list filtered on its category, the total of the risk tab the whole list.
+ *
  * @param  array  $row      Row of digiriskRiskOverviewRows()
  * @param  string $tab      risk, penibility or rps
  * @param  int    $position Danger category, or factor on the rps tab; -1 for the total column
  * @param  array  $columns  Columns of the tab, to add up the total
  * @return array            value (null for NC), scale (0 when the cell has no level), kind (count, level,
- *                          total) and state of an empty cell (empty, notConcerned, notAssessed,
- *                          toQualify, noWorkUnit, notRated)
+ *                          total), decimals shown, state of an empty cell (empty, notConcerned,
+ *                          notAssessed, toQualify, noWorkUnit, notRated), link (whether the number opens
+ *                          the risk list) and category (the list filter, -1 for the whole list)
  */
 function digiriskRiskOverviewCell(array $row, string $tab, int $position, array $columns): array
 {
-    $rps = $row['rps'];
+    $rps  = $row['rps'];
+    $cell = ['value' => null, 'scale' => 0, 'kind' => 'count', 'decimals' => 0, 'state' => '', 'link' => false, 'category' => -1];
 
-    // Psychosocial average of the element, or why there is none
-    $rpsAverage = function () use ($rps): array {
+    // Psychosocial average of the element, or why there is none: it opens the whole list, at the top
+    // of which the psychosocial block shows the factors. The psychosocial tab gives it with a decimal;
+    // among the counts of the risk tab it reads as a whole number, the average rounded, which is the
+    // level of its colour (the levels change at .5)
+    $rpsAverage = function (int $decimals) use ($rps, $cell): array {
         if ($rps['average'] !== null) {
-            return ['value' => round($rps['average'], 1), 'scale' => (int) $rps['band'], 'kind' => 'level', 'state' => ''];
+            return array_merge($cell, ['value' => round($rps['average'], $decimals), 'scale' => (int) $rps['band'], 'kind' => 'level', 'decimals' => $decimals, 'link' => true]);
         }
         $states = [0 => 'notConcerned', 1 => 'notAssessed', -1 => 'toQualify'];
-        return ['value' => null, 'scale' => 0, 'kind' => 'level', 'state' => $states[$rps['state']] ?? 'noWorkUnit'];
+        return array_merge($cell, ['kind' => 'level', 'state' => $states[$rps['state']] ?? 'noWorkUnit']);
     };
 
     if ($tab == 'rps') {
         if ($position < 0) {
-            return $rpsAverage();
+            return $rpsAverage(1);
         }
         if (isset($rps['levels'][$position])) {
             $level = (float) $rps['levels'][$position];
-            return ['value' => round($level, 1), 'scale' => rps_scope_band($level), 'kind' => 'level', 'state' => ''];
+            return array_merge($cell, ['value' => round($level, 1), 'scale' => rps_scope_band($level), 'kind' => 'level', 'decimals' => 1, 'link' => true]);
         }
-        $empty = $rpsAverage();
-        return ['value' => null, 'scale' => 0, 'kind' => 'level', 'state' => $empty['value'] !== null ? 'notRated' : $empty['state']];
+        $empty = $rpsAverage(1);
+        return array_merge($cell, ['kind' => 'level', 'state' => $empty['value'] !== null ? 'notRated' : $empty['state']]);
     }
 
-    // Total of the risks of the row, psychosocial risks excluded: their column holds an average
     if ($position < 0) {
+        // Risk tab: the lines of the risk list of the element, every category, the psychosocial risks
+        // being a single line there as well
+        if ($tab == 'risk') {
+            $count = 0;
+            foreach ($row['cells'] as $category => $categoryCell) {
+                if ($category != Risk::PSYCHOSOCIAL_CATEGORY_POSITION) {
+                    $count += $categoryCell['count'];
+                }
+            }
+            // A work unit out of the psychosocial scope does not show its psychosocial line
+            if ($row['psychosocialLine'] && ($row['type'] != 'workunit' || $rps['state'] === null || $rps['state'] === 1)) {
+                $count++;
+            }
+            return array_merge($cell, ['value' => $count, 'kind' => 'total', 'link' => true]);
+        }
+
+        // Other tabs: the risks of their categories, which no single list shows
         $count = 0;
         foreach ($columns as $column) {
-            if ($column['position'] != Risk::PSYCHOSOCIAL_CATEGORY_POSITION) {
-                $count += $row['cells'][$column['position']]['count'] ?? 0;
-            }
+            $count += $row['cells'][$column['position']]['count'] ?? 0;
         }
-        return ['value' => $count, 'scale' => 0, 'kind' => 'total', 'state' => ''];
+        return array_merge($cell, ['value' => $count, 'kind' => 'total']);
     }
 
     if ($position == Risk::PSYCHOSOCIAL_CATEGORY_POSITION) {
-        return $rpsAverage();
+        return $rpsAverage(0);
     }
 
-    $cell = $row['cells'][$position] ?? [];
-    if (!empty($cell['count'])) {
-        return ['value' => (int) $cell['count'], 'scale' => (int) $cell['scale'], 'kind' => 'count', 'state' => ''];
+    $categoryCell = $row['cells'][$position] ?? [];
+    if (!empty($categoryCell['count'])) {
+        return array_merge($cell, ['value' => (int) $categoryCell['count'], 'scale' => (int) $categoryCell['scale'], 'link' => true, 'category' => $position]);
     }
 
-    return ['value' => null, 'scale' => 0, 'kind' => 'count', 'state' => 'empty'];
+    return array_merge($cell, ['state' => 'empty']);
 }
 
 /**
@@ -240,6 +268,8 @@ function digiriskRiskOverviewRows(DoliDB $db, array $activeDigiriskElementList, 
             // Elements right under it: a groupment holding some can be folded on the page
             'children' => 0,
             'cells'    => [],
+            // Whether its risk list holds a psychosocial line
+            'psychosocialLine' => false,
             'rps'      => ['state' => null, 'levels' => [], 'average' => null, 'band' => 0, 'reason' => ''],
         ];
     }
@@ -268,6 +298,12 @@ function digiriskRiskOverviewRows(DoliDB $db, array $activeDigiriskElementList, 
         $cell['scale'] = max($cell['scale'], $scale);
 
         $rows[$elementId]['cells'][$category] = $cell;
+
+        // The risk list of the element shows one psychosocial line, for a risk without a factor: the
+        // risks of a factor are the detail of the assessment (digiriskdolibarr_risklist_view.tpl.php)
+        if ($category == Risk::PSYCHOSOCIAL_CATEGORY_POSITION && ($currentRisk->sub_category === null || $currentRisk->sub_category === '' || (int) $currentRisk->sub_category < 0)) {
+            $rows[$elementId]['psychosocialLine'] = true;
+        }
     }
 
     // Psychosocial assessment of the work units, gathered on every groupment above them
@@ -422,8 +458,8 @@ function digiriskRiskOverviewExportXlsx(array $overviewRows, array $overviewColu
                     $sheet->getStyle($coordinate)->applyFromArray($fill($emptyColours));
                 } else {
                     $sheet->setCellValue($coordinate, $cell['value']);
-                    // A psychosocial level keeps its decimal, as on the page: 3,0 rather than 3
-                    if ($cell['kind'] == 'level') {
+                    // A psychosocial value of the psychosocial sheet keeps its decimal, as on the page: 3,0 rather than 3
+                    if ($cell['decimals']) {
                         $sheet->getStyle($coordinate)->getNumberFormat()->setFormatCode('0.0');
                     }
                     if ($cell['scale'] > 0) {
