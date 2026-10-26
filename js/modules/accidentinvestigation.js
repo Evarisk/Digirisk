@@ -18,8 +18,8 @@
  * \file    js/modules/accidentinvestigation.js
  * \ingroup digiriskdolibarr
  * \brief   JavaScript of the actions tab of the accident investigation: the add button of the header of each
- *          section (curative, corrective) opens the add-action form of that section, and the progress of an
- *          action is dragged on its slider then saved on release.
+ *          section (curative, corrective) opens the add-action form of that section, the progress of an
+ *          action is dragged on its slider then saved on release, and the Gantt of the actions is laid out.
  */
 
 'use strict';
@@ -41,6 +41,7 @@ window.digiriskdolibarr.accidentinvestigation.init = function() {
 
     window.digiriskdolibarr.accidentinvestigation.event();
     $('.accidentinvestigation-progress__slider').each(window.digiriskdolibarr.accidentinvestigation.refreshProgress);
+    window.digiriskdolibarr.accidentinvestigation.drawGantt();
 };
 
 /**
@@ -135,6 +136,8 @@ window.digiriskdolibarr.accidentinvestigation.saveProgress = function() {
                 $page.find('[id^="accidentinvestigation-actions-counter-"]').each(function() {
                     $('#' + this.id).replaceWith(this);
                 });
+                $('#accidentinvestigation-gantt').replaceWith($page.find('#accidentinvestigation-gantt'));
+                window.digiriskdolibarr.accidentinvestigation.drawGantt();
             },
             error: function() {
                 // Back to the saved progress, which the value attribute still holds
@@ -146,4 +149,24 @@ window.digiriskdolibarr.accidentinvestigation.saveProgress = function() {
             }
         });
     }, 300));
+};
+
+/**
+ * Lay out the Gantt of the actions: the positions computed by the back office, percentages of the timeline carried
+ * by data attributes, become the CSS variables of the ticks, of today and of the bars. The chart stays hidden until then.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.accidentinvestigation.drawGantt = function() {
+    const $gantt = $('#accidentinvestigation-gantt');
+
+    $gantt.find('[data-position]').each(function() {
+        this.style.setProperty('--position', this.dataset.position + '%');
+    });
+    $gantt.find('.accidentinvestigation-gantt__bar').each(function() {
+        this.style.setProperty('--start', this.dataset.start + '%');
+        this.style.setProperty('--length', this.dataset.length + '%');
+        this.style.setProperty('--progress', this.dataset.progress + '%');
+    });
+    $gantt.addClass('accidentinvestigation-gantt--drawn');
 };
