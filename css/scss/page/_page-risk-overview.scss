@@ -65,13 +65,78 @@ body#mainbody.digirisk-risk-overview-public {
     color: $dr-text;
   }
 
-  // ---- Tabs ----
+  // ---- Tabs, fold and unfold ----
+
+  .risk-overview__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 0 0 14px;
+  }
 
   .risk-overview__tabs {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    margin: 0 0 14px;
+  }
+
+  .risk-overview__fold-actions {
+    display: inline-flex;
+    gap: 4px;
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border: 0;
+      border-radius: $dr-radius-sm;
+      background: transparent;
+      color: $dr-muted;
+      font-family: $dr-font;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover {
+        background: $dr-bg;
+        color: $dr-text;
+      }
+    }
+  }
+
+  // Fold arrow of a groupment, an empty space of the same width on the other rows to keep the refs aligned
+  .risk-overview__toggle,
+  .risk-overview__toggle-space {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+
+  .risk-overview__toggle {
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: $dr-faint;
+    font-size: 11px;
+    cursor: pointer;
+
+    &:hover {
+      background: $dr-bg;
+      color: $dr-text;
+    }
+  }
+
+  .risk-overview__row[hidden] {
+    display: none;
   }
 
   .risk-overview__tab {

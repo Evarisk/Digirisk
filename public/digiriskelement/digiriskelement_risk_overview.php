@@ -59,6 +59,7 @@ saturne_load_langs();
 // Get parameters
 $key    = GETPOST('key', 'alphanohtml');
 $tab    = GETPOST('tab', 'aZ09');
+$action = GETPOST('action', 'aZ09');
 $entity = !isModEnabled('multicompany') ? $conf->entity : GETPOSTINT('entity');
 
 if ($entity > 0) {
@@ -99,7 +100,17 @@ if ($accessAllowed) {
     foreach (array_keys(DIGIRISK_RISK_OVERVIEW_CATEGORIES) as $categoryTab) {
         $overviewColumns[$categoryTab] = digiriskRiskOverviewCategoryColumns($categoryTab);
     }
+    $overviewColumns['rps'] = digiriskRiskOverviewFactorColumns($rpsSubCategories);
+
+    // The same tables as an Excel workbook, one sheet per tab
+    if ($action == 'export') {
+        digiriskRiskOverviewExportXlsx($overviewRows, $overviewColumns, $rpsScale);
+        $db->close();
+        exit;
+    }
 }
+
+$exportUrl = $_SERVER['PHP_SELF'] . '?' . http_build_query(['entity' => $conf->entity, 'key' => $key, 'action' => 'export']);
 
 /*
  * View
