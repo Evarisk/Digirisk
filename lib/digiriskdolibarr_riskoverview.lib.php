@@ -313,16 +313,15 @@ function digiriskRiskOverviewRows(DoliDB $db, array $activeDigiriskElementList, 
 }
 
 /**
- * Format an average of psychosocial levels for a cell: one decimal, without a trailing ",0".
+ * Format a psychosocial level or average for a cell: always one decimal, so that a level and an
+ * average read alike in the column.
  *
- * @param  float  $value Average from 1 to 4
- * @return string        "2,5", "3"
+ * @param  float  $value Level or average from 1 to 4
+ * @return string        "2,5", "3,0"
  */
 function digiriskRiskOverviewFormatLevel(float $value): string
 {
-    $rounded = round($value, 1);
-
-    return floor($rounded) == $rounded ? (string) (int) $rounded : price($rounded, 0, '', 0, 1, 1);
+    return price(round($value, 1), 0, '', 0, 1, 1);
 }
 
 /**
@@ -411,6 +410,10 @@ function digiriskRiskOverviewExportXlsx(array $overviewRows, array $overviewColu
                     $sheet->getStyle($coordinate)->applyFromArray($fill($emptyColours));
                 } else {
                     $sheet->setCellValue($coordinate, $cell['value']);
+                    // A psychosocial level keeps its decimal, as on the page: 3,0 rather than 3
+                    if ($cell['kind'] == 'level') {
+                        $sheet->getStyle($coordinate)->getNumberFormat()->setFormatCode('0.0');
+                    }
                     if ($cell['scale'] > 0) {
                         $sheet->getStyle($coordinate)->applyFromArray($fill($levelColours[$cell['scale']], true));
                     } else {
