@@ -65,6 +65,30 @@
     opacity: 1;
   }
 
+  /* Column titles wrap rather than being cut: Dolibarr ends them with an ellipsis past 100px */
+  table.liste th.wrapcolumntitle.liste_titre:not(.maxwidthsearch),
+  table.liste td.wrapcolumntitle.liste_titre:not(.maxwidthsearch),
+  table.liste th.wrapcolumntitle.liste_titre_sel:not(.maxwidthsearch),
+  table.liste td.wrapcolumntitle.liste_titre_sel:not(.maxwidthsearch) {
+    max-width: none;
+    overflow: visible;
+    white-space: normal;
+    text-overflow: clip;
+    line-height: 1.35;
+  }
+
+  /* Saturne lists: the filter caret is pinned to the right of the title, a wrapped title would leave it alone on a line */
+  table.liste > thead > tr.liste_titre > th[data-colkey] {
+    padding-right: 24px;
+
+    .saturne-col-filter-btn {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+    }
+  }
+
   tr.liste_titre th a,
   tr.liste_titre td a,
   tr.liste_titre_sel th a,
@@ -78,6 +102,34 @@
   tr.liste_titre th.liste_titre_sel a,
   tr.liste_titre td.liste_titre_sel a {
     color: $dr-primary-strong;
+  }
+
+  /* Filters printed above a list: the head of the card of the table, not a box of their own */
+  div.liste_titre_bydiv {
+    box-sizing: border-box;
+    margin-bottom: 0;
+    border: 1px solid $dr-border;
+    border-bottom: 0;
+    border-radius: $dr-radius-lg $dr-radius-lg 0 0;
+    background: $dr-surface-soft;
+    box-shadow: none;
+  }
+
+  table.liste.listwithfilterbefore {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+
+    > thead > tr:first-of-type > th:first-child,
+    > tbody > tr:first-of-type > td:first-child,
+    > tbody > tr:first-of-type > th:first-child {
+      border-top-left-radius: 0 !important;
+    }
+
+    > thead > tr:first-of-type > th:last-child,
+    > tbody > tr:first-of-type > td:last-child,
+    > tbody > tr:first-of-type > th:last-child {
+      border-top-right-radius: 0 !important;
+    }
   }
 
   /* Search row of the lists */
