@@ -34,6 +34,7 @@ global $conf, $db, $langs, $mc, $user;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
+require_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
 require_once DOL_DOCUMENT_ROOT . "/core/class/html.formprojet.class.php";
 require_once DOL_DOCUMENT_ROOT . "/core/class/html.formcompany.class.php";
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
@@ -83,17 +84,10 @@ if (saturne_check_admin_write_access()) {
     }
 }
 
-// Public overview of the risks: the link handed out carries a key, created the first time it is opened
-if ($action == 'setRiskOverviewPublic' && saturne_check_admin_write_access()) {
-    $riskOverviewPublic = GETPOSTINT('DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE') ? 1 : 0;
-    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE', $riskOverviewPublic, 'integer', 0, '', $conf->entity);
-    if ($riskOverviewPublic && !dol_strlen(getDolGlobalString('DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_KEY'))) {
-        dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_KEY', bin2hex(random_bytes(24)), 'chaine', 0, '', $conf->entity);
-    }
-
-    setEventMessages($langs->trans('SetupSaved'), null, 'mesgs');
-    header('Location: ' . $_SERVER['PHP_SELF'] . '#riskoverview');
-    exit;
+// Public overview of the risks: its switch saves itself and reloads the page, which creates here the
+// key carried by the link the first time the overview is published
+if (saturne_check_admin_write_access() && getDolGlobalInt('DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE') && !dol_strlen(getDolGlobalString('DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_KEY'))) {
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_KEY', bin2hex(random_bytes(24)), 'chaine', 0, '', $conf->entity);
 }
 
 // A new key cuts off every link handed out so far
@@ -515,22 +509,19 @@ require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl
 print '<div id="riskoverview"></div>';
 print load_fiche_titre('<i class="fas fa-th pictofixedwidth"></i>' . $langs->trans('RiskOverviewPublicConfig'), '', '');
 
-print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '" name="riskoverview_form">';
-print '<input type="hidden" name="token" value="' . newToken() . '">';
-print '<input type="hidden" name="action" value="setRiskOverviewPublic">';
-print '<table class="noborder centpercent editmode">';
+// Same switch as the other settings of the page, saved on click; the reload shows the link at once
+print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
-print '<td>' . $langs->trans('Option') . '</td>';
-print '<td>' . $langs->trans('Value') . '</td>';
-print '<td>' . $langs->trans('Action') . '</td>';
+print '<td>' . $langs->trans('Parameters') . '</td>';
+print '<td>' . $langs->trans('Description') . '</td>';
+print '<td class="center">' . $langs->trans('Status') . '</td>';
 print '</tr>';
-print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE">' . $langs->trans('RiskOverviewPublicInterface') . '</label>';
-print '<div class="opacitymedium small">' . $langs->trans('RiskOverviewPublicInterfaceHelp') . '</div></td>';
-print '<td><input type="checkbox" name="DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE" id="DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE" value="1"' . (getDolGlobalInt('DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE') ? ' checked' : '') . '> ' . $langs->trans('Yes') . '</td>';
-print '<td><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '"></td>';
+print '<tr class="oddeven">';
+print '<td>' . $langs->trans('RiskOverviewPublicInterface') . '</td>';
+print '<td>' . $langs->trans('RiskOverviewPublicInterfaceHelp') . '</td>';
+print '<td class="center">' . ajax_constantonoff('DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE', [], null, 0, 0, 1, 2, 0, 1, '', '', 'inline-block', 0, '', saturne_check_admin_write_access() ? 0 : 1) . '</td>';
 print '</tr>';
 print '</table>';
-print '</form>';
 
 $riskOverviewPublicUrl = digiriskRiskOverviewPublicUrl();
 if (dol_strlen($riskOverviewPublicUrl)) {
