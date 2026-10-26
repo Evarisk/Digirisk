@@ -108,7 +108,7 @@ window.digiriskdolibarr.ticket.event = function() {
   $(document).on( 'focus',   '.digirisk-ticket-card .dtc-progress-value[contenteditable]', window.digiriskdolibarr.ticket.progressFocus);
   $(document).on( 'keydown', '.digirisk-ticket-card .dtc-progress-value[contenteditable]', window.digiriskdolibarr.ticket.progressKeydown);
   $(document).on( 'blur',    '.digirisk-ticket-card .dtc-progress-value[contenteditable]', window.digiriskdolibarr.ticket.saveProgressInline);
-  $(document).on( 'click',   '.edit-message-on-click', function() { window.location.href = $(this).data('edit-url'); });
+  $(document).on( 'click',   '.digirisk-ticket-card .edit-message-on-click, .digirisk-ticket-card .dtc-message-edit', window.digiriskdolibarr.ticket.editMessageInline);
   $(document).on( 'click',   '.digirisk-ticket-card .dtc-extrafield-value', window.digiriskdolibarr.ticket.editExtrafieldInline);
   // Keyboard navigation: Enter/Space on a tabbable extrafield span triggers inline edit
   $(document).on( 'keydown', '.digirisk-ticket-card .dtc-extrafield-value[tabindex]', function(e) {
@@ -571,6 +571,121 @@ window.digiriskdolibarr.ticket.renderSubject = function($wrap, value) {
   var text = (value && value.length) ? $('<div>').text(value).html() : '';
   // Keep dtc-tabfield/tabindex: the subject is the first link of the Tab chain (#4885).
   $wrap.html('<span class="dtc-subject-value dtc-tabfield" tabindex="0">' + text + '</span>');
+};
+
+/**
+ * Ticket card — edit the initial message on the spot (rich text editor + Save / Cancel), no page reload.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Click event, on the message or on the pencil of its section.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.editMessageInline = function(event) {
+  // A link written in the message keeps opening normally
+  if (!$(this).hasClass('dtc-message-edit') && $(event.target).closest('a').length) {
+    return;
+  }
+  event.preventDefault();
+  var $msg = $(this).closest('table').find('.dtc-message-value');
+  if (!$msg.length || $msg.data('editing')) {
+    return;
+  }
+  $msg.data('editing', true);
+
+  var current = String($msg.attr('data-raw') || '');
+  var $area   = $('<textarea id="dtc_message_editor" rows="8"></textarea>').val(current);
+  var $save   = $('<button type="button" class="dtc-message-editor__save"><i class="fas fa-check"></i> <span></span></button>');
+  var $cancel = $('<button type="button" class="dtc-message-editor__cancel"></button>').text($msg.attr('data-lang-cancel'));
+  $save.find('span').text($msg.attr('data-lang-save'));
+  var $editor = $('<div class="dtc-message-editor"></div>').append($area, $('<div class="dtc-message-editor__bar"></div>').append($save, $cancel));
+  $msg.hide().after($editor);
+
+  var editor = null;
+  if (typeof CKEDITOR !== 'undefined') {
+    try {
+      editor = CKEDITOR.replace('dtc_message_editor', {
+        customConfig: window.ckeditorConfig || '',
+        removePlugins: 'elementspath,save,flash,div,anchor,specialchar,exportpdf,wsc,scayt',
+        versionCheck: false,
+        htmlEncodeOutput: false,
+        allowedContent: true,
+        toolbar: 'dolibarr_details',
+        height: 160,
+        width: '100%',
+        startupFocus: 'end'
+      });
+    } catch (e) {
+      editor = null;
+    }
+  }
+  if (!editor) {
+    $area.trigger('focus');
+  }
+
+  var close = function() {
+    if (editor) {
+      try { editor.destroy(true); } catch (e) {}
+    }
+    $editor.remove();
+    $msg.show().data('editing', false);
+  };
+
+  var save = function() {
+    var value = editor ? editor.getData() : $area.val();
+    if (value === current) {
+      close();
+      return;
+    }
+    $save.add($cancel).prop('disabled', true);
+    var url = String($msg.attr('data-url'));
+    $.ajax({
+      url: url + window.saturne.toolbox.getQuerySeparator(url) + 'action=setmessage_ajax&token=' + window.saturne.toolbox.getToken(),
+      type: 'POST',
+      data: { message: value },
+      dataType: 'json',
+      success: function(resp) {
+        if (!resp || !resp.success) {
+          $save.add($cancel).prop('disabled', false);
+          return;
+        }
+        $msg.attr('data-raw', resp.message_html).html(resp.message_html !== '' ? resp.message_html : $msg.attr('data-empty'));
+        // The conversation opens on the same message
+        $('.digirisk-ticket-card .dtc-msg--initial [data-msg-body]').html(resp.bubble_html);
+        close();
+        window.digiriskdolibarr.ticket.flashInline($msg);
+      },
+      error: function() {
+        $save.add($cancel).prop('disabled', false);
+      }
+    });
+  };
+
+  $save.on('click', save);
+  $cancel.on('click', close);
+  // Ctrl+Enter saves and Escape cancels, from the editor as from the plain textarea
+  var onKey = function(ctrlEnter, escape) {
+    if (ctrlEnter) {
+      save();
+    } else if (escape) {
+      close();
+    }
+  };
+  if (editor) {
+    editor.on('key', function(ev) {
+      var ctrl = CKEDITOR.CTRL || 0x110000;
+      var isCtrlEnter = ev.data.keyCode === ctrl + 13 || ev.data.keyCode === ctrl + 10;
+      if (isCtrlEnter || ev.data.keyCode === 27) {
+        ev.cancel();
+        onKey(isCtrlEnter, !isCtrlEnter);
+      }
+    });
+  } else {
+    $area.on('keydown', function(e) {
+      onKey((e.ctrlKey || e.metaKey) && e.key === 'Enter', e.key === 'Escape');
+    });
+  }
 };
 
 /**

@@ -216,6 +216,51 @@ class ActionsDigiriskdolibarr
             $this->resprints .= '<link rel="stylesheet" type="text/css" href="' . dol_buildpath('/digiriskdolibarr/css/digiriskdolibarr.min.css', 1) . '">';
         }
 
+        // The other tabs of the Digirisk ticket card are the native ticket pages (contacts, notes, files, agenda)
+        // or pages of other modules: browsed from the Digirisk menu, they keep the look of the card
+        if ($this->isDigiriskTicketTab($parameters['context'])) {
+            $this->resprints .= '<link rel="stylesheet" type="text/css" href="' . dol_buildpath('/digiriskdolibarr/css/digiriskdolibarr.min.css', 1) . '">';
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Tell whether the current page is a tab of a ticket browsed from the Digirisk menu, other than the Digirisk card
+     *
+     * @param  string $context Hook contexts of the page
+     * @return bool
+     */
+    private function isDigiriskTicketTab(string $context): bool
+    {
+        if (($_SESSION['mainmenu'] ?? '') !== 'digiriskdolibarr' || strpos($_SERVER['PHP_SELF'], '/digiriskdolibarr/') !== false) {
+            return false;
+        }
+
+        return preg_match('/\b(contactticketcard|documentticketcard|ticketnote|ticketmessaging|ticketagenda)\b/', $context) || GETPOST('fromtype', 'alpha') === 'ticket';
+    }
+
+    /**
+     * Overloading the completeTabsHead function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function completeTabsHead(array $parameters): int
+    {
+        // The hook manager merges $this->results into the tabs: a value left by a previous hook would become a tab
+        $this->results = [];
+
+        // Ticket tabs browsed from the Digirisk menu: the "Ticket" tab leads back to the Digirisk ticket card,
+        // not to the native one
+        if (($parameters['type'] ?? '') === 'ticket' && ($parameters['mode'] ?? '') === 'remove' && ($_SESSION['mainmenu'] ?? '') === 'digiriskdolibarr' && !empty($parameters['object']->id)) {
+            foreach ($parameters['head'] as $key => $tab) {
+                if (($tab[2] ?? '') === 'tabTicket') {
+                    $parameters['head'][$key][0] = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $parameters['object']->id;
+                }
+            }
+        }
+
         return 0; // or return 1 to replace standard code
     }
 
