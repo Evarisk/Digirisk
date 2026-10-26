@@ -193,6 +193,28 @@ body#mainbody.digirisk-risk-overview-public {
     }
   }
 
+  // The 22 categories of the risk tab take the whole card and share it equally: at a fixed 46px each
+  // the table overflowed, with a horizontal scroll, below a 1500px wide screen
+  .risk-overview__card[data-tab="risk"] {
+    width: auto;
+  }
+
+  .risk-overview__table--risk {
+    width: 100%;
+    table-layout: fixed;
+
+    .risk-overview__head {
+      width: auto;
+      min-width: 0;
+    }
+
+    .risk-overview__picto {
+      width: 100%;
+      max-width: 30px;
+      height: auto;
+    }
+  }
+
   // Both directions scroll inside the card, so that the heads and the element column stay in view:
   // the header, the tabs and the legend of the card stay on screen around it
   .risk-overview__scroll {
@@ -202,9 +224,19 @@ body#mainbody.digirisk-risk-overview-public {
   }
 
   .risk-overview__table {
+    // Width of the element column, which the sticky total column follows
+    --risk-overview-element-width: #{$risk-overview-element-width};
     border-collapse: separate;
     border-spacing: 0;
     font-size: 13px;
+
+    @media (max-width: 1200px) {
+      --risk-overview-element-width: 220px;
+    }
+
+    @media (max-width: 700px) {
+      --risk-overview-element-width: #{$risk-overview-element-width-sm};
+    }
 
     th,
     td {
@@ -227,9 +259,9 @@ body#mainbody.digirisk-risk-overview-public {
     position: sticky;
     left: 0;
     z-index: 1;
-    width: $risk-overview-element-width;
-    min-width: $risk-overview-element-width;
-    max-width: $risk-overview-element-width;
+    width: var(--risk-overview-element-width);
+    min-width: var(--risk-overview-element-width);
+    max-width: var(--risk-overview-element-width);
     padding: 6px 12px;
     border-right: 1px solid $dr-border;
     background: $dr-surface;
@@ -251,7 +283,7 @@ body#mainbody.digirisk-risk-overview-public {
 
   .risk-overview__total {
     position: sticky;
-    left: $risk-overview-element-width;
+    left: var(--risk-overview-element-width);
     z-index: 1;
     width: $risk-overview-total-width;
     min-width: $risk-overview-total-width;
@@ -326,6 +358,11 @@ body#mainbody.digirisk-risk-overview-public {
       min-width: 112px;
       padding-left: 6px;
       padding-right: 6px;
+
+      @media (max-width: 1200px) {
+        width: 96px;
+        min-width: 96px;
+      }
     }
 
     .risk-overview__head-name {
@@ -379,6 +416,34 @@ body#mainbody.digirisk-risk-overview-public {
     border-radius: 0;
     border-width: 0 1px 0 0;
     border-right-color: $dr-border;
+  }
+
+  // A number opens the risk list of the element: the link fills its cell, keeps the cell colour (the
+  // Dolibarr link colour would outrank it) and rings the cell on hover
+  .risk-overview__cell,
+  .risk-overview__total {
+    padding: 0;
+  }
+
+  .risk-overview__link {
+    display: block;
+    line-height: 34px;
+    border-radius: 6px;
+    transition: box-shadow $dr-transition;
+
+    &,
+    &:link,
+    &:visited,
+    &:hover {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    &:hover,
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px $dr-primary;
+    }
   }
 
   // ---- Legend, empty and closed states ----
@@ -445,9 +510,6 @@ body#mainbody.digirisk-risk-overview-public {
   // Phone: a narrower element column, the categories scroll under it
   @media (max-width: 700px) {
     .risk-overview__element {
-      width: $risk-overview-element-width-sm;
-      min-width: $risk-overview-element-width-sm;
-      max-width: $risk-overview-element-width-sm;
       font-size: 12px;
     }
 
@@ -455,6 +517,17 @@ body#mainbody.digirisk-risk-overview-public {
     .risk-overview__total {
       position: static;
       left: auto;
+    }
+
+    // A phone cannot hold the 22 categories: they keep their width and scroll under the names
+    .risk-overview__table--risk {
+      width: auto;
+      table-layout: auto;
+
+      .risk-overview__head {
+        width: $risk-overview-cell-width;
+        min-width: $risk-overview-cell-width;
+      }
     }
   }
 }

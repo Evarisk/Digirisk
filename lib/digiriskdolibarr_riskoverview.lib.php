@@ -81,6 +81,18 @@ function digiriskRiskOverviewPublicUrl(string $tab = ''): string
 }
 
 /**
+ * Risk list of a groupment or work unit in the application, the worst risks first: where a number of
+ * the overview leads. Only a user logged in to Dolibarr reaches it, a visitor gets the login page.
+ *
+ * @param  int    $elementId Groupment or work unit
+ * @return string            URL of digiriskelement_risk.php sorted by descending cotation
+ */
+function digiriskRiskOverviewElementUrl(int $elementId): string
+{
+    return dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?' . http_build_query(['id' => $elementId, 'sortfield' => 'evaluation.cotation', 'sortorder' => 'DESC']);
+}
+
+/**
  * Columns of a tab of danger categories, in the order of the tab.
  *
  * @param  string $tab risk or penibility

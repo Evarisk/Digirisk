@@ -2805,6 +2805,7 @@ RiskOverviewFold                         = Fold
 RiskOverviewUnfold                       = Unfold
 RiskOverviewFoldAll                      = Fold all
 RiskOverviewUnfoldAll                    = Unfold all
+RiskOverviewOpenRisks                    = Open the risks of %s, sorted by rating (Dolibarr account required)
 RiskOverviewEmpty                        = No groupment nor work unit.
 RiskOverviewLegendRisks                  = Each cell gives the number of risks of the category, on the colour of the most severe one.
 RiskOverviewLegendRisksPsychosocial      = The psychosocial risk column gives the average of the rated factors, out of 4.

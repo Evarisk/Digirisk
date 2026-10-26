@@ -2817,6 +2817,7 @@ RiskOverviewFold                         = Replier
 RiskOverviewUnfold                       = Déplier
 RiskOverviewFoldAll                      = Tout replier
 RiskOverviewUnfoldAll                    = Tout déplier
+RiskOverviewOpenRisks                    = Ouvrir les risques de %s, triés par cotation (compte Dolibarr requis)
 RiskOverviewEmpty                        = Aucun groupement ni unité de travail.
 RiskOverviewLegendRisks                  = Chaque case donne le nombre de risques de la catégorie, sur la couleur du plus grave.
 RiskOverviewLegendRisksPsychosocial      = La colonne des risques psychosociaux donne la moyenne des facteurs cotés, sur 4.

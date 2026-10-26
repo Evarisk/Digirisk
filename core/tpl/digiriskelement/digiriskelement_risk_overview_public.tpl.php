@@ -141,11 +141,18 @@ $emptyCellTitles = [
                                     <span class="risk-overview__label"><?php echo dol_escape_htmltag($overviewRow['label']); ?></span>
                                 </th>
 
-                                <?php foreach (array_merge([-1], array_keys($columns)) as $position) :
+                                <?php
+                                // A number opens the risk list of the element, the worst risks first
+                                $elementUrl = digiriskRiskOverviewElementUrl((int) $overviewRow['id']);
+                                $openTitle  = $langs->trans('RiskOverviewOpenRisks', $overviewRow['ref']);
+                                foreach (array_merge([-1], array_keys($columns)) as $position) :
                                     $cell       = digiriskRiskOverviewCell($overviewRow, $panelTab, (int) $position, $columns);
                                     $totalClass = $position < 0 ? 'risk-overview__total ' : ''; ?>
                                     <?php if ($cell['kind'] == 'total') : ?>
-                                        <td class="risk-overview__total"><?php echo (int) $cell['value']; ?></td>
+                                        <td class="risk-overview__total">
+                                            <a class="risk-overview__link" href="<?php echo dol_escape_htmltag($elementUrl); ?>" target="_blank" rel="noopener"
+                                               title="<?php echo dol_escape_htmltag($openTitle); ?>"><?php echo (int) $cell['value']; ?></a>
+                                        </td>
                                     <?php elseif ($cell['value'] === null) :
                                         $cellTitle = $emptyCellTitles[$cell['state']] ?? '';
                                         if ($cell['state'] == 'notConcerned' && dol_strlen($overviewRow['rps']['reason'])) {
@@ -156,8 +163,9 @@ $emptyCellTitles = [
                                         // A count reads the level of the worst risk, a psychosocial value its level of the scale
                                         $cellName  = $position < 0 ? $langs->trans('RiskOverviewPsychosocialAverage') : ($position == Risk::PSYCHOSOCIAL_CATEGORY_POSITION && $panelTab != 'rps' ? $langs->trans('RiskOverviewPsychosocialAverageHelp') : $columns[$position]['name']);
                                         $cellLevel = $cell['kind'] == 'count' ? $langs->trans($riskLevelLabels[$cell['scale']] ?? 'GreyRisk') : $rpsScale[$cell['scale']]['range'] . ' · ' . $rpsScale[$cell['scale']]['label']; ?>
-                                        <td class="<?php echo $totalClass; ?>risk-overview__cell" data-scale="<?php echo (int) $cell['scale']; ?>" title="<?php echo dol_escape_htmltag($cellName . ' — ' . $cellLevel); ?>">
-                                            <?php echo $cell['kind'] == 'count' ? (int) $cell['value'] : digiriskRiskOverviewFormatLevel((float) $cell['value']); ?>
+                                        <td class="<?php echo $totalClass; ?>risk-overview__cell" data-scale="<?php echo (int) $cell['scale']; ?>">
+                                            <a class="risk-overview__link" href="<?php echo dol_escape_htmltag($elementUrl); ?>" target="_blank" rel="noopener"
+                                               title="<?php echo dol_escape_htmltag($cellName . ' — ' . $cellLevel . '. ' . $openTitle); ?>"><?php echo $cell['kind'] == 'count' ? (int) $cell['value'] : digiriskRiskOverviewFormatLevel((float) $cell['value']); ?></a>
                                         </td>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
