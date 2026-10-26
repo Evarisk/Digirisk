@@ -2746,7 +2746,8 @@ class modDigiriskdolibarr extends DolibarrModules
             $tags->fk_parent = $tagID;
             $tags->create($user);
 
-            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 3, 'integer', 0, '', $conf->entity);
+            // FP and TS are created by the next steps
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 1, 'integer', 0, '', $conf->entity);
         }
         if (getDolGlobalInt('DIGIRISKDOLIBARR_PROJECT_TAGS_SET') == 1) {
             //Install after 8.3.0
@@ -2778,6 +2779,32 @@ class modDigiriskdolibarr extends DolibarrModules
             $tags->create($user);
 
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 4, 'integer', 0, '', $conf->entity);
+        }
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_PROJECT_TAGS_SET') == 4) {
+            // Installs made while step 0 jumped to step 3 never got FP and TS, nor these tags on their projects
+            require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+
+            $qhseTag = new Categorie($this->db);
+            if ($qhseTag->fetch(0, 'QHSE', 'project') > 0) {
+                foreach (['FP' => 'DIGIRISKDOLIBARR_FIREPERMIT_PROJECT', 'TS' => 'DIGIRISKDOLIBARR_TICKET_PROJECT'] as $tagLabel => $projectConst) {
+                    $projectTag = new Categorie($this->db);
+                    if ($projectTag->fetch(0, $tagLabel, 'project') > 0) {
+                        continue;
+                    }
+
+                    $projectTag->label     = $tagLabel;
+                    $projectTag->type      = 'project';
+                    $projectTag->fk_parent = $qhseTag->id;
+                    if ($projectTag->create($user) > 0 && getDolGlobalInt($projectConst) > 0) {
+                        $project = new Project($this->db);
+                        if ($project->fetch(getDolGlobalInt($projectConst)) > 0) {
+                            $projectTag->add_type($project, 'project');
+                        }
+                    }
+                }
+            }
+
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 5, 'integer', 0, '', $conf->entity);
         }
 
         if (getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_TAGS_SET') == 0) {
