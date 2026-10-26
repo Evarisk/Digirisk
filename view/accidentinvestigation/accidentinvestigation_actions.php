@@ -188,8 +188,16 @@ if ($id > 0 || !empty($ref)) {
             2 => ['titleKey' => 'CorrectiveActions', 'addKey' => 'AddCorrectiveAction'],
         ];
 
+        $actionsByType = [];
+        foreach (array_keys($sectionConfig) as $type) {
+            $actionsByType[$type] = getAccidentInvestigationActionsByType($db, (int) $object->fk_task, $type);
+        }
+
+        // Gantt of every action, above their sections
+        include __DIR__ . '/../../core/tpl/accidentinvestigation/digiriskdolibarr_accidentinvestigation_actions_gantt.tpl.php';
+
         foreach ($sectionConfig as $type => $cfg) {
-            $actions = getAccidentInvestigationActionsByType($db, (int) $object->fk_task, $type);
+            $actions = $actionsByType[$type];
             $total   = count($actions);
             $done    = 0;
             foreach ($actions as $row) {
