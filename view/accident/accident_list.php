@@ -201,7 +201,9 @@ $title    = $langs->trans("AccidentList");
 $helpUrl = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
 
 if ($fromid > 0) {
-    digirisk_header($title, $helpUrl);
+    // digirisk-horizontal-scroll bounds #id-right to the viewport so the wide accident list table
+    // scrolls inside its own .div-table-responsive instead of widening the whole page
+    digirisk_header($title, $helpUrl, [], [], '', 'digirisk-horizontal-scroll');
     $objectlinked = $digiriskelement;
 	$objectlinked->fetch($fromid);
     saturne_get_fiche_head($objectlinked,'elementAccidents', $langs->trans('Accident'));
@@ -542,7 +544,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 		if ($key == 'status') $cssforfield          .= ($cssforfield ? ' ' : '') . 'center';
         elseif ($key == 'progress') $cssforfield    .= ($cssforfield ? ' ' : '') . 'center';
         elseif ($key == 'ref') $cssforfield         .= ($cssforfield ? ' ' : '') . 'nowrap';
-		elseif ($key == 'description') $cssforfield .= ($cssforfield ? ' ' : '') . 'accidentdocument-description';
+		elseif ($key == 'description') $cssforfield .= ($cssforfield ? ' ' : '') . 'accidentdocument-description minwidth300';
 
         if (!empty($arrayfields['t.' . $key]['checked'])) {
 			print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="width:2%">';

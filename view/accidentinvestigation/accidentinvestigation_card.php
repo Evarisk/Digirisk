@@ -48,6 +48,7 @@ require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../class/accidentinvestigation.class.php';
 require_once __DIR__ . '/../../class/digiriskdocuments/accidentinvestigationdocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accidentinvestigation.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_media.lib.php';
 
 // Load translation files required by the page
 saturne_load_langs();
@@ -118,6 +119,10 @@ if ($reshook < 0) {
 }
 
 if (empty($reshook)) {
+
+	// Image sent, taken from the media library or removed from the media block of the card
+	$canEditPhotos = $object->status < AccidentInvestigation::STATUS_VALIDATED;
+	digiriskObjectMediaActions($object, $action, 'accidentinvestigation/' . $object->ref . '/causality_tree', 'causality_tree', $permissiontoadd && $canEditPhotos, $permissiontodelete && $canEditPhotos);
 
 	$backurlforlist = dol_buildpath('/digiriskdolibarr/view/accidentinvestigation/accidentinvestigation_list.php', 1);
 
@@ -329,39 +334,36 @@ if ($action == 'create') {
 	// Print form confirm.
 	print $formConfirm;
 
-	print '<div class="fichecenter">';
+	print '<div class="fichecenter accidentinvestigation-fields">';
 	print '<div class="fichehalfleft">';
 	print '<table class="border centpercent tableforfield">';
 
+	// The accident and its victim open the left column, the findings of the investigation go to the right one
+	print '<tr class="field_fk_accident"><td class="titlefieldmiddle fieldname_fk_accident">' . $langs->trans($object->fields['fk_accident']['label']) . '</td>';
+	print '<td class="valuefield fieldname_fk_accident">' . $object->showOutputField($object->fields['fk_accident'], 'fk_accident', (string) $object->fk_accident, '', '', '', 0) . '</td></tr>';
+	print '<tr class="field_user_victim"><td class="titlefieldmiddle">' . $langs->trans('UserVictim') . '</td>';
+	print '<td class="valuefield">' . ($victim->id > 0 ? $victim->getNomUrl(1) : '') . '</td></tr>';
+	$object->fields['fk_accident']['visible'] = 0;
+	$keyforbreak = 'note_public';
+
+	// The ITAMAMI axes are shown by the schema under the fields, they stay in the create and edit forms
+	foreach (['itamami_individual', 'itamami_task', 'itamami_activity', 'itamami_material', 'itamami_environment'] as $itamamiField) {
+		$object->fields[$itamamiField]['visible'] = 0;
+	}
+
 	require_once DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
 
-    print '<td class="titlefield">' . $langs->trans("UserVictim") . '</td>';
-    print '<td>' . ($victim->id > 0 ? $victim->getNomUrl(1) : '') . '</td>';
-	print '<tr class="linked-medias causality_tree gallery-table"> <td class=""><label for="causality_tree">' . $langs->trans("CausalityTree") . '</label></td>';
-	print '<td class="linked-medias-list">';
-	$pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accidentinvestigation/'. $object->ref . '/causality_tree/';
-	?>
-	<span class="add-medias" <?php echo ($object->status < AccidentInvestigation::STATUS_VALIDATED && empty($object->causality_tree)) ? '' : 'style="display:none"' ?>>
-		<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
-		<label for="fast-upload-photo-default">
-			<div title="<?php echo $langs->trans('AddPhotoFromComputer') ?>" class="wpeo-button button-square-50">
-				<i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
-			</div>
-		</label>
-		<input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->causality_tree ?>"/>
-		<div title="<?php echo $langs->trans('AddPhotoFromMediaGallery') ?>" class="wpeo-button button-square-50 open-media-gallery add-media modal-open" value="0">
-			<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="<?php echo $object->id?>" data-from-type="accidentinvestigation" data-from-subtype="causality_tree" data-from-subdir="causality_tree"/>
-			<i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
-		</div>
-	</span>
-	<?php
-	$relativepath = 'digiriskdolibarr/medias/thumbs';
-	print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, 'accidentinvestigation/'. $object->ref . '/causality_tree/', $object, 'causality_tree', 0, $permissiontodelete && $object->status < AccidentInvestigation::STATUS_VALIDATED);
+	// The investigation document shows the image picked as favorite in the editor
+	print '<tr><td class="titlefield">' . $langs->trans('CausalityTree') . '</td><td>';
+	print digiriskObjectMediaBlock($object, 'accidentinvestigation/' . $object->ref . '/causality_tree', 'causality_tree', $permissiontoadd && $object->status < AccidentInvestigation::STATUS_VALIDATED);
 	print '</td></tr>';
 
 	print '</table></div>';
+	print '</div>';
 
 	print '<div class="clearboth"></div>';
+
+	include __DIR__ . '/../../core/tpl/accidentinvestigation/digiriskdolibarr_accidentinvestigation_itamami_schema.tpl.php';
 
 	if ($action != 'presend') {
         $allSigned = $signatory->checkSignatoriesSignatures($id, $object->element);

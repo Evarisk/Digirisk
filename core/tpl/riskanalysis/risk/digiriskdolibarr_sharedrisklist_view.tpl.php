@@ -209,6 +209,8 @@ $arrayofselected = is_array($toselect) ? $toselect : array();
 $param                                                                      = '';
 if ( ! empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&contextpage=' . urlencode($contextpage);
 $param                                                                     .= '&id=' . $id;
+// The page falls back on professional risks without it: sorting or paging an environmental list would switch lists
+$param                                                                     .= '&risk_type=' . urlencode($riskType);
 $param                                                                     .= '&sharedrisks=' . 1;
 if ($limit > 0 && $limit != $conf->liste_limit) $param                     .= '&limit=' . urlencode($limit);
 foreach ($search as $key => $val) {

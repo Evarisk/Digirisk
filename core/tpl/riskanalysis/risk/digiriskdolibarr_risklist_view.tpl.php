@@ -457,6 +457,8 @@ $arrayofselected = is_array($toselect) ? $toselect : array();
 $param                                                                      = '';
 if ( ! empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&contextpage=' . urlencode($contextpage);
 $param                                                                     .= '&id=' . $id;
+// The page falls back on professional risks without it: sorting or paging an environmental list would switch lists
+$param                                                                     .= '&risk_type=' . urlencode($riskType);
 if ($limit > 0 && $limit != $conf->liste_limit) $param                     .= '&limit=' . urlencode($limit);
 foreach ($search as $key => $val) {
     if (is_array($search[$key]) && count($search[$key])) foreach ($search[$key] as $skey) $param .= '&search_' . $key . '[]=' . urlencode($skey);
@@ -719,7 +721,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                                 <div>
                                     <div class="riskassessment-task-field has-icon">
                                         <i class="far fa-calendar-check fa-fw riskassessment-task-field-icon"></i>
-                                        <?php print '<input type="datetime-local" id="RiskassessmentTaskDateEndModalRisk" class="widthcentpercent" name="RiskassessmentTaskDateEndModalRisk">'; ?>
+                                        <?php print '<input type="date" id="RiskassessmentTaskDateEndModalRisk" class="widthcentpercent" name="RiskassessmentTaskDateEndModalRisk">'; ?>
                                         <?php print '<input type="hidden" id="RiskassessmentTaskDateEndModalRiskhour" name="RiskassessmentTaskDateEndModalRiskhour" value="">'; ?>
                                         <?php print '<input type="hidden" id="RiskassessmentTaskDateEndModalRiskmin" name="RiskassessmentTaskDateEndModalRiskmin" value="">'; ?>
                                     </div>

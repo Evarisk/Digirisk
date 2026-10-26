@@ -207,3 +207,22 @@ function digiriskRiskAssessmentMovePhotos(string $workDir, RiskAssessment $riskA
         $riskAssessment->photo = $moved[0];
     }
 }
+
+/**
+ * Timestamp of the deadline of a task, typed as a day in the risk modals
+ *
+ * A datetime-local input left without its time sends nothing, the modals ask for a day only. The
+ * deadline lasts until the end of that day, so a task due on the day it starts stays after its start
+ * date, and is read in the timezone the modals print it in, so it shows back on the same day.
+ *
+ * @param  string $date Value of the date input, "YYYY-MM-DD"
+ * @return int          Timestamp, or 0 when the input is empty or malformed
+ */
+function digiriskTaskDeadlineToTimestamp(string $date): int
+{
+    if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $date, $parts)) {
+        return 0;
+    }
+
+    return (int) dol_mktime(23, 59, 59, (int) $parts[2], (int) $parts[3], (int) $parts[1]);
+}

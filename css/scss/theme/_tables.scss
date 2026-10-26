@@ -101,6 +101,13 @@
     color: $dr-text;
   }
 
+  /* Black cotation cell (DigiBoard risk stats): the row colour above put dark text on the black background */
+  table.liste > tbody > tr:not(.liste_titre):not(.liste_titre_filter) > td.risk-evaluation-cotation[data-scale="4"],
+  table.noborder:not(.nobordernopadding) > tbody > tr:not(.liste_titre):not(.liste_titre_filter) > td.risk-evaluation-cotation[data-scale="4"],
+  table.formdoc > tbody > tr:not(.liste_titre) > td.risk-evaluation-cotation[data-scale="4"] {
+    color: #fff;
+  }
+
   table.liste > tbody > tr:last-child > td,
   table.noborder:not(.nobordernopadding) > tbody > tr:last-child > td,
   table.formdoc > tbody > tr:last-child > td {

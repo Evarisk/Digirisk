@@ -86,6 +86,26 @@
     font-family: $dr-font;
     font-size: 12px;
     box-shadow: $dr-shadow-hover;
+
+    /* data-color="light": Saturne gives it a dark text, which the dark background above made
+       unreadable (black on black). Light background again, arrow included */
+    &.tooltip-light {
+      background: $dr-surface;
+      color: $dr-text;
+
+      &.tooltip-top::before {
+        border-top-color: $dr-surface;
+      }
+      &.tooltip-bottom::before {
+        border-bottom-color: $dr-surface;
+      }
+      &.tooltip-left::before {
+        border-left-color: $dr-surface;
+      }
+      &.tooltip-right::before {
+        border-right-color: $dr-surface;
+      }
+    }
   }
 
   .ui-tooltip,
@@ -120,6 +140,45 @@
 
     .ui-dialog-buttonpane button {
       border-radius: $dr-radius;
+    }
+  }
+
+  /* ---- Resizable jQuery UI dialogs (document preview of the magnifier) ---- */
+
+  .ui-dialog.ui-resizable {
+    /* Dolibarr 24 caps every dialog at 70% of the screen: the frame stopped growing while
+       its content kept following the mouse, and was cut by the overflow above */
+    max-width: none;
+
+    /* The rounded corners cut the corner grips: brought back inside the curve */
+    .ui-resizable-se {
+      right: 5px;
+      bottom: 5px;
+    }
+    .ui-resizable-sw {
+      left: 5px;
+      bottom: 5px;
+    }
+    .ui-resizable-ne {
+      right: 5px;
+      top: 5px;
+    }
+    .ui-resizable-nw {
+      left: 5px;
+      top: 5px;
+    }
+
+    /* jQuery UI only covers the iframes while resizing or dragging: the PDF viewer swallowed
+       the mouse, so the dialog could not shrink and kept following the mouse once released.
+       :active covers the first move, before jQuery UI adds its classes */
+    &.ui-dialog-resizing,
+    &.ui-dialog-dragging,
+    &:has(.ui-resizable-handle:active, .ui-dialog-titlebar:active) {
+      object,
+      embed,
+      iframe {
+        pointer-events: none;
+      }
     }
   }
 

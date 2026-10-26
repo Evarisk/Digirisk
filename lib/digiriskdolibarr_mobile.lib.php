@@ -381,7 +381,60 @@ function digiriskMobileRiskPhotoDir(string $elementType, string $objectRef, int 
     global $conf;
 
     // dir_output, like the Saturne media helpers reading those photos back
-    return $conf->digiriskdolibarr->dir_output . '/' . $elementType . '/' . dol_sanitizeFileName($objectRef) . '/risks/' . $category;
+    return $conf->digiriskdolibarr->dir_output . '/' . digiriskMobileRiskPhotoSubDir($elementType, $objectRef, $category);
+}
+
+/**
+ * Sub directory, relative to the module output directory, of the photos of one risk.
+ * See digiriskMobileRiskPhotoDir().
+ *
+ * @param  string $elementType Object element (preventionplan, firepermit...)
+ * @param  string $objectRef   Object reference
+ * @param  int    $category    Danger category position
+ * @return string              Sub directory, without leading nor trailing slash
+ */
+function digiriskMobileRiskPhotoSubDir(string $elementType, string $objectRef, int $category): string
+{
+    return $elementType . '/' . dol_sanitizeFileName($objectRef) . '/risks/' . $category;
+}
+
+/**
+ * Hand the photos of a risk over to its new danger category, thumbs included.
+ *
+ * Photos are keyed by category: left behind, they would sit in a folder nothing reads any more.
+ * No other risk of the object holds the new category, so whatever its folder still holds belongs to
+ * a removed risk and goes away.
+ *
+ * @param  string $elementType  Object element (preventionplan, firepermit...)
+ * @param  string $objectRef    Object reference
+ * @param  int    $fromCategory Former danger category position
+ * @param  int    $toCategory   New danger category position
+ * @return void
+ */
+function digiriskMobileMoveRiskPhotoDir(string $elementType, string $objectRef, int $fromCategory, int $toCategory)
+{
+    $fromDir = digiriskMobileRiskPhotoDir($elementType, $objectRef, $fromCategory);
+    $toDir   = digiriskMobileRiskPhotoDir($elementType, $objectRef, $toCategory);
+
+    if ($fromCategory === $toCategory || !dol_is_dir($fromDir)) {
+        return;
+    }
+
+    if (dol_is_dir($toDir)) {
+        dol_delete_dir_recursive($toDir);
+    }
+    dol_mkdir($toDir);
+
+    // One file at a time so the file index follows them: dol_move_dir() would also rename every
+    // file whose name holds the former category
+    foreach (dol_dir_list($fromDir, 'files') as $photoFile) {
+        dol_move($photoFile['fullname'], $toDir . '/' . $photoFile['name']);
+    }
+    if (dol_is_dir($fromDir . '/thumbs')) {
+        dol_move_dir($fromDir . '/thumbs', $toDir . '/thumbs', 1, 0, 0);
+    }
+
+    dol_delete_dir_recursive($fromDir);
 }
 
 /**
@@ -410,9 +463,7 @@ function digiriskMobileRiskUploadSubDir(string $uploadToken, $blockIndex): strin
  */
 function digiriskMobileGetRiskPhotos(string $elementType, string $objectRef, int $category): array
 {
-    $photoSubDir = $elementType . '/' . dol_sanitizeFileName($objectRef) . '/risks/' . $category;
-
-    return saturne_get_media_files('digiriskdolibarr', $photoSubDir, '', '', ['type' => 'image', 'sort_order' => 'asc']);
+    return saturne_get_media_files('digiriskdolibarr', digiriskMobileRiskPhotoSubDir($elementType, $objectRef, $category), '', '', ['type' => 'image', 'sort_order' => 'asc']);
 }
 
 /**
@@ -718,4 +769,115 @@ function digiriskGetQrCodeSvg(string $data, string $color = '#0f172a'): string
         $svg,
         1
     );
+}
+
+/**
+ * Draw a QR code in the colours of Digirisk as a PNG file, for the documents.
+ *
+ * The look of the code shown in the risk assessment document: blue modules, orange finder patterns with
+ * rounded corners and the triangle of the logo on a white square in the middle. Settings checked against
+ * two decoders on a dozen addresses, sharp and blurred, from 150 to 600 pixels:
+ * - the finder patterns take a deeper orange than the logo, which is too light for a scanner to find them;
+ * - error correction level H, the highest: the code still reads with about a fifth of it hidden in the middle,
+ *   at the cost of more, smaller modules, which a very small print reads less easily than level Q;
+ * - a margin of three modules around the code, the ODT templates set it in a cell with borders.
+ *
+ * @param  string $data     Content to encode
+ * @param  string $filePath PNG file to write, its directory is created when missing
+ * @param  int    $size     Side of the image, in pixels
+ * @return bool             True when the file was written
+ */
+function digiriskGetQrCodePng(string $data, string $filePath, int $size = 600): bool
+{
+    if (!dol_strlen($data) || !function_exists('imagecreatetruecolor')) {
+        return false;
+    }
+
+    require_once DOL_DOCUMENT_ROOT . '/includes/tecnickcom/tcpdf/tcpdf_barcodes_2d.php';
+
+    $barcode = (new TCPDF2DBarcode($data, 'QRCODE,H'))->getBarcodeArray();
+    $count   = (int) ($barcode['num_rows'] ?? 0);
+    if ($count <= 0) {
+        return false;
+    }
+
+    // Drawn four times larger, then scaled down: GD does not smooth the curves of filled shapes
+    $quietZone = 3;
+    $unit      = (int) ceil($size * 4 / ($count + 2 * $quietZone));
+    $side      = $unit * ($count + 2 * $quietZone);
+
+    $image  = imagecreatetruecolor($side, $side);
+    $white  = imagecolorallocate($image, 0xff, 0xff, 0xff);
+    $blue   = imagecolorallocate($image, 0x00, 0x67, 0xa6);
+    $orange = imagecolorallocate($image, 0xe0, 0x78, 0x00);
+    imagefilledrectangle($image, 0, 0, $side - 1, $side - 1, $white);
+
+    $roundedRectangle = function (int $x1, int $y1, int $x2, int $y2, int $radius, int $color) use ($image) {
+        $radius = min($radius, (int) floor(($x2 - $x1) / 2), (int) floor(($y2 - $y1) / 2));
+        imagefilledrectangle($image, $x1 + $radius, $y1, $x2 - $radius, $y2, $color);
+        imagefilledrectangle($image, $x1, $y1 + $radius, $x2, $y2 - $radius, $color);
+        foreach ([[$x1 + $radius, $y1 + $radius], [$x2 - $radius, $y1 + $radius], [$x1 + $radius, $y2 - $radius], [$x2 - $radius, $y2 - $radius]] as $corner) {
+            imagefilledellipse($image, $corner[0], $corner[1], 2 * $radius, 2 * $radius, $color);
+        }
+    };
+
+    // The logo stands on a centred square of modules, as many on each side of it so it stays centred
+    $logoModules = (int) round($count * 0.22);
+    if (($count - $logoModules) % 2) {
+        $logoModules++;
+    }
+    $logoStart = ($count - $logoModules) / 2;
+    $logoEnd   = $logoStart + $logoModules;
+
+    $finderOrigins = [[0, 0], [0, $count - 7], [$count - 7, 0]];
+    $gap           = (int) round($unit * 0.05);
+
+    for ($row = 0; $row < $count; $row++) {
+        for ($col = 0; $col < $count; $col++) {
+            if (empty($barcode['bcode'][$row][$col])) {
+                continue;
+            }
+            // The finder patterns are drawn whole below, in their own colour
+            foreach ($finderOrigins as $finderOrigin) {
+                if ($row >= $finderOrigin[0] && $row < $finderOrigin[0] + 7 && $col >= $finderOrigin[1] && $col < $finderOrigin[1] + 7) {
+                    continue 2;
+                }
+            }
+            if ($row >= $logoStart && $row < $logoEnd && $col >= $logoStart && $col < $logoEnd) {
+                continue;
+            }
+
+            $x = ($col + $quietZone) * $unit;
+            $y = ($row + $quietZone) * $unit;
+            $roundedRectangle($x + $gap, $y + $gap, $x + $unit - $gap - 1, $y + $unit - $gap - 1, (int) round($unit * 0.15), $blue);
+        }
+    }
+
+    foreach ($finderOrigins as $finderOrigin) {
+        $x = ($finderOrigin[1] + $quietZone) * $unit;
+        $y = ($finderOrigin[0] + $quietZone) * $unit;
+        $roundedRectangle($x, $y, $x + 7 * $unit - 1, $y + 7 * $unit - 1, (int) round($unit * 1.6), $orange);
+        $roundedRectangle($x + $unit, $y + $unit, $x + 6 * $unit - 1, $y + 6 * $unit - 1, (int) round($unit * 1), $white);
+        $roundedRectangle($x + 2 * $unit, $y + 2 * $unit, $x + 5 * $unit - 1, $y + 5 * $unit - 1, (int) round($unit * 0.6), $orange);
+    }
+
+    $logo = @imagecreatefrompng(__DIR__ . '/../img/digiriskdolibarr_color_512.png');
+    if ($logo !== false) {
+        // A module of white around the triangle, the way the modules keep their distance from each other
+        $logoX    = (int) (($logoStart + $quietZone) * $unit + $unit);
+        $logoSide = (int) (($logoModules - 2) * $unit);
+        imagealphablending($image, true);
+        imagecopyresampled($image, $logo, $logoX, $logoX, 0, 0, $logoSide, $logoSide, imagesx($logo), imagesy($logo));
+        imagedestroy($logo);
+    }
+
+    $final = imagecreatetruecolor($size, $size);
+    imagecopyresampled($final, $image, 0, 0, 0, 0, $size, $size, $side, $side);
+    imagedestroy($image);
+
+    dol_mkdir(dirname($filePath));
+    $written = imagepng($final, $filePath);
+    imagedestroy($final);
+
+    return $written;
 }

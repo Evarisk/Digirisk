@@ -209,6 +209,58 @@ class ActionsDigiriskdolibarr
             $this->resprints .= '<link rel="stylesheet" type="text/css" href="' . dol_buildpath('/digiriskdolibarr/css/digiriskdolibarr.min.css', 1) . '">';
         }
 
+        // The tabs other modules add on the Digirisk objects (DoliLetter spread, DigiQuali controls and surveys)
+        // are pages of those modules: they only load their own stylesheet, so the Digirisk theme is missing on
+        // the menu, banner and tabs of the object
+        if (strpos($_SERVER['PHP_SELF'], '/digiriskdolibarr/') === false && strpos(GETPOST('fromtype', 'alpha'), 'digiriskdolibarr_') === 0) {
+            $this->resprints .= '<link rel="stylesheet" type="text/css" href="' . dol_buildpath('/digiriskdolibarr/css/digiriskdolibarr.min.css', 1) . '">';
+        }
+
+        // The other tabs of the Digirisk ticket card are the native ticket pages (contacts, notes, files, agenda)
+        // or pages of other modules: browsed from the Digirisk menu, they keep the look of the card
+        if ($this->isDigiriskTicketTab($parameters['context'])) {
+            $this->resprints .= '<link rel="stylesheet" type="text/css" href="' . dol_buildpath('/digiriskdolibarr/css/digiriskdolibarr.min.css', 1) . '">';
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Tell whether the current page is a tab of a ticket browsed from the Digirisk menu, other than the Digirisk card
+     *
+     * @param  string $context Hook contexts of the page
+     * @return bool
+     */
+    private function isDigiriskTicketTab(string $context): bool
+    {
+        if (($_SESSION['mainmenu'] ?? '') !== 'digiriskdolibarr' || strpos($_SERVER['PHP_SELF'], '/digiriskdolibarr/') !== false) {
+            return false;
+        }
+
+        return preg_match('/\b(contactticketcard|documentticketcard|ticketnote|ticketmessaging|ticketagenda)\b/', $context) || GETPOST('fromtype', 'alpha') === 'ticket';
+    }
+
+    /**
+     * Overloading the completeTabsHead function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function completeTabsHead(array $parameters): int
+    {
+        // The hook manager merges $this->results into the tabs: a value left by a previous hook would become a tab
+        $this->results = [];
+
+        // Ticket tabs browsed from the Digirisk menu: the "Ticket" tab leads back to the Digirisk ticket card,
+        // not to the native one
+        if (($parameters['type'] ?? '') === 'ticket' && ($parameters['mode'] ?? '') === 'remove' && ($_SESSION['mainmenu'] ?? '') === 'digiriskdolibarr' && !empty($parameters['object']->id)) {
+            foreach ($parameters['head'] as $key => $tab) {
+                if (($tab[2] ?? '') === 'tabTicket') {
+                    $parameters['head'][$key][0] = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $parameters['object']->id;
+                }
+            }
+        }
+
         return 0; // or return 1 to replace standard code
     }
 
@@ -2148,9 +2200,9 @@ class ActionsDigiriskdolibarr
                 'label_field'    => 'label',
                 'hook_name_card' => $objectName . 'list',
                 'hook_name_list' => $objectName . 'card',
-                'create_url'     => 'custom/digiriskdolibarr/view/' . $objectName . '/' . $objectName . '_card.php?action=create',
-                'class_path'     => 'custom/digiriskdolibarr/class/' . $objectName . '.class.php',
-                'lib_path'       => 'custom/digiriskdolibarr/lib/digiriskdolibarr_' . $objectName . '.lib.php'
+                'create_url'     => 'digiriskdolibarr/view/' . $objectName . '/' . $objectName . '_card.php?action=create',
+                'class_path'     => 'digiriskdolibarr/class/' . $objectName . '.class.php',
+                'lib_path'       => 'digiriskdolibarr/lib/digiriskdolibarr_' . $objectName . '.lib.php'
             ];
         }
 
@@ -2158,19 +2210,19 @@ class ActionsDigiriskdolibarr
         $objects = ['risk', 'riskassessment', 'risksign'];
         foreach ($objects as $objectName) {
             $objectsMetadata['digiriskdolibarr_' . $objectName]['create_url'] = '';
-            $objectsMetadata['digiriskdolibarr_' . $objectName]['class_path'] = 'custom/digiriskdolibarr/class/riskanalysis/' . $objectName . '.class.php';
-            $objectsMetadata['digiriskdolibarr_' . $objectName]['lib_path']   = 'custom/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php';
+            $objectsMetadata['digiriskdolibarr_' . $objectName]['class_path'] = 'digiriskdolibarr/class/riskanalysis/' . $objectName . '.class.php';
+            $objectsMetadata['digiriskdolibarr_' . $objectName]['lib_path']   = 'digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php';
         }
         // La table de l'enquete accident ne suit pas la regle de nommage des autres objets : sans
         // cette correction, la metadonnee pointe une table inexistante et plus rien ne matche
         // (les fichiers lies, donc la diffusion, cherchent sur src_object_type = table_element)
         $objectsMetadata['digiriskdolibarr_accidentinvestigation']['table_element'] = 'digiriskdolibarr_accident_investigation';
 
-        $objectsMetadata['digiriskdolibarr_digiriskelement']['create_url'] = 'custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0';
+        $objectsMetadata['digiriskdolibarr_digiriskelement']['create_url'] = 'digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0';
 
         $objectsMetadata['digiriskdolibarr_evaluator']['create_url'] = '';
-        $objectsMetadata['digiriskdolibarr_evaluator']['class_path'] = 'custom/digiriskdolibarr/class/evaluator.class.php';
-        $objectsMetadata['digiriskdolibarr_evaluator']['lib_path']   = 'custom/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php';
+        $objectsMetadata['digiriskdolibarr_evaluator']['class_path'] = 'digiriskdolibarr/class/evaluator.class.php';
+        $objectsMetadata['digiriskdolibarr_evaluator']['lib_path']   = 'digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php';
 
         // A risk has no label: its description tells it apart when medias are assigned to it
         $objectsMetadata['digiriskdolibarr_risk']['label_field'] = 'description';

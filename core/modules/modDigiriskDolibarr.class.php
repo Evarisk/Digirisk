@@ -1794,6 +1794,22 @@ class modDigiriskdolibarr extends DolibarrModules
         $this->menu[$r++] = [
             'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskticket',
             'type'     => 'left',
+            'titre'    => $langs->transnoentities('TicketKanban'),
+            'prefix'   => '<i class="fas fa-columns pictofixedwidth"></i>',
+            'mainmenu' => 'digiriskdolibarr',
+            'leftmenu' => 'digiriskdolibarr_ticketkanban',
+            'url'      => '/digiriskdolibarr/view/ticket/ticket_action_card.php',
+            'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+            'position' => 100 + $r,
+            'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'ticket\')',
+            'perms'    => '$user->rights->digiriskdolibarr->lire && $user->rights->ticket->read',
+            'target'   => '',
+            'user'     => 0,
+        ];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskticket',
+            'type'     => 'left',
             'titre'    => '<i class="fas fa-list pictofixedwidth"></i>' . $langs->transnoentities('TicketList'),
             'mainmenu' => 'digiriskdolibarr',
             'leftmenu' => 'digiriskdolibarr_ticketlist',
@@ -2235,6 +2251,11 @@ class modDigiriskdolibarr extends DolibarrModules
         // Digirisk cannot run without the Saturne framework : refuse the activation instead of breaking every page of the Dolibarr instance.
         if (!$this->saturneAvailable) {
             $this->error = $langs->trans('SaturneModuleMissing');
+            return 0;
+        }
+
+        // Dolibarr runs init() before activating $this->depends : activate them first, their tables (saturne_schedules, ticket...) are filled below
+        if (function_exists('saturne_activate_module_dependencies') && saturne_activate_module_dependencies($this) < 0) {
             return 0;
         }
 
@@ -2725,7 +2746,8 @@ class modDigiriskdolibarr extends DolibarrModules
             $tags->fk_parent = $tagID;
             $tags->create($user);
 
-            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 3, 'integer', 0, '', $conf->entity);
+            // FP and TS are created by the next steps
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 1, 'integer', 0, '', $conf->entity);
         }
         if (getDolGlobalInt('DIGIRISKDOLIBARR_PROJECT_TAGS_SET') == 1) {
             //Install after 8.3.0
@@ -2757,6 +2779,32 @@ class modDigiriskdolibarr extends DolibarrModules
             $tags->create($user);
 
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 4, 'integer', 0, '', $conf->entity);
+        }
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_PROJECT_TAGS_SET') == 4) {
+            // Installs made while step 0 jumped to step 3 never got FP and TS, nor these tags on their projects
+            require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+
+            $qhseTag = new Categorie($this->db);
+            if ($qhseTag->fetch(0, 'QHSE', 'project') > 0) {
+                foreach (['FP' => 'DIGIRISKDOLIBARR_FIREPERMIT_PROJECT', 'TS' => 'DIGIRISKDOLIBARR_TICKET_PROJECT'] as $tagLabel => $projectConst) {
+                    $projectTag = new Categorie($this->db);
+                    if ($projectTag->fetch(0, $tagLabel, 'project') > 0) {
+                        continue;
+                    }
+
+                    $projectTag->label     = $tagLabel;
+                    $projectTag->type      = 'project';
+                    $projectTag->fk_parent = $qhseTag->id;
+                    if ($projectTag->create($user) > 0 && getDolGlobalInt($projectConst) > 0) {
+                        $project = new Project($this->db);
+                        if ($project->fetch(getDolGlobalInt($projectConst)) > 0) {
+                            $projectTag->add_type($project, 'project');
+                        }
+                    }
+                }
+            }
+
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 5, 'integer', 0, '', $conf->entity);
         }
 
         if (getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_TAGS_SET') == 0) {
@@ -2888,8 +2936,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			]
 		];
 
-		$externalmodule = json_decode($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING, true);
-		$externalmodule = !empty($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING) ? array_merge($externalmodule, $params) : $params;
+		$externalmodule = json_decode(getDolGlobalString('MULTICOMPANY_EXTERNAL_MODULES_SHARING'), true);
+		$externalmodule = is_array($externalmodule) ? array_merge($externalmodule, $params) : $params;
 		$jsonformat = json_encode($externalmodule);
 		dolibarr_set_const($this->db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat, 'json', 0, '', 0);
 

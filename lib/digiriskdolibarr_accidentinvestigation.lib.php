@@ -93,7 +93,7 @@ function getAccidentInvestigationActionsByType(DoliDB $db, int $parentTaskId, in
 
     $containerTaskId = getAccidentInvestigationActionContainerTask($db, $parentTaskId, $type);
 
-    $sql  = 'SELECT t.rowid, t.ref, t.label, t.datee, t.progress, t.fk_statut,';
+    $sql  = 'SELECT t.rowid, t.ref, t.label, t.datec, t.dateo, t.datee, t.progress, t.fk_statut,';
     $sql .= ' (SELECT CONCAT(u2.firstname, \' \', u2.lastname)';
     $sql .= '  FROM ' . MAIN_DB_PREFIX . 'element_contact ec2';
     $sql .= '  INNER JOIN ' . MAIN_DB_PREFIX . 'c_type_contact ctc2';
@@ -119,6 +119,106 @@ function getAccidentInvestigationActionsByType(DoliDB $db, int $parentTaskId, in
     }
 
     return $results;
+}
+
+/**
+ * Return the Gantt of the actions of an accident investigation.
+ *
+ * An action is only given a deadline: its bar starts at the start date of its task when one was entered in the
+ * project, else at its creation, and runs to its deadline, or stays open up to the end of the timeline while it has
+ * none. The timeline covers whole weeks, months, quarters or years around the bars and today, and every position is
+ * a percentage of it.
+ *
+ * @param  DoliDB                           $db            Database handler
+ * @param  array<int, array<int, stdClass>> $actionsByType Actions of each type, from getAccidentInvestigationActionsByType()
+ * @return array{today: float, ticks: array<int, array{position: float, label: string}>, rows: array<int, array<int, array{action: stdClass, from: int, end: int, left: float, length: float, state: string, lateDays: int}>>}
+ */
+function getAccidentInvestigationActionsGantt(DoliDB $db, array $actionsByType): array
+{
+    $now   = dol_now();
+    $first = $now;
+    $last  = $now;
+
+    $bars = [];
+    foreach ($actionsByType as $type => $actions) {
+        foreach ($actions as $action) {
+            $end   = (!empty($action->datee) && $action->datee !== '0000-00-00 00:00:00') ? (int) $db->jdate($action->datee) : 0;
+            $from  = (int) $db->jdate(!empty($action->dateo) ? $action->dateo : $action->datec);
+            // A deadline set before the creation: the bar keeps the day of the deadline
+            $start = ($end > 0 && $from > $end) ? (int) dol_get_first_hour($end, 'tzserver') : $from;
+
+            $bars[$type][] = ['action' => $action, 'from' => $from, 'start' => $start, 'end' => $end];
+            $first         = min($first, $start);
+            $last          = max($last, $end > 0 ? $end : $now);
+        }
+    }
+
+    // Unit of the timeline from its span: weeks up to two months, then months, quarters and years
+    $span = ($last - $first) / 86400;
+    if ($span <= 62) {
+        $unit = 'week';
+    } elseif ($span <= 366) {
+        $unit = 'month';
+    } elseif ($span <= 1100) {
+        $unit = 'quarter';
+    } else {
+        $unit = 'year';
+    }
+
+    // Ticks from the start of the unit holding the first bar, the last one closes the unit holding the last bar.
+    // mktime() works in the timezone of the server, like the dates of the database.
+    $year  = (int) date('Y', $first);
+    $month = (int) date('n', $first);
+    $day   = (int) date('j', $first) - (int) date('N', $first) + 1;
+    $tickAt = function (int $index) use ($unit, $year, $month, $day): int {
+        if ($unit == 'week') {
+            return (int) mktime(0, 0, 0, $month, $day + 7 * $index, $year);
+        } elseif ($unit == 'month') {
+            return (int) mktime(0, 0, 0, $month + $index, 1, $year);
+        } elseif ($unit == 'quarter') {
+            return (int) mktime(0, 0, 0, $month - ($month - 1) % 3 + 3 * $index, 1, $year);
+        }
+        return (int) mktime(0, 0, 0, 1, 1, $year + $index);
+    };
+
+    $tickTimes = [$tickAt(0)];
+    while (end($tickTimes) <= $last) {
+        $tickTimes[] = $tickAt(count($tickTimes));
+    }
+    $timelineStart = $tickTimes[0];
+    $timelineEnd   = array_pop($tickTimes);
+    $positionOf    = function (int $time) use ($timelineStart, $timelineEnd): float {
+        return round(($time - $timelineStart) * 100 / ($timelineEnd - $timelineStart), 3);
+    };
+
+    $tickFormat = ['week' => '%d %b', 'month' => '%b %Y', 'quarter' => '%b %Y', 'year' => '%Y'];
+    $ticks      = [];
+    foreach ($tickTimes as $tickTime) {
+        $ticks[] = ['position' => $positionOf($tickTime), 'label' => dol_print_date($tickTime, $tickFormat[$unit], 'tzserver')];
+    }
+
+    $rows = [];
+    foreach ($bars as $type => $typeBars) {
+        foreach ($typeBars as $bar) {
+            $isDone = (int) $bar['action']->progress >= 100;
+            $isLate = !$isDone && $bar['end'] > 0 && $bar['end'] < $now;
+            $left   = $positionOf($bar['start']);
+
+            $rows[$type][] = [
+                'action'   => $bar['action'],
+                'from'     => $bar['from'],
+                'end'      => $bar['end'],
+                'left'     => $left,
+                // Without deadline, the bar stays open up to the end of the timeline. A bar keeps a visible width even
+                // when it starts and ends on the same day
+                'length'   => max(round(($bar['end'] > 0 ? $positionOf($bar['end']) : 100) - $left, 3), 0.8),
+                'state'    => $isDone ? 'done' : ($isLate ? 'late' : ($bar['end'] > 0 ? 'progress' : 'open')),
+                'lateDays' => $isLate ? (int) floor(($now - $bar['end']) / 86400) + 1 : 0,
+            ];
+        }
+    }
+
+    return ['today' => $positionOf($now), 'ticks' => $ticks, 'rows' => $rows];
 }
 
 /**

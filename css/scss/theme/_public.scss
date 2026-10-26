@@ -36,6 +36,12 @@ $dr-public-scope: 'body#mainbody.page-public-card';
     }
   }
 
+  /* The ticket register is also filled from a computer: wider card for its category grid and form */
+  &.page-public-ticket .public-card__container,
+  &.page-public-ticket .ticketpublicarea.digirisk-page-container {
+    max-width: 1200px;
+  }
+
   .public-card__logo,
   .signature-logo {
     margin: 8px auto 24px;
