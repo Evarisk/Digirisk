@@ -82,8 +82,8 @@ $tabUrl = function (string $tabName) use ($key) {
     return $_SERVER['PHP_SELF'] . '?' . http_build_query(['entity' => $conf->entity, 'key' => $key, 'tab' => $tabName]);
 };
 
-$overviewRows = [];
-$columns      = [];
+$overviewRows    = [];
+$overviewColumns = [];
 if ($accessAllowed) {
     $digiriskElement           = new DigiriskElement($db);
     $activeDigiriskElementList = $digiriskElement->getActiveDigiriskElements();
@@ -94,8 +94,11 @@ if ($accessAllowed) {
     // Psychosocial assessment of each work unit, as shown by the risk list
     require __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_rps_scope_data.tpl.php';
 
+    // Every tab is rendered, the visitor switches between them without reloading the page
     $overviewRows = digiriskRiskOverviewRows($db, $activeDigiriskElementList, $rpsLines, $rpsSubCategories);
-    $columns      = $tab == 'rps' ? [] : digiriskRiskOverviewCategoryColumns($tab);
+    foreach (array_keys(DIGIRISK_RISK_OVERVIEW_CATEGORIES) as $categoryTab) {
+        $overviewColumns[$categoryTab] = digiriskRiskOverviewCategoryColumns($categoryTab);
+    }
 }
 
 /*

@@ -110,6 +110,11 @@ body#mainbody.digirisk-risk-overview-public {
     border: 1px solid $dr-border;
     border-radius: $dr-radius-lg;
     overflow: hidden;
+
+    // The tabs not shown (js/modules/riskOverview.js)
+    &[hidden] {
+      display: none;
+    }
   }
 
   // Both directions scroll inside the card, so that the heads and the element column stay in view:

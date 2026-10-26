@@ -22,7 +22,7 @@
  *          A risk cell holds the number of risks of the category on the colour of the worst one,
  *          a psychosocial cell the level of the factor or the average of the factors.
  *
- * Variables : $accessAllowed, $tab, $tabUrl, $overviewRows, $columns, $rpsSubCategories, $rpsScale,
+ * Variables : $accessAllowed, $tab, $tabUrl, $overviewRows, $overviewColumns, $rpsSubCategories, $rpsScale,
  *             $langs, $mysoc (public/digiriskelement/digiriskelement_risk_overview.php)
  */
 
@@ -80,22 +80,25 @@ $rpsStateTitle = function (array $rps) use ($langs): string {
 
         <nav class="risk-overview__tabs">
             <?php foreach ($overviewTabs as $overviewTab => $overviewTabMeta) : ?>
-                <a class="risk-overview__tab<?php echo $overviewTab == $tab ? ' is-active' : ''; ?>" href="<?php echo dol_escape_htmltag($tabUrl($overviewTab)); ?>">
+                <a class="risk-overview__tab<?php echo $overviewTab == $tab ? ' is-active' : ''; ?>" data-tab="<?php echo $overviewTab; ?>" href="<?php echo dol_escape_htmltag($tabUrl($overviewTab)); ?>">
                     <i class="fas <?php echo $overviewTabMeta['icon']; ?>"></i> <?php echo $langs->trans($overviewTabMeta['label']); ?>
                 </a>
             <?php endforeach; ?>
         </nav>
 
-        <div class="risk-overview__card">
+        <?php // The three tabs are in the page: js/modules/riskOverview.js shows one without reloading
+        foreach ($overviewTabs as $panelTab => $overviewTabMeta) :
+            $columns = $overviewColumns[$panelTab] ?? []; ?>
+        <div class="risk-overview__card" data-tab="<?php echo $panelTab; ?>"<?php echo $panelTab == $tab ? '' : ' hidden'; ?>>
             <?php if (empty($overviewRows)) : ?>
                 <div class="risk-overview__empty"><?php echo $langs->trans('RiskOverviewEmpty'); ?></div>
             <?php else : ?>
                 <div class="risk-overview__scroll">
-                    <table class="risk-overview__table risk-overview__table--<?php echo $tab; ?>">
+                    <table class="risk-overview__table risk-overview__table--<?php echo $panelTab; ?>">
                         <thead>
                         <tr>
                             <th class="risk-overview__element" scope="col"><?php echo $langs->trans('RiskOverviewElement'); ?></th>
-                            <?php if ($tab == 'rps') : ?>
+                            <?php if ($panelTab == 'rps') : ?>
                                 <th class="risk-overview__total" scope="col" title="<?php echo dol_escape_htmltag($langs->trans('RiskOverviewPsychosocialAverageHelp')); ?>">
                                     <?php echo $langs->trans('RiskOverviewPsychosocialAverage'); ?>
                                 </th>
@@ -127,7 +130,7 @@ $rpsStateTitle = function (array $rps) use ($langs): string {
                                     <span class="risk-overview__label"><?php echo dol_escape_htmltag($overviewRow['label']); ?></span>
                                 </th>
 
-                                <?php if ($tab == 'rps') :
+                                <?php if ($panelTab == 'rps') :
                                     // A cell without a level reads NC, whatever the reason: not concerned, to qualify, not assessed, factor not rated
                                     $rpsEmptyTitle = $rps['average'] !== null ? $langs->trans('RiskOverviewFactorNotRated') : $rpsStateTitle($rps); ?>
                                     <?php if ($rps['average'] !== null) : ?>
@@ -186,7 +189,7 @@ $rpsStateTitle = function (array $rps) use ($langs): string {
                 </div>
 
                 <div class="risk-overview__legend">
-                    <?php if ($tab == 'rps') : ?>
+                    <?php if ($panelTab == 'rps') : ?>
                         <span class="risk-overview__legend-text"><?php echo $langs->trans('RiskOverviewLegendPsychosocial'); ?></span>
                         <span class="risk-overview__keys">
                             <?php foreach ($rpsScale as $rpsLevel => $rpsMeta) : ?>
@@ -197,7 +200,7 @@ $rpsStateTitle = function (array $rps) use ($langs): string {
                     <?php else : ?>
                         <span class="risk-overview__legend-text">
                             <?php echo $langs->trans('RiskOverviewLegendRisks'); ?>
-                            <?php if ($tab == 'risk') : ?>
+                            <?php if ($panelTab == 'risk') : ?>
                                 <?php echo $langs->trans('RiskOverviewLegendRisksPsychosocial'); ?>
                             <?php endif; ?>
                         </span>
@@ -211,5 +214,6 @@ $rpsStateTitle = function (array $rps) use ($langs): string {
                 </div>
             <?php endif; ?>
         </div>
+        <?php endforeach; ?>
     <?php endif; ?>
 </div>
