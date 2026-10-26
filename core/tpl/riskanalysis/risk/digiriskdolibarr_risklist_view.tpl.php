@@ -802,7 +802,7 @@ if (isset($object) && $object->element == 'digiriskelement' && $object->element_
     // Groupement de tete : la qualification de toutes les unites rattachees
     $rpsScopeElementId = (int) $object->id;
     require __DIR__ . '/digiriskdolibarr_rps_scope_view.tpl.php';
-    require __DIR__ . '/digiriskdolibarr_rps_scope_assets.tpl.php';
+    require __DIR__ . '/digiriskdolibarr_rps_dict_modal.tpl.php';
 } elseif (isset($object) && isset($rpsStateByUnit[(int) $object->id]) && $rpsStateByUnit[(int) $object->id] === 1) {
     // Unite de travail concernee : sa ligne psychosociale, evaluable sur place
     $rpsUnitLine = null;
@@ -821,7 +821,6 @@ if (isset($object) && $object->element == 'digiriskelement' && $object->element_
     }
     require __DIR__ . '/digiriskdolibarr_rps_unit_view.tpl.php';
     require __DIR__ . '/digiriskdolibarr_rps_eval_modal.tpl.php';
-    require __DIR__ . '/digiriskdolibarr_rps_scope_assets.tpl.php';
 }
 
 print '<div class="div-table-responsive">'; // You can use div-table-responsive-no-min if you dont need reserved height for your table

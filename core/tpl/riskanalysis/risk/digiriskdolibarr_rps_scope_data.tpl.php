@@ -39,16 +39,20 @@ foreach (($rpsAllSub[Risk::PSYCHOSOCIAL_CATEGORY_POSITION] ?? []) as $sub) {
     }
 }
 
-// Les 4 reponses de la grille tombent sur les 4 paliers de cotation Digirisk. La rampe va du
-// vert au rouge sombre plutot que du gris au noir : sur une grille de 26 criteres, le gris du
-// palier le plus faible et le noir du plus grave se lisaient tous les deux comme "neutre".
-// Les bornes, elles, restent celles de Risk::$cotations.
+// Les 4 reponses de la grille tombent sur les 4 paliers de cotation Digirisk, avec leurs couleurs
+// (css/scss/page/_page-rps.scss). Les bornes restent celles de Risk::$cotations.
 $rpsScale = [
-    1 => ['label' => $langs->trans('Weak'),     'color' => '#3a9d5d', 'ink' => '#ffffff', 'range' => '0-47'],
-    2 => ['label' => $langs->trans('Moderate'), 'color' => '#e9ad4f', 'ink' => '#3a2a00', 'range' => '48-50'],
-    3 => ['label' => $langs->trans('High'),     'color' => '#e05353', 'ink' => '#ffffff', 'range' => '51-79'],
-    4 => ['label' => $langs->trans('Extreme'),  'color' => '#8f2222', 'ink' => '#ffffff', 'range' => '80-100'],
+    1 => ['label' => $langs->trans('Weak'),     'range' => '0-47'],
+    2 => ['label' => $langs->trans('Moderate'), 'range' => '48-50'],
+    3 => ['label' => $langs->trans('High'),     'range' => '51-79'],
+    4 => ['label' => $langs->trans('Extreme'),  'range' => '80-100'],
 ];
+
+// Libelles des paliers lus par js/modules/psychosocialScope.js pour recalculer la cotation
+$rpsScaleLabels = [];
+foreach ($rpsScale as $rpsScaleLevel => $rpsScaleMeta) {
+    $rpsScaleLabels[$rpsScaleLevel] = $rpsScaleMeta['range'] . ' · ' . $rpsScaleMeta['label'];
+}
 
 if (!function_exists('rps_scope_level')) {
     /**

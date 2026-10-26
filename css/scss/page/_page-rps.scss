@@ -1,0 +1,1206 @@
+@import "../theme/tokens";
+
+// Psychosocial risks of the risk list: qualification block of the root groupment, line of a
+// concerned work unit, assessment modal and criteria modal (core/tpl/riskanalysis/risk/*_rps_*).
+// The four levels keep the colours of the Digirisk cotation chips (grey, yellow, red, black):
+// background, text of the chips, text of a picked answer (the 12px label is unreadable in white
+// on the yellow)
+$rps-scales: (
+  1: ($color__grey, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+  2: ($color__yellow, #ffffff, #422006),
+  3: ($color__red, #ffffff, #ffffff),
+  4: ($color__dark, #ffffff, #ffffff),
+);
+
+// Columns of the unit rows: six factor cells of 28px spaced by 6px, the score, the qualification
+// switch with its open button. Below the sum of them, the row wraps (see the container query)
+$rps-factors-width: 6 * 28px + 5 * 6px;
+$rps-score-width: 112px;
+$rps-actions-width: 200px;
+
+// Background and text of a level, data-scale="0" being "not rated yet"
+@mixin rps-scale-fill {
+  background: $dr-bg;
+  color: $dr-faint;
+
+  @each $level, $colors in $rps-scales {
+    &[data-scale="#{$level}"] {
+      background: nth($colors, 1);
+      color: nth($colors, 2);
+    }
+  }
+}
+
+#{$dr-scope} {
+  .rps-scope {
+    @include dr-card;
+    container-type: inline-size;
+    position: relative;
+    z-index: 1;
+    margin: 0 0 22px;
+    overflow: hidden;
+    color: $dr-text;
+    font-size: 13px;
+
+    * {
+      box-sizing: border-box;
+    }
+  }
+
+  // Buttons of the block and of its modals, sized like the rest of the risk list
+  :is(.rps-scope, .rps-modal-container) .wpeo-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px;
+    font-size: 13px;
+    white-space: nowrap;
+
+    &.button-size-small {
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+
+    &[class*="button-square-"] {
+      justify-content: center;
+      padding: 0;
+    }
+
+    &[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .rps-num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rps-attention {
+    color: #a16207;
+    font-weight: 600;
+  }
+
+  .rps-hidden {
+    display: none !important;
+  }
+
+  // ---- Header: title, cotation, coverage ----
+
+  .rps-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 18px;
+    padding: 14px 18px;
+    border-bottom: 1px solid $dr-border;
+  }
+
+  .rps-head-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: $dr-radius;
+    background: $dr-primary-soft;
+    color: $dr-primary;
+    font-size: 16px;
+  }
+
+  // Its basis keeps the metrics and the fold button on the title line, the subtitle wraps instead
+  .rps-head-text {
+    display: flex;
+    flex: 1 1 260px;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .rps-head-title {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: $dr-text;
+  }
+
+  .rps-head-sub {
+    font-size: 12px;
+    color: $dr-muted;
+  }
+
+  .rps-head-metrics {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 18px;
+    margin-left: auto;
+  }
+
+  .rps-metric {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    .rps-band {
+      align-self: flex-start;
+    }
+  }
+
+  .rps-metric-label {
+    @include dr-label;
+    font-size: 10px;
+
+    b {
+      color: $dr-text;
+    }
+  }
+
+  .rps-metric-value {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    color: $dr-muted;
+    font-size: 12px;
+
+    .rps-num {
+      color: $dr-text;
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1;
+    }
+  }
+
+  .rps-progress {
+    display: block;
+    width: 120px;
+    height: 6px;
+    border: none;
+    border-radius: $dr-radius-pill;
+    background: $dr-border;
+    overflow: hidden;
+    appearance: none;
+
+    &::-webkit-progress-bar {
+      background: $dr-border;
+    }
+
+    &::-webkit-progress-value {
+      border-radius: $dr-radius-pill;
+      background: $dr-primary;
+      transition: width $dr-transition;
+    }
+
+    &::-moz-progress-bar {
+      border-radius: $dr-radius-pill;
+      background: $dr-primary;
+    }
+  }
+
+  // Cotation of a unit or of the whole scope, as a Digirisk cotation chip
+  .rps-band {
+    @include rps-scale-fill;
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: $dr-radius-sm;
+    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.08);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+
+    &[data-scale="0"] {
+      box-shadow: inset 0 0 0 1px $dr-border;
+      font-weight: 600;
+    }
+  }
+
+  .rps-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 9px;
+    border: 1px solid rgba(13, 138, 255, 0.25);
+    border-radius: $dr-radius-pill;
+    background: $dr-primary-soft;
+    color: $dr-primary-strong;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  // ---- Groups of work units ----
+
+  .rps-body {
+    background: $dr-surface;
+  }
+
+  .rps-group {
+    &[hidden] {
+      display: none;
+    }
+
+    & + .rps-group {
+      border-top: 1px solid $dr-border;
+    }
+  }
+
+  .rps-group-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    padding: 12px 18px 6px;
+  }
+
+  .rps-group-title {
+    @include dr-label;
+  }
+
+  .rps-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 20px;
+    padding: 0 7px;
+    border-radius: $dr-radius-pill;
+    background: $dr-bg;
+    color: $dr-muted;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .rps-group[data-group="yes"] .rps-count {
+    background: $dr-primary-soft;
+    color: $dr-primary-strong;
+  }
+
+  .rps-group[data-group="tbd"] .rps-count {
+    background: $dr-warning-soft;
+    color: #a16207;
+  }
+
+  .rps-group-hint {
+    color: $dr-faint;
+    font-size: 12px;
+  }
+
+  .rps-factor-key {
+    color: $dr-faint;
+    font-size: 10px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    cursor: help;
+  }
+
+  // ---- Rows: the grid changes with the state, a unit out of scope has no factor nor score ----
+
+  .rps-rows {
+    padding: 0 10px 10px;
+  }
+
+  // The F1 to F6 keys share the grid of the rows, so that they sit above the factor cells
+  .rps-row,
+  .rps-row-keys {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) $rps-factors-width $rps-score-width $rps-actions-width;
+    align-items: center;
+    gap: 14px;
+    padding: 9px 8px;
+  }
+
+  .rps-row-keys {
+    padding-top: 0;
+    padding-bottom: 2px;
+
+    .rps-factors {
+      grid-column: 2;
+    }
+
+    .rps-factor-key {
+      width: 28px;
+    }
+  }
+
+  .rps-row {
+    border-radius: $dr-radius-sm;
+    transition: background-color $dr-transition;
+
+    & + .rps-row {
+      box-shadow: inset 0 1px 0 #eef2f6;
+    }
+
+    &:hover {
+      background: $dr-surface-soft;
+    }
+
+    &[data-state="0"],
+    &[data-state="-1"] {
+      grid-template-columns: minmax(180px, 1fr) $rps-actions-width;
+
+      .rps-factors,
+      .rps-score {
+        display: none;
+      }
+    }
+
+    &[data-state="0"] .rps-unit-label {
+      color: $dr-muted;
+    }
+  }
+
+  // Narrow list (tree unfolded, small screen): the rows wrap, the metrics of the header go under
+  // the title and the fold button stays on the title line
+  @container (max-width: 780px) {
+    .rps-head-metrics {
+      flex-basis: 100%;
+      order: 1;
+      margin-left: 0;
+    }
+
+    .rps-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+    }
+
+    .rps-row-keys {
+      display: none;
+    }
+
+    .rps-unit {
+      flex: 1 1 260px;
+    }
+
+    .rps-actions {
+      margin-left: auto;
+    }
+  }
+
+  .rps-unit {
+    min-width: 0;
+  }
+
+  .rps-unit-ref {
+    display: inline-block;
+    margin-right: 7px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: $dr-primary;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    vertical-align: 1px;
+  }
+
+  .rps-unit-label {
+    font-weight: 600;
+    color: $dr-text;
+  }
+
+  .rps-unit-meta {
+    display: block;
+    margin-top: 3px;
+    overflow: hidden;
+    color: $dr-muted;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    .fa-info-circle {
+      color: $dr-faint;
+    }
+  }
+
+  .rps-reason-input {
+    width: min(360px, 100%);
+    font-size: 12px;
+  }
+
+  // Factor cells, coloured like the cotation chips
+  .rps-factors {
+    display: flex;
+    gap: 6px;
+  }
+
+  .rps-cell {
+    @include rps-scale-fill;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: $dr-radius-sm;
+    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.08);
+    font-size: 12px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+
+    &[data-scale="0"] {
+      border: 1px dashed $dr-border-strong;
+      background: $dr-surface;
+      box-shadow: none;
+    }
+  }
+
+  .rps-score {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+
+    .rps-num {
+      font-size: 15px;
+      font-weight: 700;
+    }
+  }
+
+  .rps-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  // Concerned / not concerned / to qualify, saved on click
+  .rps-switch {
+    display: inline-flex;
+    padding: 2px;
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius-pill;
+    background: $dr-bg;
+
+    button {
+      padding: 3px 11px;
+      border: 0;
+      border-radius: $dr-radius-pill;
+      background: transparent;
+      color: $dr-muted;
+      font-family: $dr-font;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.5;
+      cursor: pointer;
+      transition: background-color $dr-transition, color $dr-transition;
+
+      &:hover {
+        color: $dr-text;
+      }
+
+      &.is-yes,
+      &.is-no,
+      &.is-tbd {
+        color: #ffffff;
+        box-shadow: $dr-shadow-sm;
+      }
+
+      &.is-yes {
+        background: $dr-primary;
+      }
+
+      &.is-no {
+        background: $dr-text-soft;
+      }
+
+      &.is-tbd {
+        background: $dr-warning;
+      }
+    }
+  }
+
+  // ---- Footer and notes ----
+
+  .rps-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+    padding: 10px 18px;
+    border-top: 1px solid $dr-border;
+    background: $dr-surface-soft;
+    color: $dr-muted;
+    font-size: 12px;
+
+    .fa-sitemap {
+      color: $dr-faint;
+    }
+
+    a {
+      color: $dr-primary;
+      font-weight: 600;
+    }
+  }
+
+  .rps-foot-note {
+    flex: 1;
+    min-width: 280px;
+  }
+
+  .rps-keys {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .rps-key {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+  }
+
+  // The grey of level 1 hardly shows on the footer background: outlined
+  .rps-key-swatch {
+    @include rps-scale-fill;
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+  }
+
+  .rps-note {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+    padding: 10px 18px;
+    border-top: 1px solid rgba(233, 173, 79, 0.45);
+    background: rgba(233, 173, 79, 0.1);
+    color: #854d0e;
+    font-size: 12px;
+    line-height: 1.55;
+
+    > span {
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .fas {
+      color: $dr-warning;
+    }
+  }
+
+  // ---- Line of the work unit being viewed ----
+
+  .rps-unit-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 24px;
+    padding: 16px 18px;
+  }
+
+  .rps-unit-factors,
+  .rps-grid-factors {
+    display: flex;
+    gap: 10px;
+  }
+
+  .rps-factor {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+
+    .rps-cell {
+      width: 36px;
+      height: 32px;
+      font-size: 13px;
+    }
+  }
+
+  .rps-unit-state {
+    flex: 1 1 240px;
+    color: $dr-text-soft;
+    line-height: 1.5;
+  }
+
+  .rps-unit-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
+
+  // Action plan of the unit, kept from the block
+  .rps-actions-strip {
+    padding: 12px 18px;
+    border-top: 1px solid $dr-border;
+
+    &.is-missing {
+      background: rgba(233, 173, 79, 0.1);
+    }
+  }
+
+  .rps-actions-strip-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+
+    .wpeo-button {
+      margin-left: auto;
+    }
+  }
+
+  .rps-actions-count {
+    @include dr-label;
+
+    b {
+      color: $dr-text;
+    }
+  }
+
+  .rps-actions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .rps-action-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px 6px 12px;
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius;
+    background: $dr-surface;
+    transition: opacity $dr-transition;
+
+    &.is-done {
+      background: $dr-surface-soft;
+
+      .rps-action-label {
+        color: $dr-faint;
+        text-decoration: line-through;
+      }
+    }
+
+    &.is-saving {
+      opacity: 0.55;
+    }
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      cursor: pointer;
+    }
+  }
+
+  .rps-action-ref {
+    color: $dr-primary;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .rps-action-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .rps-task-owner {
+    max-width: 180px;
+  }
+
+  .rps-task-due {
+    max-width: 150px;
+  }
+
+  .rps-task-delete:hover {
+    background: $dr-danger-soft;
+    color: #b91c1c;
+  }
+
+  // ---- Modals: assessment of a unit and criteria of the grid ----
+
+  .wpeo-modal .modal-container.rps-modal-container {
+    display: flex;
+    flex-direction: column;
+    width: 92%;
+    max-width: 1080px;
+    height: auto;
+    max-height: calc(100% - 4em);
+
+    .modal-header,
+    .modal-footer {
+      flex: 0 0 auto;
+      height: auto;
+    }
+
+    .modal-header {
+      gap: 12px;
+    }
+
+    .modal-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+
+      .fas {
+        color: $dr-primary;
+      }
+    }
+
+    // min-height: 0 lets the flex item shrink below its content, its own overflow takes over
+    .modal-content {
+      flex: 1 1 auto;
+      height: auto;
+      min-height: 0;
+      padding: 0;
+      overflow-y: auto;
+    }
+
+    // Saturne right-aligns the footer text: the error and the notes read from the left
+    .modal-footer {
+      flex-wrap: wrap;
+      gap: 12px 18px;
+      justify-content: flex-start;
+      text-align: left;
+    }
+  }
+
+  .rps-modal-sub {
+    padding: 12px 24px 0;
+    color: $dr-muted;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  // Choice of the method
+  .rps-method-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+    padding: 12px 24px 0;
+  }
+
+  .rps-method-label {
+    @include dr-label;
+  }
+
+  .rps-method-switch {
+    display: inline-flex;
+    gap: 3px;
+    padding: 3px;
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius;
+    background: $dr-bg;
+  }
+
+  .rps-method {
+    padding: 5px 13px;
+    border: 0;
+    border-radius: $dr-radius-sm;
+    background: transparent;
+    color: $dr-muted;
+    font-family: $dr-font;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+    text-align: left;
+    cursor: pointer;
+
+    small {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+    }
+
+    &:hover {
+      color: $dr-text;
+    }
+
+    &.is-on {
+      background: $dr-surface;
+      color: $dr-primary-strong;
+      box-shadow: $dr-shadow-sm;
+    }
+  }
+
+  .rps-method-hint {
+    margin-left: auto;
+    color: $dr-faint;
+    font-size: 12px;
+  }
+
+  // Date, observation and progress of the assessment
+  .rps-modal-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px 16px;
+    margin: 12px 24px 0;
+    padding: 12px 14px;
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius;
+    background: $dr-surface-soft;
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      @include dr-label;
+      font-size: 10px;
+    }
+
+    input {
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+  }
+
+  .rps-grow {
+    flex: 1;
+    min-width: 220px;
+  }
+
+  .rps-grid-progress {
+    margin-left: auto;
+    color: $dr-muted;
+    font-size: 12px;
+
+    b {
+      color: $dr-text;
+      font-size: 15px;
+    }
+  }
+
+  .rps-modal-body {
+    padding: 4px 24px 16px;
+  }
+
+  .rps-pane {
+    display: none;
+  }
+
+  #rps_eval_modal[data-method="point"] .rps-pane[data-method="point"],
+  #rps_eval_modal[data-method="grid"] .rps-pane[data-method="grid"] {
+    display: block;
+  }
+
+  .rps-pane-source {
+    padding: 12px 0 2px;
+    color: $dr-muted;
+    font-size: 12px;
+
+    .fas {
+      color: $dr-primary;
+    }
+  }
+
+  .rps-grid-family {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 14px 0 6px;
+    background: $dr-surface;
+    @include dr-label;
+  }
+
+  .rps-grid-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 9px 0;
+    border-top: 1px solid #eef2f6;
+
+    &.is-context {
+      opacity: 0.85;
+    }
+  }
+
+  .rps-grid-criterion {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .rps-grid-name {
+    display: block;
+    color: $dr-text;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .rps-grid-question {
+    display: block;
+    margin-top: 2px;
+    color: $dr-muted;
+    font-size: 12px;
+  }
+
+  .rps-grid-answers {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 6px;
+  }
+
+  // The four levels read on the answers themselves: a dot of the level colour at rest (a tint of
+  // the black level would read as a picked grey), the cotation chip colour once picked
+  .rps-grid-answer {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 104px;
+    padding: 6px 10px;
+    border: 1px solid $dr-border-strong;
+    border-radius: $dr-radius-sm;
+    background: $dr-surface;
+    color: $dr-text-soft;
+    font-family: $dr-font;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color $dr-transition, border-color $dr-transition, box-shadow $dr-transition, color $dr-transition;
+
+    &::before {
+      content: '';
+      flex: none;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+    }
+
+    &:hover {
+      border-color: $dr-faint;
+      background: $dr-surface-soft;
+      color: $dr-text;
+    }
+
+    @each $level, $colors in $rps-scales {
+      &[data-scale="#{$level}"] {
+        &::before {
+          background: nth($colors, 1);
+        }
+
+        &.is-picked {
+          border-color: nth($colors, 1);
+          background: nth($colors, 1);
+          color: nth($colors, 3);
+
+          &::before {
+            box-shadow: inset 0 0 0 1px currentColor;
+          }
+        }
+      }
+    }
+
+    // The picked answer does not rely on its colour alone: ring and weight
+    &.is-picked {
+      box-shadow: 0 0 0 2px $dr-surface, 0 0 0 4px $dr-primary;
+      font-weight: 700;
+    }
+  }
+
+  // Prevention actions, typed per factor
+  .rps-actions-block {
+    margin-top: 16px;
+    padding: 14px 0 4px;
+    border-top: 1px solid $dr-border;
+  }
+
+  .rps-actions-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 12px;
+    margin-bottom: 10px;
+  }
+
+  .rps-actions-title {
+    @include dr-label;
+  }
+
+  .rps-actions-hint {
+    flex: 1;
+    min-width: 260px;
+    color: $dr-muted;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .rps-action-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: $dr-radius-sm;
+
+    &[hidden] {
+      display: none;
+    }
+
+    &.is-to-treat {
+      background: rgba(224, 83, 83, 0.06);
+
+      .rps-action-factor::after {
+        content: ' · à traiter';
+        color: #b91c1c;
+      }
+    }
+  }
+
+  .rps-action-factor {
+    min-width: 210px;
+    font-weight: 600;
+  }
+
+  .rps-action-input {
+    flex: 1;
+  }
+
+  .rps-action-owner {
+    max-width: 170px;
+  }
+
+  .rps-action-due {
+    max-width: 150px;
+  }
+
+  .rps-actions-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 0 2px;
+    border: 0;
+    background: none;
+    color: $dr-primary;
+    font-family: $dr-font;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &[hidden] {
+      display: none;
+    }
+
+    .fas {
+      font-size: 10px;
+    }
+  }
+
+  .rps-grid-summary {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+  }
+
+  .rps-grid-error {
+    flex-basis: 100%;
+    order: -1;
+    padding: 8px 12px;
+    border: 1px solid rgba(224, 83, 83, 0.3);
+    border-radius: $dr-radius-sm;
+    background: $dr-danger-soft;
+    color: #b91c1c;
+    font-size: 12px;
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  .rps-modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+  }
+
+  // Criteria of the grid
+  table.rps-dict-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding: 10px 24px;
+      border-bottom: 1px solid $dr-border;
+      background: $dr-surface;
+      text-align: left;
+      @include dr-label;
+    }
+
+    td {
+      padding: 8px 24px;
+      border-bottom: 1px solid #eef2f6;
+      vertical-align: top;
+    }
+
+    tr.rps-dict-family td {
+      background: $dr-surface-soft;
+      @include dr-label;
+    }
+
+    .rps-dict-position,
+    .rps-dict-muted {
+      color: $dr-muted;
+    }
+
+    .rps-dict-position {
+      width: 44px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .rps-dict-factor {
+      width: 170px;
+    }
+
+    .rps-dict-direction {
+      width: 100px;
+    }
+
+    .rps-dict-active {
+      width: 64px;
+    }
+
+    td.rps-dict-active {
+      color: $dr-primary;
+      font-size: 16px;
+    }
+
+    .rps-dict-edit {
+      width: 52px;
+      text-align: right;
+    }
+  }
+
+  .rps-dict-question {
+    display: block;
+    margin-top: 2px;
+    color: $dr-muted;
+    font-size: 12px;
+  }
+
+  .rps-dict-foot-note {
+    flex: 1;
+    max-width: 560px;
+    color: $dr-muted;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+}

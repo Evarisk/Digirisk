@@ -19,9 +19,7 @@
  *             concernee n'affiche pas la ligne du risque psychosocial, une unite concernee
  *             la retrouve a sa place, parmi ses autres risques.
  *
- *             La persistance de la qualification n est pas encore branchee.
- *
- * Variables attendues : $rpsLines, $rpsScale, $rpsSubCategories, $rpsExistingTotal,
+ * Variables attendues : $rpsLines, $rpsScale, $rpsScaleLabels, $rpsSubCategories, $rpsExistingTotal,
  *                       $rpsScopeElementId, $activeDigiriskElementList, $object, $langs
  */
 
@@ -68,31 +66,35 @@ $rpsGroupMeta = [
 ];
 
 ?>
-<div class="rps-scope rps-scope-top">
+<div class="rps-scope" data-endpoint="<?php echo dol_buildpath('/digiriskdolibarr/core/ajax/save_rps_assessment.php', 1); ?>"
+     data-scale-labels="<?php echo dol_escape_htmltag(json_encode($rpsScaleLabels)); ?>">
 
     <div class="rps-head">
-        <span class="rps-head-title">
-            <i class="fas fa-brain"></i>
-            Risques psychosociaux
-            <span class="rps-head-sub">toutes les unités de travail du document unique &mdash; une qualification par unité</span>
-        </span>
+        <span class="rps-head-icon"><i class="fas fa-brain"></i></span>
+        <div class="rps-head-text">
+            <span class="rps-head-title">Risques psychosociaux</span>
+            <span class="rps-head-sub">Toutes les unités de travail du document unique &mdash; une qualification par unité</span>
+        </div>
 
-        <span class="rps-head-metrics">
-            <span class="rps-metric">
-                <b class="rps-num" id="rps-average"><?php echo $rpsDone > 0 ? number_format($rpsAverage, 2, ',', ' ') : '—'; ?></b>
-                <span class="rps-metric-label">/ 4 cotation</span>
+        <div class="rps-head-metrics">
+            <div class="rps-metric">
+                <span class="rps-metric-label">Cotation</span>
+                <span class="rps-metric-value">
+                    <b class="rps-num" id="rps-average"><?php echo $rpsDone > 0 ? number_format($rpsAverage, 2, ',', ' ') : '—'; ?></b> / 4
+                </span>
+            </div>
+            <span class="rps-band" id="rps-band" data-scale="<?php echo $rpsDone > 0 ? (int) $rpsBand : 0; ?>">
+                <?php echo $rpsDone > 0 ? $rpsScaleLabels[$rpsBand] : 'non cotée'; ?>
             </span>
-            <span class="rps-pill rps-pill-band" id="rps-band"
-                  style="background:<?php echo $rpsDone > 0 ? $rpsScale[$rpsBand]['color'] : '#f1f2f5'; ?>;color:<?php echo $rpsDone > 0 ? $rpsScale[$rpsBand]['ink'] : '#9aa1ab'; ?>">
-                <?php echo $rpsDone > 0 ? $rpsScale[$rpsBand]['range'] . ' · ' . $rpsScale[$rpsBand]['label'] : 'non cotée'; ?>
-            </span>
-            <span class="rps-metric rps-metric-coverage">
+            <div class="rps-metric">
                 <span class="rps-metric-label"><b id="rps-done"><?php echo $rpsDone; ?></b>/<b id="rps-concerned"><?php echo $rpsConcerned; ?></b> évaluées</span>
-                <span class="rps-bar"><i id="rps-bar" style="width:<?php echo (int) $rpsCoverage; ?>%"></i></span>
-            </span>
-        </span>
+                <progress class="rps-progress" id="rps-bar" max="100" value="<?php echo (int) $rpsCoverage; ?>"></progress>
+            </div>
+        </div>
 
-        <button type="button" class="rps-icon-button rps-scope-toggle" title="Replier"><i class="fas fa-chevron-up"></i></button>
+        <button type="button" class="wpeo-button button-transparent button-square-30 rps-scope-toggle" title="Replier">
+            <i class="fas fa-chevron-up button-icon"></i>
+        </button>
     </div>
 
     <div class="rps-body">
@@ -103,16 +105,19 @@ $rpsGroupMeta = [
                     <span class="rps-group-title"><?php echo dol_escape_htmltag($rpsMeta['title']); ?></span>
                     <span class="rps-count"><?php echo count($rpsStateLines); ?></span>
                     <span class="rps-group-hint"><?php echo dol_escape_htmltag($rpsMeta['hint']); ?></span>
-                    <?php if ($rpsMeta['key'] == 'yes') : ?>
-                        <span class="rps-group-legend">
-                            <?php foreach ($rpsSubCategories as $rpsPosition => $rpsSub) : ?>
-                                <abbr title="<?php echo dol_escape_htmltag($langs->trans($rpsSub['label'])); ?>">F<?php echo (int) $rpsPosition + 1; ?></abbr>
-                            <?php endforeach; ?>
-                        </span>
-                    <?php endif; ?>
                 </div>
 
                 <div class="rps-rows">
+                    <?php if ($rpsMeta['key'] == 'yes') : ?>
+                        <div class="rps-row-keys">
+                            <span class="rps-factors">
+                                <?php foreach ($rpsSubCategories as $rpsPosition => $rpsSub) : ?>
+                                    <abbr class="rps-factor-key" title="<?php echo dol_escape_htmltag($langs->trans($rpsSub['label'])); ?>">F<?php echo (int) $rpsPosition + 1; ?></abbr>
+                                <?php endforeach; ?>
+                            </span>
+                        </div>
+                    <?php endif; ?>
+
                     <?php foreach ($rpsStateLines as $rpsLine) : ?>
                         <div class="rps-row" data-element="<?php echo (int) $rpsLine['id']; ?>"
                              data-state="<?php echo (int) $rpsLine['state']; ?>"
@@ -123,7 +128,7 @@ $rpsGroupMeta = [
                                 <span class="rps-unit-label"><?php echo dol_escape_htmltag($rpsLine['label']); ?></span>
                                 <span class="rps-unit-meta">
                                     <?php if ($rpsLine['state'] === 0) : ?>
-                                        <i class="fas fa-circle-info"></i> <span class="rps-reason"><?php echo dol_escape_htmltag($rpsLine['reason']); ?></span>
+                                        <i class="fas fa-info-circle"></i> <span class="rps-reason"><?php echo dol_escape_htmltag($rpsLine['reason']); ?></span>
                                         <?php if (!empty($rpsLine['orphans'])) : ?>
                                             <span class="rps-attention">&middot; <?php echo count($rpsLine['orphans']); ?> risque<?php echo count($rpsLine['orphans']) > 1 ? 's' : ''; ?> à archiver</span>
                                         <?php endif; ?>
@@ -155,21 +160,17 @@ $rpsGroupMeta = [
                             </div>
 
                             <div class="rps-factors">
-                                <?php foreach ($rpsSubCategories as $rpsPosition => $rpsSub) : ?>
-                                    <?php if (isset($rpsLine['levels'][$rpsPosition])) :
-                                        $rpsLevel = $rpsLine['levels'][$rpsPosition]; ?>
-                                        <span class="rps-cell" style="background:<?php echo $rpsScale[$rpsLevel]['color']; ?>;color:<?php echo $rpsScale[$rpsLevel]['ink']; ?>"
-                                              title="<?php echo dol_escape_htmltag($langs->trans($rpsSub['label']) . ' — ' . $rpsScale[$rpsLevel]['label']); ?>"><?php echo $rpsLevel; ?></span>
-                                    <?php else : ?>
-                                        <span class="rps-cell rps-cell-empty" title="<?php echo dol_escape_htmltag($langs->trans($rpsSub['label']) . ' — non évalué'); ?>"></span>
-                                    <?php endif; ?>
+                                <?php foreach ($rpsSubCategories as $rpsPosition => $rpsSub) :
+                                    $rpsLevel = (int) ($rpsLine['levels'][$rpsPosition] ?? 0); ?>
+                                    <span class="rps-cell" data-scale="<?php echo $rpsLevel; ?>"
+                                          title="<?php echo dol_escape_htmltag($langs->trans($rpsSub['label']) . ' — ' . ($rpsLevel ? $rpsScale[$rpsLevel]['label'] : 'non évalué')); ?>"><?php echo $rpsLevel ?: ''; ?></span>
                                 <?php endforeach; ?>
                             </div>
 
                             <div class="rps-score">
                                 <?php if ($rpsLine['done']) : ?>
                                     <b class="rps-num"><?php echo number_format($rpsLine['average'], 2, ',', ' '); ?></b>
-                                    <span class="rps-pill" style="background:<?php echo $rpsScale[$rpsLine['band']]['color']; ?>;color:<?php echo $rpsScale[$rpsLine['band']]['ink']; ?>"><?php echo $rpsScale[$rpsLine['band']]['range']; ?></span>
+                                    <span class="rps-band" data-scale="<?php echo (int) $rpsLine['band']; ?>"><?php echo $rpsScale[$rpsLine['band']]['range']; ?></span>
                                 <?php endif; ?>
                             </div>
 
@@ -179,9 +180,9 @@ $rpsGroupMeta = [
                                     <button type="button" data-value="0" class="<?php echo $rpsLine['state'] === 0 ? 'is-no' : ''; ?>">Non</button>
                                     <button type="button" data-value="-1" class="<?php echo $rpsLine['state'] === -1 ? 'is-tbd' : ''; ?>" title="À qualifier">?</button>
                                 </span>
-                                <a class="rps-evaluate" href="<?php echo dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . (int) $rpsLine['id']; ?>">
-                                    <i class="fas fa-arrow-right"></i>
-                                    <span>Ouvrir l'unité</span>
+                                <a class="wpeo-button button-grey button-square-30 wpeo-tooltip-event" aria-label="Ouvrir l'unité" data-direction="left"
+                                   href="<?php echo dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . (int) $rpsLine['id']; ?>">
+                                    <i class="fas fa-arrow-right button-icon"></i>
                                 </a>
                             </div>
                         </div>
@@ -196,20 +197,25 @@ $rpsGroupMeta = [
                 La qualification se prend ici, une fois. Elle commande la liste des risques de chaque unité :
                 non concernée, l'unité n'affiche plus de ligne « risques psychosociaux ».
             </span>
-            <span class="rps-foot-keys">
+            <span class="rps-keys">
                 <?php foreach ($rpsScale as $rpsLevel => $rpsMetaScale) : ?>
-                    <span><i style="background:<?php echo $rpsMetaScale['color']; ?>"></i><?php echo $rpsLevel . ' ' . $rpsMetaScale['label']; ?></span>
+                    <span class="rps-key"><i class="rps-key-swatch" data-scale="<?php echo (int) $rpsLevel; ?>"></i><?php echo $rpsLevel . ' ' . $rpsMetaScale['label']; ?></span>
                 <?php endforeach; ?>
             </span>
-            <button type="button" class="rps-button rps-open-dict"><i class="fas fa-sliders"></i> Gérer les critères</button>
+            <div class="wpeo-button button-grey button-size-small modal-open">
+                <input type="hidden" class="modal-options" data-modal-to-open="rps_dict_modal">
+                <i class="fas fa-sliders-h"></i> Gérer les critères
+            </div>
         </div>
 
         <?php if (!empty($rpsExistingTotal) && $rpsExistingTotal > 1) : ?>
             <div class="rps-note">
-                <i class="fas fa-triangle-exclamation"></i>
-                <b><?php echo (int) $rpsExistingTotal; ?> risques psychosociaux</b> sont aujourd'hui enregistrés séparément :
-                la grille INRS en crée un par critère, la modale « Faire le point » huit par unité. La qualification
-                ci-dessus les consolide en une ligne par unité de travail, sans rien sortir du document unique.
+                <span>
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <b><?php echo (int) $rpsExistingTotal; ?> risques psychosociaux</b> sont aujourd'hui enregistrés séparément :
+                    la grille INRS en crée un par critère, la modale « Faire le point » huit par unité. La qualification
+                    ci-dessus les consolide en une ligne par unité de travail, sans rien sortir du document unique.
+                </span>
             </div>
         <?php endif; ?>
     </div>
