@@ -133,8 +133,9 @@ if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && empty($conf->global->DIGIR
 
 	$tags = new Categorie($db);
 
-	$tags->fetch('', 'DU');
-	$tags->add_type($project, 'project');
+	if ($tags->fetch('', 'DU') > 0) {
+		$tags->add_type($project, 'project');
+	}
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_PROJECT_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
 }
 
@@ -178,8 +179,9 @@ if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) 
 
 	$tags = new Categorie($db);
 
-	$tags->fetch('', 'DU');
-	$tags->add_type($project, 'project');
+	if ($tags->fetch('', 'DU') > 0) {
+		$tags->add_type($project, 'project');
+	}
 
 	header("Location: " . $_SERVER['PHP_SELF']);
 }
@@ -195,8 +197,9 @@ if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0 && empty($conf->g
 	require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 	$tags = new Categorie($db);
 
-	$tags->fetch('', 'PP');
-	$tags->add_type($project, 'project');
+	if ($tags->fetch('', 'PP') > 0) {
+		$tags->add_type($project, 'project');
+	}
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
 }
 
@@ -222,8 +225,9 @@ if ( $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT == 0 || $project->st
 
 	$tags = new Categorie($db);
 
-	$tags->fetch('', 'PP');
-	$tags->add_type($project, 'project');
+	if ($tags->fetch('', 'PP') > 0) {
+		$tags->add_type($project, 'project');
+	}
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT == 0 || $project->statut == 2 ) {
@@ -248,8 +252,9 @@ if ( $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT == 0 || $project->statut
 
 	$tags = new Categorie($db);
 
-	$tags->fetch('', 'FP');
-	$tags->add_type($project, 'project');
+	if ($tags->fetch('', 'FP') > 0) {
+		$tags->add_type($project, 'project');
+	}
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT == 0 || $project->statut == 2 ) {
@@ -274,8 +279,9 @@ if ( $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT == 0 || $project->statut =
 
 	$tags = new Categorie($db);
 
-	$tags->fetch('', 'ACC');
-	$tags->add_type($project, 'project');
+	if ($tags->fetch('', 'ACC') > 0) {
+		$tags->add_type($project, 'project');
+	}
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT == 0 || $project->statut == 2 ) {
@@ -300,8 +306,9 @@ if ( $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT == 0 || $project->statut == 
 
 	$tags = new Categorie($db);
 
-	$tags->fetch('', 'TS');
-	$tags->add_type($project, 'project');
+	if ($tags->fetch('', 'TS') > 0) {
+		$tags->add_type($project, 'project');
+	}
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT == 0 || $project->statut == 2 ) {
@@ -326,8 +333,9 @@ if ( $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT == 0 || $project->statu
 
     $tags = new Categorie($db);
 
-    $tags->fetch('', 'ENV');
-    $tags->add_type($project, 'project');
+    if ($tags->fetch('', 'ENV') > 0) {
+        $tags->add_type($project, 'project');
+    }
 
     $url = '/projet/tasks.php?id=' . $project_id;
 
@@ -359,8 +367,7 @@ if (!dolibarr_get_const($db, 'DIGIRISKDOLIBARR_USERAPI_SET', 0)) {
 		$apiUser = new User($db);
 		$apiUser->fetch($user_id);
 		//Rights digiriskdolibarr api
-		$apiUser->addrights(43630236);
-		$apiUser->addrights(43630237);
+		$apiUser->addrights(0, 'digiriskdolibarr', 'api');
 	}
 
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERAPI_SET', $user_id, 'integer', 0, '', 0);
@@ -489,6 +496,7 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_USERGROUP_UPDATED') >= 0 && getDolGlobalIn
                 $userGroup->addrights(43630250, 'digiriskdolibarr');  // Accident create
                 $userGroup->addrights(43630252, 'digiriskdolibarr');  // AccidentInvestigation read
                 $userGroup->addrights(43630253, 'digiriskdolibarr');  // AccidentInvestigation create
+                $userGroup->addrights(0, 'digiriskdolibarr', 'api');  // API read and write
 
                 $userGroup->addrights('', 'saturne', 'lire');
                 $userGroup->addrights('', 'saturne', 'read');

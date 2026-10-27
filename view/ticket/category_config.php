@@ -148,7 +148,7 @@ if (empty($resHook)) {
 
         if (empty($label) || empty($type)) {
             setEventMessages($langs->transnoentities('ErrorFieldRequired'), [], 'errors');
-            header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&type=ticket&action=createExtra');
+            header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&type=ticket&action=createExtra&token=' . newToken());
             exit;
         }
 
@@ -357,7 +357,7 @@ print '</div>';
 if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
     if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
         if ($action != 'createExtra') {
-            $createExtraUrl = $_SERVER['PHP_SELF'] . '?id=' . $id . '&type=ticket&action=createExtra';
+            $createExtraUrl = $_SERVER['PHP_SELF'] . '?id=' . $id . '&type=ticket&action=createExtra&token=' . newToken();
             print '<div class="tabsAction">';
             print '<a class="butAction" href="' . dol_sanitizeUrl($createExtraUrl) . '">' . img_picto('', 'add', 'class="paddingright"') . $langs->transnoentities('AddExtraField') . '</a>';
             print '</div>';

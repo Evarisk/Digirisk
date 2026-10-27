@@ -1,0 +1,262 @@
+/* Digirisk modern theme: Dolibarr action buttons and Saturne wpeo-button */
+
+#{$dr-scope} {
+  /* ---- Dolibarr actions of a card (tabsAction) ---- */
+
+  div.tabsAction {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0 22px;
+  }
+
+  div.tabsAction > a.butAction,
+  div.tabsAction > a.butActionRefused,
+  div.tabsAction > a.butActionDelete,
+  div.tabsAction > span.butAction,
+  div.tabsAction > span.butActionRefused,
+  div.tabsAction > span.butActionDelete,
+  div.tabsAction > div.divButAction > .butAction,
+  div.tabsAction > div.divButAction > .butActionRefused,
+  div.tabsAction > div.divButAction > .butActionDelete,
+  div.tabsAction > .dropdown > .dropdown-toggle {
+    margin: 0 !important;
+  }
+
+  .butAction,
+  .butAction:link,
+  .butAction:visited,
+  .butAction:hover,
+  .butAction:active,
+  .butActionDelete,
+  .butActionDelete:link,
+  .butActionDelete:visited,
+  .butActionDelete:hover,
+  .butActionDelete:active,
+  .butActionRefused {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    margin: 0 4px;
+    padding: 8px 14px;
+    border: 1px solid transparent;
+    border-radius: $dr-radius;
+    font-family: $dr-font !important;
+    font-size: 13px;
+    font-weight: 600 !important;
+    line-height: 1.3;
+    letter-spacing: 0;
+    text-transform: none;
+    transition: background-color $dr-transition, box-shadow $dr-transition, transform $dr-transition;
+  }
+
+  .butAction,
+  .butAction:link,
+  .butAction:visited {
+    background: $dr-primary;
+    color: #ffffff !important;
+    box-shadow: 0 1px 2px rgba(13, 138, 255, 0.35);
+  }
+
+  .butAction:hover,
+  .dropdown-holder.open > .butAction {
+    background: $dr-primary-strong;
+    box-shadow: 0 4px 12px rgba(13, 138, 255, 0.3);
+  }
+
+  .butAction:active {
+    transform: scale(0.98);
+  }
+
+  .butActionDelete,
+  .butActionDelete:link,
+  .butActionDelete:visited,
+  .butActionDelete:hover,
+  .butActionDelete:active {
+    background: $dr-danger-soft !important;
+    color: #c53030 !important;
+    box-shadow: none;
+  }
+
+  .butActionDelete:hover {
+    background: rgba(224, 83, 83, 0.2) !important;
+  }
+
+  .butActionRefused {
+    background: $dr-surface-soft;
+    border: 1px solid $dr-border;
+    color: $dr-faint !important;
+    opacity: 1;
+  }
+
+  .butAction .fas,
+  .butAction .far,
+  .butActionRefused .fas,
+  .butActionRefused .far,
+  .butActionDelete .fas,
+  .butActionDelete .far {
+    font-size: 12px;
+  }
+
+  /* "New" buttons next to a list title: the 6px eldy padding around the 2em icon did not fit in the
+     34px, the icon touched the bottom (and outside .page-ut-gp-list, in content-box, the button grew to 48px) */
+  a.btnTitle,
+  span.btnTitle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-sizing: border-box;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 4px;
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius;
+    background: $dr-surface;
+    box-shadow: $dr-shadow-sm;
+    color: $dr-text-soft;
+    transition: border-color $dr-transition, color $dr-transition;
+
+    &:hover {
+      border-color: $dr-primary;
+      color: $dr-primary;
+      box-shadow: $dr-shadow-sm;
+    }
+
+    /* Eldy grows the "+" by 10% on hover: the button widened and slid to the left under the mouse */
+    &.btnTitlePlus:hover .btnTitle-icon::before {
+      font-size: inherit;
+    }
+
+    &.btnTitleSelected {
+      border-color: $dr-primary;
+      background: $dr-primary-soft;
+      color: $dr-primary;
+    }
+  }
+
+  a.btnTitle.btnTitlePlus .fa-plus-circle,
+  span.btnTitle .fa-plus-circle {
+    color: $dr-primary;
+  }
+
+  /* ---- Submit buttons of the Dolibarr forms ---- */
+
+  input.button:not(.buttongen):not(.smallpaddingimp),
+  button.button:not(.buttongen):not(.smallpaddingimp),
+  a.button:not(.buttongen) {
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    border-radius: $dr-radius;
+    background: $dr-primary;
+    color: #ffffff !important;
+    font-family: $dr-font;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: none;
+    box-shadow: 0 1px 2px rgba(13, 138, 255, 0.35);
+    transition: background-color $dr-transition;
+
+    &:hover {
+      background: $dr-primary-strong;
+      box-shadow: 0 4px 12px rgba(13, 138, 255, 0.3);
+    }
+  }
+
+  /* Digirisk cancel buttons only carry name="cancel" */
+  input.button.button-cancel:not(.buttongen),
+  button.button.button-cancel:not(.buttongen),
+  input.button[name="cancel"]:not(.buttongen),
+  button.button[name="cancel"]:not(.buttongen) {
+    background: $dr-surface !important;
+    border: 1px solid $dr-border-strong;
+    color: $dr-text-soft !important;
+    box-shadow: none;
+
+    &:hover {
+      background: $dr-surface-soft !important;
+    }
+  }
+
+  /* ---- Saturne buttons ---- */
+
+  .wpeo-button {
+    border-width: 1px;
+    border-radius: $dr-radius;
+    font-weight: 600;
+    transition: background-color $dr-transition, border-color $dr-transition, box-shadow $dr-transition, color $dr-transition;
+
+    /* Saturne centres the content of the square buttons with a line-height sized for its 3px
+       border: with the 1px border above, every icon sat 1 to 2px too high. The icon is aligned on
+       the top of the line, the baseline moved it down when its font is smaller than the button's */
+    @each $size in 30, 40, 50, 60 {
+      &.button-square-#{$size},
+      &.button-square-#{$size} .button-icon {
+        line-height: #{$size - 2}px;
+      }
+    }
+
+    &[class*="button-square-"] .button-icon {
+      vertical-align: top;
+    }
+
+    &:hover {
+      box-shadow: inset 0 -2.6em rgba(255, 255, 255, 0.14);
+    }
+
+    &.button-rounded {
+      border-radius: 50%;
+    }
+
+    &.button-grey {
+      background: $dr-surface-soft;
+      border-color: $dr-border;
+      color: $dr-text-soft;
+
+      &:hover {
+        background: $dr-bg;
+        box-shadow: none;
+        color: $dr-text;
+      }
+    }
+
+    &.button-light {
+      border-color: $dr-border;
+    }
+
+    &.button-secondary {
+      background: $dr-navy;
+      border-color: $dr-navy;
+    }
+
+    /* The Saturne green (#47e58e) carries a white label badly ("Mettre à jour" of the modals) */
+    &.button-green {
+      background: $dr-success;
+      border-color: $dr-success;
+      color: #ffffff;
+    }
+
+    &.button-transparent {
+      border-color: transparent;
+      color: $dr-faint;
+
+      &:hover {
+        background: $dr-bg;
+        color: $dr-text;
+      }
+    }
+
+    &.button-disable {
+      background: $dr-border !important;
+      border-color: $dr-border !important;
+      color: $dr-faint !important;
+    }
+
+    &.button-bordered {
+      background: $dr-surface;
+    }
+  }
+}

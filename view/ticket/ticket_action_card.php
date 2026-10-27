@@ -444,6 +444,7 @@ saturne_header(0, '', $title, $helpUrl);
 // Kanban picker data — loaded only when no specific ticket is requested.
 $pickerAllUsers          = [];
 $pickerAllCategories     = [];
+$pickerTagFilterOptions  = [];
 $pickerTicketsJson       = [];
 $pickerTypeColumns       = [];
 $pickerTypeTickets       = [];
@@ -496,6 +497,48 @@ if ($object->id <= 0) {
             $pickerAllCategories[] = ['id' => (int) $objCat->rowid, 'label' => $objCat->label, 'color' => $objCat->color];
         }
         $db->free($resCats);
+    }
+
+    // Tag filter options in tree order. Each tag carries the path of its parents, shown while searching, and
+    // the guides drawn before it: one per ancestor under the root ('line' while that ancestor has siblings
+    // below it, 'blank' otherwise) then its own branch ('mid', or 'last' for the last child of its parent)
+    $tagTree = $categorie->get_full_arbo(Categorie::TYPE_TICKET);
+    if (is_array($tagTree)) {
+        $tagChildren = [];
+        foreach ($tagTree as $tagId => $tag) {
+            // A parent missing from the tree (another entity) leaves its child at the root
+            $tagChildren[isset($tagTree[$tag['fk_parent']]) ? (int) $tag['fk_parent'] : 0][] = (int) $tagId;
+        }
+
+        // A tag without colour takes the one of its closest coloured parent, so that each family reads at a glance
+        /**
+         * @param  int      $parentId    Tag whose children are added, 0 for the root tags
+         * @param  string[] $guides      Guides drawn before the children of $parentId
+         * @param  string[] $path        Labels of $parentId and its ancestors, from the root
+         * @param  string   $parentColor Colour inherited by the children without one
+         * @return void
+         */
+        $addTagBranch = function (int $parentId, array $guides, array $path, string $parentColor) use (&$addTagBranch, &$pickerTagFilterOptions, $tagTree, $tagChildren) {
+            $siblings = $tagChildren[$parentId] ?? [];
+            foreach ($siblings as $index => $tagId) {
+                $isLast   = $index === count($siblings) - 1;
+                $tagLabel = dol_html_entity_decode($tagTree[$tagId]['label'], ENT_QUOTES | ENT_HTML5);
+                $tagColor = !empty($tagTree[$tagId]['color']) ? (string) $tagTree[$tagId]['color'] : $parentColor;
+
+                $pickerTagFilterOptions[] = [
+                    'id'        => $tagId,
+                    'label'     => $tagLabel,
+                    'color'     => $tagColor,
+                    'ancestors' => $path,
+                    'path'      => implode(' › ', $path),
+                    'guides'    => $guides,
+                    'branch'    => $parentId > 0 ? ($isLast ? 'last' : 'mid') : '',
+                ];
+
+                $addTagBranch($tagId, $parentId > 0 ? array_merge($guides, [$isLast ? 'blank' : 'line']) : [], array_merge($path, [$tagLabel]), $tagColor);
+            }
+        };
+        $addTagBranch(0, [], [], '');
     }
 
     // Tickets with enriched data (assignee, severity, type, group, company).

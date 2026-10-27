@@ -44,7 +44,7 @@ $fpExtName = trim($fpExtSignatory->firstname . ' ' . $fpExtSignatory->lastname);
         <div><i class="fas fa-hard-hat"></i> <?php print $langs->trans('FirePermitExteriorCompany'); ?></div>
         <?php if ($fpExtSigned) { ?>
         <div class="digirisk-mobile-extsign__signed">
-            <i class="fas fa-check"></i> <?php print $langs->trans('MobilePPExtAlreadySigned', dol_print_date($fpExtSignatory->signature_date, 'dayhour')); ?>
+            <i class="fas fa-check"></i> <?php print $langs->trans('MobilePPExtAlreadySigned', dol_print_date($fpExtSignatory->signature_date, 'dayhour', 'tzuser')); ?>
         </div>
         <?php } ?>
     </div>
@@ -72,7 +72,7 @@ $fpExtName = trim($fpExtSignatory->firstname . ' ' . $fpExtSignatory->lastname);
         <span>
             <?php
             print $fpExtEmailSent
-                ? $langs->trans('MobilePPExtEmailSentOn', dol_escape_htmltag($fpExtSignatory->email), dol_print_date($fpExtSignatory->last_email_sent_date, 'dayhour'))
+                ? $langs->trans('MobilePPExtEmailSentOn', dol_escape_htmltag($fpExtSignatory->email), dol_print_date($fpExtSignatory->last_email_sent_date, 'dayhour', 'tzuser'))
                 : $langs->trans('MobilePPExtEmailNotSent');
             ?>
         </span>
@@ -93,7 +93,7 @@ $fpExtName = trim($fpExtSignatory->firstname . ' ' . $fpExtSignatory->lastname);
 
         <?php if ($object->status < FirePermit::STATUS_LOCKED) { ?>
             <?php if ($fpExtSigned) { ?>
-                <a href="<?php print $_SERVER['PHP_SELF']; ?>?action=lock_mobile&plan_id=<?php print $object->id; ?>&token=<?php print newToken(); ?>" class="digirisk-mobile-success__button digirisk-mobile-success__button--primary">
+                <a href="<?php print $_SERVER['PHP_SELF']; ?>?created=<?php print $object->id; ?>&action=lock_mobile&plan_id=<?php print $object->id; ?>&token=<?php print newToken(); ?>" class="digirisk-mobile-success__button digirisk-mobile-success__button--primary">
                     <i class="fas fa-lock"></i> <?php print $langs->trans('MobileLock'); ?>
                 </a>
             <?php } else { ?>

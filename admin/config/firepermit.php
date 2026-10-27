@@ -37,6 +37,8 @@ require_once DOL_DOCUMENT_ROOT . "/core/class/html.formprojet.class.php";
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_firepermitround.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
 require_once __DIR__ . '/../../class/firepermit.class.php';
 
 // Translations
@@ -59,7 +61,8 @@ if (isModEnabled('project')) {
 $form = new Form($db);
 
 // Security check - Protection if external user
-$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
 /*
@@ -119,6 +122,57 @@ if ($action == 'setMobileDefaults' && !GETPOST('cancel', 'alpha')) {
 		header('Location: ' . $_SERVER['PHP_SELF']);
 		exit;
 	}
+}
+
+if ($action == 'setFireWatch' && !GETPOST('cancel', 'alpha')) {
+	$roundCount     = GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COUNT');
+	$roundInterval  = GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_INTERVAL');
+	$roundAtWorkEnd = GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_AT_WORK_END') ? 1 : 0;
+	if ($roundCount < 1 || $roundCount > DIGIRISK_FIREPERMIT_ROUND_MAX_COUNT) {
+		setEventMessages($langs->trans('FireWatchErrorRoundCount', DIGIRISK_FIREPERMIT_ROUND_MAX_COUNT), null, 'errors');
+		$error++;
+	} elseif ($roundInterval < 1 || $roundInterval > DIGIRISK_FIREPERMIT_ROUND_MAX_DELAY) {
+		setEventMessages($langs->trans('FireWatchErrorRoundInterval', DIGIRISK_FIREPERMIT_ROUND_MAX_DELAY), null, 'errors');
+		$error++;
+	} elseif (empty(digiriskFirePermitBuildRoundDelays($roundCount, $roundInterval, (bool) $roundAtWorkEnd))) {
+		setEventMessages($langs->trans('FireWatchErrorRoundsTooLate', digiriskFirePermitFormatDelay(DIGIRISK_FIREPERMIT_ROUND_MAX_DELAY)), null, 'errors');
+		$error++;
+	}
+
+	if (!$error) {
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COUNT', $roundCount, 'integer', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_ROUND_INTERVAL', $roundInterval, 'integer', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_ROUND_AT_WORK_END', $roundAtWorkEnd, 'integer', 0, '', $conf->entity);
+
+		foreach (DIGIRISK_FIREPERMIT_ROUND_ITEMS as $roundItem) {
+			$constName = 'DIGIRISKDOLIBARR_FIREPERMIT_ROUND_' . strtoupper($roundItem);
+			$itemLevel = GETPOSTINT($constName);
+			if (!in_array($itemLevel, [DIGIRISK_FIREPERMIT_ROUND_ITEM_DISABLED, DIGIRISK_FIREPERMIT_ROUND_ITEM_OPTIONAL, DIGIRISK_FIREPERMIT_ROUND_ITEM_REQUIRED], true)) {
+				$itemLevel = DIGIRISK_FIREPERMIT_ROUND_ITEM_OPTIONAL;
+			}
+			dolibarr_set_const($db, $constName, $itemLevel, 'integer', 0, '', $conf->entity);
+		}
+
+		$publicInterface = GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_PUBLIC_INTERFACE') ? 1 : 0;
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_ROUND_PUBLIC_INTERFACE', $publicInterface, 'integer', 0, '', $conf->entity);
+
+		// The link handed to the watcher carries this key: create it the first time the interface is opened
+		if ($publicInterface && !dol_strlen(getDolGlobalString('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_PUBLIC_KEY'))) {
+			dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_ROUND_PUBLIC_KEY', bin2hex(random_bytes(24)), 'chaine', 0, '', $conf->entity);
+		}
+
+		setEventMessages($langs->trans('SetupSaved'), null, 'mesgs');
+		header('Location: ' . $_SERVER['PHP_SELF'] . '#firewatch');
+		exit;
+	}
+}
+
+// A new key cuts off every link handed out so far, for instance once a guard company leaves
+if ($action == 'setNewFireWatchKey') {
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_ROUND_PUBLIC_KEY', bin2hex(random_bytes(24)), 'chaine', 0, '', $conf->entity);
+	setEventMessages($langs->trans('FireWatchPublicKeyRenewed'), null, 'mesgs');
+	header('Location: ' . $_SERVER['PHP_SELF'] . '#firewatch');
+	exit;
 }
 
 /*
@@ -200,6 +254,27 @@ print '</td></tr>';
 print '</table>';
 print '</form>';
 
+// --- List ---
+print load_fiche_titre($langs->trans('FirepermitList'), '', '');
+
+print '<table class="noborder centpercent editmode">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans('Name') . '</td>';
+print '<td>' . $langs->trans('Description') . '</td>';
+print '<td class="center">' . $langs->trans('Status') . '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_FIREPERMIT_SEARCH_REF_BY_NUMBER">' . $langs->trans('ListSearchRefByNumber') . '</label></td>';
+// What the switch changes, shown on fire permit references
+print '<td>' . $langs->trans('ListSearchRefByNumberDescription');
+print '<div class="opacitymedium paddingtop">' . $langs->trans('ListSearchRefByNumberExample');
+print '<br>' . $langs->trans('ListSearchRefByNumberExampleOff', 'FP1, FP11, FP12, FP21…');
+print '<br>' . $langs->trans('ListSearchRefByNumberExampleOn', 'FP1') . '</div></td>';
+print '<td class="center">' . saturne_constant_onoff('DIGIRISKDOLIBARR_FIREPERMIT_SEARCH_REF_BY_NUMBER', $permissiontowrite) . '</td>';
+print '</tr>';
+
+print '</table>';
+
 // --- Mobile creation defaults ---
 print load_fiche_titre($langs->trans('MobilePPDefaultsTitle'), '', '');
 
@@ -257,6 +332,90 @@ print '</tr>';
 
 print '</table>';
 print '</form>';
+
+// --- Fire watch rounds after the hot work ---
+print '<div id="firewatch"></div>';
+print load_fiche_titre('<i class="fas fa-walking pictofixedwidth"></i>' . $langs->trans('FireWatchSetupTitle'), '', '');
+
+$roundItemLevels = [
+	DIGIRISK_FIREPERMIT_ROUND_ITEM_DISABLED => $langs->trans('Disabled'),
+	DIGIRISK_FIREPERMIT_ROUND_ITEM_OPTIONAL => $langs->trans('Optional'),
+	DIGIRISK_FIREPERMIT_ROUND_ITEM_REQUIRED => $langs->trans('Required'),
+];
+$roundItemLabels = [
+	'comment'   => 'Comment',
+	'photo'     => 'Photo',
+	'geoloc'    => 'FireWatchGeoloc',
+	'signature' => 'Signature',
+];
+
+print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '" name="firewatch_form">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="setFireWatch">';
+print '<table class="noborder centpercent editmode">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans('Option') . '</td>';
+print '<td>' . $langs->trans('Value') . '</td>';
+print '<td>' . $langs->trans('Action') . '</td>';
+print '</tr>';
+
+// Schedule of the rounds after the end of the work: values that could not be saved are shown again to be fixed
+$roundSchedule = digiriskFirePermitGetRoundSchedule();
+$roundPosted   = GETPOSTISSET('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COUNT');
+$roundCount    = $roundPosted ? GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COUNT') : $roundSchedule['count'];
+$roundInterval = $roundPosted ? GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_INTERVAL') : $roundSchedule['interval'];
+$roundAtEnd    = $roundPosted ? GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_AT_WORK_END') : $roundSchedule['at_work_end'];
+
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COUNT">' . $langs->trans('FireWatchRoundCount') . '</label>';
+print '<div class="opacitymedium small">' . $langs->trans('FireWatchRoundCountHelp', DIGIRISK_FIREPERMIT_ROUND_MAX_COUNT) . '</div></td>';
+print '<td><input type="number" name="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COUNT" id="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COUNT" value="' . $roundCount . '" min="1" max="' . DIGIRISK_FIREPERMIT_ROUND_MAX_COUNT . '" class="flat minwidth100" required></td>';
+print '<td rowspan="' . (5 + count(DIGIRISK_FIREPERMIT_ROUND_ITEMS)) . '"><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '"></td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_INTERVAL">' . $langs->trans('FireWatchRoundInterval') . '</label>';
+print '<div class="opacitymedium small">' . $langs->trans('FireWatchRoundIntervalHelp') . '</div></td>';
+print '<td><input type="number" name="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_INTERVAL" id="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_INTERVAL" value="' . $roundInterval . '" min="1" max="' . DIGIRISK_FIREPERMIT_ROUND_MAX_DELAY . '" class="flat minwidth100" required> ' . $langs->trans('Minutes') . '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_AT_WORK_END">' . $langs->trans('FireWatchFirstRoundAtWorkEnd') . '</label>';
+print '<div class="opacitymedium small">' . $langs->trans('FireWatchFirstRoundAtWorkEndHelp') . '</div></td>';
+print '<td><input type="checkbox" name="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_AT_WORK_END" id="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_AT_WORK_END" value="1"' . ($roundAtEnd ? ' checked' : '') . '> ' . $langs->trans('Yes') . '</td>';
+print '</tr>';
+
+// Rounds the saved schedule plans, as they will show on the permits
+print '<tr class="oddeven"><td>' . $langs->trans('FireWatchRoundsSchedule') . '</td>';
+print '<td>' . dol_escape_htmltag(dol_ucfirst(implode(', ', array_map('digiriskFirePermitRoundDelayLabel', digiriskFirePermitGetRoundDelays())))) . '</td>';
+print '</tr>';
+
+// What the watcher is asked for when recording a round
+foreach (DIGIRISK_FIREPERMIT_ROUND_ITEMS as $roundItem) {
+	$constName = 'DIGIRISKDOLIBARR_FIREPERMIT_ROUND_' . strtoupper($roundItem);
+	print '<tr class="oddeven"><td><label for="' . $constName . '">' . $langs->trans('FireWatchAskFor', $langs->transnoentities($roundItemLabels[$roundItem])) . '</label></td>';
+	print '<td>' . $form->selectarray($constName, $roundItemLevels, digiriskFirePermitRoundItemLevel($roundItem), 0, 0, 0, '', 0, 0, 0, '', 'minwidth150') . '</td>';
+	print '</tr>';
+}
+
+// Public interface used by the watcher
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_PUBLIC_INTERFACE">' . $langs->trans('FireWatchPublicInterface') . '</label>';
+print '<div class="opacitymedium small">' . $langs->trans('FireWatchPublicInterfaceHelp') . '</div></td>';
+print '<td><input type="checkbox" name="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_PUBLIC_INTERFACE" id="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_PUBLIC_INTERFACE" value="1"' . (getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_PUBLIC_INTERFACE') ? ' checked' : '') . '> ' . $langs->trans('Yes') . '</td>';
+print '</tr>';
+
+print '</table>';
+print '</form>';
+
+$fireWatchPublicUrl = digiriskFirePermitRoundsPublicUrl();
+if (dol_strlen($fireWatchPublicUrl)) {
+	print '<div class="firepermit-firewatch__public">';
+	print '<div class="firepermit-firewatch__qr">' . digiriskGetQrCodeSvg($fireWatchPublicUrl) . '</div>';
+	print '<div>';
+	print '<div><strong>' . $langs->trans('FireWatchPublicLink') . '</strong></div>';
+	print '<div class="opacitymedium small">' . $langs->trans('FireWatchPublicLinkAdminHelp') . '</div>';
+	print '<div class="firepermit-firewatch__url"><a href="' . dol_escape_htmltag($fireWatchPublicUrl) . '" target="_blank" rel="noopener">' . dol_escape_htmltag($fireWatchPublicUrl) . '</a> ' . showValueWithClipboardCPButton($fireWatchPublicUrl, 0, 'none') . '</div>';
+	print '<div class="margintoponly"><a class="button smallpaddingimp" href="' . $_SERVER['PHP_SELF'] . '?action=setNewFireWatchKey&token=' . newToken() . '">' . $langs->trans('FireWatchRenewPublicKey') . '</a></div>';
+	print '</div>';
+	print '</div>';
+}
 
 // Page end
 print dol_get_fiche_end();

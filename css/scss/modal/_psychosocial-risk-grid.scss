@@ -1,0 +1,284 @@
+/* Grille d'évaluation des facteurs de risques psychosociaux de l'INRS (outil RPS-DU, ED 6403) :
+   26 critères sont cotés d'une traite, la modal doit rester lisible sur toute sa hauteur et les
+   quatre couleurs de la grille papier restent le repère de lecture de l'évaluateur. */
+$rps-du-green:  #92d050;
+$rps-du-yellow: #ffff00;
+$rps-du-orange: #ffc000;
+$rps-du-red:    #ff0000;
+
+/* L'espacement appartient à la barre de boutons de la liste, pas au bouton lui-même : il suit
+   celui des autres boutons d'ajout de la liste des risques. */
+.psychosocial-risk-grid-add {
+  margin-left: 10px;
+}
+
+.wpeo-modal .modal-container.modal-container-psychosocial-grid {
+  max-width: 1500px;
+  width: 92%;
+  /* La modal se dimensionne sur sa grille plutôt que sur les pourcentages fixes de Saturne :
+     sans cela le tableau laisse un large vide au-dessus du pied de modal. */
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  max-height: calc(100% - 4em);
+
+  .modal-header,
+  .modal-footer {
+    height: auto;
+    flex: 0 0 auto;
+  }
+
+  /* min-height: 0 laisse l'élément flex passer sous la hauteur de son contenu, son propre
+     overflow-y prend alors le relais. */
+  .modal-content {
+    height: auto;
+    min-height: 0;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.psychosocial-grid-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 0 4px 12px;
+
+  .psychosocial-grid-source {
+    color: $color__text-main;
+    font-size: 13px;
+
+    i {
+      color: $color__primary;
+      margin-right: 6px;
+    }
+  }
+
+  .psychosocial-grid-date-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+  }
+
+  /* La date d'évaluation est saisie une fois pour toute la grille : les 26 critères sont cotés
+     au cours du même entretien. */
+  .psychosocial-grid-date {
+    padding: 8px 10px;
+    border: 1px solid #d5dbe3;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: normal;
+
+    &:focus {
+      border-color: $color__primary;
+      box-shadow: 0 0 0 2px rgba(13, 138, 255, 0.15);
+      outline: none;
+    }
+  }
+}
+
+.psychosocial-grid-content {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0 4px 4px;
+}
+
+.psychosocial-grid-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 0;
+  table-layout: fixed;
+
+  /* L'en-tête reste visible pendant le défilement : sans lui, les critères du bas de la grille
+     n'ont plus de repère de colonne. */
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f4f6f9;
+    border-bottom: 2px solid $color__primary;
+    color: $color__text-main;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    padding: 12px 10px;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  td {
+    border: none;
+    border-bottom: 1px solid #e6e9ee;
+    padding: 10px;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  /* Les sept familles de la grille papier : elles ne portent pas de cotation, elles annoncent
+     les critères qui suivent. */
+  .psychosocial-grid-family td {
+    background: #eef3fb;
+    border-bottom: 1px solid #d7e2f2;
+    border-top: 1px solid #d7e2f2;
+    color: $color__secondary;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 12px 14px;
+    text-align: left;
+    text-transform: uppercase;
+
+    i {
+      color: $color__primary;
+      margin-right: 8px;
+    }
+  }
+
+  .psychosocial-grid-row:hover {
+    background-color: #f7f9fc;
+  }
+
+  .psychosocial-grid-cell-criterion {
+    text-align: left;
+  }
+
+  .psychosocial-grid-criterion-name {
+    display: block;
+    font-weight: bold;
+  }
+
+  .psychosocial-grid-criterion-question {
+    display: block;
+    margin-top: 4px;
+    color: #6b7684;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  /* Les quatre réponses sont posées en 2 × 2 : sur une seule ligne, leurs libellés
+     ("Parfois / Plutôt non") réduiraient les colonnes de saisie à rien. */
+  .psychosocial-grid-answers {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .psychosocial-grid-answer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    /* Tant qu'aucune réponse n'est retenue, le critère ne sera pas créé : les quatre couleurs
+       restent en retrait pour que les critères cotés se repèrent d'un coup d'oeil. */
+    opacity: 0.5;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+
+    &[data-scale="1"] {
+      background: $rps-du-green;
+    }
+    &[data-scale="2"] {
+      background: $rps-du-yellow;
+    }
+    &[data-scale="3"] {
+      background: $rps-du-orange;
+    }
+    &[data-scale="4"] {
+      background: $rps-du-red;
+      color: #fff;
+    }
+
+    &:hover {
+      opacity: 0.85;
+    }
+
+    &.psychosocial-grid-answer-selected {
+      opacity: 1;
+      box-shadow: 0 0 0 2px #fff, 0 0 0 4px $color__primary;
+      transform: scale(1.04);
+    }
+  }
+
+  .psychosocial-grid-description,
+  .psychosocial-grid-task {
+    width: 100%;
+    min-height: 46px;
+    padding: 8px 10px;
+    border: 1px solid #d5dbe3;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.35;
+    resize: vertical;
+    transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out;
+
+    &:focus {
+      border-color: $color__primary;
+      box-shadow: 0 0 0 2px rgba(13, 138, 255, 0.15);
+      outline: none;
+    }
+  }
+
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 34%;
+  }
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 26%;
+  }
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 22%;
+  }
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 18%;
+  }
+
+  @media (max-width: $media__medium) {
+    .psychosocial-grid-answer {
+      min-height: 32px;
+      font-size: 11px;
+    }
+  }
+}
+
+.wpeo-modal .modal-container.modal-container-psychosocial-grid .modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  .wpeo-button {
+    margin: 0;
+  }
+
+  .psychosocial-grid-hint {
+    flex: 1 1 100%;
+    color: #6b7684;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .psychosocial-grid-assessed-count {
+    display: inline-block;
+    min-width: 24px;
+    margin-left: 6px;
+    padding: 1px 7px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.25);
+    font-weight: bold;
+  }
+}

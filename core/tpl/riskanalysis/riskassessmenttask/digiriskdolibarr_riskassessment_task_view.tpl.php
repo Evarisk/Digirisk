@@ -164,7 +164,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
                                     </div>
                                     <div class="flex flex-row items-center">
                                         <i class="fas fa-calendar-check" style="margin-right: 1em;"></i>
-                                        <?php print '<input type="datetime-local" id="RiskassessmentTaskDateEnd' . $risk->id . '" name="RiskassessmentTaskDateEnd' . $risk->id . '">'; ?>
+                                        <?php print '<input type="date" id="RiskassessmentTaskDateEnd' . $risk->id . '" name="RiskassessmentTaskDateEnd' . $risk->id . '">'; ?>
                                     </div>
                                     <div class="flex flex-row items-center paddingright">
                                         <i class="fas fa-euro-sign" style="margin-right: 1em;"></i>
@@ -174,7 +174,8 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
                                 <div>
                                     <div class="flex flex-row items-center justify-center">
                                         <i class="fas fa-user-tie 100" style="margin-right: 1em;"></i>
-                                        <?php print saturne_select_users('executive_id', 0, 1, 'executiveSelect minwidth200'); ?>
+                                        <?php // One id per risk: with the id of the risk add modal, each of these selects re-initialised its select2, closing it if it was open
+                                        print saturne_select_users('executive_id' . $risk->id, 0, 1, 'executiveSelect minwidth200'); ?>
                                     </div>
                                 </div>
                             </div>
@@ -357,7 +358,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 									</div>
 									<div>
 										<span class="title"><?php echo $langs->trans('Deadline'); ?></span>
-                                        <?php print '<input type="datetime-local" id="RiskassessmentTaskDateEndEdit' . $related_task->id . '" name="RiskassessmentTaskDateEndEdit' . $related_task->id . '" value="' . ($related_task->datee ? dol_print_date($related_task->datee, '%Y-%m-%dT%H:%M:%S') : '') . '">'; ?>
+                                        <?php print '<input type="date" id="RiskassessmentTaskDateEndEdit' . $related_task->id . '" name="RiskassessmentTaskDateEndEdit' . $related_task->id . '" value="' . ($related_task->datee ? dol_print_date($related_task->datee, '%Y-%m-%d') : '') . '">'; ?>
 									</div>
 									<div class="riskassessment-task-budget">
 										<span class="title"><?php echo $langs->trans('Budget'); ?></span>

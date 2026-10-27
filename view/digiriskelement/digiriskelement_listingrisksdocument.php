@@ -106,6 +106,17 @@ if (empty($resHook)) {
 
         $moreParams['showAccidents'] = GETPOST('showaccidents') ? 1 : 0;
 
+        $moreParams['showPhoto'] = GETPOST('showphoto') ? 1 : 0;
+
+        $moreParams['showElementPhoto'] = GETPOST('showelementphoto') ? 1 : 0;
+
+        // Masquages du plan d'actions : ce que le formulaire poste l'emporte sur la
+        // configuration du module, le temps de cette generation - issue #5289
+        $moreParams['taskHideRef'] = GETPOST('taskhideref') ? 1 : 0;
+        $moreParams['taskHideResponsible'] = GETPOST('taskhideresponsible') ? 1 : 0;
+        $moreParams['taskHideDate'] = GETPOST('taskhidedate') ? 1 : 0;
+        $moreParams['taskHideBudget'] = GETPOST('taskhidebudget') ? 1 : 0;
+
         if (GETPOST('accidentdaterange')) {
             $moreParams['accidentDateStart'] = dol_mktime(0, 0, 0, GETPOSTINT('accidentdatestartmonth'), GETPOSTINT('accidentdatestartday'), GETPOSTINT('accidentdatestartyear'));
             $moreParams['accidentDateEnd']   = dol_mktime(23, 59, 59, GETPOSTINT('accidentdateendmonth'), GETPOSTINT('accidentdateendday'), GETPOSTINT('accidentdateendyear'));
@@ -191,19 +202,40 @@ $firstDayOfTheYear = dol_get_first_day((int) date('Y'));
 print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksShowRegisters') . '</td>';
 print '<td><input type="checkbox" id="showregisters" name="showregisters" checked></td></tr>';
 print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksRegistersDateRange') . '</td>';
-print '<td>' . $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'registerdatestart');
+print '<td><input type="checkbox" id="registerdaterange" name="registerdaterange">';
+print '<label for="registerdaterange" class="marginrightonly">' . $langs->trans('UseDateRange') . '</label> ';
+print $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'registerdatestart');
 print $langs->trans('At') . $form->selectDate(dol_now(), 'registerdateend');
-print $langs->trans('UseDateRange');
-print '<input type="checkbox" id="registerdaterange" name="registerdaterange"></td></tr>';
+print '</td></tr>';
 
 // Accidents, et la plage de dates qui les borne
 print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksShowAccidents') . '</td>';
 print '<td><input type="checkbox" id="showaccidents" name="showaccidents" checked></td></tr>';
 print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksAccidentsDateRange') . '</td>';
-print '<td>' . $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'accidentdatestart');
+print '<td><input type="checkbox" id="accidentdaterange" name="accidentdaterange">';
+print '<label for="accidentdaterange" class="marginrightonly">' . $langs->trans('UseDateRange') . '</label> ';
+print $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'accidentdatestart');
 print $langs->trans('At') . $form->selectDate(dol_now(), 'accidentdateend');
-print $langs->trans('UseDateRange');
-print '<input type="checkbox" id="accidentdaterange" name="accidentdaterange"></td></tr>';
+print '</td></tr>';
+
+// Photo des evaluations : cochee par defaut, soit le rendu historique
+print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksShowPhoto') . '</td>';
+print '<td><input type="checkbox" id="showphoto" name="showphoto" checked></td></tr>';
+
+// Photo de l'element en pleine page : decochee, elle n'ajoute pas de page par defaut
+print '<tr class="oddeven"><td>' . $langs->trans('ListingRisksShowElementPhoto') . '</td>';
+print '<td><input type="checkbox" id="showelementphoto" name="showelementphoto"></td></tr>';
+
+// Masquages du plan d'actions : precochees sur la configuration du module, pour que
+// generer sans rien toucher rende le meme document qu avant
+print '<tr class="oddeven"><td>' . $langs->trans('TaskHideRefInDocument') . '</td>';
+print '<td><input type="checkbox" id="taskhideref" name="taskhideref"' . (getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT') ? ' checked' : '') . '></td></tr>';
+print '<tr class="oddeven"><td>' . $langs->trans('TaskHideResponsibleInDocument') . '</td>';
+print '<td><input type="checkbox" id="taskhideresponsible" name="taskhideresponsible"' . (getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT') ? ' checked' : '') . '></td></tr>';
+print '<tr class="oddeven"><td>' . $langs->trans('TaskHideDateInDocument') . '</td>';
+print '<td><input type="checkbox" id="taskhidedate" name="taskhidedate"' . (getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_DATE_IN_DOCUMENT') ? ' checked' : '') . '></td></tr>';
+print '<tr class="oddeven"><td>' . $langs->trans('TaskHideBudgetInDocument') . '</td>';
+print '<td><input type="checkbox" id="taskhidebudget" name="taskhidebudget"' . (getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT') ? ' checked' : '') . '></td></tr>';
 
 print '</table>';
 

@@ -34,13 +34,16 @@ global $conf, $db, $langs, $user;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/class/html.formprojet.class.php";
+require_once DOL_DOCUMENT_ROOT . "/core/class/doleditor.class.php";
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../class/preventionplan.class.php';
+require_once __DIR__ . '/../../class/digiriskresources.class.php';
 
 // Translations
-saturne_load_langs(["admin"]);
+saturne_load_langs(["admin", "companies"]);
 
 
 // Parameters
@@ -89,8 +92,47 @@ if ($action == 'setMaitreOeuvre') {
 	if ( ! $error) {
 		$constForVal = 'DIGIRISKDOLIBARR_' . strtoupper($object->element) . "_MAITRE_OEUVRE";
 		dolibarr_set_const($db, $constForVal, $masterWorkerId, 'integer', 0, '', $conf->entity);
+
+		// Labour inspector suggested on new plans: the security setup page edits the same resources
+		if ($permissiontowrite && GETPOSTISSET('labourinspector_socid')) {
+			$resources                 = new DigiriskResources($db);
+			$labourInspectorId         = GETPOSTINT('labourinspector_socid');
+			$labourInspectorContactIds = array_filter(array_map('intval', GETPOST('labourinspector_contactid', 'array')));
+			$resources->setDigiriskResources($db, $user->id, 'LabourInspectorSociety', 'societe', [$labourInspectorId > 0 ? $labourInspectorId : 0], $conf->entity);
+			$resources->setDigiriskResources($db, $user->id, 'LabourInspectorContact', 'socpeople', $labourInspectorContactIds, $conf->entity);
+		}
+
 		setEventMessages($langs->trans("SetupSaved"), null, 'mesgs');
 	}
+}
+
+// Images of the document parts, sent by the Saturne media blocks
+if ($permissiontowrite) {
+	digiriskPreventionPlanDocumentImagesActions($action);
+}
+
+// What the parts of the document print from the setup: emergency numbers and texts
+if ($action == 'setDocumentContent' && $permissiontowrite && !GETPOST('cancel', 'alpha')) {
+	$resources = new DigiriskResources($db);
+	$allLinks  = $resources->fetchDigiriskResources();
+
+	// The security setup page edits the same resources, with the same rules: an emergency number
+	// left empty keeps the current one
+	foreach (digiriskPreventionPlanEmergencyResources() as $resourceRef => $resource) {
+		$resourceId = GETPOSTINT($resource['field']) > 0 ? GETPOSTINT($resource['field']) : (int) ($allLinks[$resourceRef]->id[0] ?? 0);
+		if ($resourceId > 0) {
+			$resources->setDigiriskResources($db, $user->id, $resourceRef, 'societe', [$resourceId], $conf->entity);
+		}
+	}
+
+	foreach (digiriskPreventionPlanDocumentTexts() as $text) {
+		dolibarr_set_const($db, $text['const'], GETPOST($text['field'], 'restricthtml'), 'chaine', 0, '', $conf->entity);
+	}
+
+	setEventMessages($langs->trans('SetupSaved'), null, 'mesgs');
+	// Back on the section that was just saved
+	header('Location: ' . $_SERVER['PHP_SELF'] . '#document-content');
+	exit;
 }
 
 if ($action == 'setMobileDefaults' && !GETPOST('cancel', 'alpha')) {
@@ -199,8 +241,78 @@ print '</td>';
 print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 print '</td></tr>';
 
+// Labour inspector suggested on new plans, shared with the security setup page and the legal display
+$resources                 = new DigiriskResources($db);
+$allLinks                  = $resources->fetchDigiriskResources();
+$labourInspectorId         = (int) ($allLinks['LabourInspectorSociety']->id[0] ?? 0);
+$labourInspectorContactIds = array_filter(array_map('intval', (array) ($allLinks['LabourInspectorContact']->id ?? [])));
+$labourInspectorEvents     = [['method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourinspector_contactid', 'params' => ['add-customer-contact' => 'disabled']]];
+
+print '<tr class="oddeven"><td class="tdtop"><label for="labourinspector_socid">' . $langs->trans('LabourInspector') . '</label></td>';
+print '<td class="tdtop">' . $langs->trans('PreventionPlanDefaultLabourInspectorDescription') . '</td>';
+print '<td>';
+print $form->select_company($labourInspectorId ?: '', 'labourinspector_socid', '', 'SelectThirdParty', 1, 0, $labourInspectorEvents, 0, 'minwidth300');
+print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER['PHP_SELF']) . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans('AddThirdParty') . '"></span></a>';
+print '<div class="paddingtop">' . $form->selectcontacts($labourInspectorId > 0 ? $labourInspectorId : -1, array_map('strval', $labourInspectorContactIds), 'labourinspector_contactid', 0, '', '', 0, 'quatrevingtpercent', 0, 0, 0, [], '', 'labourinspector_contactid', true) . '</div>';
+print '</td>';
+print '<td class="tdtop"><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '"></td>';
+print '</tr>';
+
 print '</table>';
 print '</form>';
+
+// --- Document content: for each part of the PDF, the text it prints and the images added to it ---
+$societe       = new Societe($db);
+$documentTexts = digiriskPreventionPlanDocumentTexts();
+
+$emergencyNumbers = [];
+foreach (digiriskPreventionPlanEmergencyResources() as $resourceRef => $resource) {
+	$resourceId = (int) ($allLinks[$resourceRef]->id[0] ?? 0);
+	$phone      = ($resourceId > 0 && $societe->fetch($resourceId) > 0) ? $societe->phone : '';
+
+	$emergencyNumbers[$resourceRef] = $resource + ['id' => $resourceId, 'phone' => $phone];
+}
+
+$documentParts = [];
+foreach (digiriskPreventionPlanDocumentImageParts() as $documentPart => $documentPartTitle) {
+	$documentParts[$documentPart] = [
+		'title'   => $langs->trans($documentPartTitle),
+		// What the part prints besides its images: a text of the setup, the emergency numbers, nothing
+		// at all for the site traffic, or what each plan holds
+		'content' => isset($documentTexts[$documentPart]) ? 'text' : ($documentPart == 'emergency' ? 'emergency' : ($documentPart == 'sitetraffic' ? 'imagesonly' : 'plan')),
+		'images'  => digiriskPreventionPlanDocumentImagesBlock($documentPart, !empty($permissiontowrite)),
+	];
+
+	if (isset($documentTexts[$documentPart])) {
+		$documentParts[$documentPart] += $documentTexts[$documentPart] + ['value' => getDolGlobalString($documentTexts[$documentPart]['const'])];
+	}
+}
+
+require __DIR__ . '/../../core/tpl/digiriskdocuments/digiriskdolibarr_preventionplan_document_content.tpl.php';
+
+// Opening a photo of a block hands over to the Saturne editor
+print saturne_photo_editor_modal();
+
+// --- List ---
+print load_fiche_titre($langs->trans('PreventionplanList'), '', '');
+
+print '<table class="noborder centpercent editmode">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans('Name') . '</td>';
+print '<td>' . $langs->trans('Description') . '</td>';
+print '<td class="center">' . $langs->trans('Status') . '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_PREVENTIONPLAN_SEARCH_REF_BY_NUMBER">' . $langs->trans('ListSearchRefByNumber') . '</label></td>';
+// What the switch changes, shown on prevention plan references
+print '<td>' . $langs->trans('ListSearchRefByNumberDescription');
+print '<div class="opacitymedium paddingtop">' . $langs->trans('ListSearchRefByNumberExample');
+print '<br>' . $langs->trans('ListSearchRefByNumberExampleOff', 'PP1, PP11, PP12, PP21…');
+print '<br>' . $langs->trans('ListSearchRefByNumberExampleOn', 'PP1') . '</div></td>';
+print '<td class="center">' . saturne_constant_onoff('DIGIRISKDOLIBARR_PREVENTIONPLAN_SEARCH_REF_BY_NUMBER', $permissiontowrite) . '</td>';
+print '</tr>';
+
+print '</table>';
 
 // --- Mobile creation defaults ---
 print load_fiche_titre($langs->trans('MobilePPDefaultsTitle'), '', '');
@@ -213,11 +325,12 @@ $emailTemplateInt     = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_T
 
 // Fetch email templates
 $emailTemplatesList = ['0' => ''];
-$sql = "SELECT rowid, label FROM " . MAIN_DB_PREFIX . "c_email_templates WHERE type_template = 'preventionplan' AND active = 1 ORDER BY position ASC, label ASC";
+$sql = "SELECT rowid, label FROM " . MAIN_DB_PREFIX . "c_email_templates WHERE type_template = 'preventionplan' AND active = 1 AND entity IN (" . getEntity('c_email_templates') . ") ORDER BY position ASC, label ASC";
 $resql = $db->query($sql);
 if ($resql) {
 	while ($obj = $db->fetch_object($resql)) {
-		$emailTemplatesList[$obj->rowid] = $obj->label;
+		// The templates shipped with the module are labelled with a translation key between parentheses
+		$emailTemplatesList[$obj->rowid] = preg_match('/^\((.*)\)$/', $obj->label, $reg) ? $langs->trans($reg[1]) : $obj->label;
 	}
 }
 

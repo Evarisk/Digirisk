@@ -80,7 +80,6 @@ function digiriskRefreshFirePermitDocument(DoliDB $db, int $permitId, User $user
 
     require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmfiles.class.php';
     require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-    require_once __DIR__ . '/../../saturne/lib/documents.lib.php';
     dol_include_once('/digiriskdolibarr/class/firepermit.class.php');
     dol_include_once('/digiriskdolibarr/class/digiriskdolibarrdocuments/firepermitdocument.class.php');
     // digiriskShareGeneratedFile() : helper commun aux objets diffuses, defini avec le plan de prevention
@@ -116,31 +115,9 @@ function digiriskRefreshFirePermitDocument(DoliDB $db, int $permitId, User $user
     // repertoire d'une autre entite
     $relativeDir = trim(str_replace(DOL_DATA_ROOT, '', $conf->digiriskdolibarr->dir_output), '/') . '/' . $documentDir;
 
-    // Le permis de feu n'a qu'un generateur ODT : la constante de configuration ne porte que le
-    // prefixe du modele, la cle attendue par la generation y ajoute le template a utiliser. On la
-    // resout comme le fait la page de generation, sinon aucun generateur n'est trouve.
-    $model      = '';
-    $modelLists = saturne_get_list_of_models($db, $permit->element . 'document');
-    if (is_array($modelLists) && !empty($modelLists)) {
-        asort($modelLists);
-        $modelLists   = array_filter($modelLists, 'saturne_remove_index');
-        $defaultModel = getDolGlobalString('DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL');
-        foreach ($modelLists as $modelKey => $modelLabel) {
-            if (dol_strlen($defaultModel) && strpos($modelKey, $defaultModel) !== false) {
-                $model = $modelKey;
-            }
-        }
-        if (!dol_strlen($model)) {
-            $model = (string) key($modelLists);
-        }
-    }
-    $model = str_replace($permit->element . 'document_custom_odt', $permit->element . 'document_odt', $model);
-
-    if (!dol_strlen($model)) {
-        dol_syslog('digiriskRefreshFirePermitDocument : aucun modele de document disponible', LOG_WARNING);
-
-        return -1;
-    }
+    // Comme le plan de prevention, le document diffuse est le PDF natif : il ne depend ni d'une trame
+    // ODT ni de la conversion par LibreOffice, absente de bien des serveurs
+    $model = 'firepermitdocument';
 
     // On genere avant de supprimer : une generation en echec laisserait sinon le permis sans aucun
     // document, alors que la diffusion est deja en ligne.

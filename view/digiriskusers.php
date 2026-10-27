@@ -393,10 +393,12 @@ if ($num == 1 && !headers_sent() && ! empty($conf->global->MAIN_SEARCH_DIRECT_OP
 
 $title    = $langs->trans("ListOfUsers");
 $help_url = 'FR:Module_Digirisk';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.min.js");
+$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css", "/digiriskdolibarr/css/digiriskdolibarr.min.css");
 
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+// digirisk-horizontal-scroll bounds #id-right to the viewport so the wide user list table
+// scrolls inside its own .div-table-responsive instead of widening the whole page
+llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss, '', 'digirisk-horizontal-scroll');
 
 $param                                                                      = '';
 if ( ! empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&amp;contextpage=' . urlencode($contextpage);
@@ -783,67 +785,14 @@ $reshook    = $hookmanager->executeHooks('printFieldListFooter', $parameters); /
 print $hookmanager->resPrint;
 
 print "</table>";
+print '</div>';
 
 print "</form>\n";
 
 if ($permissiontoadd) {
-	print '<form action="' . $_SERVER['PHP_SELF'] . '" method="POST" name="createuser">';
-	print '<input type="hidden" name="token" value="' . newToken() . '">';
-	print '<input type="hidden" name="action" value="add">';
-	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-	if ( ! empty($ldap_sid)) print '<input type="hidden" name="ldap_sid" value="' . dol_escape_htmltag($ldap_sid) . '">';
-	print '<input type="hidden" name="entity" value="' . $conf->entity . '">';
-
-	$generated_password = getRandomPassword(false);
-	$password           = (GETPOSTISSET('password') ? GETPOST('password') : $generated_password);
-
-	?>
-	<div class="digirisk-wrap wpeo-wrap digirisk-users" id="addUser" style="padding-right: 0 !important;">
-		<div class="main-container" style="width:auto;  margin-top:0 !important; padding-left:0 !important;">
-			<div class="wpeo-tab">
-				<div class="tab-container">
-					<div class="tab-content tab-active" style="padding:0 !important">
-						<div class="wpeo-table table-flex table-risk">
-							<div class="table-row user-row edit">
-								<input type="hidden" name="action" value="add" />
-								<input type="hidden" class="input-domain-mail" name="societyname" value="<?php echo preg_replace('/ /', '', getDolGlobalString('MAIN_INFO_SOCIETE_NOM')) . '.fr' ?>" />
-								<div class="table-cell table-150">
-									<input type="text" id="lastname" placeholder="<?php echo $langs->trans('LastName'); ?>" name="lastname" value="<?php echo dol_escape_htmltag(GETPOST('lastname')); ?>" />
-								</div>
-								<div class="table-cell table-150">
-									<input type="text" id="firstname" placeholder="<?php echo $langs->trans('FirstName'); ?>" name="firstname" value="<?php echo dol_escape_htmltag(GETPOST('firstname')); ?>" />
-								</div>
-								<div class="table-cell table-300">
-									<input style="width:100%" type="email" id="email" class="email" placeholder="<?php echo $langs->trans('Email') ; ?>" name="email" value="<?php echo GETPOST('email'); ?>" />
-								</div>
-								<div class="table-cell table-150">
-									<input type="text" id="job" placeholder="<?php echo $langs->trans('PostOrFunction'); ?>" name="job" value="<?php echo dol_escape_htmltag(GETPOST('job')); ?>" />
-								</div>
-								<div class="table-cell table-300">
-									<?php echo $form->select_dolgroups($group, 'groupid', 1, '', 0, '', array(), (string) $conf->entity, false, 'minwidth100imp widthcentpercentminusxx groupselectcontact'); ?>
-								</div>
-								<div class="table-cell">
-									<input type="submit" id="createuseraction" name="createuseraction" style="display : none">
-									<label for="createuseraction">
-										<div class="wpeo-button button-square-50 button-blue wpeo-tooltip-event" aria-label="<?php echo $langs->trans('CreateUser'); ?>">
-											<i class="button-icon fas fa-plus"></i>
-										</div>
-									</label>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<?php
+	include __DIR__ . '/../core/tpl/user/digiriskdolibarr_user_create_form.tpl.php';
 	$action = '';
-	print '</form>';
-	print '</table></tr>';
 }
-
-print '</div>';
 
 $db->free($result);
 

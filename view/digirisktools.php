@@ -52,6 +52,8 @@ $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
 
 $error = 0;
+$exportDownloadUrl = '';
+$exportDownloadName = '';
 
 // Initialize technical objects
 $digiriskStandard     = new DigiriskStandard($db);
@@ -567,6 +569,8 @@ if ((GETPOST('dataMigrationExportGlobal', 'alpha') || GETPOST('dataMigrationExpo
 							$tasksExportArray['rowid']              = $tasksingle->id;
 							$tasksExportArray['dateo']              = $tasksingle->date_start;
 							$tasksExportArray['datee']              = $tasksingle->date_end;
+							$tasksExportArray['date_start']         = $tasksingle->date_start;
+							$tasksExportArray['date_end']           = $tasksingle->date_end;
 							$tasksExportArray['label']              = $tasksingle->label;
 							$tasksExportArray['description']        = $tasksingle->description;
 							$tasksExportArray['duration_effective'] = $tasksingle->duration_effective;
@@ -619,16 +623,9 @@ if ((GETPOST('dataMigrationExportGlobal', 'alpha') || GETPOST('dataMigrationExpo
 		$zip->addFile($filename, basename($filename));
 		$zip->close();
 		$filenamezip = $exportName . '.zip';
-		$filepath = DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&file=' . urlencode('temp/'.$filenamezip);
-
-		?>
-		<script>
-			var alink = document.createElement( 'a' );
-			alink.setAttribute('href', <?php echo json_encode($filepath); ?>);
-			alink.setAttribute('download', <?php echo json_encode($filenamezip); ?>);
-			alink.click();
-		</script>
-		<?php
+		$filepath = DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&file=' . urlencode('temp/' . $filenamezip);
+		$exportDownloadUrl = $filepath;
+		$exportDownloadName = $filenamezip;
 		$fileExportGlobals = dol_dir_list($filedir, "files", 0, '', '', '', '', 1);
 	}
 }
@@ -690,7 +687,7 @@ if ($action == 'import_global_dolibarr' && ! empty($conf->global->MAIN_UPLOAD_DO
                         $digiriskElement->array_options['wp_digi_id'] = $digiriskelementsingle['rowid'];
                         $digiriskElement->array_options['entity'] = $conf->entity;
 
-                        $digiriskElement->fk_parent = $digiriskElement->fetch_id_from_wp_digi_id($digiriskelementsingle['fk_parent']) ?: 0;
+                        $digiriskElement->fk_parent = !empty($digiriskelementsingle['fk_parent']) ? ($digiriskElement->fetch_id_from_wp_digi_id($digiriskelementsingle['fk_parent']) ?: 0) : 0;
 
                         $digiriskelementid = $digiriskElement->create($user);
 
@@ -739,18 +736,18 @@ if ($action == 'import_global_dolibarr' && ! empty($conf->global->MAIN_UPLOAD_DO
                                         if (array_key_exists('tasks', $digiriskExportRisk)) {
                                             foreach ($digiriskExportRisk['tasks'] as $digiriskExportTask) {
                                                 $task->ref = $refTaskMod->getNextValue('', $task);
-                                                $task->date_start = $digiriskExportTask['date_start'];
-                                                $task->date_end = $digiriskExportTask['date_end'];
-                                                $task->label = $digiriskExportTask['label'];
-                                                $task->description = $digiriskExportTask['description'];
-                                                $task->duration_effective = $digiriskExportTask['duration_effective'];
-                                                $task->planned_workload = $digiriskExportTask['planned_workload'];
-                                                $task->progress = $digiriskExportTask['progress'];
-                                                $task->priority = $digiriskExportTask['priority'];
-                                                $task->budget_amount = $digiriskExportTask['budget_amount'];
+                                                $task->date_start = $digiriskExportTask['date_start'] ?? $digiriskExportTask['dateo'] ?? null;
+                                                $task->date_end = $digiriskExportTask['date_end'] ?? $digiriskExportTask['datee'] ?? null;
+                                                $task->label = $digiriskExportTask['label'] ?? '';
+                                                $task->description = $digiriskExportTask['description'] ?? '';
+                                                $task->duration_effective = $digiriskExportTask['duration_effective'] ?? 0;
+                                                $task->planned_workload = $digiriskExportTask['planned_workload'] ?? 0;
+                                                $task->progress = $digiriskExportTask['progress'] ?? 0;
+                                                $task->priority = $digiriskExportTask['priority'] ?? 0;
+                                                $task->budget_amount = $digiriskExportTask['budget_amount'] ?? 0;
                                                 //	$task->fk_statut                = $digiriskExportTask['fk_statut'];
-                                                $task->note_public = $digiriskExportTask['note_public'];
-                                                $task->note_private = $digiriskExportTask['note_private'];
+                                                $task->note_public = $digiriskExportTask['note_public'] ?? '';
+                                                $task->note_private = $digiriskExportTask['note_private'] ?? '';
                                                 $task->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
                                                 $task->array_options['fk_risk'] = $risk->id;
 
@@ -973,6 +970,15 @@ if (!empty($actionError)) {
     echo '<input name="error" value="' . join('<br>', $actionError) . '" data-title="' . $langs->transnoentities('Error') . '" type="hidden">';
 } elseif (isset($actionSuccess)) {
     echo '<input name="success" value="' . $actionSuccess . '" data-title="' . $langs->transnoentities('Success') . '" type="hidden">';
+}
+
+if (!empty($exportDownloadUrl) && !empty($exportDownloadName)) {
+    print '<script>
+        var alink = document.createElement("a");
+        alink.setAttribute("href", ' . json_encode($exportDownloadUrl) . ');
+        alink.setAttribute("download", ' . json_encode($exportDownloadName) . ');
+        alink.click();
+    </script>';
 }
 
 if ($user->rights->digiriskdolibarr->adminpage->read) {

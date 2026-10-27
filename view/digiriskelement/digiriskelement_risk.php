@@ -295,12 +295,16 @@ if ($sharedrisks) {
 				}
 				$riskAssessmentsOfRisk = $riskAssessmentsOrderedByRisk[$risks->id];
 
+				// A shared risk whose assessments are all drafts or deleted has no validated one: the empty
+				// RiskAssessment keeps the cotation at 0 instead of a fatal error on the whole risk page
+				$lastEvaluation = null;
 				if (is_array($riskAssessmentsOfRisk) && !empty($riskAssessmentsOfRisk)) {
-					$lastEvaluation    = array_filter($riskAssessmentsOfRisk, function($lastRiskAssessment) {
+					$validatedRiskAssessments = array_filter($riskAssessmentsOfRisk, function($lastRiskAssessment) {
 						return $lastRiskAssessment->status == 1;
 					});
-					$lastEvaluation = array_shift($lastEvaluation);
-				} else {
+					$lastEvaluation = array_shift($validatedRiskAssessments);
+				}
+				if (!is_object($lastEvaluation)) {
 					$lastEvaluation = new RiskAssessment($db);
 				}
 
@@ -426,7 +430,15 @@ if ($object->id > 0) {
 		require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_sharedrisklist_view.tpl.php';
 	}
 
-	require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_psychosocial_risk_modal.tpl.php';
+	// Chaque méthode d'évaluation des risques psychosociaux s'active depuis la configuration des
+	// risques, la grille RPS-DU n'étant de surcroît proposée que sur les risques professionnels
+	if (getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_METHOD', 1)) {
+		require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_psychosocial_risk_modal.tpl.php';
+	}
+
+	if ($riskType == 'risk' && getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_GRID_METHOD', 1)) {
+		require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_psychosocial_risk_grid_modal.tpl.php';
+	}
 }
 
 ?>

@@ -1,0 +1,293 @@
+/* Digirisk modern theme: public pages opened from a QR code or a link (ticket register, its
+   confirmation, signature of the Digirisk documents). Same look as the PWA: slate canvas,
+   one white card, large touch targets. The fire watch page has its own PWA design already. */
+
+$dr-public-scope: 'body#mainbody.page-public-card';
+
+#{$dr-public-scope} {
+  margin-top: 0;
+  padding: 32px 16px 48px;
+  background: $dr-bg;
+  font-family: $dr-font;
+  color: $dr-text;
+  -webkit-font-smoothing: antialiased;
+
+  div.fiche {
+    margin: 0 auto;
+  }
+
+  /* ---- The card ---- */
+
+  .public-card__container,
+  .ticketpublicarea.digirisk-page-container {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 24px 28px;
+    border: 1px solid $dr-border;
+    border-radius: 18px;
+    background: $dr-surface;
+    box-shadow: $dr-shadow;
+
+    @media (max-width: $media__small) {
+      padding: 18px 16px;
+      border-radius: $dr-radius-lg;
+    }
+  }
+
+  /* The ticket register is also filled from a computer: wider card for its category grid and form */
+  &.page-public-ticket .public-card__container,
+  &.page-public-ticket .ticketpublicarea.digirisk-page-container {
+    max-width: 1200px;
+  }
+
+  .public-card__logo,
+  .signature-logo {
+    margin: 8px auto 24px;
+  }
+
+  /* ---- Titles ---- */
+
+  table.table-fiche-title .titre,
+  .information-title,
+  .ticketpublicarea h1 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: $dr-text;
+  }
+
+  .ticketpublicarea h2 {
+    font-size: 15px;
+    font-weight: 600;
+    color: $dr-muted;
+  }
+
+  table.table-fiche-title td.col-picto > img {
+    box-sizing: border-box;
+    width: 40px;
+    height: 40px;
+    padding: 7px;
+    border-radius: $dr-radius;
+    background: $dr-primary-soft;
+    object-fit: contain;
+  }
+
+  .information-user {
+    color: $dr-text-soft;
+    font-weight: 600;
+  }
+
+  .information-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius-pill;
+    color: $dr-text-soft;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  /* ---- Entity chooser (multicompany) ---- */
+
+  .ticketpublicarea .wpeo-gridlayout .card {
+    height: 100%;
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius-lg;
+    background: $dr-surface;
+    box-shadow: $dr-shadow-sm;
+    transition: border-color $dr-transition, box-shadow $dr-transition, transform $dr-transition;
+
+    &:hover {
+      border-color: $dr-primary;
+      box-shadow: $dr-shadow-hover;
+      transform: translateY(-2px);
+    }
+
+    img {
+      border-radius: $dr-radius;
+    }
+
+    .card-container {
+      color: $dr-text;
+    }
+  }
+
+  /* ---- Register categories ---- */
+
+  .ticketpublicarea .categories-container {
+    gap: 12px;
+  }
+
+  .ticketpublicarea .ticket-parentCategory .wpeo-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 96px;
+    border-radius: $dr-radius-lg;
+    box-shadow: $dr-shadow-sm;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    transition: transform $dr-transition, box-shadow $dr-transition;
+
+    &:hover {
+      box-shadow: $dr-shadow-hover;
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    img {
+      max-height: 48px;
+      border-radius: $dr-radius-sm;
+    }
+
+  }
+
+  /* "No photo for now" placeholder of the registers without a picture: the label and the colour
+     of the tile are enough, the sentence repeated on every tile was only noise */
+  .ticketpublicarea .ticket-parentCategory .wpeo-button > .opacitymedium,
+  .ticketpublicarea .ticket-subCategory > .opacitymedium {
+    display: none;
+  }
+
+  .ticketpublicarea .ticket-parentCategory.active .wpeo-button {
+    border-color: $dr-text !important;
+    box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.25);
+  }
+
+  .ticketpublicarea .ticket-subCategory {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 64px;
+    border: 1px solid $dr-border;
+    border-radius: 12px;
+    background: $dr-surface;
+    font-weight: 600;
+    color: $dr-text;
+
+    .button-label {
+      margin-top: 0;
+    }
+
+    img {
+      border-radius: $dr-radius-sm;
+    }
+
+    &:hover {
+      background: $dr-surface-soft;
+    }
+
+    &.active {
+      border-color: $dr-primary;
+      box-shadow: 0 0 0 3px rgba(13, 138, 255, 0.25);
+    }
+  }
+
+  /* ---- Fields ---- */
+
+  .ticketpublicarea :is(input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input:not([type]), select, textarea):not(.select2-search__field) {
+    padding: 8px 12px;
+    border: 1px solid $dr-border-strong;
+    border-radius: $dr-radius;
+    background: $dr-surface;
+    font-family: $dr-font;
+    font-size: 16px;
+
+    &:focus {
+      outline: none;
+      border-color: $dr-primary;
+      box-shadow: $dr-ring;
+    }
+  }
+
+  .select2-container--default .select2-selection--single,
+  .select2-container--default .select2-selection--multiple {
+    border: 1px solid $dr-border-strong !important;
+    border-radius: $dr-radius !important;
+  }
+
+  .ticketpublicarea label,
+  .ticketpublicarea .tableforinputfields > p,
+  .ticketpublicarea strong {
+    color: $dr-text;
+  }
+
+  .ticketpublicarea .form-label,
+  .ticketpublicarea label.form-field-container {
+    font-weight: 600;
+  }
+
+  /* The optional fields are printed with an inline font-weight: 300: they stay apart from the
+     required ones through their colour instead of a thin font */
+  .ticketpublicarea .form-label[style*="font-weight:300"] {
+    font-weight: 600 !important;
+    color: $dr-muted;
+  }
+
+  /* White label on the light register colours (yellow, pink) */
+  .ticketpublicarea .ticket-parentCategory .button-label {
+    text-shadow: 0 1px 2px rgba(15, 23, 42, 0.35);
+  }
+
+  /* ---- Buttons ---- */
+
+  .ticketpublicarea input[type="submit"],
+  .ticketpublicarea .button,
+  .public-card__footer .wpeo-button {
+    min-height: 46px;
+    padding: 12px 22px;
+    border: none;
+    border-radius: 12px;
+    background: $dr-primary;
+    color: #ffffff;
+    font-family: $dr-font;
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(13, 138, 255, 0.3);
+    cursor: pointer;
+  }
+
+  /* Disabled until the signature is drawn */
+  .public-card__footer .wpeo-button.button-grey,
+  .public-card__footer .wpeo-button.button-disable {
+    background: $dr-border;
+    color: $dr-muted;
+    box-shadow: none;
+  }
+
+  /* ---- Signature ---- */
+
+  .objet-container {
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius-lg;
+    background: $dr-surface-soft;
+    box-shadow: none;
+  }
+
+  .signature-element canvas.canvas-signature {
+    /* Same 1px as Saturne: the signature pad maps the pointer on the canvas box */
+    border: 1px dashed $dr-border-strong;
+    border-radius: $dr-radius-lg;
+    background: $dr-surface-soft;
+  }
+
+  /* ---- Notices ---- */
+
+  .wpeo-notice {
+    border: 1px solid rgba(13, 138, 255, 0.3);
+    border-left: 4px solid $dr-primary;
+    border-radius: 12px;
+    background: rgba(13, 138, 255, 0.06);
+  }
+}

@@ -1,0 +1,134 @@
+/* Digirisk modern theme: inputs, selects and select2 of the Dolibarr forms */
+
+$dr-input-selector: 'input[type="text"], input[type="number"], input[type="email"], input[type="password"], input[type="search"], input[type="url"], input[type="tel"], input[type="date"], input[type="datetime-local"], input[type="time"], input:not([type]), textarea, select';
+
+#{$dr-scope} {
+  /* The Saturne forms (.form-field-container) and the Digirisk modals draw their own
+     field boxes: only the Dolibarr forms of the page are aimed at */
+  div.fiche,
+  .ui-dialog {
+    :is(#{$dr-input-selector}):not(.select2-search__field):not(.form-field):not(.cke_source) {
+      box-sizing: border-box;
+      padding: 6px 10px;
+      border: 1px solid $dr-border-strong;
+      border-radius: $dr-radius-sm;
+      background-color: $dr-surface;
+      color: $dr-text;
+      font-family: $dr-font;
+      transition: border-color $dr-transition, box-shadow $dr-transition;
+
+      &:hover {
+        border-color: $dr-faint;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $dr-primary;
+        box-shadow: $dr-ring;
+      }
+
+      &::placeholder {
+        color: $dr-faint;
+      }
+    }
+
+    /* The page size combo of a second list on the page stays a native <select>: ajax_combobox()
+       only turns the first #limit into a select2. The field padding above cut its "25" */
+    select.selectlimit:not(.select2-hidden-accessible):not(.select2-search__field):not(.form-field):not(.cke_source) {
+      height: 32px;
+      padding: 0 4px 0 10px;
+      // A native <select> ignores text-align: the value stuck to the arrow
+      text-align-last: center;
+    }
+
+    :is(#{$dr-input-selector}):disabled {
+      background-color: $dr-surface-soft;
+      color: $dr-muted;
+    }
+
+    .form-field-container :is(#{$dr-input-selector}),
+    .wpeo-modal :is(#{$dr-input-selector}),
+    .wpeo-table :is(#{$dr-input-selector}),
+    .wpeo-form :is(#{$dr-input-selector}) {
+      border-radius: $dr-radius-sm;
+    }
+  }
+
+  /* eldy forces the border colour of the search inputs of the lists to the title background
+     with !important, which makes them invisible on the light header */
+  .liste_titre :is(#{$dr-input-selector}):not(.select2-search__field) {
+    border-color: $dr-border-strong !important;
+
+    &:focus {
+      border-color: $dr-primary !important;
+    }
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: $dr-primary;
+  }
+
+  /* ---- select2 ---- */
+
+  .select2-container--default .select2-selection--single,
+  .select2-container--default .select2-selection--multiple {
+    min-height: 32px;
+    border: 1px solid $dr-border-strong !important;
+    border-radius: $dr-radius-sm !important;
+    background-color: $dr-surface;
+    transition: border-color $dr-transition, box-shadow $dr-transition;
+  }
+
+  .select2-container--default.select2-container--focus .select2-selection--single,
+  .select2-container--default.select2-container--focus .select2-selection--multiple,
+  .select2-container--default.select2-container--open .select2-selection--single,
+  .select2-container--default.select2-container--open .select2-selection--multiple {
+    border-color: $dr-primary !important;
+    box-shadow: $dr-ring;
+  }
+
+  .select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 30px;
+    color: $dr-text;
+  }
+
+  .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 30px;
+  }
+
+  .select2-container--default .select2-selection--multiple .select2-selection__choice {
+    border: none;
+    border-radius: $dr-radius-pill;
+    background: $dr-primary-soft;
+    color: $dr-primary-strong;
+    font-weight: 600;
+  }
+
+  .select2-dropdown {
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius;
+    box-shadow: $dr-shadow-hover;
+    overflow: hidden;
+  }
+
+  .select2-container--default .select2-results__option--highlighted[aria-selected],
+  .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+    background: $dr-primary;
+  }
+
+  .select2-search--dropdown .select2-search__field {
+    border: 1px solid $dr-border-strong;
+    border-radius: $dr-radius-sm;
+  }
+
+  /* Switches of the admin pages (ajax_constantonoff) */
+  .fa-toggle-on.font-status4,
+  .fa-toggle-on {
+    color: $dr-primary;
+  }
+
+  .fa-toggle-off {
+    color: $dr-faint;
+  }
+}

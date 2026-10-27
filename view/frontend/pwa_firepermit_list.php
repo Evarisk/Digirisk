@@ -32,8 +32,12 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/firepermit.class.php';
+require_once __DIR__ . '/../../class/firepermitround.class.php';
 require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
+require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
+require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_firepermitround.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_pwa.lib.php';
 
 // Global variables definitions
@@ -54,6 +58,15 @@ $listPage   = max(0, GETPOSTINT('page'));
 $object            = new FirePermit($db);
 $preventionplan    = new PreventionPlan($db);
 $digiriskresources = new DigiriskResources($db);
+$signatory         = new SaturneSignature($db, 'digiriskdolibarr', $object->element);
+$roundObject       = new FirePermitRound($db);
+$now               = dol_now();
+
+$fireWatchStateLabels = [
+    'late'     => 'FireWatchRoundStateLate',
+    'due'      => 'FireWatchRoundStateDue',
+    'upcoming' => 'FireWatchRoundStateUpcoming',
+];
 
 $listStatusOptions = [
     ''                            => $langs->transnoentities('AllStatus'),
@@ -66,18 +79,25 @@ if (!array_key_exists($listStatus, $listStatusOptions)) {
     $listStatus = '';
 }
 
-list($listRows, $listTotal, $listTotalPages) = digiriskPwaFetchList('FirePermit', $listSearch, $listStatus, $listPage, function ($record) use ($digiriskresources, $preventionplan, $user) {
-    // fetchResourcesFromObject() returns the resolved Societe for a single match, and 0 when there is none
-    $extSociety  = $digiriskresources->fetchResourcesFromObject('ExtSociety', $record);
-    $societyName = (is_object($extSociety) && $extSociety->id > 0) ? $extSociety->name : '';
+list($listRows, $listTotal, $listTotalPages) = digiriskPwaFetchList('FirePermit', $listSearch, $listStatus, $listPage, function ($record) use ($digiriskresources, $signatory, $preventionplan, $user, $langs, $roundObject, $now, $fireWatchStateLabels) {
+    $details = digiriskPwaCardDetails($record, $digiriskresources, $signatory);
 
-    $lines = [];
-    if ($societyName !== '') {
-        $lines[] = ['icon' => 'fa-industry', 'text' => $societyName];
-    }
-    $lines[] = ['icon' => 'fa-calendar-alt', 'text' => digiriskPwaFormatPeriod($record->date_start, $record->date_end)];
+    $lines = $details['lines'];
     if ($record->fk_preventionplan > 0 && $preventionplan->fetch($record->fk_preventionplan) > 0) {
         $lines[] = ['icon' => 'fa-project-diagram', 'text' => $preventionplan->ref];
+    }
+    // A signed permit is under surveillance once its work is over: say where the rounds stand
+    if ($record->status == FirePermit::STATUS_LOCKED) {
+        $fireWatch = digiriskFirePermitRoundsSummary($record, $roundObject->fetchFromFirePermit($record->id), $now);
+        if ($fireWatch['state'] === 'working') {
+            $lines[] = ['icon' => 'fa-hard-hat', 'text' => $langs->transnoentities('FireWatchWorkInProgress')];
+        } elseif ($fireWatch['state'] === 'done') {
+            $lines[] = ['icon' => 'fa-check', 'text' => $langs->transnoentities('FireWatchAllRoundsDone')];
+        } else {
+            $lines[] = ['icon' => 'fa-walking', 'text' => $langs->transnoentities('FireWatchRoundNumber', $fireWatch['nextRound']->position)
+                . ' · ' . dol_print_date($fireWatch['nextRound']->date_planned, 'hour', 'tzuserrel')
+                . ' · ' . $langs->transnoentities($fireWatchStateLabels[$fireWatch['state']])];
+        }
     }
 
     return [
@@ -92,6 +112,8 @@ list($listRows, $listTotal, $listTotalPages) = digiriskPwaFetchList('FirePermit'
         'ref'        => $record->ref,
         'title'      => $record->label,
         'lines'      => $lines,
+        'pictos'     => $details['pictos'],
+        'foot'       => $details['foot'],
         'statusHtml' => digiriskPwaStatusHtml($record),
     ];
 });

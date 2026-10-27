@@ -147,10 +147,10 @@ if ($object->id > 0) {
     // DateRange -- Plage de date
     $firstDayOfTheYear = dol_get_first_day((int) date('Y'));
     print '<tr class="oddeven"><td>' . $langs->trans("DateRange") . '</td>';
-    print '<td>' . $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'datestart');
+    print '<td><input type="checkbox" id="daterange" name="daterange" checked>';
+    print '<label for="daterange" class="marginrightonly">' . $langs->trans('UseDateRange') . '</label> ';
+    print $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'datestart');
     print $langs->trans('At') . $form->selectDate(dol_now(), 'dateend');
-    print $langs->trans('UseDateRange');
-    print '<input type="checkbox" id="daterange" name="daterange" checked>';
     print '</td></tr>';
 
     // Destinataire
@@ -162,8 +162,6 @@ if ($object->id > 0) {
 
     print dol_get_fiche_end();
 
-    print '<div class="fichecenter"><div class="fichehalfleft">';
-
     $objRef    = dol_sanitizeFileName($object->ref);
     $dirFiles  = $document->element . '/' . $objRef;
     $fileDir   = $upload_dir . '/' . $dirFiles;
@@ -171,17 +169,6 @@ if ($object->id > 0) {
 
     print saturne_show_documents($object->module . ':AuditReportDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 1, 0, '', '', $langs->defaultlang, '', $object);
     print '</form>';
-
-    print '</div><div class="fichehalfright">';
-
-    $moreHtmlCenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=DigiriskDolibarr&object_type=' . $object->element . '&show_nav=0&handle_photo=true');
-
-    // List of actions on element
-    require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
-    $formActions = new FormActions($db);
-    $formActions->showactions($object, $object->element . '@' . $object->module, 0, 1, '', 10, '', $moreHtmlCenter);
-
-    print '</div></div>';
 }
 
 // End of page
