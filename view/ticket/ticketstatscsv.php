@@ -157,10 +157,10 @@ print '</tr>';
 $startYear = strftime('%Y', dol_now()) - (!getDolGlobalInt('MAIN_STATS_GRAPHS_SHOW_N_YEARS') ? 2 : max(1, min(10, getDolGlobalInt('MAIN_STATS_GRAPHS_SHOW_N_YEARS'))));
 $startDay  = dol_mktime(0, 0, 0, getDolGlobalInt('SOCIETE_FISCAL_MONTH_START'), 1, $startYear);
 print '<tr><td>' . $langs->trans('DateRange') . '</td><td>';
+print '<input type="checkbox" id="daterange" name="daterange" checked>';
+print '<label for="daterange" class="marginrightonly">' . $langs->trans('UseDateRange') . '</label> ';
 print $langs->trans('From') . $form->selectDate((!empty($dateStart) ? $dateStart : $startDay), 'dateStart');
 print $langs->trans('At') . $form->selectDate((!empty($dateEnd) ? $dateEnd : dol_now()), 'dateEnd');
-print $langs->trans('UseDateRange');
-print '<input type="checkbox" id="daterange" name="daterange" checked>';
 print '</td></tr>';
 print '</table>';
 

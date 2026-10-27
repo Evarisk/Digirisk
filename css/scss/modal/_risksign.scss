@@ -22,14 +22,44 @@
   }
 }
 
+// Les modales d'ajout et d'edition epousent leur contenu : deux champs n'ont pas besoin des 560px
+// de la modale generique, qui laissaient les deux tiers de la boite vides.
+.wpeo-modal[class*="modal-risksign"] .modal-container {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  max-height: calc(100% - 4em);
+  // La regle globale .modal-container de page/_digiai.scss coupe tout ce qui depasse : la grille de
+  // pictogrammes doit pouvoir deborder de la modale
+  overflow: visible;
+
+  .modal-header,
+  .modal-footer {
+    height: auto;
+    flex: 0 0 auto;
+  }
+  .modal-header {
+    padding-bottom: 1em;
+  }
+  // La grille de pictogrammes flotte par-dessus la modale, comme un menu deroulant : le contenu ne
+  // la rogne pas et ne defile pas pour elle
+  .modal-content {
+    height: auto;
+    flex: 1 1 auto;
+    padding-top: 1em;
+    overflow: visible;
+  }
+  .modal-footer {
+    padding-top: 1em;
+  }
+}
+
 .wpeo-modal[class*="modal-risksign"] .modal-container .risksign-content {
   display: flex;
   // Ancre de la liste de pictogrammes : le panneau se cale sur la largeur du bloc plutot
   // que sur celle du bouton qui l'ouvre.
   position: relative;
   padding-bottom: 1em;
-  margin-bottom: 1em;
-  border-bottom: 1px solid rgba(0,0,0,0.2);
 
   .risksign-category {
     margin-right: 1.5em;
@@ -37,14 +67,14 @@
     .wpeo-dropdown {
       position: static;
     }
-    // La grille prend toute la largeur de la modale au lieu des 360px du dropdown, et se
-    // borne en hauteur pour ne pas deborder sous le pied de la modale.
+    // La grille prend toute la largeur de la modale au lieu des 360px du dropdown. Elle flotte
+    // par-dessus la modale et se borne en hauteur pour rester dans la fenetre.
     .saturne-dropdown-content {
       top: 100%;
       left: 0;
       right: 0;
       width: auto;
-      max-height: 300px;
+      max-height: min(300px, 40vh);
       overflow-y: auto;
       grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
       grid-gap: 0.3em;

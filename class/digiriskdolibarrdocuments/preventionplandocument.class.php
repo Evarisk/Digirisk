@@ -24,6 +24,7 @@
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../digiriskdocuments.class.php';
 require_once __DIR__ . '/../digiriskresources.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
 // Load Saturne libraries
 require_once __DIR__ . '/../../../saturne/lib/dolibarr.lib.php';
@@ -91,10 +92,9 @@ class PreventionPlanDocument extends DigiriskDocuments
 			$extsociety = new stdClass();
 		}
 
-		$maitreoeuvre = $signatory->fetchSignatory('MasterWorker', $preventionplan->id, 'preventionplan');
-		$maitreoeuvre = is_array($maitreoeuvre) ? array_shift($maitreoeuvre) : $maitreoeuvre;
-		$extsocietyresponsible = $signatory->fetchSignatory('ExtSocietyResponsible', $preventionplan->id, 'preventionplan');
-		$extsocietyresponsible  = is_array($extsocietyresponsible) ? array_shift($extsocietyresponsible) : $extsocietyresponsible;
+		// Not the first row returned: a role can hold several rows, in no fixed order
+		$maitreoeuvre          = digiriskGetCurrentSignatory($signatory, 'MasterWorker', (int) $preventionplan->id, 'preventionplan');
+		$extsocietyresponsible = digiriskGetCurrentSignatory($signatory, 'ExtSocietyResponsible', (int) $preventionplan->id, 'preventionplan');
 		$extsocietyintervenants = $signatory->fetchSignatory('ExtSocietyAttendant', $preventionplan->id, 'preventionplan');
 		$labourinspector = $resources->fetchResourcesFromObject('LabourInspector', $preventionplan);
 		if ($labourinspector < 1) {

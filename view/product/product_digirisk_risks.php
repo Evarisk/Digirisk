@@ -284,7 +284,7 @@ if ($action == 'delete_risk_photo' && $permissiontoadd) {
 // â”€â”€ Page output â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $form  = new Form($db);
 $title = $langs->trans('Product') . ' - ' . $langs->trans('Risks');
-llxHeader('', $title, '');
+llxHeader('', $title, '', '', 0, 0, ['/saturne/js/saturne.min.js'], ['/saturne/css/saturne.min.css', '/digiriskdolibarr/css/digiriskdolibarr.min.css']);
 
 $head  = product_prepare_head($object);
 $titre = $langs->trans('CardProduct' . $object->type);
@@ -298,66 +298,8 @@ dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', '', '', 0, '', '', 1)
 print '<div class="fichecenter">';
 print '<div class="underbanner clearboth"></div>';
 
-// â”€â”€ CSS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-print '<link rel="stylesheet" href="' . DOL_URL_ROOT . '/custom/saturne/css/saturne.min.css">';
-print '<script src="' . DOL_URL_ROOT . '/custom/saturne/js/saturne.min.js"></script>';
+// Saturne JS configuration (the CSS and JS files are loaded by llxHeader)
 print '<script>window.saturne = window.saturne || {}; window.saturne.config = window.saturne.config || {}; window.saturne.config.urlRoot = "' . DOL_URL_ROOT . '";</script>';
-print '<style>
-.dr-risk-block { border:1px solid #ddd; border-radius:6px; margin-bottom:6px; overflow:hidden; position:relative; }
-.dr-risk-header { display:flex; align-items:center; gap:8px; padding:7px 12px; background:#f7f7f7; border-bottom:1px solid #e0e0e0; font-weight:bold; }
-.dr-risk-header.is-edit { border-radius:0; }
-.dr-risk-header img.dr-cat-icon { width:48px; height:48px; object-fit:contain; flex-shrink:0; }
-/* Description inline in header */
-.dr-risk-desc-inline { flex:1; font-size:.85em; font-weight:normal; color:#444; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
-.dr-editable { cursor:text; border-radius:3px; padding:1px 4px; transition:background .15s, box-shadow .15s; outline:none; }
-.dr-editable:hover { background:rgba(0,0,0,.04); }
-.dr-editable:focus { white-space:normal; overflow:visible; background:#fff; box-shadow:0 0 0 2px #1a5fa8; color:#111; }
-.dr-editable:empty:before { content:attr(data-placeholder); color:#aaa; font-style:italic; pointer-events:none; }
-@keyframes dr-saved { 0%{box-shadow:0 0 0 2px #27ae60} 80%{box-shadow:0 0 0 2px #27ae60} 100%{box-shadow:none} }
-.dr-saved-flash { animation:dr-saved 1.2s ease forwards; }
-@keyframes dr-block-saved { 0%{border-color:#27ae60;box-shadow:0 0 0 2px rgba(39,174,96,.5)} 80%{border-color:#27ae60;box-shadow:0 0 0 2px rgba(39,174,96,.3)} 100%{border-color:#ddd;box-shadow:none} }
-.dr-block-saved { animation:dr-block-saved 1.4s ease forwards; }
-.dr-risk-date { font-size:.76em; font-weight:normal; white-space:nowrap; margin-right:4px; flex-shrink:0; }
-/* Header photo thumbs */
-.dr-header-photos { display:flex; gap:4px; align-items:center; flex-shrink:0; }
-.dr-header-photo { width:32px; height:32px; border-radius:3px; overflow:hidden; border:1px solid #ccc; flex-shrink:0; }
-.dr-header-photo img { width:100%; height:100%; object-fit:cover; }
-/* Saturne media block in header: force perfect vertical alignment */
-.dr-risk-header .linked-medias { margin:0 !important; padding:0 !important; flex-shrink:0; display:inline-flex !important; align-items:center !important; line-height:0 !important; }
-.dr-risk-header .add-medias { margin:0 !important; padding:0 !important; }
-.dr-risk-header .saturne-media-upload-block { gap:6px !important; align-items:center !important; margin:0 !important; padding:0 !important; }
-.dr-risk-header .saturne-media-gallery { display:inline-flex !important; align-items:center !important; gap:6px !important; margin:0 !important; padding:0 !important; }
-.dr-risk-header .fast-upload-options { margin:0 !important; padding:0 !important; height:0 !important; overflow:hidden !important; }
-.dr-risk-header .saturne-media-count-badge { font-size:10px; height:16px; min-width:16px; padding:0 3px; top:-5px; right:-5px; }
-/* Edit mode body */
-.dr-risk-body { padding:10px 12px; }
-.dr-edit-layout { display:flex; gap:14px; align-items:flex-start; }
-.dr-edit-left { flex:1; min-width:0; }
-.dr-edit-right { flex:0 0 auto; display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
-.dr-risk-desc { width:100%; min-height:40px; max-height:80px; border:1px solid #ccc; border-radius:4px; padding:6px 8px; font-size:.9em; resize:vertical; }
-.dr-risk-actions { display:flex; gap:6px; align-items:flex-start; margin-top:6px; }
-.dr-risk-actions-footer { display:flex; justify-content:flex-end; gap:6px; margin-top:10px; padding-top:8px; border-top:1px solid #eee; }
-.dr-risk-photos-inline { display:flex; flex-wrap:wrap; gap:4px; align-items:center; }
-.dr-risk-photo-thumb { position:relative; width:48px; height:48px; border-radius:4px; overflow:hidden; border:1px solid #ddd; }
-.dr-risk-photo-thumb img { width:100%; height:100%; object-fit:cover; }
-.dr-risk-photo-del { position:absolute; top:1px; right:1px; background:rgba(180,0,0,.8); color:#fff; border:none; border-radius:50%; width:16px; height:16px; font-size:9px; cursor:pointer; display:flex; align-items:center; justify-content:center; text-decoration:none; line-height:1; }
-.dr-protection-row { display:flex; gap:6px; align-items:center; margin-top:6px; }
-.dr-protection-row input[type=text] { flex:1; }
-.dr-add-protection { margin-top:8px; display:inline-flex; align-items:center; gap:5px; font-size:.88em; cursor:pointer; color:#fff; background:#1a5fa8; border:none; border-radius:4px; padding:5px 12px; }
-.dr-btn { border:none; border-radius:4px; cursor:pointer; padding:6px 10px; font-size:.85em; color:#fff; }
-.dr-btn-orange { background:#e68a00; }
-.dr-upload-btn { display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; background:#e68a00; border-radius:4px; color:#fff; cursor:pointer; border:none; font-size:1em; }
-.dr-cat-modal { display:none; position:fixed; z-index:9999; top:0; left:0; width:100%; height:100%; }
-.dr-cat-modal.open { display:block; }
-.dr-cat-modal__overlay { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.5); z-index:1; }
-.dr-cat-modal__dialog { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; border-radius:8px; width:min(680px,95vw); max-height:80vh; display:flex; flex-direction:column; box-shadow:0 8px 32px rgba(0,0,0,.25); z-index:2; }
-.dr-cat-modal__header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid #ddd; font-weight:bold; font-size:1.05em; }
-.dr-cat-modal__header button { background:none; border:none; font-size:1.3em; cursor:pointer; color:#555; }
-.dr-cat-modal__grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; padding:16px; overflow-y:auto; }
-.dr-cat-option { display:flex; flex-direction:column; align-items:center; gap:6px; padding:10px 6px; border:2px solid transparent; border-radius:8px; cursor:pointer; transition:border-color .15s, background .15s; text-align:center; font-size:.82em; }
-.dr-cat-option:hover { border-color:#1a5fa8; background:#f0f4ff; }
-.dr-cat-option img { width:60px; height:60px; object-fit:contain; }
-</style>';
 
 // ── Add button (top-LEFT) ─────────────────────────────────────────────────────────
 if ($permissiontoadd) {

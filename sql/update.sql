@@ -312,3 +312,10 @@ ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD itamami_task text NU
 ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD itamami_activity text NULL AFTER itamami_task;
 ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD itamami_material text NULL AFTER itamami_activity;
 ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD itamami_environment text NULL AFTER itamami_material;
+
+-- 23.5.x - fire watch rounds after hot work (issue #4835)
+ALTER TABLE llx_digiriskdolibarr_firepermit ADD date_work_end datetime NULL AFTER fk_preventionplan;
+ALTER TABLE llx_digiriskdolibarr_firepermit ADD firewatch_name varchar(255) NULL AFTER date_work_end;
+
+-- 23.5.x - Restore the level 0 of gravity and exposure that PHP 7 saved as NULL (0 != '' was false): a factor 0 gives a cotation of 0 (issue #5384)
+UPDATE llx_digiriskdolibarr_riskassessment SET gravite = COALESCE(gravite, 0), exposition = COALESCE(exposition, 0), cotation = 0 WHERE method = 'advanced' AND cotation IS NULL AND (gravite IS NULL OR exposition IS NULL) AND occurrence IS NOT NULL AND formation IS NOT NULL AND protection IS NOT NULL;

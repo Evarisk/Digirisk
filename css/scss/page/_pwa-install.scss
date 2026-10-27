@@ -1,0 +1,168 @@
+/* DigiriskDolibarr PWA: "install the application" banner and its step by step help.
+   The banner is rendered hidden, pwa-install.js reveals it unless the application
+   already runs installed. */
+
+.digirisk-pwa-install {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px 10px 12px;
+  background: #2b7de9;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  color: #ffffff;
+
+  &.is-visible {
+    display: flex;
+  }
+
+  &__icon {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    padding: 4px;
+    box-sizing: border-box;
+    background: #ffffff;
+    border-radius: 9px;
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__title {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  &__description {
+    font-size: 12px;
+    opacity: 0.9;
+  }
+
+  &__button {
+    flex: 0 0 auto;
+    padding: 8px 14px;
+    background: #ffffff;
+    border: 0;
+    border-radius: 18px;
+    color: #2b7de9;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  &__dismiss {
+    flex: 0 0 auto;
+    padding: 6px;
+    background: transparent;
+    border: 0;
+    color: #ffffff;
+    opacity: 0.8;
+    cursor: pointer;
+  }
+}
+
+/* The banner opens the home screen, above the tiles */
+.digirisk-pwa .digirisk-pwa-install {
+  margin-bottom: 12px;
+}
+
+.digirisk-pwa-install-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1003;
+  background: rgba(15, 23, 42, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+
+  &.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.digirisk-pwa-install-help {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1004;
+  box-sizing: border-box;
+  padding: 14px 16px 24px;
+  background: #ffffff;
+  border-radius: 14px 14px 0 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(100%);
+  transition: transform 0.25s ease;
+
+  &.is-open {
+    transform: translateY(0);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  &__title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  &__close {
+    padding: 6px;
+    background: transparent;
+    border: 0;
+    color: #64748b;
+    cursor: pointer;
+  }
+
+  &__steps {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: #1e293b;
+    }
+
+    i {
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      line-height: 34px;
+      text-align: center;
+      background: #eff6ff;
+      border-radius: 50%;
+      color: #2b7de9;
+    }
+  }
+
+  &[data-platform="ios"] &__steps--ios,
+  &[data-platform="other"] &__steps--other {
+    display: flex;
+  }
+
+  &__note {
+    margin: 14px 0 0;
+    font-size: 12px;
+    color: #64748b;
+  }
+}

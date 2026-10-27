@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * \file    class/digiriskelement_product.class.php
  * \ingroup digiriskdolibarr

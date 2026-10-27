@@ -387,7 +387,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '23.5.0';
+		$this->version         = '23.6.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr_color@digiriskdolibarr';
 
@@ -441,6 +441,8 @@ class modDigiriskdolibarr extends DolibarrModules
 				'thirdpartycard',
 				'contactcard',
 				'preventionplanschedules',
+				'preventionplanlist',
+				'firepermitlist',
 				'firepermitschedules',
 				'digiriskdolibarradmindocuments',
                 'digiriskelementview',
@@ -456,6 +458,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 'elementproperties',
                 'main',
                 'saturnegetobjectsmetadata',
+                'saturnemediaassign',
+                'saturnemedialibrary',
                 'digiriskdolibarrindex'
 			],
 
@@ -643,6 +647,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON', 'chaine', 'mod_preventionplan_standard', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE', 'integer', 0, '', 0, 'current'],
+			// A number alone in the reference filter of the list finds that number exactly (1 gives PP1, not PP11)
+			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLAN_SEARCH_REF_BY_NUMBER', 'integer', 0, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLAN_TAGS_SET', 'integer', 0, '', 0, 'current'],
 
 			// CONST PREVENTION PLAN DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
@@ -664,6 +671,17 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ADDON', 'chaine', 'mod_firepermit_standard', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_PROJECT', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE', 'integer', 0, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_SEARCH_REF_BY_NUMBER', 'integer', 0, '', 0, 'current'],
+
+			// CONST FIRE PERMIT ROUNDS (fire watch after hot work: number of rounds, minutes between two, first one at the end of the work, then 0 = disabled, 1 = optional, 2 = required)
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COUNT', 'integer', 3, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_INTERVAL', 'integer', 60, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_AT_WORK_END', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COMMENT', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_PHOTO', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_GEOLOC', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_SIGNATURE', 'integer', 2, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMIT_ROUND_PUBLIC_INTERFACE', 'integer', 0, '', 0, 'current'],
 
 			// CONST FIRE PERMIT DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMITDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
@@ -714,6 +732,10 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_LISTINGS', 'integer', 0, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_SHOW_SHARED_RISKS', 'integer', 0, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_CATEGORY_ON_RISK', 'integer', 0, '', 0, 'current'],
+            // Les deux méthodes d'évaluation des risques psychosociaux sont proposées par défaut,
+            // chacune reste activable séparément depuis la configuration des risques
+            $i++ => ['DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_METHOD', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_GRID_METHOD', 'integer', 1, '', 0, 'current'],
 
 			// CONST RISK ASSESSMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE', 'integer', 1, '', 0, 'current'],
@@ -1503,6 +1525,22 @@ class modDigiriskdolibarr extends DolibarrModules
 		];
 
 		$this->menu[$r++] = [
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',
+			'type'     => 'left',
+			'titre'    => $langs->transnoentities('PwaApplication'),
+			'prefix'   => '<i class="fas fa-mobile-alt pictofixedwidth"></i>',
+			'mainmenu' => 'digiriskdolibarr',
+			'leftmenu' => 'digiriskdolibarr_pwa',
+			'url'      => '/digiriskdolibarr/view/frontend/pwa_home.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+			'position' => 100 + $r,
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',
+			'perms'    => '$user->rights->digiriskdolibarr->preventionplan->read || $user->rights->digiriskdolibarr->firepermit->read',
+			'target'   => '',
+			'user'     => 2,
+		];
+
+		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    		// '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left', 										// This is a Left menu entry
 			'titre'    => $langs->trans('RiskAssessmentDocument'),
@@ -1642,22 +1680,6 @@ class modDigiriskdolibarr extends DolibarrModules
         ];
 
 		$this->menu[$r++] = [
-			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',
-			'type'     => 'left',
-			'titre'    => $langs->transnoentities('PwaApplication'),
-			'prefix'   => '<i class="fas fa-mobile-alt pictofixedwidth"></i>',
-			'mainmenu' => 'digiriskdolibarr',
-			'leftmenu' => 'digiriskdolibarr_pwa',
-			'url'      => '/digiriskdolibarr/view/frontend/pwa_home.php',
-			'langs'    => 'digiriskdolibarr@digiriskdolibarr',
-			'position' => 100 + $r,
-			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',
-			'perms'    => '$user->rights->digiriskdolibarr->preventionplan->read || $user->rights->digiriskdolibarr->firepermit->read',
-			'target'   => '',
-			'user'     => 2,
-		];
-
-		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->trans('FirePermit'),
@@ -1767,6 +1789,22 @@ class modDigiriskdolibarr extends DolibarrModules
             'perms'    => '$user->rights->digiriskdolibarr->lire && $user->rights->ticket->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
             'target'   => '',
             'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+        ];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskticket',
+            'type'     => 'left',
+            'titre'    => $langs->transnoentities('TicketKanban'),
+            'prefix'   => '<i class="fas fa-columns pictofixedwidth"></i>',
+            'mainmenu' => 'digiriskdolibarr',
+            'leftmenu' => 'digiriskdolibarr_ticketkanban',
+            'url'      => '/digiriskdolibarr/view/ticket/ticket_action_card.php',
+            'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+            'position' => 100 + $r,
+            'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'ticket\')',
+            'perms'    => '$user->rights->digiriskdolibarr->lire && $user->rights->ticket->read',
+            'target'   => '',
+            'user'     => 0,
         ];
 
         $this->menu[$r++] = [
@@ -2216,6 +2254,11 @@ class modDigiriskdolibarr extends DolibarrModules
             return 0;
         }
 
+        // Dolibarr runs init() before activating $this->depends : activate them first, their tables (saturne_schedules, ticket...) are filled below
+        if (function_exists('saturne_activate_module_dependencies') && saturne_activate_module_dependencies($this) < 0) {
+            return 0;
+        }
+
         if (empty($conf->global->DIGIRISKDOLIBARR_ACCIDENT_REMOVE_FK_USER_VICTIM)) {
 
             require_once __DIR__ . '/../../class/accident.class.php';
@@ -2245,6 +2288,18 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$this->_load_tables('/digiriskdolibarr/sql/');
 
+        // The signature request template comes with data.sql: preselect it in the prevention plan setup
+        // so the admin sees which template is used, without overriding a template already picked
+        require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
+        $signatureEmailTemplate = digiriskGetPreventionPlanSignatureEmailTemplate($this->db, 0);
+        if (!empty($signatureEmailTemplate)) {
+            foreach (['DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_TEMPLATE_EXT', 'DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_TEMPLATE_INT'] as $templateConst) {
+                if (!getDolGlobalInt($templateConst)) {
+                    dolibarr_set_const($this->db, $templateConst, (int) $signatureEmailTemplate->rowid, 'integer', 0, '', $conf->entity);
+                }
+            }
+        }
+
         dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
         dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DB_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
 
@@ -2252,10 +2307,11 @@ class modDigiriskdolibarr extends DolibarrModules
 		delDocumentModel('legaldisplay_odt', 'legaldisplay');
 		delDocumentModel('firepermitdocument_odt', 'firepermitdocument');
 		delDocumentModel('preventionplandocument_odt', 'preventionplandocument');
-		// Modele PDF natif : sans cette suppression, la reactivation du module rejoue son insertion
+		// Modeles PDF natifs : sans cette suppression, la reactivation du module rejoue leur insertion
 		// sur une ligne deja presente et addDocumentModel s'arrete sur une erreur de cle dupliquee,
 		// ce qui interrompt l'activation
 		delDocumentModel('preventionplandocument', 'preventionplandocument');
+		delDocumentModel('firepermitdocument', 'firepermitdocument');
 		delDocumentModel('preventionplandocument_specimen_odt', 'preventionplandocumentspecimen');
 		delDocumentModel('groupmentdocument_odt', 'groupmentdocument');
 		delDocumentModel('groupmentdocument', 'groupmentdocument');
@@ -2283,6 +2339,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		addDocumentModel('informationssharing_odt', 'informationssharing', 'ODT templates', 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
 		addDocumentModel('legaldisplay_odt', 'legaldisplay', 'ODT templates', 'DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
 		addDocumentModel('firepermitdocument_odt', 'firepermitdocument', 'ODT templates', 'DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH');
+        addDocumentModel('firepermitdocument', 'firepermitdocument', $langs->transnoentities('FirePermitDocumentPDF'));
 		addDocumentModel('preventionplandocument_odt', 'preventionplandocument', 'ODT templates', 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('preventionplandocument', 'preventionplandocument', $langs->transnoentities('PreventionPlanDocumentPDF'));
 		addDocumentModel('preventionplandocument_specimen_odt', 'preventionplandocumentspecimen', 'ODT templates', 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH');
@@ -2689,7 +2746,8 @@ class modDigiriskdolibarr extends DolibarrModules
             $tags->fk_parent = $tagID;
             $tags->create($user);
 
-            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 3, 'integer', 0, '', $conf->entity);
+            // FP and TS are created by the next steps
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 1, 'integer', 0, '', $conf->entity);
         }
         if (getDolGlobalInt('DIGIRISKDOLIBARR_PROJECT_TAGS_SET') == 1) {
             //Install after 8.3.0
@@ -2721,6 +2779,47 @@ class modDigiriskdolibarr extends DolibarrModules
             $tags->create($user);
 
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 4, 'integer', 0, '', $conf->entity);
+        }
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_PROJECT_TAGS_SET') == 4) {
+            // Installs made while step 0 jumped to step 3 never got FP and TS, nor these tags on their projects
+            require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+
+            $qhseTag = new Categorie($this->db);
+            if ($qhseTag->fetch(0, 'QHSE', 'project') > 0) {
+                foreach (['FP' => 'DIGIRISKDOLIBARR_FIREPERMIT_PROJECT', 'TS' => 'DIGIRISKDOLIBARR_TICKET_PROJECT'] as $tagLabel => $projectConst) {
+                    $projectTag = new Categorie($this->db);
+                    if ($projectTag->fetch(0, $tagLabel, 'project') > 0) {
+                        continue;
+                    }
+
+                    $projectTag->label     = $tagLabel;
+                    $projectTag->type      = 'project';
+                    $projectTag->fk_parent = $qhseTag->id;
+                    if ($projectTag->create($user) > 0 && getDolGlobalInt($projectConst) > 0) {
+                        $project = new Project($this->db);
+                        if ($project->fetch(getDolGlobalInt($projectConst)) > 0) {
+                            $projectTag->add_type($project, 'project');
+                        }
+                    }
+                }
+            }
+
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 5, 'integer', 0, '', $conf->entity);
+        }
+
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_TAGS_SET') == 0) {
+            // The constructCategory hook that registers this type is not loaded yet on the very first activation, and
+            // without it Categorie would fall back on type 0 and create product tags : the id it declares is used instead
+            $preventionPlanTagType = isset($tags->MAP_ID['digiriskpreventionplan']) ? 'digiriskpreventionplan' : '436302002';
+
+            foreach (['PreventionPlanTag400Hours', 'PreventionPlanTagSeriousImminentDanger'] as $tagLabel) {
+                $preventionPlanTag        = new Categorie($this->db);
+                $preventionPlanTag->label = $langs->transnoentities($tagLabel);
+                $preventionPlanTag->type  = $preventionPlanTagType;
+                $preventionPlanTag->create($user);
+            }
+
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_TAGS_SET', 1, 'integer', 0, '', $conf->entity);
         }
 
 		if (empty($conf->global->DIGIRISKDOLIBARR_TRIGGERS_UPDATED)) {
@@ -2837,8 +2936,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			]
 		];
 
-		$externalmodule = json_decode($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING, true);
-		$externalmodule = !empty($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING) ? array_merge($externalmodule, $params) : $params;
+		$externalmodule = json_decode(getDolGlobalString('MULTICOMPANY_EXTERNAL_MODULES_SHARING'), true);
+		$externalmodule = is_array($externalmodule) ? array_merge($externalmodule, $params) : $params;
 		$jsonformat = json_encode($externalmodule);
 		dolibarr_set_const($this->db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat, 'json', 0, '', 0);
 
@@ -2983,7 +3082,22 @@ class modDigiriskdolibarr extends DolibarrModules
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_REMOVE_TICKET_PUBLIC_INTERFACE_CONST', 1, 'integer', 0, '', $conf->entity);
         }
 
-        return $this->_init($sql, $options);
+        $result = $this->_init($sql, $options);
+
+        // Photos sent straight to a record never reached the media library, where the gallery lists
+        // them: they join it, the work folders of the mobile forms and the certificates of the
+        // external workers aside. Only what is still missing is copied. Once the module is active,
+        // and for a while only: a large catch up must not leave it disabled by running out of time,
+        // the button of the gallery finishes it
+        if ($result > 0) {
+            require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
+            if (function_exists('saturne_sync_media_library')) {
+                $librarySettings = digiriskMediaLibrarySettings();
+                saturne_sync_media_library('digiriskdolibarr', $librarySettings['excluded'], $librarySettings['folders'], microtime(true) + 20);
+            }
+        }
+
+        return $result;
 	}
 
 	/**

@@ -690,3 +690,56 @@ function digiriskdolibarr_ticket_mail_models(): array
 
     return $mailModels;
 }
+
+/**
+ * Address of the public ticket interface the documents send people to
+ *
+ * The interface shared between entities comes first when Multicompany is enabled, the one of the entity
+ * otherwise, the order the documents always picked their QR code in. Within an interface, the address
+ * chosen in the configuration of the tickets (origin, short or external) is used, the origin one when the
+ * chosen one is empty, and the address of this server when nothing was ever saved.
+ *
+ * @return string Full URL
+ */
+function digiriskdolibarr_ticket_public_interface_url(): string
+{
+    global $conf;
+
+    $publicInterfaceTypes = isModEnabled('multicompany') ? ['multicompany', 'current'] : ['current'];
+    foreach ($publicInterfaceTypes as $publicInterfaceType) {
+        $constPrefix = 'DIGIRISKDOLIBARR_TICKET_' . dol_strtoupper($publicInterfaceType) . '_PUBLIC_INTERFACE_';
+        foreach (['origin', 'short', 'external'] as $urlType) {
+            $url = getDolGlobalString($constPrefix . 'URL_' . dol_strtoupper($urlType));
+            if (getDolGlobalString($constPrefix . 'RADIO') == $urlType . dol_ucfirst($publicInterfaceType) . 'TicketPublicInterfaceURL' && dol_strlen($url)) {
+                return $url;
+            }
+        }
+        if (getDolGlobalString($constPrefix . 'URL_ORIGIN')) {
+            return getDolGlobalString($constPrefix . 'URL_ORIGIN');
+        }
+    }
+
+    return dol_buildpath('/digiriskdolibarr/public/ticket/create_ticket.php', 2) . '?entity=' . $conf->entity;
+}
+
+/**
+ * QR code of the public ticket interface, drawn for the document being generated
+ *
+ * Drawn again for every document from the address configured at that moment: a code stored once kept
+ * pointing to an address changed since, and a document generated before anyone pressed the button of
+ * the configuration printed N/A in its place. The ODT templates resize the image in place to fit their
+ * cell, a reason more not to keep it.
+ *
+ * @param  string $url Address to encode
+ * @return string      Path of the PNG image, empty when it could not be drawn
+ */
+function digiriskdolibarr_ticket_qrcode_file(string $url): string
+{
+    global $conf;
+
+    require_once __DIR__ . '/digiriskdolibarr_mobile.lib.php';
+
+    $filePath = $conf->digiriskdolibarr->multidir_output[$conf->entity ?: 1] . '/temp/ticketqrcode.png';
+
+    return digiriskGetQrCodePng($url, $filePath) ? $filePath : '';
+}

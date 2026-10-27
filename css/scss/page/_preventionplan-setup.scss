@@ -1,0 +1,56 @@
+/* Content of the PDF, on the prevention plan setup page: one row per part of the document, its
+   text next to its images. */
+.digirisk-document-content {
+  // Fixed layout: the editors and the selectors fit the width of the page instead of pushing it
+  // wider, which made the whole page scroll sideways
+  &__table {
+    table-layout: fixed;
+
+    td {
+      vertical-align: top;
+    }
+  }
+
+  &__part-head {
+    width: 16%;
+  }
+
+  &__part {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  // Room for the two buttons and the gallery thumbnail
+  &__images-head {
+    width: 200px;
+  }
+
+  // The four emergency numbers, their labels in a column of their own
+  &__emergency {
+    display: grid;
+    grid-template-columns: minmax(110px, max-content) minmax(0, 1fr);
+    gap: 6px 12px;
+    align-items: center;
+  }
+
+  // The number printed, read from the third party, right next to its selector
+  &__emergency-value {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+
+    // select2 writes a fixed width on its container: it has to give way to the cell
+    .select2-container {
+      flex: 1 1 0;
+      min-width: 0;
+      width: auto !important;
+    }
+  }
+
+  &__emergency-phone {
+    flex: none;
+    min-width: 3em;
+    font-weight: 600;
+  }
+}

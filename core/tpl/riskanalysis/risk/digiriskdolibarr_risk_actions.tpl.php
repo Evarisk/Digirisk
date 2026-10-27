@@ -1,5 +1,12 @@
 <?php
 
+require_once __DIR__ . '/../../../../lib/digiriskdolibarr_risk.lib.php';
+
+// Photos of the risk modals, posted by their Saturne media block
+if ( ! $error && $permissiontoadd) {
+	digiriskRiskAssessmentMediaActions($action);
+}
+
 if ( ! $error && $action == 'add' && $permissiontoadd) {
 	$data = json_decode(file_get_contents('php://input'), true);
 
@@ -57,44 +64,14 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 				$evaluation->exposition = $exposition;
 			}
 
-			$pathToTmpPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/';
-			$files          = dol_dir_list($pathToTmpPhoto);
-
-			if ( ! empty($files)) {
-				foreach ($files as $file) {
-					$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $evaluation->ref;
-
-					if ( ! is_dir($pathToEvaluationPhoto)) {
-						mkdir($pathToEvaluationPhoto);
-					}
-					if ( ! is_file($pathToEvaluationPhoto . '/' . $file['name'])) {
-						copy($file['fullname'], $pathToEvaluationPhoto . '/' . $file['name']);
-					}
-
-					global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
-					$destfull = $pathToEvaluationPhoto . '/' . $file['name'];
-
-					// Create thumbs
-					$imgThumbLarge = vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE, '_large', 50, "thumbs");
-					$imgThumbMedium = vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM, '_medium', 50, "thumbs");
-					$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-					$imgThumbMini  = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
-					unlink($file['fullname']);
-				}
-			}
-			$filesThumbs = dol_dir_list($pathToTmpPhoto . '/thumbs/');
-			if ( ! empty($filesThumbs)) {
-				foreach ($filesThumbs as $fileThumb) {
-					unlink($fileThumb['fullname']);
-				}
-			}
+			digiriskRiskAssessmentMovePhotos($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0', $evaluation);
 
 			$result2 = $evaluation->create($user, false);
 
 			if ($result2 > 0) {
 				$tasktitle = $data['task'];
 				$dateStart = dol_stringtotime($data['dateStart']);
-                $dateEnd   = dol_stringtotime($data['dateEnd']);
+                $dateEnd   = digiriskTaskDeadlineToTimestamp((string) ($data['dateEnd'] ?? ''));
 				$budget    = $data['budget'];
 				$executive_id = isset($data['executiveId']) ? $data['executiveId'] : 0;
 				if ( ! empty($tasktitle) && $tasktitle !== 'undefined') {
@@ -331,37 +308,7 @@ if ( ! $error && $action == 'addEvaluation' && $permissiontoadd) {
 		$evaluation->exposition = $exposition;
 	}
 
-	$pathToTmpPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/' . $risktmp->ref;
-	$files          = dol_dir_list($pathToTmpPhoto);
-
-	if ( ! empty($files)) {
-		foreach ($files as $file) {
-			$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $evaluation->ref;
-
-			mkdir($pathToEvaluationPhoto);
-			copy($file['fullname'], $pathToEvaluationPhoto . '/' . $file['name']);
-
-			global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
-			$destfull = $pathToEvaluationPhoto . '/' . $file['name'];
-
-			// Create thumbs
-			// We can't use $object->addThumbs here because there is no $object known
-			// Used on logon for example
-			$imgThumbLarge = vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE, '_large', 50, "thumbs");
-			$imgThumbMedium = vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM, '_medium', 50, "thumbs");
-			$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-			// Create mini thumbs for image (Ratio is near 16/9)
-			// Used on menu or for setup page for example
-			$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
-			unlink($file['fullname']);
-		}
-	}
-	$filesThumbs = dol_dir_list($pathToTmpPhoto . '/thumbs/');
-	if ( ! empty($filesThumbs)) {
-		foreach ($filesThumbs as $fileThumb) {
-			unlink($fileThumb['fullname']);
-		}
-	}
+	digiriskRiskAssessmentMovePhotos($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/' . $risktmp->ref, $evaluation);
 
 	$result = $evaluation->create($user);
 
@@ -443,7 +390,7 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 	$riskID        = $data['riskToAssign'];
 	$tasktitle     = $data['tasktitle'];
     $dateStart     = dol_stringtotime($data['dateStart']);
-    $dateEnd       = dol_stringtotime($data['dateEnd']);
+    $dateEnd       = digiriskTaskDeadlineToTimestamp((string) ($data['dateEnd'] ?? ''));
 	$budget        = $data['budget'];
     $executiveUser = $data['executiveId'];
 	$extrafields->fetch_name_optionals_label($task->table_element);
@@ -489,7 +436,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 	$riskAssessmentTaskID = $data['riskAssessmentTaskID'];
 	$tasktitle            = $data['tasktitle'];
     $dateStart            = dol_stringtotime($data['dateStart']);
-    $dateEnd              = dol_stringtotime($data['dateEnd']);
+    $dateEnd              = digiriskTaskDeadlineToTimestamp((string) ($data['dateEnd'] ?? ''));
 	$budget               = $data['budget'];
 	$taskProgress         = $data['taskProgress'];
 	$executiveUser        = $data['executiveId'];

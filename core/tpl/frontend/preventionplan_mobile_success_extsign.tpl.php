@@ -40,7 +40,7 @@ $ppExtName = trim($ppExtSignatory->firstname . ' ' . $ppExtSignatory->lastname);
         <div><i class="fas fa-hard-hat"></i> Entreprise Extérieure ( EE )</div>
         <?php if ($ppExtSigned) { ?>
         <div style="font-size: 0.65em; background: #e6f2e9; color: #2d6a3c; padding: 4px 8px; border-radius: 15px; font-weight: bold; line-height: 1.2;">
-            <i class="fas fa-check"></i> Signé le <?php print dol_print_date($ppExtSignatory->signature_date, 'dayhour'); ?>
+            <i class="fas fa-check"></i> Signé le <?php print dol_print_date($ppExtSignatory->signature_date, 'dayhour', 'tzuser'); ?>
         </div>
         <?php } ?>
     </div>
@@ -69,7 +69,7 @@ $ppExtName = trim($ppExtSignatory->firstname . ' ' . $ppExtSignatory->lastname);
         <span>
             <?php
             print $ppExtEmailSent
-                ? $langs->trans('MobilePPExtEmailSentOn', dol_escape_htmltag($ppExtSignatory->email), dol_print_date($ppExtSignatory->last_email_sent_date, 'dayhour'))
+                ? $langs->trans('MobilePPExtEmailSentOn', dol_escape_htmltag($ppExtSignatory->email), dol_print_date($ppExtSignatory->last_email_sent_date, 'dayhour', 'tzuser'))
                 : $langs->trans('MobilePPExtEmailNotSent');
             ?>
         </span>
@@ -91,12 +91,12 @@ $ppExtName = trim($ppExtSignatory->firstname . ' ' . $ppExtSignatory->lastname);
 
         <?php if ($object->status < PreventionPlan::STATUS_LOCKED) { ?>
             <?php if ($ppExtSigned) { ?>
-                <a href="<?php print $_SERVER['PHP_SELF']; ?>?action=lock_mobile&plan_id=<?php print $object->id; ?>" class="digirisk-mobile-success__button digirisk-mobile-success__button--primary">
-                    <i class="fas fa-lock"></i> Verrouiller
+                <a href="<?php print $_SERVER['PHP_SELF']; ?>?created=<?php print $object->id; ?>&action=lock_mobile&plan_id=<?php print $object->id; ?>&token=<?php print newToken(); ?>" class="digirisk-mobile-success__button digirisk-mobile-success__button--primary">
+                    <i class="fas fa-lock"></i> <?php print $langs->trans('MobileLock'); ?>
                 </a>
             <?php } else { ?>
-                <button type="button" class="digirisk-mobile-success__button" style="opacity: 0.5; cursor: not-allowed;" disabled title="Le plan doit être signé avant d'être verrouillé">
-                    <i class="fas fa-lock"></i> Verrouiller
+                <button type="button" class="digirisk-mobile-success__button digirisk-mobile-success__button--disabled" disabled title="<?php print dol_escape_htmltag($langs->trans('MobilePPLockNeedsSignature')); ?>">
+                    <i class="fas fa-lock"></i> <?php print $langs->trans('MobileLock'); ?>
                 </button>
             <?php } ?>
         <?php } ?>

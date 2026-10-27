@@ -209,6 +209,39 @@ function digiriskGetPreventionPlanSignatureUrl(SaturneSignature $signatory): str
 }
 
 /**
+ * Modele d'email de la demande de signature d'un plan de prevention.
+ *
+ * Lu en SQL direct plutot que par CEmailTemplate::fetch() : sur Dolibarr 23, fetch() ajoute une
+ * condition sur le libelle meme quand l'identifiant est fourni et ne trouve alors jamais rien, sans
+ * erreur, si bien que le modele choisi etait ignore.
+ *
+ * @param  DoliDB      $db         Base de donnees
+ * @param  int         $templateId Modele choisi dans la configuration, 0 pour celui livre avec le module
+ * @return object|null             Ligne du modele (topic, content, joinfiles), null si aucun n'est actif
+ */
+function digiriskGetPreventionPlanSignatureEmailTemplate(DoliDB $db, int $templateId): ?object
+{
+    $sql  = 'SELECT rowid, topic, content, joinfiles FROM ' . MAIN_DB_PREFIX . 'c_email_templates';
+    $sql .= ' WHERE active = 1 AND entity IN (' . getEntity('c_email_templates') . ')';
+    if ($templateId > 0) {
+        $sql .= ' AND rowid = ' . $templateId;
+    } else {
+        $sql .= " AND type_template = 'preventionplan' AND label = '(PreventionPlanSignatureRequest)'";
+    }
+    $sql .= ' ORDER BY rowid ASC';
+    $sql .= $db->plimit(1);
+
+    $resql = $db->query($sql);
+    if (!$resql) {
+        return null;
+    }
+
+    $template = $db->fetch_object($resql);
+
+    return $template ?: null;
+}
+
+/**
  * Envoie a un signataire le lien de signature du plan de prevention.
  *
  * Rend compte de ce qui s'est passe au lieu de le passer sous silence : l'interface mobile affiche
@@ -224,6 +257,8 @@ function digiriskGetPreventionPlanSignatureUrl(SaturneSignature $signatory): str
  */
 function digiriskSendPreventionPlanSignatureEmail(DoliDB $db, PreventionPlan $plan, SaturneSignature $signatory, string $societyName, User $user, Translate $langs): array
 {
+    global $conf;
+
     require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
 
     $result = ['sent' => false, 'error' => '', 'email' => (string) $signatory->email];
@@ -251,7 +286,9 @@ function digiriskSendPreventionPlanSignatureEmail(DoliDB $db, PreventionPlan $pl
     $subject      = $langs->transnoentities('MobilePPSignatureEmailSubject', $plan->ref);
     $message      = $langs->transnoentities('MobilePPSignatureEmailContent', $societyName, $signatureUrl);
 
-    // Override with custom template if configured
+    // Modele d'email : celui choisi dans la configuration pour ce role, sinon celui livre avec le
+    // module. Le texte ci-dessus ne sert plus que si aucun des deux n'est disponible (module pas
+    // encore reactive depuis la livraison du modele, modele desactive).
     $templateId = 0;
     if ($signatory->role === 'ExtSocietyResponsible') {
         $templateId = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_EMAIL_TEMPLATE_EXT');
@@ -263,48 +300,35 @@ function digiriskSendPreventionPlanSignatureEmail(DoliDB $db, PreventionPlan $pl
     $mimetype = [];
     $filename = [];
 
-    if ($templateId > 0) {
-        require_once DOL_DOCUMENT_ROOT . '/core/class/cemailtemplate.class.php';
-        $emailTemplate = new CEmailTemplate($db);
-        if ($emailTemplate->fetch($templateId) > 0) {
-            
-            // Si la piece jointe est demandée, on genère et on cherche le document
-            if ($emailTemplate->joinfiles == 1) {
-                digiriskGeneratePreventionPlanDocument($plan->id);
-                $dir = $conf->digiriskdolibarr->dir_output . '/' . $plan->element . 'document/' . dol_sanitizeFileName($plan->ref);
-                $fileArray = dol_dir_list($dir, 'files', 0, '\.pdf$', 'date', 'DESC');
-                if (!empty($fileArray)) {
-                    $filepath[] = $dir . '/' . $fileArray[0]['name'];
-                    $mimetype[] = 'application/pdf';
-                    $filename[] = $fileArray[0]['name'];
-                }
+    $emailTemplate = digiriskGetPreventionPlanSignatureEmailTemplate($db, $templateId);
+    if (!empty($emailTemplate)) {
+        // Si la piece jointe est demandée, on genère et on cherche le document
+        if (!empty($emailTemplate->joinfiles)) {
+            digiriskRefreshPreventionPlanDocument($db, (int) $plan->id, $user, $langs);
+            $dir       = $conf->digiriskdolibarr->dir_output . '/' . $plan->element . 'document/' . dol_sanitizeFileName($plan->ref);
+            $fileArray = dol_dir_list($dir, 'files', 0, '\.pdf$', '', 'date', SORT_DESC);
+            if (!empty($fileArray)) {
+                $filepath[] = $dir . '/' . $fileArray[0]['name'];
+                $mimetype[] = 'application/pdf';
+                $filename[] = $fileArray[0]['name'];
             }
-
-            $userFullName = $user->getFullName($langs);
-            $userEmail = $user->email;
-            $userPhonePro = $user->office_phone;
-            $myCompanyName = getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
-            $myCompanyFullAddress = trim($conf->global->MAIN_INFO_SOCIETE_ADDRESS . ' ' . $conf->global->MAIN_INFO_SOCIETE_ZIP . ' ' . $conf->global->MAIN_INFO_SOCIETE_TOWN);
-
-            $subject = str_replace(
-                ['__PLAN_REF__', '__COMPANY_NAME__'], 
-                [$plan->ref, $societyName], 
-                $emailTemplate->topic
-            );
-            $message = str_replace(
-                [
-                    '__PLAN_REF__', '__COMPANY_NAME__', '__SIGNATURE_URL__',
-                    '__USER_FULLNAME__', '__USER_EMAIL__', '__USER_PHONEPRO__',
-                    '__MYCOMPANY_NAME__', '__MYCOMPANY_FULLADDRESS__'
-                ], 
-                [
-                    $plan->ref, $societyName, $signatureUrl,
-                    $userFullName, $userEmail, $userPhonePro,
-                    $myCompanyName, $myCompanyFullAddress
-                ], 
-                $emailTemplate->content
-            );
         }
+
+        // Jetons propres au plan, en plus des jetons communs de Dolibarr. make_substitutions() resout
+        // aussi les cles de traduction __(Cle)__ et les constantes __[CONSTANTE]__ du modele.
+        $substitutions = array_merge(getCommonSubstitutionArray($langs), [
+            '__PLAN_REF__'              => $plan->ref,
+            '__COMPANY_NAME__'          => $societyName,
+            '__SIGNATURE_URL__'         => $signatureUrl,
+            '__USER_FULLNAME__'         => $user->getFullName($langs),
+            '__USER_EMAIL__'            => $user->email,
+            '__USER_PHONEPRO__'         => $user->office_phone,
+            '__MYCOMPANY_NAME__'        => getDolGlobalString('MAIN_INFO_SOCIETE_NOM'),
+            '__MYCOMPANY_FULLADDRESS__' => trim(getDolGlobalString('MAIN_INFO_SOCIETE_ADDRESS') . ' ' . getDolGlobalString('MAIN_INFO_SOCIETE_ZIP') . ' ' . getDolGlobalString('MAIN_INFO_SOCIETE_TOWN')),
+        ]);
+
+        $subject = make_substitutions($emailTemplate->topic, $substitutions, $langs);
+        $message = make_substitutions($emailTemplate->content, $substitutions, $langs);
     }
 
     $mailfile = new CMailFile($subject, $signatory->email, $from, $message, $filepath, $mimetype, $filename, '', '', 0, -1, '', '', '', '', 'mail');
@@ -406,4 +430,170 @@ function digiriskShareGeneratedFile(DoliDB $db, string $fileName, string $tableE
     }
 
     return $ecmFile->update($user) > 0 ? 1 : -1;
+}
+
+/**
+ * Contenu reutilisable d'un plan de prevention, sous la forme ou le formulaire de la PWA le
+ * pre-remplit : motif, tags, risques (description, entreprises concernees, protections),
+ * certifications et horaires.
+ *
+ * Sert a la modification d'un plan et aux trames : ce qui est propre a une intervention
+ * (entreprise exterieure, responsable, dates, visite prealable, signatures, photos) n'en fait pas
+ * partie.
+ *
+ * @param  DoliDB         $db   Base de donnees
+ * @param  PreventionPlan $plan Plan de prevention charge
+ * @return array                Cles du pre-remplissage : label, categories, risks, certifications, schedule_<jour>_am/pm
+ * @throws Exception
+ */
+function digiriskPreventionPlanReusableContent(DoliDB $db, PreventionPlan $plan): array
+{
+    require_once __DIR__ . '/../../saturne/class/saturneschedules.class.php';
+
+    $plan->fetch_optionals();
+
+    $content = [
+        'label'          => (string) $plan->label,
+        'categories'     => [],
+        'risks'          => [],
+        'certifications' => [],
+    ];
+
+    if (isModEnabled('categorie')) {
+        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+
+        $category   = new Categorie($db);
+        $categories = $category->containing($plan->id, 'preventionplan');
+        if (is_array($categories)) {
+            foreach ($categories as $categoryItem) {
+                $content['categories'][] = $categoryItem->id;
+            }
+        }
+    }
+
+    // Protections are stored flat in the extrafield, each one carrying the risk it belongs to
+    $storedProtections = !empty($plan->array_options['options_mobile_protections']) ? json_decode($plan->array_options['options_mobile_protections'], true) : [];
+    if (!is_array($storedProtections)) {
+        $storedProtections = [];
+    }
+
+    // Which company each risk concerns, keyed by danger category
+    $storedRiskCompanies = !empty($plan->array_options['options_mobile_risk_companies']) ? json_decode($plan->array_options['options_mobile_risk_companies'], true) : [];
+    if (!is_array($storedRiskCompanies)) {
+        $storedRiskCompanies = [];
+    }
+
+    $planLine = new PreventionPlanLine($db);
+    $lines    = $planLine->fetchAll('', '', 0, 0, ['fk_preventionplan' => $plan->id]);
+    foreach (is_array($lines) ? $lines : [] as $line) {
+        $lineProtections = [];
+        foreach ($storedProtections as $storedProtection) {
+            // Plans created before the protections moved inside the risks have no risk_category:
+            // keep them on the first risk rather than dropping them silently
+            $storedRiskCategory = isset($storedProtection['risk_category']) ? (int) $storedProtection['risk_category'] : 0;
+            if ($storedRiskCategory === (int) $line->category || (empty($storedRiskCategory) && empty($content['risks']))) {
+                $lineProtections[] = $storedProtection;
+            }
+        }
+        // Plans created before the concerned companies existed have nothing stored: both are ticked
+        $lineCompanies = $storedRiskCompanies[(string) $line->category] ?? ['eu' => 1, 'ee' => 1];
+
+        $content['risks'][] = [
+            'category'    => $line->category,
+            'description' => $line->description,
+            'company_eu'  => !empty($lineCompanies['eu']) ? 1 : 0,
+            'company_ee'  => !empty($lineCompanies['ee']) ? 1 : 0,
+            'protections' => $lineProtections,
+        ];
+    }
+
+    $certifications = !empty($plan->array_options['options_mobile_certifications']) ? json_decode($plan->array_options['options_mobile_certifications'], true) : [];
+    $content['certifications'] = is_array($certifications) ? $certifications : [];
+
+    $schedules = new SaturneSchedules($db);
+    $schedules->fetch(0, '', ' AND element_type = "preventionplan" AND element_id = ' . ((int) $plan->id) . ' AND status = 1');
+    foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as $day) {
+        $parts = explode(' ', (string) $schedules->$day);
+        $content['schedule_' . $day . '_am'] = $parts[0] ?? 'N/A';
+        $content['schedule_' . $day . '_pm'] = $parts[1] ?? 'N/A';
+    }
+
+    return $content;
+}
+
+/**
+ * Saturne media block of the photos of one risk, on the card of a draft prevention plan
+ *
+ * The photos go to the folder the mobile interface, the document and the card of a locked plan read,
+ * see digiriskMobileRiskPhotoDir().
+ *
+ * @param  PreventionPlan $plan     Prevention plan
+ * @param  int            $category Danger category position of the risk
+ * @return string                   HTML of the block
+ */
+function digiriskPreventionPlanRiskMediaBlock(PreventionPlan $plan, int $category): string
+{
+    require_once __DIR__ . '/digiriskdolibarr_mobile.lib.php';
+
+    $photoDir      = digiriskMobileRiskPhotoDir($plan->element, $plan->ref, $category);
+    $photoDirExist = dol_is_dir($photoDir);
+
+    $block = saturne_render_media_block('digiriskdolibarr', digiriskMobileRiskPhotoSubDir($plan->element, $plan->ref, $category), 'risk-' . $category, 'digiriskdolibarr,preventionplan,write', ['show_photo' => true, 'show_audio' => false, 'show_file' => false]);
+
+    // The block creates its folder as soon as it is displayed: one left unused would stay behind
+    // empty. An upload creates it again.
+    if (!$photoDirExist) {
+        dol_delete_dir($photoDir, 1);
+    }
+
+    return $block;
+}
+
+/**
+ * Photo added or removed from the media block of a risk, on the card of a draft prevention plan: the
+ * Saturne media block posts on the page and expects itself back, refreshed. The folder comes from the
+ * browser, so only the photo folders of the risks of this plan are writable, and only while it is a draft.
+ *
+ * @param  string         $action Requested action: anything but uploadPhoto and deletePhoto returns at once
+ * @param  PreventionPlan $plan   Prevention plan of the card
+ * @return void                   Ends the request when it handled the action
+ * @throws Exception
+ */
+function digiriskPreventionPlanRiskMediaActions(string $action, PreventionPlan $plan): void
+{
+    global $conf, $db, $langs, $user;
+
+    if (!in_array($action, ['uploadPhoto', 'deletePhoto'], true) || GETPOST('module_name', 'alpha') !== 'digiriskdolibarr') {
+        return;
+    }
+
+    require_once __DIR__ . '/digiriskdolibarr_mobile.lib.php';
+
+    $subDir   = GETPOST('sub_dir', 'alphanohtml');
+    $category = null;
+
+    if ($plan->id > 0 && $plan->status == PreventionPlan::STATUS_DRAFT) {
+        $planLine  = new PreventionPlanLine($db);
+        $planLines = $planLine->fetchAll('', '', 0, 0, ['fk_preventionplan' => $plan->id]);
+
+        foreach (is_array($planLines) ? $planLines : [] as $line) {
+            if ($subDir === digiriskMobileRiskPhotoSubDir($plan->element, $plan->ref, (int) $line->category)) {
+                $category = (int) $line->category;
+                break;
+            }
+        }
+    }
+
+    if ($category === null) {
+        http_response_code(403);
+        exit;
+    }
+
+    require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+
+    // Writes the photo with its thumbs, or removes it with them
+    require dol_buildpath('/saturne/core/tpl/actions/media_block_actions.tpl.php');
+
+    print digiriskPreventionPlanRiskMediaBlock($plan, $category);
+    exit;
 }
