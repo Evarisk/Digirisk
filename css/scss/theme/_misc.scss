@@ -5,6 +5,9 @@
 
   .chart-container:has(canvas[id^="advancementGauge"]) {
     display: flex;
+    /* The title is a sibling of the canvas block when $move_title_gauge is set (cards) */
+    align-items: center;
+    gap: 8px;
     width: max-content !important;
     margin: 0 0 14px;
     padding: 5px 14px 5px 6px;
