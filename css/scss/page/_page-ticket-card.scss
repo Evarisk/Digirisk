@@ -1,3 +1,5 @@
+@import "../theme/tokens";
+
 // Ticket card (issue #4443) — light, modern restyle layered over the native
 // Dolibarr ticket card. Fully scoped to .digirisk-ticket-card so it never leaks
 // to other pages. Self-contained variables (no dependency on global colors).
@@ -77,6 +79,51 @@ $dtc-title:       #111827;
                     gap: 6px;
                     font-weight: 400;
                     flex: 0 0 auto;
+                }
+
+                // Secondary info next to the section title (parent task of the ticket tasks)
+                .dtc-head-sub {
+                    font-weight: 400;
+                    min-width: 0;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                // Add button of a section (new task, new accident) — the color and case are forced
+                // because the theme styles the links and the text of the section headers
+                .dtc-head-add {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 5px;
+                    margin: 0;
+                    padding: 4px 11px;
+                    border: 0;
+                    border-radius: 999px;
+                    background: $dtc-blue;
+                    color: #fff !important;
+                    font: inherit;
+                    font-size: 12px;
+                    font-weight: 600;
+                    line-height: 1.4;
+                    letter-spacing: 0;
+                    text-transform: none;
+                    white-space: nowrap;
+                    text-decoration: none;
+                    cursor: pointer;
+                    transition: background .15s ease, box-shadow .15s ease;
+
+                    &:hover {
+                        background: darken($dtc-blue, 8%);
+                        box-shadow: $dtc-shadow-hov;
+                    }
+
+                    &.is-disabled {
+                        background: $dtc-border;
+                        color: $dtc-grey !important;
+                        cursor: not-allowed;
+                        box-shadow: none;
+                    }
                 }
 
                 // Inline (on-the-fly) editable subject, shown on the same line as the label
@@ -191,6 +238,15 @@ $dtc-title:       #111827;
         opacity: .5;
         transition: opacity .15s ease, color .15s ease;
         &:hover { opacity: 1; color: $dtc-blue; }
+    }
+
+    // ---- Tasks section: column labels under the section header ----
+    table.dtc-tasks-table > tbody > tr.dtc-table-cols > td {
+        font-size: 0.78em;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: $dtc-grey;
     }
 
     // ---- Linked tasks table ----
@@ -334,7 +390,57 @@ $dtc-title:       #111827;
         }
     }
 
+    // Initial message edited on the spot (js/modules/ticket.js)
+    .dtc-message-editor__bar {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+
+        button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
+            padding: 6px 14px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            font: inherit;
+            font-size: 0.9em;
+            font-weight: 600;
+            text-transform: none;
+            cursor: pointer;
+            transition: background .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
+
+            &:disabled {
+                opacity: .6;
+                cursor: default;
+            }
+        }
+
+        .dtc-message-editor__save {
+            background: $dtc-blue;
+            color: #fff;
+
+            &:hover:not(:disabled) {
+                background: darken($dtc-blue, 8%);
+                box-shadow: $dtc-shadow-hov;
+            }
+        }
+
+        .dtc-message-editor__cancel {
+            background: #fff;
+            border-color: $dtc-border;
+            color: $dtc-grey;
+
+            &:hover:not(:disabled) {
+                border-color: $dtc-blue;
+                color: $dtc-blue;
+            }
+        }
+    }
+
     .edit-message-on-click {
+        cursor: pointer;
         border: 1px dashed transparent;
         padding: 4px;
         border-radius: 4px;
@@ -343,31 +449,6 @@ $dtc-title:       #111827;
         &:hover {
             border-color: $dtc-blue;
             background: rgba(43, 108, 176, .05);
-        }
-    }
-
-    // ---- Status action buttons (native .butAction.butStatus) → pills ----
-    .navBarForStatus .butAction.butStatus {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        margin: 3px 0 3px 6px;
-        padding: 5px 12px;
-        border: 1px solid $dtc-border;
-        border-radius: 999px;
-        background: #fff;
-        color: $dtc-title;
-        font-weight: 600;
-        box-shadow: $dtc-shadow;
-        text-transform: none;
-        transition: transform .15s ease, box-shadow .15s ease, background .15s ease, color .15s ease, border-color .15s ease;
-
-        &:hover {
-            transform: translateY(-1px);
-            box-shadow: $dtc-shadow-hov;
-            background: $dtc-blue;
-            color: #fff;
-            border-color: $dtc-blue;
         }
     }
 
@@ -728,6 +809,33 @@ $dtc-title:       #111827;
         padding: 2px 10px;
         color: $dtc-grey;
         font-style: italic;
+    }
+}
+
+// ---- Status action buttons (native .butAction.butStatus) → white pills ----
+// The theme paints every .butAction blue and is imported after the pages: the theme scope in front
+// is needed to win, otherwise the colored status dot of each button sits on a blue background.
+#{$dr-scope} .digirisk-ticket-card .navBarForStatus .butAction.butStatus {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 3px 0 3px 6px;
+    padding: 5px 12px;
+    border: 1px solid $dtc-border;
+    border-radius: 999px;
+    background: #fff;
+    color: $dtc-title !important;
+    font-weight: 600;
+    box-shadow: $dtc-shadow;
+    text-transform: none;
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease, color .15s ease, border-color .15s ease;
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: $dtc-shadow-hov;
+        background: $dtc-bg;
+        border-color: $dtc-blue;
+        color: $dtc-blue !important;
     }
 }
 

@@ -105,9 +105,34 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     ];
 
     /**
+     * @var array Neuf couleurs de la roue des principes de prevention - issue #5307
+     */
+    protected array $wheelColors = [
+        [214, 69, 65],
+        [232, 125, 55],
+        [240, 176, 60],
+        [163, 188, 66],
+        [76, 166, 107],
+        [61, 158, 160],
+        [59, 122, 176],
+        [110, 92, 165],
+        [186, 84, 140]
+    ];
+
+    /**
      * @var array Responsables des taches, indexes par identifiant de tache
      */
     protected array $taskResponsibles = [];
+
+    /**
+     * @var bool Afficher la colonne photo des evaluations - issue #5299
+     */
+    protected bool $showPhoto = true;
+
+    /**
+     * @var array Options de masquage du plan d'actions retenues pour cette generation - issue #5289
+     */
+    protected array $taskOptions = [];
 
     /**
      * Bande basse reservee au pied de page, en mm. Le contenu s'arrete au dessus, le pied
@@ -682,11 +707,14 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         $this->_pagehead($pdf, $object, $outputLangs, $size);
 
         $this->sectionCover($pdf, $object, $outputLangs, $size);
+        $this->sectionPerimeterTree($pdf, $object, $outputLangs, $size);
+        $this->sectionElementPhoto($pdf, $object, $outputLangs, $size, $moreParam);
         $this->sectionLegalReminder($pdf, $outputLangs, $size);
         $this->sectionCotationMethod($pdf, $outputLangs, $size);
         $this->sectionRisks($pdf, $object, $outputLangs, $size, $moreParam);
         $this->sectionRegisters($pdf, $object, $outputLangs, $size, $moreParam);
         $this->sectionAccidents($pdf, $object, $outputLangs, $size, $moreParam);
+        $this->sectionGlossary($pdf, $outputLangs, $size);
 
         $this->_pagefooter($pdf, $object, $outputLangs, $size);
 
@@ -985,33 +1013,16 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     }
 
     /**
-     * Chemin du QR code de l'interface publique de ticket.
+     * Chemin du QR code de l'interface publique de ticket, dessine pour ce document a partir de
+     * l'adresse configuree au moment de la generation.
      *
-     * @return string Chemin complet, vide si aucun QR code n'a ete genere
+     * @return string Chemin complet, vide si le QR code n'a pas pu etre dessine
      */
     protected function ticketQrCodePath(): string
     {
-        global $conf;
+        require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_ticket.lib.php';
 
-        // Le QR code partage entre entites prime, celui de l'entite prend le relais quand il n'y a
-        // rien de partage : sans ce repli une base multi-societe montee apres coup n'en aurait aucun
-        $qrCodeDirs = [$conf->digiriskdolibarr->multidir_output[$conf->entity ?: 1] . '/ticketqrcode/'];
-        if (isModEnabled('multicompany')) {
-            array_unshift($qrCodeDirs, DOL_DATA_ROOT . '/digiriskdolibarr/multicompany/ticketqrcode/');
-        }
-
-        foreach ($qrCodeDirs as $qrCodeDir) {
-            $qrCodeList = dol_dir_list($qrCodeDir, 'files');
-            if (!is_array($qrCodeList) || empty($qrCodeList)) {
-                continue;
-            }
-            $qrCode = array_shift($qrCodeList);
-            if (is_readable($qrCode['fullname'])) {
-                return $qrCode['fullname'];
-            }
-        }
-
-        return '';
+        return digiriskdolibarr_ticket_qrcode_file(digiriskdolibarr_ticket_public_interface_url());
     }
 
     /**
@@ -1063,6 +1074,201 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     }
 
     /**
+     * Arborescence du perimetre : l'organigramme des GP et UT couverts par ce document.
+     *
+     * Le SICTOM a dessine a la main ce qu'il attend (issue #5287) : une seule boite quand le
+     * document porte sur une unite de travail, la boite du groupement et son arbre quand il
+     * porte sur un groupement. Les boites sont indentees par profondeur et reliees a leur
+     * parent, ce qui tient quelle que soit la taille de l'arbre - leur GP38 compte 18 UT.
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  object    $object      Element imprime
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @return void
+     */
+    protected function sectionPerimeterTree($pdf, $object, Translate $outputLangs, float $size)
+    {
+        $perimeter = $this->perimeterElements($object);
+        if (empty($perimeter)) {
+            return;
+        }
+
+        $this->newPage($pdf);
+        $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksPerimeterTreeTitle'), $size);
+
+        $depths = $this->perimeterDepths($perimeter);
+
+        $indent     = 12;
+        $boxHeight  = 7;
+        $gap        = 2.5;
+        $left       = $this->marge_gauche;
+        $maxWidth   = $this->contentWidth($pdf) - 40;
+        // Ordonnee du bas de la derniere boite dessinee a chaque profondeur : c'est de la que
+        // part le trait vers l'enfant suivant
+        $lastBottom = [];
+
+        foreach ($perimeter as $elementId => $element) {
+            $depth = $depths[$elementId] ?? 0;
+            $this->checkPageBreak($pdf, $boxHeight + $gap);
+
+            $x = $left + ($depth * $indent);
+            $y = $pdf->GetY();
+            $width = min($maxWidth - ($depth * $indent), 140);
+
+            // Le trait qui relie la boite a son parent : une descente puis une equerre
+            if ($depth > 0 && isset($lastBottom[$depth - 1])) {
+                $parentX = $left + (($depth - 1) * $indent) + 4;
+                $pdf->SetDrawColor(160, 160, 160);
+                $pdf->Line($parentX, $lastBottom[$depth - 1], $parentX, $y + ($boxHeight / 2));
+                $pdf->Line($parentX, $y + ($boxHeight / 2), $x, $y + ($boxHeight / 2));
+                $pdf->SetDrawColor(190, 190, 190);
+            }
+
+            // Un groupement porte la couleur d'accent, une unite de travail reste claire
+            $isGroup = !empty($element['object']->element_type) && $element['object']->element_type == 'groupment';
+            if ($isGroup) {
+                $pdf->SetFillColor($this->accent[0], $this->accent[1], $this->accent[2]);
+                $pdf->SetTextColor(255, 255, 255);
+                $pdf->SetFont('', 'B', $size);
+            } else {
+                $pdf->SetFillColor($this->headBg[0], $this->headBg[1], $this->headBg[2]);
+                $pdf->SetTextColor(0, 0, 0);
+                $pdf->SetFont('', '', $size);
+            }
+
+            $label = $element['object']->ref . ' - ' . $element['object']->label;
+            $pdf->SetXY($x, $y);
+            $pdf->Cell($width, $boxHeight, ' ' . dol_trunc($label, 70), 1, 0, 'L', true);
+
+            $pdf->SetTextColor(0, 0, 0);
+            $lastBottom[$depth] = $y + $boxHeight;
+            // Les profondeurs plus basses sont refermees : leur dernier trait ne doit pas
+            // redescendre vers une boite qui n'est plus leur enfant
+            foreach (array_keys($lastBottom) as $openDepth) {
+                if ($openDepth > $depth) {
+                    unset($lastBottom[$openDepth]);
+                }
+            }
+
+            $pdf->SetY($y + $boxHeight + $gap);
+        }
+
+        $pdf->SetY($pdf->GetY() + 4);
+        $this->paragraph($pdf, $outputLangs->transnoentities('ListingRisksPerimeterTreeLegend'), $size - 1, 'I', [140, 140, 140]);
+    }
+
+    /**
+     * Profondeur de chaque element du perimetre, relative a la racine du document.
+     *
+     * fetchDigiriskElementFlat() ne remplit sa cle depth que pour une lecture depuis la
+     * racine de l'etablissement : demandee sur un groupement, elle rend 0 partout et
+     * l'arbre sort plat. La profondeur se retrouve en remontant fk_parent tant que le
+     * parent appartient au perimetre.
+     *
+     * @param  array $perimeter Elements du perimetre, indexes par identifiant
+     * @return array            Profondeur par identifiant
+     */
+    protected function perimeterDepths(array $perimeter): array
+    {
+        $depths = [];
+
+        foreach (array_keys($perimeter) as $elementId) {
+            $depth  = 0;
+            $cursor = $elementId;
+            // Garde-fou : une boucle dans les fk_parent ferait tourner la generation sans fin
+            for ($step = 0; $step < 50; $step++) {
+                $parent = (int) ($perimeter[$cursor]['object']->fk_parent ?? 0);
+                if ($parent <= 0 || !isset($perimeter[$parent])) {
+                    break;
+                }
+                $depth++;
+                $cursor = $parent;
+            }
+            $depths[$elementId] = $depth;
+        }
+
+        return $depths;
+    }
+
+    /**
+     * Lexique des abreviations employees dans le document.
+     *
+     * Le SICTOM en tient un a la main au bas de son DUERP (issue #5287). Seules les
+     * abreviations de Digirisk y figurent : celles qui tiennent a l'organisation d'un client
+     * n'ont rien a faire dans un document genere pour tous.
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @return void
+     */
+    protected function sectionGlossary($pdf, Translate $outputLangs, float $size)
+    {
+        $this->newPage($pdf);
+        $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksGlossaryTitle'), $size);
+
+        $rows = [];
+        foreach (['GP', 'UT', 'RK', 'RA', 'COT', 'ATMP', 'TK', 'DUERP', 'PAPRIPACT'] as $abbreviation) {
+            $rows[] = [
+                ['text' => $outputLangs->transnoentities('ListingRisksGlossary' . $abbreviation . 'Short'), 'bold' => true],
+                $outputLangs->transnoentities('ListingRisksGlossary' . $abbreviation)
+            ];
+        }
+
+        $this->table($pdf, [$outputLangs->transnoentities('ListingRisksGlossaryAbbreviation'), $outputLangs->transnoentities('Description')], $rows, [40, 360], $size);
+    }
+
+    /**
+     * Photo de l'element, sur sa propre page.
+     *
+     * Digirisk ne porte aucune notion de plan ni de coordonnees : le seul mecanisme
+     * d'image est DigiriskElement::photo, deja affichee en petit sur la couverture. La
+     * montrer en grand permet d'y mettre ce que le client veut - le SICTOM y place la
+     * carte de son territoire. Decochee par defaut : le document ne doit pas gagner une
+     * page chez tout le monde. Issue #5307
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  object    $object      Element imprime
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @param  array     $moreParam   More param (showElementPhoto)
+     * @return void
+     */
+    protected function sectionElementPhoto($pdf, $object, Translate $outputLangs, float $size, array $moreParam)
+    {
+        global $conf;
+
+        if (empty($moreParam['showElementPhoto']) || empty($object->photo) || empty($object->element_type)) {
+            return;
+        }
+
+        // La photo pleine page merite l'original, pas la vignette de la couverture
+        $photoPath = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref . '/' . $object->photo;
+        if (!is_readable($photoPath)) {
+            return;
+        }
+
+        $this->newPage($pdf);
+        $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksElementPhotoTitle'), $size);
+
+        $caption = 6;
+        $top     = $pdf->GetY() + 2;
+        $width   = $this->contentWidth($pdf);
+        // getBreakMargin() porte deja la bande du pied de page, posee au setPageOrientation.
+        // La legende est retranchee ici : sinon l'image prend toute la hauteur restante et la
+        // legende, ecrite sous elle, part seule a la page suivante
+        $height  = $pdf->getPageHeight() - $top - $pdf->getBreakMargin() - $caption;
+
+        // fitbox CT : l'image garde ses proportions et se cale en haut, centree, sans jamais
+        // deborder sur le pied de page quel que soit son cadrage
+        $pdf->Image($photoPath, $this->marge_gauche, $top, $width, $height, '', '', '', false, 300, '', false, false, 0, 'CT');
+
+        $pdf->SetY($top + $height);
+        $this->paragraph($pdf, $this->coverElementLabel($object), $size - 1, 'I', [140, 140, 140]);
+    }
+
+    /**
      * Rappel reglementaire : definitions et principes generaux de prevention, comme le gabarit.
      *
      * @param  TCPDF     $pdf         PDF handler
@@ -1091,6 +1297,87 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         for ($principle = 1; $principle <= 9; $principle++) {
             $this->paragraph($pdf, $principle . '. ' . $outputLangs->transnoentities('PreventionPrinciple' . $principle), $size);
         }
+
+        $pdf->SetY($pdf->GetY() + 2);
+        $this->preventionWheel($pdf, $outputLangs, $size);
+    }
+
+    /**
+     * Roue des neuf principes generaux de prevention.
+     *
+     * Le module ne livre pas cette illustration - img/legalPicto ne contient qu'un badge
+     * Creative Commons - alors elle se dessine : un anneau de neuf secteurs numerotes, chacun
+     * legende par le verbe du principe. Elle accompagne la liste en toutes lettres qui la
+     * precede, elle ne la remplace pas. Issue #5307
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @return void
+     */
+    protected function preventionWheel($pdf, Translate $outputLangs, float $size)
+    {
+        $outer = 38;
+        $inner = 18;
+        // Hauteur du bloc : le diametre, plus la place des legendes au dessus et en dessous
+        $needed = ($outer * 2) + 24;
+        $this->checkPageBreak($pdf, $needed);
+
+        $centerX = $this->marge_gauche + ($this->contentWidth($pdf) / 2);
+        $centerY = $pdf->GetY() + 12 + $outer;
+
+        $step = 360 / 9;
+
+        for ($principle = 1; $principle <= 9; $principle++) {
+            $start = ($principle - 1) * $step;
+            $color = $this->wheelColors[$principle - 1];
+
+            $pdf->SetFillColor($color[0], $color[1], $color[2]);
+            $pdf->SetDrawColor(255, 255, 255);
+            $pdf->SetLineWidth(0.6);
+            // Les deux derniers arguments de PieSector() sont laisses a leur defaut, qui est
+            // deja ce qu'on veut : origine a midi et sens horaire. Les passer ferait buter
+            // PHPStan, le PHPDoc de TCPDF typant $cw en float alors qu'il vaut true
+            $pdf->PieSector($centerX, $centerY, $outer, $start, $start + $step, 'F');
+        }
+
+        // Le disque blanc creuse l'anneau
+        $pdf->SetFillColor(255, 255, 255);
+        $pdf->Circle($centerX, $centerY, $inner, 0, 360, 'F');
+        $pdf->SetDrawColor(190, 190, 190);
+        $pdf->SetLineWidth(0.2);
+
+        $numberRadius = ($outer + $inner) / 2;
+        $labelRadius  = $outer + 3;
+
+        for ($principle = 1; $principle <= 9; $principle++) {
+            $middle = (($principle - 1) * $step) + ($step / 2);
+            $angle  = deg2rad($middle);
+
+            // Repere du PDF : les ordonnees descendent, d'ou le sinus en abscisse et le
+            // cosinus retranche en ordonnee pour tourner dans le sens horaire depuis midi
+            $numberX = $centerX + ($numberRadius * sin($angle));
+            $numberY = $centerY - ($numberRadius * cos($angle));
+
+            $pdf->SetFont('', 'B', $size + 1);
+            $pdf->SetTextColor(255, 255, 255);
+            $pdf->SetXY($numberX - 5, $numberY - 2.5);
+            $pdf->Cell(10, 5, (string) $principle, 0, 0, 'C');
+
+            $labelX = $centerX + ($labelRadius * sin($angle));
+            $labelY = $centerY - ($labelRadius * cos($angle));
+
+            $pdf->SetFont('', '', $size - 2);
+            $pdf->SetTextColor(60, 60, 60);
+            // A droite de l'axe le texte part vers la droite, a gauche il s'y termine :
+            // les legendes s'ecartent de la roue au lieu de lui passer dessus
+            $onTheRight = (sin($angle) >= 0);
+            $pdf->SetXY($onTheRight ? $labelX : $labelX - 48, $labelY - 3);
+            $pdf->MultiCell(48, 3.5, $outputLangs->transnoentities('PreventionPrincipleShort' . $principle), 0, $onTheRight ? 'L' : 'R', false, 1);
+        }
+
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetY($centerY + $outer + 8);
     }
 
     /**
@@ -1104,6 +1391,9 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
      */
     protected function sectionCotationMethod($pdf, Translate $outputLangs, float $size)
     {
+        // Sa propre page : depuis que la roue occupe le bas du cadre reglementaire, les deux
+        // grilles n y tiennent plus et la derniere ligne partait seule a la page suivante
+        $this->newPage($pdf);
         $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksCotationMethodTitle'), $size);
 
         $this->paragraph($pdf, $outputLangs->transnoentities('ListingRisksCotationMethodText'), $size);
@@ -1127,6 +1417,91 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         }
 
         $this->table($pdf, $header, $rows, [25, 35, 90, 250], $size);
+
+        $pdf->SetY($pdf->GetY() + 4);
+        $this->sectionCotationCriteria($pdf, $outputLangs, $size);
+    }
+
+    /**
+     * Grille des criteres de la methode avancee, et la formule qui en tire la cotation.
+     *
+     * Les libelles sont lus dans js/json/default.json, le fichier que la fiche de risque
+     * utilise deja pour construire sa grille : recopier ces seuils ici les ferait diverger
+     * silencieusement du jour ou le fichier change. Issue #5303
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @return void
+     */
+    protected function sectionCotationCriteria($pdf, Translate $outputLangs, float $size)
+    {
+        $criteria = $this->advancedCotationCriteria();
+        if (empty($criteria)) {
+            return;
+        }
+
+        $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksCriteriaTitle'), $size);
+        $this->paragraph($pdf, $outputLangs->transnoentities('ListingRisksCriteriaText'), $size);
+
+        // Les seuils vont de 0 a 4 : une colonne par niveau, plus celle du nom du critere
+        $header = [$outputLangs->transnoentities('ListingRisksCriteriaColumn')];
+        for ($level = 0; $level <= 4; $level++) {
+            $header[] = (string) $level;
+        }
+
+        $rows = [];
+        foreach ($criteria as $name => $levels) {
+            // Le fichier ecrit les noms sans accent : la cle de langue existe pour Gravite,
+            // les quatre autres noms sont deja leur propre cle
+            $label = $outputLangs->transnoentities($name == 'Gravite' ? 'Gravity' : $name);
+            $row   = [['text' => $label, 'bold' => true]];
+            for ($level = 0; $level <= 4; $level++) {
+                $row[] = $levels[$level] ?? '';
+            }
+            $rows[] = $row;
+        }
+
+        $this->table($pdf, $header, $rows, [40, 72, 72, 72, 72, 72], $size);
+    }
+
+    /**
+     * Criteres de la methode avancee, lus dans le fichier livre par le module.
+     *
+     * @return array Par nom de critere, le libelle de chaque seuil
+     */
+    protected function advancedCotationCriteria(): array
+    {
+        $path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json';
+        if (!is_readable($path)) {
+            return [];
+        }
+
+        $decoded = json_decode((string) file_get_contents($path), true);
+        // risk_variable porte les criteres du risque professionnel, riskenvironmental_variable
+        // ceux du risque environnemental : ce document est le document unique
+        $variables = $decoded[0]['option']['risk_variable'] ?? null;
+        if (!is_array($variables)) {
+            return [];
+        }
+
+        $criteria = [];
+        foreach ($variables as $variable) {
+            if (empty($variable['name'])) {
+                continue;
+            }
+            $levels = [];
+            foreach (($variable['option']['survey']['request'] ?? []) as $request) {
+                // Un seuil vide signale un niveau que ce critere n'utilise pas
+                if (!isset($request['seuil']) || !dol_strlen((string) $request['seuil'])) {
+                    continue;
+                }
+                $levels[(int) $request['seuil']] = (string) ($request['question'] ?? '');
+            }
+            $criteria[$variable['name']] = $levels;
+        }
+
+        return $criteria;
     }
 
     /**
@@ -1167,17 +1542,25 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
 
         $this->taskResponsibles = $this->loadTaskResponsibles($riskTasks);
 
+        // Sans choix explicite la photo reste affichee : le formulaire n'est pas toujours poste
+        $this->showPhoto = !isset($moreParam['showPhoto']) || !empty($moreParam['showPhoto']);
+        $this->taskOptions = $this->resolveTaskOptions($moreParam);
+
         $header = [
-            $outputLangs->transnoentities('DigiriskElement'),
-            $outputLangs->transnoentities('Ref'),
+            $outputLangs->transnoentities('ListingRisksElementColumn'),
+            $outputLangs->transnoentities('ListingRisksRiskRefColumn'),
             $outputLangs->transnoentities('ListingRisksCotationColumn'),
             $outputLangs->transnoentities('ListingRisksRiskColumn'),
-            $outputLangs->transnoentities('Description'),
-            $outputLangs->transnoentities('Photo'),
+            $outputLangs->transnoentities('ListingRisksRiskDescriptionColumn'),
             $outputLangs->transnoentities('ListingRisksAssessmentColumn'),
             $outputLangs->transnoentities('ListingRisksActionPlan')
         ];
-        $widths = [55, 32, 14, 40, 80, 32, 60, 87];
+        $widths = [55, 32, 14, 40, 95, 70, 94];
+
+        if ($this->showPhoto) {
+            array_splice($header, 5, 0, [$outputLangs->transnoentities('Photo')]);
+            $widths = [55, 32, 14, 40, 80, 32, 60, 87];
+        }
 
         $this->newPage($pdf);
         $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksListTitle'), $size);
@@ -1250,16 +1633,21 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         $categoryName = getDolGlobalInt('DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME') ? $riskLine->getDangerCategoryName($riskLine, $riskLine->type) : '';
         $pictoPath    = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $riskLine->getDangerCategory($riskLine, $riskLine->type) . '.png';
 
-        return [
+        $cells = [
             $elementLabel,
             $riskLine->ref . "\n" . $riskLine->riskAssessmentRef,
             ['text' => (string) ($riskLine->riskAssessmentCotation ?: 0), 'align' => 'C', 'bold' => true, 'fill' => $this->levelBg[$level], 'color' => $this->levelText[$level]],
             ['text' => $categoryName, 'align' => 'C', 'image' => is_readable($pictoPath) ? $pictoPath : ''],
             saturne_flatten_wysiwyg_blocks($riskLine->description, true),
-            ['image' => $this->riskAssessmentPhotoPath($riskLine), 'text' => ''],
             $this->riskAssessmentComment($riskLine, $outputLangs),
             $this->riskTasksText($riskLine->id, $riskTasks, $outputLangs)
         ];
+
+        if ($this->showPhoto) {
+            array_splice($cells, 5, 0, [['image' => $this->riskAssessmentPhotoPath($riskLine), 'text' => '']]);
+        }
+
+        return $cells;
     }
 
     /**
@@ -1343,22 +1731,56 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     }
 
     /**
-     * Taches du programme annuel de prevention rattachees a un risque.
+     * Options de masquage du plan d'actions pour cette generation.
      *
-     * @param  int       $riskId      Risk ID
-     * @param  array     $riskTasks   Taches, indexees par identifiant de risque
+     * Elles ne valaient que globalement, par la configuration du module. Le formulaire de
+     * generation peut desormais les choisir au coup par coup : ce qu'il poste l'emporte,
+     * et sans lui la configuration du module continue de decider - un document genere
+     * depuis ailleurs sort donc exactement comme avant. Issue #5289
+     *
+     * @param  array $moreParam More param
+     * @return array            Par cle d'option, 1 pour masquer
+     */
+    protected function resolveTaskOptions(array $moreParam): array
+    {
+        $options = [];
+        foreach ([
+            'taskHideRef' => 'DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT',
+            'taskHideResponsible' => 'DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT',
+            'taskHideDate' => 'DIGIRISKDOLIBARR_TASK_HIDE_DATE_IN_DOCUMENT',
+            'taskHideBudget' => 'DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT',
+        ] as $key => $constant) {
+            $options[$key] = isset($moreParam[$key]) ? (int) $moreParam[$key] : getDolGlobalInt($constant);
+        }
+
+        return $options;
+    }
+
+    /**
+     * Plan d'actions d'un risque, scinde entre actions en cours et actions terminees.
+     *
+     * Le SICTOM lit le listing bloc par bloc : une liste unique ne disait pas ou en etait
+     * chaque action. Un bloc sans action n'est pas rendu du tout - la maquette rayait les
+     * « N/A » qui occupaient la place sans rien apprendre. Issue #5299
+     *
+     * @param  int       $riskId      Identifiant du risque
+     * @param  array     $riskTasks   Taches indexees par risque
      * @param  Translate $outputLangs Lang object
-     * @return string                 Texte de la cellule
+     * @return string                 Texte de la cellule, vide si le risque n'a aucune action
      */
     protected function riskTasksText(int $riskId, array $riskTasks, Translate $outputLangs): string
     {
         global $conf;
 
+        $options = $this->taskOptions ?: $this->resolveTaskOptions([]);
+
         if (empty($riskTasks[$riskId])) {
             return '';
         }
 
-        $lines = [];
+        $inProgress = [];
+        $done       = [];
+
         foreach ($riskTasks[$riskId] as $riskTask) {
             $progress = $riskTask->progress;
             if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS')) {
@@ -1368,35 +1790,55 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
                 }
             }
 
-            if ($progress == 100 && !getDolGlobalInt('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE')) {
-                $lines[] = $outputLangs->transnoentities('ActionPreventionCompletedTaskDone');
+            $isDone = ($progress >= 100);
+
+            // Les actions soldees peuvent etre masquees : le bloc le dit alors une fois,
+            // au lieu de repeter la meme phrase par action
+            if ($isDone && !getDolGlobalInt('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE')) {
+                $done[0] = $outputLangs->transnoentities('ActionPreventionCompletedTaskDone');
                 continue;
             }
 
             $line = $riskTask->label;
             // Une tache sans reference garde son seul libelle, sans le tiret de separation
-            if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT') && !empty($riskTask->ref)) {
+            if (!$options['taskHideRef'] && !empty($riskTask->ref)) {
                 $line = $riskTask->ref . ' - ' . $line;
             }
-            if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT') && !empty($this->taskResponsibles[$riskTask->id])) {
+            if (!$options['taskHideResponsible'] && !empty($this->taskResponsibles[$riskTask->id])) {
                 $line .= "\n" . $outputLangs->transnoentities('Responsible') . ' : ' . implode(', ', $this->taskResponsibles[$riskTask->id]);
             }
-            if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_DATE_IN_DOCUMENT')) {
+            if (!$options['taskHideDate']) {
                 $startDate = (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_TASK_START_DATE') && !empty($riskTask->dateo)) ? $riskTask->dateo : $riskTask->datec;
                 $line     .= "\n" . $outputLangs->transnoentities('DateStart') . ' : ' . dol_print_date($startDate, 'dayreduceformat', 'tzuser', $outputLangs);
                 if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_TASK_END_DATE') && !empty($riskTask->datee)) {
                     $line .= ' - ' . $outputLangs->transnoentities('Deadline') . ' : ' . dol_print_date($riskTask->datee, 'dayreduceformat', 'tzuser', $outputLangs);
                 }
             }
-            if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT')) {
+            if (!$options['taskHideBudget']) {
                 $line .= "\n" . $outputLangs->transnoentities('Budget') . ' : ' . price($riskTask->budget_amount, 0, $outputLangs, 1, 0, 0, $conf->currency);
             }
-            $line .= (getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT') ? "\n" : ' - ') . $outputLangs->transnoentities('DigiriskProgress') . ' : ' . ($progress ?: 0) . ' %';
 
-            $lines[] = $line;
+            // Une action terminee porte son avancement dans son bloc : le repeter n'apprend rien
+            if (!$isDone) {
+                $line .= ($options['taskHideBudget'] ? "\n" : ' - ') . $outputLangs->transnoentities('DigiriskProgress') . ' : ' . ($progress ?: 0) . ' %';
+            }
+
+            if ($isDone) {
+                $done[] = $line;
+            } else {
+                $inProgress[] = $line;
+            }
         }
 
-        return implode("\n\n", $lines);
+        $blocks = [];
+        if (!empty($inProgress)) {
+            $blocks[] = $outputLangs->transnoentities('ListingRisksActionsInProgress') . " :\n" . implode("\n\n", $inProgress);
+        }
+        if (!empty($done)) {
+            $blocks[] = $outputLangs->transnoentities('ListingRisksActionsDone') . " :\n" . implode("\n\n", $done);
+        }
+
+        return implode("\n\n", $blocks);
     }
 
     /**
@@ -1439,15 +1881,13 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
 
         $header = [
             $outputLangs->transnoentities('ListingRisksRegisterRefColumn'),
-            $outputLangs->transnoentities('DigiriskElement'),
+            $outputLangs->transnoentities('ListingRisksElementColumn'),
             $outputLangs->transnoentities('Categories'),
-            $outputLangs->transnoentities('DateCreation'),
-            $outputLangs->transnoentities('Subject'),
+            $outputLangs->transnoentities('ListingRisksRegisterDeclarationDate'),
             $outputLangs->transnoentities('TicketMessage'),
-            $outputLangs->transnoentities('DigiriskProgress'),
             $outputLangs->transnoentities('Status')
         ];
-        $widths = [32, 60, 45, 28, 70, 105, 22, 38];
+        $widths = [32, 66, 52, 40, 172, 38];
 
         $rows = [];
         foreach ($tickets as $ticket) {
@@ -1456,9 +1896,7 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
                 $ticket->digiriskElementRefLabel ?? '',
                 $this->registerCategories($ticket),
                 ['text' => dol_print_date($ticket->datec, 'dayreduceformat', 'tzuser', $outputLangs), 'align' => 'C'],
-                $ticket->subject,
                 dol_string_nohtmltag($ticket->message),
-                ['text' => ($ticket->progress ?: 0) . ' %', 'align' => 'C'],
                 ['text' => $ticket->getLibStatut(), 'align' => 'C']
             ];
         }
@@ -1603,16 +2041,14 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         }
 
         $header = [
-            $outputLangs->transnoentities('Ref'),
-            $outputLangs->transnoentities('AccidentDate'),
-            $outputLangs->transnoentities('DigiriskElement'),
-            $outputLangs->transnoentities('AccidentType'),
-            $outputLangs->transnoentities('Victim'),
-            $outputLangs->transnoentities('Label'),
-            $outputLangs->transnoentities('WorkStopDays'),
-            $outputLangs->transnoentities('Status')
+            $outputLangs->transnoentities('ListingRisksAccidentRefColumn'),
+            $outputLangs->transnoentities('ListingRisksAccidentWorkStopColumn'),
+            $outputLangs->transnoentities('ListingRisksAccidentElementColumn'),
+            $outputLangs->transnoentities('LesionLocalization'),
+            $outputLangs->transnoentities('LesionNature'),
+            $outputLangs->transnoentities('ListingRisksAccidentLabelColumn')
         ];
-        $widths = [32, 30, 60, 42, 55, 125, 24, 32];
+        $widths = [32, 26, 62, 60, 60, 160];
 
         $perimeter = $this->perimeterElements($object);
         $extraData = $this->accidentExtraData(array_keys($accidents));
@@ -1626,17 +2062,17 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
 
             $rows[] = [
                 $accident->ref,
-                ['text' => dol_print_date($accident->accident_date, 'dayreduceformat', 'tzuser', $outputLangs), 'align' => 'C'],
+                ['text' => empty($extraData[$accident->id]['days']) ? '' : (int) $extraData[$accident->id]['days'], 'align' => 'C'],
                 $elementLabel,
-                $outputLangs->transnoentities($accident->fields['accident_type']['arrayofkeyval'][(int) $accident->accident_type] ?? 'WorkAccidentStatement'),
-                $extraData[$accident->id]['victim'] ?? '',
-                $accident->label,
-                ['text' => (int) ($extraData[$accident->id]['days'] ?? 0), 'align' => 'C'],
-                ['text' => $accident->getLibStatut(), 'align' => 'C']
+                $extraData[$accident->id]['lesionLocalization'] ?? '',
+                $extraData[$accident->id]['lesionNature'] ?? '',
+                $accident->label
             ];
         }
 
         $this->table($pdf, $header, $rows, $widths, $size);
+
+        $this->paragraph($pdf, $outputLangs->transnoentities('ListingRisksAccidentWorkStopNote'), $size - 1, 'I', [140, 140, 140]);
     }
 
     /**
@@ -1676,14 +2112,15 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     }
 
     /**
-     * Jours d'arret et victime de chaque accident, en une requete.
+     * Jours d'arret et lesions des accidents, en deux requetes plutot qu'une.
      *
-     * Meme forme que loadTaskResponsibles() plus haut : une jointure sur la table des
-     * utilisateurs plutot qu'un User::fetch() par ligne, le document n'ayant besoin que
-     * du nom. Les identifiants sont convertis en entiers, donc la liste est sure.
+     * Un accident porte plusieurs arrets et plusieurs lesions : les joindre dans la meme
+     * requete multiplierait les lignes et fausserait la somme des jours. Les lesions sont
+     * donc lues a part, puis regroupees en PHP - ni le module ni le socle n'utilisent
+     * GROUP_CONCAT, qui ne serait de toute facon pas portable hors MySQL.
      *
-     * @param  array $accidentIds Identifiants des accidents affiches
-     * @return array              ['days' => int, 'victim' => string], indexes par accident
+     * @param  array $accidentIds Identifiants des accidents
+     * @return array              Par identifiant : days, lesionLocalization, lesionNature
      */
     protected function accidentExtraData(array $accidentIds): array
     {
@@ -1691,23 +2128,47 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
             return [];
         }
 
-        $sql  = 'SELECT a.rowid, SUM(ws.workstop_days) as days, u.firstname, u.lastname';
-        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident as a';
-        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop as ws ON ws.fk_accident = a.rowid';
-        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'user as u ON u.rowid = a.fk_user_employer';
-        $sql .= ' WHERE a.rowid IN (' . implode(',', array_map('intval', $accidentIds)) . ')';
-        $sql .= ' GROUP BY a.rowid, u.firstname, u.lastname';
-
+        $ids       = implode(',', array_map('intval', $accidentIds));
         $extraData = [];
-        $resql     = $this->db->query($sql);
+
+        $sql  = 'SELECT ws.fk_accident, SUM(ws.workstop_days) as days';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop as ws';
+        $sql .= ' WHERE ws.fk_accident IN (' . $ids . ')';
+        $sql .= ' GROUP BY ws.fk_accident';
+
+        $resql = $this->db->query($sql);
         if ($resql) {
             while ($obj = $this->db->fetch_object($resql)) {
-                $extraData[(int) $obj->rowid] = [
-                    'days'   => (int) $obj->days,
-                    'victim' => trim($obj->firstname . ' ' . $obj->lastname)
-                ];
+                $extraData[(int) $obj->fk_accident]['days'] = (int) $obj->days;
             }
             $this->db->free($resql);
+        }
+
+        $sql  = 'SELECT l.fk_accident, l.lesion_localization, l.lesion_nature';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_lesion as l';
+        $sql .= ' WHERE l.fk_accident IN (' . $ids . ')';
+        $sql .= ' ORDER BY l.rowid';
+
+        $localizations = [];
+        $natures       = [];
+        $resql         = $this->db->query($sql);
+        if ($resql) {
+            while ($obj = $this->db->fetch_object($resql)) {
+                $accidentId = (int) $obj->fk_accident;
+                if (dol_strlen($obj->lesion_localization)) {
+                    $localizations[$accidentId][] = $obj->lesion_localization;
+                }
+                if (dol_strlen($obj->lesion_nature)) {
+                    $natures[$accidentId][] = $obj->lesion_nature;
+                }
+            }
+            $this->db->free($resql);
+        }
+
+        foreach ($accidentIds as $accidentId) {
+            $accidentId = (int) $accidentId;
+            $extraData[$accidentId]['lesionLocalization'] = implode(', ', $localizations[$accidentId] ?? []);
+            $extraData[$accidentId]['lesionNature']       = implode(', ', $natures[$accidentId] ?? []);
         }
 
         return $extraData;

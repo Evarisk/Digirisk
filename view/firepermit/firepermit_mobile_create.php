@@ -53,6 +53,7 @@ require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_firepermit.lib.php';
 
 // Global variables definitions
@@ -120,8 +121,8 @@ $isEdit = false;
 // Default dates from admin config
 $defaultStartToday = getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_DATE_START_TODAY', 1);
 $defaultDuration   = getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_DEFAULT_DURATION', 1);
-$defaultDateStart  = $defaultStartToday ? dol_print_date(dol_now(), '%Y-%m-%dT%H:%M') : '';
-$defaultDateEnd    = $defaultStartToday ? dol_print_date(dol_time_plus_duree(dol_now(), $defaultDuration, 'd'), '%Y-%m-%dT%H:%M') : '';
+$defaultDateStart  = $defaultStartToday ? dol_print_date(dol_now(), '%Y-%m-%dT%H:%M', 'tzuser') : '';
+$defaultDateEnd    = $defaultStartToday ? dol_print_date(dol_time_plus_duree(dol_now(), $defaultDuration, 'd'), '%Y-%m-%dT%H:%M', 'tzuser') : '';
 
 $prefill = [
     'label' => '',
@@ -236,6 +237,9 @@ if ($id > 0 && $object->fetch($id) > 0) {
 /*
  * Actions
  */
+
+// Toutes les actions de cet ecran modifient des donnees : jeton anti-CSRF exige, quel que soit le reglage
+digiriskMobileCheckToken($action);
 
 // Photo taken or removed on a type of work block: the Saturne media block posts here and expects the
 // refreshed block as a response. Only the temporary directory of this form session is writable.
@@ -594,7 +598,12 @@ if ($action == 'add_mobile' && $permissiontoadd) {
 
                 // Replace the linked exterior company and its responsible
                 $digiriskresources->setDigiriskResources($db, $user->id, 'ExtSociety', 'societe', [$extSocietyId], $conf->entity, 'firepermit', $object->id, 0);
-                $signatory->setSignatory($object->id, 'firepermit', 'socpeople', [$respContactId], 'ExtSocietyResponsible');
+                // Unchanged, the responsible keeps their row: a new one would take a pending or signed
+                // responsible's place with an unsigned row and a new signature link
+                $currentExtResponsible = digiriskGetCurrentSignatory($signatory, 'ExtSocietyResponsible', (int) $object->id, 'firepermit');
+                if (!is_object($currentExtResponsible) || $currentExtResponsible->element_id != $respContactId) {
+                    $signatory->setSignatory($object->id, 'firepermit', 'socpeople', [$respContactId], 'ExtSocietyResponsible');
+                }
 
                 // Replace the lines by the ones currently in the form
                 $oldLines = $firepermitdet->fetchAll('', '', 0, 0, ['fk_firepermit' => $object->id]);
@@ -776,8 +785,32 @@ if ($action == 'lock_mobile' && $permissiontoadd) {
     $lockPermit = new FirePermit($db);
 
     if ($permitId > 0 && $lockPermit->fetch($permitId) > 0) {
-        $lockPermit->setLocked($user, false);
-        digiriskRefreshFirePermitDocument($db, (int) $lockPermit->id, $user, $langs, true);
+        if ($lockPermit->setLocked($user) > 0) {
+            digiriskRefreshFirePermitDocument($db, (int) $lockPermit->id, $user, $langs, true);
+        } else {
+            setEventMessages($lockPermit->error, $lockPermit->errors, 'errors');
+        }
+    }
+
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?created=' . $permitId);
+    exit;
+}
+
+/*
+ * Cloture (archivage) du permis de feu depuis l'ecran de succes, derniere etape de la barre d'avancement.
+ * Jamais automatique : l'utilisateur la demande, une fois le permis verrouille et la surveillance apres
+ * travaux terminee (fin des travaux declaree, plus aucune ronde en attente, comme sur la fiche Dolibarr).
+ */
+if ($action == 'setArchived' && $permissiontoadd) {
+    $permitId      = GETPOSTINT('plan_id');
+    $archivePermit = new FirePermit($db);
+
+    if ($permitId > 0 && $archivePermit->fetch($permitId) > 0 && $archivePermit->status == FirePermit::STATUS_LOCKED) {
+        if (empty($archivePermit->date_work_end) || $archivePermit->countPendingRounds() > 0) {
+            setEventMessages($langs->trans('FireWatchArchiveBlocked'), [], 'errors');
+        } elseif ($archivePermit->setArchived($user) <= 0) {
+            setEventMessages($archivePermit->error, $archivePermit->errors, 'errors');
+        }
     }
 
     header('Location: ' . $_SERVER['PHP_SELF'] . '?created=' . $permitId);
@@ -823,15 +856,16 @@ if ($action == 'resend_ext_signature_email' && $permissiontoadd) {
     }
 
     // Le message est pose tel quel dans la page par le JS : les entites HTML de la traduction y
-    // apparaitraient en clair ("n'a pas pu &ecirc;tre envoye")
+    // apparaitraient en clair ("n'a pas pu &ecirc;tre envoye"). L'erreur de CMailFile arrive elle-meme
+    // en HTML (entites, <br>) : ramenee a du texte d'abord, sinon elle resterait encodee deux fois
     $resendMessage = $resendResult['sent']
-        ? $langs->trans('MobilePPSignatureEmailSentTo', $resendResult['email'])
-        : $langs->trans('MobilePPWarningEmailNotSentDetail', $errorMsg);
+        ? $langs->transnoentities('MobilePPSignatureEmailSentTo', $resendResult['email'])
+        : $langs->transnoentities('MobilePPWarningEmailNotSentDetail', dol_string_nohtmltag($errorMsg, 1));
 
     header('Content-Type: application/json');
     echo json_encode([
         'success' => $resendResult['sent'],
-        'message' => dol_html_entity_decode($resendMessage, ENT_QUOTES),
+        'message' => $resendMessage,
     ], JSON_INVALID_UTF8_SUBSTITUTE);
     exit;
 }

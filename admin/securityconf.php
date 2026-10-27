@@ -110,9 +110,6 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION", GETPOST("emplacementCD", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION", GETPOST("description", 'none'), 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, "DIGIRISKDOLIBARR_GENERAL_MEANS", GETPOST("moyensgeneraux", 'none'), 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, "DIGIRISKDOLIBARR_GENERAL_RULES", GETPOST("consignesgenerales", 'none'), 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, "DIGIRISKDOLIBARR_FIRST_AID", GETPOST("firstaid", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_RULES_LOCATION", GETPOST("emplacementRI", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_DUER_LOCATION", GETPOST("emplacementDU", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION", GETPOST("emplacementCC", 'none'), 'chaine', 0, '', $conf->entity);
@@ -138,7 +135,7 @@ saturne_header(0,'', $title, $helpUrl);
 $counter = 0;
 
 $securityResources = array("SAMU","Pompiers","Police","AllEmergencies","RightsDefender","PoisonControlCenter", "Responsible", "PreventionOfficer", "LabourDoctorSociety", "LabourDoctorContact", "LabourInspectorSociety", "LabourInspectorContact" );
-$securityConsts    = array("DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION", "DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION", "DIGIRISKDOLIBARR_GENERAL_MEANS", "DIGIRISKDOLIBARR_GENERAL_RULES", "DIGIRISKDOLIBARR_FIRST_AID", "DIGIRISKDOLIBARR_RULES_LOCATION", "DIGIRISKDOLIBARR_DUER_LOCATION", "DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION");
+$securityConsts    = array("DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION", "DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION", "DIGIRISKDOLIBARR_RULES_LOCATION", "DIGIRISKDOLIBARR_DUER_LOCATION", "DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION");
 $socialResources   = array("TitularsCSE", "AlternatesCSE", "TitularsDP", "AlternatesDP");
 
 $maxnumber = count($securityResources) + count($securityConsts);
@@ -513,25 +510,10 @@ $doleditor = new DolEditor('description', getDolGlobalString('DIGIRISKDOLIBARR_S
 $doleditor->Create();
 print '</td></tr>';
 
-// * General means at disposal - Moyens généraux mis à disposition *
+// * General means, general instructions and first aid: only the prevention plan and the fire permit print them, they are set on the prevention plan setup page *
 
-print '<tr class="oddeven"><td><label for="moyensgeneraux">' . $langs->trans("GeneralMeansAtDisposal") . '</label></td><td>';
-$doleditor = new DolEditor('moyensgeneraux', getDolGlobalString('DIGIRISKDOLIBARR_GENERAL_MEANS'), '', 200, 'dolibarr_details', '', false, true, getDolGlobalString('FCKEDITOR_ENABLE_SOCIETE'), ROWS_3, '90%');
-$doleditor->Create();
-print '</td></tr>';
-
-// * General instructions - Consignes générales *
-
-print '<tr class="oddeven"><td><label for="consignesgenerales">' . $langs->trans("GeneralInstructions") . '</label></td><td>';
-$doleditor = new DolEditor('consignesgenerales', getDolGlobalString('DIGIRISKDOLIBARR_GENERAL_RULES'), '', 200, 'dolibarr_details', '', false, true, getDolGlobalString('FCKEDITOR_ENABLE_SOCIETE'), ROWS_3, '90%');
-$doleditor->Create();
-print '</td></tr>';
-
-// * General instructions - Consignes générales *
-
-print '<tr class="oddeven"><td><label for="firstaid">' . $langs->trans("FirstAid") . '</label></td><td>';
-$doleditor = new DolEditor('firstaid', getDolGlobalString('DIGIRISKDOLIBARR_FIRST_AID'), '', 200, 'dolibarr_details', '', false, true, getDolGlobalString('FCKEDITOR_ENABLE_SOCIETE'), ROWS_3, '90%');
-$doleditor->Create();
+print '<tr class="oddeven"><td>' . $langs->trans('PreventionPlanDocumentTexts') . '</td><td>';
+print '<a href="' . dol_buildpath('/digiriskdolibarr/admin/config/preventionplan.php', 1) . '#document-content">' . img_picto('', 'setup', 'class="pictofixedwidth"') . $langs->trans('PreventionPlanDocumentTextsMoved') . '</a>';
 print '</td></tr>';
 
 // * Rules of procedure - Règlement intérieur *

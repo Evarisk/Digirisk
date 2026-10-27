@@ -1,0 +1,210 @@
+[
+  {
+    "position": 1,
+    "family": "Intensité et complexité du travail",
+    "subCategory": 1,
+    "name": "Contraintes de rythmes de travail",
+    "question": "Les salariés sont-ils soumis à des contraintes de rythmes élevés ?",
+    "reversed": false
+  },
+  {
+    "position": 2,
+    "family": "Intensité et complexité du travail",
+    "subCategory": 1,
+    "name": "Niveau de précision des objectifs de travail",
+    "question": "Les objectifs des salariés sont-ils clairement définis ?",
+    "reversed": true
+  },
+  {
+    "position": 3,
+    "family": "Intensité et complexité du travail",
+    "subCategory": 1,
+    "name": "Adéquation des objectifs de travail avec les moyens et les responsabilités",
+    "question": "Les objectifs fixés sont-ils compatibles avec les moyens et responsabilités alloués aux salariés pour les atteindre ?",
+    "reversed": true
+  },
+  {
+    "position": 4,
+    "family": "Intensité et complexité du travail",
+    "subCategory": 1,
+    "name": "Compatibilité des instructions de travail entre elles",
+    "question": "Les salariés reçoivent-ils des instructions, des ordres ou demandes qui peuvent être contradictoires entre eux ?",
+    "reversed": false
+  },
+  {
+    "position": 5,
+    "family": "Intensité et complexité du travail",
+    "subCategory": 1,
+    "name": "Gestion de la polyvalence",
+    "question": "Les salariés sont-ils amenés à changer de tâches, de postes ou de fonctions à l'improviste pour répondre aux contraintes du moment ?",
+    "reversed": false
+  },
+  {
+    "position": 6,
+    "family": "Intensité et complexité du travail",
+    "subCategory": 1,
+    "name": "Interruption dans le travail",
+    "question": "Les salariés sont-ils fréquemment interrompus au cours de leur travail par des tâches non prévues ?",
+    "reversed": false
+  },
+  {
+    "position": 7,
+    "family": "Intensité et complexité du travail",
+    "subCategory": 1,
+    "name": "Attention et vigilance dans le travail",
+    "question": "Les salariés exercent-ils des activités qui nécessitent une attention soutenue ou une vigilance permanente ?",
+    "reversed": false
+  },
+  {
+    "position": 8,
+    "family": "Horaires de travail difficiles",
+    "subCategory": 1,
+    "name": "Durée hebdomadaire de travail",
+    "question": "Arrive-t-il que des salariés travaillent plus de 45 heures par semaine ?",
+    "reversed": false
+  },
+  {
+    "position": 9,
+    "family": "Horaires de travail difficiles",
+    "subCategory": 1,
+    "name": "Travail en horaires atypiques",
+    "question": "Les salariés sont-ils soumis à des horaires de nuit, alternants ou décalés ?",
+    "reversed": false
+  },
+  {
+    "position": 10,
+    "family": "Horaires de travail difficiles",
+    "subCategory": 1,
+    "name": "Extension de la disponibilité en dehors des horaires de travail",
+    "question": "Les salariés sont-ils contactés en dehors des horaires de travail pour des raisons professionnelles ?",
+    "reversed": false
+  },
+  {
+    "position": 11,
+    "family": "Horaires de travail difficiles",
+    "subCategory": 1,
+    "name": "Prévisibilité des horaires et anticipation de leur changement",
+    "question": "Les salariés connaissent-ils suffisamment à l'avance leurs horaires de travail ou les changements éventuels de leur planning de travail ?",
+    "reversed": true
+  },
+  {
+    "position": 12,
+    "family": "Horaires de travail difficiles",
+    "subCategory": 1,
+    "name": "Conciliation entre vie professionnelle et vie personnelle",
+    "question": "L'entreprise permet-elle aux salariés de concilier vie professionnelle et vie personnelle ?",
+    "reversed": true
+  },
+  {
+    "position": 13,
+    "family": "Exigences émotionnelles",
+    "subCategory": 0,
+    "name": "Tensions avec le public",
+    "question": "L'organisation du travail (politique marketing, ressources mises à disposition, etc.) génère-t-elle des situations de tension avec le public (client, usagers, patients, etc.) ?",
+    "reversed": false
+  },
+  {
+    "position": 14,
+    "family": "Exigences émotionnelles",
+    "subCategory": 0,
+    "name": "Confrontation à la souffrance d'autrui",
+    "question": "Les salariés ont-ils les moyens d'agir efficacement face à la souffrance, à la détresse ou aux difficultés des personnes qu'ils ont à prendre en charge (patients, usagers, clients, etc.) ?",
+    "reversed": true
+  },
+  {
+    "position": 15,
+    "family": "Exigences émotionnelles",
+    "subCategory": 0,
+    "name": "Maîtrise des émotions",
+    "question": "Dans leur travail, les salariés se doivent-ils de « faire bonne figure » en toutes circonstances ?",
+    "reversed": false
+  },
+  {
+    "position": 16,
+    "family": "Faible autonomie au travail",
+    "subCategory": 2,
+    "name": "Autonomie dans la tâche",
+    "question": "Les salariés ont-ils des marges de manœuvre dans la manière de réaliser leur travail dès lors que les objectifs sont atteints ?",
+    "reversed": true
+  },
+  {
+    "position": 17,
+    "family": "Faible autonomie au travail",
+    "subCategory": 2,
+    "name": "Autonomie temporelle",
+    "question": "Les salariés peuvent-ils interrompre momentanément leur travail quand ils en ressentent le besoin ?",
+    "reversed": true
+  },
+  {
+    "position": 18,
+    "family": "Faible autonomie au travail",
+    "subCategory": 2,
+    "name": "Utilisation et développement des compétences",
+    "question": "Les salariés peuvent-ils utiliser leurs compétences professionnelles et en développer de nouvelles ?",
+    "reversed": true
+  },
+  {
+    "position": 19,
+    "family": "Rapports sociaux au travail dégradés",
+    "subCategory": 3,
+    "name": "Soutien de la part des collègues",
+    "question": "Existe-t-il des possibilités d'entraide entre les salariés, par exemple en cas de surcharge de travail ou de travail délicat ou compliqué ?",
+    "reversed": true
+  },
+  {
+    "position": 20,
+    "family": "Rapports sociaux au travail dégradés",
+    "subCategory": 3,
+    "name": "Soutien de la part des supérieurs hiérarchiques",
+    "question": "Les salariés reçoivent-ils un soutien de la part de l'encadrement ?",
+    "reversed": true
+  },
+  {
+    "position": 21,
+    "family": "Rapports sociaux au travail dégradés",
+    "subCategory": 3,
+    "name": "Désaccords professionnels",
+    "question": "Existe-t-il entre les salariés des causes de désaccord ayant pour origine l'organisation du travail (flou sur le rôle de chacun, inégalité de traitement, etc.) ?",
+    "reversed": false
+  },
+  {
+    "position": 22,
+    "family": "Rapports sociaux au travail dégradés",
+    "subCategory": 3,
+    "name": "Reconnaissance dans le travail",
+    "question": "Les salariés reçoivent-ils des marques de reconnaissance de leur travail de la part de l'entreprise ?",
+    "reversed": true
+  },
+  {
+    "position": 23,
+    "family": "Conflits de valeurs",
+    "subCategory": 4,
+    "name": "Qualité empêchée",
+    "question": "Les salariés considèrent-ils qu'ils font un travail de qualité ?",
+    "reversed": true
+  },
+  {
+    "position": 24,
+    "family": "Conflits de valeurs",
+    "subCategory": 4,
+    "name": "Travail inutile",
+    "question": "Les salariés estiment-ils en général que leur travail est reconnu comme utile ?",
+    "reversed": true
+  },
+  {
+    "position": 25,
+    "family": "Insécurité de l'emploi et du travail",
+    "subCategory": 5,
+    "name": "Insécurité socio-économique (emploi, salaire, carrière…)",
+    "question": "Les salariés sont-ils confrontés à des incertitudes quant au maintien de leur activité dans les prochains mois ?",
+    "reversed": false
+  },
+  {
+    "position": 26,
+    "family": "Insécurité de l'emploi et du travail",
+    "subCategory": 5,
+    "name": "Conduite du changement dans l'entreprise",
+    "question": "Les changements sont-ils suffisamment anticipés, accompagnés, et clairement expliqués aux salariés ?",
+    "reversed": true
+  }
+]

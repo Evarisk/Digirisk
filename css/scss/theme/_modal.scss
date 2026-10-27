@@ -1,0 +1,189 @@
+/* Digirisk modern theme: Saturne modals, dropdowns, tooltips and jQuery UI dialogs */
+
+#{$dr-scope} {
+  /* ---- Modals ---- */
+
+  .wpeo-modal {
+    background: rgba(15, 23, 42, 0.55);
+
+    .modal-container {
+      border: 1px solid $dr-border;
+      box-shadow: $dr-shadow-lg;
+    }
+
+    &.modal-active {
+      backdrop-filter: blur(3px);
+    }
+
+    &.modal-active .modal-container {
+      border-radius: 18px;
+    }
+
+    .modal-container .modal-header {
+      align-items: center;
+      border-bottom: 1px solid #eef2f6;
+
+      .modal-title {
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        text-transform: none;
+        color: $dr-text;
+      }
+
+      .modal-close:not(.wpeo-button) {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border-radius: 50%;
+        color: $dr-faint;
+        transition: background-color $dr-transition, color $dr-transition;
+
+        &:hover {
+          background: $dr-bg;
+          color: $dr-text;
+        }
+      }
+    }
+
+    .modal-container .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      border-top: 1px solid #eef2f6;
+    }
+  }
+
+  /* ---- Dropdowns ---- */
+
+  .wpeo-dropdown .saturne-dropdown-content,
+  .wpeo-dropdown .dropdown-content {
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius;
+    box-shadow: $dr-shadow-hover;
+  }
+
+  .wpeo-dropdown .dropdown-item:hover {
+    background: $dr-surface-soft;
+  }
+
+  /* Dolibarr dropdowns (top right menus, list column selector) */
+  .dropdown-menu {
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius;
+    box-shadow: $dr-shadow-hover;
+  }
+
+  /* ---- Tooltips ---- */
+
+  .wpeo-tooltip {
+    border-radius: $dr-radius-sm;
+    background: $dr-text;
+    font-family: $dr-font;
+    font-size: 12px;
+    box-shadow: $dr-shadow-hover;
+
+    /* data-color="light": Saturne gives it a dark text, which the dark background above made
+       unreadable (black on black). Light background again, arrow included */
+    &.tooltip-light {
+      background: $dr-surface;
+      color: $dr-text;
+
+      &.tooltip-top::before {
+        border-top-color: $dr-surface;
+      }
+      &.tooltip-bottom::before {
+        border-bottom-color: $dr-surface;
+      }
+      &.tooltip-left::before {
+        border-left-color: $dr-surface;
+      }
+      &.tooltip-right::before {
+        border-right-color: $dr-surface;
+      }
+    }
+  }
+
+  .ui-tooltip,
+  #tiptip_content,
+  .classfortooltip + .ui-tooltip {
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius;
+    box-shadow: $dr-shadow-hover;
+  }
+
+  /* ---- jQuery UI dialogs (confirmations) ---- */
+
+  .ui-dialog {
+    border: 1px solid $dr-border !important;
+    border-radius: 16px !important;
+    box-shadow: $dr-shadow-lg;
+    overflow: hidden;
+
+    .ui-dialog-titlebar {
+      border: none;
+      border-bottom: 1px solid #eef2f6;
+      border-radius: 0;
+      background: $dr-surface;
+      color: $dr-text;
+      font-weight: 700;
+    }
+
+    .ui-dialog-buttonpane {
+      border-top: 1px solid #eef2f6;
+      background: $dr-surface-soft;
+    }
+
+    .ui-dialog-buttonpane button {
+      border-radius: $dr-radius;
+    }
+  }
+
+  /* ---- Resizable jQuery UI dialogs (document preview of the magnifier) ---- */
+
+  .ui-dialog.ui-resizable {
+    /* Dolibarr 24 caps every dialog at 70% of the screen: the frame stopped growing while
+       its content kept following the mouse, and was cut by the overflow above */
+    max-width: none;
+
+    /* The rounded corners cut the corner grips: brought back inside the curve */
+    .ui-resizable-se {
+      right: 5px;
+      bottom: 5px;
+    }
+    .ui-resizable-sw {
+      left: 5px;
+      bottom: 5px;
+    }
+    .ui-resizable-ne {
+      right: 5px;
+      top: 5px;
+    }
+    .ui-resizable-nw {
+      left: 5px;
+      top: 5px;
+    }
+
+    /* jQuery UI only covers the iframes while resizing or dragging: the PDF viewer swallowed
+       the mouse, so the dialog could not shrink and kept following the mouse once released.
+       :active covers the first move, before jQuery UI adds its classes */
+    &.ui-dialog-resizing,
+    &.ui-dialog-dragging,
+    &:has(.ui-resizable-handle:active, .ui-dialog-titlebar:active) {
+      object,
+      embed,
+      iframe {
+        pointer-events: none;
+      }
+    }
+  }
+
+  .ui-widget-overlay {
+    background: rgba(15, 23, 42, 0.55);
+    opacity: 1;
+  }
+}

@@ -48,6 +48,7 @@ require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/preventionplandocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
 
 // Global variables definitions
@@ -119,7 +120,7 @@ $extrafields->fetch_name_optionals_label($preventionplandet->table_element);
 $hookmanager->initHooks(array('preventionplancard', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Get files upload dir
-$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+$upload_dir = $conf->digiriskdolibarr->multidir_output[!empty($object->entity) ? $object->entity : $conf->entity] ?? $conf->digiriskdolibarr->dir_output;
 
 // Security check - Protection if external user
 $permissiontoread   = $user->rights->digiriskdolibarr->preventionplan->read;
@@ -138,6 +139,11 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($reshook)) {
 	$error = 0;
+
+	// Photo added or removed from the media block of a risk being edited: answered without redirection
+	if ($permissiontoadd) {
+		digiriskPreventionPlanRiskMediaActions($action, $object);
+	}
 
 	$backurlforlist = dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_list.php', 1);
 
@@ -365,8 +371,23 @@ if (empty($reshook)) {
 				$digiriskresources->setDigiriskResources($db, $user->id, 'LabourInspector', 'societe', array($labourInspectorId), $conf->entity, 'preventionplan', $object->id, 0);
 				$digiriskresources->setDigiriskResources($db, $user->id, 'LabourInspectorAssigned', 'socpeople', array($labourInspectorContactId), $conf->entity, 'preventionplan', $object->id, 0);
 
-				$signatory->setSignatory($object->id, 'preventionplan', 'user', array($masterWorkerId), 'MasterWorker');
-				$signatory->setSignatory($object->id, 'preventionplan', 'socpeople', array($extResponsibleId), 'ExtSocietyResponsible');
+				// A responsible saved unchanged keeps their row: setSignatory() would add an unsigned one next to
+				// the signed one, and the documents could then show the unsigned row, without the signature
+				$signatoriesChanged  = false;
+				$currentMasterWorker = digiriskGetCurrentSignatory($signatory, 'MasterWorker', (int) $object->id, 'preventionplan');
+				if (!is_object($currentMasterWorker) || $currentMasterWorker->element_id != $masterWorkerId) {
+					$signatory->setSignatory($object->id, 'preventionplan', 'user', array($masterWorkerId), 'MasterWorker');
+					$signatoriesChanged = true;
+				}
+				$currentExtResponsible = digiriskGetCurrentSignatory($signatory, 'ExtSocietyResponsible', (int) $object->id, 'preventionplan');
+				if (!is_object($currentExtResponsible) || is_array($extResponsibleId) || $currentExtResponsible->element_id != $extResponsibleId) {
+					$signatory->setSignatory($object->id, 'preventionplan', 'socpeople', array($extResponsibleId), 'ExtSocietyResponsible');
+					$signatoriesChanged = true;
+				}
+				// The update trigger regenerated the document before the responsibles changed
+				if ($signatoriesChanged) {
+					digiriskRefreshPreventionPlanDocument($db, (int) $object->id, $user, $langs, true);
+				}
 
 				// Update prevention plan OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -536,6 +557,13 @@ if (empty($reshook)) {
 				if ($oldCategoryId != $riskCategoryId) {
 					$protections = array_filter($protections, function($p) use ($oldCategoryId) { return $p['risk_category'] != $oldCategoryId; });
 					unset($riskCompanies[$oldCategoryId]);
+
+					// The photos are keyed by category as well, they follow the risk. A risk added twice
+					// before the uniqueness check keeps them: they are its photos too
+					$sameCategoryLines = $preventionplandet->fetchAll('', '', 0, 0, ['fk_preventionplan' => $object->id, 'category' => $oldCategoryId]);
+					if (empty($sameCategoryLines)) {
+						digiriskMobileMoveRiskPhotoDir($object->element, $object->ref, (int) $oldCategoryId, (int) $riskCategoryId);
+					}
 				}
 
 				$protections = array_filter($protections, function($p) use ($riskCategoryId) { return $p['risk_category'] != $riskCategoryId; });
@@ -579,6 +607,12 @@ if (empty($reshook)) {
 		$preventionplandet->fetch($lineid);
 		$result = $preventionplandet->delete($user, false, false);
 		if ($result > 0) {
+			// The photos of the risk go with it, unless the same risk was added twice before the uniqueness check
+			$sameCategoryLines = $preventionplandet->fetchAll('', '', 0, 0, ['fk_preventionplan' => $preventionplandet->fk_preventionplan, 'category' => $preventionplandet->category]);
+			if ($preventionplandet->fk_preventionplan == $object->id && empty($sameCategoryLines)) {
+				dol_delete_dir_recursive(digiriskMobileRiskPhotoDir($object->element, $object->ref, (int) $preventionplandet->category));
+			}
+
 			// Delete prevention plan line OK
 			setEventMessages($langs->trans('DeletePreventionPlanLine') . ' ' . $preventionplandet->ref . ' ' . $langs->trans('PreventionPlanMessage'), array());
 			$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -722,7 +756,7 @@ $form        = new Form($db);
 $formproject = new FormProjets($db);
 
 $title       = $langs->trans("PreventionPlan");
-$titleCreate = $langs->trans("NewPreventionPlan");
+$titleCreate = $langs->trans("NewPreventionplan");
 $titleEdit   = $langs->trans("ModifyPreventionPlan");
 
 $helpUrl = 'FR:Module_Digirisk#DigiRisk_-_Plan_de_pr.C3.A9vention';
@@ -923,7 +957,9 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td></tr>';
 
 	//Maitre d'oeuvre
-	$masterWorker  = is_array($objectSignatories['MasterWorker'] ?? null) ? array_shift($objectSignatories['MasterWorker'])->element_id : '';
+	// Not the first row returned: a role can hold several rows, in no fixed order
+	$currentMasterWorker = digiriskGetCurrentSignatory($signatory, 'MasterWorker', (int) $object->id, 'preventionplan');
+	$masterWorker  = is_object($currentMasterWorker) ? $currentMasterWorker->element_id : '';
 	$userlist      = $form->select_dolusers($masterWorker, '', 1, null, 0, '', '', 0, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth100imp widthcentpercentminusxx maxwidth400', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MasterWorker', 'MasterWorker_id', '', $object, 0) . '</td>';
@@ -948,7 +984,8 @@ if (($id || $ref) && $action == 'edit') {
 	}
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '</td></tr>';
-	$extSocietyResponsibleId = is_array($objectSignatories['ExtSocietyResponsible'] ?? null) ? array_shift($objectSignatories['ExtSocietyResponsible'])->element_id : GETPOST('ext_society_responsible');
+	$currentExtResponsible   = digiriskGetCurrentSignatory($signatory, 'ExtSocietyResponsible', (int) $object->id, 'preventionplan');
+	$extSocietyResponsibleId = is_object($currentExtResponsible) ? $currentExtResponsible->element_id : GETPOST('ext_society_responsible');
 
 	if ($extSocietyResponsibleId > 0) {
 		$contact->fetch($extSocietyResponsibleId);
@@ -1449,9 +1486,9 @@ print '<input type="hidden" name="fk_element" value="0">';
 
 					$coldisplay++;
 					print '<td>';
-					// Photo upload block
-					$blockUploadSubDir = $object->ref . '/risk-' . $item->category;
-					print saturne_render_media_block('digiriskdolibarr', $blockUploadSubDir, 'risk-' . $item->category, 'digiriskdolibarr,preventionplan,write', ['show_photo' => true, 'show_audio' => false, 'show_file' => false]);
+					// Photo upload block, and the editor a selected photo opens in before its upload
+					print digiriskPreventionPlanRiskMediaBlock($object, (int) $item->category);
+					print saturne_photo_editor_modal();
 					print '</td>';
 
 					$coldisplay += $colspan;
@@ -1518,17 +1555,11 @@ print '<input type="hidden" name="fk_element" value="0">';
 
 					$coldisplay++;
 					print '<td class="center">';
-					// Display photos
-					$riskDir = $conf->digiriskdolibarr->dir_output . '/preventionplan/' . $object->ref . '/risk-' . $item->category;
-					if (dol_is_dir($riskDir)) {
-						$files = dol_dir_list($riskDir, 'files', 0, '\.(png|jpg|jpeg|gif)$', 'name', 'ASC');
-						if (!empty($files)) {
-							foreach ($files as $file) {
-								$url = DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&entity=1&file=preventionplan/' . $object->ref . '/risk-' . $item->category . '/' . urlencode($file['name']);
-								print '<a href="'.$url.'" target="_blank"><img src="'.$url.'" style="height:40px; margin:2px; border-radius:4px; border:1px solid #ccc;"></a>';
-							}
-						} else {
-							print '<span class="opacitymedium">&mdash;</span>';
+					// Display photos, from the folder the mobile interface and the document use
+					$riskPhotos = digiriskMobileGetRiskPhotos($object->element, $object->ref, (int) $item->category);
+					if (!empty($riskPhotos)) {
+						foreach ($riskPhotos as $riskPhoto) {
+							print '<a href="' . $riskPhoto['url'] . '&attachment=0" target="_blank"><img src="' . $riskPhoto['url'] . '" style="height:40px; margin:2px; border-radius:4px; border:1px solid #ccc;"></a>';
 						}
 					} else {
 						print '<span class="opacitymedium">&mdash;</span>';
@@ -1541,7 +1572,7 @@ print '<input type="hidden" name="fk_element" value="0">';
 					if ($object->status == 1) {
 						print '<td class="center">';
 						$coldisplay++;
-						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&action=editline&lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
+						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&action=editline&token=' . newToken() . '&lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
 						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&action=deleteline&lineid=' . $item->id . '&token=' . newToken() . '">';
 						print img_delete();
 						print '</a>';
@@ -1672,8 +1703,6 @@ print '<input type="hidden" name="fk_element" value="0">';
 			// Read-only risk list, styled like the protections block for theme consistency.
 			// Each risk shows what the mobile interface captured for it: photos and protections (EPI).
 			if (is_array($preventionplandets) && !empty($preventionplandets)) {
-				require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
-
 				$mobileRiskProtections = !empty($object->array_options['options_mobile_protections'])    ? json_decode($object->array_options['options_mobile_protections'], true)    : [];
 				$mobileRiskCompanies   = !empty($object->array_options['options_mobile_risk_companies']) ? json_decode($object->array_options['options_mobile_risk_companies'], true) : [];
 				$signalisationFile     = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json';

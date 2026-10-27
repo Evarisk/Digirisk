@@ -192,11 +192,12 @@ window.digiriskdolibarr.risk.createRisk = function ( event ) {
 			executiveId: executiveId,
       categories: categories,
 			criteres: {
+				// An environmental risk names its criteria historique, milieu, maitrise and frequence
 				gravite: criteres['gravite'] ? criteres['gravite'] : 0,
-				occurrence: criteres['occurrence'] ? criteres['occurrence'] : 0,
-				protection: criteres['protection'] ? criteres['protection'] : 0,
-				formation: criteres['formation'] ? criteres['formation'] : 0,
-				exposition: criteres['exposition'] ? criteres['exposition'] : 0
+				occurrence: criteres['occurrence'] ? criteres['occurrence'] : (criteres['historique'] ? criteres['historique'] : 0),
+				protection: criteres['protection'] ? criteres['protection'] : (criteres['milieu'] ? criteres['milieu'] : 0),
+				formation: criteres['formation'] ? criteres['formation'] : (criteres['maitrise'] ? criteres['maitrise'] : 0),
+				exposition: criteres['exposition'] ? criteres['exposition'] : (criteres['frequence'] ? criteres['frequence'] : 0)
 			}
 		}),
 		processData: false,

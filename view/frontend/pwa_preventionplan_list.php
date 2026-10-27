@@ -33,6 +33,8 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
+require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
+require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_pwa.lib.php';
 
 // Global variables definitions
@@ -52,6 +54,7 @@ $listPage   = max(0, GETPOSTINT('page'));
 
 $object            = new PreventionPlan($db);
 $digiriskresources = new DigiriskResources($db);
+$signatory         = new SaturneSignature($db, 'digiriskdolibarr', $object->element);
 
 $listStatusOptions = [
     ''                                 => $langs->transnoentities('AllStatus'),
@@ -64,16 +67,8 @@ if (!array_key_exists($listStatus, $listStatusOptions)) {
     $listStatus = '';
 }
 
-list($listRows, $listTotal, $listTotalPages) = digiriskPwaFetchList('PreventionPlan', $listSearch, $listStatus, $listPage, function ($record) use ($digiriskresources, $user) {
-    // fetchResourcesFromObject() returns the resolved Societe for a single match, and 0 when there is none
-    $extSociety  = $digiriskresources->fetchResourcesFromObject('ExtSociety', $record);
-    $societyName = (is_object($extSociety) && $extSociety->id > 0) ? $extSociety->name : '';
-
-    $lines = [];
-    if ($societyName !== '') {
-        $lines[] = ['icon' => 'fa-industry', 'text' => $societyName];
-    }
-    $lines[] = ['icon' => 'fa-calendar-alt', 'text' => digiriskPwaFormatPeriod($record->date_start, $record->date_end)];
+list($listRows, $listTotal, $listTotalPages) = digiriskPwaFetchList('PreventionPlan', $listSearch, $listStatus, $listPage, function ($record) use ($digiriskresources, $signatory, $user) {
+    $details = digiriskPwaCardDetails($record, $digiriskresources, $signatory);
 
     return [
         'url'        => ($record->status == PreventionPlan::STATUS_DRAFT)
@@ -84,7 +79,9 @@ list($listRows, $listTotal, $listTotalPages) = digiriskPwaFetchList('PreventionP
             : '',
         'ref'        => $record->ref,
         'title'      => $record->label,
-        'lines'      => $lines,
+        'lines'      => $details['lines'],
+        'pictos'     => $details['pictos'],
+        'foot'       => $details['foot'],
         'statusHtml' => digiriskPwaStatusHtml($record),
     ];
 });

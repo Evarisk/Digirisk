@@ -2851,12 +2851,14 @@ function digiriskformconfirm($page, $title, $question, $action, $formquestion = 
  *
  * The bounds are the ones of the list search form, so a graph bar and the list it opens hold the same records
  *
- * @param  string $prefix Name of the list date filter, without its bound suffix ('search_date', 'search_accident_date')
- * @param  int    $start  Timestamp of the first day of the range, 0 for no lower bound
- * @param  int    $end    Timestamp of the last day of the range, 0 for no upper bound
- * @return string         Search criteria, empty when the range is unbounded
+ * @param  string $prefix      Name of the list date filter, without its bound suffix ('search_date', 'search_accident_date')
+ * @param  int    $start       Timestamp of the first day of the range, 0 for no lower bound
+ * @param  int    $end         Timestamp of the last day of the range, 0 for no upper bound
+ * @param  string $boundPrefix Text between the name of the filter and its bound: '_' for the Dolibarr lists
+ *                             (search_date_startday), '_dt' for the Saturne ones (search_accident_date_dtstartday)
+ * @return string              Search criteria, empty when the range is unbounded
  */
-function digirisk_get_date_range_filter(string $prefix, int $start = 0, int $end = 0): string
+function digirisk_get_date_range_filter(string $prefix, int $start = 0, int $end = 0, string $boundPrefix = '_'): string
 {
     $filter = [];
     foreach (['start' => $start, 'end' => $end] as $bound => $timestamp) {
@@ -2865,9 +2867,9 @@ function digirisk_get_date_range_filter(string $prefix, int $start = 0, int $end
         }
 
         $date     = dol_getdate($timestamp);
-        $filter[] = $prefix . '_' . $bound . 'day=' . $date['mday'];
-        $filter[] = $prefix . '_' . $bound . 'month=' . $date['mon'];
-        $filter[] = $prefix . '_' . $bound . 'year=' . $date['year'];
+        $filter[] = $prefix . $boundPrefix . $bound . 'day=' . $date['mday'];
+        $filter[] = $prefix . $boundPrefix . $bound . 'month=' . $date['mon'];
+        $filter[] = $prefix . $boundPrefix . $bound . 'year=' . $date['year'];
     }
 
     return implode('&', $filter);
@@ -3166,4 +3168,212 @@ function digiriskdolibarr_taken_refs(string $table, string $where)
     $db->free($resql);
 
     return $refs;
+}
+
+/**
+ * Current holder of a single-person signatory role of an object (EU or EE responsible).
+ *
+ * fetchSignatory() lists the rows of a role in no fixed order. Saving a plan or a permit from its
+ * Dolibarr card used to add a new unsigned row for the same person next to the signed one
+ * (setSignatory() only retires unsigned rows): depending on the order the database returned them,
+ * the document showed the unsigned row and lost the signature. The latest row is the current holder,
+ * but when an older row of that same person is signed, the signed one is kept.
+ *
+ * @param  SaturneSignature      $signatory  Signatory handler
+ * @param  string                $role       Role (MasterWorker, ExtSocietyResponsible)
+ * @param  int                   $objectId   Object id
+ * @param  string                $objectType Object type (preventionplan, firepermit)
+ * @return SaturneSignature|null             Current holder, null when the role has none
+ */
+function digiriskGetCurrentSignatory(SaturneSignature $signatory, string $role, int $objectId, string $objectType): ?SaturneSignature
+{
+    $signatories = $signatory->fetchSignatory($role, $objectId, $objectType);
+    if (!is_array($signatories) || empty($signatories)) {
+        return null;
+    }
+
+    usort($signatories, function ($a, $b) {
+        return $b->id <=> $a->id;
+    });
+    $current = $signatories[0];
+
+    if (empty($current->signature)) {
+        foreach ($signatories as $other) {
+            if (!empty($other->signature) && $other->element_type == $current->element_type && $other->element_id == $current->element_id) {
+                return $other;
+            }
+        }
+    }
+
+    return $current;
+}
+
+/**
+ * Emergency numbers printed in the prevention plan document, in its order. Each one is a third party
+ * of the company setup, and its phone is the number.
+ *
+ * @return array<string, array{label: string, field: string}> Translation key of the label and name of the form field, by resource
+ */
+function digiriskPreventionPlanEmergencyResources(): array
+{
+    return [
+        'Pompiers'       => ['label' => 'Firefighters', 'field' => 'pompiers_socid'],
+        'Police'         => ['label' => 'Police', 'field' => 'police_socid'],
+        'SAMU'           => ['label' => 'SAMU', 'field' => 'samu_socid'],
+        'AllEmergencies' => ['label' => 'AnyEmergency', 'field' => 'touteurgence_socid'],
+    ];
+}
+
+/**
+ * Texts of the setup printed in the prevention plan document, and in the fire permit one.
+ *
+ * @return array<string, array{const: string, field: string}> Constant holding the text and name of the form field, by part of the document
+ */
+function digiriskPreventionPlanDocumentTexts(): array
+{
+    return [
+        'means'        => ['const' => 'DIGIRISKDOLIBARR_GENERAL_MEANS', 'field' => 'moyensgeneraux'],
+        'instructions' => ['const' => 'DIGIRISKDOLIBARR_GENERAL_RULES', 'field' => 'consignesgenerales'],
+        'firstaid'     => ['const' => 'DIGIRISKDOLIBARR_FIRST_AID', 'field' => 'firstaid'],
+    ];
+}
+
+/**
+ * Parts of the prevention plan document that can carry images, in the order of the document.
+ *
+ * Each part is printed with the translation key of its title. "Circulation sur le site" has no text
+ * of its own: it only shows in the document when it has images.
+ *
+ * @return array<string, string> Translation key of the part title, by part
+ */
+function digiriskPreventionPlanDocumentImageParts(): array
+{
+    return [
+        'companies'      => 'Companies',
+        'emergency'      => 'EmergencyNumbers',
+        'means'          => 'GeneralMeansAtDisposal',
+        'instructions'   => 'GeneralInstructions',
+        'firstaid'       => 'FirstAid',
+        'sitetraffic'    => 'PreventionPlanSiteTraffic',
+        'priorvisit'     => 'PriorVisit',
+        'intervention'   => 'Intervention',
+        'risks'          => 'RiskAnalysis',
+        'certifications' => 'MobilePPCertifications',
+        'signatures'     => 'Signatures',
+    ];
+}
+
+/**
+ * Directory of the images of a part of the prevention plan document, relative to the module output.
+ *
+ * @param  string $part Part of the document, a key of digiriskPreventionPlanDocumentImageParts()
+ * @return string       Sub directory, as the Saturne media block expects it
+ */
+function digiriskPreventionPlanDocumentImagesSubDir(string $part): string
+{
+    return 'preventionplan/documentimages/' . $part;
+}
+
+/**
+ * Images of a part of the prevention plan document.
+ *
+ * Sorted by name: the media block names its photos after the moment they were taken, so the
+ * document follows the order of upload, and a photo edited afterwards keeps its place.
+ *
+ * @param  string   $part Part of the document
+ * @return string[]       Full paths of the images
+ */
+function digiriskPreventionPlanDocumentImages(string $part): array
+{
+    require_once __DIR__ . '/../../saturne/lib/medias.lib.php';
+
+    $files = saturne_get_media_files('digiriskdolibarr', digiriskPreventionPlanDocumentImagesSubDir($part), '', '', ['type' => 'image', 'sort_field' => 'name', 'sort_order' => 'asc']);
+
+    return array_column($files, 'fullname');
+}
+
+/**
+ * Saturne media block of the images of a part of the prevention plan document.
+ *
+ * @param  string $part     Part of the document
+ * @param  bool   $canWrite Whether the user may add and remove images
+ * @return string           HTML of the block
+ */
+function digiriskPreventionPlanDocumentImagesBlock(string $part, bool $canWrite): string
+{
+    require_once __DIR__ . '/../../saturne/lib/medias.lib.php';
+
+    return saturne_render_media_block('digiriskdolibarr', digiriskPreventionPlanDocumentImagesSubDir($part), 'documentimages-' . $part, 'digiriskdolibarr,adminpage,write', ['show_photo' => true, 'show_audio' => false, 'show_file' => false, 'show_upload' => $canWrite]);
+}
+
+/**
+ * Image added or removed from a media block of the prevention plan setup page: the Saturne media
+ * block posts on the page and expects itself back, refreshed. Only the directories of the parts of
+ * the document are writable.
+ *
+ * @param  string $action Requested action: anything but uploadPhoto and deletePhoto returns at once
+ * @return void           Ends the request when it handled the action
+ * @throws Exception
+ */
+function digiriskPreventionPlanDocumentImagesActions(string $action): void
+{
+    global $conf;
+
+    if (!in_array($action, ['uploadPhoto', 'deletePhoto'], true)) {
+        return;
+    }
+
+    // Strict equality with a known part: the sub directory comes from the browser
+    $part = '';
+    foreach (array_keys(digiriskPreventionPlanDocumentImageParts()) as $candidate) {
+        if (GETPOST('sub_dir', 'alpha') === digiriskPreventionPlanDocumentImagesSubDir($candidate)) {
+            $part = $candidate;
+            break;
+        }
+    }
+    if (!dol_strlen($part)) {
+        http_response_code(403);
+        exit;
+    }
+
+    require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+
+    $uploadDir = $conf->digiriskdolibarr->dir_output . '/' . digiriskPreventionPlanDocumentImagesSubDir($part);
+    if (!dol_is_dir($uploadDir)) {
+        dol_mkdir($uploadDir);
+    }
+
+    if ($action == 'uploadPhoto' && getDolGlobalInt('MAIN_UPLOAD_DOC')) {
+        // The media block only sends images, make sure of it before writing anything
+        $isImageUpload = true;
+        foreach ((array) ($_FILES['userfile']['tmp_name'] ?? []) as $uploadedTmpName) {
+            if (empty($uploadedTmpName)) {
+                continue;
+            }
+            $fileInfo = new finfo(FILEINFO_MIME_TYPE);
+            if (strpos((string) $fileInfo->file($uploadedTmpName), 'image/') !== 0) {
+                $isImageUpload = false;
+                break;
+            }
+        }
+        if ($isImageUpload) {
+            dol_add_file_process($uploadDir, GETPOSTINT('overwrite'), 1, 'userfile', '', null, '', 1);
+        }
+    } elseif ($action == 'deletePhoto') {
+        $photoToDelete = dol_sanitizeFileName(GETPOST('filename', 'alphanohtml'));
+        if (dol_strlen($photoToDelete) && dol_is_file($uploadDir . '/' . $photoToDelete)) {
+            // disableglob: a bracket in the name would be read as a character class
+            dol_delete_file($uploadDir . '/' . $photoToDelete, 1);
+            // The thumbnails go with it: these folders live as long as the setup, orphans would pile up
+            foreach (['_small', '_mini'] as $thumbSize) {
+                $thumbPath = $uploadDir . '/' . getImageFileNameForSize($photoToDelete, $thumbSize);
+                if (dol_is_file($thumbPath)) {
+                    dol_delete_file($thumbPath, 1);
+                }
+            }
+        }
+    }
+
+    print digiriskPreventionPlanDocumentImagesBlock($part, true);
+    exit;
 }

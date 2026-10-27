@@ -31,6 +31,8 @@ require_once __DIR__ . '/../../../../../../saturne/class/saturneschedules.class.
 require_once __DIR__ . '/../../../../../../saturne/lib/medias.lib.php';
 require_once __DIR__ . '/../../../../../../saturne/lib/dolibarr.lib.php';
 
+require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_function.lib.php';
+
 /**
  * Class to build the prevention plan document as a PDF.
  */
@@ -96,6 +98,16 @@ class pdf_preventionplandocument extends SaturneDocumentModel
      * @var string Texte de gauche du pied de page
      */
     protected string $footerText = '';
+
+    /**
+     * @var string Cle de traduction de l'intitule des photos d'un bloc de risque
+     */
+    protected string $riskPhotosLabelKey = 'PreventionPlanRiskPhotos';
+
+    /**
+     * @var string Prefixe des cles de la phrase de periode d'intervention ('Sentence' avec horaires, 'Only' sans)
+     */
+    protected string $interventionPeriodKey = 'InterventionPeriod';
 
     /**
      * @var float Taille de police du pied de page
@@ -441,7 +453,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $pdf->SetFont('', 'B', $size + 6);
         $pdf->SetTextColor($this->accent[0], $this->accent[1], $this->accent[2]);
         $pdf->SetXY($this->marge_gauche, $posY + 2);
-        $pdf->Cell($this->contentWidth($pdf), 9, $outputLangs->transnoentities('PreventionPlan'), 0, 1, 'C');
+        $pdf->Cell($this->contentWidth($pdf), 9, $this->documentTitle($outputLangs), 0, 1, 'C');
         $pdf->SetTextColor(0, 0, 0);
 
         $pdf->SetFont('', '', $size);
@@ -493,15 +505,16 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $totalPages  = $pdf->getNumPages();
         $halfWidth   = $this->contentWidth($pdf) / 2;
 
-        $pdf->SetFont('', '', $this->footerFontSize);
-        $pdf->SetTextColor(140, 140, 140);
-
         for ($page = 1; $page <= $totalPages; $page++) {
             $pdf->setPage($page);
             // Le pied s'ecrit dans la bande basse, sous le seuil de rupture : sans couper la
             // rupture automatique son Cell serait reporte en haut de la page suivante. A recouper
             // apres chaque setPage, qui restaure les reglages memorises de la page.
             $pdf->SetAutoPageBreak(false);
+            // La police aussi, page par page : posee une seule fois, elle ne s'ecrivait que sur la
+            // page courante, et les autres pieds reprenaient la derniere police de leur contenu
+            $pdf->SetFont('', '', $this->footerFontSize);
+            $pdf->SetTextColor(140, 140, 140);
             $pdf->SetXY($this->marge_gauche, $pdf->getPageHeight() - 12);
             $pdf->Cell($halfWidth, 5, $this->footerText, 0, 0, 'L');
             $pdf->Cell($halfWidth, 5, 'Page ' . $page . ' / ' . $totalPages, 0, 0, 'R');
@@ -567,12 +580,9 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $parameters = ['file' => $file, 'object' => $object, 'outputlangs' => $outputLangs];
         $hookmanager->executeHooks('beforePDFCreation', $parameters, $object, $action);
 
-        // Meme source de donnees que le modele ODT
-        $objectDocument->DigiriskFillJSON();
-        $json = json_decode($objectDocument->json);
-        $data = (is_object($json) && isset($json->PreventionPlan)) ? (array) $json->PreventionPlan : [];
+        $data = $this->documentData($objectDocument);
 
-        $this->tmpDir = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/preventionplandocument/tmp';
+        $this->tmpDir = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $this->document_type . '/tmp';
         dol_mkdir($this->tmpDir);
 
         $pdf  = pdf_getInstance($this->format);
@@ -588,7 +598,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $pdf->SetDrawColor(190, 190, 190);
         $pdf->SetLineWidth(0.2);
         $pdf->SetTitle($outputLangs->convToOutputCharset($object->ref));
-        $pdf->SetSubject($outputLangs->transnoentities('PreventionPlan'));
+        $pdf->SetSubject($this->documentTitle($outputLangs));
         $pdf->SetCreator('Dolibarr ' . DOL_VERSION);
         $pdf->SetAuthor($outputLangs->convToOutputCharset($user->getFullName($outputLangs)));
         $pdf->SetMargins($this->marge_gauche, $this->marge_haute, $this->marge_droite);
@@ -603,16 +613,9 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $this->_pagehead($pdf, $object, $outputLangs, $size);
 
         // Rappel reglementaire, en tete de document comme dans le gabarit
-        $this->paragraph($pdf, $outputLangs->transnoentities('PreventionPlanLegalNotice'), $size - 2, 'I', [110, 110, 110]);
+        $this->paragraph($pdf, $this->legalNotice($outputLangs), $size - 2, 'I', [110, 110, 110]);
 
-        $this->sectionCompanies($pdf, $data, $outputLangs, $size);
-        $this->sectionEmergency($pdf, $data, $outputLangs, $size);
-        $this->sectionMeansAndRules($pdf, $data, $outputLangs, $size);
-        $this->sectionPriorVisit($pdf, $object, $data, $outputLangs, $size);
-        $this->sectionIntervention($pdf, $object, $outputLangs, $size);
-        $this->sectionRisks($pdf, $object, $outputLangs, $size);
-        $this->sectionCertifications($pdf, $object, $outputLangs, $size);
-        $this->sectionSignatures($pdf, $object, $outputLangs, $size);
+        $this->writeSections($pdf, $object, $data, $outputLangs, $size);
 
         $this->_pagefooter($pdf, $object, $outputLangs, $size);
 
@@ -630,6 +633,173 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $this->result = ['fullpath' => $file];
 
         return 1;
+    }
+
+    /**
+     * Titre du document, en tete de page et dans les proprietes du PDF.
+     *
+     * Le permis de feu reprend la mise en page du plan de prevention : ce qui les distingue passe
+     * par cette methode et les trois suivantes, qu'il redefinit.
+     *
+     * @param  Translate $outputLangs Lang object
+     * @return string                 Titre traduit
+     */
+    protected function documentTitle(Translate $outputLangs): string
+    {
+        return $outputLangs->transnoentities('PreventionPlan');
+    }
+
+    /**
+     * Rappel reglementaire imprime sous le titre.
+     *
+     * @param  Translate $outputLangs Lang object
+     * @return string                 Texte traduit
+     */
+    protected function legalNotice(Translate $outputLangs): string
+    {
+        return $outputLangs->transnoentities('PreventionPlanLegalNotice');
+    }
+
+    /**
+     * Donnees du document, lues dans le JSON qui alimente aussi le modele ODT.
+     *
+     * @param  SaturneDocuments $objectDocument Document source
+     * @return array                            Donnees du plan de prevention
+     */
+    protected function documentData($objectDocument): array
+    {
+        $objectDocument->DigiriskFillJSON();
+        $json = json_decode($objectDocument->json);
+
+        return (is_object($json) && isset($json->PreventionPlan)) ? (array) $json->PreventionPlan : [];
+    }
+
+    /**
+     * Sections du document, dans l'ordre du gabarit ODT.
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  object    $object      Plan de prevention
+     * @param  array     $data        Donnees du document
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @return void
+     */
+    protected function writeSections($pdf, $object, array $data, Translate $outputLangs, float $size)
+    {
+        $this->sectionCompanies($pdf, $data, $outputLangs, $size);
+        $this->sectionImages($pdf, 'companies');
+        $this->sectionEmergency($pdf, $data, $outputLangs, $size);
+        $this->sectionImages($pdf, 'emergency');
+        $this->sectionMeansAndRules($pdf, $data, $outputLangs, $size);
+        $this->sectionSiteTraffic($pdf, $outputLangs, $size);
+        $this->sectionPriorVisit($pdf, $object, $data, $outputLangs, $size);
+        $this->sectionImages($pdf, 'priorvisit');
+        $this->sectionIntervention($pdf, $object, $outputLangs, $size);
+        $this->sectionImages($pdf, 'intervention');
+        $this->sectionRisks($pdf, $object, $outputLangs, $size);
+        $this->sectionImages($pdf, 'risks');
+        $this->sectionCertifications($pdf, $object, $outputLangs, $size);
+        $this->sectionSignatures($pdf, $object, $outputLangs, $size);
+        $this->sectionImages($pdf, 'signatures');
+    }
+
+    /**
+     * Images envoyees dans la configuration pour une partie du document.
+     *
+     * Le permis de feu reprend la mise en page du plan de prevention mais pas ses images : il
+     * redefinit cette methode.
+     *
+     * @param  string   $part Partie du document, cle de digiriskPreventionPlanDocumentImageParts()
+     * @return string[]       Chemins des images
+     */
+    protected function documentImages(string $part): array
+    {
+        return digiriskPreventionPlanDocumentImages($part);
+    }
+
+    /**
+     * Dimensionne des images, une par ligne : chacune prend toute la largeur utile, comme les
+     * panneaux et les plans que les modeles ODT collaient sur toute la page, sans jamais depasser
+     * une page avec le titre de sa partie. Une image n'est pas agrandie au-dela de sa taille a
+     * 96 dpi, ce qui ne ferait que la rendre floue.
+     *
+     * @param  TCPDF    $pdf    PDF handler
+     * @param  string[] $images Chemins des images
+     * @return array            Lignes : ['path' => string, 'width' => float, 'height' => float]
+     */
+    protected function imageRows($pdf, array $images): array
+    {
+        $maxWidth  = $this->contentWidth($pdf);
+        $maxHeight = $pdf->getPageHeight() - $this->marge_haute - self::FOOTER_BAND - 24;
+
+        $rows = [];
+        foreach ($images as $path) {
+            // TCPDF n'embarque surement que le JPEG et le PNG : un autre format ferait echouer tout le document
+            $imageSize = is_readable($path) ? getimagesize($path) : false;
+            if (!is_array($imageSize) || $imageSize[0] <= 0 || $imageSize[1] <= 0 || !in_array($imageSize[2], [IMAGETYPE_JPEG, IMAGETYPE_PNG], true)) {
+                continue;
+            }
+
+            $width  = min($maxWidth, $imageSize[0] * 25.4 / 96);
+            $height = $width * $imageSize[1] / $imageSize[0];
+            if ($height > $maxHeight) {
+                $height = $maxHeight;
+                $width  = $height * $imageSize[0] / $imageSize[1];
+            }
+            $rows[] = ['path' => $path, 'width' => $width, 'height' => $height];
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Pose des images, une par ligne et centrees. Une image n'est jamais coupee par un saut de page.
+     *
+     * @param  TCPDF $pdf  PDF handler
+     * @param  array $rows Lignes rendues par imageRows()
+     * @return void
+     */
+    protected function drawImageRows($pdf, array $rows)
+    {
+        foreach ($rows as $row) {
+            $this->checkPageBreak($pdf, $row['height'] + 3);
+
+            $x = $this->marge_gauche + ($this->contentWidth($pdf) - $row['width']) / 2;
+            $y = $pdf->GetY();
+            $pdf->Image($row['path'], $x, $y, $row['width'], $row['height'], '', '', '', false, 300, '', false, false, 0, false, false, false);
+            $pdf->Rect($x, $y, $row['width'], $row['height']);
+
+            $pdf->SetY($y + $row['height'] + 3);
+        }
+    }
+
+    /**
+     * Images d'une partie, sous son contenu.
+     *
+     * @param  TCPDF  $pdf  PDF handler
+     * @param  string $part Partie du document
+     * @return void
+     */
+    protected function sectionImages($pdf, string $part)
+    {
+        $this->drawImageRows($pdf, $this->imageRows($pdf, $this->documentImages($part)));
+    }
+
+    /**
+     * Partie qui n'a que des images : son titre reste avec la premiere ligne, sinon il finirait seul
+     * en bas de la page precedente.
+     *
+     * @param  TCPDF  $pdf   PDF handler
+     * @param  string $title Titre de la partie
+     * @param  array  $rows  Lignes rendues par imageRows(), au moins une
+     * @param  float  $size  Taille de police
+     * @return void
+     */
+    protected function imagesOnlySection($pdf, string $title, array $rows, float $size)
+    {
+        $this->reserveSpace($pdf, 18 + $rows[0]['height'] + 3);
+        $this->sectionTitle($pdf, $title, $size);
+        $this->drawImageRows($pdf, $rows);
     }
 
     /**
@@ -722,17 +892,42 @@ class pdf_preventionplandocument extends SaturneDocumentModel
     protected function sectionMeansAndRules($pdf, array $data, Translate $outputLangs, float $size)
     {
         $blocks = [
-            'GeneralMeansAtDisposal' => $data['moyen_generaux_mis_disposition'] ?? '',
-            'GeneralInstructions'    => $data['consigne_generale']              ?? '',
-            'FirstAid'               => $data['premiers_secours']               ?? '',
+            'means'        => ['GeneralMeansAtDisposal', $data['moyen_generaux_mis_disposition'] ?? ''],
+            'instructions' => ['GeneralInstructions', $data['consigne_generale'] ?? ''],
+            'firstaid'     => ['FirstAid', $data['premiers_secours'] ?? ''],
         ];
 
-        foreach ($blocks as $titleKey => $html) {
+        foreach ($blocks as $part => [$titleKey, $html]) {
+            $rows = $this->imageRows($pdf, $this->documentImages($part));
+
+            // Sans texte, la partie ne s'imprime que pour ses images
             if (!dol_strlen($html)) {
+                if (!empty($rows)) {
+                    $this->imagesOnlySection($pdf, $outputLangs->transnoentities($titleKey), $rows, $size);
+                }
                 continue;
             }
+
             $this->sectionTitle($pdf, $outputLangs->transnoentities($titleKey), $size);
             $this->htmlBlock($pdf, $html, $size - 1);
+            $this->drawImageRows($pdf, $rows);
+        }
+    }
+
+    /**
+     * Circulation sur le site : une partie faite seulement des images envoyees dans la
+     * configuration, absente du document quand il n'y en a pas.
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @return void
+     */
+    protected function sectionSiteTraffic($pdf, Translate $outputLangs, float $size)
+    {
+        $rows = $this->imageRows($pdf, $this->documentImages('sitetraffic'));
+        if (!empty($rows)) {
+            $this->imagesOnlySection($pdf, $outputLangs->transnoentities('PreventionPlanSiteTraffic'), $rows, $size);
         }
     }
 
@@ -886,8 +1081,8 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         }
         // La phrase n'annonce des horaires que s'il y en a : sinon elle laissait un vide
         $sentence = $hasSchedule
-            ? $outputLangs->transnoentities('InterventionPeriodSentence', $start, $end)
-            : $outputLangs->transnoentities('InterventionPeriodOnly', $start, $end);
+            ? $outputLangs->transnoentities($this->interventionPeriodKey . 'Sentence', $start, $end)
+            : $outputLangs->transnoentities($this->interventionPeriodKey . 'Only', $start, $end);
         $this->paragraph($pdf, $sentence, $size - 1, '', [40, 40, 40]);
 
         if (!$hasSchedule) {
@@ -1013,11 +1208,12 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         // Un risque ne doit pas etre coupe : on mesure le bloc entier avant de le poser
         $this->checkPageBreak($pdf, $this->measureRiskBlock($pdf, $riskLine, $protections, $photos, $size));
 
-        // Bandeau du risque : picto a gauche, nom et reference a droite
-        $headY = $pdf->GetY();
+        // Bandeau du risque : picto a gauche, nom et reference a droite, puis le commentaire du
+        // risque dans le meme cadre
+        $headY      = $pdf->GetY();
+        $headHeight = 14 + $this->measureRiskComment($pdf, $riskLine, $size);
         $pdf->SetFillColor(248, 249, 250);
-        $pdf->SetX($this->marge_gauche);
-        $pdf->Cell($width, 14, '', 1, 1, 'L', true);
+        $pdf->Rect($this->marge_gauche, $headY, $width, $headHeight, 'DF');
 
         if (dol_strlen($pictoPath) && is_readable($pictoPath)) {
             $pdf->Image($pictoPath, $this->marge_gauche + 2, $headY + 1, 0, 12);
@@ -1049,17 +1245,22 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $pdf->Cell($width - 20, 4, $subTitle, 0, 1, 'L');
         $pdf->SetTextColor(0, 0, 0);
 
-        $pdf->SetY($headY + 14);
-        $pdf->Ln(1.5);
-
-        // Description, sans cadre : le bandeau suffit a delimiter le bloc
+        // Commentaire du risque, sous la reference et aligne sur le nom. L'intitule dit ce qu'est
+        // ce texte, comme pour les protections et les photos
         if (dol_strlen($riskLine->description)) {
+            $pdf->SetXY($this->marge_gauche + 17, $headY + 13);
+            $pdf->SetFont('', 'B', $size - 3);
+            $pdf->SetTextColor(130, 130, 130);
+            $pdf->Cell($width - 20, 4, dol_strtoupper($outputLangs->transnoentities('MobilePPRiskComment')), 0, 1, 'L');
             $pdf->SetFont('', '', $size - 1);
             $pdf->SetTextColor(40, 40, 40);
-            $pdf->SetX($this->marge_gauche + 2);
-            $pdf->MultiCell($width - 4, $this->height, $riskLine->description, 0, 'L');
+            $pdf->SetX($this->marge_gauche + 17);
+            $pdf->MultiCell($width - 20, $this->height, $riskLine->description, 0, 'L');
             $pdf->SetTextColor(0, 0, 0);
         }
+
+        $pdf->SetY($headY + $headHeight);
+        $pdf->Ln(1.5);
 
         // Moyens de prevention saisis sur la fiche, quand il y en a
         if (dol_strlen($riskLine->prevention_method)) {
@@ -1100,12 +1301,9 @@ class pdf_preventionplandocument extends SaturneDocumentModel
     protected function measureRiskBlock($pdf, $riskLine, array $protections, array $photos, float $size): float
     {
         $width  = $this->contentWidth($pdf);
-        $height = 14 + 1.5; // bandeau + interligne
+        $height = 14 + 1.5 + $this->measureRiskComment($pdf, $riskLine, $size); // bandeau + interligne
 
         $pdf->SetFont('', '', $size - 1);
-        if (dol_strlen($riskLine->description)) {
-            $height += $pdf->getNumLines($riskLine->description, $width - 4) * $this->height;
-        }
         if (dol_strlen($riskLine->prevention_method)) {
             $height += 5 + $pdf->getNumLines($riskLine->prevention_method, $width - 4) * $this->height;
         }
@@ -1113,6 +1311,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         if (!empty($protections)) {
             $perRow  = max(1, (int) floor($width / 20));
             $height += 5 + ((int) ceil(count($protections) / $perRow)) * 18;
+            $height += $this->measureProtectionComments($pdf, $protections, $size);
         }
 
         if (!empty($photos)) {
@@ -1121,6 +1320,31 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         }
 
         return $height + 5; // filet de separation
+    }
+
+    /**
+     * Hauteur que le commentaire du risque ajoute au cadre du bandeau.
+     *
+     * L'intitule part 1 mm au-dessus du bas du bandeau seul (14 mm) : 4 mm d'intitule, le texte,
+     * puis 2,5 mm de marge basse, soit 5,5 mm de plus que le texte.
+     * Sert aussi a la mesure du bloc entier : les deux ne doivent pas diverger.
+     *
+     * @param  TCPDF  $pdf      PDF handler
+     * @param  object $riskLine Ligne de plan de prevention
+     * @param  float  $size     Taille de police
+     * @return float            Hauteur en mm, 0 sans commentaire
+     */
+    protected function measureRiskComment($pdf, $riskLine, float $size): float
+    {
+        if (!dol_strlen($riskLine->description)) {
+            return 0;
+        }
+
+        // Le cadre doit coller au texte : MultiCell n'impose sa hauteur qu'a une ligne seule, au-dela
+        // chaque ligne prend la hauteur de la police, que getStringHeight mesure
+        $pdf->SetFont('', '', $size - 1);
+
+        return 5.5 + max($this->height, $pdf->getStringHeight($this->contentWidth($pdf) - 20, $riskLine->description));
     }
 
     /**
@@ -1142,7 +1366,8 @@ class pdf_preventionplandocument extends SaturneDocumentModel
     }
 
     /**
-     * Bandeau des moyens de protection d'un risque : le picto EPI et son nom dessous.
+     * Bandeau des moyens de protection d'un risque : les pictos EPI, puis le commentaire de chaque
+     * protection qui en a un.
      *
      * @param  TCPDF     $pdf         PDF handler
      * @param  array     $protections Protections du risque
@@ -1163,7 +1388,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $perRow    = max(1, (int) floor($width / $cellWidth));
         $rowCount  = (int) ceil(count($protections) / $perRow);
 
-        $this->checkPageBreak($pdf, 8 + $rowCount * $rowHeight);
+        $this->checkPageBreak($pdf, 8 + $rowCount * $rowHeight + $this->measureProtectionComments($pdf, $protections, $size));
 
         $this->blockLabel($pdf, $outputLangs->transnoentities('MobilePPProtections'), $size);
 
@@ -1187,6 +1412,44 @@ class pdf_preventionplandocument extends SaturneDocumentModel
             $pdf->SetY($startY + $rowHeight);
             $index += $perRow;
         }
+
+        // Le commentaire saisi sur la protection (« Gants anti-coupure », ce que recouvre un
+        // « Divers obligation »...) : le picto seul ne le dit pas, une ligne par protection commentee
+        foreach ($protections as $protection) {
+            if (!dol_strlen($protection['comment'])) {
+                continue;
+            }
+            $pdf->SetFont('', '', $size - 2);
+            $pdf->SetTextColor(40, 40, 40);
+            $html = '<b>' . dol_escape_htmltag($protection['name']) . '</b> : ' . dol_escape_htmltag($protection['comment']);
+            $pdf->writeHTMLCell($width - 4, $this->height, $this->marge_gauche + 2, $pdf->GetY(), $html, 0, 1, false, true, 'L');
+            $pdf->SetTextColor(0, 0, 0);
+        }
+    }
+
+    /**
+     * Hauteur des commentaires de protection imprimes sous les pictos.
+     *
+     * getNumLines ne sait pas mesurer du HTML : la hauteur est estimee sur le texte brut, en gras
+     * pour ne pas la sous-estimer.
+     *
+     * @param  TCPDF $pdf         PDF handler
+     * @param  array $protections Protections du risque
+     * @param  float $size        Taille de police
+     * @return float              Hauteur en mm
+     */
+    protected function measureProtectionComments($pdf, array $protections, float $size): float
+    {
+        $height = 0;
+
+        $pdf->SetFont('', 'B', $size - 2);
+        foreach ($protections as $protection) {
+            if (dol_strlen($protection['comment'])) {
+                $height += $pdf->getNumLines($protection['name'] . ' : ' . $protection['comment'], $this->contentWidth($pdf) - 4) * $this->height;
+            }
+        }
+
+        return $height;
     }
 
     /**
@@ -1212,7 +1475,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
 
         $this->checkPageBreak($pdf, 8 + $rowCount * ($photoHeight + 4));
 
-        $this->blockLabel($pdf, $outputLangs->transnoentities('PreventionPlanRiskPhotos'), $size);
+        $this->blockLabel($pdf, $outputLangs->transnoentities($this->riskPhotosLabelKey), $size);
 
         $index = 0;
         while ($index < count($photos)) {
@@ -1252,7 +1515,12 @@ class pdf_preventionplandocument extends SaturneDocumentModel
     protected function sectionCertifications($pdf, $object, Translate $outputLangs, float $size)
     {
         $mobileCertifications = !empty($object->array_options['options_mobile_certifications']) ? json_decode($object->array_options['options_mobile_certifications'], true) : [];
+        $imageRows            = $this->imageRows($pdf, $this->documentImages('certifications'));
         if (empty($mobileCertifications)) {
+            // Sans certification, la partie ne s'imprime que pour ses images
+            if (!empty($imageRows)) {
+                $this->imagesOnlySection($pdf, $outputLangs->transnoentities('MobilePPCertifications'), $imageRows, $size);
+            }
             return;
         }
 
@@ -1279,6 +1547,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         }
 
         $this->table($pdf, $header, $rows, $widths, $size);
+        $this->drawImageRows($pdf, $imageRows);
     }
 
     /**
@@ -1313,12 +1582,10 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         global $conf;
 
         $signatory = new SaturneSignature($this->db, $this->module, $object->element);
-        
-        $masters   = $signatory->fetchSignatory('MasterWorker', $object->id, $object->element);
-        $exteriors = $signatory->fetchSignatory('ExtSocietyResponsible', $object->id, $object->element);
 
-        $master   = (is_array($masters) && !empty($masters)) ? array_shift($masters) : null;
-        $exterior = (is_array($exteriors) && !empty($exteriors)) ? array_shift($exteriors) : null;
+        // Not the first row returned: a role can hold several rows, in no fixed order
+        $master   = digiriskGetCurrentSignatory($signatory, 'MasterWorker', (int) $object->id, $object->element);
+        $exterior = digiriskGetCurrentSignatory($signatory, 'ExtSocietyResponsible', (int) $object->id, $object->element);
 
         $gap       = 6;
         $boxWidth  = ($this->contentWidth($pdf) - $gap) / 2;
@@ -1354,8 +1621,8 @@ class pdf_preventionplandocument extends SaturneDocumentModel
 
             $labelWidth = $boxWidth * 0.34;
             $rows       = [
-                [$outputLangs->transnoentities('Lastname'), is_object($signatory) ? dol_strtoupper($signatory->lastname ?? '') : ''],
-                [$outputLangs->transnoentities('Firstname'), is_object($signatory) ? ucfirst($signatory->firstname ?? '') : ''],
+                [$outputLangs->transnoentities('Lastname'), (is_object($signatory) && !empty($signatory->lastname)) ? dol_strtoupper($signatory->lastname) : ''],
+                [$outputLangs->transnoentities('Firstname'), (is_object($signatory) && !empty($signatory->firstname)) ? ucfirst($signatory->firstname) : ''],
                 [$outputLangs->transnoentities('Email'), is_object($signatory) ? ($signatory->email ?? '') : ''],
                 [$outputLangs->transnoentities('Phone'), is_object($signatory) ? ($signatory->phone ?? '') : ''],
                 [$outputLangs->transnoentities('Date'), (is_object($signatory) && !empty($signatory->signature_date)) ? dol_print_date($signatory->signature_date, 'day', 'tzuser') : ''],

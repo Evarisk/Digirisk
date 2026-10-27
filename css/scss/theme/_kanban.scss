@@ -1,0 +1,35 @@
+/* Digirisk modern theme: PAPRIPACT (action plan) bars and kanban, aligned on the other cards */
+
+#{$dr-scope} {
+  .actionplan-project-bar,
+  .actionplan-filter-bar,
+  .actionplan-year-bar,
+  .actionplan-progress {
+    border-color: $dr-border;
+    border-radius: $dr-radius-lg;
+    box-shadow: $dr-shadow-sm;
+  }
+
+  .kanban-column {
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius-lg;
+    background: $dr-surface-soft;
+    box-shadow: none;
+  }
+
+  .kanban-column-header {
+    border-bottom: 1px solid $dr-border;
+    border-radius: $dr-radius-lg $dr-radius-lg 0 0;
+    color: $dr-text;
+  }
+
+  .kanban-card {
+    border: 1px solid $dr-border;
+    border-radius: 12px;
+    box-shadow: $dr-shadow-sm;
+
+    &:hover {
+      box-shadow: $dr-shadow-hover;
+    }
+  }
+}

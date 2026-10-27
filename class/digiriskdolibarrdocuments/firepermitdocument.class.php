@@ -27,6 +27,7 @@ require_once __DIR__ . '/../../../saturne/class/saturnedocuments.class.php';
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../digiriskdocuments.class.php';
 require_once __DIR__ . '/../digiriskresources.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
 /**
  * Class for FirePermitDocument.
@@ -82,19 +83,19 @@ class FirePermitDocument extends DigiriskDocuments
             $firepermit->fetch($signatory->fk_object);
         }
 
-		$firepermitlines     = $firepermitline->fetchAll('', '', 0, 0, array(), 'AND', GETPOST('id'));
-		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, array(), 'AND', $firepermit->fk_preventionplan);
+		// fetchAll n'a pas de parametre d'identifiant parent : passe en 7e argument il etait ignore, et le
+		// document reprenait les lignes de TOUS les permis de feu et de TOUS les plans de prevention
+		$firepermitlines     = $firepermitline->fetchAll('', '', 0, 0, array('fk_firepermit' => $firepermit->id));
+		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, array('fk_preventionplan' => $firepermit->fk_preventionplan));
 		$digirisk_resources  = $resources->fetchDigiriskResources();
 
 		$extsociety          = $resources->fetchResourcesFromObject('ExtSociety', $firepermit);
 		if ($extsociety < 1) {
 			$extsociety = new stdClass();
 		}
-		$maitreoeuvre           = $signatory->fetchSignatory('MasterWorker', $firepermit->id, 'firepermit');
-		$maitreoeuvre           = is_array($maitreoeuvre) ? array_shift($maitreoeuvre) : $maitreoeuvre;
-
-		$extsocietyresponsible  = $signatory->fetchSignatory('ExtSocietyResponsible', $firepermit->id, 'firepermit');
-		$extsocietyresponsible  = is_array($extsocietyresponsible) ? array_shift($extsocietyresponsible) : $extsocietyresponsible;
+		// Not the first row returned: a role can hold several rows, in no fixed order
+		$maitreoeuvre          = digiriskGetCurrentSignatory($signatory, 'MasterWorker', (int) $firepermit->id, 'firepermit');
+		$extsocietyresponsible = digiriskGetCurrentSignatory($signatory, 'ExtSocietyResponsible', (int) $firepermit->id, 'firepermit');
 
 		$extsocietyintervenants = $signatory->fetchSignatory('ExtSocietyAttendant', $firepermit->id, 'firepermit');
 		$labourinspector        = $resources->fetchResourcesFromObject('LabourInspector', $firepermit);
