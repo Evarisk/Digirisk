@@ -64,7 +64,7 @@ $rpsGridFamily  = '';
 $rpsPointScale = [1 => $rpsScale[1], 2 => $rpsScale[2], 3 => $rpsScale[3]];
 
 ?>
-<div class="wpeo-modal modal-close-only-with-button" id="rps_eval_modal" data-element="<?php echo (int) $object->id; ?>" data-method="<?php echo $rpsActiveMethod; ?>">
+<div class="wpeo-modal" id="rps_eval_modal" data-element="<?php echo (int) $object->id; ?>" data-method="<?php echo $rpsActiveMethod; ?>">
     <div class="modal-container rps-modal-container">
 
         <div class="modal-header">
