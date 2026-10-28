@@ -7123,12 +7123,6 @@ parameters:
 			path: view/accidentinvestigation/accidentinvestigation_actions.php
 
 		-
-			message: '#^Parameter \#3 \$type of function getAccidentInvestigationActionContainerTask expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: view/accidentinvestigation/accidentinvestigation_actions.php
-
-		-
 			message: '#^Parameter \#4 \$month of function dol_mktime expects int, string given\.$#'
 			identifier: argument.type
 			count: 1

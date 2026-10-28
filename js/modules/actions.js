@@ -15,33 +15,33 @@
  */
 
 /**
- * \file    js/modules/accidentinvestigation.js
+ * \file    js/modules/actions.js
  * \ingroup digiriskdolibarr
- * \brief   JavaScript of the actions tab of the accident investigation: the add button of the header of each
- *          section (curative, corrective) opens the add-action form of that section, the progress of an
- *          action is dragged on its slider then saved on release, and the Gantt of the actions is laid out.
+ * \brief   JavaScript of the actions tabs (accident investigation, ticket): the add button of the header of each
+ *          section opens the add-action form of that section, the progress of an action is dragged on its
+ *          slider then saved on release, and the Gantt of the actions is laid out.
  */
 
 'use strict';
 
 /**
- * Init the accidentinvestigation object and its mandatory "init" method.
+ * Init the actions object and its mandatory "init" method.
  */
-window.digiriskdolibarr.accidentinvestigation = {};
+window.digiriskdolibarr.actions = {};
 
 /**
  * Automatically called by the DigiriskDolibarr library.
  *
  * @return {void}
  */
-window.digiriskdolibarr.accidentinvestigation.init = function() {
-    if (!$('.accidentinvestigation-action-add, .accidentinvestigation-progress__slider').length) {
+window.digiriskdolibarr.actions.init = function() {
+    if (!$('.digirisk-actions-add, .digirisk-actions-progress__slider').length) {
         return;
     }
 
-    window.digiriskdolibarr.accidentinvestigation.event();
-    $('.accidentinvestigation-progress__slider').each(window.digiriskdolibarr.accidentinvestigation.refreshProgress);
-    window.digiriskdolibarr.accidentinvestigation.drawGantt();
+    window.digiriskdolibarr.actions.event();
+    $('.digirisk-actions-progress__slider').each(window.digiriskdolibarr.actions.refreshProgress);
+    window.digiriskdolibarr.actions.drawGantt();
 };
 
 /**
@@ -49,11 +49,11 @@ window.digiriskdolibarr.accidentinvestigation.init = function() {
  *
  * @return {void}
  */
-window.digiriskdolibarr.accidentinvestigation.event = function() {
-    $(document).on('click', '.accidentinvestigation-action-add', window.digiriskdolibarr.accidentinvestigation.toggleActionForm);
-    $(document).on('click', '.accidentinvestigation-action-form__cancel', window.digiriskdolibarr.accidentinvestigation.closeActionForm);
-    $(document).on('input', '.accidentinvestigation-progress__slider', window.digiriskdolibarr.accidentinvestigation.refreshProgress);
-    $(document).on('change', '.accidentinvestigation-progress__slider', window.digiriskdolibarr.accidentinvestigation.saveProgress);
+window.digiriskdolibarr.actions.event = function() {
+    $(document).on('click', '.digirisk-actions-add', window.digiriskdolibarr.actions.toggleActionForm);
+    $(document).on('click', '.digirisk-actions-form__cancel', window.digiriskdolibarr.actions.closeActionForm);
+    $(document).on('input', '.digirisk-actions-progress__slider', window.digiriskdolibarr.actions.refreshProgress);
+    $(document).on('change', '.digirisk-actions-progress__slider', window.digiriskdolibarr.actions.saveProgress);
 };
 
 /**
@@ -62,7 +62,7 @@ window.digiriskdolibarr.accidentinvestigation.event = function() {
  * @param  {Event} event Click on the add button.
  * @return {void}
  */
-window.digiriskdolibarr.accidentinvestigation.toggleActionForm = function(event) {
+window.digiriskdolibarr.actions.toggleActionForm = function(event) {
     event.preventDefault();
 
     const $form = $('#' + $(this).data('form'));
@@ -77,8 +77,8 @@ window.digiriskdolibarr.accidentinvestigation.toggleActionForm = function(event)
  *
  * @return {void}
  */
-window.digiriskdolibarr.accidentinvestigation.closeActionForm = function() {
-    $(this).closest('.accidentinvestigation-action-form').addClass('hideobject');
+window.digiriskdolibarr.actions.closeActionForm = function() {
+    $(this).closest('.digirisk-actions-form').addClass('hideobject');
 };
 
 /**
@@ -86,13 +86,13 @@ window.digiriskdolibarr.accidentinvestigation.closeActionForm = function() {
  *
  * @return {void}
  */
-window.digiriskdolibarr.accidentinvestigation.refreshProgress = function() {
+window.digiriskdolibarr.actions.refreshProgress = function() {
     const $slider = $(this);
     const value   = parseInt($slider.val(), 10) || 0;
 
     this.style.setProperty('--progress', value + '%');
-    $slider.siblings('.accidentinvestigation-progress__value').text(value + ' %');
-    $slider.closest('.accidentinvestigation-progress').toggleClass('accidentinvestigation-progress--done', value >= 100);
+    $slider.siblings('.digirisk-actions-progress__value').text(value + ' %');
+    $slider.closest('.digirisk-actions-progress').toggleClass('digirisk-actions-progress--done', value >= 100);
 };
 
 /**
@@ -101,16 +101,16 @@ window.digiriskdolibarr.accidentinvestigation.refreshProgress = function() {
  *
  * @return {void}
  */
-window.digiriskdolibarr.accidentinvestigation.saveProgress = function() {
+window.digiriskdolibarr.actions.saveProgress = function() {
     const $slider   = $(this);
-    const $progress = $slider.closest('.accidentinvestigation-progress');
+    const $progress = $slider.closest('.digirisk-actions-progress');
     const rowId     = $slider.closest('tr').attr('id');
     const value     = $slider.val();
 
     // The arrow keys fire a change at each step: only the last one is saved
     clearTimeout($slider.data('saveTimer'));
     $slider.data('saveTimer', setTimeout(function() {
-        $progress.addClass('accidentinvestigation-progress--saving');
+        $progress.addClass('digirisk-actions-progress--saving');
 
         $.ajax({
             url: window.location.href.replace(/#.*/, ''),
@@ -131,21 +131,21 @@ window.digiriskdolibarr.accidentinvestigation.saveProgress = function() {
                 const $newRow = $page.find('#' + rowId);
                 if ($newRow.length) {
                     $('#' + rowId).replaceWith($newRow);
-                    $newRow.find('.accidentinvestigation-progress__slider').each(window.digiriskdolibarr.accidentinvestigation.refreshProgress);
+                    $newRow.find('.digirisk-actions-progress__slider').each(window.digiriskdolibarr.actions.refreshProgress);
                 }
-                $page.find('[id^="accidentinvestigation-actions-counter-"]').each(function() {
+                $page.find('[id^="digirisk-actions-counter-"]').each(function() {
                     $('#' + this.id).replaceWith(this);
                 });
-                $('#accidentinvestigation-gantt').replaceWith($page.find('#accidentinvestigation-gantt'));
-                window.digiriskdolibarr.accidentinvestigation.drawGantt();
+                $('#digirisk-actions-gantt').replaceWith($page.find('#digirisk-actions-gantt'));
+                window.digiriskdolibarr.actions.drawGantt();
             },
             error: function() {
                 // Back to the saved progress, which the value attribute still holds
                 $slider.val($slider.attr('value'));
-                window.digiriskdolibarr.accidentinvestigation.refreshProgress.call($slider[0]);
+                window.digiriskdolibarr.actions.refreshProgress.call($slider[0]);
             },
             complete: function() {
-                $progress.removeClass('accidentinvestigation-progress--saving');
+                $progress.removeClass('digirisk-actions-progress--saving');
             }
         });
     }, 300));
@@ -157,16 +157,16 @@ window.digiriskdolibarr.accidentinvestigation.saveProgress = function() {
  *
  * @return {void}
  */
-window.digiriskdolibarr.accidentinvestigation.drawGantt = function() {
-    const $gantt = $('#accidentinvestigation-gantt');
+window.digiriskdolibarr.actions.drawGantt = function() {
+    const $gantt = $('#digirisk-actions-gantt');
 
     $gantt.find('[data-position]').each(function() {
         this.style.setProperty('--position', this.dataset.position + '%');
     });
-    $gantt.find('.accidentinvestigation-gantt__bar').each(function() {
+    $gantt.find('.digirisk-actions-gantt__bar').each(function() {
         this.style.setProperty('--start', this.dataset.start + '%');
         this.style.setProperty('--length', this.dataset.length + '%');
         this.style.setProperty('--progress', this.dataset.progress + '%');
     });
-    $gantt.addClass('accidentinvestigation-gantt--drawn');
+    $gantt.addClass('digirisk-actions-gantt--drawn');
 };

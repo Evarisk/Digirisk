@@ -43,6 +43,7 @@ dol_include_once('/saturne/class/task/saturnetask.class.php');
 require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../class/accidentinvestigation.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accidentinvestigation.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_action.lib.php';
 
 // Load translation files required by the page
 saturne_load_langs();
@@ -51,7 +52,7 @@ saturne_load_langs();
 $id          = GETPOST('id', 'int');
 $ref         = GETPOST('ref', 'alpha');
 $action      = GETPOST('action', 'aZ09');
-$action_type = GETPOST('action_type', 'int');
+$action_type = GETPOSTINT('action_type');
 $taskid      = GETPOST('taskid', 'int');
 $cancel      = GETPOST('cancel', 'aZ09');
 
@@ -94,7 +95,7 @@ if ($action === 'addAction' && $permissiontoadd) {
     $accident->fetch($object->fk_accident);
 
     // Actions are grouped under the T1/T2 container task created when the investigation is validated
-    $containerTaskId = getAccidentInvestigationActionContainerTask($db, (int) $object->fk_task, $action_type);
+    $containerTaskId = digiriskdolibarr_get_action_container_task($db, (int) $object->fk_task, $action_type);
 
     // Each section renders its own form, so field names are suffixed with the action type
     $deadlinePrefix = 'actiondeadline' . $action_type;
@@ -190,172 +191,12 @@ if ($id > 0 || !empty($ref)) {
 
         $actionsByType = [];
         foreach (array_keys($sectionConfig) as $type) {
-            $actionsByType[$type] = getAccidentInvestigationActionsByType($db, (int) $object->fk_task, $type);
+            $actionsByType[$type] = digiriskdolibarr_get_actions_by_type($db, (int) $object->fk_task, $type);
         }
 
-        // Gantt of every action, above their sections
-        include __DIR__ . '/../../core/tpl/accidentinvestigation/digiriskdolibarr_accidentinvestigation_actions_gantt.tpl.php';
-
-        foreach ($sectionConfig as $type => $cfg) {
-            $actions = $actionsByType[$type];
-            $total   = count($actions);
-            $done    = 0;
-            foreach ($actions as $row) {
-                if ((int) $row->progress >= 100) {
-                    $done++;
-                }
-            }
-
-            $formId = 'digirisk-add-action-form-' . $type;
-
-            print '<div class="div-table-responsive" style="margin-bottom:24px">';
-
-            // Section header, with the add button on the right like the lists of Dolibarr
-            $sectionTitle  = $langs->trans($cfg['titleKey']);
-            $sectionTitle .= ' <span id="accidentinvestigation-actions-counter-' . $type . '" class="badge badge-secondary marginleftonlyshort">' . $langs->trans('XActionsOfY', $done, $total) . '</span>';
-            $addButtonParams = ['forcenohideoftext' => 1];
-            if ($permissiontoadd) {
-                $addButtonParams['attr'] = ['class' => 'accidentinvestigation-action-add', 'data-form' => $formId];
-            }
-            print load_fiche_titre($sectionTitle, dolGetButtonTitle($langs->trans($cfg['addKey']), '', 'fa fa-plus-circle', '#', '', $permissiontoadd ? 1 : 0, $addButtonParams), '');
-
-            // Add-action form, opened by the add button of the header
-            if ($permissiontoadd) {
-                print '<div id="' . $formId . '" class="accidentinvestigation-action-form hideobject">';
-                print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '">';
-                print '<input type="hidden" name="token" value="' . newToken() . '">';
-                print '<input type="hidden" name="action" value="addAction">';
-                print '<input type="hidden" name="action_type" value="' . $type . '">';
-                print '<table class="centpercent"><tr>';
-
-                print '<td class="accidentinvestigation-action-form__label">';
-                print '<label>' . $langs->trans('ActionLabel') . ' *</label><br>';
-                print '<input type="text" name="action_label" class="minwidth300" required>';
-                print '</td>';
-
-                print '<td class="accidentinvestigation-action-form__deadline">';
-                print '<label>' . $langs->trans('ActionDeadline') . '</label><br>';
-                // Prefix suffixed with the type: both sections are rendered on the same page and
-                // the datepicker fills its hidden day/month/year fields through getElementById
-                print $form->selectDate('', 'actiondeadline' . $type, 0, 0, 1, 'addActionForm' . $type);
-                print '</td>';
-
-                print '<td class="accidentinvestigation-action-form__assignee">';
-                print '<label>' . $langs->trans('ActionAssignedTo') . '</label><br>';
-                print $form->select_dolusers('', 'assigned_user' . $type, 1, null, 0, '', '', 0, 0, 0, '', 0, '', 'minwidth200 maxwidth300');
-                print '</td>';
-
-                print '<td class="accidentinvestigation-action-form__buttons nowraponall">';
-                print '<button type="submit" class="butAction butActionShort">' . $langs->trans('Add') . '</button>';
-                print '<button type="button" class="butActionDelete butActionShort accidentinvestigation-action-form__cancel">' . $langs->trans('Cancel') . '</button>';
-                print '</td>';
-
-                print '</tr></table>';
-                print '</form>';
-                print '</div>';
-            }
-
-            // Table
-            print '<table class="tagtable liste" width="100%">';
-            print '<thead><tr class="liste_titre">';
-            print '<th class="liste_titre" width="20">&nbsp;</th>';
-            print '<th class="liste_titre">' . $langs->trans('Ref') . '</th>';
-            print '<th class="liste_titre">' . $langs->trans('ActionLabel') . '</th>';
-            print '<th class="liste_titre">' . $langs->trans('ActionAssignedTo') . '</th>';
-            print '<th class="liste_titre">' . $langs->trans('ActionDeadline') . '</th>';
-            print '<th class="liste_titre" width="200">' . $langs->trans('ActionProgress') . '</th>';
-            print '<th class="liste_titre">' . $langs->trans('Status') . '</th>';
-            print '<th class="liste_titre" width="40">&nbsp;</th>';
-            print '</tr></thead>';
-            print '<tbody>';
-
-            if (empty($actions)) {
-                print '<tr><td colspan="8" class="opacitymedium center" style="padding:14px">';
-                print $langs->trans('NoActionsYet');
-                print '</td></tr>';
-            }
-
-            foreach ($actions as $row) {
-                $pct    = max(0, min(100, (int) $row->progress));
-                $isDone = ($pct >= 100);
-                print '<tr id="accidentinvestigation-action-' . ((int) $row->rowid) . '" class="oddeven">';
-
-                // Checkbox to close action
-                print '<td class="center">';
-                if ($permissiontoadd) {
-                    if (!$isDone) {
-                        print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '" style="margin:0">';
-                        print '<input type="hidden" name="token" value="' . newToken() . '">';
-                        print '<input type="hidden" name="action" value="closeAction">';
-                        print '<input type="hidden" name="taskid" value="' . ((int) $row->rowid) . '">';
-                        print '<input type="checkbox" title="' . dol_escape_htmltag($langs->trans('MarkAsDone')) . '" onchange="this.form.submit()">';
-                        print '</form>';
-                    } else {
-                        print '<input type="checkbox" checked disabled>';
-                    }
-                }
-                print '</td>';
-
-                // Ref (link to task)
-                print '<td>';
-                print '<a href="' . dol_buildpath('/projet/tasks/task.php', 1) . '?id=' . ((int) $row->rowid) . '" target="_blank">';
-                print dol_escape_htmltag($row->ref);
-                print '</a></td>';
-
-                // Label
-                print '<td>' . dol_escape_htmltag($row->label) . '</td>';
-
-                // Assignee
-                $assignee = !empty($row->user_fullname) ? trim($row->user_fullname) : '';
-                print '<td>' . ($assignee !== '' ? dol_escape_htmltag($assignee) : '&mdash;') . '</td>';
-
-                // Deadline
-                print '<td>';
-                if (!empty($row->datee) && $row->datee !== '0000-00-00 00:00:00') {
-                    print dol_print_date($db->jdate($row->datee), 'day');
-                } else {
-                    print '&mdash;';
-                }
-                print '</td>';
-
-                // Progress: the slider is dragged to change it and saved on release by accidentinvestigation.js
-                print '<td>';
-                print '<div class="accidentinvestigation-progress' . ($isDone ? ' accidentinvestigation-progress--done' : '') . '">';
-                print '<input type="range" class="accidentinvestigation-progress__slider" min="0" max="100" step="1" value="' . $pct . '"';
-                print ' data-task-id="' . ((int) $row->rowid) . '" aria-label="' . dol_escape_htmltag($langs->trans('ActionProgress')) . '"' . ($permissiontoadd ? '' : ' disabled') . '>';
-                print '<span class="accidentinvestigation-progress__value">' . $pct . ' %</span>';
-                print '</div>';
-                print '</td>';
-
-                // Status
-                print '<td>' . $task->LibStatut((int) $row->fk_statut, 4) . '</td>';
-
-                // External link
-                print '<td class="right">';
-                print '<a href="' . dol_buildpath('/projet/tasks/task.php', 1) . '?id=' . ((int) $row->rowid) . '" target="_blank"';
-                print ' title="' . dol_escape_htmltag($langs->trans('OpenTask')) . '">';
-                print '<i class="fas fa-external-link-alt"></i>';
-                print '</a>';
-                print '</td>';
-
-                print '</tr>';
-            }
-
-            print '</tbody></table>';
-
-            print '</div>'; // div-table-responsive
-        }
-
-        // Footer note
-        print '<div class="opacitymedium" style="font-size:0.85em;text-align:right;margin-top:4px">';
-        print $langs->trans('ActionsAreProjectTasks');
-        if ((int) $object->fk_task > 0) {
-            print '&nbsp;&mdash;&nbsp;';
-            print '<a href="' . dol_buildpath('/projet/tasks/task.php', 1) . '?id=' . ((int) $object->fk_task) . '" target="_blank">';
-            print $langs->trans('SeeProjectTasksView');
-            print '</a>';
-        }
-        print '</div>';
+        $actionsFormUrl      = $_SERVER['PHP_SELF'] . '?id=' . $id;
+        $actionsParentTaskId = (int) $object->fk_task;
+        include __DIR__ . '/../../core/tpl/actions/digiriskdolibarr_actions_sections.tpl.php';
     }
 
     print '</div>'; // fichecenter
