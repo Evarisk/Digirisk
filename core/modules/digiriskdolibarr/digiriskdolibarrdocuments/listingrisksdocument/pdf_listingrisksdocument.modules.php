@@ -25,9 +25,9 @@
  */
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
-require_once __DIR__ . '/../../../../../../saturne/lib/medias.lib.php';
-require_once __DIR__ . '/../../../../../../saturne/lib/dolibarr.lib.php';
+dol_include_once('/saturne/core/modules/saturne/modules_saturne.php');
+dol_include_once('/saturne/lib/medias.lib.php');
+dol_include_once('/saturne/lib/dolibarr.lib.php');
 
 /**
  * Class to build the listing risks document as a PDF.

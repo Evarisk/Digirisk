@@ -25,11 +25,11 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../digiriskelement.class.php';
-require_once __DIR__ . '/../../../saturne/class/task/saturnetask.class.php';
+dol_include_once('/saturne/class/task/saturnetask.class.php');
 require_once __DIR__ . '/riskassessment.class.php';
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../saturne/class/saturneobject.class.php';
+dol_include_once('/saturne/class/saturneobject.class.php');
 
 /**
  * Class for Risk

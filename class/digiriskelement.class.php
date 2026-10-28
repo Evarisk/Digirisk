@@ -25,7 +25,7 @@
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 // Load Saturne libraries.
-require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
+dol_include_once('/saturne/class/saturneobject.class.php');
 
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/riskanalysis/risk.class.php';
@@ -1030,7 +1030,7 @@ class DigiriskElement extends SaturneObject
         global $conf, $langs;
 
         require_once __DIR__ . '/digiriskstandard.class.php';
-        require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
+        dol_include_once('/saturne/class/task/saturnetask.class.php');
 
         $digiriskStandard = new DigiriskStandard($this->db);
         $digiriskStandard->fetch($this->fk_standard);

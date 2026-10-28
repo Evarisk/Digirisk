@@ -600,10 +600,10 @@ if (empty($reshook)) {
     include_once __DIR__ . '/../../core/tpl/accident/digiriskdolibarr_accident_lesion_actions.tpl.php';
 
     // Action confirm_lock, confirm_archive.
-	require_once __DIR__ . '/../../../saturne/core/tpl/signature/signature_action_workflow.tpl.php';
+	require_once dol_buildpath('/saturne/core/tpl/signature/signature_action_workflow.tpl.php');
 
     // Actions set_thirdparty, set_project
-    require_once __DIR__ . '/../../../saturne/core/tpl/actions/banner_actions.tpl.php';
+    require_once dol_buildpath('/saturne/core/tpl/actions/banner_actions.tpl.php');
 }
 
 /*

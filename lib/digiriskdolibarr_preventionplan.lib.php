@@ -448,7 +448,7 @@ function digiriskShareGeneratedFile(DoliDB $db, string $fileName, string $tableE
  */
 function digiriskPreventionPlanReusableContent(DoliDB $db, PreventionPlan $plan): array
 {
-    require_once __DIR__ . '/../../saturne/class/saturneschedules.class.php';
+    dol_include_once('/saturne/class/saturneschedules.class.php');
 
     $plan->fetch_optionals();
 

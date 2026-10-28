@@ -37,7 +37,7 @@ global $conf, $db, $hookmanager, $langs, $user;
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../saturne/class/task/saturnetask.class.php';
+dol_include_once('/saturne/class/task/saturnetask.class.php');
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/accident.class.php';

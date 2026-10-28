@@ -68,7 +68,7 @@ saturne_check_access($permissiontoread);
  */
 
 // Actions update_mask
-require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
+require_once dol_buildpath('/saturne/core/tpl/actions/admin_conf_actions.tpl.php');
 
 // Les deux méthodes d'évaluation des RPS restent proposées tant que leur constante n'existe pas :
 // sans cette création, une installation mise à jour sans réactivation du module afficherait deux
@@ -183,7 +183,7 @@ print '<hr>';
 $object          = new Risk($db);
 $objectModSubdir = 'riskanalysis';
 
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php');
 
 $areRisksShared = !empty($mc->entities['risk']) ? strpos($mc->entities['risk'], $conf->entity) : 0;
 $areRisksSharable = isModEnabled('multicompany') && !empty($mc->sharings['risk']) && $areRisksShared > 0;
@@ -257,7 +257,7 @@ $constArray[$moduleNameLowerCase] = [
     ],
 ];
 
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_const_view.tpl.php');
 
 // Risk Assessments
 print load_fiche_titre('<i class="fas fa-exclamation-circle"></i> ' . $langs->trans('RiskAssessmentConfig'), '', '');
@@ -266,7 +266,7 @@ print '<hr>';
 $object          = new RiskAssessment($db);
 $objectModSubdir = 'riskanalysis';
 
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php');
 
 $constArray[$moduleNameLowerCase] = [
 	'AdvancedRiskAssessmentMethod' => [
@@ -296,7 +296,7 @@ $constArray[$moduleNameLowerCase] = [
     ]
 ];
 
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_const_view.tpl.php');
 
 // Tasks
 print load_fiche_titre('<i class="fas fa-tasks"></i> ' . $langs->trans("TaskConfig"), '', '');
@@ -403,7 +403,7 @@ $constArray[$moduleNameLowerCase] = [
     ]
 ];
 
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_const_view.tpl.php');
 
 // Click on a tuto image to display it full size
 digiriskdolibarr_tuto_overlay();
@@ -435,7 +435,7 @@ print '<hr>';
 $object          = new Evaluator($db);
 $objectModSubdir = 'digiriskelement';
 
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php');
 
 print load_fiche_titre($langs->trans("DigiriskEvaluatorData"), '', '');
 
@@ -467,7 +467,7 @@ print '<hr>';
 $object          = new RiskSign($db);
 $objectModSubdir = 'riskanalysis';
 
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php');
 
 $areRiskSignsShared    = !empty($mc->entities['risksign']) ? strpos($mc->entities['risksign'], $conf->entity) : 0;
 $areRisksSignsSharable = isModEnabled('multicompany') && !empty($mc->sharings['risksign']) && $areRiskSignsShared > 0;
@@ -486,7 +486,7 @@ $constArray[$moduleNameLowerCase] = [
 
     ],
 ];
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_const_view.tpl.php');
 
 // Page end
 print dol_get_fiche_end();

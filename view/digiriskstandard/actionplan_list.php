@@ -37,7 +37,7 @@ require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formprojet.class.php';
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../saturne/class/task/saturnetask.class.php';
+dol_include_once('/saturne/class/task/saturnetask.class.php');
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
@@ -555,7 +555,7 @@ if ($action == 'builddoc' && GETPOST('model', 'alpha') == getDolGlobalString('DI
         $moreParams      = ['modulePart' => 'project', 'actionPlanFilters' => $actionPlanFilters];
         $shouldRedirect  = false;
 
-        require __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
+        require dol_buildpath('/saturne/core/tpl/documents/documents_action.tpl.php');
 
         if (!empty($document->last_main_doc)) {
             $downloadUrl = DOL_URL_ROOT . '/document.php?modulepart=project&file=' . urlencode($project->ref . '/' . $document->last_main_doc) . '&entity=' . $conf->entity;

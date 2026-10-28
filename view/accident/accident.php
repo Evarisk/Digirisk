@@ -77,7 +77,7 @@ saturne_check_access($permissiontoread);
  * Actions
  */
 
-require_once __DIR__ . '/../../../saturne/core/tpl/actions/dashboard_actions.tpl.php';
+require_once dol_buildpath('/saturne/core/tpl/actions/dashboard_actions.tpl.php');
 
 /*
  * View
@@ -108,7 +108,7 @@ $moreParams = [
     'specialModuleNameLowerCase' => 'digirisk'
 ];
 
-require_once __DIR__ . '/../../../saturne/class/saturnedashboard.class.php';
+dol_include_once('/saturne/class/saturnedashboard.class.php');
 
 $dashboard = new SaturneDashboard($db, $moduleNameLowerCase);
 $dashboard->show_dashboard($moreParams);

@@ -303,7 +303,7 @@ class ActionsDigiriskdolibarr
 	{
 		global $conf, $db, $form, $langs, $object, $user;
 
-		require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
+		dol_include_once('/saturne/lib/saturne_functions.lib.php');
 
 		if (strpos($parameters['context'], 'admincompany') !== false) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			?>
@@ -401,7 +401,7 @@ class ActionsDigiriskdolibarr
 
                 $moduleNameLowerCase = 'digiriskdolibarr';
 
-                require_once __DIR__ . '/../../saturne/lib/documents.lib.php';
+                dol_include_once('/saturne/lib/documents.lib.php');
 
                 $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1];
                 $objRef     = dol_sanitizeFileName($object->ref);
@@ -667,7 +667,7 @@ class ActionsDigiriskdolibarr
         } else if (preg_match('/projectcard|projectcontactcard|projecttaskcard|projecttaskscard|projecttasktime|projectOverview|tasklist|category/', $parameters['context'])) {
 			if ((GETPOST('action') == '' || empty(GETPOST('action')) || GETPOST('action') != 'edit')) {
 				require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
-                require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
+                dol_include_once('/saturne/class/task/saturnetask.class.php');
 
 				$task        = new SaturneTask($db);
 				$project     = new Project($db);
@@ -836,7 +836,7 @@ class ActionsDigiriskdolibarr
                 $upload_dir          = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 
                 // Action to generate pdf from odt file
-                require __DIR__ . '/../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
+                require dol_buildpath('/saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php');
 
                 $urlToRedirect = $_SERVER['REQUEST_URI'];
                 $urlToRedirect = preg_replace('/#pdfGeneration$/', '', $urlToRedirect);
@@ -846,7 +846,7 @@ class ActionsDigiriskdolibarr
                 exit;
             }
 
-            require __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
+            require dol_buildpath('/saturne/core/tpl/documents/documents_action.tpl.php');
         } else if (strpos($parameters['context'], 'projectcard') !== false) {
             // The model is the one set as default on the documents configuration page, PAPRIPACT when none is
             if ($action == 'builddoc' && GETPOST('model') == getDolGlobalString('DIGIRISKDOLIBARR_PROJECTDOCUMENT_DEFAULT_MODEL', 'papripact_a3_paysage_projectdocument')) {
@@ -858,7 +858,7 @@ class ActionsDigiriskdolibarr
                 $permissiontoadd          = $user->rights->projet->creer;
                 $moreParams['modulePart'] = 'project';
 
-                require __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
+                require dol_buildpath('/saturne/core/tpl/documents/documents_action.tpl.php');
             }
         } else if (strpos($parameters['context'], 'projecttasktime') !== false) {
             if ($action == 'builddoc' && GETPOST('model', 'alpha') == 'timespent_projectdocument') {
@@ -890,7 +890,7 @@ class ActionsDigiriskdolibarr
                     'timeSpentDateEnd'   => dol_mktime(23, 59, 59, GETPOSTINT('timespent_date_endmonth'), GETPOSTINT('timespent_date_endday'), GETPOSTINT('timespent_date_endyear'))
                 ];
 
-                require __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
+                require dol_buildpath('/saturne/core/tpl/documents/documents_action.tpl.php');
             }
         } elseif (preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context'])) {
 			if ($action == 'list') {
@@ -1297,7 +1297,7 @@ class ActionsDigiriskdolibarr
 
         if (preg_match('/preventionplanlist|firepermitlist/', $parameters['context'])) {
             // Load Saturne libraries
-            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+            dol_include_once('/saturne/class/saturnesignature.class.php');
 
             $signatory = new SaturneSignature($this->db, 'digiriskdolibarr', $object->element);
 

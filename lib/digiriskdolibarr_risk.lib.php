@@ -61,7 +61,7 @@ function digiriskRiskAssessmentMediaBlock(string $subDir, ?RiskAssessment $riskA
     global $conf;
 
     require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-    require_once __DIR__ . '/../../saturne/lib/medias.lib.php';
+    dol_include_once('/saturne/lib/medias.lib.php');
 
     // The picking button opens the media library of the module, rendered by the risk pages
     $options = ['show_photo' => true, 'show_audio' => false, 'show_file' => false, 'show_library' => true];
@@ -172,7 +172,7 @@ function digiriskRiskAssessmentMovePhotos(string $workDir, RiskAssessment $riskA
 
     require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
     require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
-    require_once __DIR__ . '/../../saturne/lib/medias.lib.php';
+    dol_include_once('/saturne/lib/medias.lib.php');
 
     $photoDir = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $riskAssessment->ref;
     $moved    = [];

@@ -70,7 +70,7 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 }
 
 // Actions set_mod, update_mask
-require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
+require_once dol_buildpath('/saturne/core/tpl/actions/admin_conf_actions.tpl.php');
 
 /*
  * View
@@ -107,7 +107,7 @@ $object = new Accident($db);
 
 $objectModSubdir = 'digiriskelement';
 
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php');
 
 print load_fiche_titre('<i class="fas fa-user-injured"></i> ' . $langs->trans("AccidentWorkstopManagement"), '', '');
 
@@ -117,7 +117,7 @@ $object = new AccidentWorkStop($db);
 
 $objectModSubdir = 'digiriskelement';
 
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php');
 
 print load_fiche_titre('<i class="fas fa-user-injured"></i> ' . $langs->trans("AccidentLesionManagement"), '', '');
 
@@ -125,7 +125,7 @@ print '<hr>';
 
 $object = new AccidentLesion($db);
 
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php');
 
 print load_fiche_titre('<i class="fas fa-user-injured"></i> ' . $langs->trans("AccidentInvestigationManagement"), '', '');
 
@@ -135,7 +135,7 @@ $object = new AccidentInvestigation($db);
 
 $objectModSubdir = '';
 
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php');
 
 // Project
 if (isModEnabled('project')) {

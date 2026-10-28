@@ -27,7 +27,7 @@
  */
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
+dol_include_once('/saturne/class/saturneobject.class.php');
 
 /**
  * Class for FirePermitRound
@@ -270,7 +270,7 @@ class FirePermitRound extends SaturneObject
     public function saveSignature(User $user, string $signature): int
     {
         require_once DOL_DOCUMENT_ROOT . '/core/lib/ticket.lib.php';
-        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+        dol_include_once('/saturne/class/saturnesignature.class.php');
 
         $signatory = new SaturneSignature($this->db, $this->module, $this->element);
 
@@ -309,7 +309,7 @@ class FirePermitRound extends SaturneObject
      */
     public function getSignature(): string
     {
-        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+        dol_include_once('/saturne/class/saturnesignature.class.php');
 
         $signatory   = new SaturneSignature($this->db, $this->module, $this->element);
         $signatories = $signatory->fetchSignatory(self::SIGNATORY_ROLE, $this->id, $this->element);

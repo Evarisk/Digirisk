@@ -156,10 +156,10 @@ if (empty($reshook)) {
     $object->element = $object->element_type;
 
 	// Actions builddoc, forcebuilddoc, remove_file.
-	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
+	require_once dol_buildpath('/saturne/core/tpl/documents/documents_action.tpl.php');
 
 	// Action to generate pdf from odt file
-    require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
+    require_once dol_buildpath('/saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php');
 
     $object->element = 'digiriskelement';
 

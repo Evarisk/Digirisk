@@ -968,7 +968,7 @@ if ($conf->global->DIGIRISKDOLIBARR_ENCODE_BACKWARD_COMPATIBILITY == 0) {
 		$accident->update($user);
 	}
 
-	require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+	dol_include_once('/saturne/class/saturnesignature.class.php');
 
 	$signatory = new SaturneSignature($db, $moduleNameLowerCase);
 
