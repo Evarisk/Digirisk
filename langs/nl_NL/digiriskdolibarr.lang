@@ -1972,6 +1972,8 @@ TicketKanbanLogDeadline                = Wijziging van de uiterste datum
 TicketKanbanLogDeadlineDesc            = Een gebeurtenis aanmaken wanneer de uiterste datum van een ticket via het kanban wordt gewijzigd
 TicketKanbanClosedLimit                = Limiet gesloten tickets
 TicketKanbanClosedLimitDesc            = Maximaal aantal gesloten/geannuleerde tickets dat in het kanban wordt weergegeven (0 = onbeperkt)
+TicketLastMessageDate                  = Datum van het laatste bericht
+TicketElapsedTimeHelp                  = Verstreken tijd sinds het aanmaken, gestopt bij het sluiten
 
 # ===========================================================================
 # Ticket — traceerbaarheid van de wijzigingen — issue #4885

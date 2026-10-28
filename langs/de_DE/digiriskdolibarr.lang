@@ -1972,6 +1972,8 @@ TicketKanbanLogDeadline                = Änderung der Frist
 TicketKanbanLogDeadlineDesc            = Ein Ereignis anlegen, wenn die Frist eines Tickets über das Kanban geändert wird
 TicketKanbanClosedLimit                = Grenze für abgeschlossene Tickets
 TicketKanbanClosedLimitDesc            = Maximale Anzahl der im Kanban angezeigten abgeschlossenen/stornierten Tickets (0 = unbegrenzt)
+TicketLastMessageDate                  = Datum der letzten Nachricht
+TicketElapsedTimeHelp                  = Seit der Erstellung verstrichene Zeit, beim Schließen angehalten
 
 # ===========================================================================
 # Ticket — Nachvollziehbarkeit der Änderungen — issue #4885

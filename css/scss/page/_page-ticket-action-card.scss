@@ -1785,6 +1785,48 @@ $tac-border:       #e5e7eb;
     i { margin-right: 2px; }
 }
 
+// Indicators row: progress, time elapsed since creation, last message date.
+// Own class names: the actionplan .kanban-progress-bar is draggable through actionplan_kanban.js.
+.tac-picker-card__indicators {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    padding: 4px 0;
+    font-size: 10px;
+    color: $tac-grey;
+
+    i { margin-right: 2px; }
+}
+
+.tac-picker-card__progress {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.tac-picker-card__progress-track {
+    width: 56px;
+    height: 6px;
+    background: $tac-border;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.tac-picker-card__progress-fill {
+    display: block;
+    height: 100%;
+    background: $tac-green;
+    border-radius: 3px;
+}
+
+.tac-picker-card__elapsed,
+.tac-picker-card__last-msg {
+    white-space: nowrap;
+}
+
 // Subject link — looks like plain text but navigates on click.
 .tac-picker-card__subject-link {
     color: inherit;

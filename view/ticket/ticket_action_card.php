@@ -41,6 +41,7 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 // Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
@@ -548,7 +549,7 @@ if ($object->id <= 0) {
     $closedLimitClause = $closedLimit > 0 ? ' AND t.fk_statut NOT IN (' . $closedStatusList . ')' : '';
 
     $sqlTickets = 'SELECT t.rowid, t.ref, t.subject, t.fk_statut, t.datec, t.severity_code,'
-        . ' t.type_code, t.category_code,'
+        . ' t.type_code, t.category_code, t.progress, t.date_close,'
         . ' t.fk_user_assign, t.fk_soc,'
         . ' u.firstname as assign_firstname, u.lastname as assign_lastname, u.photo as assign_photo,'
         . ' s.nom as company_name'
@@ -562,7 +563,7 @@ if ($object->id <= 0) {
 
     if ($closedLimit > 0) {
         $sqlClosed = 'SELECT t.rowid, t.ref, t.subject, t.fk_statut, t.datec, t.severity_code,'
-            . ' t.type_code, t.category_code,'
+            . ' t.type_code, t.category_code, t.progress, t.date_close,'
             . ' t.fk_user_assign, t.fk_soc,'
             . ' u.firstname as assign_firstname, u.lastname as assign_lastname, u.photo as assign_photo,'
             . ' s.nom as company_name'
@@ -574,6 +575,20 @@ if ($object->id <= 0) {
             . ' ORDER BY t.datec DESC'
             . ' LIMIT ' . (int) $closedLimit;
     }
+
+    // Time elapsed since creation, same format as the ticket card, stopped at the closing date
+    $now                  = dol_now();
+    $getTicketElapsedTime =static function ($row) use ($db, $now): string {
+        $dateCreation = $db->jdate($row->datec);
+        if (empty($dateCreation)) {
+            return '';
+        }
+        $isClosed = in_array((int) $row->fk_statut, [Ticket::STATUS_CLOSED, Ticket::STATUS_CANCELED]);
+        $dateEnd  = ($isClosed && !empty($row->date_close)) ? $db->jdate($row->date_close) : $now;
+
+        return convertSecondToTime(roundUpToNextMultiple(max(0, $dateEnd - $dateCreation), 60));
+    };
+
     $resTickets = $db->query($sqlTickets);
     $ticketIds  = [];
     if ($resTickets) {
@@ -613,6 +628,9 @@ if ($object->id <= 0) {
                 'type_code'       => (string) ($row->type_code ?: ''),
                 'category_code'   => (string) ($row->category_code ?: ''),
                 'date_c'          => $row->datec ? dol_print_date($db->jdate($row->datec), 'day') : '',
+                'progress'        => min(100, max(0, (int) $row->progress)),
+                'elapsed'         => $getTicketElapsedTime($row),
+                'last_msg_date'   => 0,
                 'company_name'    => $row->company_name ?: '',
                 'assign_id'       => $assignId,
                 'assign_fullname' => $assignFullname,
@@ -665,6 +683,9 @@ if ($object->id <= 0) {
                     'type_code'       => (string) ($row->type_code ?: ''),
                     'category_code'   => (string) ($row->category_code ?: ''),
                     'date_c'          => $row->datec ? dol_print_date($db->jdate($row->datec), 'day') : '',
+                    'progress'        => min(100, max(0, (int) $row->progress)),
+                    'elapsed'         => $getTicketElapsedTime($row),
+                    'last_msg_date'   => 0,
                     'company_name'    => $row->company_name ?: '',
                     'assign_id'       => $assignId,
                     'assign_fullname' => $assignFullname,
@@ -697,9 +718,29 @@ if ($object->id <= 0) {
             }
             $db->free($resTktCats);
         }
+
+        // Last message of every ticket in one query: fk_element IN (...) keeps the actioncomm index
+        $sqlLastMsg = 'SELECT a.fk_element, MAX(a.datep) as last_msg_date'
+            . ' FROM ' . MAIN_DB_PREFIX . 'actioncomm a'
+            . ' WHERE a.fk_element IN (' . implode(',', $ticketIds) . ')'
+            . " AND a.elementtype = 'ticket'"
+            . " AND a.code LIKE 'TICKET_MSG%'"
+            . ' GROUP BY a.fk_element';
+        $resLastMsg      = $db->query($sqlLastMsg);
+        $lastMsgByTicket = [];
+        if ($resLastMsg) {
+            while ($row = $db->fetch_object($resLastMsg)) {
+                $lastMsgByTicket[(int) $row->fk_element] = $db->jdate($row->last_msg_date);
+            }
+            $db->free($resLastMsg);
+        }
+
         foreach ($pickerTicketsJson as &$t) {
             if (isset($catsByTicket[$t['id']])) {
                 $t['categories'] = $catsByTicket[$t['id']];
+            }
+            if (!empty($lastMsgByTicket[$t['id']])) {
+                $t['last_msg_date'] = $lastMsgByTicket[$t['id']];
             }
         }
         unset($t);
