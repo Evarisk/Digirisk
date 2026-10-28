@@ -262,7 +262,53 @@ class ActionsDigiriskdolibarr
             }
         }
 
+        // Tab of the corrective and preventive actions of a ticket (#5549), right after its contacts. Tested on the
+        // object: Dolibarr 23 does not give the type of the tabs to the hook
+        $object = $parameters['object'] ?? null;
+        if (($parameters['mode'] ?? '') === 'add' && ($parameters['filterorigmodule'] ?? '') === 'external' && $object instanceof Ticket && $object->id > 0) {
+            $this->addTicketActionsTab($parameters['head'], $object);
+        }
+
         return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Insert the tab of the corrective and preventive actions into the tabs of a ticket, with the number of actions
+     *
+     * @param  array  $head   Tabs of the ticket, a reference to the array of complete_head_from_modules()
+     * @param  Ticket $ticket Ticket
+     * @return void
+     */
+    private function addTicketActionsTab(array &$head, Ticket $ticket): void
+    {
+        global $db, $langs, $user;
+
+        if (!isModEnabled('project') || !$user->hasRight('projet', 'lire')) {
+            return;
+        }
+
+        require_once __DIR__ . '/../lib/digiriskdolibarr_ticket.lib.php';
+
+        $langs->load('digiriskdolibarr@digiriskdolibarr');
+
+        $actionsCount = 0;
+        foreach (digiriskdolibarr_ticket_count_actions(digiriskdolibarr_ticket_get_actions($db, digiriskdolibarr_ticket_get_parent_task($db, $ticket))) as $counter) {
+            $actionsCount += $counter['total'];
+        }
+
+        $tab = [
+            dol_buildpath('/digiriskdolibarr/view/ticket/ticket_actions.php', 1) . '?id=' . (int) $ticket->id,
+            '<i class="fas fa-tasks pictofixedwidth"></i>' . $langs->trans('TicketActionsTab') . ($actionsCount > 0 ? '<span class="badge marginleftonlyshort">' . $actionsCount . '</span>' : ''),
+            'digiriskactions',
+        ];
+
+        $position = count($head);
+        foreach (array_values($head) as $index => $existingTab) {
+            if (($existingTab[2] ?? '') === 'contact') {
+                $position = $index + 1;
+            }
+        }
+        array_splice($head, $position, 0, [$tab]);
     }
 
     /**
