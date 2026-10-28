@@ -368,6 +368,9 @@ class pdf_papripact_a3_paysage_projectdocument
 
 				$nblines = count($object->lines);
 
+				// The progress cell takes the color of the Kanban column the action stands in
+				$kanbanColumns = digiriskActionPlanGetKanbanColumns($this->db);
+
 				$pdf->Open();
 				$pagenb = 0;
 				$pdf->SetDrawColor(128, 128, 128);
@@ -476,7 +479,7 @@ class pdf_papripact_a3_paysage_projectdocument
                     $tmpArray += array("element" => $elementText);
 					$tmpArray += array("label" => $object->lines[$i]->label);
 					$tmpArray += array("budget" => $object->lines[$i]->budget_amount);
-					$tmpArray += array("progress" => $object->lines[$i]->progress ? $object->lines[$i]->progress . '%' : '');
+					$tmpArray += array("progress" => (int) $object->lines[$i]->progress);
 					$tmpArray += array("date_start" => $object->lines[$i]->date_start);
 					$tmpArray += array("date_end" => $object->lines[$i]->date_end);
 					$tmpArray += array("workload" =>  $object->lines[$i]->planned_workload);
@@ -514,14 +517,11 @@ class pdf_papripact_a3_paysage_projectdocument
 					$totalbudget      += (float) $objectDoc[$i]['budget'];
 
 					$showpricebeforepagebreak = 1;
-                    $labelHeightBefore = $pdf->GetY();
 					$pdf->startTransaction();
 					// Label
 					$pdf->SetXY($this->posxlabel, $curY);
 					$pdf->MultiCell($this->posxelement - $this->posxlabel, 3, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
-                    $labelHeightAfter = $pdf->GetY();
-                    $labelHeight = $labelHeightAfter - $labelHeightBefore;
-					$posyafter = $labelHeightAfter; // Y position reached by the label, used below to know if there is still room for the total block
+					$posyafter = $pdf->GetY(); // Y position reached by the label, used below to know if there is still room for the total block
 					$pageposafter = $pdf->getPage();
 					if ($pageposafter > $pageposbefore) { // There is a pagebreak
 						$pdf->rollbackTransaction(true);
@@ -599,12 +599,15 @@ class pdf_papripact_a3_paysage_projectdocument
 
 					// Ref of task
 					$pdf->SetXY($this->posxref, $curY);
-					$pdf->MultiCell($this->posxlabel - $this->posxref, 6, $outputLangs->convToOutputCharset($ref), 0, 'L');
+					$pdf->MultiCell($this->posxlabel - $this->posxref, 3, $outputLangs->convToOutputCharset($ref), 0, 'L');
+					// The row ends below its tallest column: a wrapped ref, the two lines of the GP/UT or a wrapped risk category can go past the label
+					$rowBottom = max($nexY, $pdf->GetY());
 
                     // GP/UT carrying the risk of the task
                     $pdf->SetXY($this->posxelement, $curY);
                     $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 3);
                     $pdf->MultiCell($this->posxdatestart - $this->posxelement, 3, $outputLangs->convToOutputCharset($elementline), 0, 'L');
+                    $rowBottom = max($rowBottom, $pdf->GetY());
                     $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1);
 
                     // Date start and end
@@ -621,10 +624,6 @@ class pdf_papripact_a3_paysage_projectdocument
                     // task budget
                     $pdf->SetXY($this->posxbudget, $curY);
                     $pdf->MultiCell($this->posxprogress - $this->posxbudget, 6, $budget, 0, 'C');
-
-                    // Progress
-                    $pdf->SetXY($this->posxprogress, $curY);
-                    $pdf->MultiCell($this->posxuser - $this->posxprogress, 6, $progress, 0, 'C');
                     $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1); // We restore font
 
                     // Executive name
@@ -642,6 +641,25 @@ class pdf_papripact_a3_paysage_projectdocument
                     $pdf->SetXY($this->posxriskcategory, $curY);
                     $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 3); // We restore font
                     $pdf->MultiCell($this->posxriskassessment - $this->posxriskcategory, 0, $riskcategory, 0, 'L');
+                    $rowBottom = max($rowBottom, $pdf->GetY());
+                    $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1); // We restore font
+
+                    // The colored cells come last, once every column has set the height of the row
+                    $rowHeight = $rowBottom - $curY;
+                    $nexY      = $rowBottom;
+
+                    // Progress, inset by 1 mm so the colored cell does not touch its neighbours
+                    $progressColumn = digiriskActionPlanGetColumnForProgress($kanbanColumns, $progress);
+                    $progressColor  = colorStringToArray($progressColumn['color'] ?? '', [153, 153, 153]);
+                    // Dictionary columns can take any color: a dark one carries white text
+                    $progressTextColor = (($progressColor[0] * 299 + $progressColor[1] * 587 + $progressColor[2] * 114) / 1000) >= 128 ? 0 : 255;
+                    $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 2); // We use a smaller font
+                    $pdf->SetFillColor($progressColor[0], $progressColor[1], $progressColor[2]);
+                    $pdf->SetTextColor($progressTextColor, $progressTextColor, $progressTextColor);
+                    $pdf->SetXY($this->posxprogress + 1, $curY);
+                    $pdf->MultiCell($this->posxuser - $this->posxprogress - 2, $rowHeight, $progress . '%', 0, 'C', true, 1, null, null, true, 0, false, true, $rowHeight, 'M');
+                    $pdf->SetFillColor(255, 255, 255);
+                    $pdf->SetTextColor(0, 0, 0);
                     $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1); // We restore font
 
 					// Risk assessment
@@ -659,7 +677,7 @@ class pdf_papripact_a3_paysage_projectdocument
 						}
 					}
 					$pdf->SetXY($this->posxriskassessment, $curY);
-					$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxriskassessment, $labelHeight, $lastEvaluation, 0, 'C', true, 1, null, null, true, 0, false, true, 0, 'M');
+					$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxriskassessment, $rowHeight, $lastEvaluation, 0, 'C', true, 1, null, null, true, 0, false, true, $rowHeight, 'M');
 					$pdf->SetTextColor(0, 0, 0);
 
 					// Add line

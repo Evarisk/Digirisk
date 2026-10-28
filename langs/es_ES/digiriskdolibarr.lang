@@ -2340,6 +2340,7 @@ MobileFPNoTagAvailable = No hay disponible ninguna etiqueta de permiso de fuego.
 MobileFPErrorUpdatingPermit = Error al actualizar el permiso de fuego.
 MobileFPErrorCreatingPermit = Error al crear el permiso de fuego.
 MobileFPLockNeedsSignature = El permiso debe estar firmado antes de poder bloquearlo.
+MobilePPLockNeedsSignature = El plan debe estar firmado antes de poder bloquearlo.
 MobileFPSpreadAvailableOnceSignedAndLocked = La difusión estará disponible en cuanto el permiso esté firmado por los responsables y bloqueado.
 MobileFPDefaultDateStartToday = Fecha de inicio = fecha de hoy
 MobileFPDefaultDuration = Duración por defecto del periodo (días)

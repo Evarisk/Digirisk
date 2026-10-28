@@ -160,7 +160,10 @@ class DigiriskElement extends SaturneObject
         $this->fk_standard = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
         $this->status      = 1;
 
-        return $this->createCommon($user, $noTrigger);
+        $result = $this->createCommon($user, $noTrigger);
+        self::$activeElementsCache = [];
+
+        return $result;
     }
 
     /**
@@ -198,16 +201,18 @@ class DigiriskElement extends SaturneObject
         global $conf;
 
         $trashID = getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH');
-        if ($trashID <= 0) {
-            return 0;
+        $trash   = new self($this->db);
+        if ($trashID > 0 && $trash->fetch($trashID) > 0 && (int) $trash->entity === (int) $conf->entity) {
+            return $trashID;
         }
 
-        $trash = new self($this->db);
-        if ($trash->fetch($trashID) <= 0 || $trash->entity != $conf->entity) {
-            return 0;
+        if ($trash->fetch(0, '', ' AND t.entity = ' . ((int) $conf->entity) . " AND (t.status = " . self::STATUS_TRASH_ROOT . " OR t.ref = 'GP0')") > 0 && (int) $trash->id > 0) {
+            require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', (int) $trash->id, 'integer', 0, '', $conf->entity);
+            return (int) $trash->id;
         }
 
-        return $trashID;
+        return 0;
     }
 
     /**
@@ -236,6 +241,7 @@ class DigiriskElement extends SaturneObject
         $this->status    = self::STATUS_TRASHED;
 
         $result = $this->update($user, true);
+        self::$activeElementsCache = [];
         if ($result > 0 && getDolGlobalInt('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_DELETE') > 0) {
             $this->call_trigger('DIGIRISKELEMENT_DELETE', $user);
         }
@@ -279,6 +285,7 @@ class DigiriskElement extends SaturneObject
         }
 
         $this->db->commit();
+        self::$activeElementsCache = [];
 
         return 1;
     }
@@ -313,6 +320,7 @@ class DigiriskElement extends SaturneObject
         }
 
         $this->db->commit();
+        self::$activeElementsCache = [];
 
         return 1;
     }
@@ -754,6 +762,69 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
+     * Return the ids of the validated elements reachable from the root through validated ancestors only
+     *
+     * An element under a trashed or archived groupment, or whose parent no longer exists, is out of the
+     * active tree even with STATUS_VALIDATED. The read covers every entity and ignores the caller's filter,
+     * otherwise a filtered caller would lose the ancestors needed to reach its elements.
+     *
+     * @return array<int, int>|int Ids indexed by id, int < 0 if KO
+     * @throws Exception
+     */
+    public function getReachableDigiriskElementIds()
+    {
+        // A fresh object: a caller may have trimmed $this->fields (the element card unsets fk_parent)
+        $digiriskElement                       = new self($this->db);
+        $digiriskElement->isextrafieldmanaged  = 0;
+        $digiriskElement->ismultientitymanaged = 0;
+
+        $digiriskElements = $digiriskElement->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED]);
+        if (!is_array($digiriskElements)) {
+            return -1;
+        }
+
+        $trashID = getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH');
+        if ($trashID > 0) {
+            unset($digiriskElements[$trashID]);
+        }
+
+        $childrenByParent = [];
+        foreach ($digiriskElements as $digiriskElementId => $digiriskElementObject) {
+            $childrenByParent[(int) $digiriskElementObject->fk_parent][] = (int) $digiriskElementId;
+        }
+
+        $reachableIds = [];
+        $queue        = $childrenByParent[0] ?? [];
+        while (!empty($queue)) {
+            $digiriskElementId = array_pop($queue);
+            if (isset($reachableIds[$digiriskElementId])) {
+                continue;
+            }
+            $reachableIds[$digiriskElementId] = $digiriskElementId;
+            foreach ($childrenByParent[$digiriskElementId] ?? [] as $childId) {
+                $queue[] = $childId;
+            }
+        }
+
+        return $reachableIds;
+    }
+
+    /**
+     * @var array<string, mixed> Per-request cache of active elements
+     */
+    private static array $activeElementsCache = [];
+
+    /**
+     * Clear the per-request active elements cache.
+     *
+     * @return void
+     */
+    public static function clearActiveElementsCache(): void
+    {
+        self::$activeElementsCache = [];
+    }
+
+    /**
      * Get active digirisk elements without trash
      *
      * @param  string    $multiEntityManagement                        Multi entity management (all, current, shared, entities)
@@ -769,15 +840,21 @@ class DigiriskElement extends SaturneObject
         // inherited/shared lists…). Each call re-ran fetchAll(), which loads every element's
         // extrafields one row at a time (N+1). Cache the raw fetch per request, keyed by
         // everything that changes the result set (filter, entity scope).
-        static $activeElementsCache = [];
         // The column list comes from $this->fields, which a caller may have trimmed (the element card
         // unsets fk_parent to shape its form): two objects must not share the same cache entry when
         // they do not load the same columns
         $cacheKey = ($moreParams['filter'] ?? '') . '|' . (string) ($this->ismultientitymanaged ?? '') . '|' . getEntity($this->element) . '|' . count($this->fields);
-        if (!array_key_exists($cacheKey, $activeElementsCache)) {
-            $activeElementsCache[$cacheKey] = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ($moreParams['filter'] ?? '')]);
+        if (!array_key_exists($cacheKey, self::$activeElementsCache)) {
+            $digiriskElements = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ($moreParams['filter'] ?? '')]);
+            // The status alone is not enough: delete() only moves the deleted GP to the bin, its descendants
+            // keep STATUS_VALIDATED and their risks used to stay in every list built on this method
+            $reachableIds = $this->getReachableDigiriskElementIds();
+            if (is_array($digiriskElements) && is_array($reachableIds)) {
+                $digiriskElements = array_intersect_key($digiriskElements, $reachableIds);
+            }
+            self::$activeElementsCache[$cacheKey] = $digiriskElements;
         }
-        $digiriskElements = $activeElementsCache[$cacheKey];
+        $digiriskElements = self::$activeElementsCache[$cacheKey];
         if (!is_array($digiriskElements) || empty($digiriskElements)) {
             return -1;
         }
@@ -864,7 +941,8 @@ class DigiriskElement extends SaturneObject
             $statusType = 'status8';
         }
 
-        return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
+        // The bin and the elements put in it (negative statuses) have no label of their own
+        return dolGetStatus($this->labelStatus[$status] ?? '', $this->labelStatusShort[$status] ?? '', '', $statusType, $mode);
     }
 
     /**
@@ -991,13 +1069,26 @@ class DigiriskElement extends SaturneObject
 
         $digiriskElements = $this->fetchDigiriskElementFlat(GETPOSTISSET('id') ? GETPOST('id') : 0);
 
+        // Information tab of a GP/UT: the risks of the element come first. The home dashboard has no id and
+        // already shows the risks of the whole company
+        $currentDigiriskElement = new DigiriskElement($this->db);
+        if (GETPOSTINT('id') > 0 && $currentDigiriskElement->fetch(GETPOSTINT('id')) > 0) {
+            require_once __DIR__ . '/riskanalysis/risk.class.php';
+
+            $risk  = new Risk($this->db);
+            $array = array_merge($array, $risk->loadDigiriskElementDashboard($currentDigiriskElement, $digiriskElements));
+        }
+
         if (empty($dashboardConfig->graphs->DigiriskElementsRepartitionByDepth->hide)) {
             $array['graphs'][] = $this->getDigiriskElementListsByDepth($digiriskElements);
         } else {
             $array['disabledGraphs']['DigiriskElementsRepartitionByDepth'] = $langs->transnoentities('DigiriskElementsRepartitionByDepth');
         }
         if (empty($dashboardConfig->graphs->RisksRepartitionByDigiriskElement->hide)) {
-            $array['graphs'][] = $this->getRisksByDigiriskElement('risk', $digiriskElements);
+            // A work unit contains nothing: its pie had a single part, itself at 100 %
+            if ($currentDigiriskElement->element_type != 'workunit') {
+                $array['graphs'][] = $this->getRisksByDigiriskElement('risk', $digiriskElements);
+            }
         } else {
             $array['disabledGraphs']['RisksRepartitionByDigiriskElement'] = $langs->transnoentities('RisksRepartitionByDigiriskElement');
         }
@@ -1026,7 +1117,7 @@ class DigiriskElement extends SaturneObject
         $array['width']      = '100%';
         $array['height']     = 400;
         $array['type']       = 'pie';
-        $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
+        $array['showlegend'] = ($conf->browser->layout ?? '') == 'phone' ? 1 : 2;
         $array['dataset']    = 1;
 
         // Get current digirisk element and add data in $digiriskElements array
@@ -1081,7 +1172,7 @@ class DigiriskElement extends SaturneObject
         $array['width']      = '100%';
         $array['height']     = 400;
         $array['type']       = 'pie';
-        $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
+        $array['showlegend'] = ($conf->browser->layout ?? '') == 'phone' ? 1 : 2;
         $array['dataset']    = 1;
 
         $children = [];

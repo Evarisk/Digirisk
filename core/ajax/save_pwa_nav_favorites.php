@@ -31,6 +31,7 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 }
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_pwa_nav.lib.php';
 
 header('Content-Type: application/json');
@@ -44,6 +45,9 @@ if (empty($user->id)) {
 
 $action = GETPOST('action', 'aZ09');
 $key    = 'DIGIRISKDOLIBARR_PWA_NAV_FAVORITES';
+
+// Jeton anti-CSRF exige, quel que soit le reglage
+digiriskMobileCheckToken($action);
 
 if ($action === 'save') {
     // CSV of slugs, validated against the items the user may actually reach

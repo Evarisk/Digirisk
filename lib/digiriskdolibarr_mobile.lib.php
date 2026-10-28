@@ -39,6 +39,64 @@ if (!defined('DIGIRISK_MOBILE_UPLOAD_DIR')) {
 }
 
 /**
+ * Settings of the Digirisk media library, as the saturneMediaLibraryFolders hook gives them to Saturne
+ *
+ * The photos of the tickets sit in the ticket folder of Dolibarr. The work folders of the mobile forms
+ * hold photos still on their way to an object, and the certificates of the external workers are
+ * personal documents: both stay out of a library everyone can browse.
+ *
+ * @param  int   $entity Entity, the current one when left out
+ * @return array         'folders': element => folder holding one <ref>/ folder per record, 'excluded': folder names
+ */
+function digiriskMediaLibrarySettings(int $entity = 0): array
+{
+    global $conf;
+
+    $entity = $entity > 0 ? $entity : (int) $conf->entity;
+
+    return [
+        // The default layout stands in while Digirisk is being activated, before its configuration is loaded
+        'folders'  => ['ticket' => $conf->ticket->multidir_output[$entity] ?? DOL_DATA_ROOT . ($entity > 1 ? '/' . $entity : '') . '/ticket'],
+        'excluded' => [DIGIRISK_MOBILE_UPLOAD_DIR, 'certifications'],
+    ];
+}
+
+/**
+ * Cancel an action of the mobile interfaces that does not carry the anti CSRF token of the session.
+ *
+ * Dolibarr checks the token only when MAIN_SECURITY_CSRF_WITH_TOKEN is set, and on a GET request only
+ * for the action names it deems sensitive (set*, add*, del*... from level 2, every action from level 3):
+ * the lock_mobile link went through without any token below level 3. Every action of these screens
+ * changes data, so the token is required here whatever the setting.
+ *
+ * @param  string $action Requested action, emptied when the token is missing or wrong (as Dolibarr does)
+ * @return void           Ends an AJAX request with an HTTP 403 JSON answer instead
+ */
+function digiriskMobileCheckToken(string &$action): void
+{
+    global $langs;
+
+    $token = GETPOST('token', 'alpha');
+    if (!dol_strlen($action) || (dol_strlen($token) && $token === currentToken())) {
+        return;
+    }
+
+    dol_syslog(__FUNCTION__ . ' ' . $_SERVER['PHP_SELF'] . ' action ' . $action . ' refused: anti CSRF token missing or invalid', LOG_WARNING);
+
+    $message = $langs->transnoentities('SecurityTokenHasExpiredSoActionHasBeenCanceledPleaseRetry');
+    // The AJAX calls (jQuery) expect JSON, not the page the canceled action falls back to
+    if (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest') {
+        http_response_code(403);
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'error' => $message, 'errors' => [$message], 'message' => $message]);
+        exit;
+    }
+
+    setEventMessages($message, [], 'warnings');
+    $action = '';
+}
+
+/**
  * Get the reusable electronic signature (base64 data URL) of a user.
  * Reads the "UserSignature" SaturneSignature record (the ElectronicSignature shown on the user card).
  *
@@ -323,7 +381,60 @@ function digiriskMobileRiskPhotoDir(string $elementType, string $objectRef, int 
     global $conf;
 
     // dir_output, like the Saturne media helpers reading those photos back
-    return $conf->digiriskdolibarr->dir_output . '/' . $elementType . '/' . dol_sanitizeFileName($objectRef) . '/risks/' . $category;
+    return $conf->digiriskdolibarr->dir_output . '/' . digiriskMobileRiskPhotoSubDir($elementType, $objectRef, $category);
+}
+
+/**
+ * Sub directory, relative to the module output directory, of the photos of one risk.
+ * See digiriskMobileRiskPhotoDir().
+ *
+ * @param  string $elementType Object element (preventionplan, firepermit...)
+ * @param  string $objectRef   Object reference
+ * @param  int    $category    Danger category position
+ * @return string              Sub directory, without leading nor trailing slash
+ */
+function digiriskMobileRiskPhotoSubDir(string $elementType, string $objectRef, int $category): string
+{
+    return $elementType . '/' . dol_sanitizeFileName($objectRef) . '/risks/' . $category;
+}
+
+/**
+ * Hand the photos of a risk over to its new danger category, thumbs included.
+ *
+ * Photos are keyed by category: left behind, they would sit in a folder nothing reads any more.
+ * No other risk of the object holds the new category, so whatever its folder still holds belongs to
+ * a removed risk and goes away.
+ *
+ * @param  string $elementType  Object element (preventionplan, firepermit...)
+ * @param  string $objectRef    Object reference
+ * @param  int    $fromCategory Former danger category position
+ * @param  int    $toCategory   New danger category position
+ * @return void
+ */
+function digiriskMobileMoveRiskPhotoDir(string $elementType, string $objectRef, int $fromCategory, int $toCategory)
+{
+    $fromDir = digiriskMobileRiskPhotoDir($elementType, $objectRef, $fromCategory);
+    $toDir   = digiriskMobileRiskPhotoDir($elementType, $objectRef, $toCategory);
+
+    if ($fromCategory === $toCategory || !dol_is_dir($fromDir)) {
+        return;
+    }
+
+    if (dol_is_dir($toDir)) {
+        dol_delete_dir_recursive($toDir);
+    }
+    dol_mkdir($toDir);
+
+    // One file at a time so the file index follows them: dol_move_dir() would also rename every
+    // file whose name holds the former category
+    foreach (dol_dir_list($fromDir, 'files') as $photoFile) {
+        dol_move($photoFile['fullname'], $toDir . '/' . $photoFile['name']);
+    }
+    if (dol_is_dir($fromDir . '/thumbs')) {
+        dol_move_dir($fromDir . '/thumbs', $toDir . '/thumbs', 1, 0, 0);
+    }
+
+    dol_delete_dir_recursive($fromDir);
 }
 
 /**
@@ -352,9 +463,7 @@ function digiriskMobileRiskUploadSubDir(string $uploadToken, $blockIndex): strin
  */
 function digiriskMobileGetRiskPhotos(string $elementType, string $objectRef, int $category): array
 {
-    $photoSubDir = $elementType . '/' . dol_sanitizeFileName($objectRef) . '/risks/' . $category;
-
-    return saturne_get_media_files('digiriskdolibarr', $photoSubDir, '', '', ['type' => 'image', 'sort_order' => 'asc']);
+    return saturne_get_media_files('digiriskdolibarr', digiriskMobileRiskPhotoSubDir($elementType, $objectRef, $category), '', '', ['type' => 'image', 'sort_order' => 'asc']);
 }
 
 /**
@@ -386,6 +495,11 @@ function digiriskMobileMoveRiskPhotos(string $elementType, string $objectRef, in
     foreach ($uploadedPhotos as $uploadedPhoto) {
         if (dol_move($uploadedPhoto['fullname'], $photoDir . '/' . $uploadedPhoto['name'], '0', 1, 0, 0)) {
             $moved++;
+
+            // The gallery lists the media library: a photo kept on the object joins it
+            if (function_exists('saturne_add_media_to_library')) {
+                saturne_add_media_to_library('digiriskdolibarr', $photoDir . '/' . $uploadedPhoto['name']);
+            }
         }
     }
 
@@ -655,4 +769,115 @@ function digiriskGetQrCodeSvg(string $data, string $color = '#0f172a'): string
         $svg,
         1
     );
+}
+
+/**
+ * Draw a QR code in the colours of Digirisk as a PNG file, for the documents.
+ *
+ * The look of the code shown in the risk assessment document: blue modules, orange finder patterns with
+ * rounded corners and the triangle of the logo on a white square in the middle. Settings checked against
+ * two decoders on a dozen addresses, sharp and blurred, from 150 to 600 pixels:
+ * - the finder patterns take a deeper orange than the logo, which is too light for a scanner to find them;
+ * - error correction level H, the highest: the code still reads with about a fifth of it hidden in the middle,
+ *   at the cost of more, smaller modules, which a very small print reads less easily than level Q;
+ * - a margin of three modules around the code, the ODT templates set it in a cell with borders.
+ *
+ * @param  string $data     Content to encode
+ * @param  string $filePath PNG file to write, its directory is created when missing
+ * @param  int    $size     Side of the image, in pixels
+ * @return bool             True when the file was written
+ */
+function digiriskGetQrCodePng(string $data, string $filePath, int $size = 600): bool
+{
+    if (!dol_strlen($data) || !function_exists('imagecreatetruecolor')) {
+        return false;
+    }
+
+    require_once DOL_DOCUMENT_ROOT . '/includes/tecnickcom/tcpdf/tcpdf_barcodes_2d.php';
+
+    $barcode = (new TCPDF2DBarcode($data, 'QRCODE,H'))->getBarcodeArray();
+    $count   = (int) ($barcode['num_rows'] ?? 0);
+    if ($count <= 0) {
+        return false;
+    }
+
+    // Drawn four times larger, then scaled down: GD does not smooth the curves of filled shapes
+    $quietZone = 3;
+    $unit      = (int) ceil($size * 4 / ($count + 2 * $quietZone));
+    $side      = $unit * ($count + 2 * $quietZone);
+
+    $image  = imagecreatetruecolor($side, $side);
+    $white  = imagecolorallocate($image, 0xff, 0xff, 0xff);
+    $blue   = imagecolorallocate($image, 0x00, 0x67, 0xa6);
+    $orange = imagecolorallocate($image, 0xe0, 0x78, 0x00);
+    imagefilledrectangle($image, 0, 0, $side - 1, $side - 1, $white);
+
+    $roundedRectangle = function (int $x1, int $y1, int $x2, int $y2, int $radius, int $color) use ($image) {
+        $radius = min($radius, (int) floor(($x2 - $x1) / 2), (int) floor(($y2 - $y1) / 2));
+        imagefilledrectangle($image, $x1 + $radius, $y1, $x2 - $radius, $y2, $color);
+        imagefilledrectangle($image, $x1, $y1 + $radius, $x2, $y2 - $radius, $color);
+        foreach ([[$x1 + $radius, $y1 + $radius], [$x2 - $radius, $y1 + $radius], [$x1 + $radius, $y2 - $radius], [$x2 - $radius, $y2 - $radius]] as $corner) {
+            imagefilledellipse($image, $corner[0], $corner[1], 2 * $radius, 2 * $radius, $color);
+        }
+    };
+
+    // The logo stands on a centred square of modules, as many on each side of it so it stays centred
+    $logoModules = (int) round($count * 0.22);
+    if (($count - $logoModules) % 2) {
+        $logoModules++;
+    }
+    $logoStart = ($count - $logoModules) / 2;
+    $logoEnd   = $logoStart + $logoModules;
+
+    $finderOrigins = [[0, 0], [0, $count - 7], [$count - 7, 0]];
+    $gap           = (int) round($unit * 0.05);
+
+    for ($row = 0; $row < $count; $row++) {
+        for ($col = 0; $col < $count; $col++) {
+            if (empty($barcode['bcode'][$row][$col])) {
+                continue;
+            }
+            // The finder patterns are drawn whole below, in their own colour
+            foreach ($finderOrigins as $finderOrigin) {
+                if ($row >= $finderOrigin[0] && $row < $finderOrigin[0] + 7 && $col >= $finderOrigin[1] && $col < $finderOrigin[1] + 7) {
+                    continue 2;
+                }
+            }
+            if ($row >= $logoStart && $row < $logoEnd && $col >= $logoStart && $col < $logoEnd) {
+                continue;
+            }
+
+            $x = ($col + $quietZone) * $unit;
+            $y = ($row + $quietZone) * $unit;
+            $roundedRectangle($x + $gap, $y + $gap, $x + $unit - $gap - 1, $y + $unit - $gap - 1, (int) round($unit * 0.15), $blue);
+        }
+    }
+
+    foreach ($finderOrigins as $finderOrigin) {
+        $x = ($finderOrigin[1] + $quietZone) * $unit;
+        $y = ($finderOrigin[0] + $quietZone) * $unit;
+        $roundedRectangle($x, $y, $x + 7 * $unit - 1, $y + 7 * $unit - 1, (int) round($unit * 1.6), $orange);
+        $roundedRectangle($x + $unit, $y + $unit, $x + 6 * $unit - 1, $y + 6 * $unit - 1, (int) round($unit * 1), $white);
+        $roundedRectangle($x + 2 * $unit, $y + 2 * $unit, $x + 5 * $unit - 1, $y + 5 * $unit - 1, (int) round($unit * 0.6), $orange);
+    }
+
+    $logo = @imagecreatefrompng(__DIR__ . '/../img/digiriskdolibarr_color_512.png');
+    if ($logo !== false) {
+        // A module of white around the triangle, the way the modules keep their distance from each other
+        $logoX    = (int) (($logoStart + $quietZone) * $unit + $unit);
+        $logoSide = (int) (($logoModules - 2) * $unit);
+        imagealphablending($image, true);
+        imagecopyresampled($image, $logo, $logoX, $logoX, 0, 0, $logoSide, $logoSide, imagesx($logo), imagesy($logo));
+        imagedestroy($logo);
+    }
+
+    $final = imagecreatetruecolor($size, $size);
+    imagecopyresampled($final, $image, 0, 0, 0, 0, $size, $size, $side, $side);
+    imagedestroy($image);
+
+    dol_mkdir(dirname($filePath));
+    $written = imagepng($final, $filePath);
+    imagedestroy($final);
+
+    return $written;
 }

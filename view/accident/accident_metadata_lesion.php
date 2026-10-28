@@ -127,6 +127,8 @@ list($moreHtmlRef, $moreParams) = $object->getBannerTabContent();
 
 saturne_banner_tab($object, 'id', '', 1, 'rowid', 'ref', $moreHtmlRef, dol_strlen($object->photo) > 0, $moreParams);
 
+// The lesion template lists the lines through $accidentLesion, as on the accident card
+$accidentLesion = $objectline;
 include_once __DIR__ . '/../../core/tpl/accident/digiriskdolibarr_accident_lesion.tpl.php';
 
 print dol_get_fiche_end();

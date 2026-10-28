@@ -1,12 +1,12 @@
 <?php
-$allRiskAssessment = $riskAssessmentsOrderedByRisk[$risk->id];
-$lastRiskAssessment    = array_filter($allRiskAssessment, function($lastRiskAssessment) {
-	return $lastRiskAssessment->status == 1;
+$allRiskAssessment  = $riskAssessmentsOrderedByRisk[$risk->id];
+$lastRiskAssessment = array_filter($allRiskAssessment, function($riskAssessment) {
+	return $riskAssessment->status == 1;
 });
 
-if (is_array($lastRiskAssessment) && !empty($lastRiskAssessment)) {
-    $lastRiskAssessment = array_shift($lastRiskAssessment);
-}
+// The last validated assessment of the risk, or a blank one when the risk is still to assess: the add modal
+// below reads it either way, and an empty array left there raised a warning on every one of its properties
+$lastRiskAssessment = !empty($lastRiskAssessment) ? array_shift($lastRiskAssessment) : new RiskAssessment($db);
 
 $defaultCotation = [0 => '0-47', 48 => '48-50', 51 => '51-80', 100 => '81-100'];
 
@@ -191,7 +191,7 @@ else : ?>
 	<div class="table-cell-header-actions">
 		<?php if ($permissiontoread) : ?>
 			<div class="risk-evaluation-list risk-evaluation-button wpeo-button button-square-40 button-grey wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('RiskAssessmentList') ?>" value="<?php echo $risk->id ?>">
-				<input type="hidden" class="modal-options" data-modal-to-open="risk_evaluation_list<?php echo $risk->id; ?>" data-from-id="<?php echo $lastEvaluation->id; ?>" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="" data-photo-class="riskassessment-from-riskassessment-edit-<?php echo $lastEvaluation->id; ?>"/>
+				<input type="hidden" class="modal-options" data-modal-to-open="risk_evaluation_list<?php echo $risk->id; ?>" data-from-id="<?php echo $lastRiskAssessment->id; ?>" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="" data-photo-class="riskassessment-from-riskassessment-edit-<?php echo $lastRiskAssessment->id; ?>"/>
 				<i class="fas fa-list button-icon"></i>
 			</div>
 		<?php else : ?>
@@ -345,37 +345,10 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 							<?php print $form->selectDate('', 'RiskAssessmentDateCreate0', 0, 0, 0, '', 1, 1); ?>
 						</div>
 					<?php endif; ?>
-                    <div class="riskassessment-medias linked-medias riskassessment-from-riskassessment-create-<?php echo $risk->id ?>">
-                        <div class="element-linked-medias element-linked-medias-0 risk-<?php echo $risk->id ?>">
-                            <div class="medias section-title"><i class="fas fa-images"></i> <?php echo $langs->trans('Medias'); ?></div>
-                            <table class="add-medias">
-                                <tr>
-                                    <td>
-                                        <input hidden multiple class="fast-upload" id="fast-upload-photo-riskassessment-create-<?php echo $risk->id ?>" type="file" name="userfile[]" capture="environment" accept="image/*">
-                                        <label for="fast-upload-photo-riskassessment-create-<?php echo $risk->id ?>">
-                                            <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?>">
-                                                <i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
-                                            </div>
-                                        </label>
-                                        <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?? '' ?>"/>
-                                    </td>
-                                    <td>
-                                        <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="<?php echo $lastRiskAssessment->id; ?>">
-                                            <input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="<?php echo $risk->ref; ?>" data-photo-class="riskassessment-from-riskassessment-create-<?php echo $risk->id ?>"/>
-                                            <i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="element-linked-medias-list">
-                                            <?php
-                                            $relativepath = 'digiriskdolibarr/medias/thumbs';
-                                            print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/' . $risk->ref, 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0/' . $risk->ref);
-                                            ?>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
+                    <div class="riskassessment-medias">
+                        <div class="medias section-title"><i class="fas fa-images"></i> <?php echo $langs->trans('Medias'); ?></div>
+                        <?php // The assessment does not exist yet: its creation moves these photos into its folder
+                        print digiriskRiskAssessmentMediaBlock('riskassessment/tmp/RA0/' . $risk->ref); ?>
                     </div>
 				</div>
 				<!-- RISK EVALUATION SINGLE -->
@@ -419,8 +392,8 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 					<span><?php echo $langs->trans('CloseModal'); ?></span>
 				</div>
 				<?php if ($permissiontoadd) : ?>
-					<div class="risk-evaluation-create wpeo-button button-blue button-disable modal-close"value="<?php echo $risk->id ?>">
-						<i class="fas fa-plus"></i> <span style="color: #fff"><?php echo $langs->trans('Add'); ?></span>
+					<div class="risk-evaluation-create wpeo-button button-blue button-disable modal-close" value="<?php echo $risk->id ?>">
+						<i class="fas fa-plus"></i> <span><?php echo $langs->trans('Add'); ?></span>
 					</div>
 				<?php else : ?>
 					<div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">

@@ -109,7 +109,9 @@ if ($object->id > 0) {
 	$title    = $langs->trans("Register");
 	$helpUrl  = 'FR:Module_Digirisk#Le_tableau_de_bord_et_indicateurs';
 
-	digirisk_header($title, $helpUrl);
+	// digirisk-horizontal-scroll bounds #id-right to the viewport so the wide register list tables
+	// scroll inside their own .div-table-responsive instead of widening the whole page
+	digirisk_header($title, $helpUrl, [], [], '', 'digirisk-horizontal-scroll');
 
 	print '<div id="cardContent" value="">';
 

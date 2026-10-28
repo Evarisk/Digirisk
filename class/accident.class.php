@@ -394,6 +394,37 @@ class Accident extends SaturneObject
     }
 
     /**
+     * Get the accidents and the work stops the dashboard counts
+     *
+     * The accidents past the draft status and the work stops that started between two dates, or all of them when
+     * no range is given. Every count of the dashboard is made on them, the API routes included.
+     *
+     * @param  int   $startDate Start of the range, included (0 for no range)
+     * @param  int   $endDate   End of the range, excluded (0 for no range)
+     * @return array            Accidents ('accidents') and work stops of accidents ('accidentsWithWorkStops')
+     * @throws Exception
+     */
+    public function getDashboardAccidents(int $startDate = 0, int $endDate = 0): array
+    {
+        $workStopFilter = [];
+        $accidentFilter = ' t.status > ' . self::STATUS_DRAFT;
+        if ($startDate > 0 && $endDate > 0) {
+            $workStopFilter  = ['customsql' => ' t.date_start_workstop >= \'' . dol_print_date($startDate, '%Y/%m/%d') . '\' AND t.date_start_workstop < \'' . dol_print_date($endDate, '%Y/%m/%d') . '\''];
+            $accidentFilter .= ' AND t.accident_date >= \'' . dol_print_date($startDate, '%Y/%m/%d') . '\' AND t.accident_date < \'' . dol_print_date($endDate, '%Y/%m/%d') . '\'';
+        }
+
+        $join                   = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as a ON a.rowid = t.fk_accident';
+        $accidentsWithWorkStops = saturne_fetch_all_object_type('AccidentWorkStop', 'DESC', 't.rowid', 0, 0, $workStopFilter, 'AND', false, true, false, $join);
+        $accidents              = $this->fetchAll('', '', 0, 0, ['customsql' => $accidentFilter]);
+
+        // A failed fetch returns -1, which the counts can not take
+        return [
+            'accidents'              => is_array($accidents) ? $accidents : [],
+            'accidentsWithWorkStops' => is_array($accidentsWithWorkStops) ? $accidentsWithWorkStops : [],
+        ];
+    }
+
+    /**
      * Load dashboard info accident
      *
      * @return array
@@ -424,18 +455,11 @@ class Accident extends SaturneObject
         $this->dashboardDateStart = $year == -1 ? 0 : $startDate;
         $this->dashboardDateEnd   = $year == -1 ? 0 : dol_time_plus_duree($endDate, -1, 'd');
 
-        $join                   = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as a ON a.rowid = t.fk_accident';
-        $accidentsWithWorkStops = saturne_fetch_all_object_type('AccidentWorkStop', 'DESC', 't.rowid', 0, 0, $year == -1 ? [] : ['customsql' => ' t.date_start_workstop >= \'' . dol_print_date($startDate, '%Y/%m/%d') . '\' AND t.date_start_workstop < \'' . dol_print_date($endDate, '%Y/%m/%d') . '\''], 'AND', false, true, false, $join);
-        $accidents              = $this->fetchAll('', '', 0, 0, ['customsql' => ' t.status > ' . self::STATUS_DRAFT . ($year == -1 ? '' : ' AND t.accident_date >= \'' . dol_print_date($startDate, '%Y/%m/%d') . '\' AND t.accident_date < \'' . dol_print_date($endDate, '%Y/%m/%d') . '\'')]);
+        $dashboardAccidents     = $year == -1 ? $this->getDashboardAccidents() : $this->getDashboardAccidents($startDate, $endDate);
+        $accidents              = $dashboardAccidents['accidents'];
+        $accidentsWithWorkStops = $dashboardAccidents['accidentsWithWorkStops'];
         $digiriskElement        = new DigiriskElement($db);
         $digiriskElements       = $digiriskElement->fetchDigiriskElementFlat(0);
-
-        if (empty($accidents) && !is_array($accidents)) {
-            $accidents = [];
-        }
-        if (empty($accidentsWithWorkStops) && !is_array($accidentsWithWorkStops)) {
-            $accidentsWithWorkStops = [];
-        }
 
         $arrayNbDaysWithoutAccident = $this->getNbDaysWithoutAccident($accidents);
         $arrayNbWorkstopDays        = $this->getNbWorkstopDays($accidentsWithWorkStops);
@@ -536,9 +560,10 @@ class Accident extends SaturneObject
      */
     public function getNbDaysWithoutAccident(array $accidents = []): array
     {
-        $lastAccident = end($accidents);
-        if ($lastAccident != null) {
-            $lastTimeAccident            = dol_now() - $lastAccident->accident_date;
+        // The accidents come unsorted: the last one recorded may be an old one entered afterwards
+        $accidentDates = array_filter(array_column($accidents, 'accident_date'));
+        if (!empty($accidentDates)) {
+            $lastTimeAccident            = dol_now() - max($accidentDates);
             $array['daywithoutaccident'] = abs(round($lastTimeAccident / 86400));
         } else {
             $array['daywithoutaccident'] = 'N/A';
@@ -566,7 +591,7 @@ class Accident extends SaturneObject
         $array['width']      = '100%';
         $array['height']     = 400;
         $array['type']       = 'pie';
-        $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
+        $array['showlegend'] = ($conf->browser->layout ?? '') == 'phone' ? 1 : 2;
         $array['dataset']    = 1;
 
         $array['labels'] = [
@@ -947,7 +972,7 @@ class Accident extends SaturneObject
 
         $nbAccidensWithWorkStop = [];
         foreach ($accidentsWithWorkStop as $workstop) {
-            $days = abs($workstop->date_end_workstop - $workstop->date_start_workstop) / 86400;
+            $days = $this->getWorkStopDuration($workstop);
 
             $array['data'][$this->getWorkStopDurationBucket($days)]++;
             $nbAccidensWithWorkStop[$workstop->fk_accident] = $workstop->fk_accident;
@@ -984,10 +1009,29 @@ class Accident extends SaturneObject
         $filters[] = digirisk_get_date_range_filter(
             'search_accident_date',
             empty($dateStart) ? $this->dashboardDateStart : $dateStart,
-            empty($dateEnd) ? $this->dashboardDateEnd : $dateEnd
+            empty($dateEnd) ? $this->dashboardDateEnd : $dateEnd,
+            '_dt'
         );
 
         return dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . '?' . implode('&', array_filter($filters));
+    }
+
+    /**
+     * Get the duration of a work stop, in days
+     *
+     * Its dates give it. The end date only exists since 2022: the work stops recorded before have none, and their
+     * declared number of days stands in for it, the same way getWorkStopSqlFilter() does for the lists
+     *
+     * @param  object $workStop Work stop
+     * @return float            Duration of the work stop, in days
+     */
+    public function getWorkStopDuration(object $workStop): float
+    {
+        if (empty($workStop->date_start_workstop) || empty($workStop->date_end_workstop)) {
+            return (float) $workStop->workstop_days;
+        }
+
+        return abs($workStop->date_end_workstop - $workStop->date_start_workstop) / 86400;
     }
 
     /**
@@ -1026,7 +1070,8 @@ class Accident extends SaturneObject
 
         $durationFilter = '';
         if ($isBucketOfDuration) {
-            $duration   = 'ABS(TIMESTAMPDIFF(SECOND, ws.date_start_workstop, ws.date_end_workstop)) / 86400';
+            // Same duration as getWorkStopDuration(): the declared number of days when a date is missing
+            $duration   = 'COALESCE(ABS(TIMESTAMPDIFF(SECOND, ws.date_start_workstop, ws.date_end_workstop)) / 86400, ws.workstop_days)';
             $lowerBound = 0;
             foreach (self::WORK_STOP_DURATION_LIMITS as $currentBucket => $limit) {
                 if ($currentBucket == $bucket) {
@@ -1076,7 +1121,7 @@ class Accident extends SaturneObject
                 if (empty($array['data'][$accident->fk_element])) {
                     $array['data'][$accident->fk_element] = 0;
                 }
-                $array['data'][$accident->fk_element] += abs($workstop->date_end_workstop - $workstop->date_start_workstop) / 86400;
+                $array['data'][$accident->fk_element] += $this->getWorkStopDuration($workstop);
             }
         }
         unset($array['data'][null]);
@@ -1112,6 +1157,44 @@ class Accident extends SaturneObject
             $user->fetch($victimSignatory->element_id);
         }
         return $user;
+    }
+
+    /**
+     * Get the share of the accident information filled in, as counted by the gauge of the card
+     *
+     * The location counts only when the accident has a kind of location, through the field matching that kind
+     *
+     * @param  User|null $userVictim Victim already loaded by the caller, null to load it here
+     * @return float                 Percentage of the information filled in, from 0 to 100
+     * @throws Exception
+     */
+    public function getProgress(?User $userVictim = null): float
+    {
+        $userVictim = $userVictim ?? $this->getUserVictim();
+
+        $accidentData = [$this->ref, $this->label, (!empty($this->accident_type) ? $this->accident_type : 0), $this->accident_date, $this->description];
+        switch ($this->external_accident) {
+            case 1:
+                $accidentData[] = $this->fk_element > 0 ? $this->fk_element : $this->fk_standard;
+                break;
+            case 2:
+                $accidentData[] = $this->fk_soc;
+                break;
+            case 3:
+                $accidentData[] = $this->accident_location;
+                break;
+        }
+        $accidentData[] = $userVictim->id > 0 ? $userVictim->id : '';
+
+        $accidentLesion  = new AccidentLesion($this->db);
+        $accidentLesions = $accidentLesion->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . ((int) $this->id)]);
+        $accidentData[]  = (is_array($accidentLesions) && !empty($accidentLesions)) ? count($accidentLesions) : '';
+
+        $filledData = array_filter($accidentData, function ($data) {
+            return dol_strlen((string) $data) > 0;
+        });
+
+        return count($filledData) / count($accidentData) * 100;
     }
 
     /**

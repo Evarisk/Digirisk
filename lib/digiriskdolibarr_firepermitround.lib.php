@@ -22,10 +22,12 @@
  */
 
 /**
- * Rounds planned by default after the end of the hot work, in minutes: 30 min, 1 h and 2 h.
+ * Rounds planned by default: one as soon as the hot work ends, then one every hour until two hours after it.
  * Two hours is the minimum surveillance recommended after hot work (INRS ED 6030).
  */
-const DIGIRISK_FIREPERMIT_ROUND_DEFAULT_DELAYS = '30,60,120';
+const DIGIRISK_FIREPERMIT_ROUND_DEFAULT_COUNT       = 3;
+const DIGIRISK_FIREPERMIT_ROUND_DEFAULT_INTERVAL    = 60;
+const DIGIRISK_FIREPERMIT_ROUND_DEFAULT_AT_WORK_END = 1;
 
 /**
  * A round planned beyond one day would never be walked by the watcher of the job.
@@ -47,26 +49,51 @@ const DIGIRISK_FIREPERMIT_ROUND_ITEM_OPTIONAL = 1;
 const DIGIRISK_FIREPERMIT_ROUND_ITEM_REQUIRED = 2;
 
 /**
- * Turn a typed list of delays ("30, 60, 120") into the sorted list of distinct delays it holds.
+ * Delays of the rounds of a regular schedule: a number of rounds, one every interval.
  *
- * @param  string $value Delays in minutes, separated by commas, semicolons or spaces
- * @return int[]         Delays in minutes, ascending
+ * @param  int   $count     Number of rounds
+ * @param  int   $interval  Minutes between two rounds
+ * @param  bool  $atWorkEnd True when the first round is walked as soon as the work ends, false when it comes one interval later
+ * @return int[]            Delays in minutes after the end of the work, ascending, empty when the schedule cannot be planned
  */
-function digiriskFirePermitParseRoundDelays(string $value): array
+function digiriskFirePermitBuildRoundDelays(int $count, int $interval, bool $atWorkEnd): array
 {
-    $delays = [];
-    foreach (preg_split('/[\s,;]+/', $value, -1, PREG_SPLIT_NO_EMPTY) as $delay) {
-        if (!ctype_digit($delay)) {
-            continue;
-        }
-        $delay = (int) $delay;
-        if ($delay > 0 && $delay <= DIGIRISK_FIREPERMIT_ROUND_MAX_DELAY) {
-            $delays[$delay] = $delay;
-        }
+    if ($count < 1 || $count > DIGIRISK_FIREPERMIT_ROUND_MAX_COUNT || $interval < 1 || $interval > DIGIRISK_FIREPERMIT_ROUND_MAX_DELAY) {
+        return [];
     }
-    sort($delays);
 
-    return array_slice($delays, 0, DIGIRISK_FIREPERMIT_ROUND_MAX_COUNT);
+    $firstDelay = $atWorkEnd ? 0 : $interval;
+    $lastDelay  = $firstDelay + ($count - 1) * $interval;
+    if ($lastDelay > DIGIRISK_FIREPERMIT_ROUND_MAX_DELAY) {
+        return [];
+    }
+
+    return range($firstDelay, $lastDelay, $interval);
+}
+
+/**
+ * Schedule of the rounds set in the module setup, or the default one when the setup cannot be planned.
+ *
+ * @return array{count: int, interval: int, at_work_end: bool}
+ */
+function digiriskFirePermitGetRoundSchedule(): array
+{
+    $schedule = [
+        'count'       => getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COUNT', DIGIRISK_FIREPERMIT_ROUND_DEFAULT_COUNT),
+        'interval'    => getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_INTERVAL', DIGIRISK_FIREPERMIT_ROUND_DEFAULT_INTERVAL),
+        'at_work_end' => (bool) getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_AT_WORK_END', DIGIRISK_FIREPERMIT_ROUND_DEFAULT_AT_WORK_END),
+    ];
+
+    // A broken setup would let a permit be closed without any surveillance: keep the minimum
+    if (empty(digiriskFirePermitBuildRoundDelays($schedule['count'], $schedule['interval'], $schedule['at_work_end']))) {
+        $schedule = [
+            'count'       => DIGIRISK_FIREPERMIT_ROUND_DEFAULT_COUNT,
+            'interval'    => DIGIRISK_FIREPERMIT_ROUND_DEFAULT_INTERVAL,
+            'at_work_end' => (bool) DIGIRISK_FIREPERMIT_ROUND_DEFAULT_AT_WORK_END,
+        ];
+    }
+
+    return $schedule;
 }
 
 /**
@@ -76,10 +103,9 @@ function digiriskFirePermitParseRoundDelays(string $value): array
  */
 function digiriskFirePermitGetRoundDelays(): array
 {
-    $delays = digiriskFirePermitParseRoundDelays(getDolGlobalString('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_DELAYS', DIGIRISK_FIREPERMIT_ROUND_DEFAULT_DELAYS));
+    $schedule = digiriskFirePermitGetRoundSchedule();
 
-    // An empty setup would let a permit be closed without any surveillance: keep the minimum
-    return !empty($delays) ? $delays : digiriskFirePermitParseRoundDelays(DIGIRISK_FIREPERMIT_ROUND_DEFAULT_DELAYS);
+    return digiriskFirePermitBuildRoundDelays($schedule['count'], $schedule['interval'], $schedule['at_work_end']);
 }
 
 /**
@@ -98,6 +124,19 @@ function digiriskFirePermitFormatDelay(int $minutes): string
     $minutes = $minutes % 60;
 
     return $hours . ' h' . ($minutes > 0 ? ' ' . sprintf('%02d', $minutes) : '');
+}
+
+/**
+ * Name a round by when it comes: "fin des travaux" for the one walked as soon as the work ends, "+2 h" otherwise.
+ *
+ * @param  int    $minutes Delay of the round after the end of the work, in minutes
+ * @return string          Label, not escaped
+ */
+function digiriskFirePermitRoundDelayLabel(int $minutes): string
+{
+    global $langs;
+
+    return $minutes > 0 ? '+' . digiriskFirePermitFormatDelay($minutes) : $langs->transnoentities('FireWatchRoundAtWorkEnd');
 }
 
 /**
@@ -367,6 +406,11 @@ function digiriskFirePermitMoveRoundPhotos(FirePermit $permit, FirePermitRound $
         foreach ($photos as $photo) {
             if (!dol_move($photo['fullname'], $photoDir . '/' . $photo['name'], '0', 1, 0, 0)) {
                 return -1;
+            }
+
+            // The gallery lists the media library: a photo kept on the round joins it
+            if (function_exists('saturne_add_media_to_library')) {
+                saturne_add_media_to_library('digiriskdolibarr', $photoDir . '/' . $photo['name'], (int) ($permit->entity ?: $conf->entity));
             }
         }
     }

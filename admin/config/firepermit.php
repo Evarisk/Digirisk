@@ -125,14 +125,24 @@ if ($action == 'setMobileDefaults' && !GETPOST('cancel', 'alpha')) {
 }
 
 if ($action == 'setFireWatch' && !GETPOST('cancel', 'alpha')) {
-	$roundDelays = digiriskFirePermitParseRoundDelays(GETPOST('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_DELAYS', 'alphanohtml'));
-	if (empty($roundDelays)) {
-		setEventMessages($langs->trans('FireWatchErrorNoDelay'), null, 'errors');
+	$roundCount     = GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COUNT');
+	$roundInterval  = GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_INTERVAL');
+	$roundAtWorkEnd = GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_AT_WORK_END') ? 1 : 0;
+	if ($roundCount < 1 || $roundCount > DIGIRISK_FIREPERMIT_ROUND_MAX_COUNT) {
+		setEventMessages($langs->trans('FireWatchErrorRoundCount', DIGIRISK_FIREPERMIT_ROUND_MAX_COUNT), null, 'errors');
+		$error++;
+	} elseif ($roundInterval < 1 || $roundInterval > DIGIRISK_FIREPERMIT_ROUND_MAX_DELAY) {
+		setEventMessages($langs->trans('FireWatchErrorRoundInterval', DIGIRISK_FIREPERMIT_ROUND_MAX_DELAY), null, 'errors');
+		$error++;
+	} elseif (empty(digiriskFirePermitBuildRoundDelays($roundCount, $roundInterval, (bool) $roundAtWorkEnd))) {
+		setEventMessages($langs->trans('FireWatchErrorRoundsTooLate', digiriskFirePermitFormatDelay(DIGIRISK_FIREPERMIT_ROUND_MAX_DELAY)), null, 'errors');
 		$error++;
 	}
 
 	if (!$error) {
-		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_ROUND_DELAYS', implode(',', $roundDelays), 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COUNT', $roundCount, 'integer', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_ROUND_INTERVAL', $roundInterval, 'integer', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_ROUND_AT_WORK_END', $roundAtWorkEnd, 'integer', 0, '', $conf->entity);
 
 		foreach (DIGIRISK_FIREPERMIT_ROUND_ITEMS as $roundItem) {
 			$constName = 'DIGIRISKDOLIBARR_FIREPERMIT_ROUND_' . strtoupper($roundItem);
@@ -326,7 +336,6 @@ print '</form>';
 // --- Fire watch rounds after the hot work ---
 print '<div id="firewatch"></div>';
 print load_fiche_titre('<i class="fas fa-walking pictofixedwidth"></i>' . $langs->trans('FireWatchSetupTitle'), '', '');
-print '<div class="opacitymedium marginbottomonly">' . $langs->trans('FireWatchSetupDescription') . '</div>';
 
 $roundItemLevels = [
 	DIGIRISK_FIREPERMIT_ROUND_ITEM_DISABLED => $langs->trans('Disabled'),
@@ -350,12 +359,32 @@ print '<td>' . $langs->trans('Value') . '</td>';
 print '<td>' . $langs->trans('Action') . '</td>';
 print '</tr>';
 
-// Delays of the rounds after the end of the work
-print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_DELAYS">' . $langs->trans('FireWatchRoundDelays') . '</label>';
-print '<div class="opacitymedium small">' . $langs->trans('FireWatchRoundDelaysHelp') . '</div></td>';
-print '<td><input type="text" name="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_DELAYS" id="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_DELAYS" class="flat minwidth200" value="' . dol_escape_htmltag(implode(', ', digiriskFirePermitGetRoundDelays())) . '"> ' . $langs->trans('Minutes');
-print '<div class="opacitymedium small">' . dol_escape_htmltag(implode(' / ', array_map('digiriskFirePermitFormatDelay', digiriskFirePermitGetRoundDelays()))) . '</div></td>';
-print '<td rowspan="6"><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '"></td>';
+// Schedule of the rounds after the end of the work: values that could not be saved are shown again to be fixed
+$roundSchedule = digiriskFirePermitGetRoundSchedule();
+$roundPosted   = GETPOSTISSET('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COUNT');
+$roundCount    = $roundPosted ? GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COUNT') : $roundSchedule['count'];
+$roundInterval = $roundPosted ? GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_INTERVAL') : $roundSchedule['interval'];
+$roundAtEnd    = $roundPosted ? GETPOSTINT('DIGIRISKDOLIBARR_FIREPERMIT_ROUND_AT_WORK_END') : $roundSchedule['at_work_end'];
+
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COUNT">' . $langs->trans('FireWatchRoundCount') . '</label>';
+print '<div class="opacitymedium small">' . $langs->trans('FireWatchRoundCountHelp', DIGIRISK_FIREPERMIT_ROUND_MAX_COUNT) . '</div></td>';
+print '<td><input type="number" name="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COUNT" id="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_COUNT" value="' . $roundCount . '" min="1" max="' . DIGIRISK_FIREPERMIT_ROUND_MAX_COUNT . '" class="flat minwidth100" required></td>';
+print '<td rowspan="' . (5 + count(DIGIRISK_FIREPERMIT_ROUND_ITEMS)) . '"><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '"></td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_INTERVAL">' . $langs->trans('FireWatchRoundInterval') . '</label>';
+print '<div class="opacitymedium small">' . $langs->trans('FireWatchRoundIntervalHelp') . '</div></td>';
+print '<td><input type="number" name="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_INTERVAL" id="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_INTERVAL" value="' . $roundInterval . '" min="1" max="' . DIGIRISK_FIREPERMIT_ROUND_MAX_DELAY . '" class="flat minwidth100" required> ' . $langs->trans('Minutes') . '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_AT_WORK_END">' . $langs->trans('FireWatchFirstRoundAtWorkEnd') . '</label>';
+print '<div class="opacitymedium small">' . $langs->trans('FireWatchFirstRoundAtWorkEndHelp') . '</div></td>';
+print '<td><input type="checkbox" name="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_AT_WORK_END" id="DIGIRISKDOLIBARR_FIREPERMIT_ROUND_AT_WORK_END" value="1"' . ($roundAtEnd ? ' checked' : '') . '> ' . $langs->trans('Yes') . '</td>';
+print '</tr>';
+
+// Rounds the saved schedule plans, as they will show on the permits
+print '<tr class="oddeven"><td>' . $langs->trans('FireWatchRoundsSchedule') . '</td>';
+print '<td>' . dol_escape_htmltag(dol_ucfirst(implode(', ', array_map('digiriskFirePermitRoundDelayLabel', digiriskFirePermitGetRoundDelays())))) . '</td>';
 print '</tr>';
 
 // What the watcher is asked for when recording a round

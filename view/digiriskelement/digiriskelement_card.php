@@ -45,6 +45,7 @@ require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/groupmentdocument
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/workunitdocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_media.lib.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -106,6 +107,10 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($reshook)) {
 	$error = 0;
+
+	// Photo sent, taken from the media library or removed from the media block of the card
+	$canEditPhotos = $object->status == $object::STATUS_VALIDATED;
+	digiriskObjectMediaActions($object, $action, $object->element_type . '/' . $object->ref, 'photo', $permissiontoadd && $canEditPhotos, $permissiontodelete && $canEditPhotos);
 
 	$backurlforlist = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=1', 1);
 
@@ -379,7 +384,7 @@ if (($id || $ref) && $action == 'edit') {
         $childrenElements = [];
         if (is_array($children) && !empty($children)) {
             foreach ($children as $key => $value) {
-                $childrenElements[$key] .= $key;
+                $childrenElements[$key] = $key;
             }
         }
         print '<tr><td>' . $langs->trans("ParentElement") . '</td><td>';
@@ -443,7 +448,6 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true, $moreParams);
 
 	print '<div class="fichecenter">';
-	print '<div class="fichehalfleft">';
 	print '<table class="border centpercent tableforfield">';
 
 	print '<tr><td class="titlefield tdtop">' . $langs->trans("Description") . '</td>';
@@ -472,30 +476,14 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	print '<input type="checkbox" id="show_in_selectorshow_in_selector" name="show_in_selectorshow_in_selector"' . (($object->show_in_selector == 0) ?  '' : ' checked=""') . '" disabled> ';
 	print '</td></tr>';
 
-	print '<tr class="linked-medias digirisk-element-photo-'. $object->id .'"><td class=""><label for="photos">' . $langs->trans("Photo") . '</label></td><td class="linked-medias-list" style="display: flex; gap: 10px; height: auto;">';
-	print '<span class="add-medias" '. (($object->status == $object::STATUS_VALIDATED) ? "" : "style='display:none'") . '>';
-	print '<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">';
-	print '<label for="fast-upload-photo-default">';
-	print '<div title="'. $langs->trans('AddPhotoFromComputer') .'" class="wpeo-button button-square-50">';
-	print '<i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>';
-	print '</div>';
-	print '</label>';
-	print '&nbsp';
-	print '<input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>';
-	print '<div title="'. $langs->trans('AddPhotoFromMediaGallery') .'" class="wpeo-button button-square-50 open-media-gallery add-media modal-open" value="0">';
-	print '<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="'. $object->id .'" data-from-type="'. $object->element_type .'" data-from-subtype="photo" data-from-subdir="" data-photo-class="digirisk-element-photo-'. $object->id .'"/>';
-	print '<i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>';
-	print '</div>';
-	print '</span>';
-	print '&nbsp';
-    print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref, 'small', 5, 0, 0, 0, 50, 50, 0, 0, 0, $object->element_type . '/'. $object->ref . '/', $object, 'photo', $object->status == $object::STATUS_VALIDATED, $permissiontodelete && $object->status == $object::STATUS_VALIDATED);
+	print '<tr><td class="titlefield">' . $langs->trans('Photo') . '</td><td>';
+	print digiriskObjectMediaBlock($object, $object->element_type . '/' . $object->ref, 'photo', $permissiontoadd && $object->status == $object::STATUS_VALIDATED);
 	print '</td></tr>';
 
 	// Other attributes. Fields from hook formObjectOptions and Extrafields.
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_view.tpl.php';
 
 	print '</table>';
-	print '</div>';
 
 	print '<div class="clearboth"></div>';
 

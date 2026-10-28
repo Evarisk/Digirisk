@@ -84,9 +84,15 @@ if ($id > 0) {
     }
 }
 
+// Once every round is done, the permit is closed from its screen in the application (never automatically)
+$roundsCloseUrl = ($permissiontoadd && $object->id > 0) ? dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_mobile_create.php', 1) . '?created=' . $object->id . '#digirisk-mobile-archive' : '';
+
 /*
  * Actions
  */
+
+// Fin des travaux, ronde, photos : jeton anti-CSRF exige, quel que soit le reglage
+digiriskMobileCheckToken($action);
 
 $parameters = [];
 $resHook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action);

@@ -1,0 +1,231 @@
+/* Digirisk modern theme: Dolibarr lists (noborder / liste / formdoc) and Saturne flex tables */
+
+#{$dr-scope} {
+  table.liste,
+  table.noborder:not(.nobordernopadding):not(.paymenttable):not(.margintable),
+  table.formdoc,
+  div.noborder:not(.paymenttable) {
+    box-sizing: border-box;
+    margin-bottom: 22px;
+    border: 1px solid $dr-border !important;
+    border-radius: $dr-radius-lg;
+    border-collapse: separate !important;
+    border-spacing: 0;
+    background: $dr-surface;
+    box-shadow: $dr-shadow-sm;
+  }
+
+  /* Rounded corners carried by the corner cells, so that nothing has to be clipped
+     (dropdowns and tooltips open from inside the rows) */
+  table.liste,
+  table.noborder:not(.nobordernopadding),
+  table.formdoc {
+    > tbody > tr:first-child > td:first-child,
+    > tbody > tr:first-child > th:first-child,
+    > thead > tr:first-child > th:first-child {
+      border-top-left-radius: $dr-radius-lg - 1px;
+    }
+
+    > tbody > tr:first-child > td:last-child,
+    > tbody > tr:first-child > th:last-child,
+    > thead > tr:first-child > th:last-child {
+      border-top-right-radius: $dr-radius-lg - 1px;
+    }
+
+    > tbody > tr:last-child > td:first-child {
+      border-bottom-left-radius: $dr-radius-lg - 1px;
+    }
+
+    > tbody > tr:last-child > td:last-child {
+      border-bottom-right-radius: $dr-radius-lg - 1px;
+    }
+  }
+
+  /* Header row */
+  tr.liste_titre,
+  tr.liste_titre_sel {
+    background: $dr-surface-soft;
+  }
+
+  tr.liste_titre th,
+  tr.liste_titre td,
+  tr.liste_titre_sel th,
+  tr.liste_titre_sel td,
+  tr.liste_titre th.liste_titre:not(.maxwidthsearch),
+  tr.liste_titre td.liste_titre:not(.maxwidthsearch) {
+    padding-top: 11px;
+    padding-bottom: 11px;
+    border-bottom: 1px solid $dr-border !important;
+    background: $dr-surface-soft;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: $dr-muted;
+    opacity: 1;
+  }
+
+  /* Column titles wrap rather than being cut: Dolibarr ends them with an ellipsis past 100px */
+  table.liste th.wrapcolumntitle.liste_titre:not(.maxwidthsearch),
+  table.liste td.wrapcolumntitle.liste_titre:not(.maxwidthsearch),
+  table.liste th.wrapcolumntitle.liste_titre_sel:not(.maxwidthsearch),
+  table.liste td.wrapcolumntitle.liste_titre_sel:not(.maxwidthsearch) {
+    max-width: none;
+    overflow: visible;
+    white-space: normal;
+    text-overflow: clip;
+    line-height: 1.35;
+  }
+
+  /* Saturne lists: the filter caret is pinned to the right of the title, a wrapped title would leave it alone on a line */
+  table.liste > thead > tr.liste_titre > th[data-colkey] {
+    padding-right: 24px;
+
+    .saturne-col-filter-btn {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+    }
+  }
+
+  tr.liste_titre th a,
+  tr.liste_titre td a,
+  tr.liste_titre_sel th a,
+  tr.liste_titre_sel td a {
+    color: $dr-text-soft;
+  }
+
+  /* Sorted column */
+  tr.liste_titre th.liste_titre_sel,
+  tr.liste_titre td.liste_titre_sel,
+  tr.liste_titre th.liste_titre_sel a,
+  tr.liste_titre td.liste_titre_sel a {
+    color: $dr-primary-strong;
+  }
+
+  /* Filters printed above a list: the head of the card of the table, not a box of their own */
+  div.liste_titre_bydiv {
+    box-sizing: border-box;
+    margin-bottom: 0;
+    border: 1px solid $dr-border;
+    border-bottom: 0;
+    border-radius: $dr-radius-lg $dr-radius-lg 0 0;
+    background: $dr-surface-soft;
+    box-shadow: none;
+  }
+
+  table.liste.listwithfilterbefore {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+
+    > thead > tr:first-of-type > th:first-child,
+    > tbody > tr:first-of-type > td:first-child,
+    > tbody > tr:first-of-type > th:first-child {
+      border-top-left-radius: 0 !important;
+    }
+
+    > thead > tr:first-of-type > th:last-child,
+    > tbody > tr:first-of-type > td:last-child,
+    > tbody > tr:first-of-type > th:last-child {
+      border-top-right-radius: 0 !important;
+    }
+  }
+
+  /* Search row of the lists */
+  tr.liste_titre_filter td,
+  tr.liste_titre_filter th {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid $dr-border !important;
+    background: $dr-surface;
+    text-transform: none;
+  }
+
+  /* Body rows */
+  table.liste > tbody > tr:not(.liste_titre):not(.liste_titre_filter) > td,
+  table.noborder:not(.nobordernopadding) > tbody > tr:not(.liste_titre):not(.liste_titre_filter) > td,
+  table.formdoc > tbody > tr:not(.liste_titre) > td {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-top: none;
+    border-bottom: 1px solid #eef2f6;
+    color: $dr-text;
+  }
+
+  /* Black cotation cell (DigiBoard risk stats): the row colour above put dark text on the black background */
+  table.liste > tbody > tr:not(.liste_titre):not(.liste_titre_filter) > td.risk-evaluation-cotation[data-scale="4"],
+  table.noborder:not(.nobordernopadding) > tbody > tr:not(.liste_titre):not(.liste_titre_filter) > td.risk-evaluation-cotation[data-scale="4"],
+  table.formdoc > tbody > tr:not(.liste_titre) > td.risk-evaluation-cotation[data-scale="4"] {
+    color: #fff;
+  }
+
+  table.liste > tbody > tr:last-child > td,
+  table.noborder:not(.nobordernopadding) > tbody > tr:last-child > td,
+  table.formdoc > tbody > tr:last-child > td {
+    border-bottom: none !important;
+  }
+
+  tr.oddeven,
+  tr.oddeven:nth-child(odd),
+  tr.oddeven:nth-child(even) {
+    background: $dr-surface;
+  }
+
+  tr.oddeven:hover,
+  tr.highlight,
+  .tagtr.oddeven:hover {
+    background: $dr-surface-soft !important;
+  }
+
+  tr.liste_total td,
+  tr.liste_total_wrap td {
+    border-top: 1px solid $dr-border !important;
+    background: $dr-surface-soft;
+    font-weight: 700;
+    color: $dr-text;
+  }
+
+  .div-table-responsive,
+  .div-table-responsive-no-min {
+    border-radius: $dr-radius-lg;
+  }
+
+  /* Box title rows of the dashboard widgets (box_titre) */
+  tr.liste_titre.box_titre td {
+    text-transform: none;
+    font-size: 13px;
+    color: $dr-text;
+  }
+
+  /* ---- Saturne flex tables (wpeo-table.table-flex) ---- */
+
+  .wpeo-table.table-flex {
+    border-radius: $dr-radius-lg;
+
+    .table-row.table-header {
+      background: $dr-surface-soft;
+
+      .table-cell {
+        font-size: 11.5px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        color: $dr-muted;
+      }
+    }
+  }
+
+  /* Pagination of the lists */
+  div.pagination li a,
+  div.pagination li span {
+    border-radius: $dr-radius-sm;
+  }
+
+  div.pagination li.pagination span.active,
+  div.pagination li.pagination .active {
+    background: $dr-primary;
+    border-color: $dr-primary;
+    color: #ffffff;
+  }
+}

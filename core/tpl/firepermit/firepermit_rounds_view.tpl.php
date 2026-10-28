@@ -49,7 +49,7 @@ foreach ($fireWatchRounds as $fireWatchRound) {
     }
 }
 
-$fireWatchDelayLabels = array_map('digiriskFirePermitFormatDelay', $fireWatchDelays);
+$fireWatchDelayLabels = array_map('digiriskFirePermitRoundDelayLabel', $fireWatchDelays);
 ?>
 <div class="firepermit-firewatch" id="firewatch">
     <?php print load_fiche_titre('<i class="fas fa-walking pictofixedwidth"></i>' . $langs->trans('FireWatchTitle'), '', ''); ?>
@@ -122,7 +122,7 @@ $fireWatchDelayLabels = array_map('digiriskFirePermitFormatDelay', $fireWatchDel
                     <tr class="oddeven">
                         <td class="nowraponall">
                             <?php print $langs->trans('FireWatchRoundNumber', $fireWatchRound->position); ?>
-                            <span class="opacitymedium">(+<?php print digiriskFirePermitFormatDelay((int) $fireWatchRound->delay_minutes); ?>)</span>
+                            <span class="opacitymedium">(<?php print dol_escape_htmltag(digiriskFirePermitRoundDelayLabel((int) $fireWatchRound->delay_minutes)); ?>)</span>
                         </td>
                         <td class="nowraponall"><?php print dol_print_date($fireWatchRound->date_planned, 'dayhour', 'tzuserrel'); ?></td>
                         <td class="center"><?php print dolGetStatus($langs->trans($badgeLabel), $langs->trans($badgeLabel), '', $badgeType, 5); ?></td>

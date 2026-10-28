@@ -2340,6 +2340,7 @@ MobileFPNoTagAvailable = Brak dostępnych tagów zezwolenia na prace pożarowe.
 MobileFPErrorUpdatingPermit = Błąd podczas aktualizacji zezwolenia na prace pożarowe.
 MobileFPErrorCreatingPermit = Błąd podczas tworzenia zezwolenia na prace pożarowe.
 MobileFPLockNeedsSignature = Zezwolenie musi zostać podpisane, zanim będzie mogło zostać zablokowane.
+MobilePPLockNeedsSignature = Plan musi zostać podpisany, zanim będzie mógł zostać zablokowany.
 MobileFPSpreadAvailableOnceSignedAndLocked = Rozpowszechnianie będzie dostępne, gdy zezwolenie zostanie podpisane przez osoby odpowiedzialne i zablokowane.
 MobileFPDefaultDateStartToday = Data rozpoczęcia = data dzisiejsza
 MobileFPDefaultDuration = Domyślny czas trwania okresu (dni)

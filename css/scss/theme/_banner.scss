@@ -1,0 +1,131 @@
+/* Digirisk modern theme: object banner (saturne_banner_tab / dol_banner_tab) and field tables */
+
+#{$dr-scope} {
+  div.arearef,
+  div.arearefnobottom {
+    display: flow-root;
+    box-sizing: border-box;
+    margin-bottom: 16px;
+    padding: 16px 18px;
+    @include dr-card;
+
+    .divphotoref {
+      margin-right: 16px;
+    }
+
+    .photoref,
+    .divphotoref > img,
+    .divphotoref .photowithmargin,
+    .divphotoref .photoref img {
+      border: none;
+      border-radius: $dr-radius-lg;
+      box-shadow: none;
+      background: $dr-surface-soft;
+    }
+
+    .photoref {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: $dr-primary-soft;
+
+      .fas,
+      .far,
+      .fa {
+        color: $dr-primary;
+        opacity: 1;
+      }
+    }
+
+    div.refid,
+    .refid {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: $dr-text;
+    }
+
+    div.refidno,
+    .refidno {
+      margin-top: 4px;
+      font-size: 13px;
+      font-weight: 400;
+      color: $dr-text-soft;
+      line-height: 1.6;
+    }
+
+    .banner-ref-sep {
+      color: $dr-faint;
+    }
+
+    div.statusref {
+      margin-top: 4px;
+    }
+
+    .pagination.paginationref li a,
+    .pagination.paginationref li span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 30px;
+      height: 30px;
+      padding: 0;
+      border: 1px solid $dr-border;
+      border-radius: $dr-radius-sm;
+      background: $dr-surface;
+      color: $dr-text-soft;
+    }
+
+    .pagination.paginationref li a:hover {
+      border-color: $dr-primary;
+      color: $dr-primary;
+    }
+  }
+
+  div.underbanner,
+  div.underrefbanner {
+    border-bottom: none;
+  }
+
+  /* Field tables of the cards become white cards */
+  table.border.tableforfield,
+  table.border.tableforfieldcreate,
+  table.border.tableforfieldedit,
+  div.tabBar table.border:not(.nobordernopadding):not(.tableforfield) {
+    box-sizing: border-box;
+    border: 1px solid $dr-border !important;
+    border-collapse: separate !important;
+    border-spacing: 0;
+    border-radius: $dr-radius-lg;
+    background: $dr-surface;
+    box-shadow: $dr-shadow-sm;
+
+    > tbody > tr > td {
+      padding: 9px 14px !important;
+      border-top: none !important;
+      border-bottom: 1px solid #eef2f6 !important;
+      color: $dr-text;
+    }
+
+    > tbody > tr:last-child > td {
+      border-bottom: none !important;
+    }
+
+    > tbody > tr > td.titlefield,
+    > tbody > tr > td.titlefieldcreate,
+    > tbody > tr > td:first-child:not(:only-child) {
+      color: $dr-muted;
+      font-weight: 500;
+    }
+  }
+
+  div.fichecenter {
+    margin-bottom: 8px;
+  }
+
+  div.fichehalfleft table.tableforfield,
+  div.fichehalfright table.tableforfield {
+    margin-bottom: 12px;
+  }
+
+}

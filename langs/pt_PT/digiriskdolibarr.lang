@@ -2340,6 +2340,7 @@ MobileFPNoTagAvailable = Não está disponível nenhuma etiqueta de licença de 
 MobileFPErrorUpdatingPermit = Erro ao atualizar a licença de fogo.
 MobileFPErrorCreatingPermit = Erro ao criar a licença de fogo.
 MobileFPLockNeedsSignature = A licença deve estar assinada antes de poder ser bloqueada.
+MobilePPLockNeedsSignature = O plano deve estar assinado antes de poder ser bloqueado.
 MobileFPSpreadAvailableOnceSignedAndLocked = A difusão estará disponível assim que a licença for assinada pelos responsáveis e bloqueada.
 MobileFPDefaultDateStartToday = Data de início = data de hoje
 MobileFPDefaultDuration = Duração predefinida do período (dias)

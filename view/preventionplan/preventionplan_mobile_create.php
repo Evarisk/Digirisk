@@ -201,6 +201,9 @@ if (!$isEdit) {
  * Actions
  */
 
+// Toutes les actions de cet ecran modifient des donnees : jeton anti-CSRF exige, quel que soit le reglage
+digiriskMobileCheckToken($action);
+
 // Photo taken or removed on a risk block: the Saturne media block posts here and expects the
 // refreshed block as a response. Only the temporary directory of this form session is writable.
 if (($action == 'uploadPhoto' || $action == 'deletePhoto') && $permissiontoadd) {
@@ -809,10 +812,13 @@ if ($action == 'lock_mobile' && $permissiontoadd) {
     $lockPlan = new PreventionPlan($db);
     
     if ($planId > 0 && $lockPlan->fetch($planId) > 0) {
-        $lockPlan->setLocked($user, false);
-        digiriskRefreshPreventionPlanDocument($db, (int) $lockPlan->id, $user, $langs, true);
+        if ($lockPlan->setLocked($user) > 0) {
+            digiriskRefreshPreventionPlanDocument($db, (int) $lockPlan->id, $user, $langs, true);
+        } else {
+            setEventMessages($lockPlan->error, $lockPlan->errors, 'errors');
+        }
     }
-    
+
     header('Location: ' . $_SERVER['PHP_SELF'] . '?created=' . $planId);
     exit;
 }

@@ -238,6 +238,9 @@ if ($id > 0 && $object->fetch($id) > 0) {
  * Actions
  */
 
+// Toutes les actions de cet ecran modifient des donnees : jeton anti-CSRF exige, quel que soit le reglage
+digiriskMobileCheckToken($action);
+
 // Photo taken or removed on a type of work block: the Saturne media block posts here and expects the
 // refreshed block as a response. Only the temporary directory of this form session is writable.
 if (($action == 'uploadPhoto' || $action == 'deletePhoto') && $permissiontoadd) {
@@ -782,8 +785,32 @@ if ($action == 'lock_mobile' && $permissiontoadd) {
     $lockPermit = new FirePermit($db);
 
     if ($permitId > 0 && $lockPermit->fetch($permitId) > 0) {
-        $lockPermit->setLocked($user, false);
-        digiriskRefreshFirePermitDocument($db, (int) $lockPermit->id, $user, $langs, true);
+        if ($lockPermit->setLocked($user) > 0) {
+            digiriskRefreshFirePermitDocument($db, (int) $lockPermit->id, $user, $langs, true);
+        } else {
+            setEventMessages($lockPermit->error, $lockPermit->errors, 'errors');
+        }
+    }
+
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?created=' . $permitId);
+    exit;
+}
+
+/*
+ * Cloture (archivage) du permis de feu depuis l'ecran de succes, derniere etape de la barre d'avancement.
+ * Jamais automatique : l'utilisateur la demande, une fois le permis verrouille et la surveillance apres
+ * travaux terminee (fin des travaux declaree, plus aucune ronde en attente, comme sur la fiche Dolibarr).
+ */
+if ($action == 'setArchived' && $permissiontoadd) {
+    $permitId      = GETPOSTINT('plan_id');
+    $archivePermit = new FirePermit($db);
+
+    if ($permitId > 0 && $archivePermit->fetch($permitId) > 0 && $archivePermit->status == FirePermit::STATUS_LOCKED) {
+        if (empty($archivePermit->date_work_end) || $archivePermit->countPendingRounds() > 0) {
+            setEventMessages($langs->trans('FireWatchArchiveBlocked'), [], 'errors');
+        } elseif ($archivePermit->setArchived($user) <= 0) {
+            setEventMessages($archivePermit->error, $archivePermit->errors, 'errors');
+        }
     }
 
     header('Location: ' . $_SERVER['PHP_SELF'] . '?created=' . $permitId);

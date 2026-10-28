@@ -1,0 +1,60 @@
+/* Digirisk modern theme: design tokens.
+   Same palette as the PWAs of Digirisk, DigiQuali and ReedCRM (Tailwind slate greys
+   plus the Saturne blue), so that the back office and the mobile screens look alike. */
+
+/* digiriskdolibarr.min.css is only loaded on Digirisk pages, but the PWA screens and the
+   public pages already have their own design: the theme stays away from them */
+$dr-scope: 'body#mainbody:not(.template-pwa):not(.digirisk-mobile-create):not(.page-public-card):not(.digirisk-firewatch-public)';
+
+$dr-bg: #f1f5f9;
+$dr-surface: #ffffff;
+$dr-surface-soft: #f8fafc;
+$dr-border: #e2e8f0;
+$dr-border-strong: #cbd5e1;
+$dr-text: #1e293b;
+$dr-text-soft: #475569;
+$dr-muted: #64748b;
+$dr-faint: #94a3b8;
+
+$dr-primary: $color__primary;
+$dr-primary-strong: #0a6fd1;
+$dr-primary-soft: rgba(13, 138, 255, 0.1);
+$dr-navy: $color__secondary;
+$dr-success: #16a34a;
+$dr-success-soft: rgba(22, 163, 74, 0.12);
+$dr-warning: #d97706;
+$dr-warning-soft: rgba(233, 173, 79, 0.18);
+$dr-danger: $color__red;
+$dr-danger-soft: rgba(224, 83, 83, 0.12);
+$dr-environment: $color__riskenvironmental;
+
+$dr-radius-lg: 14px;
+$dr-radius: 10px;
+$dr-radius-sm: 8px;
+$dr-radius-pill: 999px;
+
+$dr-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+$dr-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.06);
+$dr-shadow-hover: 0 4px 16px rgba(15, 23, 42, 0.12);
+$dr-shadow-lg: 0 20px 48px rgba(15, 23, 42, 0.22);
+$dr-ring: 0 0 0 3px rgba(13, 138, 255, 0.18);
+
+$dr-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+$dr-transition: 0.15s ease;
+
+/* Uppercase micro label, used for table headers and field labels */
+@mixin dr-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $dr-muted;
+}
+
+/* White rounded surface */
+@mixin dr-card {
+  background: $dr-surface;
+  border: 1px solid $dr-border;
+  border-radius: $dr-radius-lg;
+  box-shadow: $dr-shadow-sm;
+}

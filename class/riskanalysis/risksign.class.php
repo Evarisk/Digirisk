@@ -53,9 +53,9 @@ class RiskSign extends SaturneObject
 	public $ismultientitymanaged = 1;
 
 	/**
-	 * @var string String with name of icon for risksign. Must be the part after the 'object_' into object_risksign.png
+	 * @var string Icon of the risk sign: object_risksign.png never existed, the picto was a broken image
 	 */
-	public string $picto = 'risksign@digiriskdolibarr';
+	public string $picto = 'fontawesome_fa-map-signs_fas_#d35968';
 
     public const STATUS_DELETED   = -1;
     public const STATUS_DRAFT     = 0;
@@ -118,6 +118,90 @@ class RiskSign extends SaturneObject
 		$filter = array('customsql' => 'fk_element=' . $this->db->escape($parent_id) . ' AND status > ' . $this::STATUS_DELETED);
 		return $this->fetchAll('', '', 0, 0, $filter, 'AND');
 	}
+
+    /**
+     * Return a link to the risk sign (with optionaly the picto)
+     *
+     * A risk sign has no card of its own: the link opens the risk signs tab of the GP/UT it was
+     * created on, where it is listed and edited. SaturneObject::getNomUrl() pointed to a
+     * risksign_card.php that does not exist.
+     *
+     * @param  int    $withPicto           Include picto in link (0 = No picto, 1 = Include picto into link, 2 = Only picto)
+     * @param  string $option              On what the link point to ('nolink', 'blank', ...)
+     * @param  int    $noToolTip           1 = Disable tooltip
+     * @param  string $moreCSS             Add more css on link
+     * @param  int    $saveLastSearchValue -1 = Auto, 0 = No save of lastsearch_values when clicking, 1 = Save lastsearch_values whenclicking
+     * @param  int    $addLabel            0 = Default, 1 = Add label into string, >1 = Add first chars into string
+     * @return string                      String with URL
+     */
+    public function getNomUrl(int $withPicto = 0, string $option = '', int $noToolTip = 0, string $moreCSS = '', int $saveLastSearchValue = -1, int $addLabel = 0): string
+    {
+        global $action, $conf, $hookmanager, $langs;
+
+        if (!empty($conf->dol_no_mouse_hover)) {
+            // Force disable tooltips
+            $noToolTip = 1;
+        }
+
+        $result = '';
+        $params = [
+            'id'         => $this->id,
+            'objecttype' => $this->element . '@' . $this->module,
+            'option'     => $option,
+        ];
+        $classForTooltip = 'classfortooltip';
+        $dataParams      = '';
+        if (getDolGlobalInt('MAIN_ENABLE_AJAX_TOOLTIP')) {
+            $classForTooltip = 'classforajaxtooltip';
+            $dataParams      = ' data-params="' . dol_escape_htmltag(json_encode($params)) . '"';
+            $label           = '';
+        } else {
+            $label = implode($this->getTooltipContentArray($params));
+        }
+
+        $url = dol_buildpath('/' . $this->module . '/view/digiriskelement/digiriskelement_risksign.php', 1) . '?id=' . ((int) $this->fk_element);
+
+        $linkclose = '';
+        if (empty($noToolTip)) {
+            if (getDolGlobalInt('MAIN_OPTIMIZEFORTEXTBROWSER')) {
+                $label      = $langs->trans('Show' . dol_ucfirst($this->element));
+                $linkclose .= ' alt="' . dolPrintHTMLForAttribute($label) . '"';
+            }
+            $linkclose .= ($label ? ' title="' . dolPrintHTMLForAttribute($label) . '"' : ' title="tocomplete"');
+            $linkclose .= $dataParams . ' class="' . $classForTooltip . ($moreCSS ? ' ' . $moreCSS : '') . '"';
+        } else {
+            $linkclose = ($moreCSS ? ' class="' . $moreCSS . '"' : '');
+        }
+
+        if ($option == 'nolink' || empty($this->fk_element)) {
+            $linkstart = '<span';
+            $linkend   = '</span>';
+        } else {
+            $linkstart = '<a href="' . $url . '"' . ($option == 'blank' ? ' target="_blank"' : '');
+            $linkend   = '</a>';
+        }
+        $linkstart .= $linkclose . '>';
+
+        $result .= $linkstart;
+        if ($withPicto) {
+            $result .= img_object(($noToolTip ? '' : $label), $this->picto, (($withPicto != 2) ? 'class="paddingright"' : ''), 0, 0, $noToolTip ? 0 : 1);
+        }
+        if ($withPicto != 2) {
+            $result .= $this->ref;
+        }
+        $result .= $linkend;
+
+        $hookmanager->initHooks([$this->element . 'dao']);
+        $parameters = ['id' => $this->id, 'getnomurl' => &$result];
+        $resHook    = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action);
+        if ($resHook > 0) {
+            $result = $hookmanager->resPrint;
+        } else {
+            $result .= $hookmanager->resPrint;
+        }
+
+        return $result;
+    }
 
     /**
      * Load risk sign infos

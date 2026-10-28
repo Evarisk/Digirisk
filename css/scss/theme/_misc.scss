@@ -1,0 +1,91 @@
+/* Digirisk modern theme: small Digirisk widgets (completion gauge, risk counters, legacy blocks) */
+
+#{$dr-scope} {
+  /* ---- Completion gauge (digiriskdolibarr_configuration_gauge_view.tpl.php) ---- */
+
+  .chart-container:has(canvas[id^="advancementGauge"]) {
+    display: flex;
+    /* The title is a sibling of the canvas block when $move_title_gauge is set (cards) */
+    align-items: center;
+    gap: 8px;
+    width: max-content !important;
+    margin: 0 0 14px;
+    padding: 5px 14px 5px 6px;
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius-pill;
+    background: $dr-surface;
+    box-shadow: $dr-shadow-sm;
+
+    .wpeo-gridlayout {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    canvas {
+      width: 28px !important;
+      height: 28px !important;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: $dr-text;
+    }
+  }
+
+  /* On a card, the gauge goes to the right, above the banner */
+  div.tabBar > .chart-container:has(canvas[id^="advancementGauge"]) {
+    margin-left: auto;
+  }
+
+  /* ---- Risk counters on top of the risk list (risk_list.php) ---- */
+
+  .risk-dashboard {
+    &__tile {
+      padding: 7px 16px 7px 7px;
+      border-color: $dr-border;
+      border-radius: 12px;
+      box-shadow: $dr-shadow-sm;
+
+      &:hover {
+        border-color: $dr-primary;
+        box-shadow: $dr-shadow;
+      }
+
+      &.selected {
+        border-color: $dr-primary;
+        box-shadow: 0 0 0 2px $dr-primary;
+      }
+    }
+
+    &__count {
+      border-radius: $dr-radius;
+      font-variant-numeric: tabular-nums;
+    }
+
+    &__label {
+      color: $dr-text;
+    }
+  }
+
+  /* ---- Admin pages: help lines with a big picto ---- */
+
+  .config-tuto {
+    border-radius: $dr-radius;
+  }
+
+  h2 {
+    color: $dr-text;
+    letter-spacing: -0.01em;
+  }
+
+  /* ---- Legacy Digirisk tabs and tables (css/digiriskdolibarr.css, users page) ---- */
+
+  .wpeo-tab .tab-list .tab-element.tab-active {
+    border-color: $dr-primary;
+    color: $dr-primary-strong;
+  }
+}
