@@ -234,6 +234,13 @@ if (!isset($rpsAssessmentByElement)) {
 if (!isset($rpsTasksByElement)) {
     $rpsTasksByElement = [];
 
+    // Une action creee pour un facteur porte son nom en tete de libelle ("Autonomie : ...") :
+    // c'est ce qui la rattache au facteur, sans colonne dediee sur la tache
+    $rpsFactorPrefixes = [];
+    foreach ($rpsSubCategories as $rpsPosition => $rpsSub) {
+        $rpsFactorPrefixes[$rpsPosition] = $langs->transnoentities($rpsSub['label']) . ' : ';
+    }
+
     // Le responsable d'une tache est son contact interne "TASKEXECUTIVE" : c'est la
     // convention Dolibarr, celle qu'affiche la fiche de la tache.
     $sqlTasks  = 'SELECT r.fk_element, t.rowid, t.ref, t.label, t.fk_statut, t.progress, t.datee,';
@@ -252,10 +259,23 @@ if (!isset($rpsTasksByElement)) {
     $resTasks = $db->query($sqlTasks);
     if ($resTasks) {
         while ($o = $db->fetch_object($resTasks)) {
+            $rpsTaskFactor = null;
+            $rpsTaskText   = (string) $o->label;
+            foreach ($rpsFactorPrefixes as $rpsPosition => $rpsPrefix) {
+                if (mb_stripos($rpsTaskText, $rpsPrefix) === 0) {
+                    $rpsTaskFactor = $rpsPosition;
+                    $rpsTaskText   = mb_substr($rpsTaskText, mb_strlen($rpsPrefix));
+                    break;
+                }
+            }
+
             $rpsTasksByElement[(int) $o->fk_element][] = [
                 'id'       => (int) $o->rowid,
                 'ref'      => (string) $o->ref,
                 'label'    => (string) $o->label,
+                // Facteur vise et libelle sans son prefixe, quand l'action a ete creee pour un facteur
+                'factor'   => $rpsTaskFactor,
+                'text'     => $rpsTaskText,
                 'progress' => (int) $o->progress,
                 'done'     => ((int) $o->progress >= 100 || (int) $o->fk_statut == 3),
                 'due'      => $o->datee,
@@ -326,12 +346,15 @@ if (is_array($activeDigiriskElementList)) {
             'id'      => $elementId,
             'ref'     => $element->ref,
             'label'   => $element->label,
+            'parent'  => (int) $element->fk_parent,
             'state'   => $scope['state'],
             'reason'  => $scope['reason'],
             'date'    => '',
             'levels'  => [],
             'orphans' => $rpsExistingRefs[$elementId] ?? [],
             'tasks'   => $rpsTasksByElement[$elementId] ?? [],
+            // Une action se rattache au risque de l'evaluation consolidee : sans elle, rien a quoi la lier
+            'assessed' => !empty($rpsAssessmentByElement[$elementId]),
         ];
 
         if (!empty($rpsAssessmentByElement[$elementId])) {
@@ -366,6 +389,14 @@ if (is_array($activeDigiriskElementList)) {
                 if ($rpsFactorLevel >= 3) {
                     $line['toTreat'][] = $rpsFactorPosition;
                 }
+            }
+
+            // Facteurs a traiter sans aucune action. Une action sans facteur reconnu peut en couvrir
+            // n'importe lequel : l'unite n'est alors pas signalee, faute de pouvoir le dire
+            $line['untreated'] = [];
+            $rpsTaskFactors    = array_column($line['tasks'], 'factor');
+            if (!in_array(null, $rpsTaskFactors, true)) {
+                $line['untreated'] = array_values(array_diff($line['toTreat'], $rpsTaskFactors));
             }
         }
 

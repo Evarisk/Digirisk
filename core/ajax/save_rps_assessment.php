@@ -96,7 +96,15 @@ function rps_average_to_scale(float $average): int
 $action    = $data['action'] ?? '';
 $elementId = (int) ($data['fk_element'] ?? 0);
 
-if ($elementId <= 0) {
+// La qualification peut viser plusieurs unites d'un coup : la selection du tableau du groupement de tete
+$elementIds = $elementId > 0 ? [$elementId] : [];
+if ($action == 'scope' && isset($data['fk_elements']) && is_array($data['fk_elements'])) {
+    $elementIds = array_values(array_unique(array_filter(array_map('intval', $data['fk_elements']), function ($id) {
+        return $id > 0;
+    })));
+}
+
+if (empty($elementIds)) {
     http_response_code(400);
     echo json_encode(['error' => 'Missing work unit']);
     exit;
@@ -118,32 +126,98 @@ if ($action == 'scope') {
 
     $db->begin();
 
-    $sql  = 'SELECT rowid FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_rpsscope';
-    $sql .= ' WHERE fk_element = ' . $elementId . ' AND entity = ' . (int) $conf->entity;
-    $resql = $db->query($sql);
-    $existing = ($resql && $db->num_rows($resql) > 0) ? $db->fetch_object($resql)->rowid : 0;
+    // Toutes les unites ou aucune : une selection a moitie qualifiee ne se verrait pas dans le tableau
+    foreach ($elementIds as $scopeElementId) {
+        $sql  = 'SELECT rowid FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_rpsscope';
+        $sql .= ' WHERE fk_element = ' . $scopeElementId . ' AND entity = ' . (int) $conf->entity;
+        $resql = $db->query($sql);
+        $existing = ($resql && $db->num_rows($resql) > 0) ? $db->fetch_object($resql)->rowid : 0;
 
-    if ($existing > 0) {
-        $sql  = 'UPDATE ' . MAIN_DB_PREFIX . 'digiriskdolibarr_rpsscope';
-        $sql .= " SET concerned = " . $concerned . ", reason = '" . $db->escape($reason) . "'";
-        $sql .= ', fk_user_modif = ' . (int) $user->id;
-        $sql .= ' WHERE rowid = ' . (int) $existing;
-    } else {
-        $sql  = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_rpsscope';
-        $sql .= ' (entity, date_creation, fk_element, concerned, reason, fk_user_modif) VALUES (';
-        $sql .= (int) $conf->entity . ", '" . $db->idate(dol_now()) . "', " . $elementId . ', ';
-        $sql .= $concerned . ", '" . $db->escape($reason) . "', " . (int) $user->id . ')';
+        if ($existing > 0) {
+            $sql  = 'UPDATE ' . MAIN_DB_PREFIX . 'digiriskdolibarr_rpsscope';
+            $sql .= " SET concerned = " . $concerned . ", reason = '" . $db->escape($reason) . "'";
+            $sql .= ', fk_user_modif = ' . (int) $user->id;
+            $sql .= ' WHERE rowid = ' . (int) $existing;
+        } else {
+            $sql  = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_rpsscope';
+            $sql .= ' (entity, date_creation, fk_element, concerned, reason, fk_user_modif) VALUES (';
+            $sql .= (int) $conf->entity . ", '" . $db->idate(dol_now()) . "', " . $scopeElementId . ', ';
+            $sql .= $concerned . ", '" . $db->escape($reason) . "', " . (int) $user->id . ')';
+        }
+
+        if (!$db->query($sql)) {
+            $db->rollback();
+            http_response_code(500);
+            echo json_encode(['error' => $db->lasterror()]);
+            exit;
+        }
     }
 
-    if (!$db->query($sql)) {
+    $db->commit();
+    echo json_encode(['success' => 1, 'concerned' => $concerned, 'elements' => $elementIds]);
+    exit;
+}
+
+/* --------------------------------------------------------------------------
+ * Ajout d'une action de prevention, sans repasser par l'evaluation
+ * ----------------------------------------------------------------------- */
+
+if ($action == 'task_create') {
+    $taskLabel = trim((string) ($data['label'] ?? ''));
+    if ($taskLabel === '') {
+        http_response_code(400);
+        echo json_encode(['error' => "Libellé de l'action manquant"]);
+        exit;
+    }
+
+    // L'action se rattache au risque de l'evaluation consolidee, comme celles saisies dans l'evaluation
+    $sql  = 'SELECT rowid FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_risk';
+    $sql .= ' WHERE fk_element = ' . $elementId;
+    $sql .= ' AND category = ' . (int) Risk::PSYCHOSOCIAL_CATEGORY_POSITION;
+    $sql .= ' AND status > 0 AND (sub_category IS NULL OR sub_category = -1)';
+    $sql .= ' AND entity IN (' . getEntity('digiriskelement') . ')';
+    $sql .= ' ORDER BY rowid ASC LIMIT 1';
+
+    $resql  = $db->query($sql);
+    $riskId = ($resql && $db->num_rows($resql) > 0) ? (int) $db->fetch_object($resql)->rowid : 0;
+    if ($riskId <= 0) {
+        http_response_code(409);
+        echo json_encode(['error' => "Évaluez l'unité avant de lui ajouter une action : l'action se rattache à son évaluation."]);
+        exit;
+    }
+
+    // Le facteur vise part en tete du libelle, comme pour les actions saisies dans l'evaluation
+    $factor = (int) ($data['factor'] ?? -1);
+    foreach ((Risk::getDangerSubCategories()[Risk::PSYCHOSOCIAL_CATEGORY_POSITION] ?? []) as $subCategory) {
+        if ((int) $subCategory['position'] === $factor && $factor <= 5) {
+            $taskLabel = $langs->transnoentities($subCategory['label']) . ' : ' . $taskLabel;
+        }
+    }
+
+    list($refTaskMod) = saturne_require_objects_mod(['project/task' => $conf->global->PROJECT_TASK_ADDON], 'digiriskdolibarr');
+
+    $db->begin();
+
+    $task                                   = new Task($db);
+    $task->ref                              = $refTaskMod->getNextValue('', $task);
+    $task->label                            = $taskLabel;
+    $task->description                      = '';
+    $task->status                           = 1;
+    $task->progress                         = 0;
+    $task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+    $task->array_options['options_fk_risk'] = $riskId;
+    $task->date_start                       = dol_now();
+    $task->date_end                         = dol_now() + 30 * 86400;
+
+    if ($task->create($user) <= 0) {
         $db->rollback();
         http_response_code(500);
-        echo json_encode(['error' => $db->lasterror()]);
+        echo json_encode(['error' => $task->errorsToString() ?: $task->error]);
         exit;
     }
 
     $db->commit();
-    echo json_encode(['success' => 1, 'concerned' => $concerned]);
+    echo json_encode(['success' => 1, 'task' => $task->id, 'ref' => $task->ref]);
     exit;
 }
 
