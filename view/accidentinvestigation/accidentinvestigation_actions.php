@@ -133,7 +133,17 @@ if ($action === 'addAction' && $permissiontoadd) {
     exit();
 }
 
-if ($action === 'closeAction' && $permissiontoadd && $taskid > 0) {
+// Only the actions of this investigation can be closed or moved from its tab, not any task of the instance
+$investigationActionIds = [];
+if ($taskid > 0) {
+    foreach ([1, 2] as $type) {
+        foreach (digiriskdolibarr_get_actions_by_type($db, (int) $object->fk_task, $type) as $actionRow) {
+            $investigationActionIds[] = (int) $actionRow->rowid;
+        }
+    }
+}
+
+if ($action === 'closeAction' && $permissiontoadd && in_array((int) $taskid, $investigationActionIds, true)) {
     $taskToClose           = new Task($db);
     $taskToClose->fetch($taskid);
     $taskToClose->progress = 100;
@@ -148,7 +158,7 @@ if ($action === 'closeAction' && $permissiontoadd && $taskid > 0) {
     exit();
 }
 
-if ($action === 'updateProgress' && $permissiontoadd && $taskid > 0) {
+if ($action === 'updateProgress' && $permissiontoadd && in_array((int) $taskid, $investigationActionIds, true)) {
     $taskToUpdate           = new Task($db);
     $taskToUpdate->fetch($taskid);
     $taskToUpdate->progress = min(100, max(0, GETPOST('progress_value', 'int')));
