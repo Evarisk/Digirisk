@@ -44,14 +44,16 @@ global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $user;
 saturne_load_langs(['ticket', 'companies', 'projects', 'categories']);
 
 $id      = GETPOSTINT('id');
+$ref     = GETPOST('ref', 'alpha');
 $trackId = GETPOST('track_id', 'alpha');
 $action  = GETPOST('action', 'aZ09');
 
 $now = dol_now();
 
 $object = new Ticket($db);
-if ($id > 0 || !empty($trackId)) {
-    $object->fetch($id, '', $trackId);
+// The previous / next arrows of the banner (dol_banner_tab) open the card by its ref
+if ($id > 0 || !empty($ref) || !empty($trackId)) {
+    $object->fetch($id, $ref, $trackId);
     if ($object->id > 0) {
         $object->fetch_optionals();
     }

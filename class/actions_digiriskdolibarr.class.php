@@ -252,8 +252,9 @@ class ActionsDigiriskdolibarr
         $this->results = [];
 
         // Ticket tabs browsed from the Digirisk menu: the "Ticket" tab leads back to the Digirisk ticket card,
-        // not to the native one
-        if (($parameters['type'] ?? '') === 'ticket' && ($parameters['mode'] ?? '') === 'remove' && ($_SESSION['mainmenu'] ?? '') === 'digiriskdolibarr' && !empty($parameters['object']->id)) {
+        // not to the native one. Dolibarr 23 does not give the type of the tabs to the hook, the object tells it
+        $tabsType = $parameters['type'] ?? ($parameters['object']->element ?? '');
+        if ($tabsType === 'ticket' && ($parameters['mode'] ?? '') === 'remove' && ($_SESSION['mainmenu'] ?? '') === 'digiriskdolibarr' && !empty($parameters['object']->id)) {
             foreach ($parameters['head'] as $key => $tab) {
                 if (($tab[2] ?? '') === 'tabTicket') {
                     $parameters['head'][$key][0] = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $parameters['object']->id;
