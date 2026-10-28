@@ -800,7 +800,7 @@ class DigiriskDolibarr extends SaturneApi
 	/**
 	 * Create a new organization element (Groupment GP or Work Unit UT) in the current entity.
 	 *
-	 * @param array $request_data JSON body: label, element_type ('groupment'|'workunit'), optional fk_parent, description, show_in_selector, ranks {@from body}
+	 * @param array $request_data JSON body: label, element_type ('groupment'|'workunit'), optional fk_parent, description, show_in_selector, ranks, people_percentage (0 to 100) {@from body}
 	 *
 	 * @return int New DigiriskElement ID
 	 *
@@ -824,6 +824,9 @@ class DigiriskDolibarr extends SaturneApi
 		}
 		if (!in_array($elementType, ['groupment', 'workunit'], true)) {
 			throw new RestException(400, 'Invalid element_type (groupment or workunit expected)');
+		}
+		if (!DigiriskElement::isValidPeoplePercentage($data['people_percentage'] ?? null)) {
+			throw new RestException(400, 'Invalid people_percentage (0 to 100 expected)');
 		}
 
 		$fkParent = isset($data['fk_parent']) ? (int) $data['fk_parent'] : 0;
@@ -861,7 +864,7 @@ class DigiriskDolibarr extends SaturneApi
 	 * Update an existing active organization element (GP/UT).
 	 *
 	 * @param int   $id           DigiriskElement ID
-	 * @param array $request_data Fields to update (label, description, fk_parent, show_in_selector, ranks) {@from body}
+	 * @param array $request_data Fields to update (label, description, fk_parent, show_in_selector, ranks, people_percentage from 0 to 100) {@from body}
 	 *
 	 * @return object Cleaned updated DigiriskElement
 	 *
@@ -893,6 +896,9 @@ class DigiriskDolibarr extends SaturneApi
 
 		if (isset($data['element_type']) && !in_array($data['element_type'], ['groupment', 'workunit'], true)) {
 			throw new RestException(400, 'Invalid element_type (groupment or workunit expected)');
+		}
+		if (!DigiriskElement::isValidPeoplePercentage($data['people_percentage'] ?? null)) {
+			throw new RestException(400, 'Invalid people_percentage (0 to 100 expected)');
 		}
 
 		if (array_key_exists('fk_parent', $data)) {
