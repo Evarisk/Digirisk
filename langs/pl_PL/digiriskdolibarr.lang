@@ -1972,6 +1972,8 @@ TicketKanbanLogDeadline                = Zmiana terminu
 TicketKanbanLogDeadlineDesc            = Utwórz zdarzenie, gdy termin zgłoszenia zostanie zmieniony przez kanban
 TicketKanbanClosedLimit                = Limit zamkniętych zgłoszeń
 TicketKanbanClosedLimitDesc            = Maksymalna liczba zamkniętych/anulowanych zgłoszeń wyświetlanych w kanbanie (0 = bez ograniczeń)
+TicketLastMessageDate                  = Data ostatniej wiadomości
+TicketElapsedTimeHelp                  = Czas od utworzenia, zatrzymany przy zamknięciu
 
 # ===========================================================================
 # Ticket — identyfikowalność zmian — issue #4885

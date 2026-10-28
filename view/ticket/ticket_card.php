@@ -200,17 +200,19 @@ if ($action === 'setproject_ajax' && $permissionToWrite) {
         }
     }
     $object->setProject($newProjectId);
-    $projRef = '';
-    $cardUrl = '';
+    $projRef   = '';
+    $projLabel = '';
+    $cardUrl   = '';
     if ($newProjectId > 0) {
         $proj = new Project($db);
         $proj->fetch($newProjectId);
-        $projRef = trim($proj->ref);
-        $cardUrl = DOL_URL_ROOT . '/projet/card.php?id=' . $newProjectId;
+        $projRef   = trim($proj->ref);
+        $projLabel = $projRef . ($proj->title ? ' - ' . $proj->title : '');
+        $cardUrl   = DOL_URL_ROOT . '/projet/card.php?id=' . $newProjectId;
     }
     digiriskdolibarr_ticket_log_field_change($object, $langs->transnoentities('Project'), $oldProjRef, $projRef, $ticketLogConst);
     header('Content-Type: application/json');
-    print json_encode(['success' => 1, 'id' => $newProjectId, 'name' => $projRef, 'cardurl' => $cardUrl]);
+    print json_encode(['success' => 1, 'id' => $newProjectId, 'name' => $projLabel, 'cardurl' => $cardUrl]);
     exit;
 }
 
@@ -692,14 +694,15 @@ if (isModEnabled('project')) {
     $morehtmlref .= img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="dtc-badge-logo"');
     $morehtmlref .= '<a class="dtc-badge-nav" href="' . dol_escape_htmltag($projUrl) . '" title="' . dol_escape_htmltag($langs->trans('Project')) . '"' . ($hasProject ? '' : ' style="display:none;"') . '><i class="fas fa-project-diagram"></i></a>';
     $projNameClass = 'dtc-project-name dtc-badge-name' . ($permissionToWrite ? ' dtc-inline-edit' : '') . ($hasProject ? '' : ' is-empty');
-    $projNameText  = $hasProject ? dol_escape_htmltag($object->project->ref) : dol_escape_htmltag($emptyProjLabel);
+    $projNameText  = $hasProject ? dol_escape_htmltag($object->project->ref . ($object->project->title ? ' - ' . $object->project->title : '')) : dol_escape_htmltag($emptyProjLabel);
     $projNameTitle = $permissionToWrite ? $langs->trans('SetProject') : $langs->trans('Project');
     $morehtmlref .= '<a class="' . $projNameClass . '" href="' . dol_escape_htmltag($projUrl) . '" title="' . dol_escape_htmltag($projNameTitle) . '">' . $projNameText . '</a>';
     if ($permissionToWrite) {
         require_once DOL_DOCUMENT_ROOT . '/core/class/html.formprojet.class.php';
         $formproject = new FormProjets($db);
         // mode=1 → array; we build a plain <select> (avoids the search-to-select autocompleter), select2-ified by JS on reveal.
-        $projectArray = $formproject->select_projects_list((int) $object->socid, (string) $object->fk_project, 'dtc_project_select', 24, 0, 0, 0, 0, 0, 1, '', 1, 0, '', '', '');
+        // Untruncated title (maxlength 0) so the select2 search also matches the end of long titles.
+        $projectArray = $formproject->select_projects_list((int) $object->socid, (string) $object->fk_project, 'dtc_project_select', 0, 0, 0, 0, 0, 0, 1, '', 1, 0, '', '', '');
         $morehtmlref .= '<span class="dtc-project-selector dtc-inline-selector" style="display:none;">';
         $morehtmlref .= '<select class="dtc-inline-select minwidth200" id="dtc_project_select" name="dtc_project_select">';
         $morehtmlref .= '<option value="0"' . (empty($object->fk_project) ? ' selected' : '') . '></option>';
@@ -710,7 +713,8 @@ if (isModEnabled('project')) {
                     continue;
                 }
                 $selectedAttr = ($projId === (int) $object->fk_project) ? ' selected' : '';
-                $morehtmlref .= '<option value="' . $projId . '"' . $selectedAttr . '>' . dol_escape_htmltag($projLine['value']) . '</option>';
+                // labelx = "ref, title - thirdparty"; value only holds the ref
+                $morehtmlref .= '<option value="' . $projId . '"' . $selectedAttr . '>' . dol_escape_htmltag($projLine['labelx']) . '</option>';
             }
         }
         $morehtmlref .= '</select>';

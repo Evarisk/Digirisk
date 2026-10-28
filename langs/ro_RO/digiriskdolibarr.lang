@@ -1972,6 +1972,8 @@ TicketKanbanLogDeadline                = Modificarea termenului limită
 TicketKanbanLogDeadlineDesc            = Creați un eveniment atunci când termenul limită al unui tichet este modificat prin kanban
 TicketKanbanClosedLimit                = Limita tichetelor închise
 TicketKanbanClosedLimitDesc            = Numărul maxim de tichete închise/anulate afișate în kanban (0 = nelimitat)
+TicketLastMessageDate                  = Data ultimului mesaj
+TicketElapsedTimeHelp                  = Timp scurs de la creare, oprit la închidere
 
 # ===========================================================================
 # Ticket — trasabilitatea modificărilor — issue #4885
