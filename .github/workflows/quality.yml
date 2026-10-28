@@ -68,6 +68,17 @@ jobs:
             - name: Parite fr_FR / en_US
               run: php dev/ci/lang-parity.php
 
+            # PHP resout __DIR__ vers la cible d'un lien symbolique : un module installe dans
+            # htdocs/custom par symlink cherche alors Saturne a cote de la cible et meurt en
+            # fatale. Seul l'amorcage vers saturne.main.inc.php, execute avant main.inc.php
+            # (dol_buildpath n'y existe pas encore), garde le chemin relatif.
+            - name: Inclusions de Saturne
+              run: |
+                  if grep -rnE "(__DIR__|dirname\(__FILE__\))[^;]*['\"]/?(\.\./)+saturne/" --include='*.php' --exclude-dir=vendor --exclude-dir=node_modules . | grep -v 'saturne/saturne\.main\.inc\.php'; then
+                    echo "::error::Inclusion relative de Saturne : dol_include_once('/saturne/...') pour une classe ou une lib, require(_once) dol_buildpath('/saturne/...') pour un template, file_exists(dol_buildpath('/saturne/...')) pour une garde."
+                    exit 1
+                  fi
+
     phpstan:
         name: PHPStan
         runs-on: ubuntu-latest
