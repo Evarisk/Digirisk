@@ -22,10 +22,10 @@
  *             defaut des risques psychosociaux deja enregistres sur l'unite.
  *
  * Variables attendues : $rpsUnitLine, $rpsScale, $rpsScaleLabels, $rpsSubCategories, $rpsRootGroupment,
- *                       $rpsRootGroupmentId, $rpsUsers, $object, $langs
+ *                       $rpsRootGroupmentId, $rpsUsers, $rpsAssessmentByElement, $object, $langs
  */
 
-global $langs;
+global $db, $langs;
 
 if (empty($rpsUnitLine)) {
     return;
@@ -81,6 +81,15 @@ if ($rpsDefaultFactor === null && $rpsUnitFilled > 0) {
 $rpsUntreatedNames = [];
 foreach ($rpsUntreated as $rpsPosition) {
     $rpsUntreatedNames[] = 'F' . ((int) $rpsPosition + 1) . ' ' . $langs->trans($rpsSubCategories[$rpsPosition]['label']);
+}
+
+// Rapport de la derniere evaluation consolidee (photos et documents joints a sa saisie)
+$rpsLastAssessment = null;
+if (!empty($rpsAssessmentByElement[(int) $object->id]['id'])) {
+    $rpsLastAssessment = new RiskAssessment($db);
+    if ($rpsLastAssessment->fetch($rpsAssessmentByElement[(int) $object->id]['id']) <= 0) {
+        $rpsLastAssessment = null;
+    }
 }
 
 ?>
@@ -160,6 +169,13 @@ foreach ($rpsUntreated as $rpsPosition) {
                     <span class="rps-factor-level"><?php echo $rpsLevel ? $rpsScale[$rpsLevel]['label'] : 'non coté'; ?></span>
                 </div>
             <?php endforeach; ?>
+
+            <?php if ($rpsLastAssessment !== null) : ?>
+                <h5 class="rps-detail-title rps-report-title">Rapport de l'évaluation du <?php echo dol_print_date($rpsLastAssessment->date_riskassessment, 'day'); ?></h5>
+                <div class="rps-report">
+                    <?php print digiriskRiskAssessmentMediaBlock('riskassessment/' . $rpsLastAssessment->ref, $rpsLastAssessment, true); ?>
+                </div>
+            <?php endif; ?>
         </div>
 
         <div class="rps-unit-detail-actions">

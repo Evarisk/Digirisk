@@ -35,6 +35,7 @@ require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/riskassessment.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_risk.lib.php';
 
 global $conf, $db, $langs, $user;
 
@@ -615,6 +616,9 @@ $evaluation->status              = 1;
 $evaluation->method              = 'rps';
 $evaluation->comment             = trim((string) ($data['comment'] ?? ''));
 $evaluation->date_riskassessment = $assessmentDate;
+
+// Le rapport joint pendant la saisie (photos et documents) rejoint le dossier de l'evaluation
+digiriskRiskAssessmentMovePhotos($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . digiriskRiskAssessmentPsychosocialWorkDir($elementId), $evaluation);
 
 if ($evaluation->create($user) <= 0) {
     $db->rollback();

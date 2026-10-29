@@ -33,7 +33,23 @@ window.digiriskdolibarr.psychosocialScope = {};
 window.digiriskdolibarr.psychosocialScope.init = function() {
   window.digiriskdolibarr.psychosocialScope.event();
   window.digiriskdolibarr.psychosocialScope.restoreDetail();
+  window.digiriskdolibarr.psychosocialScope.detachFilesModals();
   window.digiriskdolibarr.psychosocialScope.openFromHash();
+};
+
+/**
+ * Sort dans la page les fenêtres des fichiers du rapport. Rendues à côté de leur bloc, elles restaient
+ * prises dans la ligne de l'unité (son conteneur de requêtes les rogne) ou dans la fenêtre d'évaluation,
+ * qu'un clic sur leur fond ou leur croix fermait avec elles. Rafraîchies par leur id après un envoi,
+ * elles restent où elles sont.
+ *
+ * @since   23.5.1
+ * @version 23.5.1
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.psychosocialScope.detachFilesModals = function() {
+  $('.rps-unit-card .saturne-files-modal, #rps_eval_modal .saturne-files-modal').appendTo(document.body);
 };
 
 /**

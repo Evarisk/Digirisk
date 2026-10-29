@@ -103,6 +103,13 @@ $rpsPointScale = [1 => $rpsScale[1], 2 => $rpsScale[2], 3 => $rpsScale[3]];
                 <label class="rps-grow">Observation
                     <input type="text" id="rps-eval-comment" placeholder="Participants, contexte, éléments factuels relevés...">
                 </label>
+                <?php // L'evaluation n'existe pas encore : son enregistrement deplace ces fichiers dans son dossier ?>
+                <div class="rps-eval-report" title="Grille remplie, compte rendu, photos du support… joints à l'évaluation">
+                    <span class="rps-eval-report-label">Rapport</span>
+                    <div class="rps-report">
+                        <?php print digiriskRiskAssessmentMediaBlock(digiriskRiskAssessmentPsychosocialWorkDir((int) $object->id), null, true); ?>
+                    </div>
+                </div>
                 <span class="rps-grid-progress"><b id="rps-eval-answered">0</b>/<span id="rps-eval-total">0</span> cotés</span>
             </div>
 

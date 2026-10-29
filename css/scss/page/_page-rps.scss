@@ -1398,6 +1398,72 @@ $rps-actions-width: 200px;
     min-width: 220px;
   }
 
+  // Report of the assessment (filled grid, minutes, photos): the Saturne media block, its buttons on
+  // the height of the fields around it
+  .rps-eval-report {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .rps-eval-report-label {
+    @include dr-label;
+    font-size: 10px;
+  }
+
+  // The date and the observation on the height of the report buttons: the theme gives the text
+  // fields 28px, the browser the date 33px
+  #rps_eval_modal :is(#rps-eval-date, #rps-eval-comment) {
+    box-sizing: border-box;
+    height: 34px;
+    margin: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .rps-report {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+
+    .linked-medias,
+    .saturne-media-upload-block,
+    .saturne-media-gallery {
+      flex-direction: row;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .saturne-upload-label,
+    .saturne-open-files-library,
+    .saturne-media-gallery .open-media-editor-as-gallery {
+      width: 34px;
+      min-width: 34px;
+      height: 34px;
+      min-height: 34px;
+      border-radius: $dr-radius-sm;
+
+      i {
+        font-size: 15px;
+      }
+    }
+
+    .saturne-open-files-library {
+      border: 1px solid $dr-border-strong;
+      box-shadow: none;
+      color: $dr-text-soft;
+    }
+
+    .saturne-media-gallery .open-media-editor-as-gallery img {
+      border-radius: $dr-radius-sm !important;
+    }
+  }
+
+  .rps-report-title {
+    margin-top: 14px;
+  }
+
   .rps-grid-progress {
     margin-left: auto;
     color: $dr-muted;
