@@ -113,6 +113,13 @@ $digiriskelement      = $digiriskelement->getActiveDigiriskElements('current', $
  * Actions
  */
 
+// The timezone of the browser, posted then reloaded by every page until the session holds it: kept on a closed
+// interface too, whose page would otherwise reload for ever
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && GETPOSTISSET('tz')) {
+    $_SESSION['dol_tz_string'] = GETPOST('tz');
+    exit;
+}
+
 $parameters = [];
 // Checked by the view alone, a direct POST to a closed interface still created the ticket and stored its medias (#5569)
 $resHook    = $publicInterfaceOpen ? $hookmanager->executeHooks('doActions', $parameters, $object, $action) : 0; // Note that $action and $object may have been modified by some hooks.
@@ -121,11 +128,6 @@ if ($resHook < 0) {
 }
 
 if (empty($resHook) && $publicInterfaceOpen) {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && GETPOSTISSET('tz')) {
-        $_SESSION['dol_tz_string'] = GETPOST('tz');
-        exit;
-    }
-
     // Media of the ticket shown, sent or removed by its media block
     if ($action == 'showMedia') {
         digiriskTicketPublicShowMedia($ticketUploadSubDir);
