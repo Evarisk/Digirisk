@@ -1991,6 +1991,15 @@ TicketActionCreated                    = Maßnahme angelegt: %s
 TicketActionsTab                       = Korrektur- / Präventivmaßnahmen
 TicketActionsSummary                   = Bilanz der Maßnahmen
 TicketActionsNeedProject               = Verknüpfen Sie ein Projekt mit dem Ticket, um ihm Korrektur- und Präventivmaßnahmen hinzuzufügen
+TicketPublicInterfacePin               = PIN-Code für Meldungen
+TicketPublicInterfacePinHelp           = Leer lassen, damit jeder melden kann. Mit einem Code aus 4 bis 12 Ziffern fragt das öffentliche Formular ihn vor der Anzeige ab: Geben Sie ihn den meldeberechtigten Personen.
+TicketPublicInterfacePinNone           = Keiner: freie Meldung
+TicketPublicInterfacePinFormat         = Der PIN-Code muss 4 bis 12 Ziffern haben
+TicketPublicInterfacePinSet            = PIN-Code gespeichert: Das öffentliche Formular fragt ihn jetzt ab
+TicketPublicInterfacePinRemoved        = PIN-Code entfernt: Jeder kann melden
+TicketPublicInterfacePinPrompt         = Geben Sie den von Ihrem Unternehmen mitgeteilten PIN-Code ein, um zu melden
+TicketPublicInterfacePinWrong          = Falscher PIN-Code
+TicketPublicInterfacePinLocked         = Zu viele Versuche: Versuchen Sie es in %s Minute(n) erneut
 TicketDocumentGenerated                = Dokument erzeugt
 TicketFileDeleted                      = Datei gelöscht
 

@@ -1991,6 +1991,15 @@ TicketActionCreated                    = Utworzono działanie: %s
 TicketActionsTab                       = Działania korygujące / zapobiegawcze
 TicketActionsSummary                   = Bilans działań
 TicketActionsNeedProject               = Powiąż projekt ze zgłoszeniem, aby dodać do niego działania korygujące i zapobiegawcze
+TicketPublicInterfacePin               = Kod PIN zgłoszeń
+TicketPublicInterfacePinHelp           = Pozostaw puste, aby każdy mógł zgłaszać. Z kodem od 4 do 12 cyfr formularz publiczny prosi o niego przed wyświetleniem: przekaż go osobom uprawnionym do zgłaszania.
+TicketPublicInterfacePinNone           = Brak: zgłoszenia otwarte
+TicketPublicInterfacePinFormat         = Kod PIN musi mieć od 4 do 12 cyfr
+TicketPublicInterfacePinSet            = Kod PIN zapisany: formularz publiczny teraz o niego prosi
+TicketPublicInterfacePinRemoved        = Kod PIN usunięty: każdy może zgłaszać
+TicketPublicInterfacePinPrompt         = Wpisz kod PIN przekazany przez firmę, aby zgłosić
+TicketPublicInterfacePinWrong          = Nieprawidłowy kod PIN
+TicketPublicInterfacePinLocked         = Zbyt wiele prób: spróbuj ponownie za %s min
 TicketDocumentGenerated                = Dokument wygenerowany
 TicketFileDeleted                      = Plik usunięty
 

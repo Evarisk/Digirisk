@@ -102,6 +102,19 @@ if ($entity > 0) {
 // Read once the entity is loaded: closed, the interface processes no action and its view only says so
 $publicInterfaceOpen = $entity <= 0 || getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE');
 
+// With a PIN code set for the entity, nothing but its check is processed until the session typed it (#5549)
+$publicPinUnlocked = $entity <= 0 || digiriskdolibarr_ticket_public_pin_unlocked($entity);
+$publicPinError    = '';
+if ($publicInterfaceOpen && !$publicPinUnlocked && $action === 'checkPin') {
+    $pinResult = digiriskdolibarr_ticket_public_pin_check(GETPOST('pin', 'alphanohtml'), $entity);
+    if ($pinResult > 0) {
+        header('Location: ' . $_SERVER['PHP_SELF'] . '?entity=' . $entity);
+        exit;
+    }
+    $publicPinError = $pinResult < 0 ? $langs->trans('TicketPublicInterfacePinLocked', (string) -$pinResult) : $langs->trans('TicketPublicInterfacePinWrong');
+}
+$publicInterfaceUsable = $publicInterfaceOpen && $publicPinUnlocked;
+
 // The medias of the ticket wait there until it is created
 $ticketUploadSubDir = digiriskTicketPublicUploadSubDir();
 
@@ -122,12 +135,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && GETPOSTISSET('tz')) {
 
 $parameters = [];
 // Checked by the view alone, a direct POST to a closed interface still created the ticket and stored its medias (#5569)
-$resHook    = $publicInterfaceOpen ? $hookmanager->executeHooks('doActions', $parameters, $object, $action) : 0; // Note that $action and $object may have been modified by some hooks.
+$resHook    = $publicInterfaceUsable ? $hookmanager->executeHooks('doActions', $parameters, $object, $action) : 0; // Note that $action and $object may have been modified by some hooks.
 if ($resHook < 0) {
     setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 }
 
-if (empty($resHook) && $publicInterfaceOpen) {
+if (empty($resHook) && $publicInterfaceUsable) {
     // Media of the ticket shown, sent or removed by its media block
     if ($action == 'showMedia') {
         digiriskTicketPublicShowMedia($ticketUploadSubDir);
@@ -424,6 +437,28 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 		print '<div class="error">' . $langs->trans('TicketPublicInterfaceForbidden') . '</div>';
 		$db->close();
 		exit();
+	}
+
+	// The PIN code of the entity is asked before the declaration form (#5549)
+	if (!$publicPinUnlocked) {
+		print '<div class="ticketpublicarea digirisk-page-container public-ticket-pin">';
+		print load_fiche_titre($langs->trans('CreateTicket'), '', 'digiriskdolibarr_color@digiriskdolibarr');
+		print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?entity=' . $entity . '" class="public-ticket-pin__form">';
+		print '<input type="hidden" name="token" value="' . newToken() . '">';
+		print '<input type="hidden" name="action" value="checkPin">';
+		print '<input type="hidden" name="entity" value="' . $entity . '">';
+		print '<label for="public-ticket-pin" class="public-ticket-pin__prompt">' . $langs->trans('TicketPublicInterfacePinPrompt') . '</label>';
+		if ($publicPinError !== '') {
+			print '<div class="error public-ticket-pin__error">' . dol_escape_htmltag($publicPinError) . '</div>';
+		}
+		print '<input type="password" id="public-ticket-pin" name="pin" class="public-ticket-pin__input" inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="off" autofocus required>';
+		print '<button type="submit" class="wpeo-button public-ticket-pin__submit"><i class="fas fa-unlock pictofixedwidth"></i>' . $langs->trans('Validate') . '</button>';
+		print '</form>';
+		print '</div>';
+
+		llxFooter('', 'public');
+		$db->close();
+		exit;
 	}
 
 	// A photo picked in the media block opens in the editor first. The editor binds itself to its modal

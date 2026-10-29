@@ -1991,6 +1991,15 @@ TicketActionCreated                    = Actie aangemaakt: %s
 TicketActionsTab                       = Corrigerende / preventieve acties
 TicketActionsSummary                   = Overzicht van de acties
 TicketActionsNeedProject               = Koppel een project aan het ticket om er corrigerende en preventieve acties aan toe te voegen
+TicketPublicInterfacePin               = PIN-code voor meldingen
+TicketPublicInterfacePinHelp           = Leeg laten zodat iedereen kan melden. Met een code van 4 tot 12 cijfers vraagt het openbare formulier erom voordat het verschijnt: geef hem aan de personen die mogen melden.
+TicketPublicInterfacePinNone           = Geen: vrije melding
+TicketPublicInterfacePinFormat         = De PIN-code moet 4 tot 12 cijfers hebben
+TicketPublicInterfacePinSet            = PIN-code opgeslagen: het openbare formulier vraagt er nu om
+TicketPublicInterfacePinRemoved        = PIN-code verwijderd: iedereen kan melden
+TicketPublicInterfacePinPrompt         = Voer de PIN-code in die uw bedrijf heeft gegeven om te melden
+TicketPublicInterfacePinWrong          = Onjuiste PIN-code
+TicketPublicInterfacePinLocked         = Te veel pogingen: probeer het over %s minuut/minuten opnieuw
 TicketDocumentGenerated                = Document gegenereerd
 TicketFileDeleted                      = Bestand verwijderd
 

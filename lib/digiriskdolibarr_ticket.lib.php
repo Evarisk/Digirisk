@@ -802,6 +802,63 @@ function digiriskdolibarr_ticket_mail_models(): array
 }
 
 /**
+ * Whether the public ticket interface of the entity may be used by the visitor (#5549)
+ *
+ * Without a PIN code set for the entity, everyone may declare. With one, only the session that typed it: the
+ * session keeps a hash of the code it unlocked, so changing the code locks the interface again for everyone.
+ *
+ * @param  int  $entity Entity of the public interface
+ * @return bool         True when the declaration form may be shown and its actions processed
+ */
+function digiriskdolibarr_ticket_public_pin_unlocked(int $entity): bool
+{
+    $pin = getDolGlobalString('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_PIN');
+    if ($pin === '') {
+        return true;
+    }
+
+    return hash_equals(hash('sha256', $pin), (string) ($_SESSION['digiriskdolibarr_ticket_public_pin'][$entity] ?? ''));
+}
+
+/**
+ * Check the PIN code typed on the public ticket interface, and unlock it for the session when it matches
+ *
+ * At most five wrong codes per quarter of an hour and per session, each one answered a second later, so the code
+ * cannot be found by trying them all.
+ *
+ * @param  string $pin    Code typed by the visitor
+ * @param  int    $entity Entity of the public interface
+ * @return int            1 unlocked, 0 wrong code, < 0 too many attempts: minutes left to wait, as a negative
+ */
+function digiriskdolibarr_ticket_public_pin_check(string $pin, int $entity): int
+{
+    $now         = dol_now();
+    $lockSeconds = 900;
+    $attempts    = array_values(array_filter((array) ($_SESSION['digiriskdolibarr_ticket_public_pin_attempts'] ?? []), static function ($attempt) use ($now, $lockSeconds): bool {
+        return (int) $attempt > $now - $lockSeconds;
+    }));
+    if (count($attempts) >= 5) {
+        $_SESSION['digiriskdolibarr_ticket_public_pin_attempts'] = $attempts;
+
+        return -max(1, (int) ceil((min($attempts) + $lockSeconds - $now) / 60));
+    }
+
+    $expected = getDolGlobalString('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_PIN');
+    if ($expected !== '' && hash_equals($expected, $pin)) {
+        $_SESSION['digiriskdolibarr_ticket_public_pin'][$entity] = hash('sha256', $expected);
+        unset($_SESSION['digiriskdolibarr_ticket_public_pin_attempts']);
+
+        return 1;
+    }
+
+    $attempts[] = $now;
+    $_SESSION['digiriskdolibarr_ticket_public_pin_attempts'] = $attempts;
+    sleep(1);
+
+    return 0;
+}
+
+/**
  * Address of the public ticket interface the documents send people to
  *
  * The interface shared between entities comes first when Multicompany is enabled, the one of the entity

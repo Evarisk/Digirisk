@@ -1991,6 +1991,15 @@ TicketActionCreated                    = Azione creata: %s
 TicketActionsTab                       = Azioni correttive / preventive
 TicketActionsSummary                   = Bilancio delle azioni
 TicketActionsNeedProject               = Associa un progetto al ticket per aggiungervi azioni correttive e preventive
+TicketPublicInterfacePin               = Codice PIN di dichiarazione
+TicketPublicInterfacePinHelp           = Lasciare vuoto perché tutti possano dichiarare. Con un codice da 4 a 12 cifre, il modulo pubblico lo chiede prima di mostrarsi: comunicarlo alle persone autorizzate a dichiarare.
+TicketPublicInterfacePinNone           = Nessuno: dichiarazione libera
+TicketPublicInterfacePinFormat         = Il codice PIN deve avere da 4 a 12 cifre
+TicketPublicInterfacePinSet            = Codice PIN salvato: il modulo pubblico ora lo chiede
+TicketPublicInterfacePinRemoved        = Codice PIN rimosso: tutti possono dichiarare
+TicketPublicInterfacePinPrompt         = Inserire il codice PIN comunicato dall'azienda per dichiarare
+TicketPublicInterfacePinWrong          = Codice PIN errato
+TicketPublicInterfacePinLocked         = Troppi tentativi: riprovare tra %s minuto/i
 TicketDocumentGenerated                = Documento generato
 TicketFileDeleted                      = File eliminato
 
