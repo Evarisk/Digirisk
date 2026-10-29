@@ -99,6 +99,9 @@ if ($entity > 0) {
     $upload_dir = $conf->categorie->multidir_output[isset($entity) ? $entity : 1];
 }
 
+// Read once the entity is loaded: closed, the interface processes no action and its view only says so
+$publicInterfaceOpen = $entity <= 0 || getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE');
+
 // The medias of the ticket wait there until it is created
 $ticketUploadSubDir = digiriskTicketPublicUploadSubDir();
 
@@ -110,18 +113,21 @@ $digiriskelement      = $digiriskelement->getActiveDigiriskElements('current', $
  * Actions
  */
 
+// The timezone of the browser, posted then reloaded by every page until the session holds it: kept on a closed
+// interface too, whose page would otherwise reload for ever
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && GETPOSTISSET('tz')) {
+    $_SESSION['dol_tz_string'] = GETPOST('tz');
+    exit;
+}
+
 $parameters = [];
-$resHook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks.
+// Checked by the view alone, a direct POST to a closed interface still created the ticket and stored its medias (#5569)
+$resHook    = $publicInterfaceOpen ? $hookmanager->executeHooks('doActions', $parameters, $object, $action) : 0; // Note that $action and $object may have been modified by some hooks.
 if ($resHook < 0) {
     setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 }
 
-if (empty($resHook)) {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && GETPOSTISSET('tz')) {
-        $_SESSION['dol_tz_string'] = GETPOST('tz');
-        exit;
-    }
-
+if (empty($resHook) && $publicInterfaceOpen) {
     // Media of the ticket shown, sent or removed by its media block
     if ($action == 'showMedia') {
         digiriskTicketPublicShowMedia($ticketUploadSubDir);
@@ -414,7 +420,7 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 </script>
 
 <?php if ($entity > 0) {
-	if ( ! $conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE) {
+	if (!$publicInterfaceOpen) {
 		print '<div class="error">' . $langs->trans('TicketPublicInterfaceForbidden') . '</div>';
 		$db->close();
 		exit();
