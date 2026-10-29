@@ -2,14 +2,14 @@
 
 // Psychosocial risks of the risk list: qualification block of the root groupment, line of a
 // concerned work unit, assessment modal and criteria modal (core/tpl/riskanalysis/risk/*_rps_*).
-// The four levels keep the colours of the Digirisk cotation chips (grey, yellow, red, black):
-// background, text of the chips, text of a picked answer (the 12px label is unreadable in white
-// on the yellow)
+// The four levels take the colours of the psychosocial scale, green for a low exposure to dark red
+// for an extreme one: background, text of the chips, text of a picked answer (the 12px label is
+// unreadable in white on the orange)
 $rps-scales: (
-  1: ($color__grey, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
-  2: ($color__yellow, #ffffff, #422006),
-  3: ($color__red, #ffffff, #ffffff),
-  4: ($color__dark, #ffffff, #ffffff),
+  1: ($color__rps-low, #ffffff, #ffffff),
+  2: ($color__rps-moderate, $color__rps-moderate-text, $color__rps-moderate-text),
+  3: ($color__rps-high, #ffffff, #ffffff),
+  4: ($color__rps-extreme, #ffffff, #ffffff),
 );
 
 // Columns of the unit rows: six factor cells of 28px spaced by 6px, the score, the qualification

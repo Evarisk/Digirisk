@@ -171,7 +171,7 @@ $emptyCellTitles = [
                                         // The psychosocial column of the risk tab shows the rounded average: the exact one in its tooltip
                                         $cellName  = $position < 0 ? $langs->trans('RiskOverviewPsychosocialAverage') : ($position == Risk::PSYCHOSOCIAL_CATEGORY_POSITION && $panelTab != 'rps' ? $langs->trans('RiskOverviewPsychosocialAverageHelp') . ' : ' . digiriskRiskOverviewFormatLevel((float) $overviewRow['rps']['average']) : $columns[$position]['name']);
                                         $cellLevel = $cell['kind'] == 'count' ? $langs->trans($riskLevelLabels[$cell['scale']] ?? 'GreyRisk') : $rpsScale[$cell['scale']]['range'] . ' · ' . $rpsScale[$cell['scale']]['label']; ?>
-                                        <td class="<?php echo $totalClass; ?>risk-overview__cell" data-scale="<?php echo (int) $cell['scale']; ?>">
+                                        <td class="<?php echo $totalClass; ?>risk-overview__cell<?php echo $cell['kind'] == 'level' ? ' is-psychosocial' : ''; ?>" data-scale="<?php echo (int) $cell['scale']; ?>">
                                             <a class="risk-overview__link" href="<?php echo dol_escape_htmltag($elementUrl); ?>" target="_blank" rel="noopener"
                                                title="<?php echo dol_escape_htmltag($cellName . ' — ' . $cellLevel . '. ' . $openTitle); ?>"><?php echo $cell['decimals'] ? digiriskRiskOverviewFormatLevel((float) $cell['value']) : (int) $cell['value']; ?></a>
                                         </td>

@@ -389,10 +389,14 @@ function digiriskRiskOverviewExportXlsx(array $overviewRows, array $overviewColu
     require_once DOL_DOCUMENT_ROOT . '/includes/Psr/autoloader.php';
     require_once PHPEXCELNEW_PATH . 'Spreadsheet.php';
 
-    // Colours of the Digirisk cotation chips (css/scss/element/_cotation.scss): background, text
-    $levelColours = [1 => ['ECECEC', '000000'], 2 => ['E9AD4F', 'FFFFFF'], 3 => ['E05353', 'FFFFFF'], 4 => ['2B2B2B', 'FFFFFF']];
-    $emptyColours = ['E8F6ED', '15803D'];
-    $headColours  = ['263C5C', 'FFFFFF'];
+    // Colours of the Digirisk cotation chips (css/scss/element/_cotation.scss), and of the psychosocial
+    // scale for a psychosocial level (css/scss/variable/_colors.scss): background, text
+    $levelColours    = [1 => ['ECECEC', '000000'], 2 => ['E9AD4F', 'FFFFFF'], 3 => ['E05353', 'FFFFFF'], 4 => ['2B2B2B', 'FFFFFF']];
+    $rpsLevelColours = [1 => ['3A9D5D', 'FFFFFF'], 2 => ['E9AD4F', '3A2A00'], 3 => ['E05353', 'FFFFFF'], 4 => ['8F2222', 'FFFFFF']];
+    $emptyColours    = ['E8F6ED', '15803D'];
+    // An empty cell of the psychosocial sheet is a unit not assessed, no good news: neutral
+    $rpsEmptyColours = ['F1F5F9', '64748B'];
+    $headColours     = ['263C5C', 'FFFFFF'];
 
     $tabLabels   = ['risk' => 'RiskOverviewTabRisks', 'penibility' => 'RiskOverviewTabPenibility', 'rps' => 'RiskOverviewTabPsychosocial'];
     $levelLabels = [1 => 'GreyRisk', 2 => 'OrangeRisk', 3 => 'RedRisk', 4 => 'BlackRisk'];
@@ -455,7 +459,7 @@ function digiriskRiskOverviewExportXlsx(array $overviewRows, array $overviewColu
                 $coordinate = $cellName($index + 3, $rowIndex);
                 if ($cell['value'] === null) {
                     $sheet->setCellValue($coordinate, $langs->transnoentities('RiskOverviewNotConcerned'));
-                    $sheet->getStyle($coordinate)->applyFromArray($fill($emptyColours));
+                    $sheet->getStyle($coordinate)->applyFromArray($fill($tab == 'rps' ? $rpsEmptyColours : $emptyColours));
                 } else {
                     $sheet->setCellValue($coordinate, $cell['value']);
                     // A psychosocial value of the psychosocial sheet keeps its decimal, as on the page: 3,0 rather than 3
@@ -463,7 +467,7 @@ function digiriskRiskOverviewExportXlsx(array $overviewRows, array $overviewColu
                         $sheet->getStyle($coordinate)->getNumberFormat()->setFormatCode('0.0');
                     }
                     if ($cell['scale'] > 0) {
-                        $sheet->getStyle($coordinate)->applyFromArray($fill($levelColours[$cell['scale']], true));
+                        $sheet->getStyle($coordinate)->applyFromArray($fill(($cell['kind'] == 'level' ? $rpsLevelColours : $levelColours)[$cell['scale']], true));
                     } else {
                         $sheet->getStyle($coordinate)->getFont()->setBold(true);
                     }
@@ -480,10 +484,10 @@ function digiriskRiskOverviewExportXlsx(array $overviewRows, array $overviewColu
         $rowIndex += 2;
         $sheet->setCellValue($cellName(1, $rowIndex), $langs->transnoentities($tab == 'rps' ? 'RiskOverviewLegendPsychosocial' : 'RiskOverviewLegendRisks'));
         $legend = [];
-        foreach ($levelColours as $level => $colours) {
+        foreach (($tab == 'rps' ? $rpsLevelColours : $levelColours) as $level => $colours) {
             $legend[] = [$colours, $tab == 'rps' ? $level . ' ' . $rpsScale[$level]['label'] : $langs->transnoentities($levelLabels[$level])];
         }
-        $legend[] = [$emptyColours, $langs->transnoentities('RiskOverviewNotConcerned') . ' : ' . $langs->transnoentities($tab == 'rps' ? 'RiskOverviewNoRatingHelp' : 'RiskOverviewNotConcernedHelp')];
+        $legend[] = [$tab == 'rps' ? $rpsEmptyColours : $emptyColours, $langs->transnoentities('RiskOverviewNotConcerned') . ' : ' . $langs->transnoentities($tab == 'rps' ? 'RiskOverviewNoRatingHelp' : 'RiskOverviewNotConcernedHelp')];
         foreach ($legend as $key) {
             $rowIndex++;
             $sheet->getStyle($cellName(3, $rowIndex))->applyFromArray($fill($key[0]));

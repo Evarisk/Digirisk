@@ -530,7 +530,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
      * unit, the level of each factor and the average of the rated ones, on 4. A groupment takes the
      * average of its assessed work units.
      *
-     * A level is a chip in the colour of the Digirisk cotation, drawn by the character styles
+     * A level is a chip in the colour of the psychosocial scale (green to dark red), drawn by the character styles
      * "RPS niveau 1" to "RPS niveau 4" of the template, "RPS NC" when there is no rating. They are
      * named styles, which LibreOffice keeps when the template is saved again, unlike its automatic ones
      *

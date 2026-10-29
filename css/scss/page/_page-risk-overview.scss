@@ -2,20 +2,27 @@
 
 // Public overview of the risks of the groupments and work units
 // (public/digiriskelement/digiriskelement_risk_overview.php): one row per GP/UT, one column per
-// danger category. A cell takes the colour of the Digirisk cotation chips (grey, yellow, red, black).
+// danger category. A cell takes the colour of the Digirisk cotation chips (grey, yellow, red, black),
+// the psychosocial tab those of its own scale (green to dark red).
 $risk-overview-scales: (
   1: ($color__grey, rgba(0, 0, 0, 0.8)),
   2: ($color__yellow, #ffffff),
   3: ($color__red, #ffffff),
   4: ($color__dark, #ffffff),
 );
+$risk-overview-rps-scales: (
+  1: ($color__rps-low, #ffffff),
+  2: ($color__rps-moderate, $color__rps-moderate-text),
+  3: ($color__rps-high, #ffffff),
+  4: ($color__rps-extreme, #ffffff),
+);
 $risk-overview-element-width: 280px;
 $risk-overview-element-width-sm: 170px;
 $risk-overview-total-width: 76px;
 $risk-overview-cell-width: 46px;
 
-@mixin risk-overview-scale-fill {
-  @each $level, $colors in $risk-overview-scales {
+@mixin risk-overview-scale-fill($scales: $risk-overview-scales) {
+  @each $level, $colors in $scales {
     &[data-scale="#{$level}"] {
       background: nth($colors, 1);
       color: nth($colors, 2);
@@ -491,6 +498,25 @@ body#mainbody.digirisk-risk-overview-public {
 
     &.is-empty {
       background: rgba(22, 163, 74, 0.25);
+    }
+  }
+
+  // A psychosocial level (the psychosocial tab, its column of the risk tab) reads on its own scale,
+  // where green means a low exposure
+  .risk-overview__cell.is-psychosocial,
+  .risk-overview__card[data-tab="rps"] .risk-overview__swatch {
+    @include risk-overview-scale-fill($risk-overview-rps-scales);
+  }
+
+  // An empty cell of the psychosocial tab is a unit not assessed, no good news: it stays neutral
+  .risk-overview__card[data-tab="rps"] {
+    .risk-overview__cell.is-empty {
+      background: $dr-bg;
+      color: $dr-muted;
+    }
+
+    .risk-overview__swatch.is-empty {
+      background: $dr-bg;
     }
   }
 
