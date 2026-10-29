@@ -1991,6 +1991,15 @@ TicketActionCreated                    = Acțiune creată: %s
 TicketActionsTab                       = Acțiuni corective / preventive
 TicketActionsSummary                   = Bilanțul acțiunilor
 TicketActionsNeedProject               = Asociați un proiect tichetului pentru a-i adăuga acțiuni corective și preventive
+TicketPublicInterfacePin               = Cod PIN pentru declarare
+TicketPublicInterfacePinHelp           = Lăsați gol pentru ca oricine să poată declara. Cu un cod de 4 până la 12 cifre, formularul public îl cere înainte de afișare: comunicați-l persoanelor autorizate să declare.
+TicketPublicInterfacePinNone           = Niciunul: declarare liberă
+TicketPublicInterfacePinFormat         = Codul PIN trebuie să aibă între 4 și 12 cifre
+TicketPublicInterfacePinSet            = Cod PIN salvat: formularul public îl cere de acum
+TicketPublicInterfacePinRemoved        = Cod PIN eliminat: oricine poate declara
+TicketPublicInterfacePinPrompt         = Introduceți codul PIN comunicat de compania dumneavoastră pentru a declara
+TicketPublicInterfacePinWrong          = Cod PIN incorect
+TicketPublicInterfacePinLocked         = Prea multe încercări: reîncercați peste %s minut(e)
 TicketDocumentGenerated                = Document generat
 TicketFileDeleted                      = Fișier șters
 
