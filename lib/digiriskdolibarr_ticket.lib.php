@@ -333,6 +333,69 @@ function digiriskdolibarr_ticket_count_actions(array $actionsByType): array
 }
 
 /**
+ * Fields of the QQOQCP analysis of a ticket (#5549): ticket extrafields, hidden from the native card, shown by the
+ * QQOQCP tab and its document. Who is a list of users, the five others are free text.
+ *
+ * @return array<string, array{label: string, help: string, picto: string}> Definition of each field, by extrafield key
+ */
+function digiriskdolibarr_ticket_qqoqcp_fields(): array
+{
+    return [
+        'digiriskdolibarr_qqoqcp_what'  => ['label' => 'QQOQCPWhat',  'help' => 'QQOQCPWhatHelp',  'picto' => 'fa-question'],
+        'digiriskdolibarr_qqoqcp_who'   => ['label' => 'QQOQCPWho',   'help' => 'QQOQCPWhoHelp',   'picto' => 'fa-users'],
+        'digiriskdolibarr_qqoqcp_where' => ['label' => 'QQOQCPWhere', 'help' => 'QQOQCPWhereHelp', 'picto' => 'fa-map-marker-alt'],
+        'digiriskdolibarr_qqoqcp_when'  => ['label' => 'QQOQCPWhen',  'help' => 'QQOQCPWhenHelp',  'picto' => 'fa-calendar-alt'],
+        'digiriskdolibarr_qqoqcp_how'   => ['label' => 'QQOQCPHow',   'help' => 'QQOQCPHowHelp',   'picto' => 'fa-cogs'],
+        'digiriskdolibarr_qqoqcp_why'   => ['label' => 'QQOQCPWhy',   'help' => 'QQOQCPWhyHelp',   'picto' => 'fa-lightbulb'],
+    ];
+}
+
+/**
+ * Full names of the users of the Who field of the QQOQCP analysis
+ *
+ * @param  string $userIds Comma separated user ids, as stored by the chkbxlst extrafield
+ * @return string[]        Full names, sorted by last name
+ */
+function digiriskdolibarr_ticket_qqoqcp_who_names(string $userIds): array
+{
+    global $db;
+
+    $ids = array_filter(array_map('intval', explode(',', $userIds)));
+    if (empty($ids)) {
+        return [];
+    }
+
+    $names = [];
+    $resql = $db->query('SELECT firstname, lastname, login FROM ' . MAIN_DB_PREFIX . 'user WHERE rowid IN (' . implode(',', $ids) . ') ORDER BY lastname, firstname');
+    if ($resql) {
+        while ($obj = $db->fetch_object($resql)) {
+            $names[] = trim($obj->firstname . ' ' . $obj->lastname) ?: (string) $obj->login;
+        }
+        $db->free($resql);
+    }
+
+    return $names;
+}
+
+/**
+ * Number of the filled fields of the QQOQCP analysis of a ticket, for the badge of its tab
+ *
+ * @param  Ticket $ticket Ticket, its extrafields fetched
+ * @return int            Filled fields, out of six
+ */
+function digiriskdolibarr_ticket_qqoqcp_filled_count(Ticket $ticket): int
+{
+    $filled = 0;
+    foreach (array_keys(digiriskdolibarr_ticket_qqoqcp_fields()) as $key) {
+        if (trim((string) ($ticket->array_options['options_' . $key] ?? '')) !== '') {
+            $filled++;
+        }
+    }
+
+    return $filled;
+}
+
+/**
  * Prepare ticket statistics pages header
  *
  * @return array $head   Array of tabs

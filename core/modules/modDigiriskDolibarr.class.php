@@ -886,6 +886,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON', 'chaine', 'mod_ticketdocument_standard', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKETDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/ticketdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKETDOCUMENT_DEFAULT_MODEL', 'chaine', 'ticketdocument_odt', '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_TICKETQQOQCPDOCUMENT_ADDON', 'chaine', 'mod_ticketqqoqcpdocument_standard', '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_TICKETQQOQCPDOCUMENT_DEFAULT_MODEL', 'chaine', 'ticketqqoqcpdocument', '', 0, 'current'],
 
 			// CONST PROJECT DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_PROJECTDOCUMENT_ADDON', 'chaine', 'mod_projectdocument_standard', '', 0, 'current'],
@@ -2356,6 +2358,7 @@ class modDigiriskdolibarr extends DolibarrModules
         delDocumentModel('accidentinvestigationdocument', 'accidentinvestigationdocument');
         delDocumentModel('registerdocument_odt', 'registerdocument');
         delDocumentModel('ticketdocument', 'ticketdocument');
+        delDocumentModel('ticketqqoqcpdocument', 'ticketqqoqcpdocument');
 
 		addDocumentModel('informationssharing_odt', 'informationssharing', 'ODT templates', 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
 		addDocumentModel('legaldisplay_odt', 'legaldisplay', 'ODT templates', 'DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
@@ -2381,6 +2384,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		addDocumentModel('auditreportdocument_odt', 'auditreportdocument', 'ODT templates', 'DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('ticketdocument_odt', 'ticketdocument', 'ODT templates', 'DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('ticketdocument', 'ticketdocument', $langs->transnoentities('TicketDocumentPDF'));
+        addDocumentModel('ticketqqoqcpdocument', 'ticketqqoqcpdocument', $langs->transnoentities('TicketQqoqcpDocumentPDF'));
 		addDocumentModel('papripact_a3_paysage_projectdocument', 'project', 'PAPRIPACT-A3-PAYSAGE');
         addDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument', 'ODT templates', 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('accidentinvestigationdocument', 'accidentinvestigationdocument', $langs->transnoentities('AccidentInvestigationDocumentPDF'));
@@ -2675,6 +2679,14 @@ class modDigiriskdolibarr extends DolibarrModules
             'ticket_category_config' => ['Label' => 'TicketCategoryConfig', 'type' => 'text', 'elementtype' => ['categorie'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('categorie') && isModEnabled('ticket')", 'moreparams' => []],
 
 			'ticket_categories' => ['Label' => 'Categories', 'type' => 'text', 'elementtype' => ['ticket'], 'position' => 1, 'list' => 2, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('categorie') && isModEnabled('ticket')", 'moreparams' => []],
+
+            // QQOQCP analysis of the ticket (#5549): filled and shown by its own tab and document, hidden from the native card
+            'digiriskdolibarr_qqoqcp_what'  => ['Label' => 'QQOQCPWhat',  'type' => 'text',     'elementtype' => ['ticket'], 'position' => $this->numero . 80, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => []],
+            'digiriskdolibarr_qqoqcp_who'   => ['Label' => 'QQOQCPWho',   'type' => 'chkbxlst', 'elementtype' => ['ticket'], 'position' => $this->numero . 81, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => [], 'params' => ['user:lastname|firstname:rowid' => null]],
+            'digiriskdolibarr_qqoqcp_where' => ['Label' => 'QQOQCPWhere', 'type' => 'text',     'elementtype' => ['ticket'], 'position' => $this->numero . 82, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => []],
+            'digiriskdolibarr_qqoqcp_when'  => ['Label' => 'QQOQCPWhen',  'type' => 'text',     'elementtype' => ['ticket'], 'position' => $this->numero . 83, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => []],
+            'digiriskdolibarr_qqoqcp_how'   => ['Label' => 'QQOQCPHow',   'type' => 'text',     'elementtype' => ['ticket'], 'position' => $this->numero . 84, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => []],
+            'digiriskdolibarr_qqoqcp_why'   => ['Label' => 'QQOQCPWhy',   'type' => 'text',     'elementtype' => ['ticket'], 'position' => $this->numero . 85, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => []],
 
 			'digirisk_identification' => ['Label' => 'DigiriskIdentification', 'type' => 'html', 'elementtype' => ['product'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('product')", 'moreparams' => ['visibility' => 0]],
 			'digirisk_security'       => ['Label' => 'DigiriskSecurity',       'type' => 'html', 'elementtype' => ['product'], 'position' => $this->numero . 20, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('product')", 'moreparams' => ['visibility' => 0]],
