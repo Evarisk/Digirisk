@@ -1855,6 +1855,25 @@ class modDigiriskdolibarr extends DolibarrModules
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		];
 
+		// The media library page belongs to Saturne : no entry while the installed Saturne does not ship it yet
+		if (file_exists(dol_buildpath('/saturne/view/saturne_medias.php'))) {
+			$this->menu[$r++] = [
+				'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',
+				'type'     => 'left',
+				'titre'    => 'MediaGallery',
+				'prefix'   => '<i class="fas fa-images pictofixedwidth"></i>',
+				'mainmenu' => 'digiriskdolibarr',
+				'leftmenu' => 'digiriskdolibarr_medias',
+				'url'      => '/saturne/view/saturne_medias.php?module_name=digiriskdolibarr',
+				'langs'    => 'medias@saturne',
+				'position' => 100 + $r,
+				'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',
+				'perms'    => '$user->rights->digiriskdolibarr->digiriskelement->read',
+				'target'   => '',
+				'user'     => 0,
+			];
+		}
+
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
