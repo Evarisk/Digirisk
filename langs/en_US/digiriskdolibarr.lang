@@ -683,10 +683,11 @@ AccidentInvestigationDocumentGeneratedAt = Generated on
 CorrectiveActions                        = Corrective actions
 AddCurativeAction                        = Add a curative action
 AddCorrectiveAction                      = Add a corrective action
+AddPreventiveAction                      = Add a preventive action
 InvestigationNotValidatedYet             = Please validate the accident investigation first to create actions
 ActionLabel                              = Action label
 ActionDeadline                           = Deadline
-ActionAssignedTo                         = Assigned to
+DigiriskActionAssignedTo                 = Assigned to
 ActionProgress                           = Progress
 MarkAsDone                               = Mark as done
 XActionsOfY                              = %s / %s done
@@ -2072,6 +2073,8 @@ TicketKanbanLogDeadline                = Deadline change
 TicketKanbanLogDeadlineDesc            = Create an event when the deadline of a ticket is changed through the Kanban
 TicketKanbanClosedLimit                = Closed ticket limit
 TicketKanbanClosedLimitDesc            = Maximum number of closed/cancelled tickets displayed in the Kanban (0 = unlimited)
+TicketLastMessageDate                  = Last message date
+TicketElapsedTimeHelp                  = Time elapsed since creation, stopped at closing
 
 # ===========================================================================
 # Ticket — modification traceability — issue #4885
@@ -2081,6 +2084,10 @@ TicketLogModificationsDesc             = Create an event for every edit made fro
 TicketMessageEdited                    = Message edited
 TicketMessageDeleted                   = Message deleted
 TicketTaskCreated                      = Task created: %s
+TicketActionCreated                    = Action created: %s
+TicketActionsTab                       = Corrective / preventive actions
+TicketActionsSummary                   = Actions summary
+TicketActionsNeedProject               = Link a project to the ticket to add corrective and preventive actions to it
 TicketDocumentGenerated                = Document generated
 TicketFileDeleted                      = File deleted
 

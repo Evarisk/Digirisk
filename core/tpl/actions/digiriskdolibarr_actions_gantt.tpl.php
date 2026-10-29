@@ -16,21 +16,21 @@
  */
 
 /**
- * \file    core/tpl/accidentinvestigation/digiriskdolibarr_accidentinvestigation_actions_gantt.tpl.php
+ * \file    core/tpl/actions/digiriskdolibarr_actions_gantt.tpl.php
  * \ingroup digiriskdolibarr
- * \brief   Gantt of the actions of an accident investigation, grouped by type. An action only has a deadline: its
+ * \brief   Gantt of the actions of an actions tab, grouped by type. An action only has a deadline: its
  *          bar starts at the start date of its task, or failing that at its creation (see
- *          getAccidentInvestigationActionsGantt()). Hidden while there is no action.
- *          The positions are percentages carried by data attributes, accidentinvestigation.js turns them into CSS
+ *          digiriskdolibarr_get_actions_gantt()). Hidden while there is no action.
+ *          The positions are percentages carried by data attributes, actions.js turns them into CSS
  *          variables.
  *
- * Rendered by view/accidentinvestigation/accidentinvestigation_actions.php (inherits its scope). Expects:
+ * Rendered by core/tpl/actions/digiriskdolibarr_actions_sections.tpl.php (inherits its scope). Expects:
  *   $db, $langs
  *   $sectionConfig  array  Title key of each type of action
- *   $actionsByType  array  Actions of each type, from getAccidentInvestigationActionsByType()
+ *   $actionsByType  array  Actions of each type, from digiriskdolibarr_get_actions_by_type()
  */
 
-$gantt = getAccidentInvestigationActionsGantt($db, $actionsByType);
+$gantt = digiriskdolibarr_get_actions_gantt($db, $actionsByType);
 if (empty($gantt['rows'])) {
     return;
 }
@@ -42,36 +42,36 @@ $ganttStates = [
     'open'     => $langs->trans('AccidentInvestigationActionNoDeadline'),
 ];
 
-print '<div id="accidentinvestigation-gantt" class="accidentinvestigation-gantt">';
-print '<div class="accidentinvestigation-gantt__header">';
-print '<span class="accidentinvestigation-gantt__icon"><i class="fas fa-stream"></i></span>';
+print '<div id="digirisk-actions-gantt" class="digirisk-actions-gantt">';
+print '<div class="digirisk-actions-gantt__header">';
+print '<span class="digirisk-actions-gantt__icon"><i class="fas fa-stream"></i></span>';
 print '<div>';
-print '<div class="accidentinvestigation-gantt__title">' . $langs->trans('AccidentInvestigationActionsPlanning') . '</div>';
-print '<div class="accidentinvestigation-gantt__hint">' . $langs->trans('AccidentInvestigationActionsPlanningHint') . '</div>';
+print '<div class="digirisk-actions-gantt__title">' . $langs->trans('AccidentInvestigationActionsPlanning') . '</div>';
+print '<div class="digirisk-actions-gantt__hint">' . $langs->trans('AccidentInvestigationActionsPlanningHint') . '</div>';
 print '</div>';
 print '</div>';
 
-print '<div class="accidentinvestigation-gantt__chart">';
+print '<div class="digirisk-actions-gantt__chart">';
 
 // Lines of the ticks and of today, drawn once over every row
-print '<div class="accidentinvestigation-gantt__grid" aria-hidden="true">';
+print '<div class="digirisk-actions-gantt__grid" aria-hidden="true">';
 foreach ($gantt['ticks'] as $ganttTick) {
-    print '<span class="accidentinvestigation-gantt__gridline" data-position="' . $ganttTick['position'] . '"></span>';
+    print '<span class="digirisk-actions-gantt__gridline" data-position="' . $ganttTick['position'] . '"></span>';
 }
 // Near an edge, the label of today stands on the inner side of its line
-$ganttTodaySide = $gantt['today'] > 85 ? ' accidentinvestigation-gantt__today--end' : ($gantt['today'] < 15 ? ' accidentinvestigation-gantt__today--start' : '');
-print '<span class="accidentinvestigation-gantt__today' . $ganttTodaySide . '" data-position="' . $gantt['today'] . '">';
-print '<span class="accidentinvestigation-gantt__today-label">' . $langs->trans('Today') . '</span>';
+$ganttTodaySide = $gantt['today'] > 85 ? ' digirisk-actions-gantt__today--end' : ($gantt['today'] < 15 ? ' digirisk-actions-gantt__today--start' : '');
+print '<span class="digirisk-actions-gantt__today' . $ganttTodaySide . '" data-position="' . $gantt['today'] . '">';
+print '<span class="digirisk-actions-gantt__today-label">' . $langs->trans('Today') . '</span>';
 print '</span>';
 print '</div>';
 
-print '<div class="accidentinvestigation-gantt__row accidentinvestigation-gantt__row--axis">';
-print '<div class="accidentinvestigation-gantt__name"></div>';
-print '<div class="accidentinvestigation-gantt__track">';
+print '<div class="digirisk-actions-gantt__row digirisk-actions-gantt__row--axis">';
+print '<div class="digirisk-actions-gantt__name"></div>';
+print '<div class="digirisk-actions-gantt__track">';
 foreach ($gantt['ticks'] as $ganttTickIndex => $ganttTick) {
     // Every other label gives way on narrow screens
     $ganttTickMinor = count($gantt['ticks']) > 3 && $ganttTickIndex % 2 == 1;
-    print '<span class="accidentinvestigation-gantt__tick' . ($ganttTickMinor ? ' accidentinvestigation-gantt__tick--minor' : '') . '" data-position="' . $ganttTick['position'] . '">';
+    print '<span class="digirisk-actions-gantt__tick' . ($ganttTickMinor ? ' digirisk-actions-gantt__tick--minor' : '') . '" data-position="' . $ganttTick['position'] . '">';
     print dol_escape_htmltag($ganttTick['label']);
     print '</span>';
 }
@@ -79,9 +79,9 @@ print '</div>';
 print '</div>';
 
 foreach ($gantt['rows'] as $ganttType => $ganttRows) {
-    print '<div class="accidentinvestigation-gantt__row accidentinvestigation-gantt__row--group">';
-    print '<div class="accidentinvestigation-gantt__name">' . $langs->trans($sectionConfig[$ganttType]['titleKey']) . '</div>';
-    print '<div class="accidentinvestigation-gantt__track"></div>';
+    print '<div class="digirisk-actions-gantt__row digirisk-actions-gantt__row--group">';
+    print '<div class="digirisk-actions-gantt__name">' . $langs->trans($sectionConfig[$ganttType]['titleKey']) . '</div>';
+    print '<div class="digirisk-actions-gantt__track"></div>';
     print '</div>';
 
     foreach ($ganttRows as $ganttRow) {
@@ -109,21 +109,21 @@ foreach ($gantt['rows'] as $ganttType => $ganttRows) {
         // The state is spelled out next to the value when the colour alone tells it, except on narrow screens
         $ganttValue = $ganttProgress . ' %';
         if (in_array($ganttRow['state'], ['late', 'open'])) {
-            $ganttValue .= '<span class="accidentinvestigation-gantt__value-state"> · ' . dol_escape_htmltag($ganttStates[$ganttRow['state']]) . '</span>';
+            $ganttValue .= '<span class="digirisk-actions-gantt__value-state"> · ' . dol_escape_htmltag($ganttStates[$ganttRow['state']]) . '</span>';
         }
 
-        print '<div class="accidentinvestigation-gantt__row">';
-        print '<div class="accidentinvestigation-gantt__name">';
+        print '<div class="digirisk-actions-gantt__row">';
+        print '<div class="digirisk-actions-gantt__name">';
         print '<a href="' . $ganttTaskUrl . '" target="_blank">' . dol_escape_htmltag($ganttAction->ref) . '</a>';
-        print '<span class="accidentinvestigation-gantt__label">' . dol_escape_htmltag($ganttAction->label) . '</span>';
+        print '<span class="digirisk-actions-gantt__label">' . dol_escape_htmltag($ganttAction->label) . '</span>';
         print '</div>';
-        print '<div class="accidentinvestigation-gantt__track">';
+        print '<div class="digirisk-actions-gantt__track">';
         print '<a href="' . $ganttTaskUrl . '" target="_blank" tabindex="-1"';
-        print ' class="accidentinvestigation-gantt__bar accidentinvestigation-gantt__bar--' . $ganttRow['state'] . ' accidentinvestigation-gantt__bar--value-' . $ganttValuePlace . '"';
+        print ' class="digirisk-actions-gantt__bar digirisk-actions-gantt__bar--' . $ganttRow['state'] . ' digirisk-actions-gantt__bar--value-' . $ganttValuePlace . '"';
         print ' data-start="' . $ganttRow['left'] . '" data-length="' . $ganttRow['length'] . '" data-progress="' . $ganttProgress . '"';
         print ' title="' . dol_escape_htmltag(implode("\n", $ganttDetails), 0, 1) . '">';
-        print '<span class="accidentinvestigation-gantt__fill"></span>';
-        print '<span class="accidentinvestigation-gantt__value">' . $ganttValue . '</span>';
+        print '<span class="digirisk-actions-gantt__fill"></span>';
+        print '<span class="digirisk-actions-gantt__value">' . $ganttValue . '</span>';
         print '</a>';
         print '</div>';
         print '</div>';
@@ -132,9 +132,9 @@ foreach ($gantt['rows'] as $ganttType => $ganttRows) {
 
 print '</div>'; // __chart
 
-print '<div class="accidentinvestigation-gantt__legend">';
+print '<div class="digirisk-actions-gantt__legend">';
 foreach ($ganttStates as $ganttState => $ganttStateLabel) {
-    print '<span class="accidentinvestigation-gantt__legend-item accidentinvestigation-gantt__legend-item--' . $ganttState . '">' . $ganttStateLabel . '</span>';
+    print '<span class="digirisk-actions-gantt__legend-item digirisk-actions-gantt__legend-item--' . $ganttState . '">' . $ganttStateLabel . '</span>';
 }
 print '</div>';
 

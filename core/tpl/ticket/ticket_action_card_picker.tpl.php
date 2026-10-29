@@ -138,6 +138,23 @@ function renderDimKanban($columns, $colTickets, $dim, $allUsers, $allCats, $allS
                             </a>
                         </div>
 
+                        <div class="tac-picker-card__indicators">
+                            <span class="tac-picker-card__progress" title="<?= dol_escape_htmltag($langs->trans('Progression')) ?>">
+                                <span class="tac-picker-card__progress-track"><span class="tac-picker-card__progress-fill" style="width:<?= (int) $t['progress'] ?>%"></span></span>
+                                <?= (int) $t['progress'] ?> %
+                            </span>
+                            <?php if ($t['elapsed'] !== '') : ?>
+                                <span class="tac-picker-card__elapsed" title="<?= dol_escape_htmltag($langs->trans('TicketElapsedTimeHelp')) ?>">
+                                    <i class="fas fa-hourglass-half"></i> <?= dol_escape_htmltag($t['elapsed']) ?>
+                                </span>
+                            <?php endif; ?>
+                            <?php if (!empty($t['last_msg_date'])) : ?>
+                                <span class="tac-picker-card__last-msg" title="<?= dol_escape_htmltag($langs->trans('TicketLastMessageDate') . ' : ' . dol_print_date($t['last_msg_date'], 'dayhour', 'tzuser')) ?>">
+                                    <i class="fas fa-comment-dots"></i> <?= dol_print_date($t['last_msg_date'], 'day', 'tzuser') ?>
+                                </span>
+                            <?php endif; ?>
+                        </div>
+
                         <div class="kanban-card-contacts">
                             <div class="kanban-responsible-wrapper" data-ticket-id="<?= (int) $t['id'] ?>" data-current-user="<?= (int) $t['assign_id'] ?>">
                                 <?php

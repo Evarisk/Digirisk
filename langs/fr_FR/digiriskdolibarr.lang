@@ -685,10 +685,11 @@ AccidentInvestigationDocumentGeneratedAt = Généré le
 CorrectiveActions                        = Actions correctives
 AddCurativeAction                        = Ajouter une action curative
 AddCorrectiveAction                      = Ajouter une action corrective
+AddPreventiveAction                      = Ajouter une action préventive
 InvestigationNotValidatedYet             = Validez d'abord l'enquête accident pour pouvoir créer des actions
 ActionLabel                              = Libellé de l'action
 ActionDeadline                           = Échéance
-ActionAssignedTo                         = Assigné à
+DigiriskActionAssignedTo                 = Assigné à
 ActionProgress                           = Avancement
 MarkAsDone                               = Marquer comme terminée
 XActionsOfY                              = %s / %s terminée(s)
@@ -2087,6 +2088,8 @@ TicketKanbanLogDeadline                = Modification de la date limite
 TicketKanbanLogDeadlineDesc            = Créer un événement lorsque la date limite d'un ticket est modifiée via le kanban
 TicketKanbanClosedLimit                = Limite tickets fermés
 TicketKanbanClosedLimitDesc            = Nombre maximum de tickets fermés/annulés affichés dans le kanban (0 = illimité)
+TicketLastMessageDate                  = Date du dernier message
+TicketElapsedTimeHelp                  = Temps écoulé depuis la création, arrêté à la clôture
 
 # ===========================================================================
 # Ticket — traçabilité des modifications — issue #4885
@@ -2096,6 +2099,10 @@ TicketLogModificationsDesc             = Créer un événement pour chaque édit
 TicketMessageEdited                    = Message modifié
 TicketMessageDeleted                   = Message supprimé
 TicketTaskCreated                      = Tâche créée : %s
+TicketActionCreated                    = Action créée : %s
+TicketActionsTab                       = Actions correctives / préventives
+TicketActionsSummary                   = Bilan des actions
+TicketActionsNeedProject               = Associez un projet au ticket pour lui ajouter des actions correctives et préventives
 TicketDocumentGenerated                = Document généré
 TicketFileDeleted                      = Fichier supprimé
 

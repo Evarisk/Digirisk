@@ -31,6 +31,7 @@ require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/actions_ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/ticket.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_action.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
@@ -44,14 +45,16 @@ global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $user;
 saturne_load_langs(['ticket', 'companies', 'projects', 'categories']);
 
 $id      = GETPOSTINT('id');
+$ref     = GETPOST('ref', 'alpha');
 $trackId = GETPOST('track_id', 'alpha');
 $action  = GETPOST('action', 'aZ09');
 
 $now = dol_now();
 
 $object = new Ticket($db);
-if ($id > 0 || !empty($trackId)) {
-    $object->fetch($id, '', $trackId);
+// The previous / next arrows of the banner (dol_banner_tab) open the card by its ref
+if ($id > 0 || !empty($ref) || !empty($trackId)) {
+    $object->fetch($id, $ref, $trackId);
     if ($object->id > 0) {
         $object->fetch_optionals();
     }
@@ -198,17 +201,19 @@ if ($action === 'setproject_ajax' && $permissionToWrite) {
         }
     }
     $object->setProject($newProjectId);
-    $projRef = '';
-    $cardUrl = '';
+    $projRef   = '';
+    $projLabel = '';
+    $cardUrl   = '';
     if ($newProjectId > 0) {
         $proj = new Project($db);
         $proj->fetch($newProjectId);
-        $projRef = trim($proj->ref);
-        $cardUrl = DOL_URL_ROOT . '/projet/card.php?id=' . $newProjectId;
+        $projRef   = trim($proj->ref);
+        $projLabel = $projRef . ($proj->title ? ' - ' . $proj->title : '');
+        $cardUrl   = DOL_URL_ROOT . '/projet/card.php?id=' . $newProjectId;
     }
     digiriskdolibarr_ticket_log_field_change($object, $langs->transnoentities('Project'), $oldProjRef, $projRef, $ticketLogConst);
     header('Content-Type: application/json');
-    print json_encode(['success' => 1, 'id' => $newProjectId, 'name' => $projRef, 'cardurl' => $cardUrl]);
+    print json_encode(['success' => 1, 'id' => $newProjectId, 'name' => $projLabel, 'cardurl' => $cardUrl]);
     exit;
 }
 
@@ -479,35 +484,16 @@ if ($action === 'delete_message_ajax' && $permissionToWrite) {
     exit;
 }
 
-// The tasks of a ticket hang under a parent task "TKP-<ticket ref>" of the ticket project (#4881).
-$fetchParentTaskId = static function () use ($db, $object): int {
-    if (empty($object->fk_project)) {
-        return 0;
-    }
-    $resql = $db->query('SELECT rowid FROM ' . MAIN_DB_PREFIX . "projet_task WHERE ref = '" . $db->escape('TKP-' . $object->ref) . "' AND fk_projet = " . (int) $object->fk_project);
-    $obj   = $resql ? $db->fetch_object($resql) : null;
-
-    return $obj ? (int) $obj->rowid : 0;
-};
-
-// Action: add a task from the popup (#4881) — the parent task is created along with the first task
+// Action: add a task from the popup (#4881) — the parent task "TKP-<ref>" is created along with the first task
 if ($action === 'add_child_task_modal' && $permissionToWrite && !empty($object->fk_project)) {
     require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
-    $parentTaskId = $fetchParentTaskId();
+    $parentTaskId = digiriskdolibarr_ticket_get_parent_task($db, $object);
     if ($parentTaskId <= 0) {
-        $parentTaskNew = new Task($db);
-        $parentTaskNew->fk_project = $object->fk_project;
-        $parentTaskNew->ref        = 'TKP-' . $object->ref;
-        $parentTaskNew->label      = $langs->trans('Ticket') . ' ' . $object->ref;
-        $parentTaskNew->progress   = 0;
-        $parentTaskId = (int) $parentTaskNew->create($user);
+        $parentTaskId = digiriskdolibarr_ticket_create_parent_task($object, $user, $ticketLogConst);
         if ($parentTaskId <= 0) {
-            setEventMessages($parentTaskNew->error, $parentTaskNew->errors, 'errors');
             header('Location: ' . $url_page_current . '?id=' . $object->id);
             exit;
         }
-        $db->query("UPDATE " . MAIN_DB_PREFIX . "projet_task SET ref = '" . $db->escape($parentTaskNew->ref) . "' WHERE rowid = " . $parentTaskId);
-        digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketTaskCreated', $parentTaskNew->ref), $parentTaskNew->label, $ticketLogConst);
     }
     $t = new Task($db);
     $t->fk_project = $object->fk_project;
@@ -690,14 +676,15 @@ if (isModEnabled('project')) {
     $morehtmlref .= img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="dtc-badge-logo"');
     $morehtmlref .= '<a class="dtc-badge-nav" href="' . dol_escape_htmltag($projUrl) . '" title="' . dol_escape_htmltag($langs->trans('Project')) . '"' . ($hasProject ? '' : ' style="display:none;"') . '><i class="fas fa-project-diagram"></i></a>';
     $projNameClass = 'dtc-project-name dtc-badge-name' . ($permissionToWrite ? ' dtc-inline-edit' : '') . ($hasProject ? '' : ' is-empty');
-    $projNameText  = $hasProject ? dol_escape_htmltag($object->project->ref) : dol_escape_htmltag($emptyProjLabel);
+    $projNameText  = $hasProject ? dol_escape_htmltag($object->project->ref . ($object->project->title ? ' - ' . $object->project->title : '')) : dol_escape_htmltag($emptyProjLabel);
     $projNameTitle = $permissionToWrite ? $langs->trans('SetProject') : $langs->trans('Project');
     $morehtmlref .= '<a class="' . $projNameClass . '" href="' . dol_escape_htmltag($projUrl) . '" title="' . dol_escape_htmltag($projNameTitle) . '">' . $projNameText . '</a>';
     if ($permissionToWrite) {
         require_once DOL_DOCUMENT_ROOT . '/core/class/html.formprojet.class.php';
         $formproject = new FormProjets($db);
         // mode=1 → array; we build a plain <select> (avoids the search-to-select autocompleter), select2-ified by JS on reveal.
-        $projectArray = $formproject->select_projects_list((int) $object->socid, (string) $object->fk_project, 'dtc_project_select', 24, 0, 0, 0, 0, 0, 1, '', 1, 0, '', '', '');
+        // Untruncated title (maxlength 0) so the select2 search also matches the end of long titles.
+        $projectArray = $formproject->select_projects_list((int) $object->socid, (string) $object->fk_project, 'dtc_project_select', 0, 0, 0, 0, 0, 0, 1, '', 1, 0, '', '', '');
         $morehtmlref .= '<span class="dtc-project-selector dtc-inline-selector" style="display:none;">';
         $morehtmlref .= '<select class="dtc-inline-select minwidth200" id="dtc_project_select" name="dtc_project_select">';
         $morehtmlref .= '<option value="0"' . (empty($object->fk_project) ? ' selected' : '') . '></option>';
@@ -708,7 +695,8 @@ if (isModEnabled('project')) {
                     continue;
                 }
                 $selectedAttr = ($projId === (int) $object->fk_project) ? ' selected' : '';
-                $morehtmlref .= '<option value="' . $projId . '"' . $selectedAttr . '>' . dol_escape_htmltag($projLine['value']) . '</option>';
+                // labelx = "ref, title - thirdparty"; value only holds the ref
+                $morehtmlref .= '<option value="' . $projId . '"' . $selectedAttr . '>' . dol_escape_htmltag($projLine['labelx']) . '</option>';
             }
         }
         $morehtmlref .= '</select>';
@@ -721,7 +709,29 @@ $morehtmlref .= '</div>';
 
 $linkback = '<a href="' . dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_action_card.php', 1) . '"><strong>' . $langs->trans('BackToList') . '</strong></a>';
 
-dol_banner_tab($object, 'ref', $linkback, ($user->socid ? 0 : 1), 'ref', 'ref', $morehtmlref);
+// Summary of the corrective and preventive actions under the status (#5549), each counter leads to the actions tab
+$morehtmlstatus = '';
+if (isModEnabled('project') && !empty($object->fk_project) && $user->hasRight('projet', 'lire')) {
+    $actionsCounters = digiriskdolibarr_ticket_count_actions(digiriskdolibarr_ticket_get_actions($db, digiriskdolibarr_ticket_get_parent_task($db, $object)));
+    $actionsUrl      = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_actions.php', 1) . '?id=' . (int) $object->id;
+
+    $morehtmlstatus .= '<div class="dtc-actions-summary">';
+    $morehtmlstatus .= '<span class="dtc-actions-summary__title">' . $langs->trans('TicketActionsSummary') . '</span>';
+    foreach (digiriskdolibarr_ticket_action_sections() as $actionType => $actionSection) {
+        $actionsDone  = $actionsCounters[$actionType]['done'];
+        $actionsTotal = $actionsCounters[$actionType]['total'];
+        $actionsState = $actionsTotal == 0 ? 'none' : ($actionsDone == $actionsTotal ? 'done' : 'open');
+        $actionsTitle = $langs->trans($actionSection['titleKey']) . ' : ' . $langs->trans('XActionsOfY', (string) $actionsDone, (string) $actionsTotal);
+
+        $morehtmlstatus .= '<a class="dtc-actions-summary__item dtc-actions-summary__item--' . $actionsState . '" href="' . dol_escape_htmltag($actionsUrl) . '" title="' . dol_escape_htmltag($actionsTitle) . '">';
+        $morehtmlstatus .= dol_escape_htmltag($langs->trans($actionSection['titleKey']));
+        $morehtmlstatus .= '<span class="dtc-actions-summary__count">' . $actionsDone . ' / ' . $actionsTotal . '</span>';
+        $morehtmlstatus .= '</a>';
+    }
+    $morehtmlstatus .= '</div>';
+}
+
+dol_banner_tab($object, 'ref', $linkback, ($user->socid ? 0 : 1), 'ref', 'ref', $morehtmlref, '', 0, '', $morehtmlstatus);
 
 print '<div class="fichecenter">';
 
@@ -941,7 +951,7 @@ $parentTaskId = 0;
 $parentTask   = null;
 if (isModEnabled('project')) {
     require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
-    $parentTaskId = $fetchParentTaskId();
+    $parentTaskId = digiriskdolibarr_ticket_get_parent_task($db, $object);
     if ($parentTaskId > 0) {
         $parentTask = new Task($db);
         $parentTask->fetch($parentTaskId);
@@ -1061,12 +1071,18 @@ print '</tbody></table>';
 // ---- Tasks of the ticket (#4881): children of the parent task ----
 $tasksarray = [];
 if ($parentTask) {
+    // The containers of the corrective and preventive actions (#5549) belong to the actions tab
+    $actionContainerIds = [];
+    foreach (array_keys(digiriskdolibarr_ticket_action_sections()) as $actionType) {
+        $actionContainerIds[] = digiriskdolibarr_get_action_container_task($db, $parentTaskId, $actionType);
+    }
+
     $taskObj        = new Task($db);
     $extrafieldsObj = new ExtraFields($db);
     $allTasks       = $taskObj->getTasksArray(null, null, $object->fk_project, 0, 0, '', '-1', '', 0, 0, $extrafieldsObj);
     if (!empty($allTasks)) {
         foreach ($allTasks as $tsk) {
-            if ($tsk->fk_task_parent == $parentTaskId) {
+            if ($tsk->fk_task_parent == $parentTaskId && !in_array((int) $tsk->id, $actionContainerIds, true)) {
                 $tasksarray[] = $tsk;
             }
         }

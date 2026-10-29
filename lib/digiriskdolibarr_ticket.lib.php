@@ -223,6 +223,116 @@ function digiriskdolibarr_ticket_log_field_change(Ticket $ticket, string $fieldL
 }
 
 /**
+ * Return the parent task "TKP-<ref>" the tasks and the actions of a ticket hang under (#4881)
+ *
+ * @param  DoliDB $db     Database handler
+ * @param  Ticket $ticket Ticket
+ * @return int            ID of the parent task, 0 when the ticket has no project or no parent task yet
+ */
+function digiriskdolibarr_ticket_get_parent_task(DoliDB $db, Ticket $ticket): int
+{
+    if (empty($ticket->fk_project)) {
+        return 0;
+    }
+
+    $resql = $db->query('SELECT rowid FROM ' . MAIN_DB_PREFIX . "projet_task WHERE ref = '" . $db->escape('TKP-' . $ticket->ref) . "' AND fk_projet = " . (int) $ticket->fk_project);
+    $obj   = $resql ? $db->fetch_object($resql) : null;
+
+    return $obj ? (int) $obj->rowid : 0;
+}
+
+/**
+ * Create the parent task "TKP-<ref>" of a ticket, along with the first task or action added to it
+ *
+ * On failure the error is shown to the user, the caller only has to redirect.
+ *
+ * @param  Ticket $ticket   Ticket, linked to a project
+ * @param  User   $user     User creating the task
+ * @param  string $logConst Constant gating the traceability event
+ * @return int              ID of the parent task, <= 0 on error
+ */
+function digiriskdolibarr_ticket_create_parent_task(Ticket $ticket, User $user, string $logConst = ''): int
+{
+    global $db, $langs;
+
+    require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+
+    $parentTask             = new Task($db);
+    $parentTask->fk_project = $ticket->fk_project;
+    $parentTask->ref        = 'TKP-' . $ticket->ref;
+    $parentTask->label      = $langs->trans('Ticket') . ' ' . $ticket->ref;
+    $parentTask->progress   = 0;
+
+    $parentTaskId = (int) $parentTask->create($user);
+    if ($parentTaskId <= 0) {
+        setEventMessages($parentTask->error, $parentTask->errors, 'errors');
+        return $parentTaskId;
+    }
+
+    $db->query('UPDATE ' . MAIN_DB_PREFIX . "projet_task SET ref = '" . $db->escape($parentTask->ref) . "' WHERE rowid = " . $parentTaskId);
+    digiriskdolibarr_ticket_log_event($ticket, $langs->transnoentities('TicketTaskCreated', $parentTask->ref), $parentTask->label, $logConst);
+
+    return $parentTaskId;
+}
+
+/**
+ * Sections of the actions tab of a ticket, by digirisk_action_type
+ *
+ * @return array<int, array{titleKey: string, addKey: string}> Title and add-button keys of each type
+ */
+function digiriskdolibarr_ticket_action_sections(): array
+{
+    return [
+        2 => ['titleKey' => 'CorrectiveActions', 'addKey' => 'AddCorrectiveAction'],
+        3 => ['titleKey' => 'PreventiveActions', 'addKey' => 'AddPreventiveAction'],
+    ];
+}
+
+/**
+ * Return the corrective and preventive actions of a ticket (#5549)
+ *
+ * They are project tasks typed by digirisk_action_type, under one container task per type, itself a child of the
+ * parent task "TKP-<ref>" of the ticket.
+ *
+ * @param  DoliDB $db           Database handler
+ * @param  int    $parentTaskId Parent task of the ticket, from digiriskdolibarr_ticket_get_parent_task()
+ * @return array<int, array<int, stdClass>> Actions of each type
+ */
+function digiriskdolibarr_ticket_get_actions(DoliDB $db, int $parentTaskId): array
+{
+    require_once __DIR__ . '/digiriskdolibarr_action.lib.php';
+
+    $actionsByType = [];
+    foreach (array_keys(digiriskdolibarr_ticket_action_sections()) as $type) {
+        $actionsByType[$type] = digiriskdolibarr_get_actions_by_type($db, $parentTaskId, $type);
+    }
+
+    return $actionsByType;
+}
+
+/**
+ * Count the actions of a ticket, done and in total, for each type
+ *
+ * @param  array<int, array<int, stdClass>> $actionsByType Actions of each type, from digiriskdolibarr_ticket_get_actions()
+ * @return array<int, array{done: int, total: int}>        Counters of each type
+ */
+function digiriskdolibarr_ticket_count_actions(array $actionsByType): array
+{
+    $counters = [];
+    foreach ($actionsByType as $type => $actions) {
+        $done = 0;
+        foreach ($actions as $action) {
+            if ((int) $action->progress >= 100) {
+                $done++;
+            }
+        }
+        $counters[$type] = ['done' => $done, 'total' => count($actions)];
+    }
+
+    return $counters;
+}
+
+/**
  * Prepare ticket statistics pages header
  *
  * @return array $head   Array of tabs

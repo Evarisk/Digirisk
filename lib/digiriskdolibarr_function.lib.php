@@ -2853,12 +2853,14 @@ function digiriskformconfirm($page, $title, $question, $action, $formquestion = 
  *
  * The bounds are the ones of the list search form, so a graph bar and the list it opens hold the same records
  *
- * @param  string $prefix Name of the list date filter, without its bound suffix ('search_date', 'search_accident_date')
- * @param  int    $start  Timestamp of the first day of the range, 0 for no lower bound
- * @param  int    $end    Timestamp of the last day of the range, 0 for no upper bound
- * @return string         Search criteria, empty when the range is unbounded
+ * @param  string $prefix      Name of the list date filter, without its bound suffix ('search_date', 'search_accident_date')
+ * @param  int    $start       Timestamp of the first day of the range, 0 for no lower bound
+ * @param  int    $end         Timestamp of the last day of the range, 0 for no upper bound
+ * @param  string $boundPrefix Text between the name of the filter and its bound: '_' for the Dolibarr lists
+ *                             (search_date_startday), '_dt' for the Saturne ones (search_accident_date_dtstartday)
+ * @return string              Search criteria, empty when the range is unbounded
  */
-function digirisk_get_date_range_filter(string $prefix, int $start = 0, int $end = 0): string
+function digirisk_get_date_range_filter(string $prefix, int $start = 0, int $end = 0, string $boundPrefix = '_'): string
 {
     $filter = [];
     foreach (['start' => $start, 'end' => $end] as $bound => $timestamp) {
@@ -2867,9 +2869,9 @@ function digirisk_get_date_range_filter(string $prefix, int $start = 0, int $end
         }
 
         $date     = dol_getdate($timestamp);
-        $filter[] = $prefix . '_' . $bound . 'day=' . $date['mday'];
-        $filter[] = $prefix . '_' . $bound . 'month=' . $date['mon'];
-        $filter[] = $prefix . '_' . $bound . 'year=' . $date['year'];
+        $filter[] = $prefix . $boundPrefix . $bound . 'day=' . $date['mday'];
+        $filter[] = $prefix . $boundPrefix . $bound . 'month=' . $date['mon'];
+        $filter[] = $prefix . $boundPrefix . $bound . 'year=' . $date['year'];
     }
 
     return implode('&', $filter);
@@ -3285,7 +3287,7 @@ function digiriskPreventionPlanDocumentImagesSubDir(string $part): string
  */
 function digiriskPreventionPlanDocumentImages(string $part): array
 {
-    require_once __DIR__ . '/../../saturne/lib/medias.lib.php';
+    dol_include_once('/saturne/lib/medias.lib.php');
 
     $files = saturne_get_media_files('digiriskdolibarr', digiriskPreventionPlanDocumentImagesSubDir($part), '', '', ['type' => 'image', 'sort_field' => 'name', 'sort_order' => 'asc']);
 
@@ -3301,7 +3303,7 @@ function digiriskPreventionPlanDocumentImages(string $part): array
  */
 function digiriskPreventionPlanDocumentImagesBlock(string $part, bool $canWrite): string
 {
-    require_once __DIR__ . '/../../saturne/lib/medias.lib.php';
+    dol_include_once('/saturne/lib/medias.lib.php');
 
     return saturne_render_media_block('digiriskdolibarr', digiriskPreventionPlanDocumentImagesSubDir($part), 'documentimages-' . $part, 'digiriskdolibarr,adminpage,write', ['show_photo' => true, 'show_audio' => false, 'show_file' => false, 'show_upload' => $canWrite]);
 }

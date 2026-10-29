@@ -122,7 +122,15 @@ $title  = $langs->trans('MyPage');
 $object = new MyObject($db);
 $object->fetch($id);
 saturne_header(0, '', $title, $help_url);
-require_once __DIR__ . '/../../saturne/core/tpl/banner_actions.tpl.php';
+require_once dol_buildpath('/saturne/core/tpl/banner_actions.tpl.php');
+```
+
+**Saturne's classes, libs and templates** — through the Dolibarr paths, never relative to the file. PHP resolves `__DIR__` to the **target** of a symlink: a module installed in `htdocs/custom` by symlink looks for Saturne next to the target and dies on a fatal (#5391). Never `dol_include_once` a template: it runs inside that function and loses the caller's variables. Only the `digiriskdolibarr.main.inc.php` bootstrap keeps its relative attempts — it runs before `main.inc.php`, `dol_buildpath` does not exist yet. The `Inclusions de Saturne` step of the lint job in `.github/workflows/quality.yml` refuses the pattern.
+```php
+dol_include_once('/saturne/class/saturneobject.class.php');                              // GOOD, class or lib
+require_once dol_buildpath('/saturne/core/tpl/banner_actions.tpl.php');                  // GOOD, template
+$saturneAvailable = file_exists(dol_buildpath('/saturne/lib/saturne_functions.lib.php')); // GOOD, guard
+require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';                   // BAD, fatal once symlinked
 ```
 
 **Security rules** — always:

@@ -839,6 +839,63 @@ $dtc-title:       #111827;
     }
 }
 
+// ---- Summary of the corrective and preventive actions, under the status of the banner (#5549) ----
+// One pill per type, its counter grey without action, orange while some are open, green once all are done
+.digirisk-ticket-card .dtc-actions-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: 8px;
+
+    &__title {
+        color: $dtc-grey;
+        font-size: 0.85em;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    &__item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 4px 3px 10px;
+        border: 1px solid $dtc-border;
+        border-radius: 999px;
+        background: #fff;
+        color: $dtc-title;
+        font-size: 0.9em;
+        white-space: nowrap;
+        box-shadow: $dtc-shadow;
+
+        &:hover {
+            border-color: $dtc-blue;
+            color: $dtc-blue;
+            text-decoration: none;
+        }
+    }
+
+    &__count {
+        padding: 1px 8px;
+        border-radius: 999px;
+        background: $dtc-hairline;
+        color: $dtc-grey;
+        font-weight: 700;
+    }
+
+    &__item--open .dtc-actions-summary__count {
+        background: #fff3cd;
+        color: #8a6d1d;
+    }
+
+    &__item--done .dtc-actions-summary__count {
+        background: #dcfce7;
+        color: #166534;
+    }
+}
+
 // ---- Responsive: stack the two columns ----
 @media (max-width: 900px) {
     .digirisk-ticket-card .fichecenter > .fichehalfleft,

@@ -58,7 +58,7 @@ function digiriskObjectMediaBlock(CommonObject $object, string $subDir, string $
     global $conf;
 
     require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-    require_once __DIR__ . '/../../saturne/lib/medias.lib.php';
+    dol_include_once('/saturne/lib/medias.lib.php');
 
     $missingDirs = digiriskMediaMissingDirs($conf->digiriskdolibarr->dir_output . '/' . $subDir);
 
@@ -111,7 +111,7 @@ function digiriskObjectMediaActions(CommonObject $object, string $action, string
     if ($action == 'deletePhoto' ? $canDelete : $canAdd) {
         require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
         require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
-        require_once __DIR__ . '/../../saturne/lib/medias.lib.php';
+        dol_include_once('/saturne/lib/medias.lib.php');
 
         // Writes the photo with its thumbs and puts it in the library, copies it from the library, or
         // removes it with its thumbs
@@ -163,7 +163,7 @@ function digiriskTicketPublicUploadContext(): string
  */
 function digiriskTicketPublicUploadSubDir(): string
 {
-    require_once __DIR__ . '/../../saturne/lib/medias.lib.php';
+    dol_include_once('/saturne/lib/medias.lib.php');
 
     return 'temp/ticket/' . saturne_get_upload_token(digiriskTicketPublicUploadContext());
 }
@@ -179,7 +179,7 @@ function digiriskTicketPublicMediaBlock(string $subDir): string
     global $conf;
 
     require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-    require_once __DIR__ . '/../../saturne/lib/medias.lib.php';
+    dol_include_once('/saturne/lib/medias.lib.php');
 
     // Every visitor gets a folder: only those who send something keep it
     $missingDirs = digiriskMediaMissingDirs($conf->digiriskdolibarr->dir_output . '/' . $subDir);
@@ -225,7 +225,7 @@ function digiriskTicketPublicMediaActions(string $action, string $subDir): void
     // Not loaded by the public pages
     require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
     require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
-    require_once __DIR__ . '/../../saturne/lib/medias.lib.php';
+    dol_include_once('/saturne/lib/medias.lib.php');
 
     $uploadDir = $conf->digiriskdolibarr->dir_output . '/' . $subDir;
     if (!dol_is_dir($uploadDir)) {

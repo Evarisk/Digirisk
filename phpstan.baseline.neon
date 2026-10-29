@@ -5407,63 +5407,9 @@ parameters:
 			path: view/accident/accident_card.php
 
 		-
-			message: '#^Comparison operation "\>" between User and 0 results in an error\.$#'
-			identifier: greater.invalid
-			count: 1
-			path: view/accident/accident_list.php
-
-		-
-			message: '#^Function json_decode invoked with 4 parameters, 1\-2 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: view/accident/accident_list.php
-
-		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
-			count: 1
-			path: view/accident/accident_list.php
-
-		-
 			message: '#^Negated boolean expression is always true\.$#'
 			identifier: booleanNot.alwaysTrue
-			count: 1
-			path: view/accident/accident_list.php
-
-		-
-			message: '#^Parameter \#2 \$array of method Form\:\:multiSelectArrayWithCheckbox\(\) expects array\<string, array\{label\: string, checked\?\: string, enabled\?\: string, type\?\: string, langfile\?\: string, position\?\: int, help\?\: string\}\>, non\-empty\-array\<non\-falsy\-string, array\{label\: ''Victim'', checked\: 1\}\|array\{label\: mixed, checked\: 0\|1, enabled\: bool, position\: mixed\}\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: view/accident/accident_list.php
-
-		-
-			message: '#^Ternary operator condition is always true\.$#'
-			identifier: ternary.alwaysTrue
-			count: 1
-			path: view/accident/accident_list.php
-
-		-
-			message: '#^Variable \$object might not be defined\.$#'
-			identifier: variable.undefined
 			count: 2
-			path: view/accident/accident_list.php
-
-		-
-			message: '#^Variable \$resql might not be defined\.$#'
-			identifier: variable.undefined
-			count: 3
-			path: view/accident/accident_list.php
-
-		-
-			message: '#^Variable \$risk might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: view/accident/accident_list.php
-
-		-
-			message: '#^Variable \$userObject might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
 			path: view/accident/accident_list.php
 
 		-
@@ -7180,12 +7126,6 @@ parameters:
 			message: '#^Parameter \#1 \$id of method Task\:\:fetch\(\) expects int, string given\.$#'
 			identifier: argument.type
 			count: 2
-			path: view/accidentinvestigation/accidentinvestigation_actions.php
-
-		-
-			message: '#^Parameter \#3 \$type of function getAccidentInvestigationActionContainerTask expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
 			path: view/accidentinvestigation/accidentinvestigation_actions.php
 
 		-

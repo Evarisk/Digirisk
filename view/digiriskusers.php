@@ -251,6 +251,9 @@ if ($action == 'add' && $permissiontoadd) {
 
 		$id = $object->create($user);
 		if ($id > 0) {
+			// No quick creation form posts a password: without a default value, the checks below
+			// read an undefined variable (a PHP warning on every creation)
+			$newpassword = '';
 			if (GETPOST('password')) {
 				$newpassword = $object->setPassword($user, GETPOST('password'));
 			}
@@ -269,7 +272,7 @@ if ($action == 'add' && $permissiontoadd) {
 						setEventMessages($object->error, $object->errors, 'errors');
 					}
 				} else {
-					setEventMessages($langs->trans("UserCreated", $newpassword), null, 'mesgs');
+					setEventMessages($langs->trans("UserCreated"), null, 'mesgs');
 				}
 			}
 

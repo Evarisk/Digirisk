@@ -645,10 +645,11 @@ AccidentInvestigationDocumentGeneratedAt = Erzeugt am
 CorrectiveActions                        = Korrekturmaßnahmen
 AddCurativeAction                        = Eine Sofortmaßnahme hinzufügen
 AddCorrectiveAction                      = Eine Korrekturmaßnahme hinzufügen
+AddPreventiveAction                      = Eine Präventivmaßnahme hinzufügen
 InvestigationNotValidatedYet             = Geben Sie zuerst die Unfalluntersuchung frei, um Maßnahmen anlegen zu können
 ActionLabel                              = Bezeichnung der Maßnahme
 ActionDeadline                           = Fälligkeit
-ActionAssignedTo                         = Zugewiesen an
+DigiriskActionAssignedTo                 = Zugewiesen an
 ActionProgress                           = Fortschritt
 MarkAsDone                               = Als erledigt markieren
 XActionsOfY                              = %s / %s erledigt
@@ -1972,6 +1973,8 @@ TicketKanbanLogDeadline                = Änderung der Frist
 TicketKanbanLogDeadlineDesc            = Ein Ereignis anlegen, wenn die Frist eines Tickets über das Kanban geändert wird
 TicketKanbanClosedLimit                = Grenze für abgeschlossene Tickets
 TicketKanbanClosedLimitDesc            = Maximale Anzahl der im Kanban angezeigten abgeschlossenen/stornierten Tickets (0 = unbegrenzt)
+TicketLastMessageDate                  = Datum der letzten Nachricht
+TicketElapsedTimeHelp                  = Seit der Erstellung verstrichene Zeit, beim Schließen angehalten
 
 # ===========================================================================
 # Ticket — Nachvollziehbarkeit der Änderungen — issue #4885
@@ -1981,6 +1984,10 @@ TicketLogModificationsDesc             = Für jede Bearbeitung im Ticket-Datenbl
 TicketMessageEdited                    = Nachricht geändert
 TicketMessageDeleted                   = Nachricht gelöscht
 TicketTaskCreated                      = Aufgabe angelegt: %s
+TicketActionCreated                    = Maßnahme angelegt: %s
+TicketActionsTab                       = Korrektur- / Präventivmaßnahmen
+TicketActionsSummary                   = Bilanz der Maßnahmen
+TicketActionsNeedProject               = Verknüpfen Sie ein Projekt mit dem Ticket, um ihm Korrektur- und Präventivmaßnahmen hinzuzufügen
 TicketDocumentGenerated                = Dokument erzeugt
 TicketFileDeleted                      = Datei gelöscht
 

@@ -252,8 +252,9 @@ class ActionsDigiriskdolibarr
         $this->results = [];
 
         // Ticket tabs browsed from the Digirisk menu: the "Ticket" tab leads back to the Digirisk ticket card,
-        // not to the native one
-        if (($parameters['type'] ?? '') === 'ticket' && ($parameters['mode'] ?? '') === 'remove' && ($_SESSION['mainmenu'] ?? '') === 'digiriskdolibarr' && !empty($parameters['object']->id)) {
+        // not to the native one. Dolibarr 23 does not give the type of the tabs to the hook, the object tells it
+        $tabsType = $parameters['type'] ?? ($parameters['object']->element ?? '');
+        if ($tabsType === 'ticket' && ($parameters['mode'] ?? '') === 'remove' && ($_SESSION['mainmenu'] ?? '') === 'digiriskdolibarr' && !empty($parameters['object']->id)) {
             foreach ($parameters['head'] as $key => $tab) {
                 if (($tab[2] ?? '') === 'tabTicket') {
                     $parameters['head'][$key][0] = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $parameters['object']->id;
@@ -261,7 +262,53 @@ class ActionsDigiriskdolibarr
             }
         }
 
+        // Tab of the corrective and preventive actions of a ticket (#5549), right after its contacts. Tested on the
+        // object: Dolibarr 23 does not give the type of the tabs to the hook
+        $object = $parameters['object'] ?? null;
+        if (($parameters['mode'] ?? '') === 'add' && ($parameters['filterorigmodule'] ?? '') === 'external' && $object instanceof Ticket && $object->id > 0) {
+            $this->addTicketActionsTab($parameters['head'], $object);
+        }
+
         return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Insert the tab of the corrective and preventive actions into the tabs of a ticket, with the number of actions
+     *
+     * @param  array  $head   Tabs of the ticket, a reference to the array of complete_head_from_modules()
+     * @param  Ticket $ticket Ticket
+     * @return void
+     */
+    private function addTicketActionsTab(array &$head, Ticket $ticket): void
+    {
+        global $db, $langs, $user;
+
+        if (!isModEnabled('project') || !$user->hasRight('projet', 'lire')) {
+            return;
+        }
+
+        require_once __DIR__ . '/../lib/digiriskdolibarr_ticket.lib.php';
+
+        $langs->load('digiriskdolibarr@digiriskdolibarr');
+
+        $actionsCount = 0;
+        foreach (digiriskdolibarr_ticket_count_actions(digiriskdolibarr_ticket_get_actions($db, digiriskdolibarr_ticket_get_parent_task($db, $ticket))) as $counter) {
+            $actionsCount += $counter['total'];
+        }
+
+        $tab = [
+            dol_buildpath('/digiriskdolibarr/view/ticket/ticket_actions.php', 1) . '?id=' . (int) $ticket->id,
+            '<i class="fas fa-tasks pictofixedwidth"></i>' . $langs->trans('TicketActionsTab') . ($actionsCount > 0 ? '<span class="badge marginleftonlyshort">' . $actionsCount . '</span>' : ''),
+            'digiriskactions',
+        ];
+
+        $position = count($head);
+        foreach (array_values($head) as $index => $existingTab) {
+            if (($existingTab[2] ?? '') === 'contact') {
+                $position = $index + 1;
+            }
+        }
+        array_splice($head, $position, 0, [$tab]);
     }
 
     /**
@@ -303,7 +350,7 @@ class ActionsDigiriskdolibarr
 	{
 		global $conf, $db, $form, $langs, $object, $user;
 
-		require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
+		dol_include_once('/saturne/lib/saturne_functions.lib.php');
 
 		if (strpos($parameters['context'], 'admincompany') !== false) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			?>
@@ -401,7 +448,7 @@ class ActionsDigiriskdolibarr
 
                 $moduleNameLowerCase = 'digiriskdolibarr';
 
-                require_once __DIR__ . '/../../saturne/lib/documents.lib.php';
+                dol_include_once('/saturne/lib/documents.lib.php');
 
                 $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1];
                 $objRef     = dol_sanitizeFileName($object->ref);
@@ -667,7 +714,7 @@ class ActionsDigiriskdolibarr
         } else if (preg_match('/projectcard|projectcontactcard|projecttaskcard|projecttaskscard|projecttasktime|projectOverview|tasklist|category/', $parameters['context'])) {
 			if ((GETPOST('action') == '' || empty(GETPOST('action')) || GETPOST('action') != 'edit')) {
 				require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
-                require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
+                dol_include_once('/saturne/class/task/saturnetask.class.php');
 
 				$task        = new SaturneTask($db);
 				$project     = new Project($db);
@@ -836,7 +883,7 @@ class ActionsDigiriskdolibarr
                 $upload_dir          = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 
                 // Action to generate pdf from odt file
-                require __DIR__ . '/../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
+                require dol_buildpath('/saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php');
 
                 $urlToRedirect = $_SERVER['REQUEST_URI'];
                 $urlToRedirect = preg_replace('/#pdfGeneration$/', '', $urlToRedirect);
@@ -846,7 +893,7 @@ class ActionsDigiriskdolibarr
                 exit;
             }
 
-            require __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
+            require dol_buildpath('/saturne/core/tpl/documents/documents_action.tpl.php');
         } else if (strpos($parameters['context'], 'projectcard') !== false) {
             // The model is the one set as default on the documents configuration page, PAPRIPACT when none is
             if ($action == 'builddoc' && GETPOST('model') == getDolGlobalString('DIGIRISKDOLIBARR_PROJECTDOCUMENT_DEFAULT_MODEL', 'papripact_a3_paysage_projectdocument')) {
@@ -858,7 +905,7 @@ class ActionsDigiriskdolibarr
                 $permissiontoadd          = $user->rights->projet->creer;
                 $moreParams['modulePart'] = 'project';
 
-                require __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
+                require dol_buildpath('/saturne/core/tpl/documents/documents_action.tpl.php');
             }
         } else if (strpos($parameters['context'], 'projecttasktime') !== false) {
             if ($action == 'builddoc' && GETPOST('model', 'alpha') == 'timespent_projectdocument') {
@@ -890,7 +937,7 @@ class ActionsDigiriskdolibarr
                     'timeSpentDateEnd'   => dol_mktime(23, 59, 59, GETPOSTINT('timespent_date_endmonth'), GETPOSTINT('timespent_date_endday'), GETPOSTINT('timespent_date_endyear'))
                 ];
 
-                require __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
+                require dol_buildpath('/saturne/core/tpl/documents/documents_action.tpl.php');
             }
         } elseif (preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context'])) {
 			if ($action == 'list') {
@@ -1273,6 +1320,13 @@ class ActionsDigiriskdolibarr
             return 1;
         }
 
+        // An accident saved without a type is a work accident: the work accident filter takes them too
+        if (preg_match('/accidentlist/', $parameters['context']) && $parameters['key'] == 'accident_type' && (string) $parameters['val'] === '0') {
+            $this->resprints = " AND (t.accident_type IS NULL OR t.accident_type = '0')";
+
+            return 1;
+        }
+
         return 0; // or return 1 to replace standard code
     }
 
@@ -1290,7 +1344,7 @@ class ActionsDigiriskdolibarr
 
         if (preg_match('/preventionplanlist|firepermitlist/', $parameters['context'])) {
             // Load Saturne libraries
-            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+            dol_include_once('/saturne/class/saturnesignature.class.php');
 
             $signatory = new SaturneSignature($this->db, 'digiriskdolibarr', $object->element);
 
@@ -1299,6 +1353,14 @@ class ActionsDigiriskdolibarr
             $signatories = $signatory->fetchSignatory('', $object->id, $object->element);
 
             $conf->cache['riskObjectListSignatories'] = is_array($signatories) ? $signatories : [];
+        }
+
+        if (preg_match('/accidentlist/', $parameters['context'])) {
+            // The victim is shown in its own column and counts in the progress of the accident: load it once per row
+            $victim = $object->getUserVictim();
+
+            $conf->cache['accidentListVictim']   = $victim;
+            $conf->cache['accidentListProgress'] = $object->getProgress($victim);
         }
 
         return 0; // or return 1 to replace standard code
@@ -1313,7 +1375,7 @@ class ActionsDigiriskdolibarr
      */
     public function saturnePrintFieldListLoopObject(array $parameters, object $object): int
     {
-        global $conf;
+        global $conf, $langs;
 
         if (preg_match('/preventionplanlist|firepermitlist/', $parameters['context'])) {
             // Load Dolibarr libraries
@@ -1355,7 +1417,100 @@ class ActionsDigiriskdolibarr
             $this->results = $out;
         }
 
+        if (preg_match('/accidentlist/', $parameters['context'])) {
+            $out = [];
+            $key = $parameters['key'];
+
+            // The generic list falls back on the value of the field when a hook gives an empty one: these columns have
+            // no field of their own, a non-breaking space keeps an empty cell empty
+            switch ($key) {
+                case 'fk_element':
+                    $out[$key] = $this->getAccidentLocationNomUrl($object) ?: '&nbsp;';
+                    break;
+                case 'accident_type':
+                    // An accident saved without a type is a work accident
+                    $out[$key] = $langs->trans($object->accident_type == 1 ? 'CommutingAccident' : 'WorkAccidentStatement');
+                    break;
+                case 'accident_date':
+                    // We suppose dates without time are always gmt (storage of course + output)
+                    $out[$key] = dol_print_date($object->accident_date, 'dayhour', 'tzserver') ?: '&nbsp;';
+                    break;
+                case 'victim':
+                    $victim    = $conf->cache['accidentListVictim'] ?? null;
+                    $out[$key] = ($victim instanceof User && $victim->id > 0) ? $victim->getNomUrl(-1) : '&nbsp;';
+                    break;
+                case 'progress':
+                    $progress  = (int) round($conf->cache['accidentListProgress'] ?? 0);
+                    $out[$key] = '<div class="accident-progress' . ($progress >= 100 ? ' accident-progress--complete' : '') . '">';
+                    $out[$key] .= '<progress class="accident-progress__bar" max="100" value="' . $progress . '"></progress>';
+                    $out[$key] .= '<span class="accident-progress__value">' . $progress . '&nbsp;%</span>';
+                    $out[$key] .= '</div>';
+                    break;
+            }
+
+            $this->results = $out;
+        }
+
         return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Get the link to the place of an accident: a GP/UT or the society, a third party or a free text
+     *
+     * The GP/UT, the society and the third parties are fetched once per page, several accidents often share them
+     *
+     * @param  Accident $accident Accident
+     * @return string             Link to the place, its text for a free one, empty when it is not filled in
+     * @throws Exception
+     */
+    private function getAccidentLocationNomUrl(Accident $accident): string
+    {
+        global $conf;
+
+        switch ($accident->external_accident) {
+            case 1:
+                if ($accident->fk_standard > 0) {
+                    if (!isset($conf->cache['accidentListStandard'])) {
+                        $digiriskStandard = new DigiriskStandard($this->db);
+                        $digiriskStandard->fetch(getDolGlobalInt('DIGIRISKDOLIBARR_ACTIVE_STANDARD'));
+
+                        $conf->cache['accidentListStandard'] = $digiriskStandard;
+                    }
+
+                    return $conf->cache['accidentListStandard']->getNomUrl(1, 'blank', 0, '', -1, 1);
+                }
+                if ($accident->fk_element > 0) {
+                    if (!isset($conf->cache['accidentListElements'][$accident->fk_element])) {
+                        $digiriskElement = new DigiriskElement($this->db);
+
+                        $conf->cache['accidentListElements'][$accident->fk_element] = ($digiriskElement->fetch($accident->fk_element) > 0 ? $digiriskElement : null);
+                    }
+
+                    $digiriskElement = $conf->cache['accidentListElements'][$accident->fk_element];
+
+                    return $digiriskElement instanceof DigiriskElement ? $digiriskElement->getNomUrl(1, 'blank', 0, '', -1, 1) : '';
+                }
+                break;
+            case 2:
+                if ($accident->fk_soc > 0) {
+                    require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+
+                    if (!isset($conf->cache['accidentListThirdparties'][$accident->fk_soc])) {
+                        $thirdparty = new Societe($this->db);
+
+                        $conf->cache['accidentListThirdparties'][$accident->fk_soc] = ($thirdparty->fetch($accident->fk_soc) > 0 ? $thirdparty : null);
+                    }
+
+                    $thirdparty = $conf->cache['accidentListThirdparties'][$accident->fk_soc];
+
+                    return $thirdparty instanceof Societe ? getNomUrlSociety($thirdparty, 1, 'blank') : '';
+                }
+                break;
+            case 3:
+                return dol_htmlentitiesbr((string) $accident->accident_location);
+        }
+
+        return '';
     }
 
 	/**
@@ -1367,6 +1522,8 @@ class ActionsDigiriskdolibarr
 	 */
 	public function printFieldListWhere($parameters, $object)
 	{
+        global $conf;
+
         // The same instance carries the result of every hook method : a value left by printFieldListFrom
         // would be appended to the WHERE clause of the request
         $this->resprints = '';
@@ -1377,6 +1534,23 @@ class ActionsDigiriskdolibarr
             $extSocietyId = (int) ($parameters['search']['extsociety'] ?? 0);
             if ($extSocietyId > 0) {
                 $this->resprints = ' AND rs.element_id = ' . $extSocietyId;
+            }
+        }
+
+        if (preg_match('/accidentlist/', $parameters['context'])) {
+            // Accidents tab of a GP/UT: kept out of the search criteria, removing the filters of the list must not lift it
+            if (!empty($conf->cache['accidentListElementId'])) {
+                $this->resprints .= ' AND t.fk_element = ' . ((int) $conf->cache['accidentListElementId']);
+            }
+
+            // Work stops and register have no column in the accident table
+            if (!empty($parameters['search']['workstop'])) {
+                $this->resprints .= $object->getWorkStopSqlFilter($parameters['search']['workstop']);
+            }
+            if (($parameters['search']['register'] ?? '') == Accident::WITH_REGISTER_FILTER) {
+                $this->resprints .= ' AND t.fk_ticket > 0';
+            } elseif (($parameters['search']['register'] ?? '') == Accident::WITHOUT_REGISTER_FILTER) {
+                $this->resprints .= ' AND (t.fk_ticket IS NULL OR t.fk_ticket <= 0)';
             }
         }
 
@@ -1447,6 +1621,32 @@ class ActionsDigiriskdolibarr
 				$moreforfilter .= '</div>';
 			}
 		}
+
+        if (preg_match('/accidentlist/', $parameters['context'])) {
+            // The accident list keeps its criteria in $search, the work stops and the register hold no column of their own
+            global $search;
+
+            $form = new Form($db);
+
+            $workStopFilterLabels = [
+                Accident::ANY_WORK_STOP_FILTER => $langs->transnoentities('AccidentWithDIAT'),
+                Accident::NO_WORK_STOP_FILTER  => $langs->transnoentities('AccidentWithoutDIAT')
+            ];
+            foreach (array_keys(Accident::WORK_STOP_DURATION_LIMITS) as $workStopBucket) {
+                $workStopFilterLabels[$workStopBucket] = $langs->transnoentities(ucfirst($workStopBucket));
+            }
+            $registerFilterLabels = [
+                Accident::WITH_REGISTER_FILTER    => $langs->transnoentities('AccidentWithRegister'),
+                Accident::WITHOUT_REGISTER_FILTER => $langs->transnoentities('AccidentWithoutRegister')
+            ];
+
+            $moreforfilter  = '<div class="divsearchfield">' . $langs->trans('WorkStopDuration') . ' ';
+            $moreforfilter .= $form->selectarray('search_workstop', $workStopFilterLabels, $search['workstop'] ?? '', 1, 0, 0, '', 0, 0, 0, '', 'maxwidth200');
+            $moreforfilter .= '</div>';
+            $moreforfilter .= '<div class="divsearchfield">' . $langs->trans('AccidentRegister') . ' ';
+            $moreforfilter .= $form->selectarray('search_register', $registerFilterLabels, $search['register'] ?? '', 1, 0, 0, '', 0, 0, 0, '', 'maxwidth200');
+            $moreforfilter .= '</div>';
+        }
 
         $this->resprints = $moreforfilter ?? '';
         return 0; // or return 1 to replace standard code

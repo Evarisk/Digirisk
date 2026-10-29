@@ -361,10 +361,10 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$this->db = $db;
 
-		$this->saturneAvailable = file_exists(__DIR__ . '/../../../saturne/lib/saturne_functions.lib.php');
+		$this->saturneAvailable = file_exists(dol_buildpath('/saturne/lib/saturne_functions.lib.php'));
 
 		if ($this->saturneAvailable) {
-			require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
+			dol_include_once('/saturne/lib/saturne_functions.lib.php');
 			saturne_load_langs(['digiriskdolibarr@digiriskdolibarr']);
 		} else {
 			$this->error++;
@@ -387,7 +387,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '23.5.0';
+		$this->version         = '23.6.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr_color@digiriskdolibarr';
 
@@ -415,7 +415,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			// Set this to 1 if module has its own theme directory (theme)
 			'theme' => 0,
 			// Set this to relative path of css file if module has its own css file
-			'css' => ['/digiriskdolibarr/css/patch_preview_icon.css'],
+			'css' => [],
 			// Set this to relative path of js file if module must load a js on all pages
 			'js' => [],
 			// Set here all hooks context managed by module. To find available hook context, make a "grep -r '>initHooks(' *" on source code. You can also set hook context to 'all'
@@ -2264,7 +2264,7 @@ class modDigiriskdolibarr extends DolibarrModules
         if (empty($conf->global->DIGIRISKDOLIBARR_ACCIDENT_REMOVE_FK_USER_VICTIM)) {
 
             require_once __DIR__ . '/../../class/accident.class.php';
-            require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+            dol_include_once('/saturne/class/saturnesignature.class.php');
 
             $accident  = new Accident($this->db);
             $signatory = new SaturneSignature($this->db);
@@ -2598,7 +2598,7 @@ class modDigiriskdolibarr extends DolibarrModules
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 2, 'integer', 0, '', $conf->entity);
         }
 		if (getDolGlobalInt('DIGIRISKDOLIBARR_THIRDPARTY_UPDATED') == 2) {
-			require_once __DIR__ . '/../../../saturne/class/saturneschedules.class.php';
+			dol_include_once('/saturne/class/saturneschedules.class.php');
 
 			$labourDoctorID = $resources->fetchDigiriskResource('LabourDoctorSociety');
 			$societe->fetch($labourDoctorID);
@@ -2645,7 +2645,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'fk_firepermit'            => ['Label' => 'FirePermit',            'type' => 'link', 'elementtype' => ['projet_task'], 'position' => $this->numero . 30, 'params' => ['FirePermit:digiriskdolibarr/class/firepermit.class.php:1:(entity:IN:__SHARED_ENTITIES__)' => NULL],                     ],
             'fk_accident'              => ['Label' => 'Accident',              'type' => 'link', 'elementtype' => ['projet_task'], 'position' => $this->numero . 40, 'params' => ['Accident:digiriskdolibarr/class/accident.class.php:1:(entity:IN:__SHARED_ENTITIES__)' => NULL],                         ],
             'fk_accidentinvestigation' => ['Label' => 'AccidentInvestigation', 'type' => 'link',   'elementtype' => ['projet_task'], 'position' => $this->numero . 50, 'params' => ['AccidentInvestigation:digiriskdolibarr/class/accidentinvestigation.class.php:1:(entity:IN:__SHARED_ENTITIES__)' => NULL]],
-            'digirisk_action_type'     => ['Label' => 'DigiriskActionType',    'type' => 'select', 'elementtype' => ['projet_task'], 'position' => $this->numero . 60, 'params' => [1 => 'Curative', 2 => 'Corrective'],                                                                                                                                                       ],
+            'digirisk_action_type'     => ['Label' => 'DigiriskActionType',    'type' => 'select', 'elementtype' => ['projet_task'], 'position' => $this->numero . 60, 'params' => [1 => 'Curative', 2 => 'Corrective', 3 => 'Preventive'],                                                                                                                                    ],
 
             'wp_digi_id' => ['Label' => 'WPDigiID', 'type' => 'int', 'length' => 100, 'elementtype' => ['digiriskdolibarr_digiriskelement'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')"],
             'entity'     => ['Label' => 'Entity',   'type' => 'int', 'length' => 100, 'elementtype' => ['digiriskdolibarr_digiriskelement'], 'position' => $this->numero . 20, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')"],

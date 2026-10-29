@@ -645,10 +645,11 @@ AccidentInvestigationDocumentGeneratedAt = Wygenerowano
 CorrectiveActions                        = Działania korygujące
 AddCurativeAction                        = Dodaj działanie doraźne
 AddCorrectiveAction                      = Dodaj działanie korygujące
+AddPreventiveAction                      = Dodaj działanie zapobiegawcze
 InvestigationNotValidatedYet             = Najpierw zatwierdź dochodzenie powypadkowe, aby móc tworzyć działania
 ActionLabel                              = Nazwa działania
 ActionDeadline                           = Termin
-ActionAssignedTo                         = Przypisane do
+DigiriskActionAssignedTo                 = Przypisane do
 ActionProgress                           = Postęp
 MarkAsDone                               = Oznacz jako zakończone
 XActionsOfY                              = %s / %s zakończonych
@@ -1972,6 +1973,8 @@ TicketKanbanLogDeadline                = Zmiana terminu
 TicketKanbanLogDeadlineDesc            = Utwórz zdarzenie, gdy termin zgłoszenia zostanie zmieniony przez kanban
 TicketKanbanClosedLimit                = Limit zamkniętych zgłoszeń
 TicketKanbanClosedLimitDesc            = Maksymalna liczba zamkniętych/anulowanych zgłoszeń wyświetlanych w kanbanie (0 = bez ograniczeń)
+TicketLastMessageDate                  = Data ostatniej wiadomości
+TicketElapsedTimeHelp                  = Czas od utworzenia, zatrzymany przy zamknięciu
 
 # ===========================================================================
 # Ticket — identyfikowalność zmian — issue #4885
@@ -1981,6 +1984,10 @@ TicketLogModificationsDesc             = Utwórz zdarzenie dla każdej edycji wy
 TicketMessageEdited                    = Wiadomość zmodyfikowana
 TicketMessageDeleted                   = Wiadomość usunięta
 TicketTaskCreated                      = Zadanie utworzone: %s
+TicketActionCreated                    = Utworzono działanie: %s
+TicketActionsTab                       = Działania korygujące / zapobiegawcze
+TicketActionsSummary                   = Bilans działań
+TicketActionsNeedProject               = Powiąż projekt ze zgłoszeniem, aby dodać do niego działania korygujące i zapobiegawcze
 TicketDocumentGenerated                = Dokument wygenerowany
 TicketFileDeleted                      = Plik usunięty
 
