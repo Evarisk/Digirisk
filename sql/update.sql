@@ -319,3 +319,6 @@ ALTER TABLE llx_digiriskdolibarr_firepermit ADD firewatch_name varchar(255) NULL
 
 -- 23.5.x - Restore the level 0 of gravity and exposure that PHP 7 saved as NULL (0 != '' was false): a factor 0 gives a cotation of 0 (issue #5384)
 UPDATE llx_digiriskdolibarr_riskassessment SET gravite = COALESCE(gravite, 0), exposition = COALESCE(exposition, 0), cotation = 0 WHERE method = 'advanced' AND cotation IS NULL AND (gravite IS NULL OR exposition IS NULL) AND occurrence IS NOT NULL AND formation IS NOT NULL AND protection IS NOT NULL;
+
+-- 23.6.x - Share of the company workforce present in each GP/UT, NULL while it is not entered (issue #5541)
+ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD people_percentage double(24,8) NULL AFTER show_in_selector;

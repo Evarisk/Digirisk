@@ -99,6 +99,8 @@ class DigiriskElement extends SaturneObject
         'element_type'     => ['type' => 'varchar(50)', 'label' => 'ElementType', 'enabled' => '1', 'position' => 100, 'notnull' => -1, 'visible' => 1,],
         'photo'            => ['type' => 'varchar(255)', 'label' => 'Photo', 'enabled' => '1', 'position' => 105, 'notnull' => -1, 'visible' => -2,],
         'show_in_selector' => ['type' => 'boolean', 'label' => 'ShowInSelectOnPublicTicketInterface', 'enabled' => '1', 'position' => 106, 'notnull' => 1, 'visible' => 1, 'default' => 1,],
+        // Share of the company workforce present in the element, NULL while it is not entered
+        'people_percentage' => ['type' => 'double(24,8)', 'label' => 'PeoplePercentage', 'enabled' => '1', 'position' => 107, 'notnull' => 0, 'visible' => 0,],
         'fk_user_creat'    => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 110, 'notnull' => 1, 'visible' => -2, 'foreignkey' => 'user.rowid',],
         'fk_user_modif'    => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => -2,],
         'fk_parent'        => ['type' => 'integer', 'label' => 'ParentElement', 'enabled' => '1', 'position' => 130, 'notnull' => 1, 'visible' => 1, 'default' => 0,],
@@ -119,6 +121,12 @@ class DigiriskElement extends SaturneObject
     public $element_type;
     public $photo;
     public $show_in_selector;
+
+    /**
+     * @var float|string|null Share of the company workforce present in the element, from 0 to 100
+     */
+    public $people_percentage;
+
     public $fk_user_creat;
     public $fk_user_modif;
     public $fk_parent;
@@ -972,6 +980,36 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
+     * Check a share of the company workforce before it is saved on an element
+     *
+     * @param  mixed $peoplePercentage Share entered, null or '' to leave it unset
+     * @return bool                    True when unset or between 0 and 100
+     */
+    public static function isValidPeoplePercentage($peoplePercentage): bool
+    {
+        if ($peoplePercentage === null || $peoplePercentage === '') {
+            return true;
+        }
+
+        return is_numeric($peoplePercentage) && $peoplePercentage >= 0 && $peoplePercentage <= 100;
+    }
+
+    /**
+     * Number of people present in the element, from its share of the company workforce
+     *
+     * @param  int      $nbEmployees Workforce of the company
+     * @return int|null              Number of people rounded to the nearest unit, null while the share is not entered
+     */
+    public function getNbPeople(int $nbEmployees): ?int
+    {
+        if ($this->people_percentage === null || $this->people_percentage === '') {
+            return null;
+        }
+
+        return (int) round($nbEmployees * (float) $this->people_percentage / 100);
+    }
+
+    /**
      * Return banner tab content.
      *
      * @return array
@@ -1049,6 +1087,7 @@ class DigiriskElement extends SaturneObject
         $ret .= $langs->trans('ElementType') . ' : ' . $langs->trans($this->element_type) . '<br>';
         ($this->ranks != 0 ? $ret .= $langs->trans('Order') . ' : ' . $this->ranks . '<br>' : '');
         $ret .= $langs->trans('ShowInSelectOnPublicTicketInterface') . ' : ' . ($this->show_in_selector ? $langs->trans('Yes') : $langs->trans('No')) . '<br>';
+        $ret .= $langs->trans('PeoplePercentage') . ' : ' . ($this->people_percentage !== null && $this->people_percentage !== '' ? price($this->people_percentage, 0, $langs, 1, 0) . ' %' : 'N/A') . '<br>';
 
         return $ret;
     }
