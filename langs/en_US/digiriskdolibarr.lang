@@ -2078,6 +2078,23 @@ TicketKanbanClosedLimit                = Closed ticket limit
 TicketKanbanClosedLimitDesc            = Maximum number of closed/cancelled tickets displayed in the Kanban (0 = unlimited)
 TicketLastMessageDate                  = Last message date
 TicketElapsedTimeHelp                  = Time elapsed since creation, stopped at closing
+TicketKanbanFilters                    = Filters
+TicketKanbanFilterAll                  = All
+TicketKanbanFilterAssignee             = Assignment
+TicketKanbanFilterUnassigned           = Unassigned
+TicketKanbanFilterAssigned             = Assigned
+TicketKanbanFilterProgressNone         = Not started (0 %)
+TicketKanbanFilterProgressRunning      = In progress (1 to 99 %)
+TicketKanbanFilterProgressDone         = Done (100 %)
+TicketKanbanFilterAge                  = Age
+TicketKanbanFilterAgeLess7             = Less than 7 days
+TicketKanbanFilterAge7To30             = 7 to 30 days
+TicketKanbanFilterAgeMore30            = More than 30 days
+TicketKanbanFilterLastMessage          = Last message
+TicketKanbanFilterNoMessage            = No message
+TicketKanbanFilterMessageLess7         = Less than 7 days ago
+TicketKanbanFilterMessageMore7         = More than 7 days ago
+TicketKanbanFilterMessageMore30        = More than 30 days ago
 
 # ===========================================================================
 # Ticket — modification traceability — issue #4885

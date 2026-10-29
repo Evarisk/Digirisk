@@ -1978,6 +1978,23 @@ TicketKanbanClosedLimit                = Grenze für abgeschlossene Tickets
 TicketKanbanClosedLimitDesc            = Maximale Anzahl der im Kanban angezeigten abgeschlossenen/stornierten Tickets (0 = unbegrenzt)
 TicketLastMessageDate                  = Datum der letzten Nachricht
 TicketElapsedTimeHelp                  = Seit der Erstellung verstrichene Zeit, beim Schließen angehalten
+TicketKanbanFilters                    = Filter
+TicketKanbanFilterAll                  = Alle
+TicketKanbanFilterAssignee             = Zuweisung
+TicketKanbanFilterUnassigned           = Nicht zugewiesen
+TicketKanbanFilterAssigned             = Zugewiesen
+TicketKanbanFilterProgressNone         = Nicht begonnen (0 %)
+TicketKanbanFilterProgressRunning      = In Bearbeitung (1 bis 99 %)
+TicketKanbanFilterProgressDone         = Erledigt (100 %)
+TicketKanbanFilterAge                  = Alter
+TicketKanbanFilterAgeLess7             = Weniger als 7 Tage
+TicketKanbanFilterAge7To30             = 7 bis 30 Tage
+TicketKanbanFilterAgeMore30            = Mehr als 30 Tage
+TicketKanbanFilterLastMessage          = Letzte Nachricht
+TicketKanbanFilterNoMessage            = Keine Nachricht
+TicketKanbanFilterMessageLess7         = Vor weniger als 7 Tagen
+TicketKanbanFilterMessageMore7         = Vor mehr als 7 Tagen
+TicketKanbanFilterMessageMore30        = Vor mehr als 30 Tagen
 
 # ===========================================================================
 # Ticket — Nachvollziehbarkeit der Änderungen — issue #4885

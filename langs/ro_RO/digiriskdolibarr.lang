@@ -1978,6 +1978,23 @@ TicketKanbanClosedLimit                = Limita tichetelor închise
 TicketKanbanClosedLimitDesc            = Numărul maxim de tichete închise/anulate afișate în kanban (0 = nelimitat)
 TicketLastMessageDate                  = Data ultimului mesaj
 TicketElapsedTimeHelp                  = Timp scurs de la creare, oprit la închidere
+TicketKanbanFilters                    = Filtre
+TicketKanbanFilterAll                  = Toate
+TicketKanbanFilterAssignee             = Atribuire
+TicketKanbanFilterUnassigned           = Neatribuite
+TicketKanbanFilterAssigned             = Atribuite
+TicketKanbanFilterProgressNone         = Neîncepute (0 %)
+TicketKanbanFilterProgressRunning      = În curs (1 până la 99 %)
+TicketKanbanFilterProgressDone         = Finalizate (100 %)
+TicketKanbanFilterAge                  = Vechime
+TicketKanbanFilterAgeLess7             = Mai puțin de 7 zile
+TicketKanbanFilterAge7To30             = Între 7 și 30 de zile
+TicketKanbanFilterAgeMore30            = Peste 30 de zile
+TicketKanbanFilterLastMessage          = Ultimul mesaj
+TicketKanbanFilterNoMessage            = Niciun mesaj
+TicketKanbanFilterMessageLess7         = Acum mai puțin de 7 zile
+TicketKanbanFilterMessageMore7         = Acum peste 7 zile
+TicketKanbanFilterMessageMore30        = Acum peste 30 de zile
 
 # ===========================================================================
 # Ticket — trasabilitatea modificărilor — issue #4885

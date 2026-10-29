@@ -1682,6 +1682,7 @@ window.digiriskdolibarr.ticketPickerKanban.init = function() {
     window.digiriskdolibarr.ticketPickerKanban.initSettings();
     window.digiriskdolibarr.ticketPickerKanban.initQuickCreate();
     window.digiriskdolibarr.ticketPickerKanban.initTagFilter();
+    window.digiriskdolibarr.ticketPickerKanban.restoreCardFilters();
     window.digiriskdolibarr.ticketPickerKanban.restoreTagFilter();
 
     // Restore the last active tab from localStorage.
@@ -1826,13 +1827,18 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
         e.stopPropagation();
     });
 
-    // Tag filter — changing the selection filters every board at once
-    $(document).on('change', '#tacPickerTagFilterSelect', function() {
-        window.digiriskdolibarr.ticketPickerKanban.applyTagFilter();
+    // Tag filter and card filters — changing a selection filters every board at once
+    $(document).on('change', '#tacPickerTagFilterSelect, #tacPickerFilters .tac-picker-filters__select', function() {
+        window.digiriskdolibarr.ticketPickerKanban.applyFilters();
     });
 
     $(document).on('click', '#tacPickerTagFilterReset', function() {
         $('#tacPickerTagFilterSelect').val(null).trigger('change');
+    });
+
+    $(document).on('click', '#tacPickerFiltersReset', function() {
+        $('#tacPickerFilters .tac-picker-filters__select').val('');
+        window.digiriskdolibarr.ticketPickerKanban.applyFilters();
     });
 
     // Tab switching — persist active dim in localStorage so F5 keeps the current tab.
@@ -2027,7 +2033,7 @@ window.digiriskdolibarr.ticketPickerKanban.initSortable = function() {
 };
 
 /**
- * Update column header counters after a card move. Cards hidden by the tag filter
+ * Update column header counters after a card move. Cards hidden by the filters
  * are left out so a column shows what it currently displays.
  *
  * @return {void}
@@ -2135,13 +2141,67 @@ window.digiriskdolibarr.ticketPickerKanban.getFilteredTags = function() {
 };
 
 /**
- * Hide the cards carrying none of the selected tags, on every board at once.
- * The selection is kept in localStorage so a reload reopens the same filter.
+ * Values of the card filters (assignee, progress, age, last message), empty when a filter shows everything.
+ *
+ * @return {Object} Value of each filter, by its data-filter key
+ */
+window.digiriskdolibarr.ticketPickerKanban.getCardFilters = function() {
+    var filters = {};
+    $('#tacPickerFilters .tac-picker-filters__select').each(function() {
+        filters[$(this).data('filter')] = $(this).val() || '';
+    });
+
+    return filters;
+};
+
+/**
+ * Whether a card matches the card filters. Its assignee is read on its select, which follows the reassignments
+ * made on the board; its progress, age in seconds and date of last message come from its data attributes.
+ *
+ * @param  {jQuery} $card   Kanban card
+ * @param  {Object} filters Values of the card filters
+ * @return {boolean}        True when the card stays shown
+ */
+window.digiriskdolibarr.ticketPickerKanban.matchCardFilters = function($card, filters) {
+    var day      = 86400;
+    var assignee = String($card.find('.tac-picker-assignee-select').val() || '0');
+    var progress = parseInt($card.attr('data-progress'), 10) || 0;
+    var elapsed  = parseInt($card.attr('data-elapsed'), 10);
+    var lastMsg  = parseInt($card.attr('data-last-msg'), 10) || 0;
+    var sinceMsg = Date.now() / 1000 - lastMsg;
+
+    if (filters.assignee === 'none' && assignee !== '0') return false;
+    if (filters.assignee === 'any' && assignee === '0') return false;
+    if (filters.assignee && ['none', 'any'].indexOf(filters.assignee) === -1 && assignee !== filters.assignee) return false;
+
+    if (filters.progress === 'none' && progress !== 0) return false;
+    if (filters.progress === 'running' && (progress === 0 || progress >= 100)) return false;
+    if (filters.progress === 'done' && progress < 100) return false;
+
+    if (filters.age && elapsed < 0) return false;
+    if (filters.age === 'lt7' && elapsed >= 7 * day) return false;
+    if (filters.age === '7to30' && (elapsed < 7 * day || elapsed > 30 * day)) return false;
+    if (filters.age === 'gt30' && elapsed <= 30 * day) return false;
+
+    if (filters.message === 'none' && lastMsg > 0) return false;
+    if (['lt7', 'gt7', 'gt30'].indexOf(filters.message) !== -1 && lastMsg === 0) return false;
+    if (filters.message === 'lt7' && sinceMsg >= 7 * day) return false;
+    if (filters.message === 'gt7' && sinceMsg < 7 * day) return false;
+    if (filters.message === 'gt30' && sinceMsg < 30 * day) return false;
+
+    return true;
+};
+
+/**
+ * Hide the cards carrying none of the selected tags or not matching the card filters, on every board at once.
+ * Both selections are kept in localStorage so a reload reopens the same filters.
  *
  * @return {void}
  */
-window.digiriskdolibarr.ticketPickerKanban.applyTagFilter = function() {
+window.digiriskdolibarr.ticketPickerKanban.applyFilters = function() {
     var selectedTags = window.digiriskdolibarr.ticketPickerKanban.getFilteredTags();
+    var cardFilters  = window.digiriskdolibarr.ticketPickerKanban.getCardFilters();
+    var anyCardFilter = Object.keys(cardFilters).some(function(key) { return cardFilters[key] !== ''; });
 
     $('.tac-picker-card').each(function() {
         var $card = $(this);
@@ -2152,19 +2212,48 @@ window.digiriskdolibarr.ticketPickerKanban.applyTagFilter = function() {
                 return selectedTags.indexOf(String($(this).data('cat-id'))) !== -1;
             }).length > 0;
         }
+        if (keep && anyCardFilter) {
+            keep = window.digiriskdolibarr.ticketPickerKanban.matchCardFilters($card, cardFilters);
+        }
 
         $card.toggleClass('tac-picker-card--filtered', !keep);
     });
 
     $('#tacPickerTagFilterReset').toggleClass('visible', selectedTags.length > 0);
+    $('#tacPickerFiltersReset').toggleClass('visible', anyCardFilter);
 
     try {
         localStorage.setItem('tacPickerTagFilter', JSON.stringify(selectedTags));
+        localStorage.setItem('tacPickerCardFilters', JSON.stringify(cardFilters));
     } catch (e) {
-        // Private browsing: the filter simply does not survive the reload
+        // Private browsing: the filters simply do not survive the reload
     }
 
     window.digiriskdolibarr.ticketPickerKanban.updateCounts();
+};
+
+/**
+ * Re-select the card filters kept from the previous visit and filter the boards accordingly.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.restoreCardFilters = function() {
+    var saved = {};
+    try {
+        saved = JSON.parse(localStorage.getItem('tacPickerCardFilters') || '{}') || {};
+    } catch (e) {
+        saved = {};
+    }
+
+    $('#tacPickerFilters .tac-picker-filters__select').each(function() {
+        var value = saved[$(this).data('filter')] || '';
+        // A user deactivated since the previous visit has no option left: the filter shows everything again
+        if (value && $(this).find('option[value="' + value + '"]').length) {
+            $(this).val(value);
+        }
+    });
+
+    window.digiriskdolibarr.ticketPickerKanban.applyFilters();
 };
 
 /**
@@ -2308,7 +2397,11 @@ window.digiriskdolibarr.ticketPickerKanban.saveAssignee = function(ticketId, use
             $card.removeClass('kanban-card-saving');
             if (response.success) {
                 $card.addClass('kanban-card-saved');
-                setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);
+                // The assignee filter may now hide the card: once the save has shown
+                setTimeout(function() {
+                    $card.removeClass('kanban-card-saved');
+                    window.digiriskdolibarr.ticketPickerKanban.applyFilters();
+                }, 2000);
             } else {
                 $card.addClass('kanban-card-error');
                 setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
@@ -2354,7 +2447,7 @@ window.digiriskdolibarr.ticketPickerKanban.saveTagAdd = function(ticketId, catId
                 $card.addClass('kanban-card-saved');
                 setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);
                 // The card now carries one more tag, it may enter the filtered selection
-                window.digiriskdolibarr.ticketPickerKanban.applyTagFilter();
+                window.digiriskdolibarr.ticketPickerKanban.applyFilters();
             } else {
                 $card.addClass('kanban-card-error');
                 setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
@@ -2391,7 +2484,7 @@ window.digiriskdolibarr.ticketPickerKanban.saveTagRemove = function(ticketId, ca
                     $(this).remove();
                     $card.find('.kanban-tag-option[data-value="' + catId + '"]').removeClass('assigned').find('.fa-check').remove();
                     // The card lost a tag, it may fall out of the filtered selection
-                    window.digiriskdolibarr.ticketPickerKanban.applyTagFilter();
+                    window.digiriskdolibarr.ticketPickerKanban.applyFilters();
                 });
                 $card.addClass('kanban-card-saved');
                 setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);

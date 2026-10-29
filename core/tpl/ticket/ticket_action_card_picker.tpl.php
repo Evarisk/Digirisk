@@ -93,7 +93,10 @@ function renderDimKanban($columns, $colTickets, $dim, $allUsers, $allCats, $allS
                     ?>
                     <div class="kanban-card tac-picker-card"
                          data-ticket-id="<?= (int) $t['id'] ?>"
-                         data-dim-value="<?= dol_escape_htmltag((string) $t[$dimValueField]) ?>">
+                         data-dim-value="<?= dol_escape_htmltag((string) $t[$dimValueField]) ?>"
+                         data-progress="<?= (int) $t['progress'] ?>"
+                         data-elapsed="<?= (int) $t['elapsed_seconds'] ?>"
+                         data-last-msg="<?= (int) $t['last_msg_date'] ?>">
 
                         <div class="kanban-card-header">
                             <a href="<?= dol_escape_htmltag($t['url']) ?>" class="kanban-card-ref"><?= dol_escape_htmltag($t['ref']) ?></a>
@@ -287,6 +290,39 @@ function renderDimKanban($columns, $colTickets, $dim, $allUsers, $allCats, $allS
             </button>
         </div>
     <?php endif; ?>
+
+    <!-- Filters on what the cards show (#5549): assignee, progress, age and last message, applied client side
+         together with the tags -->
+    <?php
+    $cardFilters = [
+        'assignee' => ['icon' => 'fa-user', 'label' => 'TicketKanbanFilterAssignee', 'options' => ['none' => 'TicketKanbanFilterUnassigned', 'any' => 'TicketKanbanFilterAssigned']],
+        'progress' => ['icon' => 'fa-tasks', 'label' => 'Progression', 'options' => ['none' => 'TicketKanbanFilterProgressNone', 'running' => 'TicketKanbanFilterProgressRunning', 'done' => 'TicketKanbanFilterProgressDone']],
+        'age'      => ['icon' => 'fa-hourglass-half', 'label' => 'TicketKanbanFilterAge', 'options' => ['lt7' => 'TicketKanbanFilterAgeLess7', '7to30' => 'TicketKanbanFilterAge7To30', 'gt30' => 'TicketKanbanFilterAgeMore30']],
+        'message'  => ['icon' => 'fa-comment-dots', 'label' => 'TicketKanbanFilterLastMessage', 'options' => ['none' => 'TicketKanbanFilterNoMessage', 'lt7' => 'TicketKanbanFilterMessageLess7', 'gt7' => 'TicketKanbanFilterMessageMore7', 'gt30' => 'TicketKanbanFilterMessageMore30']],
+    ];
+    ?>
+    <div class="tac-picker-tagfilter tac-picker-filters" id="tacPickerFilters">
+        <span class="tac-picker-tagfilter__label"><i class="fas fa-filter"></i> <?= $langs->trans('TicketKanbanFilters') ?></span>
+        <?php foreach ($cardFilters as $filterKey => $cardFilter) : ?>
+            <label class="tac-picker-filters__item">
+                <span class="tac-picker-filters__name"><i class="fas <?= $cardFilter['icon'] ?>"></i> <?= $langs->trans($cardFilter['label']) ?></span>
+                <select class="tac-picker-filters__select" data-filter="<?= $filterKey ?>">
+                    <option value=""><?= $langs->trans('TicketKanbanFilterAll') ?></option>
+                    <?php foreach ($cardFilter['options'] as $optionValue => $optionLabel) : ?>
+                        <option value="<?= $optionValue ?>"><?= $langs->trans($optionLabel) ?></option>
+                    <?php endforeach; ?>
+                    <?php if ($filterKey === 'assignee') : ?>
+                        <?php foreach ($pickerAllUsers as $u) : ?>
+                            <option value="<?= (int) $u['id'] ?>"><?= dol_escape_htmltag($u['fullname']) ?></option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </select>
+            </label>
+        <?php endforeach; ?>
+        <button type="button" class="tac-picker-tagfilter__reset" id="tacPickerFiltersReset">
+            <i class="fas fa-eraser"></i> <?= $langs->trans('RemoveFilter') ?>
+        </button>
+    </div>
 
     <!-- Tab navigation -->
     <div class="tac-dim-tabs" id="tacDimTabs">
