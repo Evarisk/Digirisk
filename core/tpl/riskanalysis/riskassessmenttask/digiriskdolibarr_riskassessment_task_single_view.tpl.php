@@ -4,9 +4,10 @@
 		<div class="riskassessment-task-single riskassessment-task-single-<?php echo $related_task->id ?> wpeo-table table-row">
 			<div class="riskassessment-task-content table-cell">
 				<div class="riskassessment-task-data">
-					<span class="riskassessment-task-reference" value="<?php echo $related_task->ref ?>"><?php echo $related_task->getNomUrl(0, 'withproject'); ?></span>
-					<span class="riskassessment-task-date">
-						<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->dateo))) ? $related_task->dateo : $related_task->datec)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->datee))) ? ' - ' . date('d/m/Y', $related_task->datee) : ''); ?>
+					<?php // An unfinished task whose shown deadline has passed
+					$taskLate = $conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && !empty($related_task->datee) && $related_task->datee < dol_now() && $task_progress < 100; ?>
+					<span class="riskassessment-task-date<?php echo $taskLate ? ' riskassessment-task-date-late' : ''; ?>">
+						<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->dateo))) ? $related_task->dateo : $related_task->datec)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->datee))) ? ' - ' . date('d/m/Y', $related_task->datee) : '') . ($taskLate ? ' (' . $langs->trans('RiskTaskLate') . ')' : ''); ?>
 					</span>
 					<span class="riskassessment-task-timespent  riskassessment-total-task-timespent-<?php echo $related_task->id ?>">
 						<?php $allTimeSpentArray = $timeSpentSortedByTasks[$related_task->id] ?? [];
@@ -50,38 +51,31 @@
                     $taskContributor = [];
                     $taskExecutive   = [];
 
-                    if (!empty($taskContacts)) {
-                        foreach ($taskContacts as $contact) {
-                            if ($contact['code'] === 'TASKCONTRIBUTOR') {
-                                $taskContributor[] = $contact;
-                            } elseif ($contact['code'] === 'TASKEXECUTIVE') {
-                                $taskExecutive[] = $contact;
-                            }
+                    foreach ($taskContacts as $contact) {
+                        if ($contact['code'] === 'TASKCONTRIBUTOR') {
+                            $taskContributor[] = $contact;
+                        } elseif ($contact['code'] === 'TASKEXECUTIVE') {
+                            $taskExecutive[] = $contact;
                         }
-                    } else {
-                        echo $langs->transnoentities('NoData');
                     }
-                    echo '<i class="fas fa-user-tie"></i>';
-                    if (!empty($taskExecutive)) {
-                        foreach ($taskExecutive as $executive) {
-                            $userAuthor = $usersList[$executive['id'] ?: $user->id];
-                            echo '<span class="riskassessment-task-author">';
-                            echo $userAuthor->getNomUrl(-1);
+                    // Initials only: the names and photos took up to three lines per task. getNomUrl() has no such
+                    // mode, so its link and tooltip are kept and only its name gives way to the initials. A role
+                    // nobody holds is left out rather than marked "no data"
+                    foreach (['executive' => [$taskExecutive, 'fa-user-tie'], 'contributors' => [$taskContributor, 'fa-users']] as $taskRole => [$taskRoleContacts, $taskRolePicto]) {
+                        if (empty($taskRoleContacts)) {
+                            continue;
+                        }
+                        echo '<span class="riskassessment-task-' . $taskRole . '"><i class="fas ' . $taskRolePicto . '"></i>';
+                        foreach ($taskRoleContacts as $contact) {
+                            $userAuthor   = $usersList[$contact['id'] ?: $user->id];
+                            $userInitials = dol_escape_htmltag(dol_strtoupper(dol_substr(dolGetFirstLetters($userAuthor->getFullName($langs)), 0, 3)));
+                            echo '<span class="riskassessment-task-initials">';
+                            echo preg_replace_callback('/(<span class="nopadding usertext[^"]*">)[^<]*(<\/span>)/', function ($userText) use ($userInitials) {
+                                return $userText[1] . $userInitials . $userText[2];
+                            }, $userAuthor->getNomUrl(0), 1);
                             echo '</span>';
                         }
-                    } else {
-                        echo $langs->transnoentities('NoData');
-                    }
-                    echo '<i class="fas fa-users"></i>';
-                    if (!empty($taskContributor)) {
-                        foreach ($taskContributor as $contributor) {
-                            $userAuthor = $usersList[$contributor['id'] ?: $user->id];
-                            echo '<span class="riskassessment-task-author">';
-                            echo $userAuthor->getNomUrl(-1);
-                            echo '</span>';
-                        }
-                    } else {
-                        echo $langs->transnoentities('NoData');
+                        echo '</span>';
                     }
                     ?>
 				</div>
@@ -91,6 +85,7 @@
 							<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($task_progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($task_progress == 100) ? 'checked' : ''; ?>>
 						</span>
 					<?php endif; ?>
+					<span class="riskassessment-task-reference" value="<?php echo $related_task->ref ?>"><?php echo $related_task->getNomUrl(0, 'withproject'); ?></span>
 					<span class="riskassessment-task-author-label" title="<?php echo $related_task->label; ?>">
 						<?php echo dol_trunc($related_task->label, 255); ?>
 					</span>
