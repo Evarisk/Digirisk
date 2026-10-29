@@ -593,6 +593,15 @@ $rps-actions-width: 200px;
     padding: 0 10px 0 30px;
   }
 
+  // The factor list and the label of the action add row, on the height of its button
+  div.fiche .rps-task-add :is(select.rps-task-add-factor, input.rps-task-add-label):not(.select2-search__field):not(.form-field):not(.cke_source) {
+    height: 32px;
+    margin: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    font-size: 13px;
+  }
+
   div.fiche .rps-task-add input.rps-task-add-label.is-invalid:not(.select2-search__field):not(.form-field):not(.cke_source) {
     border-color: $dr-danger;
     box-shadow: 0 0 0 3px $dr-danger-soft;
@@ -1183,8 +1192,13 @@ $rps-actions-width: 200px;
   .rps-task-add {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 6px;
     margin: 0;
+
+    .rps-task-add-submit {
+      height: 32px;
+    }
 
     .rps-task-add-factor {
       max-width: 280px;
@@ -1515,10 +1529,10 @@ $rps-actions-width: 200px;
       }
     }
 
-    // The picked answer does not rely on its colour alone: ring and weight
+    // The picked answer does not rely on its colour alone: a ring, drawn outside its box. No bolder
+    // text: wider, it pushed the other answers of the row aside
     &.is-picked {
       box-shadow: 0 0 0 2px $dr-surface, 0 0 0 4px $dr-primary;
-      font-weight: 700;
     }
   }
 
