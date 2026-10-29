@@ -10,7 +10,8 @@
  * \file    js/modules/riskOverview.js
  * \ingroup digiriskdolibarr
  * \brief   Public overview of the risks (public/digiriskelement/digiriskelement_risk_overview.php):
- *          the three tabs are in the page, a click shows one without reloading it.
+ *          the three tabs are in the page, a click shows one without reloading it; a number of risks
+ *          lists them on hover.
  */
 
 /**
@@ -46,6 +47,70 @@ window.digiriskdolibarr.riskOverview.event = function() {
   $(document).on('click', '.risk-overview__toggle', window.digiriskdolibarr.riskOverview.toggleGroupment);
   $(document).on('click', '.risk-overview__fold-all', window.digiriskdolibarr.riskOverview.foldAll);
   $(document).on('click', '.risk-overview__unfold-all', window.digiriskdolibarr.riskOverview.unfoldAll);
+  $(document).on('mouseenter focusin', '.risk-overview td.has-risk-tooltip', window.digiriskdolibarr.riskOverview.showRisks);
+  $(document).on('mouseleave focusout', '.risk-overview td.has-risk-tooltip', window.digiriskdolibarr.riskOverview.hideRisks);
+  // The table scrolls inside its card: a tooltip left open would no longer face its cell
+  document.addEventListener('scroll', window.digiriskdolibarr.riskOverview.hideRisks, true);
+};
+
+/**
+ * Affiche, au survol d'un nombre de risques, les risques qu'il compte, les plus graves en premier.
+ * L'infobulle est posée sur la page et non dans la case : le tableau défile dans sa carte, qui la
+ * couperait.
+ *
+ * @since   23.6.0
+ * @version 23.6.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.riskOverview.showRisks = function() {
+  const template = $(this).children('template.risk-overview__risks')[0];
+  if (!template) {
+    return;
+  }
+
+  let tooltip = $('.risk-overview__tooltip');
+  if (!tooltip.length) {
+    tooltip = $('<div class="risk-overview__tooltip" role="tooltip" hidden></div>').appendTo('body');
+  }
+  tooltip.empty().append(document.importNode(template.content, true)).prop('hidden', false);
+
+  // Sous la case, sinon au-dessus ; une infobulle trop haute pour l'un et l'autre se met à côté de la
+  // case, qu'elle ne doit pas cacher. Jamais hors de l'écran
+  const margin = 8;
+  const gap    = 6;
+  const cell   = this.getBoundingClientRect();
+  const width  = tooltip.outerWidth();
+  const height = tooltip.outerHeight();
+  const bottom = window.innerHeight - margin;
+  const right  = window.innerWidth - margin;
+  let top      = cell.bottom + gap;
+  let left     = cell.left;
+
+  if (top + height > bottom) {
+    top = cell.top - gap - height;
+    if (top < margin) {
+      top  = cell.top + cell.height / 2 - height / 2;
+      left = cell.right + gap + width <= right ? cell.right + gap : cell.left - gap - width;
+    }
+  }
+
+  tooltip.css({
+    top: Math.max(margin, Math.min(top, bottom - height)),
+    left: Math.max(margin, Math.min(left, right - width))
+  });
+};
+
+/**
+ * Masque l'infobulle des risques.
+ *
+ * @since   23.6.0
+ * @version 23.6.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.riskOverview.hideRisks = function() {
+  $('.risk-overview__tooltip').prop('hidden', true);
 };
 
 /**

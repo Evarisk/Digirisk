@@ -1682,14 +1682,21 @@ class Risk extends SaturneObject
     /**
      * Resolve the thumbnail URL of a risk assessment photo, or return the default nophoto placeholder.
      *
-     * @param  string $baseOutputDir Module multidir_output for current entity
-     * @param  string $raRef         RiskAssessment reference
-     * @param  string $raPhoto       RiskAssessment favorite photo filename
-     * @return string                URL to serve the image
+     * The URL is served without login (saturne/utils/viewimage.php): the public overview of the risks
+     * shows it as well.
+     *
+     * @param  string $baseOutputDir   Module multidir_output for current entity
+     * @param  string $raRef           RiskAssessment reference
+     * @param  string $raPhoto         RiskAssessment favorite photo filename
+     * @param  bool   $withPlaceholder False to get an empty string for an assessment without photo
+     * @return string                  URL to serve the image
      */
-    private function resolveDashboardRiskPhotoUrl(string $baseOutputDir, string $raRef, string $raPhoto): string
+    public function resolveDashboardRiskPhotoUrl(string $baseOutputDir, string $raRef, string $raPhoto, bool $withPlaceholder = true): string
     {
         global $conf;
+
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
         if ($raRef !== '') {
             $raSubDir = 'riskassessment/' . $raRef;
@@ -1715,7 +1722,7 @@ class Risk extends SaturneObject
             }
         }
 
-        return DOL_URL_ROOT . '/public/theme/common/nophoto.png';
+        return $withPlaceholder ? DOL_URL_ROOT . '/public/theme/common/nophoto.png' : '';
     }
 
     /**

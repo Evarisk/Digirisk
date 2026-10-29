@@ -38,6 +38,12 @@ const DIGIRISK_RISK_OVERVIEW_CATEGORIES = [
 const DIGIRISK_RISK_OVERVIEW_TABS = ['risk', 'penibility', 'rps'];
 
 /**
+ * Risks detailed in the tooltip of a number, the worst ones: beyond, the tooltip only says how many
+ * more the number counts.
+ */
+const DIGIRISK_RISK_OVERVIEW_TOOLTIP_RISKS = 5;
+
+/**
  * Whether the public overview is open: enabled in the setup, with a key to put in the link.
  *
  * @return bool
@@ -239,6 +245,78 @@ function digiriskRiskOverviewCell(array $row, string $tab, int $position, array 
 }
 
 /**
+ * Risks a number of the overview counts, for its tooltip: the worst ones first, with their current
+ * assessment as the tooltip of a risk of the action plan shows it (cotation, photo, date, comment).
+ *
+ * A category cell holds the risks of its category, the total of a tab those of its categories: every
+ * category but the psychosocial one on the risk tab, as its count does. The psychosocial risks read as
+ * a level, not as risks: they have no tooltip.
+ *
+ * @param  array  $row      Row of digiriskRiskOverviewRows()
+ * @param  string $tab      risk or penibility
+ * @param  int    $position Danger category, -1 for the total column
+ * @param  array  $columns  Columns of the tab
+ * @return array            risks (the DIGIRISK_RISK_OVERVIEW_TOOLTIP_RISKS worst ones, with the name and
+ *                          pictogram of their category and the URL of their photo, empty without one)
+ *                          and more (how many other risks the number counts)
+ * @throws Exception
+ */
+function digiriskRiskOverviewCellRisks(array $row, string $tab, int $position, array $columns): array
+{
+    global $conf, $db;
+
+    static $categories = null;
+    static $risk       = null;
+    static $photoUrls  = [];
+
+    if ($tab == 'rps' || $position == Risk::PSYCHOSOCIAL_CATEGORY_POSITION) {
+        return ['risks' => [], 'more' => 0];
+    }
+
+    if ($position >= 0) {
+        $risks = $row['cells'][$position]['risks'] ?? [];
+    } else {
+        $risks = [];
+        foreach ($tab == 'risk' ? array_keys($row['cells']) : array_keys($columns) as $category) {
+            if ($category != Risk::PSYCHOSOCIAL_CATEGORY_POSITION) {
+                $risks = array_merge($risks, $row['cells'][$category]['risks'] ?? []);
+            }
+        }
+    }
+
+    // The worst first, the oldest risk first among equal cotations
+    usort($risks, fn($first, $second) => [$second['cotation'], $first['id']] <=> [$first['cotation'], $second['id']]);
+    $shownRisks = array_slice($risks, 0, DIGIRISK_RISK_OVERVIEW_TOOLTIP_RISKS);
+
+    if ($categories === null) {
+        $categories = [];
+        foreach (Risk::getDangerCategories() as $category) {
+            $categories[(int) $category['position']] = $category;
+        }
+        $risk = new Risk($db);
+    }
+
+    $baseOutputDir = $conf->digiriskdolibarr->multidir_output[$conf->entity] ?? (DOL_DATA_ROOT . '/digiriskdolibarr');
+    foreach ($shownRisks as &$shownRisk) {
+        $category = $categories[$shownRisk['category']] ?? [];
+
+        $shownRisk['categoryName']  = (string) ($category['name'] ?? '');
+        $shownRisk['categoryPicto'] = isset($category['thumbnail_name']) ? $category['thumbnail_name'] . '.png' : '';
+        $shownRisk['description']   = trim(html_entity_decode(dol_string_nohtmltag($shownRisk['description']), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        $shownRisk['comment']       = trim(html_entity_decode(dol_string_nohtmltag($shownRisk['comment']), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+
+        // A risk is in the tooltip of its category and in the one of the total: its photo is looked for once
+        if (!isset($photoUrls[$shownRisk['id']])) {
+            $photoUrls[$shownRisk['id']] = $risk->resolveDashboardRiskPhotoUrl($baseOutputDir, $shownRisk['assessmentRef'], $shownRisk['photo'], false);
+        }
+        $shownRisk['photoUrl'] = $photoUrls[$shownRisk['id']];
+    }
+    unset($shownRisk);
+
+    return ['risks' => $shownRisks, 'more' => count($risks) - count($shownRisks)];
+}
+
+/**
  * Rows of the overview: every active groupment and work unit of the entity, in the order of the tree,
  * with the risks of each category and the psychosocial assessment.
  *
@@ -279,10 +357,12 @@ function digiriskRiskOverviewRows(DoliDB $db, array $activeDigiriskElementList, 
         }
     }
 
-    // Risks of the element itself, with their current assessment: count and worst level per category
-    $risk           = new Risk($db);
-    $riskAssessment = new RiskAssessment($db);
-    $riskInfos      = $risk->loadRiskInfos(['filterRisk' => " AND t.type = 'risk'"]);
+    // Risks of the element itself, with their current assessment: count and worst level per category,
+    // and the risks themselves for the tooltip of the number
+    $risk               = new Risk($db);
+    $riskAssessment     = new RiskAssessment($db);
+    $riskInfos          = $risk->loadRiskInfos(['filterRisk' => " AND t.type = 'risk'"]);
+    $showAssessmentDate = getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE');
     foreach ($riskInfos['current']['risks'] as $currentRisk) {
         $elementId = (int) $currentRisk->fk_element;
         if (!isset($rows[$elementId])) {
@@ -293,9 +373,22 @@ function digiriskRiskOverviewRows(DoliDB $db, array $activeDigiriskElementList, 
         $scale                    = $riskAssessment->getEvaluationScale();
         $category                 = (int) $currentRisk->category;
 
-        $cell = $rows[$elementId]['cells'][$category] ?? ['count' => 0, 'scale' => 0];
+        $cell = $rows[$elementId]['cells'][$category] ?? ['count' => 0, 'scale' => 0, 'risks' => []];
         $cell['count']++;
-        $cell['scale'] = max($cell['scale'], $scale);
+        $cell['scale']   = max($cell['scale'], $scale);
+        $cell['risks'][] = [
+            'id'             => (int) $currentRisk->id,
+            'ref'            => (string) $currentRisk->ref,
+            'description'    => (string) $currentRisk->description,
+            'category'       => $category,
+            'cotation'       => (int) $currentRisk->riskAssessmentCotation,
+            'scale'          => (int) $scale,
+            'assessmentRef'  => (string) $currentRisk->riskAssessmentRef,
+            // The date the risk list shows: the one set on the assessment when the setup says so
+            'assessmentDate' => $db->jdate($showAssessmentDate && !empty($currentRisk->riskAssessmentDate) ? $currentRisk->riskAssessmentDate : $currentRisk->riskAssessmentDateCreation),
+            'comment'        => (string) $currentRisk->riskAssessmentComment,
+            'photo'          => (string) $currentRisk->riskAssessmentPhoto,
+        ];
 
         $rows[$elementId]['cells'][$category] = $cell;
 

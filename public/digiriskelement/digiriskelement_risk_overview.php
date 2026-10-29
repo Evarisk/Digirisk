@@ -23,7 +23,8 @@
  *
  * Meant for the people the single document is presented to, who have no Dolibarr account: the page
  * is reached through a link carrying a secret key, set up in the risk assessment document
- * configuration. It shows counts and levels only, never the description of a risk.
+ * configuration. It shows counts and levels; a number of risks details on hover the worst risks it
+ * counts (description, cotation, photo and comment of their assessment).
  */
 
 if (!defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', '1');

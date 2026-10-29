@@ -21,7 +21,9 @@
  * \brief   View of the public overview of the risks: one row per groupment and work unit.
  *          A risk cell holds the number of risks of the category on the colour of the worst one,
  *          a psychosocial cell the level of the factor or the average of the factors
- *          (digiriskRiskOverviewCell(), shared with the Excel export).
+ *          (digiriskRiskOverviewCell(), shared with the Excel export). A number of risks lists them
+ *          on hover (digiriskelement_risk_overview_tooltip.tpl.php), a psychosocial average its
+ *          factors (digiriskelement_risk_overview_psychosocial_tooltip.tpl.php).
  *
  * Variables : $accessAllowed, $tab, $tabUrl, $exportUrl, $overviewRows, $overviewColumns, $rpsScale,
  *             $langs, $mysoc (public/digiriskelement/digiriskelement_risk_overview.php)
@@ -150,15 +152,28 @@ $emptyCellTitles = [
                                     $elementUrl = digiriskRiskOverviewElementUrl((int) $overviewRow['id'], (int) $cell['category']);
                                     $openTitle  = $cell['category'] >= 0
                                         ? $langs->trans('RiskOverviewOpenCategoryRisks', $columns[$position]['shortName'], $overviewRow['ref'])
-                                        : $langs->trans('RiskOverviewOpenRisks', $overviewRow['ref']); ?>
+                                        : $langs->trans('RiskOverviewOpenRisks', $overviewRow['ref']);
+                                    // A number of risks shows them on hover, the worst first: its title then only
+                                    // stays for screen readers, or the browser would show it over the tooltip
+                                    $cellRisks      = in_array($cell['kind'], ['count', 'total'], true) ? digiriskRiskOverviewCellRisks($overviewRow, $panelTab, (int) $position, $columns) : ['risks' => []];
+                                    $hasRiskTooltip = !empty($cellRisks['risks']);
+                                    // A psychosocial average (its column of the risk tab, the average of the psychosocial
+                                    // tab) shows the factors it is made of, F1 to F6
+                                    $hasPsychosocialTooltip = $cell['kind'] == 'level' && $cell['value'] !== null && ($position < 0 || $position == Risk::PSYCHOSOCIAL_CATEGORY_POSITION);
+                                    $titleAttribute         = $hasRiskTooltip || $hasPsychosocialTooltip ? 'aria-label' : 'title';
+                                    $tooltipHint    = $cell['link'] ? $openTitle : '';
+                                    $tooltipTitle   = $position >= 0 ? $columns[$position]['name'] : $langs->trans($panelTab == 'risk' ? 'RiskOverviewTooltipAllCategories' : 'RiskOverviewTabPenibility'); ?>
                                     <?php if ($cell['kind'] == 'total') : ?>
-                                        <td class="risk-overview__total">
+                                        <td class="risk-overview__total<?php echo $hasRiskTooltip ? ' has-risk-tooltip' : ''; ?>">
                                             <?php if ($cell['link']) : ?>
                                                 <a class="risk-overview__link" href="<?php echo dol_escape_htmltag($elementUrl); ?>" target="_blank" rel="noopener"
-                                                   title="<?php echo dol_escape_htmltag($openTitle); ?>"><?php echo (int) $cell['value']; ?></a>
+                                                   <?php echo $titleAttribute; ?>="<?php echo dol_escape_htmltag($openTitle); ?>"><?php echo (int) $cell['value']; ?></a>
                                             <?php else : ?>
                                                 <?php echo (int) $cell['value']; ?>
                                             <?php endif; ?>
+                                            <?php if ($hasRiskTooltip) {
+                                                require __DIR__ . '/digiriskelement_risk_overview_tooltip.tpl.php';
+                                            } ?>
                                         </td>
                                     <?php elseif ($cell['value'] === null) :
                                         $cellTitle = $emptyCellTitles[$cell['state']] ?? '';
@@ -171,9 +186,15 @@ $emptyCellTitles = [
                                         // The psychosocial column of the risk tab shows the rounded average: the exact one in its tooltip
                                         $cellName  = $position < 0 ? $langs->trans('RiskOverviewPsychosocialAverage') : ($position == Risk::PSYCHOSOCIAL_CATEGORY_POSITION && $panelTab != 'rps' ? $langs->trans('RiskOverviewPsychosocialAverageHelp') . ' : ' . digiriskRiskOverviewFormatLevel((float) $overviewRow['rps']['average']) : $columns[$position]['name']);
                                         $cellLevel = $cell['kind'] == 'count' ? $langs->trans($riskLevelLabels[$cell['scale']] ?? 'GreyRisk') : $rpsScale[$cell['scale']]['range'] . ' · ' . $rpsScale[$cell['scale']]['label']; ?>
-                                        <td class="<?php echo $totalClass; ?>risk-overview__cell<?php echo $cell['kind'] == 'level' ? ' is-psychosocial' : ''; ?>" data-scale="<?php echo (int) $cell['scale']; ?>">
+                                        <td class="<?php echo $totalClass; ?>risk-overview__cell<?php echo $cell['kind'] == 'level' ? ' is-psychosocial' : ''; ?><?php echo $hasRiskTooltip || $hasPsychosocialTooltip ? ' has-risk-tooltip' : ''; ?>" data-scale="<?php echo (int) $cell['scale']; ?>">
                                             <a class="risk-overview__link" href="<?php echo dol_escape_htmltag($elementUrl); ?>" target="_blank" rel="noopener"
-                                               title="<?php echo dol_escape_htmltag($cellName . ' — ' . $cellLevel . '. ' . $openTitle); ?>"><?php echo $cell['decimals'] ? digiriskRiskOverviewFormatLevel((float) $cell['value']) : (int) $cell['value']; ?></a>
+                                               <?php echo $titleAttribute; ?>="<?php echo dol_escape_htmltag($cellName . ' — ' . $cellLevel . '. ' . $openTitle); ?>"><?php echo $cell['decimals'] ? digiriskRiskOverviewFormatLevel((float) $cell['value']) : (int) $cell['value']; ?></a>
+                                            <?php if ($hasRiskTooltip) {
+                                                require __DIR__ . '/digiriskelement_risk_overview_tooltip.tpl.php';
+                                            } elseif ($hasPsychosocialTooltip) {
+                                                $rpsColumns = $overviewColumns['rps'] ?? [];
+                                                require __DIR__ . '/digiriskelement_risk_overview_psychosocial_tooltip.tpl.php';
+                                            } ?>
                                         </td>
                                     <?php endif; ?>
                                 <?php endforeach; ?>
