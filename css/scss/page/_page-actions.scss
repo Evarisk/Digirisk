@@ -15,21 +15,48 @@
     display: none;
   }
 
+  // The fields wrap rather than shrink: label, start, deadline, budget, assignee, buttons
+  tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px 16px;
+  }
+
   td {
-    padding: 4px 8px;
-    vertical-align: bottom;
+    padding: 4px 0;
   }
 
   &__label {
-    width: 36%;
+    flex: 1 1 260px;
+
+    input {
+      box-sizing: border-box;
+      width: 100%;
+    }
   }
 
+  &__start,
   &__deadline {
-    width: 20%;
+    flex: 0 0 auto;
+  }
+
+  &__budget {
+    flex: 0 0 110px;
   }
 
   &__assignee {
-    width: 24%;
+    flex: 1 1 200px;
+
+    // select2 measures itself while the form is still hidden
+    .select2-container {
+      width: 100% !important;
+      max-width: 300px;
+    }
+  }
+
+  &__buttons {
+    align-self: flex-end;
   }
 }
 
