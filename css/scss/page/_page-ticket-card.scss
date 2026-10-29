@@ -729,6 +729,14 @@ $dtc-title:       #111827;
         font-size: 0.82em;
         margin-bottom: 4px;
     }
+    .dtc-composer__linked-files {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 0;
+
+        .multiselectarraydtc_linked_files { flex: 1; min-width: 0; }
+    }
 
     // ---- Composer: attachments ----
     .dtc-composer__attach {

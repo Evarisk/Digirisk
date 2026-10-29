@@ -2108,6 +2108,7 @@ TicketActionsSummary                   = Bilan des actions
 TicketActionsNeedProject               = Associez un projet au ticket pour lui ajouter des actions correctives et préventives
 TicketDocumentGenerated                = Document généré
 TicketFileDeleted                      = Fichier supprimé
+TicketFilesSentByMail                  = Fichiers du ticket envoyés par e-mail : %s
 
 # Drawer de création rapide de ticket
 SelectNothing                          = — Sélectionner —
@@ -2176,6 +2177,7 @@ AddRecipient = Ajouter un destinataire
 NoRecipientFound = Aucun destinataire
 
 AddFile = Ajouter un fichier
+AttachTicketFiles = Joindre des fichiers du ticket
 
 MentionAgents = Mentionner des agents
 YouWereMentionedOnTicket = Vous avez été mentionné sur le ticket %s

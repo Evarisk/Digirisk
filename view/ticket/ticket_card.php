@@ -378,11 +378,41 @@ if ($action === 'post_message_ajax' && $permissionToWrite) {
             $mailBody  = ($intro !== '' ? $intro . '<br><br>' : '') . $mailBodyInner . '<br><br>'
                 . $langs->transnoentities('TicketNotificationEmailBodyInfosTrackUrlinternal') . ' : <a href="' . $urlTicket . '">' . $object->track_id . '</a>'
                 . (!empty($signature) ? '<br><br>' . $signature : '');
+            // Files of the ticket picked in the composer (#4650): they already live in the ticket directory,
+            // they only travel with the mail. Matched against the listing of that directory, so nothing
+            // outside of it can be attached. The listing is keyed by the same filter GETPOST applies: it
+            // alters some names (double spaces), which would otherwise drop the file without a word.
+            $mailFileList    = $fileNameList;
+            $mailMimeList    = $mimeTypeList;
+            $mailFileNames   = $mimeFileNameList;
+            $linkedFileNames = [];
+            $linkedFiles     = GETPOST('linked_files', 'array') ?: [];
+            if (!empty($linkedFiles)) {
+                require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+                $ticketFiles = [];
+                foreach (dol_dir_list($conf->ticket->dir_output . '/' . dol_sanitizeFileName($object->ref), 'files', 0, '', ['(\.meta|_preview.*\.png)$', '^\.']) as $ticketFile) {
+                    $ticketFiles[sanitizeVal($ticketFile['name'], 'alphanohtml')] = $ticketFile;
+                }
+                foreach ($linkedFiles as $linkedFile) {
+                    $ticketFile = $ticketFiles[$linkedFile] ?? null;
+                    // A file uploaded under the same name has just replaced it: already in the list.
+                    if ($ticketFile !== null && !in_array($ticketFile['name'], $mailFileNames, true)) {
+                        $mailFileList[]    = $ticketFile['fullname'];
+                        $mailMimeList[]    = dol_mimetype($ticketFile['name']);
+                        $mailFileNames[]   = $ticketFile['name'];
+                        $linkedFileNames[] = $ticketFile['name'];
+                    }
+                }
+            }
             $from    = getDolGlobalString('TICKET_NOTIFICATION_EMAIL_FROM');
             $replyto = getDolGlobalString('TICKET_NOTIFICATION_EMAIL_REPLYTO');
-            $sentOk  = $object->sendTicketMessageByEmail($mailSubject, $mailBody, 0, $sendto, $sendtocc, $fileNameList, $mimeTypeList, $mimeFileNameList, $from, $replyto);
+            $sentOk  = $object->sendTicketMessageByEmail($mailSubject, $mailBody, 0, $sendto, $mailFileList, $mailMimeList, $mailFileNames, $sendtocc, $from, $replyto);
             // Persist recipients on the actioncomm so past public messages show To/Cc chips.
             $db->query('UPDATE ' . MAIN_DB_PREFIX . "actioncomm SET email_to = '" . $db->escape(implode(',', array_keys($sendto))) . "', email_tocc = '" . $db->escape(implode(',', array_keys($sendtocc))) . "' WHERE id = " . (int) $newMsgId);
+            // The files of the ticket are not attached to the message itself: the thread keeps their names in an event.
+            if ($sentOk && !empty($linkedFileNames)) {
+                digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketFilesSentByMail', implode(', ', $linkedFileNames)), implode("\n", $linkedFileNames), $ticketLogConst);
+            }
             $mailNotice = $sentOk
                 ? ' — ' . $langs->transnoentities('MailSentToNRecipients', (string) count($sendto))
                 : ' — ' . $langs->transnoentities('MailNotSent');
@@ -1350,6 +1380,17 @@ if ($permissionToWrite) {
         }
         $db->free($resConvTpl);
     }
+    // Files of the ticket (public interface photos, generated documents, earlier attachments) the mail can carry (#4650).
+    $convTicketFiles = [];
+    foreach (dol_dir_list($ticketFilesDir, 'files', 0, '', ['(\.meta|_preview.*\.png)$', '^\.'], 'date', SORT_DESC, 1) as $convFile) {
+        $convFileSize      = dol_print_size($convFile['size'], 1, 1);
+        $convTicketFiles[] = [
+            'id'        => dol_escape_htmltag($convFile['name']),
+            'label'     => $convFile['name'] . ' (' . $convFileSize . ')',
+            // A span, not the <i> of img_mime(): the data-html of the option only keeps a few tags.
+            'labelhtml' => '<span class="fa fa-' . dol_mimetype($convFile['name'], '', 4) . ' pictofixedwidth"></span>' . dol_escape_htmltag($convFile['name']) . ' <span class="opacitymedium">' . $convFileSize . '</span>',
+        ];
+    }
     // Internal agents for @mentions.
     $convAgents = [];
     $resConvAg = $db->query('SELECT rowid, firstname, lastname, login FROM ' . MAIN_DB_PREFIX . 'user WHERE statut = 1 AND entity IN (' . getEntity('user') . ') ORDER BY lastname, firstname');
@@ -1379,6 +1420,12 @@ if ($permissionToWrite) {
             print '<option value="' . (int) $convTplId . '">' . dol_escape_htmltag($convTplLabel) . '</option>';
         }
         print '</select>';
+    }
+    if (!empty($convTicketFiles)) {
+        print '<div class="dtc-composer__linked-files">';
+        print '<span class="dtc-recipients__label" title="' . dol_escape_htmltag($langs->trans('AttachTicketFiles')) . '"><i class="fas fa-paperclip"></i></span>';
+        print $form->multiselectarray('dtc_linked_files', $convTicketFiles, [], 0, 0, 'dtc-linked-files-select', 0, '100%', '', '', $langs->trans('AttachTicketFiles'));
+        print '</div>';
     }
     print '</div>';
     print '<div class="dtc-composer__mentions">';

@@ -351,6 +351,7 @@ window.digiriskdolibarr.ticketConversation.send = function() {
     data.to = window.digiriskdolibarr.ticketConversation.collectRecipients($form, 'to');
     data.cc = window.digiriskdolibarr.ticketConversation.collectRecipients($form, 'cc');
     data.model_id = $form.find('[name="model_id"]').val() || 0;
+    data.linked_files = $form.find('#dtc_linked_files').val() || [];
   } else {
     data.mentions = $form.find('#dtc_mentions').val() || [];
   }
@@ -372,6 +373,7 @@ window.digiriskdolibarr.ticketConversation.send = function() {
       window.digiriskdolibarr.ticketConversation.clearBody();
       $form.removeData('dtcFiles');
       window.digiriskdolibarr.ticketConversation.renderFiles($form);
+      $form.find('#dtc_linked_files').val(null).trigger('change');
       window.digiriskdolibarr.ticketConversation.scrollBottom();
       $.jnotify(resp.message, 'success');
     },
@@ -388,6 +390,7 @@ window.digiriskdolibarr.ticketConversation.send = function() {
     (data.to || []).forEach(function(t) { fd.append('to[]', t); });
     (data.cc || []).forEach(function(c) { fd.append('cc[]', c); });
     (data.mentions || []).forEach(function(m) { fd.append('mentions[]', m); });
+    (data.linked_files || []).forEach(function(l) { fd.append('linked_files[]', l); });
     fd.append('model_id', data.model_id || 0);
     files.forEach(function(f) { fd.append('files[]', f); });
     ajaxOpts.data = fd;
