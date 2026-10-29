@@ -2018,6 +2018,13 @@ QQOQCPEmpty                            = Não preenchido
 QQOQCPDocuments                        = Documentos 5W1H
 TicketQqoqcpDocumentPDF                = 5W1H do ticket (PDF)
 TicketQqoqcpDocumentPDFDescription     = Análise 5W1H do ticket: o quê, quem, onde, quando, como, porquê
+OpenTicketsAssignedUnassigned            = Abertos atribuídos / não atribuídos
+OpenTicketsAssignedUnassignedDescription = Tickets abertos confiados a alguém, depois os que ainda não têm ninguém
+TicketActionsInProgress                  = Ações em curso
+TicketActionsDone                        = Ações concluídas
+TicketActionsLate                        = Ações em atraso
+TicketActionsLateDescription             = Ações em curso com o prazo ultrapassado
+TicketActionsSplit                       = %s corretivas, %s preventivas
 TicketDocumentGenerated                = Documento gerado
 TicketFileDeleted                      = Ficheiro eliminado
 
