@@ -312,17 +312,29 @@ if ($action === 'post_message_ajax' && $permissionToWrite) {
                 $fileNameList[]     = $destFile;
                 $mimeTypeList[]     = dol_mimetype($destFile);
                 $mimeFileNameList[] = $safeName;
-                $ecmFile = new EcmFiles($db);
-                $ecmFile->filepath        = $relDir;
-                $ecmFile->filename        = $safeName;
-                $ecmFile->fullpath_orig   = $safeName;
-                $ecmFile->gen_or_uploaded = 'uploaded';
-                $ecmFile->entity          = $conf->entity;
-                $ecmFile->src_object_type = 'ticket';
-                $ecmFile->src_object_id   = (int) $object->id;
-                $ecmFile->agenda_id       = (int) $newMsgId;
-                if ($ecmFile->create($user) <= 0) {
-                    dol_syslog('ticket conversation: ecm index failed for ' . $destFile, LOG_WARNING);
+                $ecmFile  = new EcmFiles($db);
+                // Label is NOT NULL: the core fills it with the checksum of the file (addFileIntoDatabaseIndex()).
+                // Without it the index was never created, and the message lost its files on reload (#5568).
+                $checksum = (string) md5_file(dol_osencode($destFile));
+                // A file uploaded under the name of a file of the ticket replaces it: its index already exists.
+                if ($ecmFile->fetch(0, '', $relDir . '/' . $safeName) > 0) {
+                    $ecmFile->label     = $checksum;
+                    $ecmFile->agenda_id = (int) $newMsgId;
+                    $ecmResult          = $ecmFile->update($user);
+                } else {
+                    $ecmFile->filepath        = $relDir;
+                    $ecmFile->filename        = $safeName;
+                    $ecmFile->fullpath_orig   = $safeName;
+                    $ecmFile->label           = $checksum;
+                    $ecmFile->gen_or_uploaded = 'uploaded';
+                    $ecmFile->entity          = $conf->entity;
+                    $ecmFile->src_object_type = 'ticket';
+                    $ecmFile->src_object_id   = (int) $object->id;
+                    $ecmFile->agenda_id       = (int) $newMsgId;
+                    $ecmResult                = $ecmFile->create($user);
+                }
+                if ($ecmResult <= 0) {
+                    dol_syslog('ticket conversation: ecm index failed for ' . $destFile . ': ' . implode(', ', $ecmFile->errors), LOG_WARNING);
                 }
             }
         }
