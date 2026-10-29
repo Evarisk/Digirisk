@@ -495,7 +495,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
         $newcardbutton .= '</div>';
 
         // Bouton pour les risques psychosociaux
-        if (getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_METHOD', 1)) {
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_RPS_SCOPE_BLOCK', 1) && getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_METHOD', 1)) {
             $newcardbutton .= '<div class="psychosocial-risk-add wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open" style="margin-left: 10px;" aria-label="' . $langs->trans('AddPsychosocialRisk') . '" value="' . $object->id . '">';
             $newcardbutton .= '<i class="fas fa-brain button-icon"></i><i class="fas fa-plus-circle button-add animated"></i>';
             $newcardbutton .= '	<input type="hidden" class="modal-options" data-modal-to-open="psychosocial_risk_add" data-from-id="'. $object->id .'" data-from-type="digiriskelement" data-from-subtype="photo" data-from-subdir="photos"/>';
@@ -504,7 +504,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
         // Bouton de la grille RPS-DU de l'INRS, la seconde méthode d'évaluation des risques
         // psychosociaux : elle n'a pas de sens sur l'onglet des risques environnementaux
-        if ($riskType == 'risk' && getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_GRID_METHOD', 1)) {
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_RPS_SCOPE_BLOCK', 1) && $riskType == 'risk' && getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_GRID_METHOD', 1)) {
             $newcardbutton .= '<div class="psychosocial-risk-grid-add wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open" aria-label="' . $langs->trans('AddPsychosocialRiskGrid') . '" value="' . $object->id . '">';
             $newcardbutton .= '<i class="fas fa-clipboard-list button-icon"></i><i class="fas fa-plus-circle button-add animated"></i>';
             $newcardbutton .= '	<input type="hidden" class="modal-options" data-modal-to-open="psychosocial_risk_grid_add" data-from-id="'. $object->id .'"/>';
@@ -521,12 +521,12 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
         $newcardbutton = '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="' . $langs->trans('PermissionDenied') . '" data-direction="left" value="' . $object->id . '"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
 
         // Bouton désactivé pour les risques psychosociaux
-        if (getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_METHOD', 1)) {
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_RPS_SCOPE_BLOCK', 1) && getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_METHOD', 1)) {
             $newcardbutton .= '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" style="margin-left: 10px;" aria-label="' . $langs->trans('PermissionDenied') . '" data-direction="left" value="' . $object->id . '"><i class="fas fa-brain button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
         }
 
         // Bouton désactivé pour la grille RPS-DU
-        if ($riskType == 'risk' && getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_GRID_METHOD', 1)) {
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_RPS_SCOPE_BLOCK', 1) && $riskType == 'risk' && getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_GRID_METHOD', 1)) {
             $newcardbutton .= '<div class="psychosocial-risk-grid-add wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="' . $langs->trans('PermissionDenied') . '" data-direction="left" value="' . $object->id . '"><i class="fas fa-clipboard-list button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
         }
     } ?>
@@ -794,6 +794,38 @@ $varpage  = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 $selectedfields  = $form->multiSelectArrayWithCheckbox('risklist_selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 $selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
 
+// RPS : la qualification des unites de travail se prend une seule fois, sur le
+// groupement de tete - l'entreprise sur la plupart des documents uniques - et commande
+// ensuite l'affichage du risque psychosocial sur chaque unite.
+require __DIR__ . '/digiriskdolibarr_rps_scope_data.tpl.php';
+if (isset($object) && $object->element == 'digiriskelement' && $object->element_type == 'groupment' && empty($object->fk_parent)) {
+    // Groupement de tete : la qualification de toutes les unites rattachees
+    $rpsScopeElementId = (int) $object->id;
+    require __DIR__ . '/digiriskdolibarr_rps_scope_view.tpl.php';
+    require __DIR__ . '/digiriskdolibarr_rps_dict_modal.tpl.php';
+} elseif (isset($object) && $object->element == 'digiriskelement' && isset($rpsStateByUnit[(int) $object->id])) {
+    // Unite de travail : sa ligne psychosociale, evaluable sur place si elle est concernee,
+    // sinon un rappel de sa qualification, qui se prend sur le groupement de tete
+    $rpsUnitLine = null;
+    foreach ($rpsLines as $rpsCandidate) {
+        if ((int) $rpsCandidate['id'] === (int) $object->id) {
+            $rpsUnitLine = $rpsCandidate;
+        }
+    }
+    $rpsRootGroupment   = null;
+    $rpsRootGroupmentId = 0;
+    foreach ($activeDigiriskElementList as $rpsCandidateId => $rpsCandidate) {
+        if (empty($rpsRootGroupment) && $rpsCandidate->element_type == 'groupment' && empty($rpsCandidate->fk_parent)) {
+            $rpsRootGroupment   = $rpsCandidate;
+            $rpsRootGroupmentId = (int) $rpsCandidateId;
+        }
+    }
+    require __DIR__ . '/digiriskdolibarr_rps_unit_view.tpl.php';
+    if ($rpsStateByUnit[(int) $object->id] === 1) {
+        require __DIR__ . '/digiriskdolibarr_rps_eval_modal.tpl.php';
+    }
+}
+
 print '<div class="div-table-responsive">'; // You can use div-table-responsive-no-min if you dont need reserved height for your table
 ?>
 <?php
@@ -907,8 +939,9 @@ print '</tr>' . "\n";
 // --------------------------------------------------------------------
 
 // contenu
-$i          = 0;
-$totalarray = array('nbfield' => 0);
+$i               = 0;
+$totalarray      = array('nbfield' => 0);
+$rpsRowShownFor  = [];
 
 while ($i < ($limit ? min($num, $limit) : $num)) {
     $obj = $db->fetch_object($resql);
@@ -917,6 +950,34 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 
     // Store properties in $risk
     $risk->setVarsFromFetchObj($obj);
+
+    // RPS : la liste des risques ne montre jamais plus d'une ligne psychosociale par unite.
+    // Les risques portant un facteur - un par critere avec la grille RPS-DU, un par facteur
+    // avec "Faire le point" - sont le detail de l'evaluation, pas des risques a lister : ils
+    // se lisent dans le bloc psychosocial. Seul le risque consolide, celui qui ne porte pas de
+    // facteur, reste dans la liste, et seulement si l'unite est declaree concernee.
+    if ($risk->category == Risk::PSYCHOSOCIAL_CATEGORY_POSITION) {
+        $rpsSubCategory = ($risk->sub_category === null || $risk->sub_category === '') ? -1 : (int) $risk->sub_category;
+
+        if ($rpsSubCategory >= 0) {
+            $i++;
+            continue;
+        }
+
+        // Le tableau n'est renseigne que pour les unites de travail : un groupement n'est pas filtre
+        if (isset($rpsStateByUnit[(int) $object->id]) && $rpsStateByUnit[(int) $object->id] !== 1) {
+            $i++;
+            continue;
+        }
+
+        // Une ligne psychosociale au maximum par element : les doublons nes de clics repetes
+        // sur les anciennes methodes d'ajout ne reviennent pas encombrer la liste.
+        if (!empty($rpsRowShownFor[(int) $risk->fk_element])) {
+            $i++;
+            continue;
+        }
+        $rpsRowShownFor[(int) $risk->fk_element] = 1;
+    }
 
     // Show here line of result
     print '<tr class="oddeven risk-row risk_row_' . $risk->id . ' risk-row-content-' . $risk->id . '" id="risk_row_' . $risk->id . '">';

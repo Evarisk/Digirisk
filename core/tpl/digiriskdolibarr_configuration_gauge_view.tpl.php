@@ -24,7 +24,7 @@ if (!isset($kCounter)) {
     $kCounter                        = $GLOBALS['digiriskGaugeCounter'];
 }
 ?>
-<div class="chart-container <?php echo $morecssGauge ?>" style=" width:50px">
+<div class="chart-container digirisk-gauge <?php echo $morecssGauge ?>" style=" width:50px">
 	<div class="wpeo-gridlayout grid-2">
 		<canvas class="" id="advancementGauge<?php echo $kCounter?>" width="28" height="28"></canvas>
 		<?php if (empty($move_title_gauge)) : ?>

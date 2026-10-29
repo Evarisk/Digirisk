@@ -164,7 +164,9 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 
 	list($modGroupment, $modWorkUnit) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
 
-	saturne_header(1, '', $title, $helpUrl, '', 0, 0, $arrayofjs, $arrayofcss, $morequerystring, $morecssonbody);
+	// The body says it hosts the GP/UT layout below: a body:has(.page-ut-gp-list) made the browser
+	// search the whole page again at each node inserted in it (seconds of select2 at load)
+	saturne_header(1, '', $title, $helpUrl, '', 0, 0, $arrayofjs, $arrayofcss, $morequerystring, trim('digirisk-ut-gp-page ' . $morecssonbody));
 
 	//Body navigation digirisk
 	$object = new DigiriskElement($db);

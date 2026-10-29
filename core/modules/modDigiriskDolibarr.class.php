@@ -736,6 +736,8 @@ class modDigiriskdolibarr extends DolibarrModules
             // chacune reste activable séparément depuis la configuration des risques
             $i++ => ['DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_METHOD', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_GRID_METHOD', 'integer', 1, '', 0, 'current'],
+            // Public overview of the risks of the GP/UT: closed until opened in the setup, which creates its key
+            $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE', 'integer', 0, '', 0, 'current'],
 
 			// CONST RISK ASSESSMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE', 'integer', 1, '', 0, 'current'],

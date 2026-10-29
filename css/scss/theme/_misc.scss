@@ -1,9 +1,12 @@
 /* Digirisk modern theme: small Digirisk widgets (completion gauge, risk counters, legacy blocks) */
 
 #{$dr-scope} {
-  /* ---- Completion gauge (digiriskdolibarr_configuration_gauge_view.tpl.php) ---- */
+  /* ---- Completion gauge (digiriskdolibarr_configuration_gauge_view.tpl.php) ----
+     Found by its class: a .chart-container:has(canvas[id^="advancementGauge"]) made the browser
+     search the page again at each node inserted in it, over a second of select2 at the load of a
+     risk list */
 
-  .chart-container:has(canvas[id^="advancementGauge"]) {
+  .chart-container.digirisk-gauge {
     display: flex;
     /* The title is a sibling of the canvas block when $move_title_gauge is set (cards) */
     align-items: center;
@@ -37,7 +40,7 @@
   }
 
   /* On a card, the gauge goes to the right, above the banner */
-  div.tabBar > .chart-container:has(canvas[id^="advancementGauge"]) {
+  div.tabBar > .chart-container.digirisk-gauge {
     margin-left: auto;
   }
 

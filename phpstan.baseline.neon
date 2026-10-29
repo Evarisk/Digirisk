@@ -3355,6 +3355,12 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/registerdocument/doc_registerdocument_odt.modules.php
 
 		-
+			message: '#^Parameter \#3 \$encode of method Segment\:\:setVars\(\) expects string, false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/riskassessmentdocument/doc_riskassessmentdocument_odt.modules.php
+
+		-
 			message: '#^Parameter \#3 \$tzoutput of function dol_print_date expects bool\|string, Translate given\.$#'
 			identifier: argument.type
 			count: 1
