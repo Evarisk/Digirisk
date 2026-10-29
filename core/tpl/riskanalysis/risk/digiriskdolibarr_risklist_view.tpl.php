@@ -7,7 +7,8 @@ $selectedfields_label = 'risklist_selectedfields';
 // Selection of new fields
 require __DIR__ . '/../../../../class/actions_changeselectedfields.php';
 
-print '<div class="fichecenter risklist wpeo-wrap">';
+// risk-list-simplified: same look as the simplified risk list of DigiBoard, see theme/_risk-list.scss
+print '<div class="fichecenter risklist risk-list-simplified wpeo-wrap">';
 print '<form method="POST" id="searchFormListRisks" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . ($object->element == 'digiriskelement' ? '?id=' . $object->id : '?mainmenu=digiriskdolibarr') . '">' . "\n";
 print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
@@ -315,6 +316,12 @@ $riskAssessmentTaskList    = $risk->getTasksWithFkRisk();
 $taskNextValue             = $refTaskMod->getNextValue('', $task);
 $timeSpentSortedByTasks    = $digiriskTask->fetchAllTimeSpentAllUsers('AND fk_element > 0', 'element_datehour', 'DESC', 1);
 $dangerCategories          = Risk::getDangerCategories($riskType);
+
+// Protection column: the protections of the element of each risk. Not one of the selectable fields: a user who saved
+// his own selection would never see it, as Dolibarr unchecks every field missing from that selection
+require_once __DIR__ . '/../../../../class/riskanalysis/risksign.class.php';
+$riskSign    = new RiskSign($db);
+$protections = $riskSign->getProtectionsByElement($allRisks ? [] : [(int) $id]);
 
 // The list is paginated and both collections are only read by id, so they load their entries
 // on demand instead of instantiating every user and every risk assessment of the database
@@ -888,6 +895,9 @@ foreach ($evaluation->fields as $key => $val) {
         }
         print '</td>';
     }
+    if ($key == 'cotation') {
+        print '<td class="liste_titre"></td>';
+    }
 }
 
 // Extra fields
@@ -920,6 +930,9 @@ foreach ($evaluation->fields as $key => $val) {
     if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
     if ( ! empty($arrayfields['evaluation.' . $key]['checked'])) {
         print getTitleFieldOfList($arrayfields['evaluation.' . $key]['label'], 0, $_SERVER['PHP_SELF'], 'evaluation.' . $key, '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : '')) . "\n";
+    }
+    if ($key == 'cotation') {
+        print getTitleFieldOfList('Protection', 0, $_SERVER['PHP_SELF'], '', '', $param, '', $sortfield, $sortorder, 'risk-protection ') . "\n";
     }
 }
 
@@ -1146,7 +1159,12 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
                 if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 ) {
                     print $langs->trans('RiskDescriptionNotActivated');
                 } else {
-                    print dol_trunc($risk->description, 120);
+                    print '<div class="risk-description-text">' . dol_escape_htmltag(dol_trunc($risk->description, 120), 0, 1) . '</div>';
+                    // The picto of the previous column only names its danger category on hover
+                    $dangerCategoryName = $risk->getDangerCategoryName($risk, $riskType);
+                    if ($dangerCategoryName !== -1) {
+                        print '<div class="risk-description-category">' . dol_escape_htmltag($dangerCategoryName) . '</div>';
+                    }
                 }
             } else print $risk->showOutputField($val, $key, $risk->$key, '');
             print '</td>';
@@ -1165,6 +1183,8 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
         elseif ($key == 'ref') $cssforfield      .= ($cssforfield ? ' ' : '') . 'nowrap';
         elseif ($key == 'cotation') $cssforfield .= ($cssforfield ? ' ' : '') . 'risk-evaluation-list-container-' . $risk->id;
         elseif ($key == 'has_tasks') $cssforfield .= ($cssforfield ? ' ' : '') . 'tasks-list-container-' . $risk->id;
+        // Read before the cotation cell: the assessment edit modal it includes reuses $key
+        $protectionAfterCell = ($key == 'cotation');
         if ( ! empty($arrayfields['evaluation.' . $key]['checked'])) {
             print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="vertical-align: top;">';
             if ($key == 'cotation') {
@@ -1180,6 +1200,9 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
                 if ( ! $i) $totalarray['pos'][$totalarray['nbfield']] = 'r.' . $key;
                 $totalarray['val']['r.' . $key]                      += $lastEvaluation->$key;
             }
+        }
+        if ($protectionAfterCell) {
+            require __DIR__ . '/digiriskdolibarr_riskprotection_view.tpl.php';
         }
     }
 
@@ -1207,7 +1230,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 
 // If no record found
 if ($num == 0) {
-    $colspan = 1;
+    $colspan = 2; // The action column and the protection one, which are not selectable fields
     foreach ($arrayfields as $key => $val) { if ( ! empty($val['checked'])) $colspan++; }
     print '<tr><td colspan="' . $colspan . '" class="opacitymedium">' . $langs->trans("NoRecordFound") . '</td></tr>';
 }

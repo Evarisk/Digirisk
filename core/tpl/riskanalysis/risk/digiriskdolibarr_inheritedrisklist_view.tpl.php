@@ -3,7 +3,7 @@
 	// Selection of new fields
 	require './../../class/actions_changeselectedfields.php';
 
-	print '<div class="fichecenter inheritedrisklist wpeo-wrap">';
+	print '<div class="fichecenter inheritedrisklist risk-list-simplified wpeo-wrap">';
 	print '<form method="POST" id="searchFormInheritedListRisks" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id .'">' . "\n";
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
@@ -72,13 +72,15 @@
 		if ($risk->ismultientitymanaged == 1) $sql .= " WHERE r.entity IN (" . getEntity($risk->element) . ")";
 		else $sql .= " WHERE 1 = 1";
 		if (!$allRisks) {
-			$inherited_risk_id = $object->fk_parent;
+			$inherited_risk_id   = $object->fk_parent;
+			$inheritedElementIds = [(int) $inherited_risk_id];
 			$sql .= " AND r.fk_element IN (" . $inherited_risk_id;
 			while ($inherited_risk_id > 0) {
 				// An ancestor out of the active elements (in the bin) ends the branch
 				$inherited_risk_id = is_object($alldigiriskelement[$inherited_risk_id] ?? null) ? $alldigiriskelement[$inherited_risk_id]->fk_parent : 0;
 				if ($inherited_risk_id > 0) {
 					$sql .= ',' . $inherited_risk_id;
+					$inheritedElementIds[] = (int) $inherited_risk_id;
 				}
 			}
 			$sql .= ")";
@@ -173,6 +175,11 @@
 			header("Location: " . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $id);
 			exit;
 		}
+
+		// Protection column, as on the main risk list: the protections of the element each risk comes from
+		require_once __DIR__ . '/../../../../class/riskanalysis/risksign.class.php';
+		$riskSign    = new RiskSign($db);
+		$protections = $riskSign->getProtectionsByElement($allRisks ? [] : $inheritedElementIds);
 	} else {
 		$num = 0;
 		$nbtotalofrecords = 0;
@@ -286,6 +293,9 @@
 			print '<td class="liste_titre' . '">';
 			print '</td>';
 		}
+		if ($key == 'cotation') {
+			print '<td class="liste_titre"></td>';
+		}
 	}
 
 	// Extra fields
@@ -318,6 +328,9 @@
 		if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
 		if ( ! empty($arrayfields['evaluation.' . $key]['checked'])) {
 			print getTitleFieldOfList($arrayfields['evaluation.' . $key]['label'], 0, $_SERVER['PHP_SELF'], 'evaluation.' . $key, '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : '')) . "\n";
+		}
+		if ($key == 'cotation') {
+			print getTitleFieldOfList('Protection', 0, $_SERVER['PHP_SELF'], '', '', $param, '', $sortfield, $sortorder, 'risk-protection ') . "\n";
 		}
 	}
 
@@ -377,7 +390,12 @@
 					if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 ) {
 						print $langs->trans('RiskDescriptionNotActivated');
 					} else {
-						print dol_trunc($risk->description, 120);
+						print '<div class="risk-description-text">' . dol_escape_htmltag(dol_trunc($risk->description, 120), 0, 1) . '</div>';
+						// The picto of the category column only names its danger category on hover
+						$dangerCategoryName = $risk->getDangerCategoryName($risk, $riskType);
+						if ($dangerCategoryName !== -1) {
+							print '<div class="risk-description-category">' . dol_escape_htmltag($dangerCategoryName) . '</div>';
+						}
 					}
 				} else print $risk->showOutputField($val, $key, $risk->$key, '');
 				print '</td>';
@@ -395,6 +413,8 @@
 			if ($key == 'status') $cssforfield       .= ($cssforfield ? ' ' : '') . 'center';
 			elseif ($key == 'ref') $cssforfield      .= ($cssforfield ? ' ' : '') . 'nowrap';
 			elseif ($key == 'cotation') $cssforfield .= ($cssforfield ? ' ' : '') . 'risk-evaluation-list-container-' . $risk->id;
+			// Read before the cotation cell: the assessment edit modal it includes reuses $key
+			$protectionAfterCell = ($key == 'cotation');
 			if ( ! empty($arrayfields['evaluation.' . $key]['checked'])) {
 				print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="vertical-align: top;">';
 				if ($key == 'cotation') {
@@ -410,6 +430,9 @@
 					if ( ! $i) $totalarray['pos'][$totalarray['nbfield']] = 'r.' . $key;
 					$totalarray['val']['r.' . $key]                      += $lastEvaluation->$key;
 				}
+			}
+			if ($protectionAfterCell) {
+				require __DIR__ . '/digiriskdolibarr_riskprotection_view.tpl.php';
 			}
 		}
 
@@ -437,7 +460,7 @@
 
 	// If no record found
 	if ($num == 0) {
-		$colspan = 1;
+		$colspan = 2; // The action column and the protection one, which are not selectable fields
 		foreach ($arrayfields as $key => $val) { if ( ! empty($val['checked'])) $colspan++; }
 		print '<tr><td colspan="' . $colspan . '" class="opacitymedium">' . $langs->trans("NoRecordFound") . '</td></tr>';
 	}

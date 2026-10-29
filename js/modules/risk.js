@@ -282,7 +282,8 @@ window.digiriskdolibarr.risk.saveRisk = function ( event ) {
 			let actionContainerSuccess = $('.messageSuccessRiskEdit');
 			if (newParent == id || moveRiskDisabled) {
 				$('.modal-active').removeClass('modal-active')
-				$('.risk-description-'+editedRiskId).html($(resp).find('.risk-description-'+editedRiskId))
+				// The content of the cell, not the cell itself: a cell nested in the cell doubled its padding
+				$('.risk-description-'+editedRiskId).html($(resp).find('.risk-description-'+editedRiskId).html())
 				$('.risk-row-content-' + editedRiskId).find('.risk-category .cell-risk').html($(resp).find('.risk-row-content-' + editedRiskId).find('.risk-category .cell-risk').children())
 				$('.risk-row-content-' + editedRiskId).find('.risk-category').fadeOut(800);
 				$('.risk-row-content-' + editedRiskId).find('.risk-category').fadeIn(800);
