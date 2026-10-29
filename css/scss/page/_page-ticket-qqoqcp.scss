@@ -1,0 +1,68 @@
+@import "../theme/tokens";
+
+// QQOQCP tab of a ticket (#5549): one card per question, two by two, the value under the question
+#{$dr-scope} .digirisk-qqoqcp {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+
+  &__item {
+    padding: 14px 16px;
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius-sm;
+    background: $dr-surface;
+  }
+
+  &__head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  &__picto {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: $dr-primary-soft;
+    color: $dr-primary;
+  }
+
+  &__label {
+    color: $dr-text;
+    font-weight: 700;
+  }
+
+  &__help {
+    color: $dr-muted;
+    font-size: 0.85em;
+  }
+
+  &__value {
+    color: $dr-text-soft;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+
+    textarea {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      resize: vertical;
+    }
+  }
+
+  &__documents {
+    float: none;
+  }
+}
+
+@media (max-width: 900px) {
+  #{$dr-scope} .digirisk-qqoqcp {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -267,9 +267,46 @@ class ActionsDigiriskdolibarr
         $object = $parameters['object'] ?? null;
         if (($parameters['mode'] ?? '') === 'add' && ($parameters['filterorigmodule'] ?? '') === 'external' && $object instanceof Ticket && $object->id > 0) {
             $this->addTicketActionsTab($parameters['head'], $object);
+            $this->addTicketQqoqcpTab($parameters['head'], $object);
         }
 
         return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Insert the QQOQCP tab into the tabs of a ticket (#5549), after its actions, with the number of filled fields
+     *
+     * @param  array  $head   Tabs of the ticket, a reference to the array of complete_head_from_modules()
+     * @param  Ticket $ticket Ticket
+     * @return void
+     */
+    private function addTicketQqoqcpTab(array &$head, Ticket $ticket): void
+    {
+        global $langs;
+
+        require_once __DIR__ . '/../lib/digiriskdolibarr_ticket.lib.php';
+
+        $langs->load('digiriskdolibarr@digiriskdolibarr');
+
+        if (empty($ticket->array_options)) {
+            $ticket->fetch_optionals();
+        }
+        $filled = digiriskdolibarr_ticket_qqoqcp_filled_count($ticket);
+
+        $tab = [
+            dol_buildpath('/digiriskdolibarr/view/ticket/ticket_qqoqcp.php', 1) . '?id=' . (int) $ticket->id,
+            '<i class="fas fa-question-circle pictofixedwidth"></i>' . $langs->trans('QQOQCP') . ($filled > 0 ? '<span class="badge marginleftonlyshort">' . $filled . '/' . count(digiriskdolibarr_ticket_qqoqcp_fields()) . '</span>' : ''),
+            'digiriskqqoqcp',
+        ];
+
+        // After the actions tab, or the contacts when it is not shown
+        $position = count($head);
+        foreach (array_values($head) as $index => $existingTab) {
+            if (in_array($existingTab[2] ?? '', ['contact', 'digiriskactions'], true)) {
+                $position = $index + 1;
+            }
+        }
+        array_splice($head, $position, 0, [$tab]);
     }
 
     /**
