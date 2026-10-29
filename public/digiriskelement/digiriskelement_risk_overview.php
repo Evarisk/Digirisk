@@ -92,7 +92,10 @@ if ($accessAllowed) {
         $activeDigiriskElementList = [];
     }
 
-    // Psychosocial assessment of each work unit, as shown by the risk list
+    // Psychosocial assessment of each work unit, as shown by the risk list: the template fills these
+    $rpsLines         = [];
+    $rpsSubCategories = [];
+    $rpsScale         = [];
     require __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_rps_scope_data.tpl.php';
 
     // Every tab is rendered, the visitor switches between them without reloading the page
