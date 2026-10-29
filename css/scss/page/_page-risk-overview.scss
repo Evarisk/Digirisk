@@ -453,6 +453,158 @@ body#mainbody.digirisk-risk-overview-public {
     }
   }
 
+  // ---- Tooltip of a number: the risks it counts, the worst first (js/modules/riskOverview.js) ----
+
+  // Laid out as the tooltip of a risk of the action plan (page/_page-actionplan.scss, .krt-*), one block
+  // per risk. It is set on the page rather than in its cell, which the scrolling card would cut
+  .risk-overview__tooltip {
+    position: fixed;
+    z-index: 1000;
+    box-sizing: border-box;
+    width: max-content;
+    min-width: 280px;
+    max-width: min(380px, calc(100vw - 16px));
+    padding: 10px 14px;
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius-sm;
+    background: $dr-surface;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+    color: $dr-text;
+    font-size: 11px;
+    // Informative only: the pointer goes on to the next cell through it
+    pointer-events: none;
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  .risk-overview__tooltip-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 6px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid $dr-border;
+    font-size: 12px;
+    font-weight: 600;
+
+    .risk-overview__ref {
+      margin-right: 0;
+    }
+  }
+
+  .risk-overview__tooltip-category {
+    flex-basis: 100%;
+    color: $dr-muted;
+    font-weight: 400;
+  }
+
+  .risk-overview__tooltip-risk {
+    padding: 8px 0;
+
+    + .risk-overview__tooltip-risk {
+      border-top: 1px solid #eef2f6;
+    }
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+
+    // The blocks are already apart: no line inside each of them
+    .krt-header,
+    .krt-eval {
+      padding: 0;
+      border-bottom: 0;
+    }
+
+    .krt-eval {
+      margin-top: 6px;
+    }
+
+    .krt-comment {
+      padding-top: 4px;
+    }
+
+    .krt-cotation {
+      @include risk-overview-scale-fill;
+    }
+  }
+
+  .risk-overview__tooltip-picto {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+  }
+
+  .risk-overview__tooltip-description {
+    color: $dr-text;
+  }
+
+  // A psychosocial average and its factors F1 to F6, on the psychosocial scale
+  .risk-overview__tooltip-average,
+  .risk-overview__tooltip-factor {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .krt-cotation {
+      flex: 0 0 auto;
+      min-width: 30px;
+      @include risk-overview-scale-fill($risk-overview-rps-scales);
+
+      &.is-empty {
+        background: $dr-bg;
+        color: $dr-muted;
+      }
+    }
+  }
+
+  .risk-overview__tooltip-average {
+    padding: 8px 0;
+    font-size: 12px;
+  }
+
+  .risk-overview__tooltip-factors {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 8px 0;
+    border-top: 1px solid #eef2f6;
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+  }
+
+  .risk-overview__tooltip-factor {
+    &.is-empty {
+      color: $dr-muted;
+    }
+  }
+
+  .risk-overview__tooltip-factor-key {
+    flex: 0 0 18px;
+    color: $dr-primary;
+  }
+
+  .risk-overview__tooltip-more,
+  .risk-overview__tooltip-hint {
+    padding-top: 8px;
+    border-top: 1px solid $dr-border;
+    color: $dr-muted;
+  }
+
+  .risk-overview__tooltip-more {
+    font-weight: 600;
+
+    + .risk-overview__tooltip-more,
+    + .risk-overview__tooltip-hint {
+      padding-top: 4px;
+      border-top: 0;
+    }
+  }
+
   // ---- Legend, empty and closed states ----
 
   // The legend wraps at the width of the table instead of widening the card
