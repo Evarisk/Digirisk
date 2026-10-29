@@ -34,7 +34,34 @@ window.digiriskdolibarr.psychosocialScope.init = function() {
   window.digiriskdolibarr.psychosocialScope.event();
   window.digiriskdolibarr.psychosocialScope.restoreDetail();
   window.digiriskdolibarr.psychosocialScope.detachFilesModals();
+  window.digiriskdolibarr.psychosocialScope.bindAnswers();
   window.digiriskdolibarr.psychosocialScope.openFromHash();
+};
+
+/**
+ * Écoute les réponses de la grille sur la fenêtre d'évaluation elle-même, et garde leur clic pour
+ * elle. Arrivé au document, il passait par les quelque 200 gestionnaires délégués des modules de la
+ * page, que jQuery teste un par un : 30 ms par réponse cochée, 2 ms ainsi.
+ *
+ * @since   23.5.1
+ * @version 23.5.1
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.psychosocialScope.bindAnswers = function() {
+  const modal = document.getElementById('rps_eval_modal');
+  if (!modal) {
+    return;
+  }
+
+  modal.addEventListener('click', function(event) {
+    const answer = event.target.closest('.rps-grid-answer');
+    if (!answer) {
+      return;
+    }
+    event.stopPropagation();
+    window.digiriskdolibarr.psychosocialScope.pickAnswer.call(answer);
+  });
 };
 
 /**
@@ -87,7 +114,6 @@ window.digiriskdolibarr.psychosocialScope.event = function() {
   // Fenêtre d'évaluation d'une unité, ouverte par la modale Saturne
   $(document).on('click', '.rps-open-eval, .rps-open-actions', scope.openAssessment);
   $(document).on('click', '#rps_eval_modal .rps-method', scope.switchMethod);
-  $(document).on('click', '#rps_eval_modal .rps-grid-answer', scope.pickAnswer);
   $(document).on('click', '#rps-actions-more', scope.toggleActions);
   $(document).on('click', '#rps-eval-save', scope.saveAssessment);
   $(document).on('click', '.rps-consolidate', scope.consolidate);
@@ -147,11 +173,13 @@ window.digiriskdolibarr.psychosocialScope.bandOf = function(average) {
  */
 window.digiriskdolibarr.psychosocialScope.setBand = function(band, level) {
   band.attr('data-scale', level);
-  band.text(level > 0 ? window.digiriskdolibarr.psychosocialScope.scaleLabel(level) : 'non cotée');
+  window.digiriskdolibarr.psychosocialScope.setText(band, level > 0 ? window.digiriskdolibarr.psychosocialScope.scaleLabel(level) : 'non cotée');
 };
 
 /**
- * Affiche un niveau dans une case de facteur, ou la vide au niveau 0.
+ * Affiche un niveau dans une case de facteur de la fenêtre d'évaluation, ou la vide au niveau 0.
+ * Le chiffre est affiché par le CSS depuis data-scale : écrire du texte dans une case rendue vide
+ * y insérerait un nœud (voir setText).
  *
  * @since   23.5.1
  * @version 23.5.1
@@ -162,7 +190,33 @@ window.digiriskdolibarr.psychosocialScope.setBand = function(band, level) {
  */
 window.digiriskdolibarr.psychosocialScope.setCell = function(cell, level) {
   cell.attr('data-scale', level || 0);
-  cell.text(level || '');
+};
+
+/**
+ * Remplace le texte d'éléments en réécrivant leur nœud texte, sans rien faire quand il est déjà
+ * le bon. jQuery .text() vide l'élément et y insère un nouveau nœud : toute insertion réveille les
+ * règles :has() de la page (thème, autres modules), qui restylent alors des milliers d'éléments,
+ * une trentaine de millisecondes à chaque fois sur la liste des risques.
+ *
+ * @since   23.5.1
+ * @version 23.5.1
+ *
+ * @param  {jQuery}        elements Éléments à mettre à jour
+ * @param  {string|number} text     Nouveau texte
+ * @return {void}
+ */
+window.digiriskdolibarr.psychosocialScope.setText = function(elements, text) {
+  text = String(text);
+  elements.each(function() {
+    const node = this.firstChild;
+    if (node && node.nodeType === Node.TEXT_NODE && !node.nextSibling) {
+      if (node.data !== text) {
+        node.data = text;
+      }
+    } else if (this.textContent !== text) {
+      this.textContent = text;
+    }
+  });
 };
 
 /**
@@ -252,12 +306,12 @@ window.digiriskdolibarr.psychosocialScope.refreshScope = function(block) {
   });
 
   block.find('.rps-tab').each(function() {
-    $(this).find('.rps-tab-count').text(counts[$(this).attr('data-filter')] || 0);
+    scope.setText($(this).find('.rps-tab-count'), counts[$(this).attr('data-filter')] || 0);
   });
 
-  block.find('#rps-average').text(assessed > 0 ? (sum / assessed).toFixed(2).replace('.', ',') : '—');
-  block.find('#rps-done').text(assessed);
-  block.find('#rps-concerned').text(concerned);
+  scope.setText(block.find('#rps-average'), assessed > 0 ? (sum / assessed).toFixed(2).replace('.', ',') : '—');
+  scope.setText(block.find('#rps-done'), assessed);
+  scope.setText(block.find('#rps-concerned'), concerned);
   block.find('#rps-bar').val(concerned > 0 ? Math.round(100 * assessed / concerned) : 0);
   scope.setBand(block.find('#rps-band'), band);
 };
@@ -368,7 +422,7 @@ window.digiriskdolibarr.psychosocialScope.refreshSelection = function(block) {
 
   block.find('.rps-bulk').toggleClass('rps-hidden', selected.length === 0);
   block.find('.rps-foot').toggleClass('rps-hidden', selected.length > 0);
-  block.find('.rps-bulk-count').text(selected.length + (selected.length > 1 ? ' unités sélectionnées' : ' unité sélectionnée'));
+  window.digiriskdolibarr.psychosocialScope.setText(block.find('.rps-bulk-count'), selected.length + (selected.length > 1 ? ' unités sélectionnées' : ' unité sélectionnée'));
 };
 
 /**
@@ -445,7 +499,7 @@ window.digiriskdolibarr.psychosocialScope.setRowState = function(row, state, rea
   row.attr('data-state', state);
   row.find('.rps-state-input').val(state);
   row.find('.rps-state-select').attr('data-state', state);
-  row.find('.rps-reason-text').text(state === '0' ? reason : '');
+  window.digiriskdolibarr.psychosocialScope.setText(row.find('.rps-reason-text'), state === '0' ? reason : '');
 };
 
 /**
@@ -815,9 +869,8 @@ window.digiriskdolibarr.psychosocialScope.openFromHash = function() {
   if (hash === '#rps-eval') {
     // Retiré de l'adresse : recharger la page après l'enregistrement ne doit pas rouvrir l'évaluation
     window.history.replaceState(null, '', window.location.pathname + window.location.search);
-    setTimeout(function() {
-      $('.rps-open-eval').first().trigger('click');
-    }, 0);
+    // Ouverte ici, sans passer par le clic du bouton : la modale Saturne peut ne pas encore l'écouter
+    window.digiriskdolibarr.psychosocialScope.openAssessment.call($('.rps-open-eval').first());
     return;
   }
 
@@ -853,8 +906,8 @@ window.digiriskdolibarr.psychosocialScope.activePane = function() {
 };
 
 /**
- * La fenêtre s'ouvre par la modale Saturne : elle est remise à jour, et le bouton Actions
- * l'amène directement sur sa section.
+ * Ouvre la fenêtre d'évaluation, ce que fait aussi la modale Saturne : elle est remise à jour, et
+ * le bouton Actions l'amène directement sur sa section.
  *
  * @since   23.5.1
  * @version 23.5.1
@@ -862,6 +915,8 @@ window.digiriskdolibarr.psychosocialScope.activePane = function() {
  * @return {void}
  */
 window.digiriskdolibarr.psychosocialScope.openAssessment = function() {
+  // La modale Saturne l'ouvre aussi : celui des deux scripts initialisé le premier suffit
+  $('#rps_eval_modal').addClass('modal-active');
   window.digiriskdolibarr.psychosocialScope.refreshAssessment();
 
   if ($(this).hasClass('rps-open-actions')) {
@@ -941,8 +996,8 @@ window.digiriskdolibarr.psychosocialScope.refreshAssessment = function() {
     }
   });
 
-  modal.find('#rps-eval-answered').text(answered);
-  modal.find('#rps-eval-total').text(rows.length);
+  scope.setText(modal.find('#rps-eval-answered'), answered);
+  scope.setText(modal.find('#rps-eval-total'), rows.length);
   modal.find('.rps-grid-factors .rps-cell').each(function() {
     scope.setCell($(this), factors[$(this).attr('data-factor')]);
   });
@@ -985,7 +1040,7 @@ window.digiriskdolibarr.psychosocialScope.refreshActions = function(factors) {
   // Le bouton reste là une fois les facteurs dépliés, pour les replier
   const more = modal.find('#rps-actions-more');
   more.prop('hidden', foldable === 0);
-  more.find('span').text(expanded ? 'Masquer les facteurs en dessous du seuil' : 'Agir aussi sur un facteur en dessous du seuil (' + foldable + ')');
+  window.digiriskdolibarr.psychosocialScope.setText(more.find('span'), expanded ? 'Masquer les facteurs en dessous du seuil' : 'Agir aussi sur un facteur en dessous du seuil (' + foldable + ')');
   more.find('i').toggleClass('fa-chevron-up', expanded).toggleClass('fa-chevron-down', !expanded);
 };
 
@@ -1159,7 +1214,7 @@ window.digiriskdolibarr.psychosocialScope.refreshTaskCount = function(card) {
   const items = card.find('.rps-action-item');
   const done  = items.filter('.is-done').length;
 
-  card.find('.rps-detail-count').text(items.length ? done + '/' + items.length + ' actions' : 'Actions');
+  window.digiriskdolibarr.psychosocialScope.setText(card.find('.rps-detail-count'), items.length ? done + '/' + items.length + ' actions' : 'Actions');
 };
 
 /**

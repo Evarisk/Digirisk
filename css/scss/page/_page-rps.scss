@@ -772,6 +772,12 @@ $rps-actions-width: 200px;
     }
   }
 
+  // The cells of the assessment modal show their level from data-scale (psychosocialScope.setCell()):
+  // a text written in a cell rendered empty would insert a node, which wakes the :has() rules of the page
+  #rps_eval_modal .rps-cell:not([data-scale="0"])::before {
+    content: attr(data-scale);
+  }
+
   // ---- Footer and notes ----
 
   .rps-foot {
@@ -1282,13 +1288,16 @@ $rps-actions-width: 200px;
       }
     }
 
-    // min-height: 0 lets the flex item shrink below its content, its own overflow takes over
+    // min-height: 0 lets the flex item shrink below its content, its own overflow takes over. The
+    // opaque background lets the browser scroll it on its own layer: transparent, every step of the
+    // wheel had the whole risk list behind the modal laid out in layers again
     .modal-content {
       flex: 1 1 auto;
       height: auto;
       min-height: 0;
       padding: 0;
       overflow-y: auto;
+      background: $dr-surface;
     }
 
     // Saturne right-aligns the footer text: the error and the notes read from the left
@@ -1545,7 +1554,9 @@ $rps-actions-width: 200px;
   }
 
   // The four levels read on the answers themselves: a dot of the level colour at rest (a tint of
-  // the black level would read as a picked grey), the cotation chip colour once picked
+  // the black level would read as a picked grey), the cotation chip colour once picked. No
+  // transition: scrolling the grid passes a hundred answers under the mouse, each hover animated
+  // over several frames made the scroll stutter
   .rps-grid-answer {
     display: inline-flex;
     align-items: center;
@@ -1560,7 +1571,6 @@ $rps-actions-width: 200px;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color $dr-transition, border-color $dr-transition, box-shadow $dr-transition, color $dr-transition;
 
     &::before {
       content: '';
