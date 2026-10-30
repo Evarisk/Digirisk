@@ -97,42 +97,20 @@ if ($action === 'addAction' && $permissiontoadd) {
     // Actions are grouped under the T1/T2 container task created when the investigation is validated
     $containerTaskId = digiriskdolibarr_get_action_container_task($db, (int) $object->fk_task, $action_type);
 
-    // Each section renders its own form, so field names are suffixed with the action type
-    $deadlinePrefix = 'actiondeadline' . $action_type;
-    $startPrefix    = 'actionstart' . $action_type;
-
     $newTask                 = new Task($db);
     $newTask->fk_project     = $accident->fk_project;
     $newTask->fk_task_parent = $containerTaskId > 0 ? $containerTaskId : (int) $object->fk_task;
     $newTask->ref            = $modTask->getNextValue(0, $newTask);
-    $newTask->label          = GETPOST('action_label', 'alphanohtml');
-    $newTask->date_start     = dol_mktime(0, 0, 0, GETPOSTINT($startPrefix . 'month'), GETPOSTINT($startPrefix . 'day'), GETPOSTINT($startPrefix . 'year'));
-    // Task::create() only writes date_end, the datee property is deprecated and ignored
-    $newTask->date_end       = dol_mktime(
-        23, 59, 59,
-        GETPOST($deadlinePrefix . 'month', 'int'),
-        GETPOST($deadlinePrefix . 'day',   'int'),
-        GETPOST($deadlinePrefix . 'year',  'int')
-    );
-    $newTask->progress       = 0;
-    // Left empty, the action gets no budget rather than a zero one
-    if (GETPOST('action_budget', 'alpha') !== '') {
-        $newTask->budget_amount = (float) price2num(GETPOST('action_budget', 'alpha'));
-    }
 
     $newTask->array_options['options_digirisk_action_type']     = (int) $action_type;
     $newTask->array_options['options_fk_accident']              = $accident->id;
     $newTask->array_options['options_fk_accidentinvestigation'] = $object->id;
 
-    $result = $newTask->create($user);
+    $result = digiriskdolibarr_create_action($newTask, (int) $action_type, $user);
     if ($result > 0) {
-        $assignedUser = GETPOST('assigned_user' . $action_type, 'int');
-        if ($assignedUser > 0) {
-            $newTask->add_contact($assignedUser, 'TASKEXECUTIVE', 'internal');
-        }
         setEventMessages($langs->trans('ActionAdded'), []);
     } else {
-        setEventMessages($newTask->error, [], 'errors');
+        setEventMessages($newTask->error, $newTask->errors, 'errors');
     }
 
     header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id);
@@ -171,6 +149,20 @@ if ($action === 'updateProgress' && $permissiontoadd && in_array((int) $taskid, 
     $result                 = $taskToUpdate->update($user);
     if ($result <= 0) {
         setEventMessages($taskToUpdate->error, [], 'errors');
+    }
+
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id);
+    exit();
+}
+
+// A field edited in place in the table (actions.js): the page sent back refreshes the row, a refusal is told in plain text
+if ($action === 'updateActionField' && $permissiontoadd && in_array((int) $taskid, $investigationActionIds, true)) {
+    $taskToUpdate = new Task($db);
+    $taskToUpdate->fetch((int) $taskid);
+    if (digiriskdolibarr_update_action_field($taskToUpdate, GETPOST('field', 'aZ09'), $user) === null) {
+        http_response_code(400);
+        print dol_escape_htmltag($taskToUpdate->errorsToString());
+        exit();
     }
 
     header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id);

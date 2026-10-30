@@ -128,32 +128,15 @@ if ($action === 'addAction' && $permissiontoadd && isset($sectionConfig[$actionT
         }
     }
 
-    // Each section renders its own form, so field names are suffixed with the action type
-    $deadlinePrefix = 'actiondeadline' . $actionType;
-    $startPrefix    = 'actionstart' . $actionType;
-
     $newTask                 = new Task($db);
     $newTask->fk_project     = $object->fk_project;
     $newTask->fk_task_parent = $containerTaskId;
     $newTask->ref            = $modTask->getNextValue(0, $newTask);
-    $newTask->label          = GETPOST('action_label', 'alphanohtml');
-    $newTask->date_start     = dol_mktime(0, 0, 0, GETPOSTINT($startPrefix . 'month'), GETPOSTINT($startPrefix . 'day'), GETPOSTINT($startPrefix . 'year'));
-    // Task::create() only writes date_end, the datee property is deprecated and ignored
-    $newTask->date_end       = dol_mktime(23, 59, 59, GETPOSTINT($deadlinePrefix . 'month'), GETPOSTINT($deadlinePrefix . 'day'), GETPOSTINT($deadlinePrefix . 'year'));
-    $newTask->progress       = 0;
-    // Left empty, the action gets no budget rather than a zero one
-    if (GETPOST('action_budget', 'alpha') !== '') {
-        $newTask->budget_amount = (float) price2num(GETPOST('action_budget', 'alpha'));
-    }
 
     $newTask->array_options['options_digirisk_action_type'] = $actionType;
 
-    $result = $newTask->create($user);
+    $result = digiriskdolibarr_create_action($newTask, $actionType, $user);
     if ($result > 0) {
-        $assignedUser = GETPOSTINT('assigned_user' . $actionType);
-        if ($assignedUser > 0) {
-            $newTask->add_contact($assignedUser, 'TASKEXECUTIVE', 'internal');
-        }
         digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketActionCreated', $newTask->ref), $langs->transnoentities($sectionConfig[$actionType]['titleKey']) . ' : ' . $newTask->label, $ticketLogConst);
         setEventMessages($langs->trans('ActionAdded'), []);
     } else {
@@ -180,6 +163,24 @@ if (($action === 'closeAction' || $action === 'updateProgress') && $permissionto
     } else {
         setEventMessages($actionTask->error, $actionTask->errors, 'errors');
     }
+
+    header('Location: ' . $pageUrl);
+    exit;
+}
+
+// A field edited in place in the table (actions.js): the page sent back refreshes the row, a refusal is told in plain text
+if ($action === 'updateActionField' && $permissiontoadd && in_array($taskid, $ticketActionIds, true)) {
+    $actionTask = new Task($db);
+    $actionTask->fetch($taskid);
+
+    $change = digiriskdolibarr_update_action_field($actionTask, GETPOST('field', 'aZ09'), $user);
+    if ($change === null) {
+        http_response_code(400);
+        print dol_escape_htmltag($actionTask->errorsToString());
+        exit;
+    }
+
+    digiriskdolibarr_ticket_log_field_change($object, $change['label'] . ' — ' . $actionTask->ref, $change['old'], $change['new'], $ticketLogConst);
 
     header('Location: ' . $pageUrl);
     exit;

@@ -17,9 +17,10 @@
 /**
  * \file    js/modules/actions.js
  * \ingroup digiriskdolibarr
- * \brief   JavaScript of the actions tabs (accident investigation, ticket): the add button of the header of each
- *          section opens the add-action form of that section, the progress of an action is dragged on its
- *          slider then saved on release, and the Gantt of the actions is laid out.
+ * \brief   JavaScript of the actions tabs (accident investigation, ticket): the view switches between condensed and
+ *          detailed, the add button of the header of each section opens the add-action form of that section, a
+ *          click on a field of an action edits it in place, the progress of an action is dragged on its slider, both
+ *          saved at once, and the Gantt of the actions is laid out.
  */
 
 'use strict';
@@ -30,14 +31,29 @@
 window.digiriskdolibarr.actions = {};
 
 /**
+ * Key of the view chosen, kept in the browser.
+ *
+ * @type {string}
+ */
+window.digiriskdolibarr.actions.viewStorageKey = 'digiriskdolibarrActionsView';
+
+/**
  * Automatically called by the DigiriskDolibarr library.
  *
  * @return {void}
  */
 window.digiriskdolibarr.actions.init = function() {
-    if (!$('.digirisk-actions-add, .digirisk-actions-progress__slider').length) {
+    if (!$('#digirisk-actions').length) {
         return;
     }
+
+    let view = 'condensed';
+    try {
+        view = window.localStorage.getItem(window.digiriskdolibarr.actions.viewStorageKey) || view;
+    } catch (error) {
+        // Storage refused (private browsing, blocked site data): the condensed view stays
+    }
+    window.digiriskdolibarr.actions.applyView(view);
 
     window.digiriskdolibarr.actions.event();
     $('.digirisk-actions-progress__slider').each(window.digiriskdolibarr.actions.refreshProgress);
@@ -50,10 +66,225 @@ window.digiriskdolibarr.actions.init = function() {
  * @return {void}
  */
 window.digiriskdolibarr.actions.event = function() {
+    $(document).on('click', '.digirisk-actions__view', window.digiriskdolibarr.actions.switchView);
     $(document).on('click', '.digirisk-actions-add', window.digiriskdolibarr.actions.toggleActionForm);
     $(document).on('click', '.digirisk-actions-form__cancel', window.digiriskdolibarr.actions.closeActionForm);
+    $(document).on('click', '.digirisk-actions-cell', window.digiriskdolibarr.actions.editCell);
     $(document).on('input', '.digirisk-actions-progress__slider', window.digiriskdolibarr.actions.refreshProgress);
     $(document).on('change', '.digirisk-actions-progress__slider', window.digiriskdolibarr.actions.saveProgress);
+};
+
+/**
+ * Show the condensed view, without the Gantt nor the detail columns, or the detailed one.
+ *
+ * @param  {string} view condensed or detailed.
+ * @return {void}
+ */
+window.digiriskdolibarr.actions.applyView = function(view) {
+    const detailed = view === 'detailed';
+
+    $('#digirisk-actions').toggleClass('digirisk-actions--condensed', !detailed);
+    $('.digirisk-actions__view').each(function() {
+        $(this).toggleClass('btnTitleSelected', ($(this).data('view') === 'detailed') === detailed);
+    });
+};
+
+/**
+ * Switch to the view of the button, and remember it for the next actions tabs.
+ *
+ * @param  {Event} event Click on a view button.
+ * @return {void}
+ */
+window.digiriskdolibarr.actions.switchView = function(event) {
+    event.preventDefault();
+
+    const view = $(this).data('view');
+    window.digiriskdolibarr.actions.applyView(view);
+    try {
+        window.localStorage.setItem(window.digiriskdolibarr.actions.viewStorageKey, view);
+    } catch (error) {
+        // Storage refused: the view only holds until the page is left
+    }
+};
+
+/**
+ * Turn a cell of an action into the editor of its field, filled with its raw value: a text, number or date field, or
+ * a copy of the list of the users or of the tags. Leaving the editor saves the new value, Escape gives the cell back.
+ *
+ * @param  {Event} event Click on the cell.
+ * @return {void}
+ */
+window.digiriskdolibarr.actions.editCell = function(event) {
+    const $cell = $(this);
+    if ($cell.hasClass('digirisk-actions-cell--editing') || $(event.target).closest('a').length) {
+        return;
+    }
+
+    const field   = $cell.data('field');
+    // attr() rather than data(): data() would turn "12" into a number and "" into undefined
+    const value   = String($cell.attr('data-value') || '');
+    const content = $cell.html();
+    const taskId  = $cell.closest('tr').data('taskId');
+
+    const restore = function() {
+        $cell.removeClass('digirisk-actions-cell--editing').html(content);
+    };
+    const save = function(newValue) {
+        // Nothing changed: no need for a round trip
+        const normalized = Array.isArray(newValue) ? newValue.slice().sort().join(',') : String(newValue);
+        const initial    = field === 'tags' ? value.split(',').filter(Boolean).sort().join(',') : value;
+        if (normalized === initial) {
+            restore();
+            return;
+        }
+        window.digiriskdolibarr.actions.saveField($cell, field, newValue, restore);
+    };
+
+    $cell.addClass('digirisk-actions-cell--editing');
+
+    // Assignee and tags: a copy of the list rendered once under the sections, searchable with select2
+    if (field === 'assignee' || field === 'tags') {
+        const $select = $('#digirisk_actions_editor_' + field).clone().attr('id', 'digirisk-actions-editor-' + field + '-' + taskId);
+        $cell.empty().append($select);
+        $select.val(field === 'tags' ? value.split(',').filter(Boolean) : (parseInt(value, 10) > 0 ? value : '-1'));
+
+        const selected = function() {
+            if (field === 'tags') {
+                return $select.val() || [];
+            }
+            return parseInt($select.val(), 10) > 0 ? $select.val() : '0';
+        };
+
+        if ($.fn.select2) {
+            // Several tags are picked in a row: the list stays open until the user clicks away
+            $select.select2({width: '100%', dropdownAutoWidth: true, closeOnSelect: field !== 'tags'});
+            $select.on('select2:close', function() {
+                save(selected());
+            });
+            $select.select2('open');
+        } else {
+            // A change is followed by a blur: only the first one saves
+            $select.on('change blur', function() {
+                $select.off('change blur');
+                save(selected());
+            });
+            $select.trigger('focus');
+        }
+        return;
+    }
+
+    const type    = field === 'label' ? 'text' : (field === 'budget' ? 'number' : 'date');
+    const $input  = $('<input class="digirisk-actions-cell__input">').attr('type', type).val(value);
+    let isDone      = false; // blur still fires after Enter or Escape
+    let isTyping    = false; // a date typed with the keyboard is only saved once left
+    let typingTimer = null;
+
+    if (type === 'number') {
+        $input.attr({min: 0, step: 'any'});
+    }
+    $cell.empty().append($input);
+    $input.trigger('focus');
+
+    const leave = function(keep) {
+        if (isDone) {
+            return;
+        }
+        isDone = true;
+        clearTimeout(typingTimer);
+
+        // A half-typed date reads as an empty value: give the cell back rather than erase the date
+        if (!keep || ($input[0].validity && $input[0].validity.badInput)) {
+            restore();
+            return;
+        }
+        save($input.val());
+    };
+
+    $input.on('blur', function() {
+        leave(true);
+    });
+    $input.on('keydown', function(keyEvent) {
+        if (keyEvent.key === 'Escape' || keyEvent.key === 'Enter') {
+            keyEvent.preventDefault();
+            leave(keyEvent.key === 'Enter');
+            return;
+        }
+        // Typing a date rewrites it segment by segment and fires a change on every intermediate value
+        if (type === 'date') {
+            isTyping = true;
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(function() {
+                isTyping = false;
+            }, 1500);
+        }
+    });
+    // A day picked in the calendar fires a change without any keystroke: that choice is saved at once
+    if (type === 'date') {
+        $input.on('change', function() {
+            if (!isTyping) {
+                leave(true);
+            }
+        });
+    }
+};
+
+/**
+ * Save a field edited in place, then refresh the action from the page sent back. A refused value is told and the
+ * cell given back as it was.
+ *
+ * @param  {jQuery}          $cell   Cell of the field.
+ * @param  {string}          field   Field of the action: label, assignee, date_start, date_end, budget or tags.
+ * @param  {string|string[]} value   New value.
+ * @param  {Function}        restore Gives the cell back as it was.
+ * @return {void}
+ */
+window.digiriskdolibarr.actions.saveField = function($cell, field, value, restore) {
+    const $row = $cell.closest('tr');
+
+    $cell.addClass('digirisk-actions-cell--saving');
+
+    $.ajax({
+        url: window.location.href.replace(/#.*/, ''),
+        type: 'POST',
+        data: {
+            token: window.saturne.toolbox.getToken(),
+            action: 'updateActionField',
+            taskid: $row.data('taskId'),
+            field: field,
+            value: value
+        },
+        success: function(resp) {
+            window.digiriskdolibarr.actions.refreshFromPage(resp, $row.attr('id'));
+        },
+        error: function(xhr) {
+            $cell.removeClass('digirisk-actions-cell--saving');
+            restore();
+            if ($.jnotify) {
+                $.jnotify(xhr.responseText || 'Error', 'error', true);
+            }
+        }
+    });
+};
+
+/**
+ * Refresh an action from the page sent back after saving it: its row, the counters of the sections and the Gantt.
+ *
+ * @param  {string} resp  HTML of the page.
+ * @param  {string} rowId ID of the row of the action.
+ * @return {void}
+ */
+window.digiriskdolibarr.actions.refreshFromPage = function(resp, rowId) {
+    const $page   = $(new DOMParser().parseFromString(resp, 'text/html'));
+    const $newRow = $page.find('#' + rowId);
+    if ($newRow.length) {
+        $('#' + rowId).replaceWith($newRow);
+        $newRow.find('.digirisk-actions-progress__slider').each(window.digiriskdolibarr.actions.refreshProgress);
+    }
+    $page.find('[id^="digirisk-actions-counter-"]').each(function() {
+        $('#' + this.id).replaceWith(this);
+    });
+    $('#digirisk-actions-gantt').replaceWith($page.find('#digirisk-actions-gantt'));
+    window.digiriskdolibarr.actions.drawGantt();
 };
 
 /**
@@ -127,17 +358,7 @@ window.digiriskdolibarr.actions.saveProgress = function() {
                     return;
                 }
 
-                const $page   = $(new DOMParser().parseFromString(resp, 'text/html'));
-                const $newRow = $page.find('#' + rowId);
-                if ($newRow.length) {
-                    $('#' + rowId).replaceWith($newRow);
-                    $newRow.find('.digirisk-actions-progress__slider').each(window.digiriskdolibarr.actions.refreshProgress);
-                }
-                $page.find('[id^="digirisk-actions-counter-"]').each(function() {
-                    $('#' + this.id).replaceWith(this);
-                });
-                $('#digirisk-actions-gantt').replaceWith($page.find('#digirisk-actions-gantt'));
-                window.digiriskdolibarr.actions.drawGantt();
+                window.digiriskdolibarr.actions.refreshFromPage(resp, rowId);
             },
             error: function() {
                 // Back to the saved progress, which the value attribute still holds

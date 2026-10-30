@@ -331,14 +331,16 @@ class ActionsDigiriskdolibarr
 
         $langs->load('digiriskdolibarr@digiriskdolibarr');
 
-        $actionsCount = 0;
-        foreach (digiriskdolibarr_ticket_count_actions(digiriskdolibarr_ticket_get_actions($db, digiriskdolibarr_ticket_get_parent_task($db, $ticket))) as $counter) {
-            $actionsCount += $counter['total'];
+        // One short label per type with its own count: "Correctives 1 / Preventives 2"
+        $counters  = digiriskdolibarr_ticket_count_actions(digiriskdolibarr_ticket_get_actions($db, digiriskdolibarr_ticket_get_parent_task($db, $ticket)));
+        $tabLabels = [];
+        foreach (digiriskdolibarr_ticket_action_sections() as $type => $section) {
+            $tabLabels[] = $langs->trans($section['tabKey']) . '<span class="badge marginleftonlyshort">' . (int) ($counters[$type]['total'] ?? 0) . '</span>';
         }
 
         $tab = [
             dol_buildpath('/digiriskdolibarr/view/ticket/ticket_actions.php', 1) . '?id=' . (int) $ticket->id,
-            '<i class="fas fa-tasks pictofixedwidth"></i>' . $langs->trans('TicketActionsTab') . ($actionsCount > 0 ? '<span class="badge marginleftonlyshort">' . $actionsCount . '</span>' : ''),
+            '<i class="fas fa-tasks pictofixedwidth"></i>' . implode(' / ', $tabLabels),
             'digiriskactions',
         ];
 
