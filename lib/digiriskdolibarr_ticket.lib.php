@@ -1115,3 +1115,74 @@ function digiriskdolibarr_ticket_files_share_block(array $files, array $links): 
 
     return $items === '' ? '' : '<p><b>' . $langs->transnoentities('TicketFilesShareLinksTitle') . '</b></p><ul>' . $items . '</ul>';
 }
+
+/**
+ * Subject of a ticket declared without one, taken from the start of its message (#5588)
+ *
+ * The public interface asks for no subject, which left an empty cell in the lists and the selectors. The
+ * message is flattened to one line and cut on a word boundary; the full text stays in the message.
+ *
+ * @param  string $message   Ticket message, plain text or HTML
+ * @param  int    $maxLength Longest subject, ellipsis included
+ * @return string            Subject, empty when the message holds no text
+ */
+function digiriskdolibarr_ticket_subject_from_message(string $message, int $maxLength = 80): string
+{
+    // A closing block tag ends a line, or two paragraphs would be glued into one word
+    $text = preg_replace('/<\/(p|div|li|tr|h[1-6])>/i', ' ', $message) ?? $message;
+    // dol_string_nohtmltag() decodes without the single quotes and leaves tabs and non-breaking spaces
+    $text = dol_html_entity_decode(dol_string_nohtmltag($text), ENT_QUOTES | ENT_HTML5);
+    $text = trim(preg_replace('/[\s\x{00A0}]+/u', ' ', $text) ?? $text);
+    if (dol_strlen($text) <= $maxLength) {
+        return $text;
+    }
+
+    // Cut after the last whole word, unless that word alone fills most of the room (a long URL)
+    $excerpt   = dol_substr($text, 0, $maxLength - 1);
+    $lastSpace = mb_strrpos($excerpt, ' ', 0, 'UTF-8');
+    if ($lastSpace !== false && $lastSpace >= $maxLength / 2) {
+        $excerpt = mb_substr($excerpt, 0, $lastSpace, 'UTF-8');
+    }
+
+    return rtrim($excerpt, ' ,;:.-') . '…';
+}
+
+/**
+ * Give a subject to the tickets of an entity saved without one, from their message (#5588)
+ *
+ * Written straight in the table: Ticket::update() would run TICKET_MODIFY, which logs an event and may
+ * notify for each ticket of the backlog. The modification date is kept, the ticket was not edited.
+ *
+ * @param  DoliDB $db     Database handler
+ * @param  int    $entity Entity whose tickets are filled
+ * @return int            Number of tickets given a subject, -1 on a database error
+ */
+function digiriskdolibarr_ticket_fill_empty_subjects(DoliDB $db, int $entity): int
+{
+    $sql  = 'SELECT t.rowid, t.message FROM ' . MAIN_DB_PREFIX . 'ticket AS t';
+    $sql .= " WHERE (t.subject IS NULL OR TRIM(t.subject) = '')";
+    $sql .= ' AND t.entity = ' . $entity;
+
+    $resql = $db->query($sql);
+    if (!$resql) {
+        return -1;
+    }
+
+    $subjects = [];
+    while ($obj = $db->fetch_object($resql)) {
+        $subject = digiriskdolibarr_ticket_subject_from_message((string) $obj->message);
+        if ($subject !== '') {
+            $subjects[(int) $obj->rowid] = $subject;
+        }
+    }
+    $db->free($resql);
+
+    foreach ($subjects as $ticketId => $subject) {
+        $sql = 'UPDATE ' . MAIN_DB_PREFIX . "ticket SET subject = '" . $db->escape($subject) . "', tms = tms WHERE rowid = " . $ticketId;
+        if (!$db->query($sql)) {
+            return -1;
+        }
+    }
+
+    return count($subjects);
+}

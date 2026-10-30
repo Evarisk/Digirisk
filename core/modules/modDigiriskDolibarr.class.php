@@ -2732,6 +2732,16 @@ class modDigiriskdolibarr extends DolibarrModules
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 6, 'integer', 0, '', 0);
         }
 
+        // Tickets of the public interface were saved without a subject until #5588: they get the start of their message
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_SUBJECT_BACKWARD_COMPATIBILITY')) {
+            require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
+
+            // A failure leaves the constant unset, so the next activation tries again
+            if (digiriskdolibarr_ticket_fill_empty_subjects($this->db, (int) $conf->entity) >= 0) {
+                dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_SUBJECT_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
+            }
+        }
+
 		//DigiriskElement favorite medias backward compatibility
 		if (empty($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY)) {
 			require_once __DIR__ . '/../../class/digiriskelement.class.php';
