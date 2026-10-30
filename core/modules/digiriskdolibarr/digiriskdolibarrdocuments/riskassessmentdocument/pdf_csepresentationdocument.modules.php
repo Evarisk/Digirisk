@@ -65,9 +65,9 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
     const MAX_EXPOSED_UNITS = 7;
 
     /**
-     * Nombre d'echeances a venir projetees.
+     * Nombre d'actions projetees dans chacune des deux listes : en retard, puis a venir.
      */
-    const MAX_NEXT_DEADLINES = 5;
+    const MAX_NEXT_DEADLINES = 4;
 
     /**
      * Nombre d'unites de travail citees sur la diapositive du perimetre.
@@ -157,7 +157,7 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
         // Les modeles PDF du document unique ecrivent dans le meme repertoire que le gabarit
         // ODT : le nom du document est ce qui les distingue dans la liste des fichiers
         $moreParam['hideTemplateName'] = 1;
-        $moreParam['documentName']     = 'PresentationCSE_';
+        $moreParam['documentName']     = $outputLangs->transnoentities('DigiriskCseFileName') . '_';
         $object->module                = $this->module;
 
         $refOrig = $object->ref;
@@ -1313,26 +1313,49 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
             ['label' => $outputLangs->transnoentities('DigiriskSynthesisActionsLate'),    'value' => $actionPlan['late'], 'color' => $this->accentWarn]
         ], $size - 1, 8);
 
-        // A droite, les prochaines echeances
-        $rightX = $this->marge_gauche + $leftWidth + 12;
-        $rightW = $width - $leftWidth - 12;
+        // A droite, deux listes : les actions en retard, puis les prochaines echeances. Une seule
+        // liste triee par date ne montrait que les plus vieux retards : avec plus de retards que
+        // de lignes, aucune echeance a venir n'apparaissait jamais
+        $rightX   = $this->marge_gauche + $leftWidth + 12;
+        $rightW   = $width - $leftWidth - 12;
+        $now      = dol_now();
+        $late     = array_values(array_filter($actionPlan['next'], fn($task) => $task->datee < $now));
+        $upcoming = array_values(array_filter($actionPlan['next'], fn($task) => $task->datee >= $now));
 
-        $this->kicker($pdf, $rightX, $y, $rightW, $outputLangs->transnoentities('DigiriskSynthesisNextDeadlines'), $size, $this->accent);
+        $listY = $this->deadlineList($pdf, $rightX, $y, $rightW, $outputLangs->transnoentities('DigiriskCseLateActions', (string) count($late)), $late, $outputLangs->transnoentities('DigiriskCseNoLateAction'), true, $outputLangs, $size);
+        $this->deadlineList($pdf, $rightX, $listY + 6, $rightW, $outputLangs->transnoentities('DigiriskSynthesisNextDeadlines'), $upcoming, $outputLangs->transnoentities('DigiriskCseNoDeadline'), false, $outputLangs, $size);
+    }
 
-        if (empty($actionPlan['next'])) {
+    /**
+     * Une liste d'actions et leur echeance, sous un surtitre.
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  float     $x           Abscisse
+     * @param  float     $y           Ordonnee
+     * @param  float     $width       Largeur
+     * @param  string    $title       Surtitre
+     * @param  array     $tasks       Taches, triees par echeance
+     * @param  string    $emptyText   Phrase imprimee quand la liste est vide
+     * @param  bool      $isLate      Echeances passees, ecrites en rouge
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @return float                  Ordonnee du bas de la liste
+     */
+    protected function deadlineList($pdf, float $x, float $y, float $width, string $title, array $tasks, string $emptyText, bool $isLate, Translate $outputLangs, float $size): float
+    {
+        $this->kicker($pdf, $x, $y, $width, $title, $size, $isLate ? $this->accentWarn : $this->accent);
+
+        if (empty($tasks)) {
             $pdf->SetFont('', '', $size);
             $pdf->SetTextColor($this->inkSoft[0], $this->inkSoft[1], $this->inkSoft[2]);
-            $pdf->SetXY($rightX, $y + 9);
-            $pdf->Cell($rightW, 6, $outputLangs->transnoentities('DigiriskCseNoDeadline'), 0, 0, 'L');
+            $pdf->SetXY($x, $y + 9);
+            $pdf->Cell($width, 6, $emptyText, 0, 0, 'L');
             $pdf->SetTextColor(0, 0, 0);
-            return;
+            return $y + 16;
         }
 
-        $now  = dol_now();
         $rows = [];
-        foreach (array_slice($actionPlan['next'], 0, self::MAX_NEXT_DEADLINES) as $task) {
-            $isLate = $task->datee < $now;
-
+        foreach (array_slice($tasks, 0, self::MAX_NEXT_DEADLINES) as $task) {
             $rows[] = [
                 ['text' => dol_print_date($task->datee, 'day', 'tzuser', $outputLangs), 'align' => 'C', 'bold' => $isLate, 'color' => $isLate ? $this->accentWarn : $this->ink],
                 dol_trunc($task->label, 90),
@@ -1341,14 +1364,16 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
         }
 
         $marginLeft         = $this->marge_gauche;
-        $this->marge_gauche = $rightX;
-        $pdf->SetXY($rightX, $y + 8);
+        $this->marge_gauche = $x;
+        $pdf->SetXY($x, $y + 8);
         $this->table($pdf, [
             ['text' => $outputLangs->transnoentities('DigiriskSynthesisDeadline'), 'align' => 'C'],
             $outputLangs->transnoentities('Label'),
             ['text' => $outputLangs->transnoentities('DigiriskProgress'), 'align' => 'C']
-        ], $rows, [$rightW * 0.18, $rightW * 0.67, $rightW * 0.15], $size - 1);
+        ], $rows, [$width * 0.18, $width * 0.67, $width * 0.15], $size - 1);
         $this->marge_gauche = $marginLeft;
+
+        return $pdf->GetY();
     }
 
     /**

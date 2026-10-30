@@ -1718,8 +1718,10 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
 
         $this->taskResponsibles = $this->loadTaskResponsibles($riskTasks);
 
-        // Sans choix explicite la photo reste affichee : le formulaire n'est pas toujours poste
-        $this->showPhoto = !isset($moreParam['showPhoto']) || !empty($moreParam['showPhoto']);
+        // Sans choix explicite la photo reste affichee : le formulaire n'est pas toujours poste.
+        // Une colonne Photo vide sur tout le document ne sert a rien : elle n'est imprimee que si
+        // une evaluation du perimetre porte une photo, et rend sa largeur a la description sinon
+        $this->showPhoto = (!isset($moreParam['showPhoto']) || !empty($moreParam['showPhoto'])) && $this->perimeterHasPhoto($riskLevels, $digiriskElements);
         $this->taskOptions = $this->resolveTaskOptions($moreParam);
 
         $header = [
@@ -1824,6 +1826,26 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         }
 
         return $cells;
+    }
+
+    /**
+     * Une evaluation au moins, parmi les risques du perimetre, porte-t-elle une photo ?
+     *
+     * @param  array $riskLevels       Risques par niveau de cotation
+     * @param  array $digiriskElements Elements du perimetre, par identifiant
+     * @return bool                    Vrai des qu'une photo est lisible
+     */
+    protected function perimeterHasPhoto(array $riskLevels, array $digiriskElements): bool
+    {
+        foreach ($riskLevels as $riskLines) {
+            foreach ($riskLines as $riskLine) {
+                if (!empty($digiriskElements[$riskLine->fk_element]) && dol_strlen($this->riskAssessmentPhotoPath($riskLine))) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

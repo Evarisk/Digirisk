@@ -116,7 +116,7 @@ class pdf_riskassessmentdocumentguide extends ModelePDFDigiriskDolibarrDocument
         // Les modeles PDF du document unique ecrivent dans le meme repertoire que le gabarit
         // ODT : le nom du document est ce qui les distingue dans la liste des fichiers
         $moreParam['hideTemplateName'] = 1;
-        $moreParam['documentName']     = 'ModeEmploi_';
+        $moreParam['documentName']     = $outputLangs->transnoentities('DigiriskGuideFileName') . '_';
         $object->module                = $this->module;
 
         $refOrig = $object->ref;
