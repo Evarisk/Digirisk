@@ -58,6 +58,13 @@ const DIGIRISK_RISK_OVERVIEW_TOOLTIP_RISKS = 5;
 const DIGIRISK_RISK_OVERVIEW_TOOLTIP_TICKETS = 5;
 
 /**
+ * Statuses of a ticket still open (Ticket::STATUS_*: not read, read, assigned, in progress, need more
+ * information, waiting): the register tab only counts them unless the visitor asks for the closed and
+ * cancelled ones (8 and 9).
+ */
+const DIGIRISK_RISK_OVERVIEW_OPEN_TICKET_STATUSES = [0, 1, 2, 3, 5, 7];
+
+/**
  * Wrong PIN codes checked within DIGIRISK_RISK_OVERVIEW_PIN_LOCK_DELAY seconds, every visitor together:
  * beyond, no code is checked until the oldest one is out of the delay, so that a code of 4 digits
  * cannot be tried out one by one.
@@ -244,18 +251,103 @@ function digiriskRiskOverviewElementUrl(int $elementId, int $category = -1): str
 }
 
 /**
+ * Filters of the register tab, read from the URL: by default only the open tickets, whatever their date.
+ *
+ * @return array closed (whether the closed and cancelled tickets count), start and end (timestamps of the
+ *               first and last day of the creation dates, null for no bound), from and to (the same days
+ *               as YYYY-MM-DD, for the form)
+ */
+function digiriskRiskOverviewRegisterFilters(): array
+{
+    $filters = ['closed' => GETPOSTINT('register_closed') > 0, 'start' => null, 'end' => null, 'from' => '', 'to' => ''];
+
+    $days = [];
+    foreach (['from', 'to'] as $bound) {
+        $day = GETPOST('register_' . $bound, 'alphanohtml');
+        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $day, $parts) && checkdate((int) $parts[2], (int) $parts[3], (int) $parts[1])) {
+            $days[$bound] = [(int) $parts[1], (int) $parts[2], (int) $parts[3], $day];
+        }
+    }
+    // Two days given the wrong way round still make a period
+    if (isset($days['from'], $days['to']) && $days['from'][3] > $days['to'][3]) {
+        $days = ['from' => $days['to'], 'to' => $days['from']];
+    }
+    if (isset($days['from'])) {
+        $filters['start'] = dol_mktime(0, 0, 0, $days['from'][1], $days['from'][2], $days['from'][0]);
+        $filters['from']  = $days['from'][3];
+    }
+    if (isset($days['to'])) {
+        $filters['end'] = dol_mktime(23, 59, 59, $days['to'][1], $days['to'][2], $days['to'][0]);
+        $filters['to']  = $days['to'][3];
+    }
+
+    return $filters;
+}
+
+/**
+ * URL parameters of the filters of the register tab, kept by the export and the reset.
+ *
+ * @param  array $filters Filters of digiriskRiskOverviewRegisterFilters()
+ * @return array          register_closed, register_from, register_to when set
+ */
+function digiriskRiskOverviewRegisterFilterParams(array $filters): array
+{
+    return array_filter([
+        'register_closed' => $filters['closed'] ? 1 : '',
+        'register_from'   => $filters['from'],
+        'register_to'     => $filters['to'],
+    ], function ($value): bool {
+        return $value !== '';
+    });
+}
+
+/**
+ * What the filters of the register tab keep, for the legend of the page and of the Excel sheet.
+ *
+ * @param  array  $filters Filters of digiriskRiskOverviewRegisterFilters()
+ * @return string          "Tickets ouverts uniquement, créés du 01/01/2026 au 30/10/2026"
+ */
+function digiriskRiskOverviewRegisterFilterLabel(array $filters): string
+{
+    global $langs;
+
+    $label = $langs->transnoentities($filters['closed'] ? 'RiskOverviewRegisterFilterAll' : 'RiskOverviewRegisterFilterOpen');
+    if ($filters['start'] !== null && $filters['end'] !== null) {
+        $label .= ', ' . $langs->transnoentities('RiskOverviewRegisterFilterPeriod', dol_print_date($filters['start'], 'day'), dol_print_date($filters['end'], 'day'));
+    } elseif ($filters['start'] !== null) {
+        $label .= ', ' . $langs->transnoentities('RiskOverviewRegisterFilterSince', dol_print_date($filters['start'], 'day'));
+    } elseif ($filters['end'] !== null) {
+        $label .= ', ' . $langs->transnoentities('RiskOverviewRegisterFilterUntil', dol_print_date($filters['end'], 'day'));
+    }
+
+    return $label;
+}
+
+/**
  * Ticket list of a groupment or work unit in the application (its register tab), the latest first:
- * where a number of the register tab leads. Only a user logged in to Dolibarr reaches it.
+ * where a number of the register tab leads, filtered as the tab so that it holds what the number
+ * counts. Only a user logged in to Dolibarr reaches it.
  *
  * @param  int    $elementId   Groupment or work unit
  * @param  array  $categoryIds Ticket categories the list is filtered on, any of them; empty for every ticket
+ * @param  array  $filters     Filters of digiriskRiskOverviewRegisterFilters(), empty for none
  * @return string              URL of digiriskelement_register.php
  */
-function digiriskRiskOverviewRegisterUrl(int $elementId, array $categoryIds = []): string
+function digiriskRiskOverviewRegisterUrl(int $elementId, array $categoryIds = [], array $filters = []): string
 {
     $params = ['id' => $elementId];
     if (!empty($categoryIds)) {
         $params['search_categories_filter'] = array_values(array_map('intval', $categoryIds));
+    }
+    if (!empty($filters) && empty($filters['closed'])) {
+        $params['search_fk_statut'] = implode(',', DIGIRISK_RISK_OVERVIEW_OPEN_TICKET_STATUSES);
+    }
+    foreach (['start' => 'dtstart', 'end' => 'dtend'] as $bound => $suffix) {
+        if (!empty($filters[$bound])) {
+            $params['search_datec_' . $suffix . 'day']   = dol_print_date($filters[$bound], '%d');
+            $params['search_datec_' . $suffix . 'month'] = dol_print_date($filters[$bound], '%m');
+            $params['search_datec_' . $suffix . 'year']  = dol_print_date($filters[$bound], '%Y');
+        }
     }
 
     return dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_register.php', 1) . '?' . http_build_query($params);
@@ -344,13 +436,15 @@ function digiriskRiskOverviewRegisterColumns(DoliDB $db): array
  * @param  DoliDB $db              Database handler
  * @param  array  $rows            Rows of digiriskRiskOverviewRows()
  * @param  array  $registerColumns Columns of digiriskRiskOverviewRegisterColumns()
+ * @param  array  $filters         Filters of digiriskRiskOverviewRegisterFilters(): the open tickets only
+ *                                 unless closed, created within start and end; empty for every ticket
  * @return array                   The rows, each with tickets: total, unregistered (the tickets of no
  *                                 register), registers (id => count, subs (id => count), direct (the
  *                                 tickets of no subcategory)) and list (each ticket for the tooltips:
  *                                 ref, date, status, severity, subject, categories; neither its message
  *                                 nor who declared it)
  */
-function digiriskRiskOverviewAddTickets(DoliDB $db, array $rows, array $registerColumns): array
+function digiriskRiskOverviewAddTickets(DoliDB $db, array $rows, array $registerColumns, array $filters = []): array
 {
     $rowIndexes = [];
     foreach ($rows as $index => $row) {
@@ -364,6 +458,15 @@ function digiriskRiskOverviewAddTickets(DoliDB $db, array $rows, array $register
     $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie_ticket as ct ON ct.fk_ticket = t.rowid';
     $sql .= ' WHERE t.entity IN (' . getEntity('ticket') . ')';
     $sql .= " AND ef.digiriskdolibarr_ticket_service IS NOT NULL AND ef.digiriskdolibarr_ticket_service <> ''";
+    if (!empty($filters) && empty($filters['closed'])) {
+        $sql .= ' AND t.fk_statut IN (' . implode(',', DIGIRISK_RISK_OVERVIEW_OPEN_TICKET_STATUSES) . ')';
+    }
+    if (!empty($filters['start'])) {
+        $sql .= " AND t.datec >= '" . $db->idate($filters['start']) . "'";
+    }
+    if (!empty($filters['end'])) {
+        $sql .= " AND t.datec <= '" . $db->idate($filters['end']) . "'";
+    }
     $resql = $db->query($sql);
 
     $tickets = [];
@@ -471,19 +574,22 @@ function digiriskRiskOverviewCategoryColumns(string $tab): array
 /**
  * Columns of the psychosocial tab: the factors F1 to F6.
  *
- * @param  array $rpsSubCategories Psychosocial factors, by position
- * @return array                   Columns: position, name, factor key (F1...)
+ * @param  array          $rpsSubCategories Psychosocial factors, by position
+ * @param  Translate|null $outputLangs      Language of the generated document, the user language when null
+ * @return array                            Columns: position, name, factor key (F1...)
  */
-function digiriskRiskOverviewFactorColumns(array $rpsSubCategories): array
+function digiriskRiskOverviewFactorColumns(array $rpsSubCategories, $outputLangs = null): array
 {
     global $langs;
+
+    $labelLangs = $outputLangs ?? $langs;
 
     $columns = [];
     foreach ($rpsSubCategories as $position => $subCategory) {
         $columns[(int) $position] = [
             'position'  => (int) $position,
-            'name'      => $langs->transnoentities($subCategory['label']),
-            'shortName' => $langs->transnoentities($subCategory['label']),
+            'name'      => $labelLangs->transnoentities($subCategory['label']),
+            'shortName' => $labelLangs->transnoentities($subCategory['label']),
             'factor'    => 'F' . ((int) $position + 1),
         ];
     }
@@ -804,24 +910,26 @@ function digiriskRiskOverviewRows(DoliDB $db, array $activeDigiriskElementList, 
  * Format a psychosocial level or average for a cell: always one decimal, so that a level and an
  * average read alike in the column.
  *
- * @param  float  $value Level or average from 1 to 4
- * @return string        "2,5", "3,0"
+ * @param  float          $value       Level or average from 1 to 4
+ * @param  Translate|null $outputLangs Language of the generated document, the user language when null
+ * @return string                      "2,5", "3,0"
  */
-function digiriskRiskOverviewFormatLevel(float $value): string
+function digiriskRiskOverviewFormatLevel(float $value, $outputLangs = null): string
 {
-    return price(round($value, 1), 0, '', 0, 1, 1);
+    return price(round($value, 1), 0, $outputLangs ?? '', 0, 1, 1);
 }
 
 /**
  * Send the overview as an Excel workbook, laid out as the single document presentation workbook: one
  * sheet per tab the setup shows, one row per groupment and work unit, the cells coloured as on the page.
  *
- * @param  array $overviewRows     Rows of digiriskRiskOverviewRows()
- * @param  array $overviewColumns  Columns of each tab, by tab
- * @param  array $rpsScale         Psychosocial levels, for the legend
+ * @param  array  $overviewRows        Rows of digiriskRiskOverviewRows()
+ * @param  array  $overviewColumns     Columns of each tab, by tab
+ * @param  array  $rpsScale            Psychosocial levels, for the legend
+ * @param  string $registerFilterLabel What the filters of the register tab keep, under its legend
  * @return void
  */
-function digiriskRiskOverviewExportXlsx(array $overviewRows, array $overviewColumns, array $rpsScale): void
+function digiriskRiskOverviewExportXlsx(array $overviewRows, array $overviewColumns, array $rpsScale, string $registerFilterLabel = ''): void
 {
     global $langs, $mysoc;
 
@@ -936,6 +1044,10 @@ function digiriskRiskOverviewExportXlsx(array $overviewRows, array $overviewColu
         $rowIndex += 2;
         $legendTexts = ['risk' => 'RiskOverviewLegendRisks', 'penibility' => 'RiskOverviewLegendRisks', 'rps' => 'RiskOverviewLegendPsychosocial', 'register' => 'RiskOverviewLegendRegisters'];
         $sheet->setCellValue($cellName(1, $rowIndex), $langs->transnoentities($legendTexts[$tab]));
+        if ($tab == 'register' && $registerFilterLabel !== '') {
+            $rowIndex++;
+            $sheet->setCellValue($cellName(1, $rowIndex), $langs->transnoentities('RiskOverviewRegisterFilterShown', $registerFilterLabel));
+        }
         $legend = [];
         if ($tab != 'register') {
             foreach (($tab == 'rps' ? $rpsLevelColours : $levelColours) as $level => $colours) {

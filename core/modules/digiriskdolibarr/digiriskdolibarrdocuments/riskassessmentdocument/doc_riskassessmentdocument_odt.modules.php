@@ -497,7 +497,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
                                 }
                             }
 
-                            $tmpArray[$scaleTagBySubCategory[$subCategoryPosition]] = $risk->getDangerSubCategoryScaleLabel($lastRiskAssessmentCotation);
+                            $tmpArray[$scaleTagBySubCategory[$subCategoryPosition]] = $risk->getDangerSubCategoryScaleLabel($lastRiskAssessmentCotation, $outputLangs);
 
                             if ($lastRiskAssessmentDate > $lastElementAssessmentDate) {
                                 $lastElementAssessmentDate = $lastRiskAssessmentDate;
@@ -567,7 +567,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
         $rpsSubCategories = [];
         require __DIR__ . '/../../../../tpl/riskanalysis/risk/digiriskdolibarr_rps_scope_data.tpl.php';
 
-        $factorColumns = digiriskRiskOverviewFactorColumns($rpsSubCategories);
+        $factorColumns = digiriskRiskOverviewFactorColumns($rpsSubCategories, $outputLangs);
 
         // The value goes into the document as it is: odtphp decodes entities before writing it, so it
         // must not hold any, the level or NC never does
@@ -577,7 +577,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
                 $text  = $outputLangs->transnoentities('RiskOverviewNotConcerned');
             } else {
                 $style = 'RPS_20_niveau_20_' . (int) $cell['scale'];
-                $text  = digiriskRiskOverviewFormatLevel((float) $cell['value']);
+                $text  = digiriskRiskOverviewFormatLevel((float) $cell['value'], $outputLangs);
             }
             return '<text:span text:style-name="' . $style . '">' . "\u{00A0}" . $text . "\u{00A0}" . '</text:span>';
         };
