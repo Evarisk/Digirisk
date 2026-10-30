@@ -206,12 +206,9 @@ class doc_ticketdocument_odt extends SaturneDocumentModel
         if (!empty($contactListInternal) && is_array($contactListInternal)) {
             $contactList = array_merge($contactList, $contactListInternal);
         }
-        if (!empty($contactList) && is_array($contactList)) {
-            foreach ($contactList as $contact) {
-                $tmpArray['contacts'] .= dol_strtoupper($contact['lastname']) . ' ' . ucfirst($contact['firstname']) . ', ';
-            }
-        } else {
-            $tmpArray['contacts'] = '';
+        $tmpArray['contacts'] = '';
+        foreach ($contactList as $contact) {
+            $tmpArray['contacts'] .= dol_strtoupper($contact['lastname']) . ' ' . ucfirst($contact['firstname']) . ', ';
         }
 
         $signatory   = new SaturneSignature($this->db);
