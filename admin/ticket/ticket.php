@@ -233,7 +233,12 @@ if ($action == 'generateCategories') {
 			setEventMessages($category->error, array(), 'errors');
 		}
 
-		createTicketCategory($langs->transnoentities('DGI'), '', 'E96A6A', 1, 'ticket', $result,'pictogramme_Danger-grave-et-imminent_32px.png');
+		$resultDGI = createTicketCategory($langs->transnoentities('DGI'), '', 'E96A6A', 1, 'ticket', $result,'pictogramme_Danger-grave-et-imminent_32px.png');
+
+		// The serious and imminent danger register comes with its own mail template - issue #5282
+		if ($resultDGI > 0) {
+			digiriskdolibarr_ticket_set_category_mail_template((int) $resultDGI, '(TicketSeriousImminentDangerMail)');
+		}
 
 		$result4 = createTicketCategory($langs->transnoentities('Quality'), '', 'FFDF77', 1, 'ticket', $result,'pictogramme_Qualité_32px.png');
 

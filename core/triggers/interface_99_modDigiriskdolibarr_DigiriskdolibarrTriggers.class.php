@@ -124,7 +124,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
         // Allowed triggers are a list of trigger from other module that should activate this file
 		if (!isModEnabled('digiriskdolibarr') || !$active) {
-			$allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE', 'TICKET_PUBLIC_INTERFACE_CREATE', 'TICKET_SIGN', 'SATURNE_SIGNATURE_SIGN', 'SATURNE_SIGNATURE_SIGN_PUBLIC', 'PRODUCT_CREATE'];
+			$allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_PUBLIC_INTERFACE_CREATE', 'TICKET_SIGN', 'SATURNE_SIGNATURE_SIGN', 'SATURNE_SIGNATURE_SIGN_PUBLIC', 'PRODUCT_CREATE'];
             if (!in_array($action, $allowedTriggers)) {
                 return 0;  // If module is not enabled or trigger is deactivated, we do nothing
             }
@@ -448,15 +448,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$result = $actioncomm->create($user);
 				break;
 
-			case 'TICKET_CREATE' :
-				// Only send this notification for tickets submitted through the DigiRisk public interface.
-				// TICKET_CREATE is fired by Dolibarr core on every ticket creation (back-office, API, ...),
-				// but the email below is built solely from public-interface extrafields.
-				if (getDolGlobalInt('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT') && !empty($object->context['digiriskdolibarrpublicinterface'])) {
-					$this->sendTicketSubmittedMail($object, $user, $langs);
-				}
-				break;
-
 			case 'TICKET_SIGN':
 				$actioncomm->elementtype = 'ticket';
 				$actioncomm->label = $langs->transnoentities('ObjectSignedTrigger', $langs->transnoentities(get_class($object)), $object->ref);
@@ -465,9 +456,16 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
             case 'TICKET_PUBLIC_INTERFACE_CREATE' :
+                // Sent here and no longer on TICKET_CREATE - issue #5282 : the public form links the
+                // categories of the ticket only once it is created, so __TICKET_TAGS__ came out empty
+                if (getDolGlobalInt('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT')) {
+                    $this->sendTicketSubmittedMail($object, $user, $langs);
+                }
+
                 dol_include_once('/saturne/class/saturnemail.class.php');
 
-                $categories = $object->getCategoriesCommon('ticket');
+                $substitutions = null;
+                $categories    = $object->getCategoriesCommon('ticket');
                 if (is_array($categories) && !empty($categories)) {
                     $category = new Categorie($this->db);
                     foreach ($categories as $categoryID) {
@@ -486,6 +484,15 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
                                 continue;
                             }
 
+                            // The template of a category used to leave as typed, __TICKET_*__ keys and
+                            // __(Key)__ translations included - issue #5282. It gets the substitutions of
+                            // the declaration mail, built once for all the categories of the ticket
+                            if ($substitutions === null) {
+                                $substitutions = $this->ticketSubmittedSubstitutions($object, $langs);
+                            }
+                            $mailSubject = make_substitutions((string) $saturneMail->topic, $substitutions, $langs);
+                            $mailContent = make_substitutions((string) $saturneMail->content, $substitutions, $langs);
+
                             $recipients = explode(',', $categoryConfigs->recipients);
                             foreach ($recipients as $recipientID) {
                                 $userTmp = new User($this->db);
@@ -499,7 +506,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
                                     // Create form object
                                     // Send mail (substitutionarray must be done just before this)
-                                    $mailfile = new CMailFile($saturneMail->topic, $sendto, $from, $saturneMail->content, array(), array(), array(), "", "", 0, -1, '', '', $trackid, '', 'ticket');
+                                    $mailfile = new CMailFile($mailSubject, $sendto, $from, $mailContent, array(), array(), array(), "", "", 0, -1, '', '', $trackid, '', 'ticket');
                                     if ($mailfile->error) {
                                         setEventMessages($mailfile->error, $mailfile->errors, 'errors');
                                     } else {
@@ -520,8 +527,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
                                                 $actioncomm->elementtype   = 'ticket';
                                                 $actioncomm->label         = $langs->transnoentities('TicketCreationMailWellSent');
                                                 $actioncomm->note_private  = $langs->transnoentities('TicketCreationMailSent', $sendto) . '<br>';
-                                                $actioncomm->note_private .= $saturneMail->topic . '<br>';
-                                                $actioncomm->note_private .= $saturneMail->content;
+                                                $actioncomm->note_private .= $mailSubject . '<br>';
+                                                $actioncomm->note_private .= $mailContent;
                                                 $result = $actioncomm->create($user);
                                             }
                                         }
@@ -1159,7 +1166,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
     }
 
     /**
-     * Substitutions offertes au modele d'email du mail de declaration.
+     * Substitutions offertes au modele d'email du mail de declaration, et depuis #5282 a celui que
+     * porte la categorie du ticket.
      *
      * Les cles __TICKET_* reprennent celles du socle pour les mails de ticket, completees des
      * champs propres au formulaire de declaration. Le GP/UT est un chkbxlst : une declaration
@@ -1198,8 +1206,34 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
         $substitutions['__TICKET_DECLARANT__']        = trim(dol_strtoupper($lastname) . ' ' . $firstname);
         $substitutions['__TICKET_DECLARATION_DATE__'] = !empty($date) ? dol_print_date($date, 'daytext', 'tzuser', $langs) : '';
         $substitutions['__TICKET_LOCATION__']         = (string) ($object->array_options['options_digiriskdolibarr_ticket_location'] ?? '');
+        $substitutions['__TICKET_TAGS__']             = $this->ticketTags($object);
         $substitutions['__TICKET_MANAGEMENT_URL__']   = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/view/ticket/ticket_card.php?id=' . $object->id;
 
         return $substitutions;
+    }
+
+    /**
+     * Libelles des tags du ticket, separes par des virgules - issue #5282
+     *
+     * Meme cle et meme rendu que le socle dans ses mails de ticket. C'est elle qui permet a un
+     * modele de nommer le registre, « Danger grave et imminent » compris : le __TICKET_CATEGORY__
+     * du socle rend le dictionnaire c_ticket_category, pas les tags.
+     *
+     * @param  CommonObject $object Ticket declare
+     * @return string               Libelles, vide quand le ticket n'en porte aucun
+     */
+    protected function ticketTags($object): string
+    {
+        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+
+        $category = new Categorie($this->db);
+
+        // containing() rend l'entier -1 sur erreur SQL
+        $labels = $category->containing($object->id, Categorie::TYPE_TICKET, 'label');
+        if (!is_array($labels)) {
+            return '';
+        }
+
+        return implode(', ', $labels);
     }
 }

@@ -858,11 +858,71 @@ function digiriskdolibarr_ticket_mail_models(): array
         if (empty($obj->label)) {
             continue;
         }
-        $mailModels[$obj->label] = $obj->label . (!empty($obj->lang) ? ' (' . $obj->lang . ')' : '');
+        $mailModels[$obj->label] = digiriskdolibarr_mail_template_label($obj->label) . (!empty($obj->lang) ? ' (' . $obj->lang . ')' : '');
     }
     $db->free($resql);
 
     return $mailModels;
+}
+
+/**
+ * Libellé affiché d'un modèle d'email — issue #5282
+ *
+ * Un modèle livré par un module enregistre une clé de traduction entre parenthèses, que le
+ * cœur traduit dans ses propres sélecteurs. Affichée telle quelle, « (TicketSeriousImminentDangerMail) »
+ * ne dit rien à la personne qui configure.
+ *
+ * @param  string $label Libellé enregistré du modèle
+ * @return string        Libellé à afficher
+ */
+function digiriskdolibarr_mail_template_label(string $label): string
+{
+    global $langs;
+
+    if (preg_match('/^\((.+)\)$/', $label, $matches)) {
+        return $langs->transnoentities($matches[1]);
+    }
+
+    return $label;
+}
+
+/**
+ * Pose un modèle d'email livré par le module sur une catégorie de ticket — issue #5282
+ *
+ * Seul le modèle est posé : le mail d'une catégorie ne part qu'avec des destinataires, que la
+ * personne qui configure choisit ensuite sur la configuration de cette catégorie.
+ *
+ * @param  int    $categoryId    Catégorie de ticket
+ * @param  string $templateLabel Libellé enregistré du modèle
+ * @return int                   Négatif si KO, 0 si le modèle est introuvable, positif si OK
+ */
+function digiriskdolibarr_ticket_set_category_mail_template(int $categoryId, string $templateLabel): int
+{
+    global $db, $langs, $user;
+
+    require_once DOL_DOCUMENT_ROOT . '/core/class/html.formmail.class.php';
+
+    // getEMailTemplate() rend l'entier -1 sur erreur SQL et un modèle vide quand le libellé ne
+    // correspond à rien, ce qui arrive tant que le module n'a pas été réactivé
+    $formMail     = new FormMail($db);
+    $mailTemplate = $formMail->getEMailTemplate($db, 'ticket_send', $user, $langs, 0, 1, $templateLabel);
+    if (!is_object($mailTemplate) || $mailTemplate->id <= 0) {
+        return 0;
+    }
+
+    $category = new Categorie($db);
+    if ($category->fetch($categoryId) <= 0) {
+        return -1;
+    }
+
+    $config = json_decode($category->array_options['options_ticket_category_config'] ?? '', true);
+    $config = is_array($config) ? $config : [];
+
+    $config['mail_template'] = $mailTemplate->id;
+
+    $category->array_options['options_ticket_category_config'] = json_encode($config);
+
+    return $category->updateExtraField('ticket_category_config');
 }
 
 /**

@@ -330,8 +330,6 @@ if (empty($resHook) && $publicInterfaceUsable) {
             }
         }
         if (empty($error)) {
-            // Flag the object so the TICKET_CREATE trigger knows this ticket comes from the DigiRisk public interface
-            $object->context['digiriskdolibarrpublicinterface'] = 1;
             $result = $object->create($user);
             $object->fetch($result);
             $track_id = $object->track_id;
