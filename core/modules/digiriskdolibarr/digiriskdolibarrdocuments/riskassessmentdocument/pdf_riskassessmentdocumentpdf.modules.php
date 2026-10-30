@@ -110,7 +110,7 @@ class pdf_riskassessmentdocumentpdf extends ModelePDFDigiriskDolibarrDocument
         $outputLangs->loadLangs(['main', 'companies', 'projects', 'other', 'ticket', 'digiriskdolibarr@digiriskdolibarr']);
 
         $moreParam['hideTemplateName'] = 1;
-        $moreParam['documentName']     = 'DocumentUnique_';
+        $moreParam['documentName']     = $outputLangs->transnoentities('DigiriskDuFileName') . '_';
         $object->module                = $this->module;
 
         $refOrig = $object->ref;
@@ -610,7 +610,7 @@ class pdf_riskassessmentdocumentpdf extends ModelePDFDigiriskDolibarrDocument
 
         $pdf->Ln(4);
         $this->sectionTitle($pdf, $outputLangs->transnoentities('DigiriskDuByFamily'), $size, 50);
-        $this->table($pdf, array_merge(['', $outputLangs->transnoentities('DangerCategory'), ['text' => '%', 'align' => 'C'], ['text' => $outputLangs->transnoentities('DigiriskDuCount'), 'align' => 'C']], $this->levelHeaders($outputLangs)),
+        $this->table($pdf, array_merge(['', $outputLangs->transnoentities('DigiriskDuDangerFamily'), ['text' => '%', 'align' => 'C'], ['text' => $outputLangs->transnoentities('DigiriskDuCount'), 'align' => 'C']], $this->levelHeaders($outputLangs)),
             $rows, array_merge([$width * 0.07, $width * 0.33, $width * 0.11, $width * 0.09], array_fill(0, 4, $width * 0.10)), $size - 0.5);
 
         $this->dashboardPsychosocial($pdf, $outputLangs, $size, $stats);
