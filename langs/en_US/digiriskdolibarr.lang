@@ -2216,6 +2216,9 @@ NoRecipientFound = No recipient found
 
 AddFile = Add file
 AttachTicketFiles = Attach ticket files
+SendTicketFilesAsShareLinks = Send as download links
+SendTicketFilesAsShareLinksHelp = The picked files are not attached to the email: it holds a public download link for each of them instead. The link stays active until the share is removed from the file list of the ticket.
+TicketFilesShareLinksTitle = Files to download:
 
 MentionAgents = Mention agents
 YouWereMentionedOnTicket = You were mentioned on ticket %s

@@ -719,10 +719,18 @@ class ActionsDigiriskdolibarr
                         $selectedTicketFiles[] = dol_escape_htmltag($ticketFile['name']);
                     }
 
-                    $pictoDigirisk = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
                     print '<table style="display: none;"><tr class="email_line" id="digirisk_ticket_linked_files">';
-                    print '<td>' . $pictoDigirisk . $langs->trans('AttachTicketFiles') . '</td>';
-                    print '<td>' . Form::multiselectarray('linked_files', $ticketFilesOptions, $selectedTicketFiles, 0, 0, '', 0, '100%', '', '', $langs->trans('AttachTicketFiles')) . '</td>';
+                    print '<td><span class="fas fa-paperclip pictofixedwidth"></span>' . $langs->trans('AttachTicketFiles') . '</td>';
+                    print '<td>' . Form::multiselectarray('linked_files', $ticketFilesOptions, $selectedTicketFiles, 0, 0, '', 0, '100%', '', '', $langs->trans('AttachTicketFiles'));
+                    // A download link makes the file public: as the "Share" box of the file list, for who can edit the ticket
+                    if ($user->hasRight('ticket', 'write')) {
+                        if (!is_object($form)) {
+                            $form = new Form($db);
+                        }
+                        print '<div class="paddingtop"><input type="checkbox" name="linked_files_as_links" id="linked_files_as_links" value="1"' . (GETPOSTINT('linked_files_as_links') ? ' checked' : '') . '> ';
+                        print '<label for="linked_files_as_links">' . $langs->trans('SendTicketFilesAsShareLinks') . '</label> ' . $form->textwithpicto('', $langs->trans('SendTicketFilesAsShareLinksHelp')) . '</div>';
+                    }
+                    print '</td>';
                     print '</tr></table>'; ?>
                     <script>
                         (function () {
@@ -1057,6 +1065,8 @@ class ActionsDigiriskdolibarr
      * Runs Ticket::newMessage() as ticket/card.php does, on a TicketLinkedFilesMailer that adds the picked
      * files to every mail sent. Left to the standard code when no file is picked, when no mail is asked
      * for, or when the message is empty: newMessage() stops on its own check and the form comes back filled.
+     * Sent as download links (#4650), the files need no help: their links are added at the end of the posted
+     * message, and the standard code sends it.
      *
      * @param  Ticket $object Ticket of the card
      * @return int            0 when left to the standard code, 1 when done here
@@ -1074,6 +1084,16 @@ class ActionsDigiriskdolibarr
 
         $linkedFiles = digiriskdolibarr_ticket_linked_files($object, GETPOST('linked_files', 'array') ?: []);
         if (empty($linkedFiles)) {
+            return 0;
+        }
+
+        if (GETPOSTINT('linked_files_as_links') && $user->hasRight('ticket', 'write')) {
+            $message = GETPOST('message', 'restricthtml');
+            // newMessage() turns a text message into HTML only when it holds no HTML: the links would make it skip that
+            if (!dol_textishtml($message)) {
+                $message = dol_nl2br($message);
+            }
+            $_POST['message'] = $message . digiriskdolibarr_ticket_files_share_block($linkedFiles, digiriskdolibarr_ticket_files_share_links($object, $linkedFiles));
             return 0;
         }
 

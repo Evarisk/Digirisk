@@ -280,10 +280,17 @@ if ($action === 'post_message_ajax' && $permissionToWrite) {
         exit;
     }
     $object->fetch($id);
+    $willMail = (!$private && (!empty($toList) || !empty($ccList)));
+    // Files of the ticket picked in the composer (#4650): attached to the mail, or sent as download links. The
+    // links go in the message itself, so the thread keeps them.
+    $linkedFiles      = $willMail ? digiriskdolibarr_ticket_linked_files($object, GETPOST('linked_files', 'array') ?: []) : [];
+    $linkedFilesLinks = !empty($linkedFiles) && GETPOSTINT('linked_files_as_links');
+    if ($linkedFilesLinks) {
+        $body .= digiriskdolibarr_ticket_files_share_block($linkedFiles, digiriskdolibarr_ticket_files_share_links($object, $linkedFiles));
+    }
     $object->subject = $subject ?: ($object->subject ?? '');
     $object->message = $body;
     $object->private = $private;
-    $willMail = (!$private && (!empty($toList) || !empty($ccList)));
     $newMsgId = $object->createTicketMessage($user, 0, [], [], [], $willMail);
     if (!$newMsgId || $newMsgId <= 0) {
         header('Content-Type: application/json');
@@ -390,13 +397,13 @@ if ($action === 'post_message_ajax' && $permissionToWrite) {
             $mailBody  = ($intro !== '' ? $intro . '<br><br>' : '') . $mailBodyInner . '<br><br>'
                 . $langs->transnoentities('TicketNotificationEmailBodyInfosTrackUrlinternal') . ' : <a href="' . $urlTicket . '">' . $object->track_id . '</a>'
                 . (!empty($signature) ? '<br><br>' . $signature : '');
-            // Files of the ticket picked in the composer (#4650): they already live in the ticket directory,
+            // Files of the ticket attached to the mail (#4650): they already live in the ticket directory,
             // they only travel with the mail.
             $mailFileList    = $fileNameList;
             $mailMimeList    = $mimeTypeList;
             $mailFileNames   = $mimeFileNameList;
             $linkedFileNames = [];
-            foreach (digiriskdolibarr_ticket_linked_files($object, GETPOST('linked_files', 'array') ?: []) as $ticketFile) {
+            foreach ($linkedFilesLinks ? [] : $linkedFiles as $ticketFile) {
                 // A file uploaded under the same name has just replaced it: already in the list.
                 if (!in_array($ticketFile['name'], $mailFileNames, true)) {
                     $mailFileList[]    = $ticketFile['fullname'];
@@ -1417,6 +1424,7 @@ if ($permissionToWrite) {
         print '<div class="dtc-composer__linked-files">';
         print '<span class="dtc-recipients__label" title="' . dol_escape_htmltag($langs->trans('AttachTicketFiles')) . '"><i class="fas fa-paperclip"></i></span>';
         print $form->multiselectarray('dtc_linked_files', $convTicketFiles, [], 0, 0, 'dtc-linked-files-select', 0, '100%', '', '', $langs->trans('AttachTicketFiles'));
+        print '<label class="dtc-composer__share-links" title="' . dol_escape_htmltag($langs->trans('SendTicketFilesAsShareLinksHelp')) . '"><input type="checkbox" id="dtc_linked_files_as_links" value="1"><i class="fas fa-link"></i>' . $langs->trans('SendTicketFilesAsShareLinks') . '</label>';
         print '</div>';
     }
     print '</div>';

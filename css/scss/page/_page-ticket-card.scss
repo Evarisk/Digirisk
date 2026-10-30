@@ -735,7 +735,16 @@ $dtc-title:       #111827;
         gap: 6px;
         padding: 5px 0;
 
+        .dtc-recipients__label { color: $dtc-blue; font-size: 1.05em; }
         .multiselectarraydtc_linked_files { flex: 1; min-width: 0; }
+    }
+    .dtc-composer__share-links {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+        font-size: 0.85em;
+        cursor: pointer;
     }
 
     // ---- Composer: attachments ----

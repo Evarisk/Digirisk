@@ -1044,3 +1044,74 @@ function digiriskdolibarr_ticket_linked_files(Ticket $ticket, array $names): arr
 
     return array_values($linkedFiles);
 }
+
+/**
+ * Public download links of files of the ticket, to send them by mail instead of attaching them (#4650)
+ *
+ * Each file gets the share key of the core (llx_ecm_files.share, the "Share" box of the file list), created
+ * when missing, along with the index of the file when it has none. The link stays valid until the share is
+ * removed from that list.
+ *
+ * @param  Ticket $ticket Ticket the files belong to
+ * @param  array  $files  dol_dir_list() entries, from digiriskdolibarr_ticket_linked_files()
+ * @return array          Links keyed by file name; a file whose index could not be written is left out
+ */
+function digiriskdolibarr_ticket_files_share_links(Ticket $ticket, array $files): array
+{
+    global $db, $dolibarr_main_url_root, $user;
+
+    require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+    require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
+    require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmfiles.class.php';
+
+    // As the file list of the core: the address of the configuration file, not the one of the current request
+    $urlWithoutUrlRoot = preg_replace('/' . preg_quote(DOL_URL_ROOT, '/') . '$/i', '', trim($dolibarr_main_url_root));
+    $urlWithRoot       = $urlWithoutUrlRoot . DOL_URL_ROOT;
+
+    $links = [];
+    foreach ($files as $file) {
+        // The index keeps the directory relative to the documents root, entity included ("2/ticket/..."),
+        // computed as addFileIntoDatabaseIndex() does
+        $relativePath = ltrim(preg_replace('/^' . preg_quote(DOL_DATA_ROOT, '/') . '/', '', $file['path']), '/\\') . '/' . $file['name'];
+
+        $ecmFile = new EcmFiles($db);
+        if ($ecmFile->fetch(0, '', $relativePath) <= 0) {
+            if (addFileIntoDatabaseIndex($file['path'], $file['name'], $file['name'], 'uploaded', 1, $ticket) <= 0 || $ecmFile->fetch(0, '', $relativePath) <= 0) {
+                dol_syslog('digiriskdolibarr_ticket_files_share_links: no index for ' . $file['fullname'], LOG_WARNING);
+                continue;
+            }
+        }
+        if (empty($ecmFile->share)) {
+            $ecmFile->share = getRandomPassword(true);
+            if ($ecmFile->update($user) <= 0) {
+                dol_syslog('digiriskdolibarr_ticket_files_share_links: share key not saved for ' . $file['fullname'] . ': ' . $ecmFile->error, LOG_WARNING);
+                continue;
+            }
+        }
+
+        $links[$file['name']] = $urlWithRoot . '/document.php?hashp=' . $ecmFile->share;
+    }
+
+    return $links;
+}
+
+/**
+ * List of download links to put at the end of a ticket message (#4650)
+ *
+ * @param  array $files Files of the ticket, dol_dir_list() entries
+ * @param  array $links Links keyed by file name, from digiriskdolibarr_ticket_files_share_links()
+ * @return string       HTML block, empty when no file has a link
+ */
+function digiriskdolibarr_ticket_files_share_block(array $files, array $links): string
+{
+    global $langs;
+
+    $items = '';
+    foreach ($files as $file) {
+        if (!empty($links[$file['name']])) {
+            $items .= '<li><a href="' . dol_escape_htmltag($links[$file['name']]) . '">' . dol_escape_htmltag($file['name']) . '</a> (' . dol_print_size($file['size'], 1, 1) . ')</li>';
+        }
+    }
+
+    return $items === '' ? '' : '<p><b>' . $langs->transnoentities('TicketFilesShareLinksTitle') . '</b></p><ul>' . $items . '</ul>';
+}
