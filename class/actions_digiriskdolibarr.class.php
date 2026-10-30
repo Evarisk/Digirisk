@@ -527,14 +527,16 @@ class ActionsDigiriskdolibarr
                 </script>
                 <?php
 
-                if (!empty($object->array_options['options_digiriskdolibarr_ticket_service'])) {
+                // Not while the GP/UT is being edited: rewriting the cell would wipe its edit form
+                $isEditingService = GETPOST('action') == 'edit_extras' && GETPOST('attribute') == 'digiriskdolibarr_ticket_service';
+                if (!empty($object->array_options['options_digiriskdolibarr_ticket_service']) && !$isEditingService) {
                     $digiriskelement    = new DigiriskElement($db);
                     $res = $digiriskelement->fetch((int)$object->array_options['options_digiriskdolibarr_ticket_service']);
                     if ($res > 0) {
                         $outDigiriskElement = $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
                         ?>
                         <script>
-                            jQuery('td[id*="digiriskdolibarr_ticket_service"]').html('<?= $outDigiriskElement ?>');
+                            jQuery('td[id*="digiriskdolibarr_ticket_service"]').html(<?php echo json_encode($outDigiriskElement); ?>);
                         </script>
                         <?php
                     }
