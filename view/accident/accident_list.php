@@ -347,12 +347,7 @@ if ($fromId > 0) {
     }
 }
 
-// Excel export of the list, with its filters and its sort
-if ($xlsxExportAvailable) {
-    dol_include_once('/saturne/class/saturnexlsxexport.class.php');
-    $newCardButton = SaturneXlsxExport::getListExportButton($formMoreParams);
-}
-
+// The Excel export button is printed by the list header of Saturne, with the filters, the sort and $formMoreParams
 require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_build_sql_select.tpl.php');
 require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_header.tpl.php');
 require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_search_input.tpl.php');
