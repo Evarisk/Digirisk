@@ -130,15 +130,21 @@ if ($action === 'addAction' && $permissiontoadd && isset($sectionConfig[$actionT
 
     // Each section renders its own form, so field names are suffixed with the action type
     $deadlinePrefix = 'actiondeadline' . $actionType;
+    $startPrefix    = 'actionstart' . $actionType;
 
     $newTask                 = new Task($db);
     $newTask->fk_project     = $object->fk_project;
     $newTask->fk_task_parent = $containerTaskId;
     $newTask->ref            = $modTask->getNextValue(0, $newTask);
     $newTask->label          = GETPOST('action_label', 'alphanohtml');
+    $newTask->date_start     = dol_mktime(0, 0, 0, GETPOSTINT($startPrefix . 'month'), GETPOSTINT($startPrefix . 'day'), GETPOSTINT($startPrefix . 'year'));
     // Task::create() only writes date_end, the datee property is deprecated and ignored
     $newTask->date_end       = dol_mktime(23, 59, 59, GETPOSTINT($deadlinePrefix . 'month'), GETPOSTINT($deadlinePrefix . 'day'), GETPOSTINT($deadlinePrefix . 'year'));
     $newTask->progress       = 0;
+    // Left empty, the action gets no budget rather than a zero one
+    if (GETPOST('action_budget', 'alpha') !== '') {
+        $newTask->budget_amount = (float) price2num(GETPOST('action_budget', 'alpha'));
+    }
 
     $newTask->array_options['options_digirisk_action_type'] = $actionType;
 

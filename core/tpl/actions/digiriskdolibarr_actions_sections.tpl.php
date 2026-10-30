@@ -24,7 +24,7 @@
  *
  * Rendered by view/accidentinvestigation/accidentinvestigation_actions.php and view/ticket/ticket_actions.php
  * (inherits their scope). Expects:
- *   $db, $form, $langs
+ *   $conf, $db, $form, $langs
  *   $sectionConfig        array  Title and add-button keys of each type of action: [type => [titleKey, addKey]]
  *   $actionsByType        array  Actions of each type, from digiriskdolibarr_get_actions_by_type()
  *   $actionsFormUrl       string URL of the page the forms post to
@@ -73,11 +73,21 @@ foreach ($sectionConfig as $type => $cfg) {
         print '<input type="text" name="action_label" class="minwidth300" required>';
         print '</td>';
 
+        // Prefixes suffixed with the type: both sections are rendered on the same page and
+        // the datepicker fills its hidden day/month/year fields through getElementById
+        print '<td class="digirisk-actions-form__start">';
+        print '<label>' . $langs->trans('DateStart') . '</label><br>';
+        print $form->selectDate('', 'actionstart' . $type, 0, 0, 1, 'addActionForm' . $type);
+        print '</td>';
+
         print '<td class="digirisk-actions-form__deadline">';
         print '<label>' . $langs->trans('ActionDeadline') . '</label><br>';
-        // Prefix suffixed with the type: both sections are rendered on the same page and
-        // the datepicker fills its hidden day/month/year fields through getElementById
         print $form->selectDate('', 'actiondeadline' . $type, 0, 0, 1, 'addActionForm' . $type);
+        print '</td>';
+
+        print '<td class="digirisk-actions-form__budget">';
+        print '<label>' . $langs->trans('Budget') . '</label><br>';
+        print '<input type="number" name="action_budget" class="maxwidth100" min="0" step="1">';
         print '</td>';
 
         print '<td class="digirisk-actions-form__assignee">';
@@ -102,7 +112,9 @@ foreach ($sectionConfig as $type => $cfg) {
     print '<th class="liste_titre">' . $langs->trans('Ref') . '</th>';
     print '<th class="liste_titre">' . $langs->trans('ActionLabel') . '</th>';
     print '<th class="liste_titre">' . $langs->trans('DigiriskActionAssignedTo') . '</th>';
+    print '<th class="liste_titre">' . $langs->trans('DateStart') . '</th>';
     print '<th class="liste_titre">' . $langs->trans('ActionDeadline') . '</th>';
+    print '<th class="liste_titre right">' . $langs->trans('Budget') . '</th>';
     print '<th class="liste_titre" width="200">' . $langs->trans('ActionProgress') . '</th>';
     print '<th class="liste_titre">' . $langs->trans('Status') . '</th>';
     print '<th class="liste_titre" width="40">&nbsp;</th>';
@@ -110,7 +122,7 @@ foreach ($sectionConfig as $type => $cfg) {
     print '<tbody>';
 
     if (empty($actions)) {
-        print '<tr><td colspan="8" class="opacitymedium center" style="padding:14px">';
+        print '<tr><td colspan="10" class="opacitymedium center" style="padding:14px">';
         print $langs->trans('NoActionsYet');
         print '</td></tr>';
     }
@@ -149,6 +161,9 @@ foreach ($sectionConfig as $type => $cfg) {
         $assignee = !empty($row->user_fullname) ? trim($row->user_fullname) : '';
         print '<td>' . ($assignee !== '' ? dol_escape_htmltag($assignee) : '&mdash;') . '</td>';
 
+        // Start date
+        print '<td>' . (!empty($row->dateo) && $row->dateo !== '0000-00-00 00:00:00' ? dol_print_date($db->jdate($row->dateo), 'day') : '&mdash;') . '</td>';
+
         // Deadline
         print '<td>';
         if (!empty($row->datee) && $row->datee !== '0000-00-00 00:00:00') {
@@ -158,7 +173,10 @@ foreach ($sectionConfig as $type => $cfg) {
         }
         print '</td>';
 
-        // Progress: the slider is dragged to change it and saved on release by accidentinvestigation.js
+        // Budget
+        print '<td class="right nowraponall">' . ($row->budget_amount !== null && $row->budget_amount !== '' ? price($row->budget_amount, 0, $langs, 1, -1, -1, $conf->currency) : '&mdash;') . '</td>';
+
+        // Progress: the slider is dragged to change it and saved on release by actions.js
         print '<td>';
         print '<div class="digirisk-actions-progress' . ($isDone ? ' digirisk-actions-progress--done' : '') . '">';
         print '<input type="range" class="digirisk-actions-progress__slider" min="0" max="100" step="1" value="' . $pct . '"';

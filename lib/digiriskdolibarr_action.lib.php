@@ -79,7 +79,7 @@ function digiriskdolibarr_get_actions_by_type(DoliDB $db, int $parentTaskId, int
 
     $containerTaskId = digiriskdolibarr_get_action_container_task($db, $parentTaskId, $type);
 
-    $sql  = 'SELECT t.rowid, t.ref, t.label, t.datec, t.dateo, t.datee, t.progress, t.fk_statut,';
+    $sql  = 'SELECT t.rowid, t.ref, t.label, t.datec, t.dateo, t.datee, t.progress, t.fk_statut, t.budget_amount,';
     $sql .= ' (SELECT CONCAT(u2.firstname, \' \', u2.lastname)';
     $sql .= '  FROM ' . MAIN_DB_PREFIX . 'element_contact ec2';
     $sql .= '  INNER JOIN ' . MAIN_DB_PREFIX . 'c_type_contact ctc2';
