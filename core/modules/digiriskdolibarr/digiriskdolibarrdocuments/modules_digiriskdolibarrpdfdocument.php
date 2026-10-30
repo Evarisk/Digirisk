@@ -34,8 +34,8 @@
  */
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../../../saturne/core/modules/saturne/modules_saturne.php';
-require_once __DIR__ . '/../../../../../saturne/lib/dolibarr.lib.php';
+dol_include_once('/saturne/core/modules/saturne/modules_saturne.php');
+dol_include_once('/saturne/lib/dolibarr.lib.php');
 
 /**
  * Classe parente des modeles PDF du document unique.
@@ -675,11 +675,14 @@ abstract class ModelePDFDigiriskDolibarrDocument extends SaturneDocumentModel
      * @param  float  $height Hauteur
      * @param  string $value  Valeur affichee en grand
      * @param  string $label  Libelle sous la valeur
-     * @param  array  $color  Couleur du trait d'accent
-     * @param  float  $size   Taille de police de reference
+     * @param  array  $color      Couleur du trait d'accent
+     * @param  float  $size       Taille de police de reference
+     * @param  int    $labelLines Nombre de lignes de libelle a prevoir, 0 pour celui du libelle :
+     *                            les tuiles d'une meme rangee passent le plus grand, sans quoi
+     *                            leurs nombres ne sont pas a la meme hauteur
      * @return void
      */
-    protected function statTile($pdf, float $x, float $y, float $width, float $height, string $value, string $label, array $color, float $size)
+    protected function statTile($pdf, float $x, float $y, float $width, float $height, string $value, string $label, array $color, float $size, int $labelLines = 0)
     {
         $this->card($pdf, $x, $y, $width, $height, $this->surface);
 
@@ -690,7 +693,7 @@ abstract class ModelePDFDigiriskDolibarrDocument extends SaturneDocumentModel
         $lineHeight = $this->height - 1;
 
         $pdf->SetFont('', '', $size - 1);
-        $labelLines = max(1, $pdf->getNumLines($label, $innerWidth));
+        $labelLines = max(1, $labelLines, $pdf->getNumLines($label, $innerWidth));
         $valueHeight = ($size + 10) * 0.42;
         $blockHeight = 1.2 + 2.6 + $valueHeight + 1.5 + ($labelLines * $lineHeight);
         $top         = $y + max(4, ($height - $blockHeight) / 2);
@@ -732,18 +735,40 @@ abstract class ModelePDFDigiriskDolibarrDocument extends SaturneDocumentModel
 
         $this->reserveSpace($pdf, $height + 5);
 
-        $gap   = 5;
-        $count = count($tiles);
-        $width = ($this->contentWidth($pdf) - (($count - 1) * $gap)) / $count;
-        $y     = $pdf->GetY();
-        $x     = $this->marge_gauche;
+        $gap        = 5;
+        $count      = count($tiles);
+        $width      = ($this->contentWidth($pdf) - (($count - 1) * $gap)) / $count;
+        $y          = $pdf->GetY();
+        $x          = $this->marge_gauche;
+        $labelLines = $this->tileLabelLines($pdf, array_column($tiles, 'label'), $width, $size);
 
         foreach ($tiles as $tile) {
-            $this->statTile($pdf, $x, $y, $width, $height, (string) $tile['value'], (string) $tile['label'], $tile['color'] ?? $this->accent, $size);
+            $this->statTile($pdf, $x, $y, $width, $height, (string) $tile['value'], (string) $tile['label'], $tile['color'] ?? $this->accent, $size, $labelLines);
             $x += $width + $gap;
         }
 
         $pdf->SetXY($this->marge_gauche, $y + $height + 5);
+    }
+
+    /**
+     * Plus grand nombre de lignes des libelles d'une rangee de tuiles.
+     *
+     * @param  TCPDF $pdf    PDF handler
+     * @param  array $labels Libelles des tuiles
+     * @param  float $width  Largeur d'une tuile
+     * @param  float $size   Taille de police de reference
+     * @return int           Nombre de lignes du libelle le plus long
+     */
+    protected function tileLabelLines($pdf, array $labels, float $width, float $size): int
+    {
+        $pdf->SetFont('', '', $size - 1);
+
+        $lines = 1;
+        foreach ($labels as $label) {
+            $lines = max($lines, $pdf->getNumLines((string) $label, $width - 10));
+        }
+
+        return $lines;
     }
 
     /**
@@ -954,15 +979,22 @@ abstract class ModelePDFDigiriskDolibarrDocument extends SaturneDocumentModel
         $pdf->SetFillColor(255, 255, 255);
         $pdf->Circle($cx, $cy, $radius * 0.62, 0, 360, 'F');
 
+        // Les hauteurs de la valeur et du libelle suivent leur corps : des hauteurs fixes
+        // faisaient chevaucher le nombre et son libelle sur les diapositives, ou la police
+        // de reference est plus grande que sur une page A4
+        $valueHeight = ($size + 7) * 0.3528 * 1.15;
+        $labelHeight = ($size - 2) * 0.3528 * 1.3;
+        $top         = $cy - (($valueHeight + $labelHeight) / 2);
+
         $pdf->SetFont('', 'B', $size + 7);
         $pdf->SetTextColor($this->ink[0], $this->ink[1], $this->ink[2]);
-        $pdf->SetXY($cx - $radius, $cy - 6.5);
-        $pdf->Cell($radius * 2, 7, $centerValue, 0, 0, 'C');
+        $pdf->SetXY($cx - $radius, $top);
+        $pdf->Cell($radius * 2, $valueHeight, $centerValue, 0, 0, 'C', false, '', 0, false, 'T', 'M');
 
         $pdf->SetFont('', '', $size - 2);
         $pdf->SetTextColor($this->inkMuted[0], $this->inkMuted[1], $this->inkMuted[2]);
-        $pdf->SetXY($cx - $radius, $cy + 0.8);
-        $pdf->Cell($radius * 2, 5, $centerLabel, 0, 0, 'C');
+        $pdf->SetXY($cx - $radius, $top + $valueHeight);
+        $pdf->Cell($radius * 2, $labelHeight, $centerLabel, 0, 0, 'C', false, '', 0, false, 'T', 'M');
 
         $pdf->SetTextColor(0, 0, 0);
     }
@@ -1015,7 +1047,7 @@ abstract class ModelePDFDigiriskDolibarrDocument extends SaturneDocumentModel
      * @param  float  $y     Ordonnee
      * @param  float  $width Largeur
      * @param  string $title Titre de l'encadre
-     * @param  array  $lines Lignes de texte
+     * @param  array  $lines Lignes de texte, ou ['text' => string, 'sub' => true] en retrait
      * @param  float  $size  Taille de police
      * @param  array  $color Couleur du filet et du titre
      * @return float         Ordonnee du bas de l'encadre
@@ -1026,12 +1058,21 @@ abstract class ModelePDFDigiriskDolibarrDocument extends SaturneDocumentModel
         $innerWidth = $width - 16;
         $lineHeight = $this->height;
 
+        // Une ligne est un texte, ou ['text' => string, 'sub' => true] pour une sous-puce en
+        // retrait : les conditions d'une phrase qui les annonce ne se lisent pas au meme niveau
+        // qu'elle
+        $items = [];
+        foreach ($lines as $line) {
+            $isSub   = is_array($line) && !empty($line['sub']);
+            $items[] = ['text' => (string) (is_array($line) ? ($line['text'] ?? '') : $line), 'indent' => $isSub ? 6 : 0];
+        }
+
         // La hauteur se mesure avant de peindre le fond : un encadre dessine a hauteur fixe
         // laisse un vide sous un texte court et tronque un texte long
         $pdf->SetFont('', '', $size - 1);
         $textHeight = 0;
-        foreach ($lines as $line) {
-            $textHeight += max(1, $pdf->getNumLines((string) $line, $innerWidth)) * $lineHeight;
+        foreach ($items as $item) {
+            $textHeight += max(1, $pdf->getNumLines($item['text'], $innerWidth - $item['indent'])) * $lineHeight;
             $textHeight += 1.5;
         }
         $height = 9 + $textHeight + 4;
@@ -1042,12 +1083,16 @@ abstract class ModelePDFDigiriskDolibarrDocument extends SaturneDocumentModel
         $this->kicker($pdf, $x + 7, $y + 4, $width - 14, $title, $size, $color);
 
         $lineY = $y + 11;
-        foreach ($lines as $line) {
-            $this->card($pdf, $x + 7, $lineY + 1.8, 2.2, 2.2, $color, 1.1);
+        foreach ($items as $item) {
+            if ($item['indent'] > 0) {
+                $this->card($pdf, $x + 7 + $item['indent'], $lineY + 2.3, 2.6, 0.9, $color, 0.45);
+            } else {
+                $this->card($pdf, $x + 7, $lineY + 1.8, 2.2, 2.2, $color, 1.1);
+            }
 
             $pdf->SetFont('', '', $size - 1);
             $pdf->SetTextColor($this->inkSoft[0], $this->inkSoft[1], $this->inkSoft[2]);
-            $pdf->MultiCell($innerWidth, $lineHeight, (string) $line, 0, 'L', false, 1, $x + 12, $lineY, true, 0, false, true, 0, 'T');
+            $pdf->MultiCell($innerWidth - $item['indent'], $lineHeight, $item['text'], 0, 'L', false, 1, $x + 12 + $item['indent'], $lineY, true, 0, false, true, 0, 'T');
 
             $lineY = $pdf->GetY() + 1.5;
         }
@@ -1657,13 +1702,14 @@ abstract class ModelePDFDigiriskDolibarrDocument extends SaturneDocumentModel
      *
      * @param  array $elements                Elements du perimetre
      * @param  array $psychosocialRisksByGPUT Cotations RPS par element et par facteur
-     * @return array                          ['units', 'concerned', 'notConcerned', 'toQualify', 'assessed']
+     * @return array                          ['units', 'concerned', 'notConcerned', 'toQualify', 'assessed',
+     *                                        'assessedConcerned' => unites concernees et evaluees]
      */
     protected function summarizePsychosocialScope(array $elements, array $psychosocialRisksByGPUT): array
     {
         global $conf;
 
-        $summary = ['units' => 0, 'concerned' => 0, 'notConcerned' => 0, 'toQualify' => 0, 'assessed' => 0];
+        $summary = ['units' => 0, 'concerned' => 0, 'notConcerned' => 0, 'toQualify' => 0, 'assessed' => 0, 'assessedConcerned' => 0];
 
         $workUnitIds = [];
         foreach ($elements as $elementId => $element) {
@@ -1699,6 +1745,9 @@ abstract class ModelePDFDigiriskDolibarrDocument extends SaturneDocumentModel
 
             if (!empty($psychosocialRisksByGPUT[$unitId])) {
                 $summary['assessed']++;
+                if ($state === 1) {
+                    $summary['assessedConcerned']++;
+                }
             }
         }
 
@@ -1778,7 +1827,15 @@ abstract class ModelePDFDigiriskDolibarrDocument extends SaturneDocumentModel
         }
 
         if (!empty($stats['auditStart']) && !empty($stats['auditEnd'])) {
-            return $outputLangs->transnoentities('DigiriskSynthesisPeriodFromTo', dol_print_date($stats['auditStart'], 'day', 'tzuser', $outputLangs), dol_print_date($stats['auditEnd'], 'day', 'tzuser', $outputLangs));
+            $start = dol_print_date($stats['auditStart'], 'day', 'tzuser', $outputLangs);
+            $end   = dol_print_date($stats['auditEnd'], 'day', 'tzuser', $outputLangs);
+
+            // Une evaluation tenue sur une seule journee ne repete pas deux fois la meme date
+            if ($start == $end) {
+                return $outputLangs->transnoentities('DigiriskSynthesisPeriodOn', $start);
+            }
+
+            return $outputLangs->transnoentities('DigiriskSynthesisPeriodFromTo', $start, $end);
         }
 
         return $outputLangs->transnoentities('DigiriskSynthesisPeriodSince', dol_print_date($stats['auditStart'] ?: $stats['auditEnd'], 'day', 'tzuser', $outputLangs));

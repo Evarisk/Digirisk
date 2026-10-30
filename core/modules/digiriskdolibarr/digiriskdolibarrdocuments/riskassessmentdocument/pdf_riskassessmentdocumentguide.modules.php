@@ -722,7 +722,7 @@ class pdf_riskassessmentdocumentguide extends ModelePDFDigiriskDolibarrDocument
      *
      * @param  TCPDF  $pdf   PDF handler
      * @param  string $title Titre
-     * @param  array  $lines Lignes
+     * @param  array  $lines Lignes, ou ['text' => string, 'sub' => true] en retrait
      * @param  float  $size  Taille de police
      * @param  array  $color Couleur
      * @return void
@@ -734,7 +734,8 @@ class pdf_riskassessmentdocumentguide extends ModelePDFDigiriskDolibarrDocument
         $pdf->SetFont('', '', $size - 1);
         $height = 13;
         foreach ($lines as $line) {
-            $height += (max(1, $pdf->getNumLines($line, $width - 16)) * $this->height) + 1.5;
+            $text    = is_array($line) ? (string) ($line['text'] ?? '') : (string) $line;
+            $height += (max(1, $pdf->getNumLines($text, $width - 16)) * $this->height) + 1.5;
         }
         $this->reserveSpace($pdf, $height + 5);
 
@@ -829,7 +830,7 @@ class pdf_riskassessmentdocumentguide extends ModelePDFDigiriskDolibarrDocument
 
         $this->subTitle($pdf, $outputLangs->transnoentities('DigiriskGuideNotionsStructure'), $size, 75);
         $this->cardGrid($pdf, [
-            ['kicker' => 'UT / WU', 'title' => $outputLangs->transnoentities('DigiriskGuideNotionsWorkUnit'), 'text' => $outputLangs->transnoentities('DigiriskGuideNotionsWorkUnitText')],
+            ['kicker' => 'UT', 'title' => $outputLangs->transnoentities('DigiriskGuideNotionsWorkUnit'), 'text' => $outputLangs->transnoentities('DigiriskGuideNotionsWorkUnitText')],
             ['kicker' => 'GP', 'title' => $outputLangs->transnoentities('DigiriskGuideNotionsGroupment'), 'text' => $outputLangs->transnoentities('DigiriskGuideNotionsGroupmentText')],
             ['kicker' => $outputLangs->transnoentities('Evaluators'), 'title' => $outputLangs->transnoentities('DigiriskGuideNotionsEvaluators'), 'text' => $outputLangs->transnoentities('DigiriskGuideNotionsEvaluatorsText'), 'color' => $this->accentAlt],
             ['kicker' => 'EVRP', 'title' => $outputLangs->transnoentities('DigiriskGuideNotionsShared'), 'text' => $outputLangs->transnoentities('DigiriskGuideNotionsSharedText'), 'color' => $this->accentAlt]
@@ -860,8 +861,8 @@ class pdf_riskassessmentdocumentguide extends ModelePDFDigiriskDolibarrDocument
 
         $this->callout($pdf, $outputLangs->transnoentities('DigiriskGuideLowRiskTitle'), [
             $outputLangs->transnoentities('DigiriskGuideLowRisk1'),
-            $outputLangs->transnoentities('DigiriskGuideLowRisk2'),
-            $outputLangs->transnoentities('DigiriskGuideLowRisk3'),
+            ['text' => $outputLangs->transnoentities('DigiriskGuideLowRisk2'), 'sub' => true],
+            ['text' => $outputLangs->transnoentities('DigiriskGuideLowRisk3'), 'sub' => true],
             $outputLangs->transnoentities('DigiriskGuideLowRisk4')
         ], $size, $this->levelBg[2]);
 

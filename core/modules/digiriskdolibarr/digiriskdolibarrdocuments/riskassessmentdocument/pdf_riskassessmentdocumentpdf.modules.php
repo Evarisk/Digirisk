@@ -272,7 +272,10 @@ class pdf_riskassessmentdocumentpdf extends ModelePDFDigiriskDolibarrDocument
         $pdf->SetFont('', '', $size);
         $pdf->SetTextColor($light[0], $light[1], $light[2]);
         $pdf->SetX($this->marge_gauche);
-        $pdf->Cell($width, 6, (dol_strlen($period) ? $period . '  -  ' : '') . $outputLangs->transnoentities('DigiriskSynthesisGeneratedAt') . ' ' . ($header['dateGeneration'] ?? dol_print_date(dol_now(), 'dayhour', 'tzuser', $outputLangs)), 0, 1, 'L');
+        // La date de generation se formate ici, dans la langue du document : celle de l'en-tete
+        // du DU est formatee dans la langue de l'utilisateur, d'ou un "10/30/2026 02:37 PM" dans
+        // un document francais
+        $pdf->Cell($width, 6, (dol_strlen($period) ? $period . '  -  ' : '') . $outputLangs->transnoentities('DigiriskSynthesisGeneratedAt') . ' ' . dol_print_date(dol_now(), 'dayhour', 'tzuser', $outputLangs), 0, 1, 'L');
 
         // Fiche du document : qui l'emet, a qui il est destine
         $y           = self::COVER_BAND + 10;
@@ -598,7 +601,7 @@ class pdf_riskassessmentdocumentpdf extends ModelePDFDigiriskDolibarrDocument
             $rows[] = array_merge([
                 $this->pictoCell($this->categoryPictoByPosition($risk, $position)),
                 $this->categoryLabel($risk, $position),
-                ['text' => round($count * 100 / $stats['totalRisks'], 1) . ' %', 'align' => 'C'],
+                ['text' => str_replace('.', $outputLangs->transnoentitiesnoconv('SeparatorDecimal'), (string) round($count * 100 / $stats['totalRisks'], 1)) . ' %', 'align' => 'C'],
                 ['text' => (string) $count, 'align' => 'C', 'bold' => true]
             ], $this->levelCountCells($levels));
         }
@@ -714,7 +717,7 @@ class pdf_riskassessmentdocumentpdf extends ModelePDFDigiriskDolibarrDocument
                     }
                     $cotation = $cotations[$factor['position']];
                     $level    = $cotation < 48 ? 1 : ($cotation < 51 ? 2 : ($cotation < 80 ? 3 : 4));
-                    $row[]    = ['pill' => true, 'text' => html_entity_decode($risk->getDangerSubCategoryScaleLabel($cotation), ENT_QUOTES | ENT_HTML5, 'UTF-8'), 'fill' => $this->levelBg[$level], 'color' => $this->levelText[$level]];
+                    $row[]    = ['pill' => true, 'text' => html_entity_decode($risk->getDangerSubCategoryScaleLabel($cotation, $outputLangs), ENT_QUOTES | ENT_HTML5, 'UTF-8'), 'fill' => $this->levelBg[$level], 'color' => $this->levelText[$level]];
                 }
                 $rows[] = $row;
             }
@@ -853,16 +856,23 @@ class pdf_riskassessmentdocumentpdf extends ModelePDFDigiriskDolibarrDocument
 
         $rows = [];
         foreach ($stats['tickets'] as $ticket) {
+            // Le statut est traduit dans la langue du document : getLibStatut() passe par la
+            // langue de l'utilisateur, ou ticket n'est pas forcement charge, et imprimait alors
+            // des cles brutes comme "SolvedClosed". L'avancement a sa propre colonne
+            $status = $ticket->labelStatusShort[$ticket->status] ?? '';
+
             $rows[] = [
                 ['text' => $ticket->ref, 'bold' => true],
                 ['text' => dol_print_date($ticket->datec, 'day', 'tzuser', $outputLangs), 'align' => 'C'],
                 $ticket->digiriskElementRefLabel ?? '',
                 $ticket->subject . (dol_strlen(trim(strip_tags((string) $ticket->message))) ? "\n" . dol_trunc(trim(strip_tags((string) $ticket->message)), 160) : ''),
                 ['text' => ((int) $ticket->progress) . ' %', 'align' => 'C'],
-                strip_tags($ticket->getLibStatut(1))
+                dol_strlen($status) ? $outputLangs->transnoentitiesnoconv($status) : ''
             ];
         }
 
+        // La date et le statut tiennent sur une ligne : a 11 et 10 % de la largeur, l'annee
+        // passait a la ligne et "Resolu/Ferme" se coupait en deux
         $width = $this->contentWidth($pdf);
         $this->table($pdf, [
             $outputLangs->transnoentities('Ref'),
@@ -871,6 +881,6 @@ class pdf_riskassessmentdocumentpdf extends ModelePDFDigiriskDolibarrDocument
             $outputLangs->transnoentities('Subject'),
             ['text' => $outputLangs->transnoentities('DigiriskProgress'), 'align' => 'C'],
             $outputLangs->transnoentities('Status')
-        ], $rows, [$width * 0.13, $width * 0.11, $width * 0.18, $width * 0.38, $width * 0.10, $width * 0.10], $size - 1.5);
+        ], $rows, [$width * 0.13, $width * 0.13, $width * 0.16, $width * 0.31, $width * 0.12, $width * 0.15], $size - 1.5);
     }
 }

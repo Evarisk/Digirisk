@@ -693,10 +693,11 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
         $this->kicker($pdf, $this->marge_gauche + 10, $y + 10, $leftWidth - 20, $outputLangs->transnoentities('DigiriskCseHeroKicker'), $size, $light);
         $this->bigNumber($pdf, $this->marge_gauche + 10, $y + 20, $leftWidth - 20, (string) $stats['totalRisks'], $outputLangs->transnoentities('DigiriskSynthesisRisksAssessed'), $size + 46, $size + 2, [255, 255, 255], [255, 255, 255]);
 
-        $share = $stats['totalRisks'] > 0 ? round($priority * 100 / $stats['totalRisks']) : 0;
+        $share    = $stats['totalRisks'] > 0 ? round($priority * 100 / $stats['totalRisks']) : 0;
+        $heroText = $priority > 0 ? $outputLangs->transnoentities('DigiriskCseHeroPriority', $priority, $share) : $outputLangs->transnoentities('DigiriskCseHeroNoPriority');
         $pdf->SetFont('', '', $size);
         $pdf->SetTextColor($light[0], $light[1], $light[2]);
-        $pdf->MultiCell($leftWidth - 20, $this->height + 1, $outputLangs->transnoentities('DigiriskCseHeroPriority', $priority, $share), 0, 'L', false, 1, $this->marge_gauche + 10, $y + 66, true, 0, false, true, 0, 'T');
+        $pdf->MultiCell($leftWidth - 20, $this->height + 1, $heroText, 0, 'L', false, 1, $this->marge_gauche + 10, $y + 66, true, 0, false, true, 0, 'T');
 
         if ($stats['totalRisks'] > 0) {
             $this->miniLevelBar($pdf, $this->marge_gauche + 10, $y + $heroHeight - 16, $leftWidth - 20, 5, $stats['levelCounts']);
@@ -713,11 +714,12 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
             [(string) $stats['accidents']['lastYear'], $outputLangs->transnoentities('DigiriskCseAccidentsLastYearLong'), $this->accentWarn]
         ];
 
-        $tileGap   = 5;
-        $tileWidth = ($rightWidth - (3 * $tileGap)) / 4;
-        $tileX     = $rightX;
+        $tileGap    = 5;
+        $tileWidth  = ($rightWidth - (3 * $tileGap)) / 4;
+        $tileX      = $rightX;
+        $labelLines = $this->tileLabelLines($pdf, array_column($tiles, 1), $tileWidth, $size);
         foreach ($tiles as $tile) {
-            $this->statTile($pdf, $tileX, $y, $tileWidth, 38, $tile[0], $tile[1], $tile[2], $size);
+            $this->statTile($pdf, $tileX, $y, $tileWidth, 38, $tile[0], $tile[1], $tile[2], $size, $labelLines);
             $tileX += $tileWidth + $tileGap;
         }
 
@@ -752,7 +754,7 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
         if ($rps['toQualify'] > 0) {
             $lines[] = $outputLangs->transnoentities('DigiriskSynthesisHighlightRpsToQualify', $rps['toQualify']);
         } elseif ($rps['concerned'] > 0) {
-            $lines[] = $outputLangs->transnoentities('DigiriskSynthesisHighlightRps', $rps['assessed'], $rps['concerned']);
+            $lines[] = $outputLangs->transnoentities('DigiriskSynthesisHighlightRps', $rps['assessedConcerned'], $rps['concerned']);
         }
 
         $lines[] = $outputLangs->transnoentities('DigiriskSynthesisHighlightAccidents', $stats['accidents']['lastYear']);
@@ -780,12 +782,14 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
         // A gauche : trois chiffres en colonne, puis l'echelle de cotation
         $tileWidth = ($leftWidth - 10) / 3;
         $tileX     = $this->marge_gauche;
-        foreach ([
+        $tiles     = [
             [(string) $stats['nbGroupment'],  $outputLangs->transnoentities('DigiriskSynthesisGroupmentsCount'), $this->accent],
             [(string) $stats['nbWorkunit'],   $outputLangs->transnoentities('DigiriskSynthesisWorkUnitsCount'),  $this->accentAlt],
-            [(string) $stats['nbEvaluators'], $outputLangs->transnoentities('Evaluators'),                       $this->accent]
-        ] as $tile) {
-            $this->statTile($pdf, $tileX, $y, $tileWidth, 36, $tile[0], $tile[1], $tile[2], $size);
+            [(string) $stats['nbEvaluators'], $outputLangs->transnoentities('EvaluatorsMin'),                    $this->accent]
+        ];
+        $labelLines = $this->tileLabelLines($pdf, array_column($tiles, 1), $tileWidth, $size);
+        foreach ($tiles as $tile) {
+            $this->statTile($pdf, $tileX, $y, $tileWidth, 36, $tile[0], $tile[1], $tile[2], $size, $labelLines);
             $tileX += $tileWidth + 5;
         }
 
@@ -1247,7 +1251,17 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
         $rightX = $this->marge_gauche + $leftWidth + 8;
         $rightW = $width - $leftWidth - 8;
 
-        $this->bigNumber($pdf, $rightX, $y + 2, $rightW, $rps['assessed'] . ' / ' . max($rps['concerned'], $rps['assessed']), $outputLangs->transnoentities('DigiriskCseRpsAssessedLong'), $size + 22, $size, $this->categoryColors[7]);
+        // Rapporte les unites evaluees a celles declarees concernees, et a toutes les unites
+        // tant qu'aucune ne l'est : "2 / 2 sur celles declarees concernees" a cote d'une legende
+        // qui annoncait zero unite concernee se contredisait
+        if ($rps['concerned'] > 0) {
+            $rpsRatio = $rps['assessedConcerned'] . ' / ' . $rps['concerned'];
+            $rpsLabel = $outputLangs->transnoentities('DigiriskCseRpsAssessedLong');
+        } else {
+            $rpsRatio = $rps['assessed'] . ' / ' . $rps['units'];
+            $rpsLabel = $outputLangs->transnoentities('DigiriskCseRpsAssessedOfUnits');
+        }
+        $this->bigNumber($pdf, $rightX, $y + 2, $rightW, $rpsRatio, $rpsLabel, $size + 22, $size, $this->categoryColors[7]);
 
         $pdf->SetXY($rightX, $y + 38);
         $this->bulletList($pdf, [
@@ -1330,7 +1344,7 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
         $this->marge_gauche = $rightX;
         $pdf->SetXY($rightX, $y + 8);
         $this->table($pdf, [
-            ['text' => $outputLangs->transnoentities('Deadline'), 'align' => 'C'],
+            ['text' => $outputLangs->transnoentities('DigiriskSynthesisDeadline'), 'align' => 'C'],
             $outputLangs->transnoentities('Label'),
             ['text' => $outputLangs->transnoentities('DigiriskProgress'), 'align' => 'C']
         ], $rows, [$rightW * 0.18, $rightW * 0.67, $rightW * 0.15], $size - 1);
@@ -1385,14 +1399,18 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
     {
         $this->slide($pdf, 'next', $outputLangs->transnoentities('DigiriskCseSlideAsk'), $outputLangs->transnoentities('DigiriskCseSlideAskSubtitle'), $outputLangs, $size);
 
+        // Le comite ne se prononce pas sur zero risque prioritaire ni sur zero action en retard :
+        // ces demandes ne sont posees que lorsqu'elles portent sur quelque chose
         $priority = (int) $stats['levelCounts'][3] + (int) $stats['levelCounts'][4];
-        $asks     = [
-            $outputLangs->transnoentities('DigiriskCseAskOpinion'),
-            $outputLangs->transnoentities('DigiriskCseAskPriorities', $priority),
-            $outputLangs->transnoentities('DigiriskCseAskLateActions', $stats['actionPlan']['late']),
-            $outputLangs->transnoentities('DigiriskCseAskRps'),
-            $outputLangs->transnoentities('DigiriskCseAskNextUpdate')
-        ];
+        $asks     = [$outputLangs->transnoentities('DigiriskCseAskOpinion')];
+        if ($priority > 0) {
+            $asks[] = $outputLangs->transnoentities('DigiriskCseAskPriorities', $priority);
+        }
+        if ($stats['actionPlan']['late'] > 0) {
+            $asks[] = $outputLangs->transnoentities('DigiriskCseAskLateActions', $stats['actionPlan']['late']);
+        }
+        $asks[] = $outputLangs->transnoentities('DigiriskCseAskRps');
+        $asks[] = $outputLangs->transnoentities('DigiriskCseAskNextUpdate');
 
         $gap    = 5;
         $count  = count($asks);
