@@ -730,6 +730,84 @@ body#mainbody.digirisk-risk-overview-public {
     }
   }
 
+  // ---- Filters of the register tab, at the top of its card ----
+
+  // They wrap at the width of the table, as the legend does, instead of widening the card
+  .risk-overview__filters {
+    box-sizing: border-box;
+    width: 0;
+    min-width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    padding: 10px 16px;
+    border-bottom: 1px solid $dr-border;
+    background: $dr-surface-soft;
+    color: $dr-text-soft;
+    font-size: 13px;
+  }
+
+  .risk-overview__filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    cursor: pointer;
+
+    input[type="date"] {
+      height: auto;
+      padding: 5px 8px;
+      border: 1px solid $dr-border;
+      border-radius: $dr-radius-sm;
+      background: $dr-surface;
+      color: $dr-text;
+      font-family: $dr-font;
+      font-size: 13px;
+    }
+  }
+
+  .risk-overview__filter-period {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+
+  .risk-overview__filter-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border: 0;
+    border-radius: $dr-radius-sm;
+    background: $dr-primary;
+    color: #ffffff;
+    font-family: $dr-font;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      filter: brightness(0.95);
+    }
+  }
+
+  .risk-overview__filter-reset {
+    font-size: 12px;
+    font-weight: 600;
+
+    &,
+    &:link,
+    &:visited {
+      color: $dr-muted;
+      text-decoration: none;
+    }
+
+    &:hover {
+      color: $dr-text;
+    }
+  }
+
   // ---- Legend, empty and closed states ----
 
   // The legend wraps at the width of the table instead of widening the card

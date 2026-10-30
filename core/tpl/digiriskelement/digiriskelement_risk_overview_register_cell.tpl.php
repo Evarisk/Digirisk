@@ -26,7 +26,8 @@
  *          nor who declared a ticket is shown.
  *
  * Variables : $cell (digiriskRiskOverviewCell()), $position, $columns (digiriskRiskOverviewRegisterColumns()),
- *             $overviewRow, $db, $langs (core/tpl/digiriskelement/digiriskelement_risk_overview_public.tpl.php)
+ *             $overviewRow, $registerFilters (digiriskRiskOverviewRegisterFilters(), kept by the links), $db, $langs
+ *             (core/tpl/digiriskelement/digiriskelement_risk_overview_public.tpl.php)
  */
 
 if (!isset($registerTicketStatic)) {
@@ -39,7 +40,7 @@ $registerTickets = $overviewRow['tickets'];
 // the registers on the total
 $breakdown = [];
 if ($position < 0) {
-    $registerUrl       = digiriskRiskOverviewRegisterUrl((int) $overviewRow['id']);
+    $registerUrl       = digiriskRiskOverviewRegisterUrl((int) $overviewRow['id'], [], $registerFilters);
     $registerName      = $langs->trans('RiskOverviewTooltipAllRegisters');
     $registerOpenTitle = $langs->trans('RiskOverviewOpenTickets', $overviewRow['ref']);
     $cellTickets       = $registerTickets['list'];
@@ -51,7 +52,7 @@ if ($position < 0) {
 } else {
     $register          = $registerTickets['registers'][$position] ?? ['subs' => [], 'direct' => 0];
     $registerIds       = $columns[$position]['ids'];
-    $registerUrl       = digiriskRiskOverviewRegisterUrl((int) $overviewRow['id'], $registerIds);
+    $registerUrl       = digiriskRiskOverviewRegisterUrl((int) $overviewRow['id'], $registerIds, $registerFilters);
     $registerName      = $columns[$position]['name'];
     $registerOpenTitle = $langs->trans('RiskOverviewOpenRegisterTickets', $registerName, $overviewRow['ref']);
     $cellTickets       = array_filter($registerTickets['list'], function (array $ticket) use ($registerIds): bool {

@@ -50,6 +50,7 @@ window.digiriskdolibarr.riskOverview.event = function() {
   $(document).on('mouseenter focusin', '.risk-overview td.has-risk-tooltip', window.digiriskdolibarr.riskOverview.showRisks);
   $(document).on('mouseleave focusout', '.risk-overview td.has-risk-tooltip', window.digiriskdolibarr.riskOverview.leaveRisks);
   $(document).on('mousemove', '.risk-overview td.has-risk-tooltip', window.digiriskdolibarr.riskOverview.showAfterScroll);
+  $(document).on('change', '.risk-overview__filters input[type="checkbox"]', window.digiriskdolibarr.riskOverview.submitFilters);
   $(document).on('pointerdown', 'body.digirisk-risk-overview-public', window.digiriskdolibarr.riskOverview.rememberTap);
   $(document).on('click', '.risk-overview td.has-risk-tooltip .risk-overview__link', window.digiriskdolibarr.riskOverview.openOnSecondTap);
   $(document).on('click', '.risk-overview__tooltip', window.digiriskdolibarr.riskOverview.tapTooltip);
@@ -148,6 +149,19 @@ window.digiriskdolibarr.riskOverview.hideOnScroll = function(event) {
   if (!$(event.target).closest('.risk-overview__tooltip').length) {
     window.digiriskdolibarr.riskOverview.hideRisks();
   }
+};
+
+/**
+ * Recharge l'onglet des registres dès que la case des tickets fermés change ; les dates attendent le
+ * bouton, une date se tape en plusieurs fois.
+ *
+ * @since   23.6.0
+ * @version 23.6.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.riskOverview.submitFilters = function() {
+  this.form.submit();
 };
 
 /**

@@ -83,6 +83,9 @@ $hookmanager->initHooks(['riskoverviewpublic', 'saturnepublicinterface']);
 // The key opens the page: without it, nothing about the risks is shown
 $accessAllowed = digiriskRiskOverviewCheckPublicKey($key);
 
+// Filters of the register tab: by default the open tickets only, whatever their date
+$registerFilters = digiriskRiskOverviewRegisterFilters();
+
 $tabUrl = function (string $tabName) use ($key) {
     global $conf;
     return $_SERVER['PHP_SELF'] . '?' . http_build_query(['entity' => $conf->entity, 'key' => $key, 'tab' => $tabName]);
@@ -121,21 +124,23 @@ if ($accessAllowed && !$pinAsked) {
     }
     $overviewColumns['rps'] = digiriskRiskOverviewFactorColumns($rpsSubCategories);
 
-    // Tickets of each register, only read when their tab is shown
+    // Tickets of each register, only read when their tab is shown: the open ones unless the visitor
+    // asks for the closed ones, within the period asked
     if (in_array('register', $overviewTabNames, true)) {
         $overviewColumns['register'] = digiriskRiskOverviewRegisterColumns($db);
-        $overviewRows                = digiriskRiskOverviewAddTickets($db, $overviewRows, $overviewColumns['register']);
+        $overviewRows                = digiriskRiskOverviewAddTickets($db, $overviewRows, $overviewColumns['register'], $registerFilters);
     }
 
     // The same tables as an Excel workbook, one sheet per tab
     if ($action == 'export') {
-        digiriskRiskOverviewExportXlsx($overviewRows, $overviewColumns, $rpsScale);
+        digiriskRiskOverviewExportXlsx($overviewRows, $overviewColumns, $rpsScale, in_array('register', $overviewTabNames, true) ? digiriskRiskOverviewRegisterFilterLabel($registerFilters) : '');
         $db->close();
         exit;
     }
 }
 
-$exportUrl = $_SERVER['PHP_SELF'] . '?' . http_build_query(['entity' => $conf->entity, 'key' => $key, 'action' => 'export']);
+// The export keeps the filters of the register tab
+$exportUrl = $_SERVER['PHP_SELF'] . '?' . http_build_query(array_merge(['entity' => $conf->entity, 'key' => $key, 'action' => 'export'], digiriskRiskOverviewRegisterFilterParams($registerFilters)));
 
 /*
  * View
