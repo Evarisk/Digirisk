@@ -17,9 +17,12 @@ $risk-overview-rps-scales: (
   4: ($color__rps-extreme, #ffffff),
 );
 $risk-overview-element-width: 280px;
-$risk-overview-element-width-sm: 170px;
+$risk-overview-element-width-sm: clamp(112px, 36vw, 160px);
 $risk-overview-total-width: 76px;
+$risk-overview-total-width-sm: 52px;
 $risk-overview-cell-width: 46px;
+$risk-overview-cell-width-sm: 40px;
+$risk-overview-phone: 700px;
 
 @mixin risk-overview-scale-fill($scales: $risk-overview-scales) {
   @each $level, $colors in $scales {
@@ -64,6 +67,17 @@ body#mainbody.page-public-card.digirisk-risk-overview-public .public-card__conta
   // A closed link only holds a message
   &.risk-overview--closed {
     max-width: 560px;
+  }
+
+  // Phone: the margins of the page and of the card go to the table
+  @media (max-width: $risk-overview-phone) {
+    padding: 16px 12px;
+  }
+}
+
+body#mainbody.page-public-card.digirisk-risk-overview-public {
+  @media (max-width: $risk-overview-phone) {
+    padding: 12px 8px 24px;
   }
 }
 
@@ -241,7 +255,7 @@ body#mainbody.digirisk-risk-overview-public {
       --risk-overview-element-width: 220px;
     }
 
-    @media (max-width: 700px) {
+    @media (max-width: $risk-overview-phone) {
       --risk-overview-element-width: #{$risk-overview-element-width-sm};
     }
 
@@ -322,6 +336,14 @@ body#mainbody.digirisk-risk-overview-public {
 
   .risk-overview__label {
     color: $dr-text;
+  }
+
+  // Ref and label of the element: a long label wraps under its ref, not under the fold arrow (its
+  // 24px and the space after it)
+  .risk-overview__name {
+    display: inline-block;
+    max-width: calc(100% - 30px);
+    vertical-align: middle;
   }
 
   .risk-overview__row--groupment {
@@ -477,6 +499,22 @@ body#mainbody.digirisk-risk-overview-public {
     &[hidden] {
       display: none;
     }
+
+    // Opened by a touch, it often covers its cell: its link opens the list, a touch closes it
+    &.is-touch {
+      max-height: calc(100vh - 16px);
+      overflow-y: auto;
+      pointer-events: auto;
+
+      .risk-overview__tooltip-hint {
+        &,
+        &:link,
+        &:visited {
+          color: $dr-primary;
+          font-weight: 600;
+        }
+      }
+    }
   }
 
   .risk-overview__tooltip-title {
@@ -595,6 +633,17 @@ body#mainbody.digirisk-risk-overview-public {
     color: $dr-muted;
   }
 
+  // A link, only followed when the tooltip was opened by a touch: else the pointer goes through it
+  .risk-overview__tooltip-hint {
+    display: block;
+
+    &:link,
+    &:visited {
+      color: $dr-muted;
+      text-decoration: none;
+    }
+  }
+
   .risk-overview__tooltip-more {
     font-weight: 600;
 
@@ -642,6 +691,7 @@ body#mainbody.digirisk-risk-overview-public {
 
   .risk-overview__swatch {
     display: inline-block;
+    flex-shrink: 0;
     width: 12px;
     height: 12px;
     border-radius: 3px;
@@ -685,16 +735,110 @@ body#mainbody.digirisk-risk-overview-public {
     font-size: 28px;
   }
 
-  // Phone: a narrower element column, the categories scroll under it
-  @media (max-width: 700px) {
-    .risk-overview__element {
+  // ---- Phone: a narrower element column, the categories scroll under it ----
+
+  @media (max-width: $risk-overview-phone) {
+    .objet-label {
+      font-size: 14px;
+    }
+
+    .risk-overview__toolbar {
+      margin-bottom: 10px;
+    }
+
+    // The three tabs share one line, their icon above their name
+    .risk-overview__tabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      width: 100%;
+    }
+
+    .risk-overview__tab {
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      padding: 8px 6px;
+      border-radius: $dr-radius;
       font-size: 12px;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    // Almost the whole screen once the page is scrolled to the table: more rows under the heads
+    .risk-overview__scroll {
+      max-height: calc(100vh - 120px);
+      max-height: calc(100svh - 120px);
+    }
+
+    .risk-overview__table {
+      font-size: 12px;
+
+      thead th {
+        padding: 8px 2px 6px;
+      }
+    }
+
+    // A smaller indent per level
+    .risk-overview__element {
+      padding: 6px 6px 6px 8px;
+      line-height: 1.25;
+
+      @for $depth from 1 through 5 {
+        &[data-depth="#{$depth}"] {
+          padding-left: 8px + $depth * 6px;
+        }
+      }
+    }
+
+    thead .risk-overview__element {
+      padding-left: 8px;
+      font-size: 10px;
+    }
+
+    .risk-overview__ref {
+      margin-right: 4px;
+    }
+
+    .risk-overview__toggle,
+    .risk-overview__toggle-space {
+      width: 16px;
+      margin-right: 2px;
+    }
+
+    // A word longer than the narrow column breaks instead of running over the next one
+    .risk-overview__name {
+      max-width: calc(100% - 24px);
+      overflow-wrap: break-word;
     }
 
     // Only the name stays in view: the categories get the rest of the screen
     .risk-overview__total {
       position: static;
       left: auto;
+      width: $risk-overview-total-width-sm;
+      min-width: $risk-overview-total-width-sm;
+    }
+
+    thead .risk-overview__total {
+      font-size: 9px;
+      letter-spacing: 0;
+    }
+
+    // Shorter heads: the names of the categories run over more columns
+    .risk-overview__head {
+      width: $risk-overview-cell-width-sm;
+      min-width: $risk-overview-cell-width-sm;
+    }
+
+    .risk-overview__head-name {
+      max-height: 120px;
+      font-size: 10px;
+    }
+
+    .risk-overview__picto {
+      width: 26px;
+      height: 26px;
+      margin-top: 4px;
     }
 
     // A phone cannot hold the 22 categories: they keep their width and scroll under the names
@@ -703,9 +847,43 @@ body#mainbody.digirisk-risk-overview-public {
       table-layout: auto;
 
       .risk-overview__head {
-        width: $risk-overview-cell-width;
-        min-width: $risk-overview-cell-width;
+        width: $risk-overview-cell-width-sm;
+        min-width: $risk-overview-cell-width-sm;
       }
+
+      .risk-overview__picto {
+        width: 26px;
+      }
+    }
+
+    .risk-overview__table--rps .risk-overview__head {
+      width: 84px;
+      min-width: 84px;
+      padding-left: 4px;
+      padding-right: 4px;
+    }
+
+    .risk-overview__cell {
+      height: 36px;
+    }
+
+    .risk-overview__link {
+      line-height: 32px;
+    }
+
+    .risk-overview__legend {
+      gap: 8px 14px;
+      padding: 10px 12px;
+      font-size: 11px;
+    }
+
+    .risk-overview__legend-text {
+      flex-basis: 100%;
+    }
+
+    // A long key (what NC means) wraps instead of leaving the card
+    .risk-overview__key {
+      white-space: normal;
     }
   }
 }
