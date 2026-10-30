@@ -23,8 +23,10 @@
  *
  * Meant for the people the single document is presented to, who have no Dolibarr account: the page
  * is reached through a link carrying a secret key, set up in the risk assessment document
- * configuration. It shows counts and levels; a number of risks details on hover the worst risks it
- * counts (description, cotation, photo and comment of their assessment).
+ * configuration, which may also ask a PIN code and hide the strenuousness, psychosocial and register
+ * tabs. It shows counts and levels; a number of risks details on hover the worst risks it counts
+ * (description, cotation, photo and comment of their assessment). The register tab only counts the
+ * tickets, whose content names people.
  */
 
 if (!defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', '1');
@@ -54,8 +56,8 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_riskoverview.lib.php';
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $mysoc;
 
-// Load translation files required by the page
-saturne_load_langs();
+// Load translation files required by the page: ticket for the status and severity of the register tab
+saturne_load_langs(['ticket']);
 
 // Get parameters
 $key    = GETPOST('key', 'alphanohtml');
@@ -67,8 +69,10 @@ if ($entity > 0) {
     $conf->setEntityValues($db, $entity);
 }
 
-if (!in_array($tab, DIGIRISK_RISK_OVERVIEW_TABS, true)) {
-    $tab = DIGIRISK_RISK_OVERVIEW_TABS[0];
+// A tab hidden in the setup opens the first one
+$overviewTabNames = digiriskRiskOverviewTabs();
+if (!in_array($tab, $overviewTabNames, true)) {
+    $tab = $overviewTabNames[0];
 }
 
 // Nobody is logged in
@@ -84,9 +88,20 @@ $tabUrl = function (string $tabName) use ($key) {
     return $_SERVER['PHP_SELF'] . '?' . http_build_query(['entity' => $conf->entity, 'key' => $key, 'tab' => $tabName]);
 };
 
+// The PIN code of the setup, when there is one, is asked after the key, once per session
+$pinError = '';
+if ($accessAllowed && $action == 'checkpin') {
+    $pinError = digiriskRiskOverviewCheckPin(GETPOST('pin', 'aZ09'));
+    if ($pinError == 'ok') {
+        header('Location: ' . $tabUrl($tab));
+        exit;
+    }
+}
+$pinAsked = $accessAllowed && !digiriskRiskOverviewPinGiven();
+
 $overviewRows    = [];
 $overviewColumns = [];
-if ($accessAllowed) {
+if ($accessAllowed && !$pinAsked) {
     $digiriskElement           = new DigiriskElement($db);
     $activeDigiriskElementList = $digiriskElement->getActiveDigiriskElements();
     if (!is_array($activeDigiriskElementList)) {
@@ -105,6 +120,12 @@ if ($accessAllowed) {
         $overviewColumns[$categoryTab] = digiriskRiskOverviewCategoryColumns($categoryTab);
     }
     $overviewColumns['rps'] = digiriskRiskOverviewFactorColumns($rpsSubCategories);
+
+    // Tickets of each register, only read when their tab is shown
+    if (in_array('register', $overviewTabNames, true)) {
+        $overviewColumns['register'] = digiriskRiskOverviewRegisterColumns($db);
+        $overviewRows                = digiriskRiskOverviewAddTickets($db, $overviewRows, $overviewColumns['register']);
+    }
 
     // The same tables as an Excel workbook, one sheet per tab
     if ($action == 'export') {

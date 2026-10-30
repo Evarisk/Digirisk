@@ -23,17 +23,22 @@
  *          a psychosocial cell the level of the factor or the average of the factors
  *          (digiriskRiskOverviewCell(), shared with the Excel export). A number of risks lists them
  *          on hover (digiriskelement_risk_overview_tooltip.tpl.php), a psychosocial average its
- *          factors (digiriskelement_risk_overview_psychosocial_tooltip.tpl.php).
+ *          factors (digiriskelement_risk_overview_psychosocial_tooltip.tpl.php). The register tab
+ *          counts the tickets of each register (digiriskelement_risk_overview_register_cell.tpl.php).
+ *          With a PIN code in the setup, a visitor who has not given it yet only gets its field.
  *
- * Variables : $accessAllowed, $tab, $tabUrl, $exportUrl, $overviewRows, $overviewColumns, $rpsScale,
- *             $langs, $mysoc (public/digiriskelement/digiriskelement_risk_overview.php)
+ * Variables : $accessAllowed, $pinAsked, $pinError, $key, $tab, $tabUrl, $exportUrl, $overviewTabNames,
+ *             $overviewRows, $overviewColumns, $rpsScale, $conf, $langs, $mysoc
+ *             (public/digiriskelement/digiriskelement_risk_overview.php)
  */
 
-$overviewTabs = [
+// The tabs the setup shows
+$overviewTabs = array_intersect_key([
     'risk'       => ['icon' => 'fa-exclamation-triangle', 'label' => 'RiskOverviewTabRisks'],
     'penibility' => ['icon' => 'fa-hard-hat',             'label' => 'RiskOverviewTabPenibility'],
     'rps'        => ['icon' => 'fa-brain',                'label' => 'RiskOverviewTabPsychosocial'],
-];
+    'register'   => ['icon' => 'fa-ticket-alt',           'label' => 'RiskOverviewTabRegisters'],
+], array_flip($overviewTabNames));
 $riskLevelLabels = [1 => 'GreyRisk', 2 => 'OrangeRisk', 3 => 'RedRisk', 4 => 'BlackRisk'];
 
 // Why a cell reads NC, in its tooltip
@@ -47,7 +52,7 @@ $emptyCellTitles = [
 ];
 
 ?>
-<div class="public-card__container risk-overview<?php echo $accessAllowed ? '' : ' risk-overview--closed'; ?>" data-public-interface="true"
+<div class="public-card__container risk-overview<?php echo $accessAllowed && !$pinAsked ? '' : ' risk-overview--closed'; ?>" data-public-interface="true"
      data-label-fold="<?php echo dol_escape_htmltag($langs->trans('RiskOverviewFold')); ?>"
      data-label-unfold="<?php echo dol_escape_htmltag($langs->trans('RiskOverviewUnfold')); ?>">
     <?php if (!$accessAllowed) : ?>
@@ -55,6 +60,21 @@ $emptyCellTitles = [
             <i class="fas fa-lock"></i>
             <div><?php echo $langs->trans('RiskOverviewPublicClosed'); ?></div>
         </div>
+    <?php elseif ($pinAsked) : ?>
+        <form class="risk-overview__pin" method="POST" action="<?php echo dol_escape_htmltag($_SERVER['PHP_SELF']); ?>">
+            <input type="hidden" name="action" value="checkpin">
+            <input type="hidden" name="entity" value="<?php echo (int) $conf->entity; ?>">
+            <input type="hidden" name="key" value="<?php echo dol_escape_htmltag($key); ?>">
+            <input type="hidden" name="tab" value="<?php echo dol_escape_htmltag($tab); ?>">
+            <i class="fas fa-lock"></i>
+            <div class="risk-overview__pin-title"><?php echo $langs->trans('RiskOverviewPublicTitle'); ?></div>
+            <label for="risk-overview-pin"><?php echo $langs->trans('RiskOverviewPinPrompt'); ?></label>
+            <input id="risk-overview-pin" class="risk-overview__pin-input" type="password" name="pin" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off" required autofocus>
+            <?php if ($pinError == 'wrong' || $pinError == 'locked') : ?>
+                <div class="risk-overview__pin-error" role="alert"><?php echo $langs->trans($pinError == 'locked' ? 'RiskOverviewPinLocked' : 'RiskOverviewPinWrong'); ?></div>
+            <?php endif; ?>
+            <button type="submit" class="wpeo-button button-blue"><?php echo $langs->trans('RiskOverviewPinSubmit'); ?></button>
+        </form>
     <?php else : ?>
         <!-- Same header as the other public interfaces (electronic signature, registers): what the page is,
              for whom, and the object it is about, with its download button -->
@@ -80,13 +100,16 @@ $emptyCellTitles = [
         </div>
 
         <div class="risk-overview__toolbar">
-            <nav class="risk-overview__tabs">
-                <?php foreach ($overviewTabs as $overviewTab => $overviewTabMeta) : ?>
-                    <a class="risk-overview__tab<?php echo $overviewTab == $tab ? ' is-active' : ''; ?>" data-tab="<?php echo $overviewTab; ?>" href="<?php echo dol_escape_htmltag($tabUrl($overviewTab)); ?>">
-                        <i class="fas <?php echo $overviewTabMeta['icon']; ?>"></i> <?php echo $langs->trans($overviewTabMeta['label']); ?>
-                    </a>
-                <?php endforeach; ?>
-            </nav>
+            <?php // A tab alone needs no switching between tabs ?>
+            <?php if (count($overviewTabs) > 1) : ?>
+                <nav class="risk-overview__tabs">
+                    <?php foreach ($overviewTabs as $overviewTab => $overviewTabMeta) : ?>
+                        <a class="risk-overview__tab<?php echo $overviewTab == $tab ? ' is-active' : ''; ?>" data-tab="<?php echo $overviewTab; ?>" href="<?php echo dol_escape_htmltag($tabUrl($overviewTab)); ?>">
+                            <i class="fas <?php echo $overviewTabMeta['icon']; ?>"></i> <?php echo $langs->trans($overviewTabMeta['label']); ?>
+                        </a>
+                    <?php endforeach; ?>
+                </nav>
+            <?php endif; ?>
             <div class="risk-overview__fold-actions">
                 <button type="button" class="risk-overview__fold-all"><i class="fas fa-compress-alt"></i> <?php echo $langs->trans('RiskOverviewFoldAll'); ?></button>
                 <button type="button" class="risk-overview__unfold-all"><i class="fas fa-expand-alt"></i> <?php echo $langs->trans('RiskOverviewUnfoldAll'); ?></button>
@@ -109,8 +132,14 @@ $emptyCellTitles = [
                                 <th class="risk-overview__total" scope="col" title="<?php echo dol_escape_htmltag($langs->trans('RiskOverviewPsychosocialAverageHelp')); ?>">
                                     <?php echo $langs->trans('RiskOverviewPsychosocialAverage'); ?>
                                 </th>
-                            <?php else : ?>
-                                <th class="risk-overview__total" scope="col" title="<?php echo dol_escape_htmltag($langs->trans($panelTab == 'risk' ? 'RiskOverviewRiskCountListHelp' : 'RiskOverviewRiskCountHelp')); ?>">
+                            <?php elseif ($panelTab == 'register') : ?>
+                                <th class="risk-overview__total" scope="col" title="<?php echo dol_escape_htmltag($langs->trans('RiskOverviewTicketCountHelp')); ?>">
+                                    <?php echo $langs->trans('RiskOverviewTicketCount'); ?>
+                                </th>
+                            <?php else :
+                                // The total of the risk tab counts the psychosocial line only when the setup shows the psychosocial risks
+                                $totalHelp = $panelTab != 'risk' ? 'RiskOverviewRiskCountHelp' : (isset($columns[Risk::PSYCHOSOCIAL_CATEGORY_POSITION]) ? 'RiskOverviewRiskCountListHelp' : 'RiskOverviewRiskCountListNoPsychosocialHelp'); ?>
+                                <th class="risk-overview__total" scope="col" title="<?php echo dol_escape_htmltag($langs->trans($totalHelp)); ?>">
                                     <?php echo $langs->trans('RiskOverviewRiskCount'); ?>
                                 </th>
                             <?php endif; ?>
@@ -118,6 +147,8 @@ $emptyCellTitles = [
                                 <th class="risk-overview__head" scope="col" title="<?php echo dol_escape_htmltag($column['name']); ?>">
                                     <?php if ($panelTab == 'rps') : ?>
                                         <span class="risk-overview__factor"><?php echo $column['factor']; ?></span>
+                                        <span class="risk-overview__head-name"><?php echo dol_escape_htmltag($column['shortName']); ?></span>
+                                    <?php elseif ($panelTab == 'register') : ?>
                                         <span class="risk-overview__head-name"><?php echo dol_escape_htmltag($column['shortName']); ?></span>
                                     <?php else : ?>
                                         <span class="risk-overview__head-name"><?php echo dol_escape_htmltag($column['shortName']); ?></span>
@@ -147,7 +178,12 @@ $emptyCellTitles = [
 
                                 <?php
                                 foreach (array_merge([-1], array_keys($columns)) as $position) :
-                                    $cell       = digiriskRiskOverviewCell($overviewRow, $panelTab, (int) $position, $columns);
+                                    $cell = digiriskRiskOverviewCell($overviewRow, $panelTab, (int) $position, $columns);
+                                    // A number of tickets has a cell of its own, with no level
+                                    if ($panelTab == 'register') {
+                                        require __DIR__ . '/digiriskelement_risk_overview_register_cell.tpl.php';
+                                        continue;
+                                    }
                                     $totalClass = $position < 0 ? 'risk-overview__total ' : '';
                                     // A number opens the risk list of the element, the worst risks first, filtered on
                                     // the category of the cell so that the list holds what the cell counts
@@ -207,7 +243,9 @@ $emptyCellTitles = [
                 </div>
 
                 <div class="risk-overview__legend">
-                    <?php if ($panelTab == 'rps') : ?>
+                    <?php if ($panelTab == 'register') : ?>
+                        <span class="risk-overview__legend-text"><?php echo $langs->trans('RiskOverviewLegendRegisters'); ?></span>
+                    <?php elseif ($panelTab == 'rps') : ?>
                         <span class="risk-overview__legend-text"><?php echo $langs->trans('RiskOverviewLegendPsychosocial'); ?></span>
                         <span class="risk-overview__keys">
                             <?php foreach ($rpsScale as $rpsLevel => $rpsMeta) : ?>
@@ -218,7 +256,7 @@ $emptyCellTitles = [
                     <?php else : ?>
                         <span class="risk-overview__legend-text">
                             <?php echo $langs->trans('RiskOverviewLegendRisks'); ?>
-                            <?php if ($panelTab == 'risk') : ?>
+                            <?php if (isset($columns[Risk::PSYCHOSOCIAL_CATEGORY_POSITION])) : ?>
                                 <?php echo $langs->trans('RiskOverviewLegendRisksPsychosocial'); ?>
                             <?php endif; ?>
                         </span>
