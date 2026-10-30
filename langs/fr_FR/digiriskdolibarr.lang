@@ -2231,6 +2231,9 @@ NoRecipientFound = Aucun destinataire
 
 AddFile = Ajouter un fichier
 AttachTicketFiles = Joindre des fichiers du ticket
+SendTicketFilesAsShareLinks = Envoyer en liens de téléchargement
+SendTicketFilesAsShareLinksHelp = Les fichiers choisis ne sont pas joints au mail : il contient à la place un lien de téléchargement public pour chacun. Le lien reste actif tant que le partage n'est pas retiré dans la liste des fichiers du ticket.
+TicketFilesShareLinksTitle = Fichiers à télécharger :
 
 MentionAgents = Mentionner des agents
 YouWereMentionedOnTicket = Vous avez été mentionné sur le ticket %s
