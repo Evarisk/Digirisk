@@ -46,6 +46,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/ticket.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/security.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/payments.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/public.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
@@ -330,6 +331,16 @@ if (empty($resHook) && $publicInterfaceUsable) {
                 $action = '';
             }
         }
+
+        // As the public pages of the core (#5623): the IP is kept on the ticket, and the declarations of one IP are
+        // capped by the same constant, a robot could otherwise create tickets and their notification mails endlessly
+        $object->ip = getUserRemoteIP();
+        $langs->load('errors');
+        if (empty($error) && checkNbPostsForASpeceificIp($object, getDolGlobalInt('MAIN_SECURITY_MAX_POST_ON_PUBLIC_PAGES_BY_IP_ADDRESS', 200)) <= 0) {
+            setEventMessages('', $object->errors, 'errors');
+            $error++;
+        }
+
         if (empty($error)) {
             $result = $object->create($user);
             $object->fetch($result);
