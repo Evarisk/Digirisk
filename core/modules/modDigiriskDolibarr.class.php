@@ -2354,6 +2354,14 @@ class modDigiriskdolibarr extends DolibarrModules
         delDocumentModel('listingrisksdocument', 'listingrisksdocument');
 		delDocumentModel('listingrisksenvironmentalaction_odt', 'listingrisksenvironmentaldocument');
 		delDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument');
+        // Modeles PDF natifs du document unique : meme raison que les autres PDF ci-dessus,
+        // la reactivation du module rejouerait leur insertion sur une ligne deja presente.
+        // Le DU simplifie (riskassessmentdocumentsynthesis) a ete retire : sa suppression reste
+        // ici pour nettoyer les installations qui l'avaient enregistre
+        delDocumentModel('riskassessmentdocumentsynthesis', 'riskassessmentdocument');
+        delDocumentModel('riskassessmentdocumentpdf', 'riskassessmentdocument');
+        delDocumentModel('riskassessmentdocumentguide', 'riskassessmentdocument');
+        delDocumentModel('csepresentationdocument', 'riskassessmentdocument');
 		delDocumentModel('auditreportdocument_odt', 'auditreportdocument');
 		delDocumentModel('ticketdocument_odt', 'ticketdocument');
         delDocumentModel('papripact_a3_paysage_projectdocument', 'project');
@@ -2385,6 +2393,9 @@ class modDigiriskdolibarr extends DolibarrModules
         addDocumentModel('listingrisksdocument', 'listingrisksdocument', $langs->transnoentities('ListingRisksDocumentPDF'));
         addDocumentModel('listingrisksenvironmentalaction_odt', 'listingrisksenvironmentaldocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSENVIRONMENTALACTION_ADDON_ODT_PATH');
 		addDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
+        addDocumentModel('riskassessmentdocumentpdf', 'riskassessmentdocument', $langs->transnoentities('DigiriskDuPDF'));
+        addDocumentModel('riskassessmentdocumentguide', 'riskassessmentdocument', $langs->transnoentities('DigiriskGuidePDF'));
+        addDocumentModel('csepresentationdocument', 'riskassessmentdocument', $langs->transnoentities('DigiriskCsePresentationPDF'));
 		addDocumentModel('auditreportdocument_odt', 'auditreportdocument', 'ODT templates', 'DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('ticketdocument_odt', 'ticketdocument', 'ODT templates', 'DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('ticketdocument', 'ticketdocument', $langs->transnoentities('TicketDocumentPDF'));
