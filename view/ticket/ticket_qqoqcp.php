@@ -18,8 +18,8 @@
 /**
  * \file    view/ticket/ticket_qqoqcp.php
  * \ingroup digiriskdolibarr
- * \brief   QQOQCP tab of a ticket (#5549): What, Who, Where, When, How and Why of the problem, kept in ticket
- *          extrafields, and its document (TicketQqoqcpDocument).
+ * \brief   QQOQCCP tab of a ticket (#5549): What, Who, Where, When, How, How much and Why of the problem, kept in
+ *          ticket extrafields, and its document (TicketQqoqcpDocument).
  */
 
 // Load DigiriskDolibarr environment
@@ -114,7 +114,7 @@ if ($action === 'update_qqoqcp' && $permissiontoadd && $object->id > 0) {
                 $logOld = $oldValue;
                 $logNew = $newValue;
             }
-            digiriskdolibarr_ticket_log_field_change($object, 'QQOQCP - ' . $logLabel, $logOld, $logNew, $ticketLogConst);
+            digiriskdolibarr_ticket_log_field_change($object, $langs->transnoentities('QQOQCP') . ' - ' . $logLabel, $logOld, $logNew, $ticketLogConst);
         }
         $object->array_options['options_' . $key] = $newValue;
     }

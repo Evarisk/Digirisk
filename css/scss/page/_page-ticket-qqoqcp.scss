@@ -1,6 +1,7 @@
 @import "../theme/tokens";
 
-// QQOQCP tab of a ticket (#5549): one card per question, two by two, the value under the question
+// QQOQCCP tab of a ticket (#5549): one card per question, two by two, the value under the question; Why, the seventh,
+// takes the whole width
 #{$dr-scope} .digirisk-qqoqcp {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -12,6 +13,10 @@
     border: 1px solid $dr-border;
     border-radius: $dr-radius-sm;
     background: $dr-surface;
+
+    &:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
   }
 
   &__head {

@@ -333,20 +333,21 @@ function digiriskdolibarr_ticket_count_actions(array $actionsByType): array
 }
 
 /**
- * Fields of the QQOQCP analysis of a ticket (#5549): ticket extrafields, hidden from the native card, shown by the
- * QQOQCP tab and its document. Who is a list of users, the five others are free text.
+ * Fields of the QQOQCCP analysis of a ticket (#5549): ticket extrafields, hidden from the native card, shown by the
+ * QQOQCCP tab and its document, in the order of the method. Who is a list of users, the six others are free text.
  *
  * @return array<string, array{label: string, help: string, picto: string}> Definition of each field, by extrafield key
  */
 function digiriskdolibarr_ticket_qqoqcp_fields(): array
 {
     return [
-        'digiriskdolibarr_qqoqcp_what'  => ['label' => 'QQOQCPWhat',  'help' => 'QQOQCPWhatHelp',  'picto' => 'fa-question'],
-        'digiriskdolibarr_qqoqcp_who'   => ['label' => 'QQOQCPWho',   'help' => 'QQOQCPWhoHelp',   'picto' => 'fa-users'],
-        'digiriskdolibarr_qqoqcp_where' => ['label' => 'QQOQCPWhere', 'help' => 'QQOQCPWhereHelp', 'picto' => 'fa-map-marker-alt'],
-        'digiriskdolibarr_qqoqcp_when'  => ['label' => 'QQOQCPWhen',  'help' => 'QQOQCPWhenHelp',  'picto' => 'fa-calendar-alt'],
-        'digiriskdolibarr_qqoqcp_how'   => ['label' => 'QQOQCPHow',   'help' => 'QQOQCPHowHelp',   'picto' => 'fa-cogs'],
-        'digiriskdolibarr_qqoqcp_why'   => ['label' => 'QQOQCPWhy',   'help' => 'QQOQCPWhyHelp',   'picto' => 'fa-lightbulb'],
+        'digiriskdolibarr_qqoqcp_what'    => ['label' => 'QQOQCPWhat',    'help' => 'QQOQCPWhatHelp',    'picto' => 'fa-question'],
+        'digiriskdolibarr_qqoqcp_who'     => ['label' => 'QQOQCPWho',     'help' => 'QQOQCPWhoHelp',     'picto' => 'fa-users'],
+        'digiriskdolibarr_qqoqcp_where'   => ['label' => 'QQOQCPWhere',   'help' => 'QQOQCPWhereHelp',   'picto' => 'fa-map-marker-alt'],
+        'digiriskdolibarr_qqoqcp_when'    => ['label' => 'QQOQCPWhen',    'help' => 'QQOQCPWhenHelp',    'picto' => 'fa-calendar-alt'],
+        'digiriskdolibarr_qqoqcp_how'     => ['label' => 'QQOQCPHow',     'help' => 'QQOQCPHowHelp',     'picto' => 'fa-cogs'],
+        'digiriskdolibarr_qqoqcp_howmuch' => ['label' => 'QQOQCPHowMuch', 'help' => 'QQOQCPHowMuchHelp', 'picto' => 'fa-calculator'],
+        'digiriskdolibarr_qqoqcp_why'     => ['label' => 'QQOQCPWhy',     'help' => 'QQOQCPWhyHelp',     'picto' => 'fa-lightbulb'],
     ];
 }
 
@@ -381,7 +382,7 @@ function digiriskdolibarr_ticket_qqoqcp_who_names(string $userIds): array
  * Number of the filled fields of the QQOQCP analysis of a ticket, for the badge of its tab
  *
  * @param  Ticket $ticket Ticket, its extrafields fetched
- * @return int            Filled fields, out of six
+ * @return int            Filled fields, out of seven
  */
 function digiriskdolibarr_ticket_qqoqcp_filled_count(Ticket $ticket): int
 {
