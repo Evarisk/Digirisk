@@ -323,3 +323,13 @@ UPDATE llx_digiriskdolibarr_riskassessment SET gravite = COALESCE(gravite, 0), e
 -- 23.5.1
 CREATE TABLE IF NOT EXISTS llx_digiriskdolibarr_rpsscope(rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL, entity integer DEFAULT 1 NOT NULL, date_creation datetime NOT NULL, tms timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, fk_element integer NOT NULL, concerned smallint DEFAULT -1 NOT NULL, reason text, fk_user_modif integer) ENGINE=innodb;
 CREATE TABLE IF NOT EXISTS llx_digiriskdolibarr_rpsanswer(rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL, entity integer DEFAULT 1 NOT NULL, date_creation datetime NOT NULL, tms timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, fk_riskassessment integer NOT NULL, criterion integer NOT NULL, criterion_label varchar(255), sub_category integer NOT NULL, scale smallint NOT NULL, cotation integer NOT NULL, comment text, fk_user_creat integer NOT NULL) ENGINE=innodb;
+
+-- 23.5.x - modeles PDF natifs du document unique : le DU en PDF, son mode d'emploi et la presentation CSE.
+-- Les trois s'ajoutent au selecteur de generation du document unique, a cote du gabarit ODT.
+-- ON DUPLICATE KEY : llx_document_model porte un index unique sur (nom, type, entity), rejouer
+-- le fichier ne doit pas echouer ni dupliquer la ligne.
+-- Le DU simplifie (riskassessmentdocumentsynthesis) est retire au profit du mode d'emploi.
+DELETE FROM llx_document_model WHERE nom = 'riskassessmentdocumentsynthesis' AND type = 'riskassessmentdocument';
+INSERT INTO llx_document_model (nom, type, entity, libelle, description) VALUES ('riskassessmentdocumentpdf', 'riskassessmentdocument', 1, 'DU-A4-PORTRAIT', NULL) ON DUPLICATE KEY UPDATE libelle = VALUES(libelle);
+INSERT INTO llx_document_model (nom, type, entity, libelle, description) VALUES ('riskassessmentdocumentguide', 'riskassessmentdocument', 1, 'DU-MODE-EMPLOI-A4', NULL) ON DUPLICATE KEY UPDATE libelle = VALUES(libelle);
+INSERT INTO llx_document_model (nom, type, entity, libelle, description) VALUES ('csepresentationdocument', 'riskassessmentdocument', 1, 'CSE-DIAPOSITIVES-16-9', NULL) ON DUPLICATE KEY UPDATE libelle = VALUES(libelle);

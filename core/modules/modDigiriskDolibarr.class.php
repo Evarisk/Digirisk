@@ -738,6 +738,10 @@ class modDigiriskdolibarr extends DolibarrModules
             $i++ => ['DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_GRID_METHOD', 'integer', 1, '', 0, 'current'],
             // Public overview of the risks of the GP/UT: closed until opened in the setup, which creates its key
             $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE', 'integer', 0, '', 0, 'current'],
+            // Its strenuousness, psychosocial and register tabs are shown until switched off
+            $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_PENIBILITY', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_PSYCHOSOCIAL', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_REGISTER', 'integer', 1, '', 0, 'current'],
 
 			// CONST RISK ASSESSMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE', 'integer', 1, '', 0, 'current'],
@@ -2350,6 +2354,14 @@ class modDigiriskdolibarr extends DolibarrModules
         delDocumentModel('listingrisksdocument', 'listingrisksdocument');
 		delDocumentModel('listingrisksenvironmentalaction_odt', 'listingrisksenvironmentaldocument');
 		delDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument');
+        // Modeles PDF natifs du document unique : meme raison que les autres PDF ci-dessus,
+        // la reactivation du module rejouerait leur insertion sur une ligne deja presente.
+        // Le DU simplifie (riskassessmentdocumentsynthesis) a ete retire : sa suppression reste
+        // ici pour nettoyer les installations qui l'avaient enregistre
+        delDocumentModel('riskassessmentdocumentsynthesis', 'riskassessmentdocument');
+        delDocumentModel('riskassessmentdocumentpdf', 'riskassessmentdocument');
+        delDocumentModel('riskassessmentdocumentguide', 'riskassessmentdocument');
+        delDocumentModel('csepresentationdocument', 'riskassessmentdocument');
 		delDocumentModel('auditreportdocument_odt', 'auditreportdocument');
 		delDocumentModel('ticketdocument_odt', 'ticketdocument');
         delDocumentModel('papripact_a3_paysage_projectdocument', 'project');
@@ -2381,6 +2393,9 @@ class modDigiriskdolibarr extends DolibarrModules
         addDocumentModel('listingrisksdocument', 'listingrisksdocument', $langs->transnoentities('ListingRisksDocumentPDF'));
         addDocumentModel('listingrisksenvironmentalaction_odt', 'listingrisksenvironmentaldocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSENVIRONMENTALACTION_ADDON_ODT_PATH');
 		addDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
+        addDocumentModel('riskassessmentdocumentpdf', 'riskassessmentdocument', $langs->transnoentities('DigiriskDuPDF'));
+        addDocumentModel('riskassessmentdocumentguide', 'riskassessmentdocument', $langs->transnoentities('DigiriskGuidePDF'));
+        addDocumentModel('csepresentationdocument', 'riskassessmentdocument', $langs->transnoentities('DigiriskCsePresentationPDF'));
 		addDocumentModel('auditreportdocument_odt', 'auditreportdocument', 'ODT templates', 'DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('ticketdocument_odt', 'ticketdocument', 'ODT templates', 'DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('ticketdocument', 'ticketdocument', $langs->transnoentities('TicketDocumentPDF'));
@@ -2730,6 +2745,16 @@ class modDigiriskdolibarr extends DolibarrModules
 
             saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 6, 'integer', 0, '', 0);
+        }
+
+        // Tickets of the public interface were saved without a subject until #5588: they get the start of their message
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_SUBJECT_BACKWARD_COMPATIBILITY')) {
+            require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
+
+            // A failure leaves the constant unset, so the next activation tries again
+            if (digiriskdolibarr_ticket_fill_empty_subjects($this->db, (int) $conf->entity) >= 0) {
+                dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_SUBJECT_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
+            }
         }
 
 		//DigiriskElement favorite medias backward compatibility
