@@ -507,36 +507,21 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
                                     // Create form object
                                     // Send mail (substitutionarray must be done just before this)
                                     $mailfile = new CMailFile($mailSubject, $sendto, $from, $mailContent, array(), array(), array(), "", "", 0, -1, '', '', $trackid, '', 'ticket');
-                                    if ($mailfile->error) {
-                                        setEventMessages($mailfile->error, $mailfile->errors, 'errors');
+                                    if ($mailfile->error || !$mailfile->sendfile()) {
+                                        $langs->load('other');
+                                        $this->logTicketMailFailure($object, $user, $langs, $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto)) . ($mailfile->error ? '<br>' . $mailfile->error : ''));
                                     } else {
-                                        if (1) {
-                                            $result = $mailfile->sendfile();
-                                            if ( ! $result) {
-                                                $langs->load("other");
-                                                $mesg = '<div class="error">';
-                                                if ($mailfile->error) {
-                                                    $mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-                                                    $mesg .= '<br>' . $mailfile->error;
-                                                } else {
-                                                    $mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-                                                }
-                                                $mesg .= '</div>';
-                                                setEventMessages($mesg, null, 'warnings');
-                                            } else {
-                                                $actioncomm->elementtype   = 'ticket';
-                                                $actioncomm->label         = $langs->transnoentities('TicketCreationMailWellSent');
-                                                $actioncomm->note_private  = $langs->transnoentities('TicketCreationMailSent', $sendto) . '<br>';
-                                                $actioncomm->note_private .= $mailSubject . '<br>';
-                                                $actioncomm->note_private .= $mailContent;
-                                                $result = $actioncomm->create($user);
-                                            }
-                                        }
+                                        $actioncomm->elementtype   = 'ticket';
+                                        $actioncomm->label         = $langs->transnoentities('TicketCreationMailWellSent');
+                                        $actioncomm->note_private  = $langs->transnoentities('TicketCreationMailSent', $sendto) . '<br>';
+                                        $actioncomm->note_private .= $mailSubject . '<br>';
+                                        $actioncomm->note_private .= $mailContent;
+                                        $result = $actioncomm->create($user);
                                     }
                                 } else {
-                                    $langs->load("errors");
-                                    setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("MailTo")), null, 'warnings');
-                                    dol_syslog('Try to send email with no recipient defined', LOG_WARNING);
+                                    // A recipient of the category without email, or no sender configured
+                                    $langs->load('errors');
+                                    $this->logTicketMailFailure($object, $user, $langs, $langs->transnoentities('ErrorFieldRequired', $langs->transnoentitiesnoconv(dol_strlen($sendto) ? 'MailFrom' : 'MailTo')) . ' (' . dol_escape_htmltag($userTmp->getFullName($langs)) . ')');
                                 }
                             }
                         }
@@ -1011,16 +996,14 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
         $recipients = $this->ticketSubmittedRecipients();
         if (empty($recipients)) {
             $langs->load('errors');
-            setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MailTo')), null, 'warnings');
-            dol_syslog(__METHOD__ . ' : try to send email with no recipient defined', LOG_WARNING);
+            $this->logTicketMailFailure($object, $user, $langs, $langs->transnoentities('ErrorFieldRequired', $langs->transnoentitiesnoconv('MailTo')));
             return;
         }
 
         $from = getDolGlobalString('MAIN_MAIL_EMAIL_FROM');
         if (!dol_strlen($from)) {
             $langs->load('errors');
-            setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MailFrom')), null, 'warnings');
-            dol_syslog(__METHOD__ . ' : MAIN_MAIL_EMAIL_FROM is empty, no mail sent', LOG_WARNING);
+            $this->logTicketMailFailure($object, $user, $langs, $langs->transnoentities('ErrorFieldRequired', $langs->transnoentitiesnoconv('MailFrom')));
             return;
         }
 
@@ -1038,22 +1021,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
             // Un CMailFile par destinataire, comme le faisait le code d'origine : une adresse
             // invalide n'empeche pas les suivantes d'etre servies
             $mailfile = new CMailFile($subject, $sendto, $from, $message, [], [], [], '', '', 0, -1, '', '', 'tic' . $object->id, '', 'ticket');
-            if ($mailfile->error) {
-                setEventMessages($mailfile->error, $mailfile->errors, 'errors');
-                continue;
-            }
-
-            if ($mailfile->sendfile()) {
+            if (!$mailfile->error && $mailfile->sendfile()) {
                 $sent[] = $sendto;
                 continue;
             }
 
             $langs->load('other');
-            $mesg = '<div class="error">' . $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-            if ($mailfile->error) {
-                $mesg .= '<br>' . $mailfile->error;
-            }
-            setEventMessages($mesg . '</div>', null, 'warnings');
+            $this->logTicketMailFailure($object, $user, $langs, $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto)) . ($mailfile->error ? '<br>' . $mailfile->error : ''));
         }
 
         if (empty($sent)) {
@@ -1073,6 +1047,39 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
         $actioncomm->percentage   = -1;
         $actioncomm->label        = $langs->transnoentities('TicketCreationMailWellSent');
         $actioncomm->note_private = $langs->transnoentities('TicketCreationMailSent', implode(', ', $sent));
+
+        $actioncomm->create($user);
+    }
+
+    /**
+     * Trace on the ticket a notification of the public interface that did not go (#5610)
+     *
+     * These mails are sent while the confirmation page of an anonymous declarant is built: an event message
+     * showed him the internal addresses and the SMTP error, and made him believe his declaration had failed.
+     * The team reads it in the agenda of the ticket instead.
+     *
+     * @param  CommonObject $object Declared ticket
+     * @param  User         $user   User at the origin of the action
+     * @param  Translate    $langs  Lang object
+     * @param  string       $detail Why the mail did not go, recipient and error included
+     * @return void
+     */
+    protected function logTicketMailFailure($object, User $user, Translate $langs, string $detail)
+    {
+        require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+
+        dol_syslog(__METHOD__ . ' : ticket ' . $object->ref . ' : ' . $detail, LOG_ERR);
+
+        $actioncomm               = new ActionComm($this->db);
+        $actioncomm->type_code    = 'AC_OTH_AUTO';
+        $actioncomm->code         = 'AC_TICKET_CREATE';
+        $actioncomm->elementtype  = 'ticket';
+        $actioncomm->fk_element   = $object->id;
+        $actioncomm->datep        = dol_now();
+        $actioncomm->userownerid  = $user->id;
+        $actioncomm->percentage   = -1;
+        $actioncomm->label        = $langs->transnoentities('TicketCreationMailNotSent');
+        $actioncomm->note_private = $detail;
 
         $actioncomm->create($user);
     }
