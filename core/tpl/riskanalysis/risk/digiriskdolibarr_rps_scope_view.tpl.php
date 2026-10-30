@@ -14,14 +14,16 @@
  *             de la liste des risques du groupement de tete - l'entreprise sur la plupart
  *             des documents uniques - et seulement a ce niveau.
  *
+ *             Un tableau de toutes les unites de travail, dans l'ordre de l'arborescence et
+ *             groupees sous leur groupement : filtres par etat, recherche, et selection
+ *             multiple pour qualifier plusieurs unites d'un coup (js/modules/psychosocialScope.js).
+ *
  *             La qualification se prend une seule fois par unite de travail, ici. Elle
  *             commande ensuite la liste des risques de chaque unite : une unite non
  *             concernee n'affiche pas la ligne du risque psychosocial, une unite concernee
  *             la retrouve a sa place, parmi ses autres risques.
  *
- *             La persistance de la qualification n est pas encore branchee.
- *
- * Variables attendues : $rpsLines, $rpsScale, $rpsSubCategories, $rpsExistingTotal,
+ * Variables attendues : $rpsLines, $rpsScale, $rpsScaleLabels, $rpsSubCategories, $rpsExistingTotal,
  *                       $rpsScopeElementId, $activeDigiriskElementList, $object, $langs
  */
 
@@ -31,24 +33,46 @@ if (empty($rpsLines)) {
     return;
 }
 
-// La qualification est prise une fois pour tout le document unique : le bloc reprend
-// toutes les unites de travail, y compris celles rattachees a un autre groupement de tete.
-// Il s'affiche sur le groupement de tete, le niveau entreprise sur la plupart des DU.
-$rpsScopeLines = $rpsLines;
+$rpsUnitUrl = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=';
 
-if (empty($rpsScopeLines)) {
-    return;
+// Les unites suivent l'arborescence de la navigation, groupees sous leur groupement direct
+$rpsLineById = [];
+foreach ($rpsLines as $rpsLine) {
+    $rpsLineById[(int) $rpsLine['id']] = $rpsLine;
 }
 
-$rpsGroups = [1 => [], -1 => [], 0 => []];
-foreach ($rpsScopeLines as $rpsLine) {
-    $rpsGroups[$rpsLine['state']][] = $rpsLine;
+$rpsTableGroups = [];
+foreach (flatten_tree(recurse_tree(0, 0, $activeDigiriskElementList)) as $rpsNodeId => $rpsNode) {
+    if (!isset($rpsLineById[$rpsNodeId])) {
+        continue;
+    }
+    $rpsParentId = (int) $rpsNode['object']->fk_parent;
+    if (!isset($rpsTableGroups[$rpsParentId])) {
+        // Chemin du groupement sous le groupement de tete, pour situer un groupement imbrique
+        $rpsPath     = [];
+        $rpsAncestor = $activeDigiriskElementList[$rpsParentId] ?? null;
+        $rpsGuard    = 0;
+        while ($rpsAncestor && !empty($rpsAncestor->fk_parent) && $rpsGuard++ < 50) {
+            $rpsAncestor = $activeDigiriskElementList[$rpsAncestor->fk_parent] ?? null;
+            if ($rpsAncestor && !empty($rpsAncestor->fk_parent)) {
+                array_unshift($rpsPath, $rpsAncestor->ref);
+            }
+        }
+        $rpsTableGroups[$rpsParentId] = [
+            'element' => $activeDigiriskElementList[$rpsParentId] ?? null,
+            'path'    => implode(' › ', $rpsPath),
+            'lines'   => [],
+        ];
+    }
+    $rpsTableGroups[$rpsParentId]['lines'][] = $rpsLineById[$rpsNodeId];
 }
 
-$rpsDone  = 0;
-$rpsTotal = 0.0;
-$rpsBand  = 0;
-foreach ($rpsGroups[1] as $rpsLine) {
+$rpsCounts = [1 => 0, 0 => 0, -1 => 0];
+$rpsDone   = 0;
+$rpsTotal  = 0.0;
+$rpsBand   = 0;
+foreach ($rpsLines as $rpsLine) {
+    $rpsCounts[$rpsLine['state']]++;
     if ($rpsLine['done']) {
         $rpsDone++;
         $rpsTotal += $rpsLine['average'];
@@ -57,160 +81,199 @@ foreach ($rpsGroups[1] as $rpsLine) {
         $rpsBand = max($rpsBand, $rpsLine['band']);
     }
 }
-$rpsConcerned = count($rpsGroups[1]);
+$rpsConcerned = $rpsCounts[1];
 $rpsAverage   = $rpsDone > 0 ? $rpsTotal / $rpsDone : 0;
 $rpsCoverage  = $rpsConcerned > 0 ? round(100 * $rpsDone / $rpsConcerned) : 0;
 
-$rpsGroupMeta = [
-    1  => ['key' => 'yes', 'title' => 'Unités concernées',     'hint' => 'le risque psychosocial apparaît dans leurs risques et entre dans la cotation'],
-    -1 => ['key' => 'tbd', 'title' => 'Unités à qualifier',    'hint' => 'exposition à trancher avant la prochaine mise à jour du document unique'],
-    0  => ['key' => 'no',  'title' => 'Unités non concernées', 'hint' => 'hors périmètre : motif conservé, aucune ligne de risque, aucune cotation'],
-];
+$rpsStateLabels = [1 => 'Concernée', 0 => 'Non concernée', -1 => 'À qualifier'];
+$rpsTabs        = ['all' => ['Toutes', count($rpsLines)], '-1' => ['À qualifier', $rpsCounts[-1]], '1' => ['Concernées', $rpsCounts[1]], '0' => ['Non concernées', $rpsCounts[0]]];
 
 ?>
-<div class="rps-scope rps-scope-top">
+<div class="rps-scope rps-scope-table" data-endpoint="<?php echo dol_buildpath('/digiriskdolibarr/core/ajax/save_rps_assessment.php', 1); ?>"
+     data-scale-labels="<?php echo dol_escape_htmltag(json_encode($rpsScaleLabels)); ?>">
 
     <div class="rps-head">
-        <span class="rps-head-title">
-            <i class="fas fa-brain"></i>
-            Risques psychosociaux
-            <span class="rps-head-sub">toutes les unités de travail du document unique &mdash; une qualification par unité</span>
-        </span>
-
-        <span class="rps-head-metrics">
-            <span class="rps-metric">
-                <b class="rps-num" id="rps-average"><?php echo $rpsDone > 0 ? number_format($rpsAverage, 2, ',', ' ') : '—'; ?></b>
-                <span class="rps-metric-label">/ 4 cotation</span>
-            </span>
-            <span class="rps-pill rps-pill-band" id="rps-band"
-                  style="background:<?php echo $rpsDone > 0 ? $rpsScale[$rpsBand]['color'] : '#f1f2f5'; ?>;color:<?php echo $rpsDone > 0 ? $rpsScale[$rpsBand]['ink'] : '#9aa1ab'; ?>">
-                <?php echo $rpsDone > 0 ? $rpsScale[$rpsBand]['range'] . ' · ' . $rpsScale[$rpsBand]['label'] : 'non cotée'; ?>
-            </span>
-            <span class="rps-metric rps-metric-coverage">
-                <span class="rps-metric-label"><b id="rps-done"><?php echo $rpsDone; ?></b>/<b id="rps-concerned"><?php echo $rpsConcerned; ?></b> évaluées</span>
-                <span class="rps-bar"><i id="rps-bar" style="width:<?php echo (int) $rpsCoverage; ?>%"></i></span>
-            </span>
-        </span>
-
-        <button type="button" class="rps-icon-button rps-scope-toggle" title="Replier"><i class="fas fa-chevron-up"></i></button>
-    </div>
-
-    <div class="rps-body">
-        <?php foreach ($rpsGroups as $rpsState => $rpsStateLines) :
-            $rpsMeta = $rpsGroupMeta[$rpsState]; ?>
-            <section class="rps-group" data-group="<?php echo $rpsMeta['key']; ?>" <?php echo empty($rpsStateLines) ? 'hidden' : ''; ?>>
-                <div class="rps-group-head">
-                    <span class="rps-group-title"><?php echo dol_escape_htmltag($rpsMeta['title']); ?></span>
-                    <span class="rps-count"><?php echo count($rpsStateLines); ?></span>
-                    <span class="rps-group-hint"><?php echo dol_escape_htmltag($rpsMeta['hint']); ?></span>
-                    <?php if ($rpsMeta['key'] == 'yes') : ?>
-                        <span class="rps-group-legend">
-                            <?php foreach ($rpsSubCategories as $rpsPosition => $rpsSub) : ?>
-                                <abbr title="<?php echo dol_escape_htmltag($langs->trans($rpsSub['label'])); ?>">F<?php echo (int) $rpsPosition + 1; ?></abbr>
-                            <?php endforeach; ?>
-                        </span>
-                    <?php endif; ?>
-                </div>
-
-                <div class="rps-rows">
-                    <?php foreach ($rpsStateLines as $rpsLine) : ?>
-                        <div class="rps-row" data-element="<?php echo (int) $rpsLine['id']; ?>"
-                             data-state="<?php echo (int) $rpsLine['state']; ?>"
-                             data-average="<?php echo $rpsLine['done'] ? sprintf('%.4f', $rpsLine['average']) : ''; ?>">
-
-                            <div class="rps-unit">
-                                <span class="rps-unit-ref"><?php echo dol_escape_htmltag($rpsLine['ref']); ?></span>
-                                <span class="rps-unit-label"><?php echo dol_escape_htmltag($rpsLine['label']); ?></span>
-                                <span class="rps-unit-meta">
-                                    <?php if ($rpsLine['state'] === 0) : ?>
-                                        <i class="fas fa-circle-info"></i> <span class="rps-reason"><?php echo dol_escape_htmltag($rpsLine['reason']); ?></span>
-                                        <?php if (!empty($rpsLine['orphans'])) : ?>
-                                            <span class="rps-attention">&middot; <?php echo count($rpsLine['orphans']); ?> risque<?php echo count($rpsLine['orphans']) > 1 ? 's' : ''; ?> à archiver</span>
-                                        <?php endif; ?>
-                                    <?php elseif ($rpsLine['state'] === -1) : ?>
-                                        exposition non tranchée
-                                    <?php elseif ($rpsLine['done']) : ?>
-                                        évaluée le <?php echo dol_print_date(strtotime($rpsLine['date']), 'day'); ?>
-                                        <?php if (!empty($rpsLine['toTreat'])) : ?>
-                                            &middot; <?php echo count($rpsLine['toTreat']); ?> facteur<?php echo count($rpsLine['toTreat']) > 1 ? 's' : ''; ?> à traiter,
-                                            <?php if (empty($rpsLine['tasks'])) : ?>
-                                                <span class="rps-attention">aucune action</span>
-                                            <?php else :
-                                                $rpsDoneCount = 0;
-                                                foreach ($rpsLine['tasks'] as $rpsTask) {
-                                                    if ($rpsTask['done']) {
-                                                        $rpsDoneCount++;
-                                                    }
-                                                } ?>
-                                                <?php echo $rpsDoneCount; ?>/<?php echo count($rpsLine['tasks']); ?> action<?php echo count($rpsLine['tasks']) > 1 ? 's' : ''; ?> faite<?php echo $rpsDoneCount > 1 ? 's' : ''; ?>
-                                            <?php endif; ?>
-                                        <?php endif; ?>
-                                        <?php if (count($rpsLine['orphans']) > 6) : ?>
-                                            <span class="rps-attention">&middot; <?php echo count($rpsLine['orphans']); ?> risques RPS à consolider</span>
-                                        <?php endif; ?>
-                                    <?php else : ?>
-                                        <span class="rps-attention">aucun facteur coté</span>
-                                    <?php endif; ?>
-                                </span>
-                            </div>
-
-                            <div class="rps-factors">
-                                <?php foreach ($rpsSubCategories as $rpsPosition => $rpsSub) : ?>
-                                    <?php if (isset($rpsLine['levels'][$rpsPosition])) :
-                                        $rpsLevel = $rpsLine['levels'][$rpsPosition]; ?>
-                                        <span class="rps-cell" style="background:<?php echo $rpsScale[$rpsLevel]['color']; ?>;color:<?php echo $rpsScale[$rpsLevel]['ink']; ?>"
-                                              title="<?php echo dol_escape_htmltag($langs->trans($rpsSub['label']) . ' — ' . $rpsScale[$rpsLevel]['label']); ?>"><?php echo $rpsLevel; ?></span>
-                                    <?php else : ?>
-                                        <span class="rps-cell rps-cell-empty" title="<?php echo dol_escape_htmltag($langs->trans($rpsSub['label']) . ' — non évalué'); ?>"></span>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
-                            </div>
-
-                            <div class="rps-score">
-                                <?php if ($rpsLine['done']) : ?>
-                                    <b class="rps-num"><?php echo number_format($rpsLine['average'], 2, ',', ' '); ?></b>
-                                    <span class="rps-pill" style="background:<?php echo $rpsScale[$rpsLine['band']]['color']; ?>;color:<?php echo $rpsScale[$rpsLine['band']]['ink']; ?>"><?php echo $rpsScale[$rpsLine['band']]['range']; ?></span>
-                                <?php endif; ?>
-                            </div>
-
-                            <div class="rps-actions">
-                                <span class="rps-switch" role="group">
-                                    <button type="button" data-value="1" class="<?php echo $rpsLine['state'] === 1 ? 'is-yes' : ''; ?>">Concernée</button>
-                                    <button type="button" data-value="0" class="<?php echo $rpsLine['state'] === 0 ? 'is-no' : ''; ?>">Non</button>
-                                    <button type="button" data-value="-1" class="<?php echo $rpsLine['state'] === -1 ? 'is-tbd' : ''; ?>" title="À qualifier">?</button>
-                                </span>
-                                <a class="rps-evaluate" href="<?php echo dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . (int) $rpsLine['id']; ?>">
-                                    <i class="fas fa-arrow-right"></i>
-                                    <span>Ouvrir l'unité</span>
-                                </a>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </section>
-        <?php endforeach; ?>
-
-        <div class="rps-foot">
-            <span class="rps-foot-note">
-                <i class="fas fa-sitemap"></i>
-                La qualification se prend ici, une fois. Elle commande la liste des risques de chaque unité :
-                non concernée, l'unité n'affiche plus de ligne « risques psychosociaux ».
-            </span>
-            <span class="rps-foot-keys">
-                <?php foreach ($rpsScale as $rpsLevel => $rpsMetaScale) : ?>
-                    <span><i style="background:<?php echo $rpsMetaScale['color']; ?>"></i><?php echo $rpsLevel . ' ' . $rpsMetaScale['label']; ?></span>
-                <?php endforeach; ?>
-            </span>
-            <button type="button" class="rps-button rps-open-dict"><i class="fas fa-sliders"></i> Gérer les critères</button>
+        <span class="rps-head-icon"><i class="fas fa-brain"></i></span>
+        <div class="rps-head-text">
+            <span class="rps-head-title">Risques psychosociaux</span>
+            <span class="rps-head-sub">Une qualification par unité de travail, pour tout le document unique</span>
         </div>
 
-        <?php if (!empty($rpsExistingTotal) && $rpsExistingTotal > 1) : ?>
-            <div class="rps-note">
-                <i class="fas fa-triangle-exclamation"></i>
+        <div class="rps-head-metrics">
+            <div class="rps-metric">
+                <span class="rps-metric-label">Moyenne</span>
+                <span class="rps-metric-value">
+                    <b class="rps-num" id="rps-average"><?php echo $rpsDone > 0 ? number_format($rpsAverage, 2, ',', ' ') : '—'; ?></b> / 4
+                </span>
+            </div>
+            <span class="rps-band" id="rps-band" data-scale="<?php echo $rpsDone > 0 ? (int) $rpsBand : 0; ?>" title="Niveau de l'unité la plus exposée">
+                <?php echo $rpsDone > 0 ? $rpsScaleLabels[$rpsBand] : 'non cotée'; ?>
+            </span>
+            <div class="rps-metric">
+                <span class="rps-metric-label"><b id="rps-done"><?php echo $rpsDone; ?></b>/<b id="rps-concerned"><?php echo $rpsConcerned; ?></b> évaluées</span>
+                <progress class="rps-progress" id="rps-bar" max="100" value="<?php echo (int) $rpsCoverage; ?>"></progress>
+            </div>
+        </div>
+    </div>
+
+    <div class="rps-toolbar">
+        <div class="rps-tabs" role="tablist">
+            <?php foreach ($rpsTabs as $rpsFilter => $rpsTab) : ?>
+                <button type="button" class="rps-tab<?php echo $rpsFilter === 'all' ? ' is-on' : ''; ?>" data-filter="<?php echo $rpsFilter; ?>" role="tab">
+                    <?php echo $rpsTab[0]; ?> <span class="rps-tab-count"><?php echo (int) $rpsTab[1]; ?></span>
+                </button>
+            <?php endforeach; ?>
+        </div>
+        <label class="rps-search">
+            <i class="fas fa-search"></i>
+            <input type="search" class="rps-search-input" placeholder="Rechercher une unité…" aria-label="Rechercher une unité">
+        </label>
+        <label class="rps-group-toggle"><input type="checkbox" class="rps-group-input" checked> Grouper par GP</label>
+    </div>
+
+    <div class="rps-table-wrap">
+        <table class="rps-table">
+            <thead>
+                <tr>
+                    <th class="rps-col-check"><input type="checkbox" class="rps-select-all" title="Tout sélectionner" aria-label="Tout sélectionner"></th>
+                    <th class="rps-col-unit">Unité</th>
+                    <th class="rps-col-state">Qualification</th>
+                    <?php foreach ($rpsSubCategories as $rpsPosition => $rpsSub) : ?>
+                        <th class="rps-col-factor"><abbr title="<?php echo dol_escape_htmltag($langs->trans($rpsSub['label'])); ?>">F<?php echo (int) $rpsPosition + 1; ?></abbr></th>
+                    <?php endforeach; ?>
+                    <th class="rps-col-score">Moy.</th>
+                    <th class="rps-col-date">Évaluée le</th>
+                    <th class="rps-col-go"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($rpsTableGroups as $rpsGroupId => $rpsGroup) : ?>
+                    <tr class="rps-group-row" data-group="<?php echo (int) $rpsGroupId; ?>">
+                        <td class="rps-col-check">
+                            <input type="checkbox" class="rps-select-group" title="Sélectionner les unités du groupement" aria-label="Sélectionner les unités du groupement">
+                        </td>
+                        <td colspan="11">
+                            <?php if (!empty($rpsGroup['element'])) : ?>
+                                <span class="rps-unit-ref is-groupment"><?php echo dol_escape_htmltag($rpsGroup['element']->ref); ?></span>
+                                <?php echo dol_escape_htmltag($rpsGroup['element']->label); ?>
+                                <?php if ($rpsGroup['path'] !== '') : ?>
+                                    <span class="rps-group-path">· dans <?php echo dol_escape_htmltag($rpsGroup['path']); ?></span>
+                                <?php endif; ?>
+                            <?php else : ?>
+                                Hors groupement
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+
+                    <?php foreach ($rpsGroup['lines'] as $rpsLine) :
+                        $rpsState   = (int) $rpsLine['state'];
+                        $rpsLevels  = $rpsLine['levels'];
+                        $rpsHasEval = count($rpsLevels) > 0;
+                        // La moyenne est gardee meme hors perimetre : repasser l'unite en concernee la retrouve
+                        $rpsLineAverage = $rpsHasEval ? array_sum($rpsLevels) / count($rpsLevels) : null; ?>
+                        <tr class="rps-row" id="rps-unit-<?php echo (int) $rpsLine['id']; ?>"
+                            data-element="<?php echo (int) $rpsLine['id']; ?>"
+                            data-group="<?php echo (int) $rpsLine['parent']; ?>"
+                            data-state="<?php echo $rpsState; ?>"
+                            data-done="<?php echo $rpsHasEval ? 1 : 0; ?>"
+                            data-average="<?php echo $rpsHasEval ? sprintf('%.4f', $rpsLineAverage) : ''; ?>"
+                            data-search="<?php echo dol_escape_htmltag($rpsLine['ref'] . ' ' . $rpsLine['label']); ?>">
+                            <td class="rps-col-check">
+                                <input type="checkbox" class="rps-select" aria-label="Sélectionner <?php echo dol_escape_htmltag($rpsLine['ref']); ?>">
+                            </td>
+                            <td class="rps-col-unit">
+                                <a class="rps-unit" href="<?php echo $rpsUnitUrl . (int) $rpsLine['id']; ?>">
+                                    <span class="rps-unit-ref"><?php echo dol_escape_htmltag($rpsLine['ref']); ?></span>
+                                    <span class="rps-unit-label" title="<?php echo dol_escape_htmltag($rpsLine['label']); ?>"><?php echo dol_escape_htmltag($rpsLine['label']); ?></span>
+                                </a>
+                            </td>
+                            <td class="rps-col-state">
+                                <span class="rps-state-select" data-state="<?php echo $rpsState; ?>">
+                                    <select class="rps-state-input" aria-label="Qualification de <?php echo dol_escape_htmltag($rpsLine['ref']); ?>">
+                                        <?php foreach ($rpsStateLabels as $rpsStateValue => $rpsStateLabel) : ?>
+                                            <option value="<?php echo $rpsStateValue; ?>"<?php echo $rpsStateValue === $rpsState ? ' selected' : ''; ?>><?php echo $rpsStateLabel; ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <i class="fas fa-chevron-down"></i>
+                                </span>
+                            </td>
+                            <?php // Facteurs d'une unite evaluee, ou a la place une seule case selon son etat : la feuille de style montre la bonne ?>
+                            <?php foreach ($rpsSubCategories as $rpsPosition => $rpsSub) :
+                                $rpsLevel = (int) ($rpsLevels[$rpsPosition] ?? 0); ?>
+                                <td class="rps-col-factor">
+                                    <span class="rps-cell" data-scale="<?php echo $rpsLevel; ?>"
+                                          title="<?php echo dol_escape_htmltag($langs->trans($rpsSub['label']) . ' — ' . ($rpsLevel ? $rpsScale[$rpsLevel]['label'] : 'non évalué')); ?>"><?php echo $rpsLevel ?: ''; ?></span>
+                                </td>
+                            <?php endforeach; ?>
+                            <td class="rps-col-span" colspan="6">
+                                <a class="rps-when-yes" href="<?php echo $rpsUnitUrl . (int) $rpsLine['id']; ?>#rps-eval"><i class="fas fa-clipboard-list"></i> Évaluer cette unité</a>
+                                <button type="button" class="rps-when-no rps-reason" title="Modifier le motif">
+                                    <i class="fas fa-info-circle"></i> <span class="rps-reason-text"><?php echo dol_escape_htmltag($rpsLine['reason']); ?></span>
+                                </button>
+                                <span class="rps-when-tbd">Exposition à trancher</span>
+                            </td>
+                            <td class="rps-col-score">
+                                <?php if ($rpsHasEval) : ?>
+                                    <span class="rps-score"><i class="rps-dot" data-scale="<?php echo rps_scope_band($rpsLineAverage); ?>"></i><b><?php echo number_format($rpsLineAverage, 2, ',', ' '); ?></b></span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="rps-col-date">
+                                <?php if (!empty($rpsLine['date'])) : ?>
+                                    <span class="rps-date"><?php echo dol_print_date(strtotime($rpsLine['date']), 'day'); ?></span>
+                                <?php endif; ?>
+                                <?php if (!empty($rpsLine['untreated'])) : ?>
+                                    <i class="fas fa-exclamation-triangle rps-untreated" title="<?php echo count($rpsLine['untreated']); ?> facteur<?php echo count($rpsLine['untreated']) > 1 ? 's' : ''; ?> élevé<?php echo count($rpsLine['untreated']) > 1 ? 's' : ''; ?> sans action"></i>
+                                <?php endif; ?>
+                            </td>
+                            <td class="rps-col-go">
+                                <a class="wpeo-button button-transparent button-square-30" href="<?php echo $rpsUnitUrl . (int) $rpsLine['id']; ?>" title="Ouvrir l'unité" aria-label="Ouvrir l'unité">
+                                    <i class="fas fa-arrow-right button-icon"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endforeach; ?>
+                <tr class="rps-empty rps-hidden"><td colspan="12">Aucune unité ne correspond.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="rps-bulk rps-hidden">
+        <b class="rps-bulk-count"></b>
+        <span class="rps-bulk-label">Passer en :</span>
+        <button type="button" class="wpeo-button button-size-small rps-bulk-apply" data-state="1"><i class="fas fa-check"></i> Concernées</button>
+        <button type="button" class="wpeo-button button-size-small rps-bulk-apply" data-state="0"><i class="fas fa-times"></i> Non concernées…</button>
+        <button type="button" class="wpeo-button button-size-small rps-bulk-apply" data-state="-1"><i class="fas fa-question"></i> À qualifier</button>
+        <button type="button" class="wpeo-button button-transparent button-square-30 rps-bulk-clear" title="Désélectionner" aria-label="Désélectionner">
+            <i class="fas fa-times button-icon"></i>
+        </button>
+    </div>
+
+    <div class="rps-foot">
+        <span class="rps-keys">
+            <?php foreach ($rpsScale as $rpsLevel => $rpsMetaScale) : ?>
+                <span class="rps-key"><i class="rps-key-swatch" data-scale="<?php echo (int) $rpsLevel; ?>"></i><?php echo $rpsLevel . ' ' . $rpsMetaScale['label']; ?></span>
+            <?php endforeach; ?>
+        </span>
+        <span class="rps-factor-keys">
+            <?php foreach ($rpsSubCategories as $rpsPosition => $rpsSub) : ?>
+                <span><b>F<?php echo (int) $rpsPosition + 1; ?></b> <?php echo dol_escape_htmltag($langs->trans($rpsSub['label'])); ?></span>
+            <?php endforeach; ?>
+        </span>
+        <div class="wpeo-button button-grey button-size-small modal-open">
+            <input type="hidden" class="modal-options" data-modal-to-open="rps_dict_modal">
+            <i class="fas fa-sliders-h"></i> Gérer les critères
+        </div>
+    </div>
+
+    <?php if (!empty($rpsExistingTotal) && $rpsExistingTotal > 1) : ?>
+        <div class="rps-note">
+            <span>
+                <i class="fas fa-exclamation-triangle"></i>
                 <b><?php echo (int) $rpsExistingTotal; ?> risques psychosociaux</b> sont aujourd'hui enregistrés séparément :
                 la grille INRS en crée un par critère, la modale « Faire le point » huit par unité. La qualification
                 ci-dessus les consolide en une ligne par unité de travail, sans rien sortir du document unique.
-            </div>
-        <?php endif; ?>
-    </div>
+            </span>
+        </div>
+    <?php endif; ?>
 </div>

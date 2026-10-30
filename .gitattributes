@@ -58,7 +58,6 @@
 .jshintignore             export-ignore
 .jshintrc                 export-ignore
 .phpcs.xml                export-ignore
-.scrutinizer.yml          export-ignore
 CLAUDE.md                 export-ignore
 composer.json             export-ignore
 composer.lock             export-ignore

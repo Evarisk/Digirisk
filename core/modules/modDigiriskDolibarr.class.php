@@ -361,10 +361,10 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$this->db = $db;
 
-		$this->saturneAvailable = file_exists(__DIR__ . '/../../../saturne/lib/saturne_functions.lib.php');
+		$this->saturneAvailable = file_exists(dol_buildpath('/saturne/lib/saturne_functions.lib.php'));
 
 		if ($this->saturneAvailable) {
-			require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
+			dol_include_once('/saturne/lib/saturne_functions.lib.php');
 			saturne_load_langs(['digiriskdolibarr@digiriskdolibarr']);
 		} else {
 			$this->error++;
@@ -387,7 +387,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '23.5.0';
+		$this->version         = '23.6.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr_color@digiriskdolibarr';
 
@@ -415,7 +415,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			// Set this to 1 if module has its own theme directory (theme)
 			'theme' => 0,
 			// Set this to relative path of css file if module has its own css file
-			'css' => ['/digiriskdolibarr/css/patch_preview_icon.css'],
+			'css' => [],
 			// Set this to relative path of js file if module must load a js on all pages
 			'js' => [],
 			// Set here all hooks context managed by module. To find available hook context, make a "grep -r '>initHooks(' *" on source code. You can also set hook context to 'all'
@@ -736,6 +736,12 @@ class modDigiriskdolibarr extends DolibarrModules
             // chacune reste activable séparément depuis la configuration des risques
             $i++ => ['DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_METHOD', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_GRID_METHOD', 'integer', 1, '', 0, 'current'],
+            // Public overview of the risks of the GP/UT: closed until opened in the setup, which creates its key
+            $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE', 'integer', 0, '', 0, 'current'],
+            // Its strenuousness, psychosocial and register tabs are shown until switched off
+            $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_PENIBILITY', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_PSYCHOSOCIAL', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_REGISTER', 'integer', 1, '', 0, 'current'],
 
 			// CONST RISK ASSESSMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE', 'integer', 1, '', 0, 'current'],
@@ -884,6 +890,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON', 'chaine', 'mod_ticketdocument_standard', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKETDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/ticketdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKETDOCUMENT_DEFAULT_MODEL', 'chaine', 'ticketdocument_odt', '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_TICKETQQOQCPDOCUMENT_ADDON', 'chaine', 'mod_ticketqqoqcpdocument_standard', '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_TICKETQQOQCPDOCUMENT_DEFAULT_MODEL', 'chaine', 'ticketqqoqcpdocument', '', 0, 'current'],
 
 			// CONST PROJECT DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_PROJECTDOCUMENT_ADDON', 'chaine', 'mod_projectdocument_standard', '', 0, 'current'],
@@ -1794,6 +1802,22 @@ class modDigiriskdolibarr extends DolibarrModules
         $this->menu[$r++] = [
             'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskticket',
             'type'     => 'left',
+            'titre'    => $langs->transnoentities('TicketKanban'),
+            'prefix'   => '<i class="fas fa-columns pictofixedwidth"></i>',
+            'mainmenu' => 'digiriskdolibarr',
+            'leftmenu' => 'digiriskdolibarr_ticketkanban',
+            'url'      => '/digiriskdolibarr/view/ticket/ticket_action_card.php',
+            'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+            'position' => 100 + $r,
+            'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'ticket\')',
+            'perms'    => '$user->rights->digiriskdolibarr->lire && $user->rights->ticket->read',
+            'target'   => '',
+            'user'     => 0,
+        ];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskticket',
+            'type'     => 'left',
             'titre'    => '<i class="fas fa-list pictofixedwidth"></i>' . $langs->transnoentities('TicketList'),
             'mainmenu' => 'digiriskdolibarr',
             'leftmenu' => 'digiriskdolibarr_ticketlist',
@@ -1836,6 +1860,25 @@ class modDigiriskdolibarr extends DolibarrModules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		];
+
+		// The media library page belongs to Saturne : no entry while the installed Saturne does not ship it yet
+		if (file_exists(dol_buildpath('/saturne/view/saturne_medias.php'))) {
+			$this->menu[$r++] = [
+				'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',
+				'type'     => 'left',
+				'titre'    => 'MediaGallery',
+				'prefix'   => '<i class="fas fa-images pictofixedwidth"></i>',
+				'mainmenu' => 'digiriskdolibarr',
+				'leftmenu' => 'digiriskdolibarr_medias',
+				'url'      => '/saturne/view/saturne_medias.php?module_name=digiriskdolibarr',
+				'langs'    => 'medias@saturne',
+				'position' => 100 + $r,
+				'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',
+				'perms'    => '$user->rights->digiriskdolibarr->digiriskelement->read',
+				'target'   => '',
+				'user'     => 0,
+			];
+		}
 
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
@@ -2238,10 +2281,15 @@ class modDigiriskdolibarr extends DolibarrModules
             return 0;
         }
 
+        // Dolibarr runs init() before activating $this->depends : activate them first, their tables (saturne_schedules, ticket...) are filled below
+        if (function_exists('saturne_activate_module_dependencies') && saturne_activate_module_dependencies($this) < 0) {
+            return 0;
+        }
+
         if (empty($conf->global->DIGIRISKDOLIBARR_ACCIDENT_REMOVE_FK_USER_VICTIM)) {
 
             require_once __DIR__ . '/../../class/accident.class.php';
-            require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+            dol_include_once('/saturne/class/saturnesignature.class.php');
 
             $accident  = new Accident($this->db);
             $signatory = new SaturneSignature($this->db);
@@ -2322,6 +2370,7 @@ class modDigiriskdolibarr extends DolibarrModules
         delDocumentModel('accidentinvestigationdocument', 'accidentinvestigationdocument');
         delDocumentModel('registerdocument_odt', 'registerdocument');
         delDocumentModel('ticketdocument', 'ticketdocument');
+        delDocumentModel('ticketqqoqcpdocument', 'ticketqqoqcpdocument');
 
 		addDocumentModel('informationssharing_odt', 'informationssharing', 'ODT templates', 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
 		addDocumentModel('legaldisplay_odt', 'legaldisplay', 'ODT templates', 'DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
@@ -2350,6 +2399,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		addDocumentModel('auditreportdocument_odt', 'auditreportdocument', 'ODT templates', 'DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('ticketdocument_odt', 'ticketdocument', 'ODT templates', 'DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('ticketdocument', 'ticketdocument', $langs->transnoentities('TicketDocumentPDF'));
+        addDocumentModel('ticketqqoqcpdocument', 'ticketqqoqcpdocument', $langs->transnoentities('TicketQqoqcpDocumentPDF'));
 		addDocumentModel('papripact_a3_paysage_projectdocument', 'project', 'PAPRIPACT-A3-PAYSAGE');
         addDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument', 'ODT templates', 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('accidentinvestigationdocument', 'accidentinvestigationdocument', $langs->transnoentities('AccidentInvestigationDocumentPDF'));
@@ -2586,7 +2636,7 @@ class modDigiriskdolibarr extends DolibarrModules
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 2, 'integer', 0, '', $conf->entity);
         }
 		if (getDolGlobalInt('DIGIRISKDOLIBARR_THIRDPARTY_UPDATED') == 2) {
-			require_once __DIR__ . '/../../../saturne/class/saturneschedules.class.php';
+			dol_include_once('/saturne/class/saturneschedules.class.php');
 
 			$labourDoctorID = $resources->fetchDigiriskResource('LabourDoctorSociety');
 			$societe->fetch($labourDoctorID);
@@ -2633,7 +2683,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'fk_firepermit'            => ['Label' => 'FirePermit',            'type' => 'link', 'elementtype' => ['projet_task'], 'position' => $this->numero . 30, 'params' => ['FirePermit:digiriskdolibarr/class/firepermit.class.php:1:(entity:IN:__SHARED_ENTITIES__)' => NULL],                     ],
             'fk_accident'              => ['Label' => 'Accident',              'type' => 'link', 'elementtype' => ['projet_task'], 'position' => $this->numero . 40, 'params' => ['Accident:digiriskdolibarr/class/accident.class.php:1:(entity:IN:__SHARED_ENTITIES__)' => NULL],                         ],
             'fk_accidentinvestigation' => ['Label' => 'AccidentInvestigation', 'type' => 'link',   'elementtype' => ['projet_task'], 'position' => $this->numero . 50, 'params' => ['AccidentInvestigation:digiriskdolibarr/class/accidentinvestigation.class.php:1:(entity:IN:__SHARED_ENTITIES__)' => NULL]],
-            'digirisk_action_type'     => ['Label' => 'DigiriskActionType',    'type' => 'select', 'elementtype' => ['projet_task'], 'position' => $this->numero . 60, 'params' => [1 => 'Curative', 2 => 'Corrective'],                                                                                                                                                       ],
+            'digirisk_action_type'     => ['Label' => 'DigiriskActionType',    'type' => 'select', 'elementtype' => ['projet_task'], 'position' => $this->numero . 60, 'params' => [1 => 'Curative', 2 => 'Corrective', 3 => 'Preventive'],                                                                                                                                    ],
 
             'wp_digi_id' => ['Label' => 'WPDigiID', 'type' => 'int', 'length' => 100, 'elementtype' => ['digiriskdolibarr_digiriskelement'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')"],
             'entity'     => ['Label' => 'Entity',   'type' => 'int', 'length' => 100, 'elementtype' => ['digiriskdolibarr_digiriskelement'], 'position' => $this->numero . 20, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')"],
@@ -2644,6 +2694,15 @@ class modDigiriskdolibarr extends DolibarrModules
             'ticket_category_config' => ['Label' => 'TicketCategoryConfig', 'type' => 'text', 'elementtype' => ['categorie'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('categorie') && isModEnabled('ticket')", 'moreparams' => []],
 
 			'ticket_categories' => ['Label' => 'Categories', 'type' => 'text', 'elementtype' => ['ticket'], 'position' => 1, 'list' => 2, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('categorie') && isModEnabled('ticket')", 'moreparams' => []],
+
+            // QQOQCCP analysis of the ticket (#5549): filled and shown by its own tab and document, hidden from the native card
+            'digiriskdolibarr_qqoqcp_what'    => ['Label' => 'QQOQCPWhat',    'type' => 'text',     'elementtype' => ['ticket'], 'position' => $this->numero . 80, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => []],
+            'digiriskdolibarr_qqoqcp_who'     => ['Label' => 'QQOQCPWho',     'type' => 'chkbxlst', 'elementtype' => ['ticket'], 'position' => $this->numero . 81, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => [], 'params' => ['user:lastname|firstname:rowid' => null]],
+            'digiriskdolibarr_qqoqcp_where'   => ['Label' => 'QQOQCPWhere',   'type' => 'text',     'elementtype' => ['ticket'], 'position' => $this->numero . 82, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => []],
+            'digiriskdolibarr_qqoqcp_when'    => ['Label' => 'QQOQCPWhen',    'type' => 'text',     'elementtype' => ['ticket'], 'position' => $this->numero . 83, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => []],
+            'digiriskdolibarr_qqoqcp_how'     => ['Label' => 'QQOQCPHow',     'type' => 'text',     'elementtype' => ['ticket'], 'position' => $this->numero . 84, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => []],
+            'digiriskdolibarr_qqoqcp_why'     => ['Label' => 'QQOQCPWhy',     'type' => 'text',     'elementtype' => ['ticket'], 'position' => $this->numero . 85, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => []],
+            'digiriskdolibarr_qqoqcp_howmuch' => ['Label' => 'QQOQCPHowMuch', 'type' => 'text',     'elementtype' => ['ticket'], 'position' => $this->numero . 86, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => []],
 
 			'digirisk_identification' => ['Label' => 'DigiriskIdentification', 'type' => 'html', 'elementtype' => ['product'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('product')", 'moreparams' => ['visibility' => 0]],
 			'digirisk_security'       => ['Label' => 'DigiriskSecurity',       'type' => 'html', 'elementtype' => ['product'], 'position' => $this->numero . 20, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('product')", 'moreparams' => ['visibility' => 0]],
@@ -2736,7 +2795,8 @@ class modDigiriskdolibarr extends DolibarrModules
             $tags->fk_parent = $tagID;
             $tags->create($user);
 
-            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 3, 'integer', 0, '', $conf->entity);
+            // FP and TS are created by the next steps
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 1, 'integer', 0, '', $conf->entity);
         }
         if (getDolGlobalInt('DIGIRISKDOLIBARR_PROJECT_TAGS_SET') == 1) {
             //Install after 8.3.0
@@ -2768,6 +2828,32 @@ class modDigiriskdolibarr extends DolibarrModules
             $tags->create($user);
 
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 4, 'integer', 0, '', $conf->entity);
+        }
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_PROJECT_TAGS_SET') == 4) {
+            // Installs made while step 0 jumped to step 3 never got FP and TS, nor these tags on their projects
+            require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+
+            $qhseTag = new Categorie($this->db);
+            if ($qhseTag->fetch(0, 'QHSE', 'project') > 0) {
+                foreach (['FP' => 'DIGIRISKDOLIBARR_FIREPERMIT_PROJECT', 'TS' => 'DIGIRISKDOLIBARR_TICKET_PROJECT'] as $tagLabel => $projectConst) {
+                    $projectTag = new Categorie($this->db);
+                    if ($projectTag->fetch(0, $tagLabel, 'project') > 0) {
+                        continue;
+                    }
+
+                    $projectTag->label     = $tagLabel;
+                    $projectTag->type      = 'project';
+                    $projectTag->fk_parent = $qhseTag->id;
+                    if ($projectTag->create($user) > 0 && getDolGlobalInt($projectConst) > 0) {
+                        $project = new Project($this->db);
+                        if ($project->fetch(getDolGlobalInt($projectConst)) > 0) {
+                            $projectTag->add_type($project, 'project');
+                        }
+                    }
+                }
+            }
+
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 5, 'integer', 0, '', $conf->entity);
         }
 
         if (getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_TAGS_SET') == 0) {
@@ -2899,8 +2985,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			]
 		];
 
-		$externalmodule = json_decode($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING, true);
-		$externalmodule = !empty($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING) ? array_merge($externalmodule, $params) : $params;
+		$externalmodule = json_decode(getDolGlobalString('MULTICOMPANY_EXTERNAL_MODULES_SHARING'), true);
+		$externalmodule = is_array($externalmodule) ? array_merge($externalmodule, $params) : $params;
 		$jsonformat = json_encode($externalmodule);
 		dolibarr_set_const($this->db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat, 'json', 0, '', 0);
 

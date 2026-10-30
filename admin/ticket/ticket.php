@@ -290,6 +290,19 @@ if ($action == 'setChildCategoryLabel') {
 	setEventMessages($langs->transnoentities('ChildCategoryLabelSet'), array());
 }
 
+// PIN code of the public interface (#5549): empty, everyone may declare
+if ($action == 'setPublicInterfacePin' && $permissiontowrite) {
+    $publicInterfacePin = trim(GETPOST('public_interface_pin', 'alphanohtml'));
+    if ($publicInterfacePin !== '' && !preg_match('/^[0-9]{4,12}$/', $publicInterfacePin)) {
+        setEventMessages($langs->transnoentities('TicketPublicInterfacePinFormat'), [], 'errors');
+    } else {
+        dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_PIN', $publicInterfacePin, 'chaine', 0, '', $conf->entity);
+        setEventMessages($langs->transnoentities($publicInterfacePin === '' ? 'TicketPublicInterfacePinRemoved' : 'TicketPublicInterfacePinSet'), []);
+    }
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
 if ($action == 'generateQRCode') {
 	$urlToEncode = GETPOST('urlToEncode');
 	$targetPath = GETPOST('targetPath');
@@ -443,7 +456,7 @@ if ($action == 'set_ticket_location_elements' && $permissiontowrite) {
 }
 
 // Actions set_mod, update_mask and the set_/del_ switch of the module constants
-require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
+require_once dol_buildpath('/saturne/core/tpl/actions/admin_conf_actions.tpl.php');
 
 /*
  * View
@@ -524,6 +537,23 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 
     print '</table>';
     print '<div class="tabsAction reposition"><button type="submit" class="butAction">' . $langs->trans('Save') . '</button></div>';
+    print '</form>';
+
+    // PIN code asked by the public interface before its form (#5549)
+    print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '" name="ticket_public_interface_pin_form">';
+    print '<input type="hidden" name="token" value="' . newToken() . '">';
+    print '<input type="hidden" name="action" value="setPublicInterfacePin">';
+    print '<table class="noborder centpercent">';
+    print '<tr class="liste_titre">';
+    print '<td>' . $langs->transnoentities('Name') . '</td>';
+    print '<td>' . $langs->transnoentities('Value') . '</td>';
+    print '<td class="center">' . $langs->transnoentities('Action') . '</td>';
+    print '</tr>';
+    print '<tr class="oddeven"><td>' . $form->textwithpicto($langs->transnoentities('TicketPublicInterfacePin'), $langs->transnoentities('TicketPublicInterfacePinHelp')) . '</td>';
+    print '<td><input type="text" name="public_interface_pin" class="maxwidth150" inputmode="numeric" pattern="[0-9]{4,12}" maxlength="12" autocomplete="off" value="' . dol_escape_htmltag(getDolGlobalString('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_PIN')) . '" placeholder="' . dol_escape_htmltag($langs->transnoentities('TicketPublicInterfacePinNone')) . '"' . ($permissiontowrite ? '' : ' disabled') . '></td>';
+    print '<td class="center">' . ($permissiontowrite ? '<button type="submit" class="button">' . $langs->trans('Save') . '</button>' : '') . '</td>';
+    print '</tr>';
+    print '</table>';
     print '</form>';
 
     print load_fiche_titre($langs->transnoentities('Config'), '', '');

@@ -25,9 +25,9 @@
  */
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
-require_once __DIR__ . '/../../../../../../saturne/lib/medias.lib.php';
-require_once __DIR__ . '/../../../../../../saturne/lib/dolibarr.lib.php';
+dol_include_once('/saturne/core/modules/saturne/modules_saturne.php');
+dol_include_once('/saturne/lib/medias.lib.php');
+dol_include_once('/saturne/lib/dolibarr.lib.php');
 
 /**
  * Class to build the listing risks document as a PDF.
@@ -1013,33 +1013,16 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     }
 
     /**
-     * Chemin du QR code de l'interface publique de ticket.
+     * Chemin du QR code de l'interface publique de ticket, dessine pour ce document a partir de
+     * l'adresse configuree au moment de la generation.
      *
-     * @return string Chemin complet, vide si aucun QR code n'a ete genere
+     * @return string Chemin complet, vide si le QR code n'a pas pu etre dessine
      */
     protected function ticketQrCodePath(): string
     {
-        global $conf;
+        require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_ticket.lib.php';
 
-        // Le QR code partage entre entites prime, celui de l'entite prend le relais quand il n'y a
-        // rien de partage : sans ce repli une base multi-societe montee apres coup n'en aurait aucun
-        $qrCodeDirs = [$conf->digiriskdolibarr->multidir_output[$conf->entity ?: 1] . '/ticketqrcode/'];
-        if (isModEnabled('multicompany')) {
-            array_unshift($qrCodeDirs, DOL_DATA_ROOT . '/digiriskdolibarr/multicompany/ticketqrcode/');
-        }
-
-        foreach ($qrCodeDirs as $qrCodeDir) {
-            $qrCodeList = dol_dir_list($qrCodeDir, 'files');
-            if (!is_array($qrCodeList) || empty($qrCodeList)) {
-                continue;
-            }
-            $qrCode = array_shift($qrCodeList);
-            if (is_readable($qrCode['fullname'])) {
-                return $qrCode['fullname'];
-            }
-        }
-
-        return '';
+        return digiriskdolibarr_ticket_qrcode_file(digiriskdolibarr_ticket_public_interface_url());
     }
 
     /**

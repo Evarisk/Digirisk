@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '23.5.0';
+		$this->version     = '23.6.0';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -465,7 +465,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
             case 'TICKET_PUBLIC_INTERFACE_CREATE' :
-                require_once __DIR__ . '/../../../saturne/class/saturnemail.class.php';
+                dol_include_once('/saturne/class/saturnemail.class.php');
 
                 $categories = $object->getCategoriesCommon('ticket');
                 if (is_array($categories) && !empty($categories)) {

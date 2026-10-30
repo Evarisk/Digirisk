@@ -524,6 +524,87 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
     }
 
     /**
+     * Set psychosocial cotation by GP/UT segment
+     *
+     * The psychosocial tab of the public risk overview, in the document: one line per groupment and work
+     * unit, the level of each factor and the average of the rated ones, on 4. A groupment takes the
+     * average of its assessed work units.
+     *
+     * A level is a chip in the colour of the psychosocial scale (green to dark red), drawn by the character styles
+     * "RPS niveau 1" to "RPS niveau 4" of the template, "RPS NC" when there is no rating. They are
+     * named styles, which LibreOffice keeps when the template is saved again, unlike its automatic ones
+     *
+     * @param Odf       $odfHandler  Object builder odf library
+     * @param Translate $outputLangs Lang object to use for output
+     * @param array     $moreParam   More param (segmentName)
+     *
+     * @throws OdfException
+     * @throws Exception
+     */
+    private static function setPsychosocialCotationByGPUTSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
+    {
+        global $db;
+
+        try {
+            $listLines = $odfHandler->setSegment($moreParam['segmentName']);
+        } catch (OdfExceptionSegmentNotFound $e) {
+            // A template without the table: the assessments are not even read
+            dol_syslog($e->getMessage());
+            return;
+        }
+
+        require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_riskoverview.lib.php';
+
+        $digiriskElement           = new DigiriskElement($db);
+        $activeDigiriskElementList = $digiriskElement->getActiveDigiriskElements();
+        if (!is_array($activeDigiriskElementList)) {
+            $activeDigiriskElementList = [];
+        }
+
+        // Psychosocial scope and assessments of the work units, as read by the public risk overview: the
+        // template fills these two
+        $rpsLines         = [];
+        $rpsSubCategories = [];
+        require __DIR__ . '/../../../../tpl/riskanalysis/risk/digiriskdolibarr_rps_scope_data.tpl.php';
+
+        $factorColumns = digiriskRiskOverviewFactorColumns($rpsSubCategories);
+
+        // The value goes into the document as it is: odtphp decodes entities before writing it, so it
+        // must not hold any, the level or NC never does
+        $chip = function (array $cell) use ($outputLangs): string {
+            if ($cell['value'] === null) {
+                $style = 'RPS_20_NC';
+                $text  = $outputLangs->transnoentities('RiskOverviewNotConcerned');
+            } else {
+                $style = 'RPS_20_niveau_20_' . (int) $cell['scale'];
+                $text  = digiriskRiskOverviewFormatLevel((float) $cell['value']);
+            }
+            return '<text:span text:style-name="' . $style . '">' . "\u{00A0}" . $text . "\u{00A0}" . '</text:span>';
+        };
+
+        foreach (digiriskRiskOverviewRows($db, $activeDigiriskElementList, $rpsLines, $rpsSubCategories) as $overviewRow) {
+            $factorNumber = 1;
+            foreach ($factorColumns as $factorColumn) {
+                $listLines->setVars('psychosocialFactor' . $factorNumber++, $chip(digiriskRiskOverviewCell($overviewRow, 'rps', $factorColumn['position'], $factorColumns)), false, 'UTF-8');
+            }
+            $listLines->setVars('psychosocialAverage', $chip(digiriskRiskOverviewCell($overviewRow, 'rps', -1, $factorColumns)), false, 'UTF-8');
+
+            $tmpArray = ['digiriskElementLabel' => str_repeat('&nbsp;', 4 * $overviewRow['depth']) . $overviewRow['ref'] . ' - ' . $overviewRow['label']];
+            static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+        }
+        $odfHandler->mergeSegment($listLines);
+
+        // Header of the table: the name of each factor
+        $tmpArray     = [];
+        $factorNumber = 1;
+        foreach ($factorColumns as $factorColumn) {
+            $tmpArray['psychosocialFactorName' . $factorNumber++] = $factorColumn['name'];
+        }
+
+        static::setTmpArrayVars($tmpArray, $odfHandler, $outputLangs, false);
+    }
+
+    /**
      * Set risk by entities segment
      *
      * @param Odf       $odfHandler  Object builder odf library
@@ -677,6 +758,10 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
             $moreParam['entity']           = 'current';
             $moreParam['digiriskElements'] = $loadDigiriskElementInfos[$moreParam['entity']]['digiriskElements'];
             static::setRiskAssessmentDocumentByEntity($odfHandler, $outputLangs, $moreParam, $loadRiskAssessmentDocumentInfos);
+
+            // The psychosocial scope belongs to the entity: no table for the shared elements
+            $moreParam['segmentName'] = 'currentPsychosocialCotationByGPUT';
+            self::setPsychosocialCotationByGPUTSegment($odfHandler, $outputLangs, $moreParam);
 
             if (!empty($moreParam['tmparray']['showSharedRisk_nocheck'])) {
                 $moreParam['entity']           = 'shared';

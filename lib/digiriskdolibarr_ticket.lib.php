@@ -223,6 +223,180 @@ function digiriskdolibarr_ticket_log_field_change(Ticket $ticket, string $fieldL
 }
 
 /**
+ * Return the parent task "TKP-<ref>" the tasks and the actions of a ticket hang under (#4881)
+ *
+ * @param  DoliDB $db     Database handler
+ * @param  Ticket $ticket Ticket
+ * @return int            ID of the parent task, 0 when the ticket has no project or no parent task yet
+ */
+function digiriskdolibarr_ticket_get_parent_task(DoliDB $db, Ticket $ticket): int
+{
+    if (empty($ticket->fk_project)) {
+        return 0;
+    }
+
+    $resql = $db->query('SELECT rowid FROM ' . MAIN_DB_PREFIX . "projet_task WHERE ref = '" . $db->escape('TKP-' . $ticket->ref) . "' AND fk_projet = " . (int) $ticket->fk_project);
+    $obj   = $resql ? $db->fetch_object($resql) : null;
+
+    return $obj ? (int) $obj->rowid : 0;
+}
+
+/**
+ * Create the parent task "TKP-<ref>" of a ticket, along with the first task or action added to it
+ *
+ * On failure the error is shown to the user, the caller only has to redirect.
+ *
+ * @param  Ticket $ticket   Ticket, linked to a project
+ * @param  User   $user     User creating the task
+ * @param  string $logConst Constant gating the traceability event
+ * @return int              ID of the parent task, <= 0 on error
+ */
+function digiriskdolibarr_ticket_create_parent_task(Ticket $ticket, User $user, string $logConst = ''): int
+{
+    global $db, $langs;
+
+    require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+
+    $parentTask             = new Task($db);
+    $parentTask->fk_project = $ticket->fk_project;
+    $parentTask->ref        = 'TKP-' . $ticket->ref;
+    $parentTask->label      = $langs->trans('Ticket') . ' ' . $ticket->ref;
+    $parentTask->progress   = 0;
+
+    $parentTaskId = (int) $parentTask->create($user);
+    if ($parentTaskId <= 0) {
+        setEventMessages($parentTask->error, $parentTask->errors, 'errors');
+        return $parentTaskId;
+    }
+
+    $db->query('UPDATE ' . MAIN_DB_PREFIX . "projet_task SET ref = '" . $db->escape($parentTask->ref) . "' WHERE rowid = " . $parentTaskId);
+    digiriskdolibarr_ticket_log_event($ticket, $langs->transnoentities('TicketTaskCreated', $parentTask->ref), $parentTask->label, $logConst);
+
+    return $parentTaskId;
+}
+
+/**
+ * Sections of the actions tab of a ticket, by digirisk_action_type
+ *
+ * @return array<int, array{titleKey: string, addKey: string}> Title and add-button keys of each type
+ */
+function digiriskdolibarr_ticket_action_sections(): array
+{
+    return [
+        2 => ['titleKey' => 'CorrectiveActions', 'addKey' => 'AddCorrectiveAction'],
+        3 => ['titleKey' => 'PreventiveActions', 'addKey' => 'AddPreventiveAction'],
+    ];
+}
+
+/**
+ * Return the corrective and preventive actions of a ticket (#5549)
+ *
+ * They are project tasks typed by digirisk_action_type, under one container task per type, itself a child of the
+ * parent task "TKP-<ref>" of the ticket.
+ *
+ * @param  DoliDB $db           Database handler
+ * @param  int    $parentTaskId Parent task of the ticket, from digiriskdolibarr_ticket_get_parent_task()
+ * @return array<int, array<int, stdClass>> Actions of each type
+ */
+function digiriskdolibarr_ticket_get_actions(DoliDB $db, int $parentTaskId): array
+{
+    require_once __DIR__ . '/digiriskdolibarr_action.lib.php';
+
+    $actionsByType = [];
+    foreach (array_keys(digiriskdolibarr_ticket_action_sections()) as $type) {
+        $actionsByType[$type] = digiriskdolibarr_get_actions_by_type($db, $parentTaskId, $type);
+    }
+
+    return $actionsByType;
+}
+
+/**
+ * Count the actions of a ticket, done and in total, for each type
+ *
+ * @param  array<int, array<int, stdClass>> $actionsByType Actions of each type, from digiriskdolibarr_ticket_get_actions()
+ * @return array<int, array{done: int, total: int}>        Counters of each type
+ */
+function digiriskdolibarr_ticket_count_actions(array $actionsByType): array
+{
+    $counters = [];
+    foreach ($actionsByType as $type => $actions) {
+        $done = 0;
+        foreach ($actions as $action) {
+            if ((int) $action->progress >= 100) {
+                $done++;
+            }
+        }
+        $counters[$type] = ['done' => $done, 'total' => count($actions)];
+    }
+
+    return $counters;
+}
+
+/**
+ * Fields of the QQOQCCP analysis of a ticket (#5549): ticket extrafields, hidden from the native card, shown by the
+ * QQOQCCP tab and its document, in the order of the method. Who is a list of users, the six others are free text.
+ *
+ * @return array<string, array{label: string, help: string, picto: string}> Definition of each field, by extrafield key
+ */
+function digiriskdolibarr_ticket_qqoqcp_fields(): array
+{
+    return [
+        'digiriskdolibarr_qqoqcp_what'    => ['label' => 'QQOQCPWhat',    'help' => 'QQOQCPWhatHelp',    'picto' => 'fa-question'],
+        'digiriskdolibarr_qqoqcp_who'     => ['label' => 'QQOQCPWho',     'help' => 'QQOQCPWhoHelp',     'picto' => 'fa-users'],
+        'digiriskdolibarr_qqoqcp_where'   => ['label' => 'QQOQCPWhere',   'help' => 'QQOQCPWhereHelp',   'picto' => 'fa-map-marker-alt'],
+        'digiriskdolibarr_qqoqcp_when'    => ['label' => 'QQOQCPWhen',    'help' => 'QQOQCPWhenHelp',    'picto' => 'fa-calendar-alt'],
+        'digiriskdolibarr_qqoqcp_how'     => ['label' => 'QQOQCPHow',     'help' => 'QQOQCPHowHelp',     'picto' => 'fa-cogs'],
+        'digiriskdolibarr_qqoqcp_howmuch' => ['label' => 'QQOQCPHowMuch', 'help' => 'QQOQCPHowMuchHelp', 'picto' => 'fa-calculator'],
+        'digiriskdolibarr_qqoqcp_why'     => ['label' => 'QQOQCPWhy',     'help' => 'QQOQCPWhyHelp',     'picto' => 'fa-lightbulb'],
+    ];
+}
+
+/**
+ * Full names of the users of the Who field of the QQOQCP analysis
+ *
+ * @param  string $userIds Comma separated user ids, as stored by the chkbxlst extrafield
+ * @return string[]        Full names, sorted by last name
+ */
+function digiriskdolibarr_ticket_qqoqcp_who_names(string $userIds): array
+{
+    global $db;
+
+    $ids = array_filter(array_map('intval', explode(',', $userIds)));
+    if (empty($ids)) {
+        return [];
+    }
+
+    $names = [];
+    $resql = $db->query('SELECT firstname, lastname, login FROM ' . MAIN_DB_PREFIX . 'user WHERE rowid IN (' . implode(',', $ids) . ') ORDER BY lastname, firstname');
+    if ($resql) {
+        while ($obj = $db->fetch_object($resql)) {
+            $names[] = trim($obj->firstname . ' ' . $obj->lastname) ?: (string) $obj->login;
+        }
+        $db->free($resql);
+    }
+
+    return $names;
+}
+
+/**
+ * Number of the filled fields of the QQOQCP analysis of a ticket, for the badge of its tab
+ *
+ * @param  Ticket $ticket Ticket, its extrafields fetched
+ * @return int            Filled fields, out of seven
+ */
+function digiriskdolibarr_ticket_qqoqcp_filled_count(Ticket $ticket): int
+{
+    $filled = 0;
+    foreach (array_keys(digiriskdolibarr_ticket_qqoqcp_fields()) as $key) {
+        if (trim((string) ($ticket->array_options['options_' . $key] ?? '')) !== '') {
+            $filled++;
+        }
+    }
+
+    return $filled;
+}
+
+/**
  * Prepare ticket statistics pages header
  *
  * @return array $head   Array of tabs
@@ -689,4 +863,255 @@ function digiriskdolibarr_ticket_mail_models(): array
     $db->free($resql);
 
     return $mailModels;
+}
+
+/**
+ * Whether the public ticket interface of the entity may be used by the visitor (#5549)
+ *
+ * Without a PIN code set for the entity, everyone may declare. With one, only the session that typed it: the
+ * session keeps a hash of the code it unlocked, so changing the code locks the interface again for everyone.
+ *
+ * @param  int  $entity Entity of the public interface
+ * @return bool         True when the declaration form may be shown and its actions processed
+ */
+function digiriskdolibarr_ticket_public_pin_unlocked(int $entity): bool
+{
+    $pin = getDolGlobalString('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_PIN');
+    if ($pin === '') {
+        return true;
+    }
+
+    return hash_equals(hash('sha256', $pin), (string) ($_SESSION['digiriskdolibarr_ticket_public_pin'][$entity] ?? ''));
+}
+
+/**
+ * Check the PIN code typed on the public ticket interface, and unlock it for the session when it matches
+ *
+ * At most five wrong codes per quarter of an hour and per session, each one answered a second later, so the code
+ * cannot be found by trying them all.
+ *
+ * @param  string $pin    Code typed by the visitor
+ * @param  int    $entity Entity of the public interface
+ * @return int            1 unlocked, 0 wrong code, < 0 too many attempts: minutes left to wait, as a negative
+ */
+function digiriskdolibarr_ticket_public_pin_check(string $pin, int $entity): int
+{
+    $now         = dol_now();
+    $lockSeconds = 900;
+    $attempts    = array_values(array_filter((array) ($_SESSION['digiriskdolibarr_ticket_public_pin_attempts'] ?? []), static function ($attempt) use ($now, $lockSeconds): bool {
+        return (int) $attempt > $now - $lockSeconds;
+    }));
+    if (count($attempts) >= 5) {
+        $_SESSION['digiriskdolibarr_ticket_public_pin_attempts'] = $attempts;
+
+        return -max(1, (int) ceil((min($attempts) + $lockSeconds - $now) / 60));
+    }
+
+    $expected = getDolGlobalString('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_PIN');
+    if ($expected !== '' && hash_equals($expected, $pin)) {
+        $_SESSION['digiriskdolibarr_ticket_public_pin'][$entity] = hash('sha256', $expected);
+        unset($_SESSION['digiriskdolibarr_ticket_public_pin_attempts']);
+
+        return 1;
+    }
+
+    $attempts[] = $now;
+    $_SESSION['digiriskdolibarr_ticket_public_pin_attempts'] = $attempts;
+    sleep(1);
+
+    return 0;
+}
+
+/**
+ * Address of the public ticket interface the documents send people to
+ *
+ * The interface shared between entities comes first when Multicompany is enabled, the one of the entity
+ * otherwise, the order the documents always picked their QR code in. Within an interface, the address
+ * chosen in the configuration of the tickets (origin, short or external) is used, the origin one when the
+ * chosen one is empty, and the address of this server when nothing was ever saved.
+ *
+ * @return string Full URL
+ */
+function digiriskdolibarr_ticket_public_interface_url(): string
+{
+    global $conf;
+
+    $publicInterfaceTypes = isModEnabled('multicompany') ? ['multicompany', 'current'] : ['current'];
+    foreach ($publicInterfaceTypes as $publicInterfaceType) {
+        $constPrefix = 'DIGIRISKDOLIBARR_TICKET_' . dol_strtoupper($publicInterfaceType) . '_PUBLIC_INTERFACE_';
+        foreach (['origin', 'short', 'external'] as $urlType) {
+            $url = getDolGlobalString($constPrefix . 'URL_' . dol_strtoupper($urlType));
+            if (getDolGlobalString($constPrefix . 'RADIO') == $urlType . dol_ucfirst($publicInterfaceType) . 'TicketPublicInterfaceURL' && dol_strlen($url)) {
+                return $url;
+            }
+        }
+        if (getDolGlobalString($constPrefix . 'URL_ORIGIN')) {
+            return getDolGlobalString($constPrefix . 'URL_ORIGIN');
+        }
+    }
+
+    return dol_buildpath('/digiriskdolibarr/public/ticket/create_ticket.php', 2) . '?entity=' . $conf->entity;
+}
+
+/**
+ * QR code of the public ticket interface, drawn for the document being generated
+ *
+ * Drawn again for every document from the address configured at that moment: a code stored once kept
+ * pointing to an address changed since, and a document generated before anyone pressed the button of
+ * the configuration printed N/A in its place. The ODT templates resize the image in place to fit their
+ * cell, a reason more not to keep it.
+ *
+ * @param  string $url Address to encode
+ * @return string      Path of the PNG image, empty when it could not be drawn
+ */
+function digiriskdolibarr_ticket_qrcode_file(string $url): string
+{
+    global $conf;
+
+    require_once __DIR__ . '/digiriskdolibarr_mobile.lib.php';
+
+    $filePath = $conf->digiriskdolibarr->multidir_output[$conf->entity ?: 1] . '/temp/ticketqrcode.png';
+
+    return digiriskGetQrCodePng($url, $filePath) ? $filePath : '';
+}
+
+/**
+ * Files of the ticket directory a mail can carry (#4650): public interface photos, generated documents,
+ * attachments of earlier messages. Most recent first
+ *
+ * @param  Ticket $ticket Ticket
+ * @return array          dol_dir_list() entries, size included
+ */
+function digiriskdolibarr_ticket_files(Ticket $ticket): array
+{
+    global $conf;
+
+    require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+
+    return dol_dir_list($conf->ticket->dir_output . '/' . dol_sanitizeFileName($ticket->ref), 'files', 0, '', ['(\.meta|_preview.*\.png)$', '^\.'], 'date', SORT_DESC, 1);
+}
+
+/**
+ * Options of the "Attach ticket files" selector, for Form::multiselectarray()
+ *
+ * @param  array $files Files of the ticket, from digiriskdolibarr_ticket_files()
+ * @return array        Options, the escaped file name as id
+ */
+function digiriskdolibarr_ticket_files_options(array $files): array
+{
+    $options = [];
+    foreach ($files as $file) {
+        $fileSize  = dol_print_size($file['size'], 1, 1);
+        $options[] = [
+            'id'        => dol_escape_htmltag($file['name']),
+            'label'     => $file['name'] . ' (' . $fileSize . ')',
+            // A span, not the <i> of img_mime(): the data-html of the option only keeps a few tags.
+            'labelhtml' => '<span class="fa fa-' . dol_mimetype($file['name'], '', 4) . ' pictofixedwidth"></span>' . dol_escape_htmltag($file['name']) . ' <span class="opacitymedium">' . $fileSize . '</span>',
+        ];
+    }
+
+    return $options;
+}
+
+/**
+ * Files of the ticket picked in the "Attach ticket files" selector
+ *
+ * A name is only accepted if it is in the listing of the ticket directory, so nothing outside of it can
+ * be attached. The listing is keyed by the same filter GETPOST applies: it alters some names (double
+ * spaces), which would otherwise drop the file without a word.
+ *
+ * @param  Ticket $ticket Ticket
+ * @param  array  $names  Names posted by the selector, read with GETPOST(..., 'array')
+ * @return array          dol_dir_list() entries of the picked files, each one once
+ */
+function digiriskdolibarr_ticket_linked_files(Ticket $ticket, array $names): array
+{
+    if (empty($names)) {
+        return [];
+    }
+
+    $ticketFiles = [];
+    foreach (digiriskdolibarr_ticket_files($ticket) as $ticketFile) {
+        $ticketFiles[sanitizeVal($ticketFile['name'], 'alphanohtml')] = $ticketFile;
+    }
+
+    $linkedFiles = [];
+    foreach ($names as $name) {
+        if (is_string($name) && isset($ticketFiles[$name])) {
+            $linkedFiles[$name] = $ticketFiles[$name];
+        }
+    }
+
+    return array_values($linkedFiles);
+}
+
+/**
+ * Public download links of files of the ticket, to send them by mail instead of attaching them (#4650)
+ *
+ * Each file gets the share key of the core (llx_ecm_files.share, the "Share" box of the file list), created
+ * when missing, along with the index of the file when it has none. The link stays valid until the share is
+ * removed from that list.
+ *
+ * @param  Ticket $ticket Ticket the files belong to
+ * @param  array  $files  dol_dir_list() entries, from digiriskdolibarr_ticket_linked_files()
+ * @return array          Links keyed by file name; a file whose index could not be written is left out
+ */
+function digiriskdolibarr_ticket_files_share_links(Ticket $ticket, array $files): array
+{
+    global $db, $dolibarr_main_url_root, $user;
+
+    require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+    require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
+    require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmfiles.class.php';
+
+    // As the file list of the core: the address of the configuration file, not the one of the current request
+    $urlWithoutUrlRoot = preg_replace('/' . preg_quote(DOL_URL_ROOT, '/') . '$/i', '', trim($dolibarr_main_url_root));
+    $urlWithRoot       = $urlWithoutUrlRoot . DOL_URL_ROOT;
+
+    $links = [];
+    foreach ($files as $file) {
+        // The index keeps the directory relative to the documents root, entity included ("2/ticket/..."),
+        // computed as addFileIntoDatabaseIndex() does
+        $relativePath = ltrim(preg_replace('/^' . preg_quote(DOL_DATA_ROOT, '/') . '/', '', $file['path']), '/\\') . '/' . $file['name'];
+
+        $ecmFile = new EcmFiles($db);
+        if ($ecmFile->fetch(0, '', $relativePath) <= 0) {
+            if (addFileIntoDatabaseIndex($file['path'], $file['name'], $file['name'], 'uploaded', 1, $ticket) <= 0 || $ecmFile->fetch(0, '', $relativePath) <= 0) {
+                dol_syslog('digiriskdolibarr_ticket_files_share_links: no index for ' . $file['fullname'], LOG_WARNING);
+                continue;
+            }
+        }
+        if (empty($ecmFile->share)) {
+            $ecmFile->share = getRandomPassword(true);
+            if ($ecmFile->update($user) <= 0) {
+                dol_syslog('digiriskdolibarr_ticket_files_share_links: share key not saved for ' . $file['fullname'] . ': ' . $ecmFile->error, LOG_WARNING);
+                continue;
+            }
+        }
+
+        $links[$file['name']] = $urlWithRoot . '/document.php?hashp=' . $ecmFile->share;
+    }
+
+    return $links;
+}
+
+/**
+ * List of download links to put at the end of a ticket message (#4650)
+ *
+ * @param  array $files Files of the ticket, dol_dir_list() entries
+ * @param  array $links Links keyed by file name, from digiriskdolibarr_ticket_files_share_links()
+ * @return string       HTML block, empty when no file has a link
+ */
+function digiriskdolibarr_ticket_files_share_block(array $files, array $links): string
+{
+    global $langs;
+
+    $items = '';
+    foreach ($files as $file) {
+        if (!empty($links[$file['name']])) {
+            $items .= '<li><a href="' . dol_escape_htmltag($links[$file['name']]) . '">' . dol_escape_htmltag($file['name']) . '</a> (' . dol_print_size($file['size'], 1, 1) . ')</li>';
+        }
+    }
+
+    return $items === '' ? '' : '<p><b>' . $langs->transnoentities('TicketFilesShareLinksTitle') . '</b></p><ul>' . $items . '</ul>';
 }

@@ -1,0 +1,911 @@
+/* Digirisk modern theme: risk lists of a groupment or a work unit with the look of the simplified risk list of
+   DigiBoard (view/risk_list.php of that module). Only the look changes: every button, modal and class the
+   scripts of the list read stays where it was. The colours of the levels keep their meaning (grey, yellow,
+   red, black) in the lighter shades of DigiBoard. */
+
+$rl-border: #e5e7eb;
+$rl-border-soft: #f3f4f6;
+$rl-head: #f9fafb;
+$rl-head-text: #4b5563;
+$rl-text: #1f2937;
+$rl-muted: #6b7280;
+$rl-faint: #9ca3af;
+$rl-ref: #1e40af;
+$rl-link: #2563eb;
+$rl-done: #10b981;
+$rl-late: #dc2626;
+
+/* Badge of the last assessment of a risk: background, text */
+$rl-badges: (
+  '1': (#f1f5f9, #4b5563),
+  '2': (#fef3c7, #92400e),
+  '3': (#fee2e2, #991b1b),
+  '4': (#111827, #ffffff),
+);
+
+#{$dr-scope} {
+  .risk-list-simplified {
+    /* ---- Table: a white card, light header, airy rows ---- */
+
+    /* No font or line height on the table nor on its cells: the modals of a row sit inside its cells and would
+       inherit them. Each block of a cell sets its own */
+    table.liste {
+      border: 1px solid $rl-border !important;
+      border-radius: $dr-radius;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    table.liste > tbody > tr.liste_titre > th,
+    table.liste > tbody > tr.liste_titre > td.liste_titre:not(.maxwidthsearch),
+    table.liste > tbody > tr.liste_titre > td.liste_titre {
+      background: $rl-head;
+      text-transform: none;
+      letter-spacing: 0.02em;
+      font-size: 12px;
+      font-weight: 600;
+      color: $rl-head-text;
+    }
+
+    table.liste > tbody > tr.liste_titre > th {
+      padding: 8px 14px;
+      border-bottom: 1px solid $rl-border !important;
+    }
+
+    /* The column picker and the check-all box side by side, not stacked in the narrow action column */
+    table.liste > tbody > tr.liste_titre > th.maxwidthsearch {
+      white-space: nowrap;
+    }
+
+    /* A title that sorts nothing has no link: same weight and colour as the links of the others */
+    table.liste > tbody > tr.liste_titre > th.risk-protection {
+      font-weight: 400;
+      color: $dr-text-soft;
+    }
+
+    /* Search row: white, the title row below carries the grey */
+    table.liste > tbody > tr.liste_titre:has(> td.liste_titre) > td.liste_titre {
+      padding: 6px 14px;
+      border-bottom: 1px solid $rl-border-soft !important;
+      background: #ffffff;
+    }
+
+    table.liste > tbody > tr.oddeven > td {
+      padding: 12px 14px;
+      border-bottom: 1px solid $rl-border-soft;
+      vertical-align: top;
+    }
+
+    table.liste > tbody > tr.oddeven:hover,
+    table.liste > tbody > tr.oddeven:hover > td {
+      background: #fbfcfd !important;
+    }
+
+    /* The category filter: a small square instead of the big button of the add modal, its caret beside it rather
+       than wrapped onto a line of its own */
+    tr.liste_titre .category-danger .dropdown-toggle {
+      display: inline-flex;
+      align-items: center;
+
+      .wpeo-button.button-square-50 {
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        border-radius: $dr-radius-sm;
+
+        .button-icon {
+          line-height: 32px;
+        }
+      }
+
+      .danger-category-pic {
+        width: 32px;
+        height: 32px;
+      }
+    }
+
+    /* ---- Ref: bold, without picto, the pencil of the edit modal next to it ---- */
+
+    .risk-container > div:first-child,
+    td.nowrap > a.classfortooltip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .risk-container > div:first-child > a,
+    td.nowrap > a.classfortooltip {
+      font-size: 13px;
+      font-weight: 700;
+      color: $rl-ref;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+      > .fas,
+      > .fa {
+        display: none;
+      }
+    }
+
+    .risk-container .risk-edit {
+      font-size: 12px;
+      color: $rl-faint;
+
+      &:hover {
+        color: $dr-primary;
+        text-decoration: none;
+      }
+    }
+
+    /* ---- Risk edit and assessment list modals: as tall as their content rather than the fixed height of the
+       Saturne modals, the header and the footer set apart ---- */
+    .wpeo-modal[id^="risk_edit"],
+    .wpeo-modal[id^="risk_evaluation_list"] {
+      .modal-container {
+        height: auto;
+        padding: 0;
+      }
+
+      .modal-header {
+        padding: 18px 24px 14px;
+        border-bottom: 1px solid $rl-border-soft;
+
+        .modal-title {
+          margin: 0;
+          font-size: 16px;
+          font-weight: 600;
+          color: $rl-text;
+        }
+      }
+
+      .modal-footer {
+        justify-content: flex-end;
+        padding: 14px 24px;
+        border-top: 1px solid $rl-border-soft;
+        border-radius: 0 0 18px 18px;
+        background: $rl-head;
+      }
+    }
+
+    /* The grid of the danger categories hangs out of the edit modal, as any dropdown, instead of being cut by it */
+    .wpeo-modal[id^="risk_edit"] {
+      .modal-container,
+      .modal-content {
+        overflow: visible;
+      }
+
+      .modal-content {
+        padding: 20px 24px 24px;
+      }
+
+      /* Labels of the fields: one size, one colour, on one line */
+      .modal-content .title {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-bottom: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 18px;
+        color: $rl-head-text;
+
+        .fa-info-circle {
+          color: $rl-faint;
+        }
+      }
+
+      .risk-content {
+        gap: 16px;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        padding-bottom: 0;
+        border-bottom: 0;
+
+        /* Left aligned as the other labels, the category column of the list centres its content */
+        .risk-category {
+          margin-right: 0;
+          text-align: left;
+
+          .title .center {
+            text-align: left;
+          }
+        }
+      }
+
+      /* The category picker drawn as a field: the picto, its caret beside it, the same border as the description */
+      .risk-category .dropdown-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-sizing: border-box;
+        height: 58px;
+        padding: 0 10px 0 4px;
+        border: 1px solid $dr-border-strong;
+        border-radius: $dr-radius-sm;
+        background: #ffffff;
+
+        &::after {
+          margin: 0;
+          color: $rl-muted;
+        }
+
+        .danger-category-pic {
+          width: 48px;
+          height: 48px;
+          border-radius: 6px;
+        }
+      }
+
+      .risk-description textarea {
+        min-height: 58px;
+        padding: 8px 12px !important;
+        font-size: 13px;
+        line-height: 1.4 !important;
+      }
+
+      hr {
+        margin: 0 0 20px;
+        border: 0;
+        border-top: 1px solid $rl-border-soft;
+      }
+    }
+
+    /* Assessment list modal: a long list scrolls inside it. Each assessment is a row as much padded above as below,
+       its parts centred on one line, rather than stuck to the header and followed by a rule with all the space */
+    .wpeo-modal[id^="risk_evaluation_list"] {
+      .modal-container {
+        max-height: min(560px, 90vh);
+      }
+
+      .modal-content {
+        min-height: 0;
+        overflow-y: auto;
+        padding: 4px 24px;
+      }
+
+      .risk-evaluation-in-modal {
+        padding: 12px 0;
+        border-bottom: 1px solid $rl-border-soft;
+
+        &:last-child {
+          border-bottom: 0;
+        }
+
+        > hr {
+          display: none;
+        }
+      }
+
+      .risk-evaluation-single {
+        align-items: center;
+        gap: 10px;
+
+        > * {
+          margin: 0;
+        }
+
+        /* One width for every level, so the photos and the references line up from a row to the next */
+        > .risk-evaluation-cotation {
+          flex: 0 0 auto;
+          box-sizing: border-box;
+          width: 72px;
+          padding: 0 4px;
+          text-align: center;
+        }
+
+        /* No gap under the image of the photo, which made the row taller than its parts */
+        > .photo {
+          line-height: 0;
+        }
+      }
+
+      .risk-evaluation-actions {
+        margin-left: auto;
+      }
+    }
+
+    /* ---- Danger category: a small picto, its name is written under the description ---- */
+
+    td.risk-category {
+      width: 52px;
+
+      .cell-risk {
+        width: auto;
+        padding: 0;
+      }
+
+      .wpeo-dropdown.category-danger {
+        padding: 0;
+      }
+
+      .danger-category-pic {
+        width: 38px;
+        height: 38px;
+        vertical-align: middle;
+      }
+    }
+
+    /* ---- Protection: the protective equipment signs of the element of the risk ---- */
+
+    td.risk-protection {
+      min-width: 70px;
+      max-width: 140px;
+    }
+
+    .risk-protection-picto {
+      width: 30px;
+      height: 30px;
+      margin: 0 4px 4px 0;
+      border-radius: 4px;
+      object-fit: contain;
+      vertical-align: top;
+    }
+
+    .risk-protection-none {
+      font-size: 12px;
+      font-style: italic;
+      color: $rl-faint;
+    }
+
+    td[class*="risk-description-"] {
+      min-width: 160px;
+      max-width: 320px;
+    }
+
+    /* wpeo-wrap spaces its lines for forms: far too loose for the short texts of a row */
+    .risk-description-text {
+      margin-bottom: 2px;
+      line-height: 1.35;
+      font-size: 13px;
+      font-weight: 600;
+      color: $rl-text;
+    }
+
+    .risk-description-category {
+      line-height: 1.35;
+      font-size: 11px;
+      color: $rl-faint;
+    }
+
+    /* ---- Header of the assessment and task cells: small counter, small buttons ---- */
+
+    td > .table-cell-header,
+    .riskassessment-task-listing-wrapper > .table-cell-header {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      line-height: 1.4;
+
+      .table-cell-header-label strong {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0;
+        text-transform: none;
+        color: $rl-faint;
+      }
+
+      .table-cell-header-actions {
+        display: flex;
+        gap: 4px;
+        margin-left: auto;
+      }
+
+      .wpeo-button.button-square-40 {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        min-width: 26px;
+        height: 26px;
+        padding: 0;
+        line-height: 1;
+        border-radius: 6px;
+        font-size: 11px;
+        box-shadow: none;
+
+        .button-icon {
+          margin: 0;
+          line-height: 1;
+        }
+
+        &.button-grey {
+          border-color: $rl-border-soft;
+          background: $rl-border-soft;
+          color: #374151;
+
+          &:hover {
+            background: $rl-border;
+          }
+        }
+      }
+    }
+
+    /* "1 / 2 tâches terminées" and its progress bar */
+    .table-cell-header-summary {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
+      white-space: nowrap;
+    }
+
+    progress.riskassessment-tasks-progress {
+      flex: 0 0 60px;
+      width: 60px;
+      height: 6px;
+      border: 0;
+      border-radius: $dr-radius-pill;
+      overflow: hidden;
+      background: $rl-border;
+      appearance: none;
+
+      &::-webkit-progress-bar {
+        background: $rl-border;
+      }
+
+      &::-webkit-progress-value {
+        background: $rl-done;
+      }
+
+      &::-moz-progress-bar {
+        background: $rl-done;
+      }
+    }
+
+    .riskassessment-tasks-percent {
+      font-size: 11px;
+      font-weight: 400;
+      color: $rl-muted;
+    }
+
+    /* ---- Last assessment: level badge, then author, date and ref, then the comment ---- */
+
+    /* Same :not() as theme/_risk.scss, which draws the box this list does without */
+    td > .risk-evaluation-list-content > .risk-evaluation-container:not(.advanced, .standard) {
+      min-width: 240px;
+      margin: 0 0 6px;
+      padding: 0;
+      border: 0;
+      background: none;
+      line-height: 1.4;
+      font-size: 13px;
+      color: $rl-text;
+    }
+
+    /* Badge, photo and edit button on the first line, whatever the width of the cell, the details below */
+    td > .risk-evaluation-list-content > .risk-evaluation-container .risk-evaluation-single {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: center;
+      gap: 4px 8px;
+
+      > * {
+        margin: 0;
+      }
+
+      > .risk-evaluation-cotation,
+      > .photo,
+      > .risk-evaluation-edit {
+        grid-row: 1;
+      }
+
+      > .risk-evaluation-cotation {
+        grid-column: 1;
+        justify-self: start;
+        width: auto;
+        min-width: 0;
+        height: auto;
+        margin-right: auto;
+        padding: 4px 10px;
+        border-radius: $dr-radius-pill;
+        box-shadow: none;
+        line-height: 1.4;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+        cursor: pointer;
+
+        @each $scale, $colors in $rl-badges {
+          &[data-scale="#{$scale}"] {
+            background: nth($colors, 1);
+            color: nth($colors, 2);
+          }
+        }
+
+        &[data-scale="1"] {
+          border: 1px solid #cbd5e1;
+        }
+
+        .risk-evaluation-cotation-level {
+          margin-right: 4px;
+        }
+
+        .risk-evaluation-cotation-value::before {
+          content: '(';
+        }
+
+        .risk-evaluation-cotation-value::after {
+          content: ')';
+        }
+      }
+
+      > .photo {
+        order: 1;
+        margin: 0 !important;
+
+        img {
+          width: 32px;
+          height: 32px;
+          margin: 0;
+          border-radius: 6px;
+          object-fit: cover;
+        }
+
+        /* No photo yet: nothing rather than a placeholder on every row */
+        &:has(img[src*="nophoto"]) {
+          display: none;
+        }
+      }
+
+      > .risk-evaluation-edit {
+        order: 2;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        min-width: 26px;
+        height: 26px;
+        padding: 0;
+        overflow: visible;
+        line-height: 1;
+        font-size: 12px;
+        color: $rl-faint;
+
+        .button-icon {
+          margin: 0;
+          line-height: 1;
+        }
+
+        &:hover {
+          color: $dr-primary;
+        }
+      }
+
+      > .risk-evaluation-content {
+        grid-row: 2;
+        grid-column: 1 / -1;
+      }
+
+      .risk-evaluation-data {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 2px 6px;
+        font-size: 11px;
+        color: $rl-muted;
+
+        > * {
+          margin: 0;
+        }
+
+        .risk-evaluation-author {
+          order: 0;
+
+          img {
+            width: 16px;
+            height: 16px;
+          }
+        }
+
+        .risk-evaluation-date {
+          order: 1;
+
+          .fa-calendar-alt {
+            display: none;
+          }
+        }
+
+        .risk-evaluation-reference {
+          order: 2;
+          font-weight: 400;
+          color: $rl-faint;
+        }
+
+        .risk-evaluation-date::before,
+        .risk-evaluation-reference::before {
+          content: '\2022';
+          margin-right: 6px;
+          color: #d1d5db;
+        }
+      }
+
+      .risk-evaluation-comment {
+        margin-top: 3px;
+        font-size: 11px;
+        font-style: italic;
+        color: $rl-head-text;
+
+        &::before {
+          content: '\00AB\00A0';
+        }
+
+        &::after {
+          content: '\00A0\00BB';
+        }
+
+        &:empty {
+          display: none;
+        }
+      }
+    }
+
+    /* Risk still to assess */
+    .risk-evaluation-none {
+      display: inline-flex;
+      padding: 4px 10px;
+      border-radius: $dr-radius-pill;
+      background: #f1f5f9;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+    }
+
+    /* ---- Action plan: a checklist, the reference and the label first, the details below ---- */
+
+    td > .riskassessment-tasks {
+      display: block;
+      min-width: 300px;
+    }
+
+    .riskassessment-tasks > .riskassessment-task-listing-wrapper {
+      display: block;
+      padding: 0;
+    }
+
+    /* The cards of the row and the ones of the task list modal, not the task edit modals which have their own */
+    .riskassessment-task-listing-wrapper > .riskassessment-task-container:not(.riskassessment-no-task),
+    .riskassessment-task-list-modal .modal-content > .riskassessment-task-container {
+      display: block;
+      min-width: 0;
+      margin: 0 0 6px;
+      padding: 6px 10px;
+      border: 1px solid $rl-border-soft;
+      border-radius: 6px;
+      background: $rl-head;
+      line-height: 1.4;
+      font-size: 12px;
+
+      .riskassessment-task-single {
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        border: 0;
+        background: none;
+
+        > * {
+          margin: 0;
+        }
+      }
+
+      .riskassessment-task-content {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-width: 0;
+        padding: 0;
+      }
+
+      .riskassessment-task-title {
+        order: -1;
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        color: $rl-text;
+
+        .riskassessment-task-progress-checkbox {
+          margin: 1px 0 0;
+          line-height: 0;
+        }
+
+        /* The checkbox that marks the task as done, drawn as the circle of a checklist */
+        .riskassessment-task-progress-checkbox input {
+          width: 16px;
+          height: 16px;
+          margin: 0;
+          border: 1.5px solid $rl-faint;
+          border-radius: 50%;
+          background: #ffffff;
+          cursor: pointer;
+          appearance: none;
+
+          &:checked {
+            border-color: $rl-done;
+            background: $rl-done url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' d='M4 8.5l2.6 2.5L12 5.5'/%3E%3C/svg%3E") center / 12px no-repeat;
+          }
+        }
+
+        .riskassessment-task-reference a {
+          font-weight: 600;
+          color: $rl-link;
+          text-decoration: none;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+
+        .riskassessment-task-author-label {
+          font-weight: 500;
+          word-break: normal;
+          overflow-wrap: anywhere;
+        }
+      }
+
+      .riskassessment-task-data {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 2px 10px;
+        margin-top: 3px;
+        font-size: 11px;
+        color: $rl-muted;
+
+        > * {
+          margin: 0;
+        }
+
+        i {
+          color: $rl-faint;
+        }
+
+        .riskassessment-task-date-late,
+        .riskassessment-task-date-late i {
+          font-weight: 600;
+          color: $rl-late;
+        }
+
+        .riskassessment-task-progress {
+          padding: 1px 6px;
+          border: 1px solid #bfdbfe;
+          border-radius: $dr-radius-pill;
+          background: #dbeafe;
+          font-size: 10px;
+          font-weight: 700;
+          line-height: 12px;
+          color: #1d4ed8;
+
+          &.progress-green {
+            border-color: #a7f3d0;
+            background: #d1fae5;
+            color: #065f46;
+          }
+
+          &.progress-yellow {
+            border-color: #fde68a;
+            background: #fef3c7;
+            color: #92400e;
+          }
+
+          &.progress-red {
+            border-color: #fecaca;
+            background: #fee2e2;
+            color: #991b1b;
+          }
+        }
+
+        .badge {
+          padding: 1px 6px;
+          font-size: 10px;
+        }
+
+      }
+
+      /* Under the checkbox column, the details line up with the label */
+      .riskassessment-task-content:has(.riskassessment-task-progress-checkbox) .riskassessment-task-data {
+        padding-left: 22px;
+      }
+
+      .riskassessment-task-actions {
+        display: flex;
+        gap: 2px;
+        margin-left: auto;
+
+        .wpeo-button.button-square-40 {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 26px;
+          min-width: 26px;
+          height: 26px;
+          padding: 0;
+          overflow: visible;
+          line-height: 1;
+          font-size: 12px;
+          color: $rl-faint;
+
+          .button-icon {
+            margin: 0;
+            line-height: 1;
+          }
+
+          &:hover {
+            color: $dr-primary;
+          }
+        }
+
+        .riskassessment-task-delete:hover {
+          color: $rl-late;
+        }
+      }
+    }
+
+    /* Users of a task, in the row as in the task list modal: their initials in a bubble, their name on hover. Only
+       in the card: the responsible field of the task forms of the modals has the same class */
+    .riskassessment-task-data > .riskassessment-task-executive,
+    .riskassessment-task-data > .riskassessment-task-contributors {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .riskassessment-task-initials {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 4px;
+      box-sizing: border-box;
+      border-radius: $dr-radius-pill;
+      background: $rl-border;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0.02em;
+      color: #374151;
+
+      /* The link of User::getNomUrl(), its name replaced by the initials */
+      a,
+      .usertext {
+        padding: 0;
+        color: inherit;
+        text-decoration: none;
+      }
+
+      &:hover {
+        background: $dr-primary-soft;
+        color: $dr-primary-strong;
+      }
+    }
+
+    .riskassessment-task-executive .riskassessment-task-initials {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    /* No task: a plain line, like the empty states of DigiBoard. Both classes: theme/_risk.scss draws the box of
+       every task container with as many */
+    .riskassessment-task-container.riskassessment-no-task {
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      background: none;
+
+      .riskassessment-task-data {
+        justify-content: flex-start !important;
+        font-size: 12px;
+        font-style: italic;
+        color: $rl-faint;
+      }
+    }
+  }
+}

@@ -448,7 +448,7 @@ function digiriskShareGeneratedFile(DoliDB $db, string $fileName, string $tableE
  */
 function digiriskPreventionPlanReusableContent(DoliDB $db, PreventionPlan $plan): array
 {
-    require_once __DIR__ . '/../../saturne/class/saturneschedules.class.php';
+    dol_include_once('/saturne/class/saturneschedules.class.php');
 
     $plan->fetch_optionals();
 
@@ -519,4 +519,81 @@ function digiriskPreventionPlanReusableContent(DoliDB $db, PreventionPlan $plan)
     }
 
     return $content;
+}
+
+/**
+ * Saturne media block of the photos of one risk, on the card of a draft prevention plan
+ *
+ * The photos go to the folder the mobile interface, the document and the card of a locked plan read,
+ * see digiriskMobileRiskPhotoDir().
+ *
+ * @param  PreventionPlan $plan     Prevention plan
+ * @param  int            $category Danger category position of the risk
+ * @return string                   HTML of the block
+ */
+function digiriskPreventionPlanRiskMediaBlock(PreventionPlan $plan, int $category): string
+{
+    require_once __DIR__ . '/digiriskdolibarr_mobile.lib.php';
+
+    $photoDir      = digiriskMobileRiskPhotoDir($plan->element, $plan->ref, $category);
+    $photoDirExist = dol_is_dir($photoDir);
+
+    $block = saturne_render_media_block('digiriskdolibarr', digiriskMobileRiskPhotoSubDir($plan->element, $plan->ref, $category), 'risk-' . $category, 'digiriskdolibarr,preventionplan,write', ['show_photo' => true, 'show_audio' => false, 'show_file' => false]);
+
+    // The block creates its folder as soon as it is displayed: one left unused would stay behind
+    // empty. An upload creates it again.
+    if (!$photoDirExist) {
+        dol_delete_dir($photoDir, 1);
+    }
+
+    return $block;
+}
+
+/**
+ * Photo added or removed from the media block of a risk, on the card of a draft prevention plan: the
+ * Saturne media block posts on the page and expects itself back, refreshed. The folder comes from the
+ * browser, so only the photo folders of the risks of this plan are writable, and only while it is a draft.
+ *
+ * @param  string         $action Requested action: anything but uploadPhoto and deletePhoto returns at once
+ * @param  PreventionPlan $plan   Prevention plan of the card
+ * @return void                   Ends the request when it handled the action
+ * @throws Exception
+ */
+function digiriskPreventionPlanRiskMediaActions(string $action, PreventionPlan $plan): void
+{
+    global $conf, $db, $langs, $user;
+
+    if (!in_array($action, ['uploadPhoto', 'deletePhoto'], true) || GETPOST('module_name', 'alpha') !== 'digiriskdolibarr') {
+        return;
+    }
+
+    require_once __DIR__ . '/digiriskdolibarr_mobile.lib.php';
+
+    $subDir   = GETPOST('sub_dir', 'alphanohtml');
+    $category = null;
+
+    if ($plan->id > 0 && $plan->status == PreventionPlan::STATUS_DRAFT) {
+        $planLine  = new PreventionPlanLine($db);
+        $planLines = $planLine->fetchAll('', '', 0, 0, ['fk_preventionplan' => $plan->id]);
+
+        foreach (is_array($planLines) ? $planLines : [] as $line) {
+            if ($subDir === digiriskMobileRiskPhotoSubDir($plan->element, $plan->ref, (int) $line->category)) {
+                $category = (int) $line->category;
+                break;
+            }
+        }
+    }
+
+    if ($category === null) {
+        http_response_code(403);
+        exit;
+    }
+
+    require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+
+    // Writes the photo with its thumbs, or removes it with them
+    require dol_buildpath('/saturne/core/tpl/actions/media_block_actions.tpl.php');
+
+    print digiriskPreventionPlanRiskMediaBlock($plan, $category);
+    exit;
 }

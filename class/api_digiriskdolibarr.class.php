@@ -33,7 +33,7 @@ require_once __DIR__ . '/digiriskelement.class.php';
 require_once __DIR__ . '/riskanalysis/risk.class.php';
 require_once __DIR__ . '/riskanalysis/riskassessment.class.php';
 require_once __DIR__ . '/../lib/digiriskdolibarr_risk.lib.php';
-require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
+dol_include_once('/saturne/class/task/saturnetask.class.php');
 require_once __DIR__ . '/digiriskdolibarrdocuments/riskassessmentdocument.class.php';
 require_once __DIR__ . '/accident.class.php';
 require_once __DIR__ . '/digiriskresources.class.php';
@@ -2360,8 +2360,10 @@ class DigiriskDolibarr extends SaturneApi
 		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
 		$conf->setEntityValues($db, $entity);
 
-		$risk = new Risk($db);
-		return $risk->getRisksByCotation()['data'];
+		// Same counts as the graph of the dashboard: the risks of each danger category, by level of the cotation scale
+		$risk                                     = new Risk($db);
+		$riskByDangerCategoriesAndRiskAssessments = $risk->getRiskByDangerCategoriesAndRiskAssessments(Risk::getDangerCategories());
+		return $risk->getRisksByCotation($riskByDangerCategoriesAndRiskAssessments)['data'];
 	}
 
 	// TASK
@@ -2534,8 +2536,9 @@ class DigiriskDolibarr extends SaturneApi
 
 		$this->setConfEntity($entity);
 
-		$accident = new Accident($this->db);
-		return $accident->getNbDaysWithoutAccident();
+		$accident           = new Accident($this->db);
+		$dashboardAccidents = $accident->getDashboardAccidents();
+		return $accident->getNbDaysWithoutAccident($dashboardAccidents['accidents']);
 	}
 
 	/**
@@ -2562,8 +2565,9 @@ class DigiriskDolibarr extends SaturneApi
 
 		$this->setConfEntity($entity);
 
-		$accident = new Accident($this->db);
-		return $accident->getNbAccidents()['data'];
+		$accident           = new Accident($this->db);
+		$dashboardAccidents = $accident->getDashboardAccidents();
+		return $accident->getNbAccidents($dashboardAccidents['accidents'], $dashboardAccidents['accidentsWithWorkStops'])['data'];
 	}
 
 	/**
@@ -2590,8 +2594,9 @@ class DigiriskDolibarr extends SaturneApi
 
 		$this->setConfEntity($entity);
 
-		$accident = new Accident($this->db);
-		return $accident->getNbWorkstopDays();
+		$accident           = new Accident($this->db);
+		$dashboardAccidents = $accident->getDashboardAccidents();
+		return $accident->getNbWorkstopDays($dashboardAccidents['accidentsWithWorkStops']);
 	}
 
 	/**
@@ -2618,8 +2623,10 @@ class DigiriskDolibarr extends SaturneApi
 
 		$this->setConfEntity($entity);
 
-		$accident = new Accident($this->db);
-		return $accident->getNbAccidentsByEmployees();
+		$accident           = new Accident($this->db);
+		$dashboardAccidents = $accident->getDashboardAccidents();
+		$employees          = (new Evaluator($this->db))->getNbEmployees();
+		return $accident->getNbAccidentsByEmployees($dashboardAccidents['accidents'], $dashboardAccidents['accidentsWithWorkStops'], $employees);
 	}
 
 	/**
@@ -2702,8 +2709,10 @@ class DigiriskDolibarr extends SaturneApi
 
 		$this->setConfEntity($entity);
 
-		$accident = new Accident($this->db);
-		return $accident->getFrequencyIndex();
+		$accident           = new Accident($this->db);
+		$dashboardAccidents = $accident->getDashboardAccidents();
+		$employees          = (new Evaluator($this->db))->getNbEmployees();
+		return $accident->getFrequencyIndex($dashboardAccidents['accidentsWithWorkStops'], $employees);
 	}
 
 	/**
@@ -2730,8 +2739,9 @@ class DigiriskDolibarr extends SaturneApi
 
 		$this->setConfEntity($entity);
 
-		$accident = new Accident($this->db);
-		return $accident->getFrequencyRate();
+		$accident           = new Accident($this->db);
+		$dashboardAccidents = $accident->getDashboardAccidents();
+		return $accident->getFrequencyRate($dashboardAccidents['accidentsWithWorkStops']);
 	}
 
 	/**
@@ -2758,8 +2768,9 @@ class DigiriskDolibarr extends SaturneApi
 
 		$this->setConfEntity($entity);
 
-		$accident = new Accident($this->db);
-		return $accident->getGravityRate();
+		$accident           = new Accident($this->db);
+		$dashboardAccidents = $accident->getDashboardAccidents();
+		return $accident->getGravityRate($dashboardAccidents['accidentsWithWorkStops']);
 	}
 
 	// DIGIRISKRESOURCES

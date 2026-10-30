@@ -83,6 +83,19 @@
     color: $dr-text;
   }
 
+  /* The task dates of the risk modal lay their icon over the field, the budget its currency.
+     The field padding of _forms.scss outranks modal/_risk.scss and took that room back: the
+     icon covered the day. Same selector as _forms.scss, the field classes make it win */
+  .riskassessment-task-field {
+    &.has-icon :is(#{$dr-input-selector}):not(.select2-search__field):not(.form-field):not(.cke_source) {
+      padding-left: 30px;
+    }
+
+    .riskassessment-task-budget:is(#{$dr-input-selector}):not(.select2-search__field):not(.form-field):not(.cke_source) {
+      padding-right: 20px;
+    }
+  }
+
   .danger-category-pic {
     border-radius: $dr-radius-sm;
   }

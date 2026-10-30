@@ -100,11 +100,28 @@
 
   .graph-dashboard.wpeo-grid {
     gap: 16px;
+    /* The negative margins of wpeo-grid compensate a padding the cards no longer have */
+    margin-left: 0;
+    margin-right: 0;
+    /* Without those margins, the calc(100% + 1em) of an older wpeo-grid (ReedCRM temp-framework.css) overflows:
+       the graphs follow the overflow and #id-right, a table-cell, widens the page endlessly */
+    width: 100%;
 
     > div {
       box-sizing: border-box;
       padding: 14px 18px 18px;
       @include dr-card;
+    }
+
+    /* Two 50% cards plus the gap do not fit a row: each graph was alone on its line, half the page empty.
+       Full width graphs (moreCSS grid-2) keep the 100% of wpeo-grid */
+    &.grid-2 > div:not(.grid-2) {
+      width: calc(50% - 8px);
+      min-width: 0;
+
+      @media (max-width: $media__medium) {
+        width: 100%;
+      }
     }
 
     table.table-fiche-title .titre {

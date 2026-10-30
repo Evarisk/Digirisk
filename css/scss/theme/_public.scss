@@ -36,6 +36,12 @@ $dr-public-scope: 'body#mainbody.page-public-card';
     }
   }
 
+  /* The ticket register is also filled from a computer: wider card for its category grid and form */
+  &.page-public-ticket .public-card__container,
+  &.page-public-ticket .ticketpublicarea.digirisk-page-container {
+    max-width: 1200px;
+  }
+
   .public-card__logo,
   .signature-logo {
     margin: 8px auto 24px;
@@ -283,5 +289,49 @@ $dr-public-scope: 'body#mainbody.page-public-card';
     border-left: 4px solid $dr-primary;
     border-radius: 12px;
     background: rgba(13, 138, 255, 0.06);
+  }
+}
+
+/* PIN code asked before the ticket register (#5549): a narrow card, one large field */
+#{$dr-public-scope}.page-public-ticket .ticketpublicarea.public-ticket-pin {
+  max-width: 440px;
+  text-align: center;
+}
+
+#{$dr-public-scope} .public-ticket-pin {
+  &__form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    margin-top: 8px;
+  }
+
+  &__prompt {
+    color: $dr-text-soft;
+    font-weight: 600;
+  }
+
+  &__error {
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  &__input {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 260px;
+    padding: 12px 14px;
+    border: 1px solid $dr-border-strong;
+    border-radius: $dr-radius;
+    font-size: 24px;
+    letter-spacing: 0.4em;
+    text-align: center;
+  }
+
+  &__submit {
+    justify-content: center;
+    width: 100%;
+    max-width: 260px;
   }
 }
