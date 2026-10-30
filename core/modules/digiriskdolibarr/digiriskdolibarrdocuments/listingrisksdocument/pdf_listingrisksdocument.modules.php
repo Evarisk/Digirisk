@@ -120,6 +120,21 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     ];
 
     /**
+     * @var array|null Risques de l'entite tels que les rend Risk::loadRiskInfos(), lus une seule fois
+     */
+    protected ?array $riskInfos = null;
+
+    /**
+     * @var array|null Registres du perimetre, lus une seule fois
+     */
+    protected ?array $registers = null;
+
+    /**
+     * @var array|null Accidents du perimetre, lus une seule fois
+     */
+    protected ?array $accidents = null;
+
+    /**
      * @var array Responsables des taches, indexes par identifiant de tache
      */
     protected array $taskResponsibles = [];
@@ -253,6 +268,27 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
     {
         $pdf->AddPage($this->orientation);
         $pdf->SetY($this->marge_haute);
+    }
+
+    /**
+     * Enchaine une section courte a la suite de la precedente, sur une nouvelle page seulement
+     * si son debut n'y tient pas.
+     *
+     * Les registres, les accidents et le lexique ouvraient chacun leur page : « Aucun accident sur
+     * ce perimetre » occupait a lui seul une page A3. Les pages d'introduction, qui reprennent le
+     * decoupage du document Word du client, gardent leur saut de page.
+     *
+     * @param  TCPDF $pdf          PDF handler
+     * @param  float $neededHeight Hauteur du debut de la section, a garder d'un seul tenant
+     * @return void
+     */
+    protected function flowSection($pdf, float $neededHeight)
+    {
+        if ($pdf->GetY() > $this->marge_haute + 1) {
+            $pdf->Ln(6);
+        }
+
+        $this->checkPageBreak($pdf, $neededHeight);
     }
 
     /**
@@ -605,15 +641,16 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         $totalPages  = $pdf->getNumPages();
         $halfWidth   = $this->contentWidth($pdf) / 2;
 
-        $pdf->SetFont('', '', $this->footerFontSize);
-        $pdf->SetTextColor(140, 140, 140);
-
         for ($page = 1; $page <= $totalPages; $page++) {
             $pdf->setPage($page);
             // Le pied s'ecrit dans la bande basse, sous le seuil de rupture : sans couper la
             // rupture automatique son Cell serait reporte en haut de la page suivante. A recouper
             // apres chaque setPage, qui restaure les reglages memorises de la page.
             $pdf->SetAutoPageBreak(false);
+            // La police aussi est a reposer sur chaque page : setPage() rend celle du dernier
+            // texte de la page, et le pied passait du gras a l'italique d'une page a l'autre
+            $pdf->SetFont('', '', $this->footerFontSize);
+            $pdf->SetTextColor(140, 140, 140);
             $pdf->SetXY($this->marge_gauche, $pdf->getPageHeight() - 10);
             $pdf->Cell($halfWidth, 5, $this->footerText, 0, 0, 'L');
             $pdf->Cell($halfWidth, 5, 'Page ' . $page . ' / ' . $totalPages, 0, 0, 'R');
@@ -653,8 +690,15 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
 
         $object = $moreParam['object'];
 
-        // ticket : les entetes de la section des registres, Subject n'existe que la - issue #5235
-        $outputLangs->loadLangs(['companies', 'projects', 'other', 'ticket', 'digiriskdolibarr@digiriskdolibarr']);
+        // Les donnees lues une seule fois le sont pour cette generation-ci
+        $this->riskInfos = null;
+        $this->registers = null;
+        $this->accidents = null;
+
+        // ticket : les entetes de la section des registres, Subject n'existe que la - issue #5235.
+        // main : Status, Categories, DateStart... Une langue choisie a la generation est un
+        // Translate neuf, ou ces cles du coeur sortaient en anglais ou brutes
+        $outputLangs->loadLangs(['main', 'companies', 'projects', 'other', 'ticket', 'digiriskdolibarr@digiriskdolibarr']);
 
         $moreParam['hideTemplateName'] = 1;
         $object->module                = $this->module;
@@ -707,6 +751,7 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         $this->_pagehead($pdf, $object, $outputLangs, $size);
 
         $this->sectionCover($pdf, $object, $outputLangs, $size);
+        $this->sectionCoverSummary($pdf, $object, $outputLangs, $size, $moreParam);
         $this->sectionPerimeterTree($pdf, $object, $outputLangs, $size);
         $this->sectionElementPhoto($pdf, $object, $outputLangs, $size, $moreParam);
         $this->sectionLegalReminder($pdf, $outputLangs, $size);
@@ -805,6 +850,139 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
             $this->sectionTitle($pdf, $outputLangs->transnoentities('Description'), $size);
             $this->htmlParagraph($pdf, $object->description, $size);
         }
+    }
+
+    /**
+     * Synthese du perimetre, sous les colonnes de la couverture : le nombre de risques de chaque
+     * niveau, l'etat du plan d'actions, et les registres et accidents quand ils sont imprimes.
+     *
+     * La couverture est le mini document unique : elle disait qui prevenir et ce que couvre le
+     * document, pas ce que l'evaluation a trouve. Ces chiffres sont ceux des sections qui suivent,
+     * lus une seule fois.
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  object    $object      Element imprime
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @param  array     $moreParam   More param (showRegisters, showAccidents, plages de dates)
+     * @return void
+     */
+    protected function sectionCoverSummary($pdf, $object, Translate $outputLangs, float $size, array $moreParam)
+    {
+        $summary = $this->perimeterSummary($object, $moreParam);
+
+        $tiles = [];
+        for ($level = 4; $level >= 1; $level--) {
+            $tiles[] = [
+                'value' => $summary['levels'][$level],
+                'label' => $outputLangs->transnoentities($this->levelLabelKey($level)),
+                'fill'  => $this->levelBg[$level],
+                'ink'   => $this->levelText[$level]
+            ];
+        }
+        $tiles[] = ['value' => $summary['ongoing'], 'label' => $outputLangs->transnoentities('ListingRisksSummaryActionsOngoing')];
+        $tiles[] = ['value' => $summary['late'], 'label' => $outputLangs->transnoentities('ListingRisksSummaryActionsLate'), 'ink' => $summary['late'] > 0 ? $this->accentWarn : null];
+        $tiles[] = ['value' => $summary['done'], 'label' => $outputLangs->transnoentities('ListingRisksSummaryActionsDone')];
+        if (!empty($moreParam['showRegisters'])) {
+            $tiles[] = ['value' => count($this->perimeterRegisters($object, $moreParam)), 'label' => $outputLangs->transnoentities('ListingRisksSummaryRegisters')];
+        }
+        if (!empty($moreParam['showAccidents'])) {
+            $tiles[] = ['value' => count($this->perimeterAccidents($object, $moreParam)), 'label' => $outputLangs->transnoentities('ListingRisksSummaryAccidents')];
+        }
+
+        $height = 24;
+        $this->checkPageBreak($pdf, $height + 20);
+        $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksCoverSummary'), $size);
+        $this->reserveSpace($pdf, $height);
+
+        $gap   = 4;
+        $width = ($this->contentWidth($pdf) - ((count($tiles) - 1) * $gap)) / count($tiles);
+        $x     = $this->marge_gauche;
+        $y     = $pdf->GetY();
+
+        foreach ($tiles as $tile) {
+            $fill = $tile['fill'] ?? [255, 255, 255];
+            $ink  = $tile['ink'] ?? $this->accent;
+
+            $pdf->SetFillColor($fill[0], $fill[1], $fill[2]);
+            $pdf->Rect($x, $y, $width, $height, 'DF');
+
+            $pdf->SetFont('', 'B', $size + 12);
+            $pdf->SetTextColor($ink[0], $ink[1], $ink[2]);
+            $pdf->SetXY($x, $y + 2);
+            $pdf->Cell($width, 11, (string) $tile['value'], 0, 0, 'C');
+
+            // Le libelle d'un niveau garde la couleur de texte de son fond, les autres sont gris
+            $labelInk = isset($tile['fill']) ? $ink : [90, 90, 90];
+            $pdf->SetFont('', '', $size - 1);
+            $pdf->SetTextColor($labelInk[0], $labelInk[1], $labelInk[2]);
+            $pdf->MultiCell($width - 4, 4, $tile['label'], 0, 'C', false, 1, $x + 2, $y + 14, true, 0, false, true, $height - 15, 'T');
+
+            $x += $width + $gap;
+        }
+
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetXY($this->marge_gauche, $y + $height + 4);
+    }
+
+    /**
+     * Chiffres de la synthese de couverture, sur le perimetre de l'element imprime.
+     *
+     * Une action est terminee a 100 % d'avancement, en retard si son echeance est passee sans
+     * l'etre : la regle du plan d'actions du document unique.
+     *
+     * @param  object $object    Element imprime
+     * @param  array  $moreParam More param
+     * @return array             ['levels' => [niveau => nombre], 'ongoing', 'late', 'done']
+     */
+    protected function perimeterSummary($object, array $moreParam): array
+    {
+        $perimeter = $this->perimeterElements($object);
+        $riskInfos = $this->loadRiskInfos($moreParam);
+        $riskTasks = $riskInfos['current']['riskTasks'] ?? [];
+        $now       = dol_now();
+
+        $summary = ['levels' => [1 => 0, 2 => 0, 3 => 0, 4 => 0], 'ongoing' => 0, 'late' => 0, 'done' => 0];
+        foreach ($riskInfos['current']['riskByRiskAssessmentLevels'] ?? [] as $level => $riskLines) {
+            foreach ($riskLines as $riskLine) {
+                if (empty($perimeter[$riskLine->fk_element]) || !isset($summary['levels'][$level])) {
+                    continue;
+                }
+
+                $summary['levels'][$level]++;
+
+                foreach ($riskTasks[$riskLine->id] ?? [] as $task) {
+                    if ((float) $task->progress >= 100) {
+                        $summary['done']++;
+                    } elseif (!empty($task->datee) && $task->datee < $now) {
+                        $summary['late']++;
+                    } else {
+                        $summary['ongoing']++;
+                    }
+                }
+            }
+        }
+
+        return $summary;
+    }
+
+    /**
+     * Risques de l'entite, lus une seule fois : la synthese de couverture et la liste des risques
+     * s'en servent toutes deux, et loadRiskInfos() est la requete la plus lourde du document.
+     *
+     * @param  array $moreParam More param
+     * @return array            Retour de Risk::loadRiskInfos()
+     */
+    protected function loadRiskInfos(array $moreParam): array
+    {
+        if ($this->riskInfos === null) {
+            $risk = new Risk($this->db);
+
+            $moreParam['filter'] = '';
+            $this->riskInfos     = $risk->loadRiskInfos($moreParam);
+        }
+
+        return $this->riskInfos;
     }
 
     /**
@@ -1205,7 +1383,8 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
      */
     protected function sectionGlossary($pdf, Translate $outputLangs, float $size)
     {
-        $this->newPage($pdf);
+        // Neuf lignes : le lexique se garde d'un seul tenant plutot que de couper son tableau
+        $this->flowSection($pdf, 80);
         $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksGlossaryTitle'), $size);
 
         $rows = [];
@@ -1529,16 +1708,13 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
      */
     protected function sectionRisks($pdf, $object, Translate $outputLangs, float $size, array $moreParam)
     {
-        $risk = new Risk($this->db);
-
         // Le perimetre du document est l'arborescence de l'element : les risques portes par un
         // element absent de cet arbre sont ignores, comme le fait le gabarit ODT
         $digiriskElements = $this->perimeterElements($object);
 
-        $moreParam['filter'] = '';
-        $riskInfos           = $risk->loadRiskInfos($moreParam);
-        $riskLevels          = $riskInfos['current']['riskByRiskAssessmentLevels'] ?? [];
-        $riskTasks           = $riskInfos['current']['riskTasks'] ?? [];
+        $riskInfos  = $this->loadRiskInfos($moreParam);
+        $riskLevels = $riskInfos['current']['riskByRiskAssessmentLevels'] ?? [];
+        $riskTasks  = $riskInfos['current']['riskTasks'] ?? [];
 
         $this->taskResponsibles = $this->loadTaskResponsibles($riskTasks);
 
@@ -1862,11 +2038,9 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
             return;
         }
 
-        require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_ticket.lib.php';
+        $tickets = $this->perimeterRegisters($object, $moreParam);
 
-        $tickets = $this->registersInPerimeter($object, $moreParam);
-
-        $this->newPage($pdf);
+        $this->flowSection($pdf, 40);
         $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksRegistersTitle'), $size);
 
         $period = $this->periodLabel($moreParam['registerDateStart'] ?? 0, $moreParam['registerDateEnd'] ?? 0, $outputLangs);
@@ -1891,17 +2065,40 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
 
         $rows = [];
         foreach ($tickets as $ticket) {
+            // Le statut se traduit dans la langue du document : getLibStatut() passe par celle de
+            // l'utilisateur, et un listing francais genere par un anglophone affichait « Unread »
+            $status = $ticket->labelStatus[$ticket->status] ?? '';
+
             $rows[] = [
                 $ticket->ref,
                 $ticket->digiriskElementRefLabel ?? '',
                 $this->registerCategories($ticket),
                 ['text' => dol_print_date($ticket->datec, 'dayreduceformat', 'tzuser', $outputLangs), 'align' => 'C'],
                 dol_string_nohtmltag($ticket->message),
-                ['text' => $ticket->getLibStatut(), 'align' => 'C']
+                ['text' => dol_strlen($status) ? $outputLangs->transnoentitiesnoconv($status) : '', 'align' => 'C']
             ];
         }
 
         $this->table($pdf, $header, $rows, $widths, $size);
+    }
+
+    /**
+     * Registres du perimetre, lus une seule fois : la synthese de la couverture les compte et
+     * leur section les liste.
+     *
+     * @param  object $object    Element imprime
+     * @param  array  $moreParam More param (registerDateStart, registerDateEnd)
+     * @return array             Tickets du perimetre
+     */
+    protected function perimeterRegisters($object, array $moreParam): array
+    {
+        if ($this->registers === null) {
+            require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_ticket.lib.php';
+
+            $this->registers = $this->registersInPerimeter($object, $moreParam);
+        }
+
+        return $this->registers;
     }
 
     /**
@@ -2023,11 +2220,9 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
             return;
         }
 
-        require_once __DIR__ . '/../../../../../class/accident.class.php';
+        $accidents = $this->perimeterAccidents($object, $moreParam);
 
-        $accidents = $this->accidentsInPerimeter($object, $moreParam);
-
-        $this->newPage($pdf);
+        $this->flowSection($pdf, 35);
         $this->sectionTitle($pdf, $outputLangs->transnoentities('ListingRisksAccidentsTitle'), $size);
 
         $period = $this->periodLabel($moreParam['accidentDateStart'] ?? 0, $moreParam['accidentDateEnd'] ?? 0, $outputLangs);
@@ -2073,6 +2268,25 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         $this->table($pdf, $header, $rows, $widths, $size);
 
         $this->paragraph($pdf, $outputLangs->transnoentities('ListingRisksAccidentWorkStopNote'), $size - 1, 'I', [140, 140, 140]);
+    }
+
+    /**
+     * Accidents du perimetre, lus une seule fois : la synthese de la couverture les compte et
+     * leur section les liste.
+     *
+     * @param  object $object    Element imprime
+     * @param  array  $moreParam More param (accidentDateStart, accidentDateEnd)
+     * @return array             Accidents du perimetre
+     */
+    protected function perimeterAccidents($object, array $moreParam): array
+    {
+        if ($this->accidents === null) {
+            require_once __DIR__ . '/../../../../../class/accident.class.php';
+
+            $this->accidents = $this->accidentsInPerimeter($object, $moreParam);
+        }
+
+        return $this->accidents;
     }
 
     /**
