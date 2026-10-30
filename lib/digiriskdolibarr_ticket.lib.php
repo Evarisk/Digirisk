@@ -973,3 +973,73 @@ function digiriskdolibarr_ticket_qrcode_file(string $url): string
 
     return digiriskGetQrCodePng($url, $filePath) ? $filePath : '';
 }
+
+/**
+ * Files of the ticket directory a mail can carry (#4650): public interface photos, generated documents,
+ * attachments of earlier messages. Most recent first
+ *
+ * @param  Ticket $ticket Ticket
+ * @return array          dol_dir_list() entries, size included
+ */
+function digiriskdolibarr_ticket_files(Ticket $ticket): array
+{
+    global $conf;
+
+    require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+
+    return dol_dir_list($conf->ticket->dir_output . '/' . dol_sanitizeFileName($ticket->ref), 'files', 0, '', ['(\.meta|_preview.*\.png)$', '^\.'], 'date', SORT_DESC, 1);
+}
+
+/**
+ * Options of the "Attach ticket files" selector, for Form::multiselectarray()
+ *
+ * @param  array $files Files of the ticket, from digiriskdolibarr_ticket_files()
+ * @return array        Options, the escaped file name as id
+ */
+function digiriskdolibarr_ticket_files_options(array $files): array
+{
+    $options = [];
+    foreach ($files as $file) {
+        $fileSize  = dol_print_size($file['size'], 1, 1);
+        $options[] = [
+            'id'        => dol_escape_htmltag($file['name']),
+            'label'     => $file['name'] . ' (' . $fileSize . ')',
+            // A span, not the <i> of img_mime(): the data-html of the option only keeps a few tags.
+            'labelhtml' => '<span class="fa fa-' . dol_mimetype($file['name'], '', 4) . ' pictofixedwidth"></span>' . dol_escape_htmltag($file['name']) . ' <span class="opacitymedium">' . $fileSize . '</span>',
+        ];
+    }
+
+    return $options;
+}
+
+/**
+ * Files of the ticket picked in the "Attach ticket files" selector
+ *
+ * A name is only accepted if it is in the listing of the ticket directory, so nothing outside of it can
+ * be attached. The listing is keyed by the same filter GETPOST applies: it alters some names (double
+ * spaces), which would otherwise drop the file without a word.
+ *
+ * @param  Ticket $ticket Ticket
+ * @param  array  $names  Names posted by the selector, read with GETPOST(..., 'array')
+ * @return array          dol_dir_list() entries of the picked files, each one once
+ */
+function digiriskdolibarr_ticket_linked_files(Ticket $ticket, array $names): array
+{
+    if (empty($names)) {
+        return [];
+    }
+
+    $ticketFiles = [];
+    foreach (digiriskdolibarr_ticket_files($ticket) as $ticketFile) {
+        $ticketFiles[sanitizeVal($ticketFile['name'], 'alphanohtml')] = $ticketFile;
+    }
+
+    $linkedFiles = [];
+    foreach ($names as $name) {
+        if (is_string($name) && isset($ticketFiles[$name])) {
+            $linkedFiles[$name] = $ticketFiles[$name];
+        }
+    }
+
+    return array_values($linkedFiles);
+}
