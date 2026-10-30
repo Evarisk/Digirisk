@@ -28,7 +28,7 @@
  *          With a PIN code in the setup, a visitor who has not given it yet only gets its field.
  *
  * Variables : $accessAllowed, $pinAsked, $pinError, $key, $tab, $tabUrl, $exportUrl, $overviewTabNames,
- *             $overviewRows, $overviewColumns, $rpsScale, $conf, $langs, $mysoc
+ *             $overviewRows, $overviewColumns, $rpsScale, $registerFilters, $conf, $langs, $mysoc
  *             (public/digiriskelement/digiriskelement_risk_overview.php)
  */
 
@@ -120,6 +120,9 @@ $emptyCellTitles = [
         foreach ($overviewTabs as $panelTab => $overviewTabMeta) :
             $columns = $overviewColumns[$panelTab] ?? []; ?>
         <div class="risk-overview__card" data-tab="<?php echo $panelTab; ?>"<?php echo $panelTab == $tab ? '' : ' hidden'; ?>>
+            <?php if ($panelTab == 'register') {
+                require __DIR__ . '/digiriskelement_risk_overview_register_filters.tpl.php';
+            } ?>
             <?php if (empty($overviewRows)) : ?>
                 <div class="risk-overview__empty"><?php echo $langs->trans('RiskOverviewEmpty'); ?></div>
             <?php else : ?>
@@ -244,7 +247,10 @@ $emptyCellTitles = [
 
                 <div class="risk-overview__legend">
                     <?php if ($panelTab == 'register') : ?>
-                        <span class="risk-overview__legend-text"><?php echo $langs->trans('RiskOverviewLegendRegisters'); ?></span>
+                        <span class="risk-overview__legend-text">
+                            <?php echo $langs->trans('RiskOverviewLegendRegisters'); ?>
+                            <strong><?php echo $langs->trans('RiskOverviewRegisterFilterShown', digiriskRiskOverviewRegisterFilterLabel($registerFilters)); ?></strong>
+                        </span>
                     <?php elseif ($panelTab == 'rps') : ?>
                         <span class="risk-overview__legend-text"><?php echo $langs->trans('RiskOverviewLegendPsychosocial'); ?></span>
                         <span class="risk-overview__keys">
