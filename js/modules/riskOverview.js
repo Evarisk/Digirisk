@@ -49,6 +49,7 @@ window.digiriskdolibarr.riskOverview.event = function() {
   $(document).on('click', '.risk-overview__unfold-all', window.digiriskdolibarr.riskOverview.unfoldAll);
   $(document).on('mouseenter focusin', '.risk-overview td.has-risk-tooltip', window.digiriskdolibarr.riskOverview.showRisks);
   $(document).on('mouseleave focusout', '.risk-overview td.has-risk-tooltip', window.digiriskdolibarr.riskOverview.leaveRisks);
+  $(document).on('mousemove', '.risk-overview td.has-risk-tooltip', window.digiriskdolibarr.riskOverview.showAfterScroll);
   $(document).on('pointerdown', 'body.digirisk-risk-overview-public', window.digiriskdolibarr.riskOverview.rememberTap);
   $(document).on('click', '.risk-overview td.has-risk-tooltip .risk-overview__link', window.digiriskdolibarr.riskOverview.openOnSecondTap);
   $(document).on('click', '.risk-overview__tooltip', window.digiriskdolibarr.riskOverview.tapTooltip);
@@ -146,6 +147,24 @@ window.digiriskdolibarr.riskOverview.leaveRisks = function() {
 window.digiriskdolibarr.riskOverview.hideOnScroll = function(event) {
   if (!$(event.target).closest('.risk-overview__tooltip').length) {
     window.digiriskdolibarr.riskOverview.hideRisks();
+  }
+};
+
+/**
+ * Remet l'infobulle qu'un défilement a fermée quand la souris bouge à nouveau sur la case : le
+ * pointeur n'en est pas sorti, aucun survol ne la rouvrirait.
+ *
+ * @since   23.6.0
+ * @version 23.6.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.riskOverview.showAfterScroll = function() {
+  const riskOverview = window.digiriskdolibarr.riskOverview;
+  const tooltip      = $('.risk-overview__tooltip');
+
+  if (!riskOverview.touch && (!tooltip.length || tooltip.prop('hidden') || riskOverview.tooltipCell !== this)) {
+    riskOverview.showRisks.call(this);
   }
 };
 

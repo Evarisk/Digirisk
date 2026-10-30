@@ -64,7 +64,7 @@ $risk-overview-phone: 700px;
 body#mainbody.page-public-card.digirisk-risk-overview-public .public-card__container {
   max-width: 1440px;
 
-  // A closed link only holds a message
+  // A closed link only holds a message, a link with a PIN code its field
   &.risk-overview--closed {
     max-width: 560px;
   }
@@ -380,8 +380,9 @@ body#mainbody.digirisk-risk-overview-public {
     margin: 6px auto 0;
   }
 
-  // Six factors only: their names fit across
-  .risk-overview__table--rps {
+  // Six factors, a few registers: their names fit across
+  .risk-overview__table--rps,
+  .risk-overview__table--register {
     .risk-overview__head {
       width: 112px;
       min-width: 112px;
@@ -436,6 +437,18 @@ body#mainbody.digirisk-risk-overview-public {
       background: rgba(22, 163, 74, 0.1);
       color: #15803d;
       font-size: 11px;
+      font-weight: 600;
+    }
+  }
+
+  // A number of tickets carries no level: a neutral tint, a register without any ticket greyed out
+  .risk-overview__cell.is-register {
+    background: rgba($dr-primary, 0.1);
+    color: $dr-navy;
+
+    &.is-zero {
+      background: $dr-bg;
+      color: $dr-faint;
       font-weight: 600;
     }
   }
@@ -621,6 +634,69 @@ body#mainbody.digirisk-risk-overview-public {
     }
   }
 
+  // Register tab: how a number splits up between subcategories (or registers), then its latest tickets
+  .risk-overview__tooltip-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #eef2f6;
+    font-size: 12px;
+  }
+
+  .risk-overview__tooltip-breakdown-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .risk-overview__ticket-icon {
+    color: $dr-primary;
+  }
+
+  // Status of a ticket: new, being handled (the default), closed, cancelled
+  .risk-overview__ticket-status {
+    padding: 1px 7px;
+    border-radius: $dr-radius-pill;
+    background: rgba($color__yellow, 0.2);
+    color: #8a5a00;
+    font-size: 11px;
+    font-weight: 600;
+
+    &[data-status="0"] {
+      background: rgba($dr-primary, 0.12);
+      color: $dr-primary;
+    }
+
+    &[data-status="8"] {
+      background: rgba(22, 163, 74, 0.14);
+      color: #15803d;
+    }
+
+    &[data-status="9"] {
+      background: $dr-bg;
+      color: $dr-muted;
+    }
+  }
+
+  .risk-overview__ticket-severity {
+    color: $color__red;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  // Tickets of a subcategory or of a register, in the tooltip of the register tab
+  .risk-overview__tooltip-count {
+    flex: 0 0 auto;
+    min-width: 30px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: rgba($dr-primary, 0.1);
+    color: $dr-navy;
+    font-weight: 700;
+    text-align: center;
+  }
+
   .risk-overview__tooltip-factor-key {
     flex: 0 0 18px;
     color: $dr-primary;
@@ -735,6 +811,55 @@ body#mainbody.digirisk-risk-overview-public {
     font-size: 28px;
   }
 
+  // PIN code asked before the overview opens
+  .risk-overview__pin {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 32px 20px;
+    color: $dr-muted;
+    text-align: center;
+
+    > .fa-lock {
+      color: $dr-faint;
+      font-size: 28px;
+    }
+  }
+
+  .risk-overview__pin-title {
+    color: $dr-text;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  // Dolibarr gives a password field a 28px height, and its focus a grey border with !important: the
+  // focus reads as a halo instead
+  .risk-overview__pin-input {
+    box-sizing: border-box;
+    width: 200px;
+    max-width: 100%;
+    height: auto;
+    padding: 10px 12px;
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius-sm;
+    background: $dr-surface;
+    color: $dr-text;
+    font-size: 22px;
+    letter-spacing: 0.3em;
+    text-align: center;
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba($dr-primary, 0.2);
+    }
+  }
+
+  .risk-overview__pin-error {
+    color: $color__red;
+    font-weight: 600;
+  }
+
   // ---- Phone: a narrower element column, the categories scroll under it ----
 
   @media (max-width: $risk-overview-phone) {
@@ -746,10 +871,11 @@ body#mainbody.digirisk-risk-overview-public {
       margin-bottom: 10px;
     }
 
-    // The three tabs share one line, their icon above their name
+    // The tabs the setup shows share one line, their icon above their name
     .risk-overview__tabs {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-auto-columns: minmax(0, 1fr);
+      grid-auto-flow: column;
       width: 100%;
     }
 
