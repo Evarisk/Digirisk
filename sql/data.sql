@@ -12,6 +12,15 @@ SELECT 0, 'digiriskdolibarr', 'preventionplan', '', 0, null, null, '(PreventionP
        null, 0
 FROM DUAL
 WHERE NOT EXISTS (SELECT rowid FROM llx_c_email_templates WHERE type_template = 'preventionplan' AND label = '(PreventionPlanSignatureRequest)');
+-- Mail of a serious and imminent danger register (issue #5282). Sent by the ticket category that carries it,
+-- to the recipients picked on the configuration of that category. Guarded for the same reason as above.
+INSERT INTO llx_c_email_templates (entity, module, type_template, lang, private, fk_user, datec, label, position, enabled, active, topic, content, content_lines, joinfiles)
+SELECT 0, 'digiriskdolibarr', 'ticket_send', '', 0, null, null, '(TicketSeriousImminentDangerMail)', 96, "isModEnabled('digiriskdolibarr')", 1,
+       '[__[MAIN_INFO_SOCIETE_NOM]__] __(TicketSeriousImminentDangerMailTopic)__ __TICKET_REF__',
+       '<p>__(Hello)__,</p><p><strong style="color: #c0392b;">__(TicketSeriousImminentDangerMailIntro)__</strong></p><p><strong>__(TicketSeriousImminentDangerMailService)__ :</strong> __TICKET_DIGIRISK_ELEMENT__<br><strong>__(Location)__ :</strong> __TICKET_LOCATION__<br><strong>__(TicketSeriousImminentDangerMailDate)__ :</strong> __TICKET_DECLARATION_DATE__<br><strong>__(TicketSeriousImminentDangerMailDeclarant)__ :</strong> __TICKET_DECLARANT__<br><strong>__(TicketSeriousImminentDangerMailTags)__ :</strong> __TICKET_TAGS__</p><p><strong>__(TicketMessage)__ :</strong><br>__TICKET_MESSAGE__</p><p>__(TicketSeriousImminentDangerMailAction)__</p><p><a href="__TICKET_MANAGEMENT_URL__">__(SeeTicketUrl)__ __TICKET_REF__</a></p><p>__(WithKindRegards)__,<br>__MYCOMPANY_NAME__</p>',
+       null, 0
+FROM DUAL
+WHERE NOT EXISTS (SELECT rowid FROM llx_c_email_templates WHERE type_template = 'ticket_send' AND label = '(TicketSeriousImminentDangerMail)');
 
 INSERT INTO `llx_c_relative_location` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(1, 0, 'UsualWorkplace', 'UsualWorkplace', '', 1);
 INSERT INTO `llx_c_relative_location` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(2, 0, 'OccasionalWorkplace', 'OccasionalWorkplace', '', 1);
