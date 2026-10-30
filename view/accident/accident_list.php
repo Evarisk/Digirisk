@@ -196,6 +196,9 @@ $permissiontodelete = $user->hasRight($object->module, $object->element, 'delete
 // Security check
 saturne_check_access($permissiontoread, $object);
 
+// The Excel export needs the base export of Saturne
+$xlsxExportAvailable = file_exists(dol_buildpath('/saturne/class/saturnexlsxexport.class.php'));
+
 /*
  * Actions
  */
@@ -233,6 +236,70 @@ if (empty($resHook)) {
 
     if (!GETPOST('confirmmassaction', 'alpha') && $massaction != 'presend' && $massaction != 'confirm_presend') {
         $massaction = '';
+    }
+
+    // Excel export of every accident matching the filters, the way the list sorts them. Answered before the
+    // list templates of Saturne, so that a generic export of the list never takes its place
+    if ($action == 'export_xlsx' && $xlsxExportAvailable) {
+        require_once __DIR__ . '/../../class/digiriskaccidentexport.class.php';
+
+        // The query of the list without its paging, run by the template into $resql
+        $limit  = 0;
+        $page   = 0;
+        $offset = 0;
+        require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_build_sql_select.tpl.php');
+
+        $accidentIds = [];
+        if (isset($resql) && $resql) {
+            while ($obj = $db->fetch_object($resql)) {
+                $accidentIds[] = (int) $obj->rowid;
+            }
+        }
+
+        $export = new DigiriskAccidentExport($db);
+        if ($searchAll) {
+            $export->filters[$langs->transnoentities('XlsxSearch')] = $searchAll;
+        }
+        $export->addFieldFilters($object, $search);
+        $export->addExtraFieldFilters($extrafields, $object->table_element, $search_array_options);
+
+        // Criteria the list reads on other tables than the accident one
+        $workStopFilterLabels = [Accident::ANY_WORK_STOP_FILTER => 'AccidentWithDIAT', Accident::NO_WORK_STOP_FILTER => 'AccidentWithoutDIAT'];
+        foreach (array_keys(Accident::WORK_STOP_DURATION_LIMITS) as $workStopBucket) {
+            $workStopFilterLabels[$workStopBucket] = ucfirst($workStopBucket);
+        }
+        $registerFilterLabels = [Accident::WITH_REGISTER_FILTER => 'AccidentWithRegister', Accident::WITHOUT_REGISTER_FILTER => 'AccidentWithoutRegister'];
+        if (isset($workStopFilterLabels[$search['workstop'] ?? ''])) {
+            $export->filters[$langs->transnoentities('WorkStopDuration')] = $langs->transnoentities($workStopFilterLabels[$search['workstop']]);
+        }
+        if (isset($registerFilterLabels[$search['register'] ?? ''])) {
+            $export->filters[$langs->transnoentities('AccidentRegister')] = $langs->transnoentities($registerFilterLabels[$search['register']]);
+        }
+        if ($fromId > 0) {
+            $digiriskElement = new DigiriskElement($db);
+            if ($digiriskElement->fetch($fromId) > 0) {
+                $export->filters[$langs->transnoentities('AccidentLocation')] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
+            }
+        } elseif ($fromIdUser > 0) {
+            $userObject = new User($db);
+            if ($userObject->fetch($fromIdUser) > 0) {
+                $export->filters[$langs->transnoentities('User')] = $userObject->getFullName($langs);
+            }
+        }
+        $categoryLabels = [];
+        foreach ($searchCategories ?? [] as $searchCategory) {
+            $category = new Categorie($db);
+            if ((int) ltrim((string) $searchCategory, '+-') > 0 && $category->fetch((int) ltrim((string) $searchCategory, '+-')) > 0) {
+                $categoryLabels[] = (strpos((string) $searchCategory, '-') === 0 ? '- ' : '') . $category->label;
+            }
+        }
+        if (!empty($categoryLabels)) {
+            $export->filters[$langs->transnoentities('Categories')] = implode(', ', $categoryLabels);
+        }
+
+        $export->export($accidentIds, $langs->transnoentities('AccidentXlsxTitle') . '_' . dol_print_date(dol_now(), 'dayhourlog'));
+        $db->close();
+        exit;
     }
 
     // Mass actions
@@ -278,6 +345,12 @@ if ($fromId > 0) {
         dol_banner_tab($userObject, 'fromiduser', $linkBack, $user->hasRight('user', 'user', 'lire') || $user->admin);
         print '<div class="underbanner clearboth"></div>';
     }
+}
+
+// Excel export of the list, with its filters and its sort
+if ($xlsxExportAvailable) {
+    dol_include_once('/saturne/class/saturnexlsxexport.class.php');
+    $newCardButton = SaturneXlsxExport::getListExportButton($formMoreParams);
 }
 
 require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_build_sql_select.tpl.php');
