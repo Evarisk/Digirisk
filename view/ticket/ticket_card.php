@@ -391,29 +391,18 @@ if ($action === 'post_message_ajax' && $permissionToWrite) {
                 . $langs->transnoentities('TicketNotificationEmailBodyInfosTrackUrlinternal') . ' : <a href="' . $urlTicket . '">' . $object->track_id . '</a>'
                 . (!empty($signature) ? '<br><br>' . $signature : '');
             // Files of the ticket picked in the composer (#4650): they already live in the ticket directory,
-            // they only travel with the mail. Matched against the listing of that directory, so nothing
-            // outside of it can be attached. The listing is keyed by the same filter GETPOST applies: it
-            // alters some names (double spaces), which would otherwise drop the file without a word.
+            // they only travel with the mail.
             $mailFileList    = $fileNameList;
             $mailMimeList    = $mimeTypeList;
             $mailFileNames   = $mimeFileNameList;
             $linkedFileNames = [];
-            $linkedFiles     = GETPOST('linked_files', 'array') ?: [];
-            if (!empty($linkedFiles)) {
-                require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-                $ticketFiles = [];
-                foreach (dol_dir_list($conf->ticket->dir_output . '/' . dol_sanitizeFileName($object->ref), 'files', 0, '', ['(\.meta|_preview.*\.png)$', '^\.']) as $ticketFile) {
-                    $ticketFiles[sanitizeVal($ticketFile['name'], 'alphanohtml')] = $ticketFile;
-                }
-                foreach ($linkedFiles as $linkedFile) {
-                    $ticketFile = $ticketFiles[$linkedFile] ?? null;
-                    // A file uploaded under the same name has just replaced it: already in the list.
-                    if ($ticketFile !== null && !in_array($ticketFile['name'], $mailFileNames, true)) {
-                        $mailFileList[]    = $ticketFile['fullname'];
-                        $mailMimeList[]    = dol_mimetype($ticketFile['name']);
-                        $mailFileNames[]   = $ticketFile['name'];
-                        $linkedFileNames[] = $ticketFile['name'];
-                    }
+            foreach (digiriskdolibarr_ticket_linked_files($object, GETPOST('linked_files', 'array') ?: []) as $ticketFile) {
+                // A file uploaded under the same name has just replaced it: already in the list.
+                if (!in_array($ticketFile['name'], $mailFileNames, true)) {
+                    $mailFileList[]    = $ticketFile['fullname'];
+                    $mailMimeList[]    = dol_mimetype($ticketFile['name']);
+                    $mailFileNames[]   = $ticketFile['name'];
+                    $linkedFileNames[] = $ticketFile['name'];
                 }
             }
             $from    = getDolGlobalString('TICKET_NOTIFICATION_EMAIL_FROM');
@@ -1393,16 +1382,7 @@ if ($permissionToWrite) {
         $db->free($resConvTpl);
     }
     // Files of the ticket (public interface photos, generated documents, earlier attachments) the mail can carry (#4650).
-    $convTicketFiles = [];
-    foreach (dol_dir_list($ticketFilesDir, 'files', 0, '', ['(\.meta|_preview.*\.png)$', '^\.'], 'date', SORT_DESC, 1) as $convFile) {
-        $convFileSize      = dol_print_size($convFile['size'], 1, 1);
-        $convTicketFiles[] = [
-            'id'        => dol_escape_htmltag($convFile['name']),
-            'label'     => $convFile['name'] . ' (' . $convFileSize . ')',
-            // A span, not the <i> of img_mime(): the data-html of the option only keeps a few tags.
-            'labelhtml' => '<span class="fa fa-' . dol_mimetype($convFile['name'], '', 4) . ' pictofixedwidth"></span>' . dol_escape_htmltag($convFile['name']) . ' <span class="opacitymedium">' . $convFileSize . '</span>',
-        ];
-    }
+    $convTicketFiles = digiriskdolibarr_ticket_files_options(digiriskdolibarr_ticket_files($object));
     // Internal agents for @mentions.
     $convAgents = [];
     $resConvAg = $db->query('SELECT rowid, firstname, lastname, login FROM ' . MAIN_DB_PREFIX . 'user WHERE statut = 1 AND entity IN (' . getEntity('user') . ') ORDER BY lastname, firstname');

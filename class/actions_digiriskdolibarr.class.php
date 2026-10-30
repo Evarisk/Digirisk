@@ -388,7 +388,7 @@ class ActionsDigiriskdolibarr
 	 */
 	public function printCommonFooter($parameters)
 	{
-		global $conf, $db, $form, $langs, $object, $user;
+		global $action, $conf, $db, $form, $langs, $object, $user;
 
 		dol_include_once('/saturne/lib/saturne_functions.lib.php');
 		// saturne_asset_full_url() for the scripts printed below: without a version, the browser keeps serving the previous release
@@ -705,6 +705,43 @@ class ActionsDigiriskdolibarr
                     echo '<input type="hidden" name="users_list" value="' . base64_encode(json_encode($users)) . '">';
                 }
 
+            // Files of the ticket in the native message form (#5581). The form has no hook: the row is moved into
+            // it before the form's own script shows or hides the email rows (.email_line) along the checkbox.
+            // ticket/card.php sets $action to add_message just before printing the form.
+            if ($action == 'add_message' && $object instanceof Ticket && !empty($object->id)) {
+                require_once __DIR__ . '/../lib/digiriskdolibarr_ticket.lib.php';
+
+                $ticketFilesOptions = digiriskdolibarr_ticket_files_options(digiriskdolibarr_ticket_files($object));
+                if (!empty($ticketFilesOptions)) {
+                    // Picked files survive the upload of a file, which posts and prints the form again
+                    $selectedTicketFiles = [];
+                    foreach (digiriskdolibarr_ticket_linked_files($object, GETPOST('linked_files', 'array') ?: []) as $ticketFile) {
+                        $selectedTicketFiles[] = dol_escape_htmltag($ticketFile['name']);
+                    }
+
+                    $pictoDigirisk = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
+                    print '<table style="display: none;"><tr class="email_line" id="digirisk_ticket_linked_files">';
+                    print '<td>' . $pictoDigirisk . $langs->trans('AttachTicketFiles') . '</td>';
+                    print '<td>' . Form::multiselectarray('linked_files', $ticketFilesOptions, $selectedTicketFiles, 0, 0, '', 0, '100%', '', '', $langs->trans('AttachTicketFiles')) . '</td>';
+                    print '</tr></table>'; ?>
+                    <script>
+                        (function () {
+                            let linkedFilesRow = jQuery('#digirisk_ticket_linked_files');
+                            let ticketForm     = jQuery('form#ticket');
+                            let anchorRow      = ticketForm.find('#addedfile').closest('tr');
+                            if (!anchorRow.length) {
+                                anchorRow = ticketForm.find('input[name="subject"]').closest('tr');
+                            }
+                            if (anchorRow.length) {
+                                anchorRow.after(linkedFilesRow);
+                                linkedFilesRow.toggle(jQuery('#send_msg_email').is(':checked'));
+                            }
+                        })();
+                    </script>
+                    <?php
+                }
+            }
+
 			if (GETPOST('action') == 'add_message') {
 
 				$object = new Ticket($this->db);
@@ -903,6 +940,11 @@ class ActionsDigiriskdolibarr
 				}
 			}
 		} else if (strpos($parameters['context'], 'ticketcard') !== false) {
+            // btn_add_message only comes from the message form of ticket/card.php
+            if ($action == 'add_message' && GETPOSTISSET('btn_add_message') && $object instanceof Ticket && $this->addMessageWithTicketFiles($object) > 0) {
+                return 1;
+            }
+
             if ($action == 'builddoc' && preg_match('/\bticketdocument\b/', GETPOST('model'))) {
                 require_once __DIR__ . '/digiriskdolibarrdocuments/ticketdocument.class.php';
 
@@ -1008,6 +1050,55 @@ class ActionsDigiriskdolibarr
             return -1;
 		}
 	}
+
+    /**
+     * Post a message of the native ticket card with files of the ticket on its mails (#5581)
+     *
+     * Runs Ticket::newMessage() as ticket/card.php does, on a TicketLinkedFilesMailer that adds the picked
+     * files to every mail sent. Left to the standard code when no file is picked, when no mail is asked
+     * for, or when the message is empty: newMessage() stops on its own check and the form comes back filled.
+     *
+     * @param  Ticket $object Ticket of the card
+     * @return int            0 when left to the standard code, 1 when done here
+     */
+    private function addMessageWithTicketFiles(Ticket $object): int
+    {
+        global $langs, $user;
+
+        if (!GETPOSTINT('send_email') || !GETPOST('message') || !$user->hasRight('ticket', 'read')) {
+            return 0;
+        }
+
+        require_once __DIR__ . '/../lib/digiriskdolibarr_ticket.lib.php';
+        require_once __DIR__ . '/ticketlinkedfilesmailer.class.php';
+
+        $linkedFiles = digiriskdolibarr_ticket_linked_files($object, GETPOST('linked_files', 'array') ?: []);
+        if (empty($linkedFiles)) {
+            return 0;
+        }
+
+        $mailer = new TicketLinkedFilesMailer($this->db);
+        if ($mailer->fetch($object->id) <= 0) {
+            return 0;
+        }
+        $mailer->linkedFiles = $linkedFiles;
+
+        $messageAction = 'add_message';
+        if ($mailer->newMessage($user, $messageAction, GETPOSTINT('private_message'), 0) <= 0) {
+            setEventMessages($mailer->error, $mailer->errors, 'errors');
+            return 1;
+        }
+
+        // The files are not tied to the message: the thread keeps their names in an event, as in the composer.
+        if (!empty($mailer->linkedFilesSent)) {
+            $langs->load('digiriskdolibarr@digiriskdolibarr');
+            digiriskdolibarr_ticket_log_event($mailer, $langs->transnoentities('TicketFilesSentByMail', implode(', ', $mailer->linkedFilesSent)), implode("\n", $mailer->linkedFilesSent), 'DIGIRISKDOLIBARR_TICKET_LOG_MODIFICATIONS');
+        }
+
+        $backtopage = GETPOST('backtopage', 'alpha');
+        header('Location: ' . (!empty($backtopage) ? $backtopage : DOL_URL_ROOT . '/ticket/card.php?track_id=' . urlencode($mailer->track_id)));
+        exit;
+    }
 
     /**
      * Overloading the formConfirm function : replacing the parent's function with the one below.
