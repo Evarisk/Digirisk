@@ -238,17 +238,8 @@ if (empty($resHook)) {
         $massaction = '';
     }
 
-    // Mass actions
-    $objectclass = 'Accident';
-    $objectlabel = 'Accident';
-    $uploaddir   = $conf->digiriskdolibarr->multidir_output[$conf->entity];
-
-    require_once DOL_DOCUMENT_ROOT . '/core/actions_massactions.inc.php';
-
-    // Mass actions archive
-    require_once dol_buildpath('/saturne/core/tpl/actions/list_massactions.tpl.php');
-
-    // Excel export of every accident matching the filters, the way the list sorts them
+    // Excel export of every accident matching the filters, the way the list sorts them. Answered before the
+    // list templates of Saturne, so that a generic export of the list never takes its place
     if ($action == 'export_xlsx' && $xlsxExportAvailable) {
         require_once __DIR__ . '/../../class/digiriskaccidentexport.class.php';
 
@@ -310,6 +301,16 @@ if (empty($resHook)) {
         $db->close();
         exit;
     }
+
+    // Mass actions
+    $objectclass = 'Accident';
+    $objectlabel = 'Accident';
+    $uploaddir   = $conf->digiriskdolibarr->multidir_output[$conf->entity];
+
+    require_once DOL_DOCUMENT_ROOT . '/core/actions_massactions.inc.php';
+
+    // Mass actions archive
+    require_once dol_buildpath('/saturne/core/tpl/actions/list_massactions.tpl.php');
 }
 
 /*
