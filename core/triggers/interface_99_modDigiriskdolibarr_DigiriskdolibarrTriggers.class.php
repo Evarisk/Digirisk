@@ -1211,12 +1211,27 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
         $substitutions['__TICKET_MESSAGE__']          = (string) $object->message;
         $substitutions['__TICKET_DIGIRISK_ELEMENT__'] = implode(', ', $elementLabels);
         $substitutions['__TICKET_DECLARANT__']        = trim(dol_strtoupper($lastname) . ' ' . $firstname);
-        $substitutions['__TICKET_DECLARATION_DATE__'] = !empty($date) ? dol_print_date($date, 'daytext', 'tzuser', $langs) : '';
+        $substitutions['__TICKET_DECLARATION_DATE__'] = !empty($date) ? dol_print_date($date, $this->ticketDeclarationDateFormat($date), 'tzuser', $langs) : '';
         $substitutions['__TICKET_LOCATION__']         = (string) ($object->array_options['options_digiriskdolibarr_ticket_location'] ?? '');
         $substitutions['__TICKET_TAGS__']             = $this->ticketTags($object);
         $substitutions['__TICKET_MANAGEMENT_URL__']   = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/view/ticket/ticket_card.php?id=' . $object->id;
 
         return $substitutions;
+    }
+
+    /**
+     * Format de la date de declaration - issue #5628
+     *
+     * Le formulaire demande l'heure du signalement, et pour un danger grave et imminent elle
+     * compte : elle est donnee avec le jour. Une heure laissee vide au formulaire arrive a
+     * 00:00, qui n'est alors pas une heure de signalement : seul le jour est donne.
+     *
+     * @param  int|string $date Date de declaration
+     * @return string           Format de dol_print_date()
+     */
+    protected function ticketDeclarationDateFormat($date): string
+    {
+        return dol_print_date($date, '%H:%M', 'tzuser') == '00:00' ? 'daytext' : 'dayhourtext';
     }
 
     /**
