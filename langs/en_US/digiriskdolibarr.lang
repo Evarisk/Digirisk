@@ -1562,6 +1562,7 @@ QRCodeGeneration                         = QR code generation
 MultiCompanyQRCodeGeneration             = Multi-entity QR code generation
 TicketCreationMailWellSent               = Ticket creation confirmation email sent
 TicketCreationMailSent                   = The ticket creation email has been sent to %s
+TicketCreationMailNotSent                = Ticket creation email not sent
 HowToSetupTicketCategories               = To configure the ticket categories, please click this link:
 ConfigTicketCategories                   = Ticket categories setup
 NewTicketSubmitted                       = A ticket has been submitted through the public interface
