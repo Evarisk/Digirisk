@@ -22,7 +22,7 @@
  *          level of each factor F1 to F6 it is made of, so that the risk tab gives them without a
  *          switch to the psychosocial tab. Shown by js/modules/riskOverview.js, as the risk tooltip.
  *
- * Variables : $overviewRow, $rpsColumns (digiriskRiskOverviewFactorColumns()), $rpsScale, $tooltipHint, $langs
+ * Variables : $overviewRow, $rpsColumns (digiriskRiskOverviewFactorColumns()), $rpsScale, $tooltipHint, $elementUrl, $langs
  *             (core/tpl/digiriskelement/digiriskelement_risk_overview_public.tpl.php); rps_scope_band() is
  *             declared by digiriskdolibarr_rps_scope_data.tpl.php
  */
@@ -65,6 +65,6 @@ $rpsBand    = (int) $overviewRow['rps']['band'];
         <?php endforeach; ?>
     </div>
     <?php if (!empty($tooltipHint)) : ?>
-        <div class="risk-overview__tooltip-hint"><i class="fas fa-external-link-alt"></i> <?php echo dol_escape_htmltag($tooltipHint); ?></div>
+        <a class="risk-overview__tooltip-hint" href="<?php echo dol_escape_htmltag($elementUrl); ?>" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i> <?php echo dol_escape_htmltag($tooltipHint); ?></a>
     <?php endif; ?>
 </template>

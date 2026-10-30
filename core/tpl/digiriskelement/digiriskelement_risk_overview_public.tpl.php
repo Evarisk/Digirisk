@@ -139,8 +139,10 @@ $emptyCellTitles = [
                                     <?php else : ?>
                                         <span class="risk-overview__toggle-space"></span>
                                     <?php endif; ?>
-                                    <span class="risk-overview__ref"><?php echo dol_escape_htmltag($overviewRow['ref']); ?></span>
-                                    <span class="risk-overview__label"><?php echo dol_escape_htmltag($overviewRow['label']); ?></span>
+                                    <span class="risk-overview__name">
+                                        <span class="risk-overview__ref"><?php echo dol_escape_htmltag($overviewRow['ref']); ?></span>
+                                        <span class="risk-overview__label"><?php echo dol_escape_htmltag($overviewRow['label']); ?></span>
+                                    </span>
                                 </th>
 
                                 <?php

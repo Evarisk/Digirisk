@@ -11,7 +11,7 @@
  * \ingroup digiriskdolibarr
  * \brief   Public overview of the risks (public/digiriskelement/digiriskelement_risk_overview.php):
  *          the three tabs are in the page, a click shows one without reloading it; a number of risks
- *          lists them on hover.
+ *          lists them on hover, or on a first touch on a phone.
  */
 
 /**
@@ -48,9 +48,12 @@ window.digiriskdolibarr.riskOverview.event = function() {
   $(document).on('click', '.risk-overview__fold-all', window.digiriskdolibarr.riskOverview.foldAll);
   $(document).on('click', '.risk-overview__unfold-all', window.digiriskdolibarr.riskOverview.unfoldAll);
   $(document).on('mouseenter focusin', '.risk-overview td.has-risk-tooltip', window.digiriskdolibarr.riskOverview.showRisks);
-  $(document).on('mouseleave focusout', '.risk-overview td.has-risk-tooltip', window.digiriskdolibarr.riskOverview.hideRisks);
+  $(document).on('mouseleave focusout', '.risk-overview td.has-risk-tooltip', window.digiriskdolibarr.riskOverview.leaveRisks);
+  $(document).on('pointerdown', 'body.digirisk-risk-overview-public', window.digiriskdolibarr.riskOverview.rememberTap);
+  $(document).on('click', '.risk-overview td.has-risk-tooltip .risk-overview__link', window.digiriskdolibarr.riskOverview.openOnSecondTap);
+  $(document).on('click', '.risk-overview__tooltip', window.digiriskdolibarr.riskOverview.tapTooltip);
   // The table scrolls inside its card: a tooltip left open would no longer face its cell
-  document.addEventListener('scroll', window.digiriskdolibarr.riskOverview.hideRisks, true);
+  document.addEventListener('scroll', window.digiriskdolibarr.riskOverview.hideOnScroll, true);
 };
 
 /**
@@ -74,6 +77,9 @@ window.digiriskdolibarr.riskOverview.showRisks = function() {
     tooltip = $('<div class="risk-overview__tooltip" role="tooltip" hidden></div>').appendTo('body');
   }
   tooltip.empty().append(document.importNode(template.content, true)).prop('hidden', false);
+  // Au doigt, l'infobulle se touche : son lien ouvre la liste, la case qu'elle couvre ne se touche plus
+  tooltip.toggleClass('is-touch', window.digiriskdolibarr.riskOverview.touch === true);
+  window.digiriskdolibarr.riskOverview.tooltipCell = this;
 
   // Sous la case, sinon au-dessus ; une infobulle trop haute pour l'un et l'autre se met à côté de la
   // case, qu'elle ne doit pas cacher. Jamais hors de l'écran
@@ -111,6 +117,97 @@ window.digiriskdolibarr.riskOverview.showRisks = function() {
  */
 window.digiriskdolibarr.riskOverview.hideRisks = function() {
   $('.risk-overview__tooltip').prop('hidden', true);
+};
+
+/**
+ * Masque l'infobulle quand le pointeur quitte la case. Ouverte au doigt, elle reste : la souris
+ * émulée quitte la case dès que le doigt touche l'infobulle, avant que son lien ne reçoive le clic.
+ *
+ * @since   23.6.0
+ * @version 23.6.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.riskOverview.leaveRisks = function() {
+  if (!window.digiriskdolibarr.riskOverview.touch) {
+    window.digiriskdolibarr.riskOverview.hideRisks();
+  }
+};
+
+/**
+ * Masque l'infobulle quand la page ou le tableau défile, mais pas quand elle défile elle-même.
+ *
+ * @since   23.6.0
+ * @version 23.6.0
+ *
+ * @param  {Event} event Défilement
+ * @return {void}
+ */
+window.digiriskdolibarr.riskOverview.hideOnScroll = function(event) {
+  if (!$(event.target).closest('.risk-overview__tooltip').length) {
+    window.digiriskdolibarr.riskOverview.hideRisks();
+  }
+};
+
+/**
+ * Au doigt, il n'y a pas de survol : le premier toucher d'un nombre affiche ses risques, le second
+ * ouvre la liste. Retient, avant que le toucher n'affiche l'infobulle, si elle était déjà ouverte
+ * sur cette case ; un toucher hors de la case et de l'infobulle la ferme.
+ *
+ * @since   23.6.0
+ * @version 23.6.0
+ *
+ * @param  {PointerEvent} event Appui sur la page
+ * @return {void}
+ */
+window.digiriskdolibarr.riskOverview.rememberTap = function(event) {
+  const riskOverview = window.digiriskdolibarr.riskOverview;
+  const cell         = $(event.target).closest('.risk-overview td.has-risk-tooltip')[0];
+  const isOpen       = $('.risk-overview__tooltip').length > 0 && !$('.risk-overview__tooltip').prop('hidden');
+
+  riskOverview.touch        = event.pointerType !== 'mouse';
+  riskOverview.tapWhileOpen = isOpen;
+  riskOverview.tapOpenCell  = isOpen && cell !== undefined && cell === riskOverview.tooltipCell;
+
+  if (riskOverview.touch && isOpen && !cell && !$(event.target).closest('.risk-overview__tooltip').length) {
+    riskOverview.hideRisks();
+  }
+};
+
+/**
+ * Au premier toucher d'un nombre, affiche ses risques au lieu d'ouvrir la liste.
+ *
+ * @since   23.6.0
+ * @version 23.6.0
+ *
+ * @param  {MouseEvent} event Clic sur le nombre
+ * @return {void}
+ */
+window.digiriskdolibarr.riskOverview.openOnSecondTap = function(event) {
+  const riskOverview = window.digiriskdolibarr.riskOverview;
+
+  if (riskOverview.touch && !riskOverview.tapOpenCell) {
+    event.preventDefault();
+    riskOverview.showRisks.call($(this).closest('td')[0]);
+  }
+};
+
+/**
+ * Ouverte au doigt, l'infobulle se ferme quand on la touche ; son lien ouvre d'abord la liste. Le
+ * clic du toucher qui vient de l'ouvrir tombe sur elle quand elle couvre sa case : il est ignoré.
+ *
+ * @since   23.6.0
+ * @version 23.6.0
+ *
+ * @param  {MouseEvent} event Clic sur l'infobulle
+ * @return {void}
+ */
+window.digiriskdolibarr.riskOverview.tapTooltip = function(event) {
+  if (!window.digiriskdolibarr.riskOverview.tapWhileOpen) {
+    event.preventDefault();
+    return;
+  }
+  window.digiriskdolibarr.riskOverview.hideRisks();
 };
 
 /**

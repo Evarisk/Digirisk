@@ -24,7 +24,7 @@
  *          on hover.
  *
  * Variables : $cellRisks (digiriskRiskOverviewCellRisks()), $cell (digiriskRiskOverviewCell()), $position,
- *             $overviewRow, $tooltipTitle, $tooltipHint, $langs
+ *             $overviewRow, $tooltipTitle, $tooltipHint, $elementUrl, $langs
  *             (core/tpl/digiriskelement/digiriskelement_risk_overview_public.tpl.php)
  */
 
@@ -86,6 +86,6 @@ $uncountedLines = (int) $cell['value'] - count($cellRisks['risks']) - (int) $cel
         <div class="risk-overview__tooltip-more"><?php echo $langs->trans('RiskOverviewTooltipPsychosocialLine'); ?></div>
     <?php endif; ?>
     <?php if (!empty($tooltipHint)) : ?>
-        <div class="risk-overview__tooltip-hint"><i class="fas fa-external-link-alt"></i> <?php echo dol_escape_htmltag($tooltipHint); ?></div>
+        <a class="risk-overview__tooltip-hint" href="<?php echo dol_escape_htmltag($elementUrl); ?>" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i> <?php echo dol_escape_htmltag($tooltipHint); ?></a>
     <?php endif; ?>
 </template>
