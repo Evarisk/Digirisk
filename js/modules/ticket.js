@@ -308,14 +308,17 @@ window.digiriskdolibarr.ticket.checkValidEmail = function() {
 /**
  * Check if phone is valid
  *
+ * Same rule as the server, any country (#5622): once the usual separators are dropped, 6 to 15 digits
+ * with an optional "+" or "00"
+ *
  * @since   9.8.2
- * @version 9.8.2
+ * @version 23.6.0
  *
  * @return {void}
  */
 window.digiriskdolibarr.ticket.checkValidPhone = function() {
-	var rePhone = /^(?:(?:(?:\+|00)\d{2}[\s]?(?:\(0\)[\s]?)?)|0){1}[1-9]{1}([\s.-]?)(?:\d{2}\1?){3}\d{2}$/;
-	if (rePhone.test(this.value) == false) {
+	var rePhone = /^(\+|00)?\d{6,15}$/;
+	if (rePhone.test(this.value.replace(/[\s.\-\/()]/g, '')) == false) {
 		$(this).css("border", "3px solid red");
 	} else {
 		$(this).css("border", "3px solid green");

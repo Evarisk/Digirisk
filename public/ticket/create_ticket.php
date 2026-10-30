@@ -257,8 +257,9 @@ if (empty($resHook) && $publicInterfaceUsable) {
             $error++;
         }
 
-        $regPhone = '/^(?:(?:(?:\+|00)\d{2}[\s]?(?:\(0\)[\s]?)?)|0){1}[1-9]{1}([\s.-]?)(?:\d{2}\1?){3}\d{2}$/';
-        if (!preg_match($regPhone, $phone) && !empty($phone)) {
+        // Any country, not only the French numbering (#5622): once the usual separators are dropped, 6 to 15 digits
+        // (E.164) with an optional "+" or "00". isValidPhone() of the core cannot help, it always says yes
+        if (!empty($phone) && !preg_match('/^(\+|00)?\d{6,15}$/', preg_replace('/[\s.\-\/()]/', '', $phone))) {
             setEventMessages($langs->trans('ErrorFieldPhone'), array(), 'errors');
             $error++;
         }
