@@ -52,6 +52,11 @@ class ActionsDigiriskdolibarr
 	public ?string $resprints;
 
 	/**
+	 * @var int Level of the output buffer holding the ticket list back while its Excel export is built, 0 without export
+	 */
+	protected int $ticketXlsxExportBufferLevel = 0;
+
+	/**
 	 * Constructor
 	 *
 	 *  @param		DoliDB		$db      Database handler
@@ -934,6 +939,14 @@ class ActionsDigiriskdolibarr
 		global $conf, $langs, $db, $user;
 
         $error = 0;
+
+        // Excel export of the ticket list: the list builds its query as usual, then printFieldListFooter sends the
+        // workbook in place of the page, held back until then
+        if (preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context']) && $action == 'export_xlsx' && $user->hasRight('ticket', 'read') && file_exists(dol_buildpath('/saturne/class/saturnexlsxexport.class.php'))) {
+            ob_start();
+            $this->ticketXlsxExportBufferLevel = ob_get_level();
+        }
+
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
 		if (strpos($parameters['context'], 'admincompany') !== false) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			if ($action == 'update') {
@@ -1775,6 +1788,15 @@ class ActionsDigiriskdolibarr
 				$moreforfilter .= Form::multiselectarray('search_category_ticket_list', $categoriesTicketArr, $searchCategoryTicket, 0, 0, 'minwidth300');
 				$moreforfilter .= '</div>';
 			}
+
+            // Excel export of every ticket matching the filters, the way the list sorts them
+            if ($user->hasRight('ticket', 'read') && file_exists(dol_buildpath('/saturne/class/saturnexlsxexport.class.php'))) {
+                dol_include_once('/saturne/class/saturnexlsxexport.class.php');
+
+                $moreforfilter .= '<div class="divsearchfield">';
+                $moreforfilter .= SaturneXlsxExport::getListExportButton(array_filter(['socid' => GETPOSTINT('socid'), 'projectid' => GETPOSTINT('projectid')]), '');
+                $moreforfilter .= '</div>';
+            }
 		}
 
         if (preg_match('/accidentlist/', $parameters['context'])) {
@@ -1806,6 +1828,46 @@ class ActionsDigiriskdolibarr
         $this->resprints = $moreforfilter ?? '';
         return 0; // or return 1 to replace standard code
 	}
+
+    /**
+     * Overloading the printFieldListFooter function : replacing the parent's function with the one below
+     *
+     * @param  array        $parameters Hook metadata (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @return int                      0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function printFieldListFooter($parameters, $object): int
+    {
+        global $langs;
+
+        if ($this->ticketXlsxExportBufferLevel > 0 && preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context']) && $object instanceof Ticket) {
+            require_once __DIR__ . '/digiriskticketexport.class.php';
+
+            // The query of the list without its paging: every ticket matching the filters, in the order of the list
+            $ticketIds = [];
+            $resql     = $this->db->query(preg_replace('/\s+LIMIT\s+\d+(\s*,\s*\d+)?(\s+OFFSET\s+\d+)?\s*$/i', '', (string) $parameters['sql']));
+            if ($resql) {
+                while ($obj = $this->db->fetch_object($resql)) {
+                    $ticketIds[] = (int) $obj->rowid;
+                }
+                $this->db->free($resql);
+            }
+
+            // The page built so far is dropped, the workbook goes out in its place
+            while (ob_get_level() >= $this->ticketXlsxExportBufferLevel) {
+                ob_end_clean();
+            }
+
+            $export = new DigiriskTicketExport($this->db);
+            $export->addTicketListFilters($object);
+            $export->export(array_values(array_unique($ticketIds)), $langs->transnoentities('TicketXlsxTitle') . '_' . dol_print_date(dol_now(), 'dayhourlog'));
+
+            $this->db->close();
+            exit;
+        }
+
+        return 0;
+    }
 
 	/**
 	 *  Overloading the printFieldListSearchParam function : replacing the parent's function with the one below
