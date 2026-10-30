@@ -992,6 +992,36 @@ function digiriskdolibarr_ticket_files(Ticket $ticket): array
 }
 
 /**
+ * Copy a document generated elsewhere (QQOQCCP, #5591) among the files of the ticket, where its "Attached files" tab
+ * and the "Attach ticket files" selector of its mail offer it
+ *
+ * @param  Ticket $ticket   Ticket
+ * @param  string $filePath Full path of the document
+ * @return int              <0 KO, >0 OK
+ */
+function digiriskdolibarr_ticket_attach_file(Ticket $ticket, string $filePath): int
+{
+    global $conf, $db;
+
+    require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+    require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmfiles.class.php';
+
+    $ticketDir = $conf->ticket->dir_output . '/' . dol_sanitizeFileName($ticket->ref);
+    $fileName  = basename($filePath);
+    if (dol_mkdir($ticketDir) < 0 || dol_copy($filePath, $ticketDir . '/' . $fileName) <= 0) {
+        return -1;
+    }
+
+    // Indexed as a file of the ticket, unless a copy of the same name already was
+    $ecmFile = new EcmFiles($db);
+    if ($ecmFile->fetch(0, '', ltrim(preg_replace('/^' . preg_quote(DOL_DATA_ROOT, '/') . '/', '', $ticketDir), '/\\') . '/' . $fileName) > 0) {
+        return 1;
+    }
+
+    return addFileIntoDatabaseIndex($ticketDir, $fileName, $filePath, 'generated', 0, $ticket) > 0 ? 1 : -1;
+}
+
+/**
  * Options of the "Attach ticket files" selector, for Form::multiselectarray()
  *
  * @param  array $files Files of the ticket, from digiriskdolibarr_ticket_files()
