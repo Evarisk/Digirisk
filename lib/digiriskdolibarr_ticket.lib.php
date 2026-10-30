@@ -997,7 +997,7 @@ function digiriskdolibarr_ticket_files(Ticket $ticket): array
  *
  * @param  Ticket $ticket   Ticket
  * @param  string $filePath Full path of the document
- * @return int              <0 KO, >0 OK
+ * @return int              1 if OK, -1 if KO
  */
 function digiriskdolibarr_ticket_attach_file(Ticket $ticket, string $filePath): int
 {
