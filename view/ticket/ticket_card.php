@@ -42,7 +42,7 @@ require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 
 global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $user;
 
-saturne_load_langs(['ticket', 'companies', 'projects', 'categories']);
+saturne_load_langs(['ticket', 'companies', 'projects', 'categories', 'other']);
 
 $id      = GETPOSTINT('id');
 $ref     = GETPOST('ref', 'alpha');
@@ -617,21 +617,57 @@ if ($action === 'confirm_set_status' && $permissionToWrite && !GETPOST('cancel')
     setEventMessages($object->error, $object->errors, 'errors');
 }
 
-// Ticket attached-files box — native generate/delete handling for the showdocuments widget (same as the native ticket card).
-$upload_dir         = $conf->ticket->dir_output;
-$permissiontoadd    = $permissionToWrite ? 1 : 0;
-$permissiontodelete = $permissionToWrite ? 1 : 0;
-// Captured before the include: actions_builddoc.inc.php resets $action once it is done.
-$fileActionBefore   = $action;
-$fileNameBefore     = GETPOST('file', 'alpha') ?: GETPOST('urlfile', 'alpha');
-include DOL_DOCUMENT_ROOT . '/core/actions_builddoc.inc.php';
+// Ticket attached-files boxes, as on the native ticket card: the native one (files of the ticket) and the Digirisk one (TicketDocument, #5593).
+$permissiontoadd     = $permissionToWrite ? 1 : 0;
+$permissiontodelete  = $permissionToWrite ? 1 : 0;
+$ticketFile          = (string) GETPOST('file', 'alpha');
+// The Digirisk box only lists ticketdocument/<ref> and its models carry the ticketdocument template directory
+$digiriskDocumentDir = 'ticketdocument/' . dol_sanitizeFileName($object->ref);
+$isDigiriskDocument  = $object->id > 0 && (($action == 'builddoc' && preg_match('/\bticketdocument\b/', GETPOST('model')))
+    || (in_array($action, ['remove_file', 'pdfGeneration'], true) && strpos($ticketFile, $digiriskDocumentDir . '/') === 0));
+$upload_dir          = $isDigiriskDocument ? $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1] : $conf->ticket->dir_output;
 
-// Traceability (#4885) — the attached-files box goes through the native include, which emits no event.
-if ($object->id > 0 && $permissionToWrite && in_array($fileActionBefore, ['builddoc', 'remove_file'], true)) {
-    if ($fileActionBefore === 'builddoc') {
+// Traceability (#4885) — both deletions redirect and exit once done, so the event is written before.
+require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+if ($object->id > 0 && $permissionToWrite && $action == 'remove_file' && $ticketFile !== '' && dol_is_file($upload_dir . '/' . $ticketFile)) {
+    digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketFileDeleted'), basename($ticketFile), $ticketLogConst);
+}
+
+if ($isDigiriskDocument) {
+    if ($action == 'pdfGeneration' && $permissionToWrite) {
+        $error = 0;
+        require dol_buildpath('/saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php');
+
+        $pdfName = dol_sanitizeFileName(pathinfo($ticketFile, PATHINFO_FILENAME) . '.pdf');
+        if (empty($error) && dol_is_file($upload_dir . '/' . dirname($ticketFile) . '/' . $pdfName)) {
+            digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketDocumentGenerated'), $pdfName, $ticketLogConst);
+        }
+        header('Location: ' . $url_page_current . '?track_id=' . urlencode($object->track_id));
+        exit;
+    }
+
+    require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/ticketdocument.class.php';
+
+    $document = new TicketDocument($db);
+    // The ticket belongs to the Dolibarr core and carries no module : without this,
+    // documents_action.tpl.php builds its download link on an empty modulepart
+    $object->module = $moduleNameLowerCase;
+    // Redirected below, once the generation is traced
+    $shouldRedirect = false;
+    require dol_buildpath('/saturne/core/tpl/documents/documents_action.tpl.php');
+
+    // documents_action.tpl.php empties $action when the generation fails
+    if ($action == 'builddoc' && $permissionToWrite) {
+        digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketDocumentGenerated'), basename((string) $document->last_main_doc), $ticketLogConst);
+        header('Location: ' . $url_page_current . '?track_id=' . urlencode($object->track_id));
+        exit;
+    }
+} else {
+    include DOL_DOCUMENT_ROOT . '/core/actions_builddoc.inc.php';
+
+    // actions_builddoc.inc.php empties $action when the generation fails, but not when no model is picked
+    if ($object->id > 0 && $action == 'builddoc' && $permissionToWrite && !is_numeric(GETPOST('model', 'alpha'))) {
         digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketDocumentGenerated'), (string) $object->model_pdf, $ticketLogConst);
-    } else {
-        digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketFileDeleted'), basename((string) $fileNameBefore), $ticketLogConst);
     }
 }
 
@@ -974,6 +1010,10 @@ $genallowed      = $permissionToWrite ? 1 : 0;
 $delallowed      = $permissionToWrite ? 1 : 0;
 print '<div class="dtc-files-box">';
 print $formfileTicket->showdocuments('ticket', $ticketFilesName, $ticketFilesDir, $url_page_current . '?id=' . $object->id, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', '');
+
+// ---- Digirisk documents box (TicketDocument), below the native one as the hook adds it on the native ticket card (#5593) ----
+dol_include_once('/saturne/lib/documents.lib.php');
+print saturne_show_documents('digiriskdolibarr:TicketDocument', $digiriskDocumentDir, $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1] . '/' . $digiriskDocumentDir, $url_page_current . '?id=' . $object->id, $genallowed, $delallowed, getDolGlobalString('DIGIRISKDOLIBARR_TICKETDOCUMENT_DEFAULT_MODEL'), 1, 0, 0, 0, '', '', '', '', '', $object);
 print '</div>';
 
 print '</div>'; // fichehalfleft
