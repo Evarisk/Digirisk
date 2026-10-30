@@ -36,10 +36,6 @@ global $conf, $db, $langs, $mc, $user;
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 require_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
-require_once DOL_DOCUMENT_ROOT . "/core/class/html.formprojet.class.php";
-require_once DOL_DOCUMENT_ROOT . "/core/class/html.formcompany.class.php";
-require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
-require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr.lib.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
@@ -52,9 +48,6 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_riskoverview.lib.php';
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
-
-$project = new Project($db);
-$task    = new Task($db);
 
 // Translations
 saturne_load_langs(["admin"]);
@@ -136,64 +129,13 @@ if (GETPOST('action') == 'setmod') {
 }
 
 if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
-	$DUProject             = GETPOST('DUProject', 'none');
-	$DUProject             = preg_split('/_/', $DUProject);
-    $EnvironmentProject    = GETPOST('EnvironmentProject', 'none');
-    $EnvironmentProject    = preg_split('/_/', $EnvironmentProject);
-	$evaluatorDuration     = GETPOST('EvaluatorDuration', 'alpha');
-	$taskTimeSpentDuration = GETPOST('TaskTimeSpentDuration', 'alpha');
-
-    if ($DUProject[0] > 0 && $DUProject[0] != $conf->global->DIGIRISKDOLIBARR_DU_PROJECT) {
-        dolibarr_set_const($db, "DIGIRISKDOLIBARR_DU_PROJECT", $DUProject[0], 'integer', 0, '', $conf->entity);
-
-        $url = '/projet/tasks.php?id=' . $DUProject[0];
-
-        $sql = "UPDATE ".MAIN_DB_PREFIX."menu SET";
-        $sql .= " url='".$db->escape($url)."'";
-        $sql .= " WHERE leftmenu='digiriskactionplan'";
-        $sql .= " AND entity=" . $conf->entity;
-
-        $resql = $db->query($sql);
-        if (!$resql) {
-            $error = "Error ".$db->lasterror();
-            return -1;
-        }
-    }
-
-    if ($EnvironmentProject[0] > 0 && $EnvironmentProject[0] != $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT) {
-        dolibarr_set_const($db, "DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT", $EnvironmentProject[0], 'integer', 0, '', $conf->entity);
-
-        $url = '/projet/tasks.php?id=' . $EnvironmentProject[0];
-
-        $sql = "UPDATE ".MAIN_DB_PREFIX."menu SET";
-        $sql .= " url='".$db->escape($url)."'";
-        $sql .= " WHERE leftmenu='digiriskenvironmentalactionplan'";
-        $sql .= " AND entity=" . $conf->entity;
-
-        $resql = $db->query($sql);
-        if (!$resql) {
-            $error = "Error ".$db->lasterror();
-            return -1;
-        }
-    }
+	$evaluatorDuration = GETPOST('EvaluatorDuration', 'alpha');
 
 	if (!empty($evaluatorDuration) || $evaluatorDuration === '0') {
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_EVALUATOR_DURATION", $evaluatorDuration, 'integer', 0, '', $conf->entity);
 	}
 
-	if (!empty($taskTimeSpentDuration) || $taskTimeSpentDuration === '0') {
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_TASK_TIMESPENT_DURATION", $taskTimeSpentDuration, 'integer', 0, '', $conf->entity);
-	}
-
-	if (!empty(GETPOST('project_contact_type'))) {
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_DEFAULT_PROJECT_CONTACT_TYPE", GETPOST('project_contact_type'), 'integer', 0, '', $conf->entity);
-	}
-
-	if (!empty(GETPOST('task_contact_type'))) {
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_DEFAULT_TASK_CONTACT_TYPE", GETPOST('task_contact_type'), 'integer', 0, '', $conf->entity);
-	}
-
-	if ($action != 'updateedit' && ! $error) {
+	if ($action != 'updateedit') {
 		setEventMessage($langs->trans('SavedConfig'));
 		header("Location: " . $_SERVER["PHP_SELF"]);
 		exit;
@@ -204,10 +146,6 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
  * View
  */
 
-if (isModEnabled('project')) {
-	$formproject = new FormProjets($db);
-}
-$formcompany = new FormCompany($db);
 $title    = $langs->trans("ModuleSetup", $moduleName);
 $helpUrl  = 'FR:Module_Digirisk#L.27onglet_Analyse_des_risques';
 
@@ -343,136 +281,6 @@ $constArray[$moduleNameLowerCase] = [
 ];
 
 require dol_buildpath('/saturne/core/tpl/admin/object/object_const_view.tpl.php');
-
-// Tasks
-print load_fiche_titre('<i class="fas fa-tasks"></i> ' . $langs->trans("TaskConfig"), '', '');
-print '<hr>';
-
-print load_fiche_titre($langs->trans("TasksManagement"), '', '');
-
-// Project
-if (isModEnabled('project')) {
-	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
-	print '<input type="hidden" name="token" value="' . newToken() . '">';
-	print '<input type="hidden" name="action" value="update">';
-	print '<table class="noborder centpercent editmode">';
-	print '<tr class="liste_titre">';
-	print '<td>' . $langs->trans("Name") . '</td>';
-	print '<td>' . $langs->trans("SelectProject") . '</td>';
-	print '<td>' . $langs->trans("Action") . '</td>';
-	print '</tr>';
-
-	$langs->load("projects");
-	print '<tr class="oddeven"><td><label for="DUProject">' . $langs->trans("DUProject") . '</label></td><td>';
-	$formproject->select_projects(-1,  $conf->global->DIGIRISKDOLIBARR_DU_PROJECT, 'DUProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
-	print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"]) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
-	print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
-	print '</td></tr>';
-
-    print '<tr class="oddeven"><td><label for="EnvironmentProject">' . $langs->trans("EnvironmentProject") . '</label></td><td>';
-    $formproject->select_projects(-1,  $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT, 'EnvironmentProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
-    print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"]) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
-    print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
-    print '</td></tr>';
-
-	print '<tr class="oddeven"><td><label for="projectContactType">' . $langs->trans("DefaultProjectContactType") . '</label></td><td class="maxwidth500">';
-	$formcompany->selectTypeContact($project, $conf->global->DIGIRISKDOLIBARR_DEFAULT_PROJECT_CONTACT_TYPE, 'project_contact_type', 'internal', 'position', 0, 'minwidth500');
-	print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
-	print '</td></tr>';
-
-	print '<tr class="oddeven"><td><label for="taskContactType">' . $langs->trans("DefaultTaskContactType") . '</label></td><td>';
-	$formcompany->selectTypeContact($task, $conf->global->DIGIRISKDOLIBARR_DEFAULT_TASK_CONTACT_TYPE, 'task_contact_type', 'internal', 'position', 0, 'minwidth500');
-	print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
-	print '</td></tr>';
-
-	print '</table>';
-	print '</form>';
-}
-
-$constArray[$moduleNameLowerCase] = [
-	'TasksManagement' => [
-		'name'        => 'TasksManagement',
-		'description' => 'TasksManagementDescription',
-		'code'        => 'DIGIRISKDOLIBARR_TASK_MANAGEMENT',
-	],
-	'ShowTaskStartDate' => [
-		'name'        => 'ShowTaskStartDate',
-		'description' => 'ShowTaskStartDateDescription',
-		'code'        => 'DIGIRISKDOLIBARR_SHOW_TASK_START_DATE',
-		'tutoImage'   => digiriskdolibarr_tuto_image('riskassessmentdocument', 'date_start', $langs->trans('ShowTaskStartDate')),
-	],
-	'ShowTaskEndDate' => [
-		'name'        => 'ShowTaskEndDate',
-		'description' => 'ShowTaskEndDateDescription',
-		'code'        => 'DIGIRISKDOLIBARR_SHOW_TASK_END_DATE',
-		'tutoImage'   => digiriskdolibarr_tuto_image('riskassessmentdocument', 'date_end', $langs->trans('ShowTaskEndDate')),
-	],
-	'ShowTasksDone' => [
-		'name'        => 'ShowTasksDone',
-		'description' => $langs->trans('ShowTasksDoneDescription') . ' % ' . $langs->trans('ShowTasksDoneDescriptionExtend'),
-		'code'        => 'DIGIRISKDOLIBARR_SHOW_TASKS_DONE',
-	],
-	'ShowTaskCalculatedProgress' => [
-		'name'        => 'ShowTaskCalculatedProgress',
-		'description' => 'ShowTaskCalculatedProgressDescription',
-		'code'        => 'DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS',
-		'tutoImage'   => digiriskdolibarr_tuto_image('riskassessmentdocument', 'progress', $langs->trans('ShowTaskCalculatedProgress')),
-	],
-	'ShowAllTasks' => [
-		'name'        => 'ShowAllTasks',
-		'description' => 'ShowAllTasksDescription',
-		'code'        => 'DIGIRISKDOLIBARR_SHOW_ALL_TASKS',
-	],
-    'TaskHideRefInDocument' => [
-        'name'        => 'TaskHideRefInDocument',
-        'description' => 'TaskHideRefInDocumentDescription',
-        'code'        => 'DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT',
-        'tutoImage'   => digiriskdolibarr_tuto_image('riskassessmentdocument', 'ref', $langs->trans('TaskHideRefInDocument')),
-    ],
-    'TaskHideResponsibleInDocument' => [
-        'name'        => 'TaskHideResponsibleInDocument',
-        'description' => 'TaskHideResponsibleInDocumentDescription',
-        'code'        => 'DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT',
-        'tutoImage'   => digiriskdolibarr_tuto_image('riskassessmentdocument', 'responsible', $langs->trans('TaskHideResponsibleInDocument')),
-    ],
-    'TaskHideDateInDocument' => [
-        'name'        => 'TaskHideDateInDocument',
-        'description' => 'TaskHideDateInDocumentDescription',
-        'code'        => 'DIGIRISKDOLIBARR_TASK_HIDE_DATE_IN_DOCUMENT',
-        'tutoImage'   => digiriskdolibarr_tuto_image('riskassessmentdocument', 'date', $langs->trans('TaskHideDateInDocument')),
-    ],
-    'TaskHideBudgetInDocument' => [
-        'name'        => 'TaskHideBudgetInDocument',
-        'description' => 'TaskHideBudgetInDocumentDescription',
-        'code'        => 'DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT',
-        'tutoImage'   => digiriskdolibarr_tuto_image('riskassessmentdocument', 'budget', $langs->trans('TaskHideBudgetInDocument')),
-    ]
-];
-
-require dol_buildpath('/saturne/core/tpl/admin/object/object_const_view.tpl.php');
-
-// Click on a tuto image to display it full size
-digiriskdolibarr_tuto_overlay();
-
-print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
-print '<input type="hidden" name="token" value="' . newToken() . '">';
-print '<input type="hidden" name="action" value="update">';
-print '<table class="noborder centpercent editmode">';
-print '<tr class="liste_titre">';
-print '<td>' . $langs->trans("Name") . '</td>';
-print '<td>' . $langs->trans("Description") . '</td>';
-print '<td>' . $langs->trans("Value") . '</td>';
-print '<td>' . $langs->trans("Action") . '</td>';
-print '</tr>';
-
-print '<tr class="oddeven"><td><label for="TaskTimeSpentDuration">' . $langs->trans("TaskTimeSpentDuration") . '</label></td>';
-print '<td>' . $langs->trans("TaskTimeSpentDurationDescription") . '</td>';
-print '<td><input type="number" name="TaskTimeSpentDuration" value="' . $conf->global->DIGIRISKDOLIBARR_TASK_TIMESPENT_DURATION . '"></td>';
-print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
-print '</td></tr>';
-
-print '</table>';
-print '</form>';
 
 // Evaluators
 print load_fiche_titre('<i class="fas fa-user-check"></i> ' . $langs->trans("EvaluatorConfig"), '', '');
