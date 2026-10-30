@@ -471,19 +471,22 @@ function digiriskRiskOverviewCategoryColumns(string $tab): array
 /**
  * Columns of the psychosocial tab: the factors F1 to F6.
  *
- * @param  array $rpsSubCategories Psychosocial factors, by position
- * @return array                   Columns: position, name, factor key (F1...)
+ * @param  array          $rpsSubCategories Psychosocial factors, by position
+ * @param  Translate|null $outputLangs      Language of the generated document, the user language when null
+ * @return array                            Columns: position, name, factor key (F1...)
  */
-function digiriskRiskOverviewFactorColumns(array $rpsSubCategories): array
+function digiriskRiskOverviewFactorColumns(array $rpsSubCategories, $outputLangs = null): array
 {
     global $langs;
+
+    $labelLangs = $outputLangs ?? $langs;
 
     $columns = [];
     foreach ($rpsSubCategories as $position => $subCategory) {
         $columns[(int) $position] = [
             'position'  => (int) $position,
-            'name'      => $langs->transnoentities($subCategory['label']),
-            'shortName' => $langs->transnoentities($subCategory['label']),
+            'name'      => $labelLangs->transnoentities($subCategory['label']),
+            'shortName' => $labelLangs->transnoentities($subCategory['label']),
             'factor'    => 'F' . ((int) $position + 1),
         ];
     }
@@ -804,12 +807,13 @@ function digiriskRiskOverviewRows(DoliDB $db, array $activeDigiriskElementList, 
  * Format a psychosocial level or average for a cell: always one decimal, so that a level and an
  * average read alike in the column.
  *
- * @param  float  $value Level or average from 1 to 4
- * @return string        "2,5", "3,0"
+ * @param  float          $value       Level or average from 1 to 4
+ * @param  Translate|null $outputLangs Language of the generated document, the user language when null
+ * @return string                      "2,5", "3,0"
  */
-function digiriskRiskOverviewFormatLevel(float $value): string
+function digiriskRiskOverviewFormatLevel(float $value, $outputLangs = null): string
 {
-    return price(round($value, 1), 0, '', 0, 1, 1);
+    return price(round($value, 1), 0, $outputLangs ?? '', 0, 1, 1);
 }
 
 /**
