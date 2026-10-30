@@ -304,6 +304,8 @@ if (empty($resHook) && $publicInterfaceUsable) {
         $object->severity_label = $label_severity;
 
         $object->message = html_entity_decode($message);
+        // The form asks for no subject: the start of the message stands for it in lists and selectors (#5588)
+        $object->subject = digiriskdolibarr_ticket_subject_from_message($object->message);
 
         $object->fk_project = $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT;
 
