@@ -1978,6 +1978,23 @@ TicketKanbanClosedLimit                = Limiet gesloten tickets
 TicketKanbanClosedLimitDesc            = Maximaal aantal gesloten/geannuleerde tickets dat in het kanban wordt weergegeven (0 = onbeperkt)
 TicketLastMessageDate                  = Datum van het laatste bericht
 TicketElapsedTimeHelp                  = Verstreken tijd sinds het aanmaken, gestopt bij het sluiten
+TicketKanbanFilters                    = Filters
+TicketKanbanFilterAll                  = Alle
+TicketKanbanFilterAssignee             = Toewijzing
+TicketKanbanFilterUnassigned           = Niet toegewezen
+TicketKanbanFilterAssigned             = Toegewezen
+TicketKanbanFilterProgressNone         = Niet begonnen (0 %)
+TicketKanbanFilterProgressRunning      = Bezig (1 tot 99 %)
+TicketKanbanFilterProgressDone         = Klaar (100 %)
+TicketKanbanFilterAge                  = Ouderdom
+TicketKanbanFilterAgeLess7             = Minder dan 7 dagen
+TicketKanbanFilterAge7To30             = 7 tot 30 dagen
+TicketKanbanFilterAgeMore30            = Meer dan 30 dagen
+TicketKanbanFilterLastMessage          = Laatste bericht
+TicketKanbanFilterNoMessage            = Geen bericht
+TicketKanbanFilterMessageLess7         = Minder dan 7 dagen geleden
+TicketKanbanFilterMessageMore7         = Meer dan 7 dagen geleden
+TicketKanbanFilterMessageMore30        = Meer dan 30 dagen geleden
 
 # ===========================================================================
 # Ticket — traceerbaarheid van de wijzigingen — issue #4885

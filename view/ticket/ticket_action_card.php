@@ -576,17 +576,21 @@ if ($object->id <= 0) {
             . ' LIMIT ' . (int) $closedLimit;
     }
 
-    // Time elapsed since creation, same format as the ticket card, stopped at the closing date
-    $now                  = dol_now();
-    $getTicketElapsedTime =static function ($row) use ($db, $now): string {
+    // Time elapsed since creation, stopped at the closing date: in seconds for the filters of the board, and
+    // in the format of the ticket card for the card itself
+    $now                     = dol_now();
+    $getTicketElapsedSeconds = static function ($row) use ($db, $now): int {
         $dateCreation = $db->jdate($row->datec);
         if (empty($dateCreation)) {
-            return '';
+            return -1;
         }
         $isClosed = in_array((int) $row->fk_statut, [Ticket::STATUS_CLOSED, Ticket::STATUS_CANCELED]);
         $dateEnd  = ($isClosed && !empty($row->date_close)) ? $db->jdate($row->date_close) : $now;
 
-        return convertSecondToTime(roundUpToNextMultiple(max(0, $dateEnd - $dateCreation), 60));
+        return max(0, $dateEnd - $dateCreation);
+    };
+    $getTicketElapsedTime = static function (int $seconds): string {
+        return $seconds < 0 ? '' : convertSecondToTime(roundUpToNextMultiple($seconds, 60));
     };
 
     $resTickets = $db->query($sqlTickets);
@@ -629,7 +633,8 @@ if ($object->id <= 0) {
                 'category_code'   => (string) ($row->category_code ?: ''),
                 'date_c'          => $row->datec ? dol_print_date($db->jdate($row->datec), 'day') : '',
                 'progress'        => min(100, max(0, (int) $row->progress)),
-                'elapsed'         => $getTicketElapsedTime($row),
+                'elapsed'         => $getTicketElapsedTime($getTicketElapsedSeconds($row)),
+                'elapsed_seconds' => $getTicketElapsedSeconds($row),
                 'last_msg_date'   => 0,
                 'company_name'    => $row->company_name ?: '',
                 'assign_id'       => $assignId,
@@ -684,7 +689,8 @@ if ($object->id <= 0) {
                     'category_code'   => (string) ($row->category_code ?: ''),
                     'date_c'          => $row->datec ? dol_print_date($db->jdate($row->datec), 'day') : '',
                     'progress'        => min(100, max(0, (int) $row->progress)),
-                    'elapsed'         => $getTicketElapsedTime($row),
+                    'elapsed'         => $getTicketElapsedTime($getTicketElapsedSeconds($row)),
+                    'elapsed_seconds' => $getTicketElapsedSeconds($row),
                     'last_msg_date'   => 0,
                     'company_name'    => $row->company_name ?: '',
                     'assign_id'       => $assignId,

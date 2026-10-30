@@ -1978,6 +1978,23 @@ TicketKanbanClosedLimit                = Limit zamkniętych zgłoszeń
 TicketKanbanClosedLimitDesc            = Maksymalna liczba zamkniętych/anulowanych zgłoszeń wyświetlanych w kanbanie (0 = bez ograniczeń)
 TicketLastMessageDate                  = Data ostatniej wiadomości
 TicketElapsedTimeHelp                  = Czas od utworzenia, zatrzymany przy zamknięciu
+TicketKanbanFilters                    = Filtry
+TicketKanbanFilterAll                  = Wszystkie
+TicketKanbanFilterAssignee             = Przypisanie
+TicketKanbanFilterUnassigned           = Nieprzypisane
+TicketKanbanFilterAssigned             = Przypisane
+TicketKanbanFilterProgressNone         = Nierozpoczęte (0 %)
+TicketKanbanFilterProgressRunning      = W toku (1 do 99 %)
+TicketKanbanFilterProgressDone         = Zakończone (100 %)
+TicketKanbanFilterAge                  = Wiek
+TicketKanbanFilterAgeLess7             = Mniej niż 7 dni
+TicketKanbanFilterAge7To30             = Od 7 do 30 dni
+TicketKanbanFilterAgeMore30            = Ponad 30 dni
+TicketKanbanFilterLastMessage          = Ostatnia wiadomość
+TicketKanbanFilterNoMessage            = Brak wiadomości
+TicketKanbanFilterMessageLess7         = Mniej niż 7 dni temu
+TicketKanbanFilterMessageMore7         = Ponad 7 dni temu
+TicketKanbanFilterMessageMore30        = Ponad 30 dni temu
 
 # ===========================================================================
 # Ticket — identyfikowalność zmian — issue #4885
