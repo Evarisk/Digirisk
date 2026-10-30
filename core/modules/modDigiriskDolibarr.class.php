@@ -3141,6 +3141,12 @@ class modDigiriskdolibarr extends DolibarrModules
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_REMOVE_TICKET_PUBLIC_INTERFACE_CONST', 1, 'integer', 0, '', $conf->entity);
         }
 
+        // BACKWARD REMOVE DEAD CSS CONST: _init() skips an empty css entry of module_parts, so the constant written by an
+        // older descriptor stays and every page requests patch_preview_icon.css, a file that never existed (#5550)
+        if (empty($this->module_parts['css']) && getDolGlobalString($this->const_name . '_CSS')) {
+            dolibarr_del_const($this->db, $this->const_name . '_CSS', $conf->entity);
+        }
+
         $result = $this->_init($sql, $options);
 
         // Photos sent straight to a record never reached the media library, where the gallery lists
