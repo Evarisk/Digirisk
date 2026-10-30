@@ -32,7 +32,7 @@ dol_include_once('/saturne/core/modules/saturne/modules_saturne.php');
 require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_ticket.lib.php';
 
 /**
- * Class to build the QQOQCP document of a ticket: What, Who, Where, When, How and Why of the problem
+ * Class to build the QQOQCCP document of a ticket: What, Who, Where, When, How, How much and Why of the problem
  */
 class pdf_ticketqqoqcpdocument extends SaturneDocumentModel
 {
