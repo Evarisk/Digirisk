@@ -188,6 +188,9 @@ class ActionsDigiriskdolibarr
      */
     public function addHtmlHeader(array $parameters): int
     {
+        // saturne_asset_full_url() for the assets printed below: without a version, the browser keeps serving the previous release
+        dol_include_once('/saturne/lib/asset.lib.php');
+
         // La modale du suivi de temps s'appuie sur la librairie Saturne, absente des pages natives
         if (preg_match('/ticketcard|projecttasktime/', $parameters['context'])) {
             $resourcesRequired = [
@@ -196,9 +199,9 @@ class ActionsDigiriskdolibarr
             ];
 
             $out  = '<!-- Includes CSS added by module saturne -->';
-            $out .= '<link rel="stylesheet" type="text/css" href="' . dol_buildpath($resourcesRequired['css'], 1) . '">';
+            $out .= '<link rel="stylesheet" type="text/css" href="' . saturne_asset_full_url($resourcesRequired['css']) . '">';
             $out .= '<!-- Includes JS added by module saturne -->';
-            $out .= '<script src="' . dol_buildpath($resourcesRequired['js'], 1) . '"></script>';
+            $out .= '<script src="' . saturne_asset_full_url($resourcesRequired['js']) . '"></script>';
 
             $this->resprints = $out;
         }
@@ -206,20 +209,20 @@ class ActionsDigiriskdolibarr
         // The schedules tab Digirisk adds on the third parties is the Saturne view opened for the
         // "societe" module: it only loads the stylesheet of that module, which does not exist
         if (strpos($_SERVER['PHP_SELF'], '/saturne/view/saturne_schedules.php') !== false && GETPOST('module_name', 'alpha') === 'societe') {
-            $this->resprints .= '<link rel="stylesheet" type="text/css" href="' . dol_buildpath('/digiriskdolibarr/css/digiriskdolibarr.min.css', 1) . '">';
+            $this->resprints .= '<link rel="stylesheet" type="text/css" href="' . saturne_asset_full_url('/digiriskdolibarr/css/digiriskdolibarr.min.css') . '">';
         }
 
         // The tabs other modules add on the Digirisk objects (DoliLetter spread, DigiQuali controls and surveys)
         // are pages of those modules: they only load their own stylesheet, so the Digirisk theme is missing on
         // the menu, banner and tabs of the object
         if (strpos($_SERVER['PHP_SELF'], '/digiriskdolibarr/') === false && strpos(GETPOST('fromtype', 'alpha'), 'digiriskdolibarr_') === 0) {
-            $this->resprints .= '<link rel="stylesheet" type="text/css" href="' . dol_buildpath('/digiriskdolibarr/css/digiriskdolibarr.min.css', 1) . '">';
+            $this->resprints .= '<link rel="stylesheet" type="text/css" href="' . saturne_asset_full_url('/digiriskdolibarr/css/digiriskdolibarr.min.css') . '">';
         }
 
         // The other tabs of the Digirisk ticket card are the native ticket pages (contacts, notes, files, agenda)
         // or pages of other modules: browsed from the Digirisk menu, they keep the look of the card
         if ($this->isDigiriskTicketTab($parameters['context'])) {
-            $this->resprints .= '<link rel="stylesheet" type="text/css" href="' . dol_buildpath('/digiriskdolibarr/css/digiriskdolibarr.min.css', 1) . '">';
+            $this->resprints .= '<link rel="stylesheet" type="text/css" href="' . saturne_asset_full_url('/digiriskdolibarr/css/digiriskdolibarr.min.css') . '">';
         }
 
         return 0; // or return 1 to replace standard code
@@ -388,10 +391,12 @@ class ActionsDigiriskdolibarr
 		global $conf, $db, $form, $langs, $object, $user;
 
 		dol_include_once('/saturne/lib/saturne_functions.lib.php');
+		// saturne_asset_full_url() for the scripts printed below: without a version, the browser keeps serving the previous release
+		dol_include_once('/saturne/lib/asset.lib.php');
 
 		if (strpos($parameters['context'], 'admincompany') !== false) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			?>
-			<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>
+			<script src="<?php echo saturne_asset_full_url('/digiriskdolibarr/js/digiriskdolibarr.js'); ?>"></script>
 			<?php
 			if (getDolGlobalString('MAIN_INFO_SOCIETE_COUNTRY') == '1:FR:France') {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
@@ -814,7 +819,7 @@ class ActionsDigiriskdolibarr
 				}
 			}
 		} elseif (strpos($parameters['context'], 'categoryindex') !== false) {	    // do something only for the context 'somecontext1' or 'somecontext2'
-            print '<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>';
+            print '<script src="' . saturne_asset_full_url('/digiriskdolibarr/js/digiriskdolibarr.js') . '"></script>';
         }
 
         if (strpos($parameters['context'], 'ticketlist')) {

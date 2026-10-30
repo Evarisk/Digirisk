@@ -11,6 +11,9 @@
  * - $projectId     int    Displayed project ID
  */
 
+// saturne_asset_full_url() for the html2canvas library loaded on demand: without a version, the browser keeps serving the previous release
+dol_include_once('/saturne/lib/asset.lib.php');
+
 // Create clean data for Gantt JS (without HTML fields like risk_nomurl)
 $ganttData = [];
 foreach ($tasksJson as $t) {
@@ -36,7 +39,7 @@ foreach ($tasksJson as $t) {
 
 <div class="gantt-container"
      data-autoexport="<?= GETPOST('export', 'aZ09') == 'png' ? 'png' : '' ?>"
-     data-html2canvas-url="<?= DOL_URL_ROOT ?>/custom/digiriskdolibarr/js/lib/html2canvas.min.js">
+     data-html2canvas-url="<?= dol_escape_htmltag(saturne_asset_full_url('/digiriskdolibarr/js/lib/html2canvas.min.js')) ?>">
     <?php if (empty($tasksJson)) : ?>
         <div class="gantt-empty">
             <i class="fas fa-tasks" style="font-size: 48px; opacity: 0.3;"></i>
