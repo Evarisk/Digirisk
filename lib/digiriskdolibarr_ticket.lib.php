@@ -278,13 +278,13 @@ function digiriskdolibarr_ticket_create_parent_task(Ticket $ticket, User $user, 
 /**
  * Sections of the actions tab of a ticket, by digirisk_action_type
  *
- * @return array<int, array{titleKey: string, addKey: string}> Title and add-button keys of each type
+ * @return array<int, array{titleKey: string, addKey: string, tabKey: string}> Title, add-button and tab keys of each type
  */
 function digiriskdolibarr_ticket_action_sections(): array
 {
     return [
-        2 => ['titleKey' => 'CorrectiveActions', 'addKey' => 'AddCorrectiveAction'],
-        3 => ['titleKey' => 'PreventiveActions', 'addKey' => 'AddPreventiveAction'],
+        2 => ['titleKey' => 'CorrectiveActions', 'addKey' => 'AddCorrectiveAction', 'tabKey' => 'TicketActionsTabCorrective'],
+        3 => ['titleKey' => 'PreventiveActions', 'addKey' => 'AddPreventiveAction', 'tabKey' => 'TicketActionsTabPreventive'],
     ];
 }
 

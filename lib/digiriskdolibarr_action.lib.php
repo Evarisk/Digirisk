@@ -79,16 +79,17 @@ function digiriskdolibarr_get_actions_by_type(DoliDB $db, int $parentTaskId, int
 
     $containerTaskId = digiriskdolibarr_get_action_container_task($db, $parentTaskId, $type);
 
+    // The assignee is the first executive of the task, the one digiriskdolibarr_update_action_field() replaces
     $sql  = 'SELECT t.rowid, t.ref, t.label, t.datec, t.dateo, t.datee, t.progress, t.fk_statut, t.budget_amount,';
-    $sql .= ' (SELECT CONCAT(u2.firstname, \' \', u2.lastname)';
-    $sql .= '  FROM ' . MAIN_DB_PREFIX . 'element_contact ec2';
+    $sql .= ' u2.rowid AS user_id, CONCAT(u2.firstname, \' \', u2.lastname) AS user_fullname';
+    $sql .= ' FROM ' . MAIN_DB_PREFIX . 'projet_task t';
+    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'projet_task_extrafields ef ON ef.fk_object = t.rowid';
+    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'user u2 ON u2.rowid = (';
+    $sql .= '  SELECT ec2.fk_socpeople FROM ' . MAIN_DB_PREFIX . 'element_contact ec2';
     $sql .= '  INNER JOIN ' . MAIN_DB_PREFIX . 'c_type_contact ctc2';
     $sql .= '   ON ctc2.rowid = ec2.fk_c_type_contact';
     $sql .= '   AND ctc2.code = \'TASKEXECUTIVE\' AND ctc2.element = \'project_task\'';
-    $sql .= '  INNER JOIN ' . MAIN_DB_PREFIX . 'user u2 ON u2.rowid = ec2.fk_socpeople';
-    $sql .= '  WHERE ec2.element_id = t.rowid LIMIT 1) AS user_fullname';
-    $sql .= ' FROM ' . MAIN_DB_PREFIX . 'projet_task t';
-    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'projet_task_extrafields ef ON ef.fk_object = t.rowid';
+    $sql .= '  WHERE ec2.element_id = t.rowid ORDER BY ec2.rowid ASC LIMIT 1)';
     $sql .= ' WHERE t.fk_task_parent IN (' . $containerTaskId . ', ' . $parentTaskId . ')';
     $sql .= '   AND t.rowid <> ' . $containerTaskId;
     $sql .= '   AND ef.digirisk_action_type = ' . $type;
@@ -105,6 +106,230 @@ function digiriskdolibarr_get_actions_by_type(DoliDB $db, int $parentTaskId, int
     }
 
     return $results;
+}
+
+/**
+ * Return the tags of the actions, in one query for all of them.
+ *
+ * The tags are linked to the task through categorie_project_task, whatever the type of their category: the kanban of
+ * the action plan and digiriskdolibarr_get_action_tag_options() offer the tags of the projects as well.
+ *
+ * @param  DoliDB $db      Database handler
+ * @param  int[]  $taskIds Action IDs
+ * @return array<int, array<int, array{id: int, label: string, color: string}>> Tags of each action, by action ID
+ */
+function digiriskdolibarr_get_actions_tags(DoliDB $db, array $taskIds): array
+{
+    $tags = [];
+    if (empty($taskIds) || !isModEnabled('category')) {
+        return $tags;
+    }
+
+    $sql  = 'SELECT ct.fk_project_task, c.rowid, c.label, c.color';
+    $sql .= ' FROM ' . MAIN_DB_PREFIX . 'categorie_project_task ct';
+    $sql .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'categorie c ON c.rowid = ct.fk_categorie';
+    $sql .= ' WHERE ct.fk_project_task IN (' . implode(',', array_map('intval', $taskIds)) . ')';
+    $sql .= '   AND c.entity IN (' . getEntity('category') . ')';
+    $sql .= ' ORDER BY c.label ASC';
+
+    $resql = $db->query($sql);
+    if (!$resql) {
+        dol_syslog(__FUNCTION__ . ': ' . $db->lasterror(), LOG_ERR);
+        return $tags;
+    }
+
+    while ($obj = $db->fetch_object($resql)) {
+        $tags[(int) $obj->fk_project_task][] = ['id' => (int) $obj->rowid, 'label' => (string) $obj->label, 'color' => (string) $obj->color];
+    }
+    $db->free($resql);
+
+    return $tags;
+}
+
+/**
+ * Return the tags an action can be given: the same as on the kanban of the action plan, the categories of the tasks
+ * then those of the projects.
+ *
+ * @param  Form $form Form handler
+ * @return array<int, string> Full label of each tag, by category ID; empty without the module Categories
+ */
+function digiriskdolibarr_get_action_tag_options(Form $form): array
+{
+    $options = [];
+    if (!isModEnabled('category')) {
+        return $options;
+    }
+
+    require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+
+    foreach ([Categorie::TYPE_PROJECT_TASK, Categorie::TYPE_PROJECT] as $categoryType) {
+        $categories = $form->select_all_categories($categoryType, '', 'parent', 64, 0, 1);
+        if (is_array($categories)) {
+            $options += $categories;
+        }
+    }
+
+    return $options;
+}
+
+/**
+ * Create an action from the add-action form of its section (core/tpl/actions/): label, start date, deadline, budget,
+ * assignee and tags. The action is created validated rather than left in draft in the project.
+ *
+ * The caller sets the project, the parent task, the ref and the extrafields of the task beforehand.
+ *
+ * @param  Task $task New task of the action
+ * @param  int  $type digirisk_action_type of the section the form belongs to
+ * @param  User $user User creating the action
+ * @return int        ID of the action, <= 0 if KO with the errors in the task
+ */
+function digiriskdolibarr_create_action(Task $task, int $type, User $user): int
+{
+    // Each section renders its own form, so field names are suffixed with the action type
+    $startPrefix    = 'actionstart' . $type;
+    $deadlinePrefix = 'actiondeadline' . $type;
+
+    $task->label      = GETPOST('action_label', 'alphanohtml');
+    $task->date_start = dol_mktime(0, 0, 0, GETPOSTINT($startPrefix . 'month'), GETPOSTINT($startPrefix . 'day'), GETPOSTINT($startPrefix . 'year'));
+    // Task::create() only writes date_end, the datee property is deprecated and ignored
+    $task->date_end   = dol_mktime(23, 59, 59, GETPOSTINT($deadlinePrefix . 'month'), GETPOSTINT($deadlinePrefix . 'day'), GETPOSTINT($deadlinePrefix . 'year'));
+    $task->progress   = 0;
+    $task->status     = Task::STATUS_VALIDATED;
+    // Left empty, the action gets no budget rather than a zero one
+    if (GETPOST('action_budget', 'alpha') !== '') {
+        $task->budget_amount = (float) price2num(GETPOST('action_budget', 'alpha'));
+    }
+
+    $result = $task->create($user);
+    if ($result <= 0) {
+        return $result;
+    }
+
+    $assignedUser = GETPOSTINT('assigned_user' . $type);
+    if ($assignedUser > 0) {
+        $task->add_contact($assignedUser, 'TASKEXECUTIVE', 'internal');
+    }
+
+    $tagIds = array_filter(array_map('intval', GETPOST('action_tags' . $type, 'array')));
+    if (!empty($tagIds) && $task->setCategories($tagIds) < 0) {
+        setEventMessages($task->error, $task->errors, 'warnings');
+    }
+
+    return $result;
+}
+
+/**
+ * Change one field of an action, edited in place in the table of its section (js/modules/actions.js).
+ *
+ * The new value is posted in "value": text for the label, Y-m-d for the dates (empty to clear), amount for the budget
+ * (empty for none), user ID for the assignee (none below 1), category IDs for the tags (none when absent).
+ *
+ * @param  Task   $task  Action, fetched
+ * @param  string $field label, date_start, date_end, budget, assignee or tags
+ * @param  User   $user  User making the change
+ * @return array{label: string, old: string, new: string}|null Field and its values before and after, for the logs;
+ *                                                              null if KO, with the errors in the task
+ */
+function digiriskdolibarr_update_action_field(Task $task, string $field, User $user): ?array
+{
+    global $conf, $db, $langs;
+
+    $formatDate   = function ($date): string {
+        return isDolTms($date) ? dol_print_date($date, 'day') : '';
+    };
+    $formatBudget = function ($amount) use ($conf, $langs): string {
+        return ($amount !== null && $amount !== '') ? price($amount, 0, $langs, 1, -1, -1, $conf->currency) : '';
+    };
+    $formatTags   = function (int $taskId) use ($db): string {
+        $tags = digiriskdolibarr_get_actions_tags($db, [$taskId]);
+        return implode(', ', array_column($tags[$taskId] ?? [], 'label'));
+    };
+
+    switch ($field) {
+        case 'label':
+            $label = trim(GETPOST('value', 'alphanohtml'));
+            if ($label === '') {
+                $task->errors[] = $langs->trans('ErrorFieldRequired', $langs->transnoentities('ActionLabel'));
+                return null;
+            }
+            $change      = ['label' => $langs->transnoentities('ActionLabel'), 'old' => (string) $task->label, 'new' => $label];
+            $task->label = $label;
+            break;
+
+        case 'date_start':
+        case 'date_end':
+            $isStart = $field === 'date_start';
+            $date    = '';
+            if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', GETPOST('value', 'alpha'), $matches)) {
+                $date = $isStart ? dol_mktime(0, 0, 0, (int) $matches[2], (int) $matches[3], (int) $matches[1]) : dol_mktime(23, 59, 59, (int) $matches[2], (int) $matches[3], (int) $matches[1]);
+            }
+            $change = ['label' => $langs->transnoentities($isStart ? 'DateStart' : 'ActionDeadline'), 'old' => $formatDate($isStart ? $task->date_start : $task->date_end), 'new' => $formatDate($date)];
+            if ($isStart) {
+                $task->date_start = $date;
+            } else {
+                $task->date_end = $date;
+            }
+            break;
+
+        case 'budget':
+            $amount              = GETPOST('value', 'alpha') !== '' ? (float) price2num(GETPOST('value', 'alpha')) : null;
+            $change              = ['label' => $langs->transnoentities('Budget'), 'old' => $formatBudget($task->budget_amount), 'new' => $formatBudget($amount)];
+            $task->budget_amount = $amount;
+            break;
+
+        case 'assignee':
+            // The assignee shown is the first executive of the task: only that one is replaced, the others stay
+            $executives = function () use ($task): array {
+                $contacts = $task->liste_contact(-1, 'internal', 0, 'TASKEXECUTIVE');
+                return is_array($contacts) ? $contacts : [];
+            };
+            $current = null;
+            foreach ($executives() as $contact) {
+                if ($current === null || (int) $contact['rowid'] < (int) $current['rowid']) {
+                    $current = $contact;
+                }
+            }
+
+            $userId = GETPOSTINT('value');
+            $change = ['label' => $langs->transnoentities('DigiriskActionAssignedTo'), 'old' => $current !== null ? trim($current['firstname'] . ' ' . $current['lastname']) : '', 'new' => ''];
+            if ($current !== null && (int) $current['id'] === $userId) {
+                $change['new'] = $change['old'];
+                return $change;
+            }
+
+            if ($current !== null && $task->delete_contact((int) $current['rowid']) < 0) {
+                return null;
+            }
+            if ($userId > 0) {
+                if ($task->add_contact($userId, 'TASKEXECUTIVE', 'internal') < 0) {
+                    return null;
+                }
+                foreach ($executives() as $contact) {
+                    if ((int) $contact['id'] === $userId) {
+                        $change['new'] = trim($contact['firstname'] . ' ' . $contact['lastname']);
+                    }
+                }
+            }
+            return $change;
+
+        case 'tags':
+            $change = ['label' => $langs->transnoentities('Categories'), 'old' => $formatTags($task->id), 'new' => ''];
+            if ($task->setCategories(array_values(array_filter(array_map('intval', GETPOST('value', 'array'))))) < 0) {
+                return null;
+            }
+            $change['new'] = $formatTags($task->id);
+            return $change;
+
+        default:
+            $task->errors[] = $langs->trans('ErrorBadParameters');
+            return null;
+    }
+
+    if ($task->update($user) <= 0) {
+        return null;
+    }
+
+    return $change;
 }
 
 /**

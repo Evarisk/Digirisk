@@ -15,25 +15,77 @@
     display: none;
   }
 
-  // The fields wrap rather than shrink: label, start, deadline, budget, assignee, buttons
+  // The fields wrap rather than shrink: label, start, deadline, budget, assignee, tags, buttons. Each one sits under
+  // its label and they all get the same height, whatever renders them (text field, datepicker of Dolibarr, select2,
+  // buttons), so that they line up
+  --field-height: 34px;
+
   tr {
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 8px 16px;
+    align-items: flex-end;
+    gap: 12px 16px;
   }
 
   td {
-    padding: 4px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0;
+  }
+
+  label {
+    color: $dr-text-soft;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+
+  input[type="text"],
+  input[type="number"] {
+    box-sizing: border-box;
+    width: 100%;
+    height: var(--field-height);
+    margin: 0;
+  }
+
+  // Datepicker of Dolibarr: the field then its calendar icon
+  .divfordateinput {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    input {
+      width: 110px;
+    }
+  }
+
+  .select2-container {
+    // select2 measures itself while the form is still hidden
+    width: 100% !important;
+    max-width: 300px;
+
+    // The theme forces the lists of several values down to 2em
+    .select2-selection--single,
+    .select2-selection--multiple {
+      box-sizing: border-box;
+      min-height: var(--field-height) !important;
+    }
+
+    .select2-selection--single {
+      height: var(--field-height);
+
+      .select2-selection__rendered {
+        line-height: calc(var(--field-height) - 2px);
+      }
+
+      .select2-selection__arrow {
+        height: calc(var(--field-height) - 2px);
+      }
+    }
   }
 
   &__label {
     flex: 1 1 260px;
-
-    input {
-      box-sizing: border-box;
-      width: 100%;
-    }
   }
 
   &__start,
@@ -45,18 +97,102 @@
     flex: 0 0 110px;
   }
 
-  &__assignee {
+  &__assignee,
+  &__tags {
     flex: 1 1 200px;
-
-    // select2 measures itself while the form is still hidden
-    .select2-container {
-      width: 100% !important;
-      max-width: 300px;
-    }
   }
 
+  // At the end of the line, or of the next one when they wrap
   &__buttons {
-    align-self: flex-end;
+    flex-direction: row !important;
+    gap: 8px !important;
+    margin-left: auto;
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      height: var(--field-height);
+      margin: 0;
+    }
+  }
+}
+
+// Actions tab: the condensed view, shown by default, leaves out the Gantt and the detail columns and tightens the rows
+#{$dr-scope} .digirisk-actions {
+  &__toolbar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  &--condensed {
+    .digirisk-actions-gantt,
+    .digirisk-actions__detail {
+      display: none;
+    }
+
+    .digirisk-actions-table td {
+      padding-top: 4px;
+      padding-bottom: 4px;
+    }
+  }
+}
+
+// Field of an action edited in place on click (actions.js)
+#{$dr-scope} .digirisk-actions-cell {
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+
+  &:not(.digirisk-actions-cell--editing):hover {
+    background: $dr-primary-soft;
+    box-shadow: inset 0 0 0 1px $dr-border;
+  }
+
+  &--editing {
+    cursor: default;
+  }
+
+  &--saving {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  &__input {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 120px;
+    height: 30px;
+    margin: 0;
+  }
+
+  .select2-container {
+    min-width: 200px;
+  }
+}
+
+// Tag of an action: a chip with the colour of its category as a dot, readable whatever that colour
+#{$dr-scope} .digirisk-actions-tag {
+  --tag-color: #{$dr-faint};
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 1px 4px 1px 0;
+  padding: 1px 8px;
+  border: 1px solid $dr-border;
+  border-radius: $dr-radius-pill;
+  background: $dr-surface;
+  color: $dr-text;
+  font-size: 12px;
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--tag-color);
   }
 }
 
