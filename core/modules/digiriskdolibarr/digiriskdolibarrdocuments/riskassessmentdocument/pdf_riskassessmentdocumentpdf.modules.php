@@ -391,7 +391,7 @@ class pdf_riskassessmentdocumentpdf extends ModelePDFDigiriskDolibarrDocument
         $pdf->SetXY($this->marge_gauche - 1, $y - 2);
         $pdf->Cell(32, 17, sprintf('%02d', $number), 0, 0, 'L');
 
-        $this->kicker($pdf, $this->marge_gauche + 32, $y + 1, $width - 32, $outputLangs->transnoentities('DigiriskDuSectionKicker', $number), $size + 1, $this->accent);
+        $this->kicker($pdf, $this->marge_gauche + 32, $y + 1, $width - 32, $outputLangs->transnoentities('DigiriskDuSectionKicker', (string) $number), $size + 1, $this->accent);
 
         $pdf->SetFont('', 'B', $size + 9);
         $pdf->SetTextColor($this->ink[0], $this->ink[1], $this->ink[2]);
@@ -503,7 +503,7 @@ class pdf_riskassessmentdocumentpdf extends ModelePDFDigiriskDolibarrDocument
                 $pdf->SetFont('', '', $size - 1.5);
                 $pdf->SetTextColor($this->inkMuted[0], $this->inkMuted[1], $this->inkMuted[2]);
                 $pdf->SetXY($this->marge_gauche + $width - 36, $y);
-                $pdf->Cell(36, $rowH, $outputLangs->transnoentities('DigiriskDuNbRisks', $count), 0, 0, 'R');
+                $pdf->Cell(36, $rowH, $outputLangs->transnoentities('DigiriskDuNbRisks', (string) $count), 0, 0, 'R');
             }
 
             $pdf->SetY($y + $rowH);
@@ -550,7 +550,7 @@ class pdf_riskassessmentdocumentpdf extends ModelePDFDigiriskDolibarrDocument
         $cardW = $width - (2 * $radius) - 88;
         $card  = ['kicker' => $outputLangs->transnoentities('DigiriskDuSite'), 'title' => $mysoc->name, 'lines' => array_filter([
             dol_strlen($mysoc->idprof2) ? $outputLangs->transnoentities('ProfId2FR') . ' : ' . $mysoc->idprof2 : '',
-            $outputLangs->transnoentities('DigiriskDuEmployeesInvolved', $stats['nbEvaluators'])
+            $outputLangs->transnoentities('DigiriskDuEmployeesInvolved', (string) $stats['nbEvaluators'])
         ])];
         $this->drawCard($pdf, $card, $cardX, $y, $cardW, 2 * $radius, $size, false);
         $pdf->SetXY($this->marge_gauche, $y + (2 * $radius) + 6);

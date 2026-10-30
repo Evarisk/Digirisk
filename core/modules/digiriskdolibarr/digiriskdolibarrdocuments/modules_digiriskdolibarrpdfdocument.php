@@ -581,7 +581,7 @@ abstract class ModelePDFDigiriskDolibarrDocument extends SaturneDocumentModel
      * @param  TCPDF $pdf       PDF handler
      * @param  float $x         Abscisse de la colonne
      * @param  float $y         Ordonnee de la ligne
-     * @param  float $width     Largeur de la colonne
+     * @param  float $columnWidth Largeur de la colonne
      * @param  float $rowHeight Hauteur de la ligne
      * @param  array $cellData  Cellule ['text', 'fill', 'color']
      * @param  float $size      Taille de police
@@ -967,7 +967,7 @@ abstract class ModelePDFDigiriskDolibarrDocument extends SaturneDocumentModel
             if ($sweep >= 359.9) {
                 $pdf->Circle($cx, $cy, $radius, 0, 360, 'F');
             } else {
-                $pdf->PieSector($cx, $cy, $radius, $angle, $angle + $sweep, 'FD', true, 90);
+                $pdf->PieSector($cx, $cy, $radius, $angle, $angle + $sweep, 'FD');
             }
 
             $angle += $sweep;
@@ -1398,9 +1398,25 @@ abstract class ModelePDFDigiriskDolibarrDocument extends SaturneDocumentModel
      */
     protected function openPdf($object, Translate $outputLangs, string $subject)
     {
+        return $this->setupPdf(pdf_getInstance($this->format), $outputLangs, $subject);
+    }
+
+    /**
+     * Configure le PDF et ouvre sa premiere page.
+     *
+     * pdf_getInstance() est typee TCPDF|TCPDI et PHPStan ne scanne pas TCPDI : le PDF arrive
+     * ici en mixed, comme dans drawTable() de Saturne, sans quoi chaque appel de methode
+     * remonte comme fait sur une classe inconnue.
+     *
+     * @param  mixed     $pdf         PDF handler, une instance de TCPDF
+     * @param  Translate $outputLangs Lang object
+     * @param  string    $subject     Sujet du document
+     * @return TCPDF                  PDF handler
+     */
+    protected function setupPdf($pdf, Translate $outputLangs, string $subject)
+    {
         global $user;
 
-        $pdf  = pdf_getInstance($this->format);
         $size = pdf_getPDFFontSize($outputLangs) + 1;
 
         if (class_exists('TCPDF')) {
@@ -1796,7 +1812,7 @@ abstract class ModelePDFDigiriskDolibarrDocument extends SaturneDocumentModel
     {
         $value = getDolGlobalString($constName);
 
-        return dol_strlen($value) ? (int) dol_stringtotime($value, 'YYYYMMDD') : 0;
+        return dol_strlen($value) ? (int) dol_stringtotime($value, 1) : 0;
     }
 
     /**

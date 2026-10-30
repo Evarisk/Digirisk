@@ -694,7 +694,7 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
         $this->bigNumber($pdf, $this->marge_gauche + 10, $y + 20, $leftWidth - 20, (string) $stats['totalRisks'], $outputLangs->transnoentities('DigiriskSynthesisRisksAssessed'), $size + 46, $size + 2, [255, 255, 255], [255, 255, 255]);
 
         $share    = $stats['totalRisks'] > 0 ? round($priority * 100 / $stats['totalRisks']) : 0;
-        $heroText = $priority > 0 ? $outputLangs->transnoentities('DigiriskCseHeroPriority', $priority, $share) : $outputLangs->transnoentities('DigiriskCseHeroNoPriority');
+        $heroText = $priority > 0 ? $outputLangs->transnoentities('DigiriskCseHeroPriority', (string) $priority, (string) $share) : $outputLangs->transnoentities('DigiriskCseHeroNoPriority');
         $pdf->SetFont('', '', $size);
         $pdf->SetTextColor($light[0], $light[1], $light[2]);
         $pdf->MultiCell($leftWidth - 20, $this->height + 1, $heroText, 0, 'L', false, 1, $this->marge_gauche + 10, $y + 66, true, 0, false, true, 0, 'T');
@@ -741,23 +741,23 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
         $lines      = [];
 
         $lines[] = $priority > 0
-            ? $outputLangs->transnoentities('DigiriskSynthesisHighlightPriority', $priority)
+            ? $outputLangs->transnoentities('DigiriskSynthesisHighlightPriority', (string) $priority)
             : $outputLangs->transnoentities('DigiriskSynthesisHighlightNoPriority');
 
         if ($actionPlan['late'] > 0) {
-            $lines[] = $outputLangs->transnoentities('DigiriskSynthesisHighlightLate', $actionPlan['late']);
+            $lines[] = $outputLangs->transnoentities('DigiriskSynthesisHighlightLate', (string) $actionPlan['late']);
         }
         if ($actionPlan['total'] > 0) {
-            $lines[] = $outputLangs->transnoentities('DigiriskSynthesisHighlightPlan', $actionPlan['done'], $actionPlan['total']);
+            $lines[] = $outputLangs->transnoentities('DigiriskSynthesisHighlightPlan', (string) $actionPlan['done'], (string) $actionPlan['total']);
         }
 
         if ($rps['toQualify'] > 0) {
-            $lines[] = $outputLangs->transnoentities('DigiriskSynthesisHighlightRpsToQualify', $rps['toQualify']);
+            $lines[] = $outputLangs->transnoentities('DigiriskSynthesisHighlightRpsToQualify', (string) $rps['toQualify']);
         } elseif ($rps['concerned'] > 0) {
-            $lines[] = $outputLangs->transnoentities('DigiriskSynthesisHighlightRps', $rps['assessedConcerned'], $rps['concerned']);
+            $lines[] = $outputLangs->transnoentities('DigiriskSynthesisHighlightRps', (string) $rps['assessedConcerned'], (string) $rps['concerned']);
         }
 
-        $lines[] = $outputLangs->transnoentities('DigiriskSynthesisHighlightAccidents', $stats['accidents']['lastYear']);
+        $lines[] = $outputLangs->transnoentities('DigiriskSynthesisHighlightAccidents', (string) $stats['accidents']['lastYear']);
 
         return $lines;
     }
@@ -814,7 +814,7 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
                 continue;
             }
             if (count($units) >= self::MAX_WORK_UNITS) {
-                $units[] = $outputLangs->transnoentities('DigiriskCseMoreWorkUnits', $stats['nbWorkunit'] - self::MAX_WORK_UNITS);
+                $units[] = $outputLangs->transnoentities('DigiriskCseMoreWorkUnits', (string) ($stats['nbWorkunit'] - self::MAX_WORK_UNITS));
                 break;
             }
             $units[] = $this->elementLabel($element, false);
@@ -1021,7 +1021,7 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
             $pdf->SetFont('', '', $size - 3);
             $pdf->SetTextColor($this->inkMuted[0], $this->inkMuted[1], $this->inkMuted[2]);
             $pdf->SetXY($x + 8, $y + 76);
-            $pdf->Cell($width - 16, 5, $outputLangs->transnoentities('DigiriskCseZoomLevelsDetail', $levels[4], $levels[3], $levels[2], $levels[1]), 0, 0, 'L');
+            $pdf->Cell($width - 16, 5, $outputLangs->transnoentities('DigiriskCseZoomLevelsDetail', (string) $levels[4], (string) $levels[3], (string) $levels[2], (string) $levels[1]), 0, 0, 'L');
 
             if ($top !== null) {
                 $element = $stats['elements'][$top->fk_element] ?? null;
@@ -1118,7 +1118,7 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
         $share = $grandSum > 0 ? round($topSum * 100 / $grandSum) : 0;
         $this->card($pdf, $rightX, $y, $rightW, 100, $this->tint($this->accentWarn, 0.92), 4);
         $this->kicker($pdf, $rightX + 8, $y + 9, $rightW - 16, $outputLangs->transnoentities('DigiriskCseExposedKicker'), $size, $this->accentWarn);
-        $this->bigNumber($pdf, $rightX + 8, $y + 20, $rightW - 16, $share . ' %', $outputLangs->transnoentities('DigiriskCseExposedShare', $topCount, count($totals)), $size + 26, $size - 0.5, $this->accentWarn);
+        $this->bigNumber($pdf, $rightX + 8, $y + 20, $rightW - 16, $share . ' %', $outputLangs->transnoentities('DigiriskCseExposedShare', (string) $topCount, (string) count($totals)), $size + 26, $size - 0.5, $this->accentWarn);
 
         $pdf->SetFont('', 'I', $size - 2);
         $pdf->SetTextColor($this->inkMuted[0], $this->inkMuted[1], $this->inkMuted[2]);
@@ -1177,7 +1177,7 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
 
         $remaining = ((int) $stats['levelCounts'][3] + (int) $stats['levelCounts'][4]) - count($priorityRisks);
         if ($remaining > 0) {
-            $this->paragraph($pdf, $outputLangs->transnoentities('DigiriskSynthesisMorePriorityRisks', $remaining), $size - 2, 'I', $this->inkMuted);
+            $this->paragraph($pdf, $outputLangs->transnoentities('DigiriskSynthesisMorePriorityRisks', (string) $remaining), $size - 2, 'I', $this->inkMuted);
         }
     }
 
@@ -1266,7 +1266,7 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
         $pdf->SetXY($rightX, $y + 38);
         $this->bulletList($pdf, [
             $outputLangs->transnoentities('DigiriskCseRpsUnicity'),
-            $rps['toQualify'] > 0 ? $outputLangs->transnoentities('DigiriskCseRpsToQualifyAlert', $rps['toQualify']) : $outputLangs->transnoentities('DigiriskCseRpsFullyQualified')
+            $rps['toQualify'] > 0 ? $outputLangs->transnoentities('DigiriskCseRpsToQualifyAlert', (string) $rps['toQualify']) : $outputLangs->transnoentities('DigiriskCseRpsFullyQualified')
         ], $size - 1, $rightW, $rightX);
     }
 
@@ -1404,10 +1404,10 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
         $priority = (int) $stats['levelCounts'][3] + (int) $stats['levelCounts'][4];
         $asks     = [$outputLangs->transnoentities('DigiriskCseAskOpinion')];
         if ($priority > 0) {
-            $asks[] = $outputLangs->transnoentities('DigiriskCseAskPriorities', $priority);
+            $asks[] = $outputLangs->transnoentities('DigiriskCseAskPriorities', (string) $priority);
         }
         if ($stats['actionPlan']['late'] > 0) {
-            $asks[] = $outputLangs->transnoentities('DigiriskCseAskLateActions', $stats['actionPlan']['late']);
+            $asks[] = $outputLangs->transnoentities('DigiriskCseAskLateActions', (string) $stats['actionPlan']['late']);
         }
         $asks[] = $outputLangs->transnoentities('DigiriskCseAskRps');
         $asks[] = $outputLangs->transnoentities('DigiriskCseAskNextUpdate');

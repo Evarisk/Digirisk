@@ -366,7 +366,7 @@ class pdf_riskassessmentdocumentguide extends ModelePDFDigiriskDolibarrDocument
         $pdf->SetXY($this->marge_gauche - 1, $y - 2);
         $pdf->Cell(40, 20, sprintf('%02d', $number), 0, 0, 'L');
 
-        $this->kicker($pdf, $this->marge_gauche + 38, $y + 2, $width - 38, $outputLangs->transnoentities('DigiriskGuideChapterKicker', $number), $size + 1, $this->accent);
+        $this->kicker($pdf, $this->marge_gauche + 38, $y + 2, $width - 38, $outputLangs->transnoentities('DigiriskGuideChapterKicker', (string) $number), $size + 1, $this->accent);
 
         $pdf->SetFont('', 'B', $size + 10);
         $pdf->SetTextColor($this->ink[0], $this->ink[1], $this->ink[2]);
@@ -1035,10 +1035,10 @@ class pdf_riskassessmentdocumentguide extends ModelePDFDigiriskDolibarrDocument
 
         $this->subTitle($pdf, $outputLangs->transnoentities('DigiriskGuideReadingDashboards'), $size, 85);
         $this->cardGrid($pdf, [
-            ['kicker' => $outputLangs->transnoentities('DigiriskGuideReadingTableKicker', 1), 'title' => $outputLangs->transnoentities('DigiriskGuideReadingByUnit'), 'text' => $outputLangs->transnoentities('DigiriskGuideReadingByUnitText')],
-            ['kicker' => $outputLangs->transnoentities('DigiriskGuideReadingTableKicker', 2), 'title' => $outputLangs->transnoentities('DigiriskGuideReadingByCategory'), 'text' => $outputLangs->transnoentities('DigiriskGuideReadingByCategoryText')],
-            ['kicker' => $outputLangs->transnoentities('DigiriskGuideReadingTableKicker', 3), 'title' => $outputLangs->transnoentities('DigiriskGuideReadingByLevel'), 'text' => $outputLangs->transnoentities('DigiriskGuideReadingByLevelText')],
-            ['kicker' => $outputLangs->transnoentities('DigiriskGuideReadingTableKicker', 4), 'title' => $outputLangs->transnoentities('DigiriskGuideReadingRps'), 'text' => $outputLangs->transnoentities('DigiriskGuideReadingRpsText'), 'color' => $this->categoryColors[7]]
+            ['kicker' => $outputLangs->transnoentities('DigiriskGuideReadingTableKicker', '1'), 'title' => $outputLangs->transnoentities('DigiriskGuideReadingByUnit'), 'text' => $outputLangs->transnoentities('DigiriskGuideReadingByUnitText')],
+            ['kicker' => $outputLangs->transnoentities('DigiriskGuideReadingTableKicker', '2'), 'title' => $outputLangs->transnoentities('DigiriskGuideReadingByCategory'), 'text' => $outputLangs->transnoentities('DigiriskGuideReadingByCategoryText')],
+            ['kicker' => $outputLangs->transnoentities('DigiriskGuideReadingTableKicker', '3'), 'title' => $outputLangs->transnoentities('DigiriskGuideReadingByLevel'), 'text' => $outputLangs->transnoentities('DigiriskGuideReadingByLevelText')],
+            ['kicker' => $outputLangs->transnoentities('DigiriskGuideReadingTableKicker', '4'), 'title' => $outputLangs->transnoentities('DigiriskGuideReadingRps'), 'text' => $outputLangs->transnoentities('DigiriskGuideReadingRpsText'), 'color' => $this->categoryColors[7]]
         ], 2, $size);
 
         $this->subTitle($pdf, $outputLangs->transnoentities('DigiriskGuideReadingRiskTable'), $size, 60);
