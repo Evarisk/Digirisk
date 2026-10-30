@@ -212,8 +212,8 @@ if ($action == 'add' && $permissiontoadd) {
 		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Email')), array(), 'errors');
 		$error++;
 	} else {
-		$regEmail = '/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/';
-		if (preg_match($regEmail, $email)) {
+		// The check of the core: the former pattern refused a "+" and any extension longer than 4 letters (.paris) (#5609)
+		if (isValidEmail($email)) {
 			$object->origin_email = $email;
 		} else {
 			setEventMessages($langs->trans('ErrorFieldEmail'), array(), 'errors');

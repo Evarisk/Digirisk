@@ -288,13 +288,16 @@ window.digiriskdolibarr.ticket.closeDashBoardTicketInfo = function() {
 /**
  * Check if email is valid
  *
+ * Only a hint while typing, the server has the last word (isValidEmail()): any x@y.z without a space,
+ * so a "+" or a long extension (.paris) is no longer shown as wrong (#5609)
+ *
  * @since   9.6.0
- * @version 9.6.0
+ * @version 23.6.0
  *
  * @return {void}
  */
 window.digiriskdolibarr.ticket.checkValidEmail = function() {
-	var reEmail = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+	var reEmail = /^[^\s@]+@[^\s@]+\.[^\s@.]{2,}$/;
 	if (reEmail.test(this.value) == false) {
 		$(this).css("border", "3px solid red");
 	} else {
