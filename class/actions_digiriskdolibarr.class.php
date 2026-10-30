@@ -2659,12 +2659,14 @@ class ActionsDigiriskdolibarr
 
             foreach ($categories as $cat) {
                 $out .= '<div class="noborderoncategories paddingleft marginbottom" style="background: #'. (empty($cat['color']) ? 'bbb' : $cat['color']) .'">';
-                $out .= '<div class="categtextwhite" data-catid="' . $cat['id'] . '" style="cursor: pointer;"><span class="fas fa-tag paddingright" style=""></span>' . addslashes($cat['label']) . '</div></div>';
+                $out .= '<div class="categtextwhite" data-catid="' . $cat['id'] . '" style="cursor: pointer;"><span class="fas fa-tag paddingright" style=""></span>' . dol_escape_htmltag($cat['label']) . '</div></div>';
             }
 
+            // json_encode: a label of a category or of a GP/UT may hold an apostrophe ("Station d'épuration"), which
+            // ended the quoted string and broke the script of the row
             ?>
             <script>
-                $('[data-key="ticket.ticket_categories"]').eq(<?= $parameters['i'] ?>).html('<?= $out ?>')
+                $('[data-key="ticket.ticket_categories"]').eq(<?= $parameters['i'] ?>).html(<?= json_encode($out) ?>)
                 $('[data-key="ticket.ticket_categories"]').eq(<?= $parameters['i'] ?>).find('.categtextwhite').on('click', function() {
                     $('#search_category_ticket_list').val($(this).data('catid')).trigger('change');
                     $('button[name="button_search_x"]').click();
@@ -2685,7 +2687,7 @@ class ActionsDigiriskdolibarr
                 $out = $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
                 ?>
                 <script>
-                    $('[data-key="ticket.digiriskdolibarr_ticket_service"]').eq(<?= $parameters['i'] ?>).html('<?= $out ?>')
+                    $('[data-key="ticket.digiriskdolibarr_ticket_service"]').eq(<?= $parameters['i'] ?>).html(<?= json_encode($out) ?>)
                 </script>
                 <?php
             }
