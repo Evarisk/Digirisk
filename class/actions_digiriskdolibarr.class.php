@@ -244,6 +244,47 @@ class ActionsDigiriskdolibarr
     }
 
     /**
+     * Overloading the saturneEmailTemplateSettings function : replacing the parent's function with the one below
+     *
+     * Declares the Digirisk settings designating an email template, shown by their label in the "Used by" column of
+     * the Saturne email templates overview (#5630)
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function saturneEmailTemplateSettings(array $parameters): int
+    {
+        global $langs;
+
+        $langs->loadLangs(['ticket', 'digiriskdolibarr@digiriskdolibarr']);
+
+        $this->results = [];
+
+        // Prevention plans and fire permits each mail the outside company's manager and its attendants
+        $documents = [
+            'PREVENTIONPLAN' => ['PreventionPlan', '/digiriskdolibarr/admin/config/preventionplan.php'],
+            'FIREPERMIT'     => ['FirePermit', '/digiriskdolibarr/admin/config/firepermit.php'],
+        ];
+        foreach ($documents as $document => $setting) {
+            foreach (['EXT' => 'MobilePPEmailTemplateExt', 'INT' => 'MobilePPEmailTemplateInt'] as $recipient => $labelKey) {
+                $this->results['DIGIRISKDOLIBARR_' . $document . '_EMAIL_TEMPLATE_' . $recipient] = [
+                    'label' => $langs->transnoentities($setting[0]) . ' · ' . $langs->transnoentities($labelKey),
+                    'url'   => dol_buildpath($setting[1], 1),
+                ];
+            }
+        }
+
+        // Holds a label, looked up by getEMailTemplate() among the ticket templates
+        $this->results['DIGIRISKDOLIBARR_TICKET_SUBMITTED_MAIL_MODEL'] = [
+            'label' => 'Digirisk · ' . $langs->transnoentities('Ticket') . ' · ' . $langs->transnoentities('TicketSubmittedMailModel'),
+            'url'   => dol_buildpath('/digiriskdolibarr/admin/ticket/ticket.php', 1),
+            'type'  => 'ticket',
+        ];
+
+        return 0;
+    }
+
+    /**
      * Overloading the completeTabsHead function : replacing the parent's function with the one below
      *
      * @param  array $parameters Hook metadata (context, etc...)
