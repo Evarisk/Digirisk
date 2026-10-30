@@ -674,18 +674,20 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 							$out .= '<input type="' . $fields[$key]['type'] . '" name="' . ($fields[$key]['name'] ?? 'options_' . $key) . '" id="' . ($fields[$key]['name'] ?? 'options_' . $key) . '" value="' . GETPOST($fields[$key]['name'] ?? 'options_' . $key) . '"' . ($required ? 'required' : '') . '/>';
 							break;
                         case 'digiriskdolibarr_ticket_service':
+                            // Kept like the other fields when a refused declaration shows the form again (#5626)
+                            $postedService = GETPOSTINT('options_' . $key) > 0 ? GETPOSTINT('options_' . $key) : '';
                             if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT') == 1) {
                                 $digiriskelementlabel = [];
                                 foreach ($digiriskelement as $element) {
                                     $digiriskelementlabel[$element->id] = $element->label;
                                 }
-                                $out .= Form::selectarray('options_' . $key, $digiriskelementlabel, '', 1);
+                                $out .= Form::selectarray('options_' . $key, $digiriskelementlabel, $postedService, 1);
                             } else {
                                 $digiriskelementlabel = [];
                                 foreach ($digiriskelement as $element) {
                                     $digiriskelementlabel[$element->id] = $element->ref . ' - ' . $element->label;
                                 }
-                                $out .= Form::selectarray('options_' . $key, $digiriskelementlabel, '', 1);
+                                $out .= Form::selectarray('options_' . $key, $digiriskelementlabel, $postedService, 1);
                             }
                             break;
                         case 'digiriskdolibarr_ticket_location':
