@@ -297,6 +297,8 @@ window.digiriskdolibarr.ticketConversation.switchMode = function() {
   $form.find('.dtc-composer__tab').removeClass('is-active');
   $tab.addClass('is-active');
   $form.find('.dtc-composer__public').toggle(mode === 'public');
+  // select2 sized the placeholder of the ticket files while the panel was hidden: 0 px, the empty field showed nothing
+  $form.find('#dtc_linked_files').trigger('change.select2');
   $form.find('.dtc-composer__mentions').toggle(mode === 'internal');
   var label = (mode === 'public') ? ($form.data('lang-send') || 'Send') : ($form.data('lang-savenote') || 'Save');
   $form.find('.dtc-composer__send-label').text(label);

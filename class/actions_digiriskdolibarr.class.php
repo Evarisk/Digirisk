@@ -719,9 +719,8 @@ class ActionsDigiriskdolibarr
                         $selectedTicketFiles[] = dol_escape_htmltag($ticketFile['name']);
                     }
 
-                    $pictoDigirisk = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
                     print '<table style="display: none;"><tr class="email_line" id="digirisk_ticket_linked_files">';
-                    print '<td>' . $pictoDigirisk . $langs->trans('AttachTicketFiles') . '</td>';
+                    print '<td><span class="fas fa-paperclip pictofixedwidth"></span>' . $langs->trans('AttachTicketFiles') . '</td>';
                     print '<td>' . Form::multiselectarray('linked_files', $ticketFilesOptions, $selectedTicketFiles, 0, 0, '', 0, '100%', '', '', $langs->trans('AttachTicketFiles'));
                     // A download link makes the file public: as the "Share" box of the file list, for who can edit the ticket
                     if ($user->hasRight('ticket', 'write')) {
