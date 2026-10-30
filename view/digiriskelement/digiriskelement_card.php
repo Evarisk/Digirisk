@@ -354,9 +354,12 @@ if (($id || $ref) && $action == 'edit') {
 
 	// * Prevention officers - Responsables de la prevention *
 
+	// Sans element (fetch rate), ceux de l'etablissement : ils ne sont rattaches a aucun objet
 	$digiriskResources    = new DigiriskResources($db);
-	$preventionOfficerIds = $digiriskResources->fetchResourcesIdsFromObject('PreventionOfficer', 'digiriskelement', $object->id);
-	$userList             = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', '', 0, 1);
+	$preventionOfficerIds = $object->id > 0
+		? $digiriskResources->fetchResourcesIdsFromObject('PreventionOfficer', 'digiriskelement', $object->id)
+		: $digiriskResources->fetchResourcesIdsFromObject('PreventionOfficer', '', 0);
+	$userList            = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', '', 0, 1);
 
 	print '<tr><td>' . $langs->trans('PreventionOfficers') . '</td><td>';
 	print img_picto('', 'user', 'class="pictofixedwidth"') . $form->multiselectarray('PreventionOfficer', $userList, $preventionOfficerIds, null, null, null, null, '300');
@@ -455,8 +458,11 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 
 	// * Prevention officers - Responsables de la prevention *
 
+	// Vue Societe (sans id) : ceux de l'etablissement, qui ne sont rattaches a aucun objet
 	$digiriskResources    = new DigiriskResources($db);
-	$preventionOfficerIds = $digiriskResources->fetchResourcesIdsFromObject('PreventionOfficer', 'digiriskelement', $object->id);
+	$preventionOfficerIds = $object->id > 0
+		? $digiriskResources->fetchResourcesIdsFromObject('PreventionOfficer', 'digiriskelement', $object->id)
+		: $digiriskResources->fetchResourcesIdsFromObject('PreventionOfficer', '', 0);
 	$preventionOfficers   = [];
 	foreach ($preventionOfficerIds as $preventionOfficerId) {
 		// Un objet par ligne : un fetch en echec laisse l'objet sur les valeurs du precedent
