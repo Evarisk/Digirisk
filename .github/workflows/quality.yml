@@ -184,3 +184,13 @@ jobs:
             - name: Run PHPStan
               working-directory: htdocs/custom/digiriskdolibarr
               run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G --error-format=github
+
+    # API de Saturne absente de sa derniere version publiee (Evarisk/Saturne#1844) : la CI analyse le
+    # module contre Saturne develop, un client qui installe le zip publie planterait sur un tel appel.
+    # Rouge seulement si la PR en introduit un, annotations pour ceux deja sur la base. Contexte
+    # « Saturne / API publiee », non requis : il informe sans bloquer le merge.
+    saturne-api:
+        name: Saturne
+        uses: Evarisk/Saturne/.github/workflows/published-api-reusable.yml@develop
+        with:
+            module: digiriskdolibarr
