@@ -878,6 +878,15 @@ class ActionsDigiriskdolibarr
                             return 0;
                         }
 
+                        // Indicateurs du plan d'action : seulement sur les projets gérés par Digirisk
+                        $digiriskProjectIds = [];
+                        foreach (['DU', 'ENVIRONMENT', 'ACCIDENT', 'PREVENTIONPLAN', 'FIREPERMIT', 'TICKET'] as $projectType) {
+                            $digiriskProjectIds[] = getDolGlobalInt('DIGIRISKDOLIBARR_' . $projectType . '_PROJECT');
+                        }
+                        if (!in_array((int) $projectId, $digiriskProjectIds, true)) {
+                            return 0;
+                        }
+
                         $allTasks = $task->getTasksArray(null, null, $projectId, 0, 0, '', '-1', '', 0, 0, $extrafields);
                         $totalConsumedTime       = 0;
                         $totatConsumedTimeAmount = 0;
