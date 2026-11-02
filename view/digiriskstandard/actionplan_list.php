@@ -42,6 +42,7 @@ dol_include_once('/saturne/class/task/saturnetask.class.php');
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
+require_once __DIR__ . '/../../class/actionplandashboard.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_actionplan.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 
@@ -55,7 +56,7 @@ saturne_load_langs();
 $action = GETPOST('action', 'aZ09');
 $view   = GETPOST('view', 'alpha');
 
-if (empty($view) || !in_array($view, ['gantt', 'kanban'])) {
+if (empty($view) || !in_array($view, ['gantt', 'kanban', 'dashboard'])) {
     $view = 'kanban';
 }
 
@@ -1110,16 +1111,28 @@ if ($historyYear <= 0) {
     }
 }
 
-// The tabs keep the view, the displayed project, the filter bar criteria and the menu highlight
-$tabUrl = $_SERVER['PHP_SELF'] . '?view=' . urlencode($view) . '&projectid=' . $projectId . digiriskActionPlanFilterUrlParams($actionPlanFilters);
+// Every link of the page keeps the menu highlight
+$menuUrlParams = '';
 if (GETPOST('mainmenu', 'aZ09')) {
-    $tabUrl .= '&mainmenu=' . urlencode(GETPOST('mainmenu', 'aZ09'));
+    $menuUrlParams .= '&mainmenu=' . urlencode(GETPOST('mainmenu', 'aZ09'));
 }
 if (GETPOST('leftmenu', 'aZ09')) {
-    $tabUrl .= '&leftmenu=' . urlencode(GETPOST('leftmenu', 'aZ09'));
+    $menuUrlParams .= '&leftmenu=' . urlencode(GETPOST('leftmenu', 'aZ09'));
 }
 if (GETPOSTINT('idmenu') > 0) {
-    $tabUrl .= '&idmenu=' . GETPOSTINT('idmenu');
+    $menuUrlParams .= '&idmenu=' . GETPOSTINT('idmenu');
+}
+
+// The tabs keep the view, the displayed project and the filter bar criteria
+$tabUrl = $_SERVER['PHP_SELF'] . '?view=' . urlencode($view) . '&projectid=' . $projectId . digiriskActionPlanFilterUrlParams($actionPlanFilters) . $menuUrlParams;
+
+// The view switch keeps the displayed project, year and criteria: Kanban and dashboard show the same corrective actions
+$yearUrlParams = '&projectid=' . $projectId . '&period=' . urlencode($actionPlanFilters['period']) . '&year=' . (int) $actionPlanFilters['year'];
+$viewUrl       = $_SERVER['PHP_SELF'] . '?' . ltrim($yearUrlParams, '&') . digiriskActionPlanFilterUrlParams($actionPlanFilters) . $menuUrlParams;
+
+// Dashboard figures of the corrective actions the Kanban would show, its links open the Kanban of the same project and year
+if ($view === 'dashboard') {
+    $actionPlanDashboard = (new ActionPlanDashboard($tasksJson, $kanbanColumns, $risk->getCotations(), $actionPlanFilters, $_SERVER['PHP_SELF'] . '?view=kanban' . $yearUrlParams . $menuUrlParams))->load_dashboard();
 }
 
 $head = [];
@@ -1149,6 +1162,8 @@ require __DIR__ . '/../../core/tpl/actionplan/actionplan_filters.tpl.php';
 // Include appropriate TPL
 if ($view === 'kanban') {
     require_once __DIR__ . '/../../core/tpl/actionplan/actionplan_list_kanban.tpl.php';
+} elseif ($view === 'dashboard') {
+    require_once __DIR__ . '/../../core/tpl/actionplan/actionplan_dashboard.tpl.php';
 } else {
     require_once __DIR__ . '/../../core/tpl/actionplan/actionplan_list_gantt.tpl.php';
 }
