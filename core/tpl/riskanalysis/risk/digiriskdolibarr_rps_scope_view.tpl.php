@@ -10,9 +10,10 @@
 /**
  * \file       core/tpl/riskanalysis/risk/digiriskdolibarr_rps_scope_view.tpl.php
  * \ingroup    digiriskdolibarr
- * \brief      Bloc de qualification des risques psychosociaux, affiche en haut
- *             de la liste des risques du groupement de tete - l'entreprise sur la plupart
- *             des documents uniques - et seulement a ce niveau.
+ * \brief      Bloc de qualification des risques psychosociaux, affiche au niveau 0 sur
+ *             l'onglet Risques psychosociaux de la societe (view/digiriskstandard/
+ *             digiriskstandard_psychosocial.php), et seulement a ce niveau : aucun groupement
+ *             n'est obligatoire dans l'organisation.
  *
  *             Un tableau de toutes les unites de travail, dans l'ordre de l'arborescence et
  *             groupees sous leur groupement : filtres par etat, recherche, et selection
@@ -24,7 +25,7 @@
  *             la retrouve a sa place, parmi ses autres risques.
  *
  * Variables attendues : $rpsLines, $rpsScale, $rpsScaleLabels, $rpsSubCategories, $rpsExistingTotal,
- *                       $rpsScopeElementId, $activeDigiriskElementList, $object, $langs
+ *                       $activeDigiriskElementList, $langs
  */
 
 global $langs;
@@ -48,13 +49,13 @@ foreach (flatten_tree(recurse_tree(0, 0, $activeDigiriskElementList)) as $rpsNod
     }
     $rpsParentId = (int) $rpsNode['object']->fk_parent;
     if (!isset($rpsTableGroups[$rpsParentId])) {
-        // Chemin du groupement sous le groupement de tete, pour situer un groupement imbrique
+        // Chemin du groupement depuis la societe, pour situer un groupement imbrique
         $rpsPath     = [];
         $rpsAncestor = $activeDigiriskElementList[$rpsParentId] ?? null;
         $rpsGuard    = 0;
         while ($rpsAncestor && !empty($rpsAncestor->fk_parent) && $rpsGuard++ < 50) {
             $rpsAncestor = $activeDigiriskElementList[$rpsAncestor->fk_parent] ?? null;
-            if ($rpsAncestor && !empty($rpsAncestor->fk_parent)) {
+            if ($rpsAncestor) {
                 array_unshift($rpsPath, $rpsAncestor->ref);
             }
         }

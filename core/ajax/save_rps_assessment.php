@@ -97,7 +97,7 @@ function rps_average_to_scale(float $average): int
 $action    = $data['action'] ?? '';
 $elementId = (int) ($data['fk_element'] ?? 0);
 
-// La qualification peut viser plusieurs unites d'un coup : la selection du tableau du groupement de tete
+// La qualification peut viser plusieurs unites d'un coup : la selection du tableau du niveau 0
 $elementIds = $elementId > 0 ? [$elementId] : [];
 if ($action == 'scope' && isset($data['fk_elements']) && is_array($data['fk_elements'])) {
     $elementIds = array_values(array_unique(array_filter(array_map('intval', $data['fk_elements']), function ($id) {

@@ -329,7 +329,7 @@ if (!isset($rpsScopeRows)) {
 
 /* --------------------------------------------------------------------------
  * Perimetre : toutes les unites de travail de l'entite.
- * La qualification est prise une seule fois, sur le groupement de tete, et commande
+ * La qualification est prise une seule fois, au niveau 0, et commande
  * ensuite l'affichage du risque psychosocial sur chaque unite.
  * ----------------------------------------------------------------------- */
 

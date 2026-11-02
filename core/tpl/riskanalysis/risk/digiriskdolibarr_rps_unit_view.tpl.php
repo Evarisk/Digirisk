@@ -14,26 +14,28 @@
  *             haut de ses risques : un bandeau d'une ligne quand elle est declaree concernee,
  *             dont le detail (facteurs et actions de prevention) se deplie.
  *
- *             La qualification, elle, se prend sur le groupement de tete : on la rappelle
- *             ici avec un lien, mais elle ne se modifie pas depuis l'unite. Une unite non
- *             concernee ou a qualifier n'a qu'un rappel de sa qualification.
+ *             La qualification, elle, se prend au niveau 0, sur l'onglet Risques psychosociaux
+ *             de la societe : on la rappelle ici avec un lien, mais elle ne se modifie pas depuis
+ *             l'unite. Une unite non concernee ou a qualifier n'a qu'un rappel de sa qualification.
  *
  *             Les facteurs affiches proviennent de la derniere evaluation consolidee, ou a
  *             defaut des risques psychosociaux deja enregistres sur l'unite.
  *
- * Variables attendues : $rpsUnitLine, $rpsScale, $rpsScaleLabels, $rpsSubCategories, $rpsRootGroupment,
- *                       $rpsRootGroupmentId, $rpsUsers, $rpsAssessmentByElement, $object, $langs
+ * Variables attendues : $rpsUnitLine, $rpsScale, $rpsScaleLabels, $rpsSubCategories, $rpsUsers,
+ *                       $rpsAssessmentByElement, $object, $langs
  */
 
-global $db, $langs;
+global $db, $langs, $user;
 
 if (empty($rpsUnitLine)) {
     return;
 }
 
 $rpsUnitState = (int) $rpsUnitLine['state'];
-$rpsRootUrl   = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . (int) $rpsRootGroupmentId . '#rps-unit-' . (int) $object->id;
-$rpsRootRef   = !empty($rpsRootGroupment) ? $rpsRootGroupment->ref : '';
+// Le lien vers la qualification suit les droits de l'onglet du niveau 0
+$rpsRootAccess = $user->hasRight('digiriskdolibarr', 'digiriskstandard', 'read');
+$rpsRootUrl    = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_psychosocial.php', 1) . '#rps-unit-' . (int) $object->id;
+$rpsRootRef    = getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
 
 if ($rpsUnitState !== 1) : ?>
     <div class="rps-scope rps-unit-notice" data-state="<?php echo $rpsUnitState; ?>">
@@ -51,7 +53,7 @@ if ($rpsUnitState !== 1) : ?>
                 <?php endif; ?>
             </span>
         </div>
-        <?php if (!empty($rpsRootGroupmentId)) : ?>
+        <?php if ($rpsRootAccess) : ?>
             <a class="wpeo-button button-grey button-size-small" href="<?php echo $rpsRootUrl; ?>">
                 Qualifier sur <?php echo dol_escape_htmltag($rpsRootRef); ?> <i class="fas fa-arrow-right"></i>
             </a>
@@ -103,7 +105,7 @@ if (!empty($rpsAssessmentByElement[(int) $object->id]['id'])) {
             <span class="rps-head-title">Risques psychosociaux</span>
             <span class="rps-unit-sub">
                 <span class="rps-state" data-state="1">Concernée</span>
-                <?php if (!empty($rpsRootGroupmentId)) : ?>
+                <?php if ($rpsRootAccess) : ?>
                     qualifiée sur <a href="<?php echo $rpsRootUrl; ?>"><?php echo dol_escape_htmltag($rpsRootRef); ?></a>
                 <?php endif; ?>
             </span>

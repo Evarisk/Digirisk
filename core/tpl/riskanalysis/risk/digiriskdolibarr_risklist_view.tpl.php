@@ -801,30 +801,17 @@ $varpage  = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 $selectedfields  = $form->multiSelectArrayWithCheckbox('risklist_selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 $selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
 
-// RPS : la qualification des unites de travail se prend une seule fois, sur le
-// groupement de tete - l'entreprise sur la plupart des documents uniques - et commande
-// ensuite l'affichage du risque psychosocial sur chaque unite.
+// RPS : la qualification des unites de travail se prend une seule fois, au niveau 0
+// (onglet Risques psychosociaux de la societe, view/digiriskstandard/digiriskstandard_psychosocial.php)
+// et commande ensuite l'affichage du risque psychosocial sur chaque unite.
 require __DIR__ . '/digiriskdolibarr_rps_scope_data.tpl.php';
-if (isset($object) && $object->element == 'digiriskelement' && $object->element_type == 'groupment' && empty($object->fk_parent)) {
-    // Groupement de tete : la qualification de toutes les unites rattachees
-    $rpsScopeElementId = (int) $object->id;
-    require __DIR__ . '/digiriskdolibarr_rps_scope_view.tpl.php';
-    require __DIR__ . '/digiriskdolibarr_rps_dict_modal.tpl.php';
-} elseif (isset($object) && $object->element == 'digiriskelement' && isset($rpsStateByUnit[(int) $object->id])) {
+if (isset($object) && $object->element == 'digiriskelement' && isset($rpsStateByUnit[(int) $object->id])) {
     // Unite de travail : sa ligne psychosociale, evaluable sur place si elle est concernee,
-    // sinon un rappel de sa qualification, qui se prend sur le groupement de tete
+    // sinon un rappel de sa qualification, qui se prend au niveau 0
     $rpsUnitLine = null;
     foreach ($rpsLines as $rpsCandidate) {
         if ((int) $rpsCandidate['id'] === (int) $object->id) {
             $rpsUnitLine = $rpsCandidate;
-        }
-    }
-    $rpsRootGroupment   = null;
-    $rpsRootGroupmentId = 0;
-    foreach ($activeDigiriskElementList as $rpsCandidateId => $rpsCandidate) {
-        if (empty($rpsRootGroupment) && $rpsCandidate->element_type == 'groupment' && empty($rpsCandidate->fk_parent)) {
-            $rpsRootGroupment   = $rpsCandidate;
-            $rpsRootGroupmentId = (int) $rpsCandidateId;
         }
     }
     require __DIR__ . '/digiriskdolibarr_rps_unit_view.tpl.php';
