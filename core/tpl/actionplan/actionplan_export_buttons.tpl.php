@@ -23,6 +23,7 @@
  * Variables expected from calling PHP:
  * - $view              string    Current view ('kanban' or 'gantt')
  * - $actionPlanFilters array     Criteria from digiriskActionPlanGetFilters(), carried over to the exports
+ * - $permissiontoread  bool      Whether the user may read the action plan
  * - $user              User      Current user (permission checks)
  * - $langs             Translate Translation object
  */
@@ -33,7 +34,7 @@ $exportAction = $_SERVER['PHP_SELF'] . '?view=' . urlencode($view);
 ?>
 
 <div class="actionplan-export-toolbar">
-    <?php if ($user->hasRight('digiriskdolibarr', 'riskassessmentdocument', 'read')) : ?>
+    <?php if ($permissiontoread) : ?>
         <form method="POST" action="<?php echo $exportAction; ?>" class="ap-export-form">
             <input type="hidden" name="token" value="<?php echo newToken(); ?>">
             <input type="hidden" name="action" value="exportCsv">
