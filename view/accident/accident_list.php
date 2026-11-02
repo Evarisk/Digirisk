@@ -242,8 +242,9 @@ if (empty($resHook)) {
     // through the mass action. Answered before the list templates of Saturne, so that a generic export of the list
     // never takes its place; the mass action keeps the limit the mass actions of the core apply
     $xlsxExportIds = [];
-    if ($massaction == 'export_xlsx' && !empty($toselect) && count($toselect) <= getDolGlobalInt('MAIN_LIMIT_FOR_MASS_ACTIONS', 1000)) {
-        $xlsxExportIds = array_map('intval', $toselect);
+    $checkedIds    = GETPOST('toselect', 'array:int');
+    if ($massaction == 'export_xlsx' && !empty($checkedIds) && count($checkedIds) <= getDolGlobalInt('MAIN_LIMIT_FOR_MASS_ACTIONS', 1000)) {
+        $xlsxExportIds = array_map('intval', $checkedIds);
     }
     if (($action == 'export_xlsx' || !empty($xlsxExportIds)) && $xlsxExportAvailable) {
         require_once __DIR__ . '/../../class/digiriskaccidentexport.class.php';
