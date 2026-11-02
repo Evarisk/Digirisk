@@ -1954,6 +1954,8 @@ Show                                  = Pokaż
 # Kanban zgłoszeń — konfiguracja rejestrowania zdarzeń — issue #4753
 # ===========================================================================
 TicketKanban                           = Kanban zgłoszeń
+RegisterKanban                         = Kanban rejestrów
+RegisterList                           = Lista rejestrów
 TicketKanbanLogging                    = Kanban zgłoszeń — Historia zmian
 TicketKanbanLoggingDescription         = Włącz tworzenie zdarzeń przy zmianach w kanbanie
 TicketKanbanLogStatus                  = Zmiana statusu

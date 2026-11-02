@@ -1954,6 +1954,8 @@ Show                                  = Afișați
 # Kanban tichete — configurarea jurnalizării — issue #4753
 # ===========================================================================
 TicketKanban                           = Kanban tichete
+RegisterKanban                         = Kanban registre
+RegisterList                           = Lista registrelor
 TicketKanbanLogging                    = Kanban tichete — Istoricul modificărilor
 TicketKanbanLoggingDescription         = Activați crearea de evenimente la modificările din kanban
 TicketKanbanLogStatus                  = Modificarea stării

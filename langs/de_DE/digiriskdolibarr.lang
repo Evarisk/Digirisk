@@ -1954,6 +1954,8 @@ Show                                  = Anzeigen
 # Ticket-Kanban — Konfiguration der Protokollierung — issue #4753
 # ===========================================================================
 TicketKanban                           = Ticket-Kanban
+RegisterKanban                         = Register-Kanban
+RegisterList                           = Registerliste
 TicketKanbanLogging                    = Ticket-Kanban — Verlauf der Änderungen
 TicketKanbanLoggingDescription         = Das Anlegen von Ereignissen bei Änderungen im Kanban aktivieren
 TicketKanbanLogStatus                  = Änderung des Status

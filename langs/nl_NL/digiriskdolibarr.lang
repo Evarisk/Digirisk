@@ -1954,6 +1954,8 @@ Show                                  = Weergeven
 # Ticket-kanban — instellingen van de gebeurtenisregistratie — issue #4753
 # ===========================================================================
 TicketKanban                           = Ticket-Kanban
+RegisterKanban                         = Registers-Kanban
+RegisterList                           = Lijst van registers
 TicketKanbanLogging                    = Ticket-Kanban — Wijzigingsgeschiedenis
 TicketKanbanLoggingDescription         = Het aanmaken van gebeurtenissen bij wijzigingen in het kanban activeren
 TicketKanbanLogStatus                  = Wijziging van de status

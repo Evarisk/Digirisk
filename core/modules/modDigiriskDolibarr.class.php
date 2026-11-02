@@ -1804,8 +1804,7 @@ class modDigiriskdolibarr extends DolibarrModules
         $this->menu[$r++] = [
             'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskticket',
             'type'     => 'left',
-            'titre'    => $langs->transnoentities('TicketKanban'),
-            'prefix'   => '<i class="fas fa-columns pictofixedwidth"></i>',
+            'titre'    => '<i class="fas fa-columns pictofixedwidth"></i>' . $langs->transnoentities('RegisterKanban'),
             'mainmenu' => 'digiriskdolibarr',
             'leftmenu' => 'digiriskdolibarr_ticketkanban',
             'url'      => '/digiriskdolibarr/view/ticket/ticket_action_card.php',
@@ -1820,7 +1819,7 @@ class modDigiriskdolibarr extends DolibarrModules
         $this->menu[$r++] = [
             'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskticket',
             'type'     => 'left',
-            'titre'    => '<i class="fas fa-list pictofixedwidth"></i>' . $langs->transnoentities('TicketList'),
+            'titre'    => '<i class="fas fa-list pictofixedwidth"></i>' . $langs->transnoentities('RegisterList'),
             'mainmenu' => 'digiriskdolibarr',
             'leftmenu' => 'digiriskdolibarr_ticketlist',
             'url'      => '/ticket/list.php',
@@ -1967,8 +1966,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=ticket,fk_leftmenu=ticketstats',
 			'type'     => 'left',
-			'titre'    => $langs->transnoentities('TicketKanban'),
-			'prefix'   => '<i class="fas fa-columns pictofixedwidth"></i>',
+			'titre'    => '<i class="fas fa-columns pictofixedwidth"></i>' . $langs->transnoentities('TicketKanban'),
 			'mainmenu' => 'ticket',
 			'leftmenu' => 'digiriskticketkanban',
 			'url'      => '/digiriskdolibarr/view/ticket/ticket_action_card.php',
@@ -1984,8 +1982,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=ticket,fk_leftmenu=ticketstats',
 			'type'     => 'left',
-			'titre'    => $langs->transnoentities('List'),
-			'prefix'   => '<i class="fas fa-list pictofixedwidth"></i>',
+			'titre'    => '<i class="fas fa-list pictofixedwidth"></i>' . $langs->transnoentities('List'),
 			'mainmenu' => 'ticket',
 			'leftmenu' => 'digiriskticketlist',
 			'url'      => '/ticket/list.php',
