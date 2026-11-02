@@ -47,6 +47,11 @@ const DIGIRISK_RISK_OVERVIEW_TAB_CONSTS = [
 ];
 
 /**
+ * Switch of the setup that hides the Excel export of the overview.
+ */
+const DIGIRISK_RISK_OVERVIEW_EXPORT_CONST = 'DIGIRISKDOLIBARR_RISK_OVERVIEW_EXPORT';
+
+/**
  * Risks detailed in the tooltip of a number, the worst ones: beyond, the tooltip only says how many
  * more the number counts.
  */
@@ -106,6 +111,17 @@ function digiriskRiskOverviewTabs(): array
         }
         return !isset(DIGIRISK_RISK_OVERVIEW_TAB_CONSTS[$tab]) || getDolGlobalInt(DIGIRISK_RISK_OVERVIEW_TAB_CONSTS[$tab], 1);
     }));
+}
+
+/**
+ * Whether the visitor of the overview may download it as an Excel workbook. A switch never saved
+ * allows it, as on an installation updated without reactivating the module.
+ *
+ * @return bool
+ */
+function digiriskRiskOverviewExportAllowed(): bool
+{
+    return getDolGlobalInt(DIGIRISK_RISK_OVERVIEW_EXPORT_CONST, 1) > 0;
 }
 
 /**
