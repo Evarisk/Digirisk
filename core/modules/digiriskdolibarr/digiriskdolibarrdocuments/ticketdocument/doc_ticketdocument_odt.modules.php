@@ -30,9 +30,9 @@ require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../../../../saturne/lib/medias.lib.php';
-require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
-require_once __DIR__ . '/../../../../../../saturne/class/saturnesignature.class.php';
+dol_include_once('/saturne/lib/medias.lib.php');
+dol_include_once('/saturne/core/modules/saturne/modules_saturne.php');
+dol_include_once('/saturne/class/saturnesignature.class.php');
 /**
  *	Class to build documents using ODF templates generator
  */
@@ -206,12 +206,9 @@ class doc_ticketdocument_odt extends SaturneDocumentModel
         if (!empty($contactListInternal) && is_array($contactListInternal)) {
             $contactList = array_merge($contactList, $contactListInternal);
         }
-        if (!empty($contactList) && is_array($contactList)) {
-            foreach ($contactList as $contact) {
-                $tmpArray['contacts'] .= dol_strtoupper($contact['lastname']) . ' ' . ucfirst($contact['firstname']) . ', ';
-            }
-        } else {
-            $tmpArray['contacts'] = '';
+        $tmpArray['contacts'] = '';
+        foreach ($contactList as $contact) {
+            $tmpArray['contacts'] .= dol_strtoupper($contact['lastname']) . ' ' . ucfirst($contact['firstname']) . ', ';
         }
 
         $signatory   = new SaturneSignature($this->db);

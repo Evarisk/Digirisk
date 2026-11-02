@@ -1,0 +1,16 @@
+/* Digirisk modern theme: status badges. The tinted pills come from the shared theme of Saturne. */
+
+#{$dr-scope} {
+  /* Locked and archived: Digirisk puts its frozen documents in status 8, a final state rather
+     than an error, hence the navy tint instead of the red of the shared theme */
+  .badge-status8 {
+    background: rgba(38, 60, 92, 0.1) !important;
+    border: 1px solid rgba(38, 60, 92, 0.25) !important;
+    color: $dr-navy !important;
+  }
+
+  /* Its status dot takes the same navy: the shared theme fills the dots of status 8 in red */
+  .badge.badge-dot.badge-status8 {
+    background: $dr-navy !important;
+  }
+}

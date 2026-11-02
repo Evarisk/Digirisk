@@ -35,7 +35,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../saturne/class/saturnemail.class.php';
+dol_include_once('/saturne/class/saturnemail.class.php');
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
@@ -236,10 +236,10 @@ if (empty($resHook)) {
     }
 
     // Actions builddoc, forcebuilddoc, remove_file
-    require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
+    require_once dol_buildpath('/saturne/core/tpl/documents/documents_action.tpl.php');
 
     // Action to generate pdf from odt file
-    require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
+    require_once dol_buildpath('/saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php');
 
     // Actions to send emails
     $triggersendname     = 'RISKASSESSMENTDOCUMENT_SENTBYMAIL';
@@ -344,22 +344,10 @@ if ($object->id > 0) {
     print '</form>';
 
     if ($action != 'presend') {
-        print '<div class="fichecenter"><div class="fichehalfleft">';
         $fileDir   = $upload_dir . '/' . $document->element;
         $urlSource =  $_SERVER['PHP_SELF'] .'?id=' . $object->id;
 
         print saturne_show_documents($object->module . ':RiskAssessmentDocument', $document->element, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, '', '', '', $langs->defaultlang, '', $object);
-
-        print '</div><div class="fichehalfright">';
-
-        $moreHtmlCenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=DigiriskDolibarr&object_type=' . $object->element . '&show_nav=0&handle_photo=true');
-
-        // List of actions on element
-        require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
-        $formActions = new FormActions($db);
-        $formActions->showactions($object, $object->element . '@' . $object->module, 0, 1, '', 10, '', $moreHtmlCenter);
-
-        print '</div></div>';
     }
 
     // Select mail models is same action as presend

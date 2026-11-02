@@ -40,8 +40,8 @@ require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
-require_once __DIR__ . '/../../../saturne/lib/medias.lib.php';
+dol_include_once('/saturne/class/saturnesignature.class.php');
+dol_include_once('/saturne/lib/medias.lib.php');
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/preventionplan.class.php';
@@ -200,6 +200,9 @@ if (!$isEdit) {
 /*
  * Actions
  */
+
+// Toutes les actions de cet ecran modifient des donnees : jeton anti-CSRF exige, quel que soit le reglage
+digiriskMobileCheckToken($action);
 
 // Photo taken or removed on a risk block: the Saturne media block posts here and expects the
 // refreshed block as a response. Only the temporary directory of this form session is writable.
@@ -610,7 +613,7 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                 $db->commit();
 
                 // Save schedules
-                require_once __DIR__ . '/../../../saturne/class/saturneschedules.class.php';
+                dol_include_once('/saturne/class/saturneschedules.class.php');
                 $saturneSchedules = new SaturneSchedules($db);
                 $saturneSchedules->fetch(0, '', ' AND element_type = "preventionplan" AND element_id = ' . $object->id . ' AND status = 1');
                 $saturneSchedules->element_type = 'preventionplan';
@@ -729,7 +732,7 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                 }
 
                 // Save schedules
-                require_once __DIR__ . '/../../../saturne/class/saturneschedules.class.php';
+                dol_include_once('/saturne/class/saturneschedules.class.php');
                 $saturneSchedules = new SaturneSchedules($db);
                 $saturneSchedules->element_type = 'preventionplan';
                 $saturneSchedules->element_id = $object->id;
@@ -809,10 +812,13 @@ if ($action == 'lock_mobile' && $permissiontoadd) {
     $lockPlan = new PreventionPlan($db);
     
     if ($planId > 0 && $lockPlan->fetch($planId) > 0) {
-        $lockPlan->setLocked($user, false);
-        digiriskRefreshPreventionPlanDocument($db, (int) $lockPlan->id, $user, $langs, true);
+        if ($lockPlan->setLocked($user) > 0) {
+            digiriskRefreshPreventionPlanDocument($db, (int) $lockPlan->id, $user, $langs, true);
+        } else {
+            setEventMessages($lockPlan->error, $lockPlan->errors, 'errors');
+        }
     }
-    
+
     header('Location: ' . $_SERVER['PHP_SELF'] . '?created=' . $planId);
     exit;
 }

@@ -83,6 +83,7 @@ class doc_groupmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
 
         // Load DigiriskDolibarr libraries
         require_once __DIR__ . '/../../../../../class/digiriskresources.class.php';
+        require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_ticket.lib.php';
 
         $digiriskResources = new DigiriskResources($this->db);
         $userTmp           = new User($this->db);
@@ -101,19 +102,8 @@ class doc_groupmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
             $tmpArray['photo'] = DOL_DOCUMENT_ROOT . $noPhoto;
         }
 
-        // Get QRCode to public interface
-        if (isModEnabled('multicompany')) {
-            $qrCodePath = DOL_DATA_ROOT . '/digiriskdolibarr/multicompany/ticketqrcode/';
-        } else {
-            $qrCodePath = $conf->digiriskdolibarr->multidir_output[$conf->entity ?: 1] . '/ticketqrcode/';
-        }
-        $QRCodeList = dol_dir_list($qrCodePath);
-        if (is_array($QRCodeList) && !empty($QRCodeList)) {
-            $QRCode          = array_shift($QRCodeList);
-            $QRCodeImagePath = $QRCode['fullname'];
-        } else {
-            $QRCodeImagePath = ''; // @todo gerer le cas avec le nouveau fonctionnel des liens externes
-        }
+        // Public ticket interface: its QR code is drawn for each document, from the address configured now
+        $ticketPublicInterfaceUrl = digiriskdolibarr_ticket_public_interface_url();
 
         $responsibleId = $digiriskResources->getSecurityResponsibleId();
         if ($responsibleId > 0) {
@@ -121,8 +111,9 @@ class doc_groupmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
         }
 
         // @todo The keyword "signature" is needed because we want the image to be cropped to fit in the table
-        $tmpArray['helpUrl']               = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php';
-        $tmpArray['signatureQRCodeTicket'] = $QRCodeImagePath;
+        // The address printed above the QR code goes without its scheme, as on the sheet shown in the risk assessment document
+        $tmpArray['helpUrl']               = preg_replace('#^https?://#i', '', $ticketPublicInterfaceUrl);
+        $tmpArray['signatureQRCodeTicket'] = digiriskdolibarr_ticket_qrcode_file($ticketPublicInterfaceUrl);
         $tmpArray['securityResponsible']   = $userTmp->id > 0 ? dol_strtoupper($userTmp->lastname) . ' ' . ucfirst($userTmp->firstname) : '';
 
         $moreParam['tmparray'] = $tmpArray;

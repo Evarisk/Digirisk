@@ -55,6 +55,9 @@ $navCurrentPage = basename($_SERVER['PHP_SELF']);
      data-max-favorites="<?php print DIGIRISKDOLIBARR_PWA_NAV_MAX_FAVORITES; ?>"
      data-add-favorite-label="<?php print dol_escape_htmltag($langs->trans('PwaNavAddFavorite')); ?>"
      data-remove-favorite-label="<?php print dol_escape_htmltag($langs->trans('PwaNavRemoveFavorite')); ?>">
+    <?php // Jeton anti-CSRF des appels AJAX (favoris, renvoi du mail) : saturne.toolbox.getToken() le lit dans un champ,
+    // or l'accueil, les listes et l'ecran de succes du permis de feu n'ont aucun formulaire ?>
+    <input type="hidden" name="token" value="<?php print newToken(); ?>">
     <div class="digirisk-pwa-nav-drawer__header">
         <span class="digirisk-pwa-nav-drawer__title"><?php print $langs->trans('PwaNavMenu'); ?></span>
         <span class="digirisk-pwa-nav-drawer__hint"><i class="fas fa-star"></i> <?php print $langs->trans('PwaNavFavoritesHint', DIGIRISKDOLIBARR_PWA_NAV_MAX_FAVORITES); ?></span>

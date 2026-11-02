@@ -25,6 +25,7 @@
  *   $langs, $now
  *   $roundsCanRecord   bool            False when the reader may only follow the surveillance
  *   $roundsDefaultName string          Name of the watcher filled in the forms, empty to let them type it
+ *   $roundsCloseUrl    string          Optional: where the reader closes the permit once every round is done (application only)
  *   $object          FirePermit (locked)
  *   $societyName     string
  *   $workLocation    string
@@ -105,7 +106,7 @@ foreach ($rounds as $round) {
     <?php if (empty($object->date_work_end)) { ?>
         <div class="digirisk-firewatch__card">
             <div class="digirisk-firewatch__section-title"><i class="fas fa-hard-hat"></i> <?php print $langs->trans('FireWatchWorkInProgress'); ?></div>
-            <p class="digirisk-firewatch__muted"><?php print $langs->trans('FireWatchIntro', implode(', ', array_map('digiriskFirePermitFormatDelay', digiriskFirePermitGetRoundDelays()))); ?></p>
+            <p class="digirisk-firewatch__muted"><?php print $langs->trans('FireWatchIntro', implode(', ', array_map('digiriskFirePermitRoundDelayLabel', digiriskFirePermitGetRoundDelays()))); ?></p>
 
             <?php if ($roundsCanRecord) { ?>
             <form method="POST" action="<?php print dol_escape_htmltag($permitUrl($object->id)); ?>" class="digirisk-firewatch__form">
@@ -143,7 +144,7 @@ foreach ($rounds as $round) {
                         <div class="digirisk-firewatch__round-head">
                             <span class="digirisk-firewatch__round-name">
                                 <?php print $langs->trans('FireWatchRoundNumber', $round->position); ?>
-                                <span class="digirisk-firewatch__muted">+<?php print digiriskFirePermitFormatDelay((int) $round->delay_minutes); ?></span>
+                                <span class="digirisk-firewatch__muted"><?php print dol_escape_htmltag(digiriskFirePermitRoundDelayLabel((int) $round->delay_minutes)); ?></span>
                             </span>
                             <span class="digirisk-firewatch__badge digirisk-firewatch__badge--<?php print $roundState; ?>"><?php print $langs->trans($roundStateLabels[$roundState]); ?></span>
                         </div>
@@ -168,7 +169,11 @@ foreach ($rounds as $round) {
             </ol>
 
             <?php if ($doneCount === count($rounds)) { ?>
-                <div class="digirisk-firewatch__banner digirisk-firewatch__banner--success"><i class="fas fa-shield-alt"></i> <?php print $langs->trans('FireWatchAllRoundsDoneHelp'); ?></div>
+                <!-- Closing the permit is never automatic: someone in charge asks for it, from the application -->
+                <div class="digirisk-firewatch__banner digirisk-firewatch__banner--success"><i class="fas fa-shield-alt"></i> <?php print $langs->trans(!empty($roundsCloseUrl) ? 'FireWatchAllRoundsDoneHelp' : 'FireWatchAllRoundsDonePublic'); ?></div>
+                <?php if (!empty($roundsCloseUrl)) { ?>
+                    <a class="digirisk-firewatch__submit" href="<?php print dol_escape_htmltag($roundsCloseUrl); ?>"><i class="fas fa-archive"></i> <?php print $langs->trans('FireWatchClosePermit'); ?></a>
+                <?php } ?>
             <?php } elseif ($roundToRecord === null) { ?>
                 <div class="digirisk-firewatch__banner"><i class="far fa-clock"></i> <?php print $langs->trans('FireWatchNextRoundLater'); ?></div>
             <?php } ?>

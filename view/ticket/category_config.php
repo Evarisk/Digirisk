@@ -37,6 +37,9 @@ require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formmail.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 
+// load DigiriskDolibarr libraries
+require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
+
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -148,7 +151,7 @@ if (empty($resHook)) {
 
         if (empty($label) || empty($type)) {
             setEventMessages($langs->transnoentities('ErrorFieldRequired'), [], 'errors');
-            header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&type=ticket&action=createExtra');
+            header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&type=ticket&action=createExtra&token=' . newToken());
             exit;
         }
 
@@ -275,7 +278,7 @@ print '</td><td class="center">';
 $formMail->fetchAllEMailTemplate('ticket_send', $user, $langs);
 $emailTemplateLabels = [];
 foreach ($formMail->lines_model as $emailTemplateLine) {
-    $emailTemplateLabels[$emailTemplateLine->id] = $emailTemplateLine->label;
+    $emailTemplateLabels[$emailTemplateLine->id] = digiriskdolibarr_mail_template_label((string) $emailTemplateLine->label);
 }
 if (!empty($emailTemplateLabels)) {
     print Form::selectarray('mail_template', $emailTemplateLabels, $ticketCategoryConfig->mail_template ?? '', 1);
@@ -357,7 +360,7 @@ print '</div>';
 if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
     if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
         if ($action != 'createExtra') {
-            $createExtraUrl = $_SERVER['PHP_SELF'] . '?id=' . $id . '&type=ticket&action=createExtra';
+            $createExtraUrl = $_SERVER['PHP_SELF'] . '?id=' . $id . '&type=ticket&action=createExtra&token=' . newToken();
             print '<div class="tabsAction">';
             print '<a class="butAction" href="' . dol_sanitizeUrl($createExtraUrl) . '">' . img_picto('', 'add', 'class="paddingright"') . $langs->transnoentities('AddExtraField') . '</a>';
             print '</div>';

@@ -50,7 +50,7 @@ if (!$fpFireWatchStarted) {
     </div>
 
     <?php if (!$fpFireWatchStarted) { ?>
-        <div class="digirisk-mobile-firewatch__text"><?php print $langs->trans('FireWatchIntro', implode(', ', array_map('digiriskFirePermitFormatDelay', digiriskFirePermitGetRoundDelays()))); ?></div>
+        <div class="digirisk-mobile-firewatch__text"><?php print $langs->trans('FireWatchIntro', implode(', ', array_map('digiriskFirePermitRoundDelayLabel', digiriskFirePermitGetRoundDelays()))); ?></div>
     <?php } else { ?>
         <ul class="digirisk-mobile-firewatch__facts">
             <li><i class="fas fa-flag-checkered"></i> <span><?php print $langs->trans('FireWatchWorkEnd'); ?> :</span> <strong><?php print dol_print_date($object->date_work_end, 'dayhour', 'tzuserrel'); ?></strong></li>

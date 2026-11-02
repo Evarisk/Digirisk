@@ -46,6 +46,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/ticket.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/security.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/payments.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/public.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
@@ -54,10 +55,11 @@ require_once DOL_DOCUMENT_ROOT . '/core/modules/ticket/mod_ticket_simple.php';
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_media.lib.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+dol_include_once('/saturne/class/saturnesignature.class.php');
 
 global $conf, $db, $hookmanager, $langs, $mc, $user;
 
@@ -67,11 +69,6 @@ saturne_load_langs(['companies', 'other', 'mails', 'ticket']);
 // Get parameters
 $action      = GETPOST('action', 'aZ09');
 $entity      = !isModEnabled('multicompany') ? $conf->entity : GETPOSTINT('entity');
-$ticketTmpId = GETPOST('ticket_id');
-
-if ( ! dol_strlen($ticketTmpId)) {
-	$ticketTmpId = generate_random_id(16);
-}
 
 // Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
 $hookmanager->initHooks(['publicticket', 'saturnepublicinterface']);
@@ -103,6 +100,25 @@ if ($entity > 0) {
     $upload_dir = $conf->categorie->multidir_output[isset($entity) ? $entity : 1];
 }
 
+// Read once the entity is loaded: closed, the interface processes no action and its view only says so
+$publicInterfaceOpen = $entity <= 0 || getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE');
+
+// With a PIN code set for the entity, nothing but its check is processed until the session typed it (#5549)
+$publicPinUnlocked = $entity <= 0 || digiriskdolibarr_ticket_public_pin_unlocked($entity);
+$publicPinError    = '';
+if ($publicInterfaceOpen && !$publicPinUnlocked && $action === 'checkPin') {
+    $pinResult = digiriskdolibarr_ticket_public_pin_check(GETPOST('pin', 'alphanohtml'), $entity);
+    if ($pinResult > 0) {
+        header('Location: ' . $_SERVER['PHP_SELF'] . '?entity=' . $entity);
+        exit;
+    }
+    $publicPinError = $pinResult < 0 ? $langs->trans('TicketPublicInterfacePinLocked', (string) -$pinResult) : $langs->trans('TicketPublicInterfacePinWrong');
+}
+$publicInterfaceUsable = $publicInterfaceOpen && $publicPinUnlocked;
+
+// The medias of the ticket wait there until it is created
+$ticketUploadSubDir = digiriskTicketPublicUploadSubDir();
+
 $moreParams           = [];
 $moreParams['filter'] = ' AND t.show_in_selector = 1';
 $digiriskelement      = $digiriskelement->getActiveDigiriskElements('current', $moreParams);
@@ -111,17 +127,26 @@ $digiriskelement      = $digiriskelement->getActiveDigiriskElements('current', $
  * Actions
  */
 
+// The timezone of the browser, posted then reloaded by every page until the session holds it: kept on a closed
+// interface too, whose page would otherwise reload for ever
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && GETPOSTISSET('tz')) {
+    $_SESSION['dol_tz_string'] = GETPOST('tz');
+    exit;
+}
+
 $parameters = [];
-$resHook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks.
+// Checked by the view alone, a direct POST to a closed interface still created the ticket and stored its medias (#5569)
+$resHook    = $publicInterfaceUsable ? $hookmanager->executeHooks('doActions', $parameters, $object, $action) : 0; // Note that $action and $object may have been modified by some hooks.
 if ($resHook < 0) {
     setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 }
 
-if (empty($resHook)) {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && GETPOSTISSET('tz')) {
-        $_SESSION['dol_tz_string'] = GETPOST('tz');
-        exit;
+if (empty($resHook) && $publicInterfaceUsable) {
+    // Media of the ticket shown, sent or removed by its media block
+    if ($action == 'showMedia') {
+        digiriskTicketPublicShowMedia($ticketUploadSubDir);
     }
+    digiriskTicketPublicMediaActions($action, $ticketUploadSubDir);
 
     if ($action == 'add') {
         $error = 0;
@@ -130,7 +155,6 @@ if (empty($resHook)) {
         $subCategoryId    = GETPOST('subCategory');
 
         $message        = GETPOST('message');
-        $ticketTmpId  = GETPOST('ticket_id');
 
         $mainCategoryObject              = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
         $mainCategoryExtrafields         = json_decode($mainCategoryObject[0]->array_options['options_ticket_category_config'] ?? '', true);
@@ -226,16 +250,17 @@ if (empty($resHook)) {
             }
         }
 
-        $regEmail = '/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/';
-        if (preg_match($regEmail, $email) || empty($email)) {
+        // The check of the core: the former pattern refused a "+" and any extension longer than 4 letters (.paris) (#5609)
+        if (empty($email) || isValidEmail($email)) {
             $object->origin_email = $email;
         } else {
             setEventMessages($langs->trans('ErrorFieldEmail'), array(), 'errors');
             $error++;
         }
 
-        $regPhone = '/^(?:(?:(?:\+|00)\d{2}[\s]?(?:\(0\)[\s]?)?)|0){1}[1-9]{1}([\s.-]?)(?:\d{2}\1?){3}\d{2}$/';
-        if (!preg_match($regPhone, $phone) && !empty($phone)) {
+        // Any country, not only the French numbering (#5622): once the usual separators are dropped, 6 to 15 digits
+        // (E.164) with an optional "+" or "00". isValidPhone() of the core cannot help, it always says yes
+        if (!empty($phone) && !preg_match('/^(\+|00)?\d{6,15}$/', preg_replace('/[\s.\-\/()]/', '', $phone))) {
             setEventMessages($langs->trans('ErrorFieldPhone'), array(), 'errors');
             $error++;
         }
@@ -281,6 +306,8 @@ if (empty($resHook)) {
         $object->severity_label = $label_severity;
 
         $object->message = html_entity_decode($message);
+        // The form asks for no subject: the start of the message stands for it in lists and selectors (#5588)
+        $object->subject = digiriskdolibarr_ticket_subject_from_message($object->message);
 
         $object->fk_project = $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT;
 
@@ -304,9 +331,17 @@ if (empty($resHook)) {
                 $action = '';
             }
         }
+
+        // As the public pages of the core (#5623): the IP is kept on the ticket, and the declarations of one IP are
+        // capped by the same constant, a robot could otherwise create tickets and their notification mails endlessly
+        $object->ip = getUserRemoteIP();
+        $langs->load('errors');
+        if (empty($error) && checkNbPostsForASpeceificIp($object, getDolGlobalInt('MAIN_SECURITY_MAX_POST_ON_PUBLIC_PAGES_BY_IP_ADDRESS', 200)) <= 0) {
+            setEventMessages('', $object->errors, 'errors');
+            $error++;
+        }
+
         if (empty($error)) {
-            // Flag the object so the TICKET_CREATE trigger knows this ticket comes from the DigiRisk public interface
-            $object->context['digiriskdolibarrpublicinterface'] = 1;
             $result = $object->create($user);
             $object->fetch($result);
             $track_id = $object->track_id;
@@ -323,10 +358,10 @@ if (empty($resHook)) {
                     $subCategoryCat->add_type($object, Categorie::TYPE_TICKET);
                 }
 
-                //Add files linked
-                $ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp';
-                $fileList          = dol_dir_list($ticket_upload_dir . '/ticket/' . $ticketTmpId . '/');
-                $thumbsList        = dol_dir_list($ticket_upload_dir . '/ticket/' . $ticketTmpId . '/thumbs/');
+                // Photos and voice notes of the media block, waiting in the temporary folder of the session
+                $ticket_upload_dir = $conf->digiriskdolibarr->dir_output . '/' . $ticketUploadSubDir;
+                $fileList          = dol_dir_list($ticket_upload_dir . '/');
+                $thumbsList        = dol_dir_list($ticket_upload_dir . '/thumbs/');
                 $ticketDirPath     = $conf->ticket->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/';
                 $fullTicketPath    = $ticketDirPath . $object->ref . '/';
                 $thumbsTicketPath  = $ticketDirPath . $object->ref . '/thumbs/';
@@ -380,92 +415,13 @@ if (empty($resHook)) {
                 $object->call_trigger('TICKET_PUBLIC_INTERFACE_CREATE', $user);
 
                 // Creation OK
-                dol_delete_dir_recursive($ticket_upload_dir . '/ticket/' . $ticketTmpId . '/');
+                saturne_invalidate_upload_token(digiriskTicketPublicUploadContext(), 'digiriskdolibarr', 'temp/ticket');
                 $urltogo = $_SERVER['PHP_SELF'] . '/../ticket_success.php?track_id=' . $track_id;
                 setEventMessages($langs->trans('TicketSent') . ' ' . getNomUrlTicketPublic($object), null);
                 header("Location: " . $urltogo);
                 exit;
             }
         }
-    }
-
-    // Add file in ticket form
-    if ($action == 'sendfile') {
-        include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-
-        $ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp';
-        if ( ! is_dir($ticket_upload_dir)) {
-            dol_mkdir($ticket_upload_dir);
-        }
-        if ( ! is_dir($ticket_upload_dir . '/ticket')) {
-            dol_mkdir($ticket_upload_dir . '/ticket');
-        }
-        $fullTicketTmpPath = $ticket_upload_dir . '/ticket/' . $ticketTmpId . '/';
-        dol_mkdir($fullTicketTmpPath);
-
-        for ($k = 0; $k < count($_FILES['files']['name']); $k++) {
-            if (($_FILES['files']['name'][$k] != "")) {
-                // Where the file is going to be stored
-
-                if (!empty($_FILES['files']['error'][$k])) {
-                    if ($_FILES['files']['error'][$k] == 1 || $_FILES['files']['error'][$k] == 2) { // UPLOAD_ERR_INI_SIZE
-                        echo '<input type="hidden" class="file-error" value="' . $langs->trans('ErrorFileSizeTooLarge') . '">';
-                    }
-                }
-
-                $target_dir        = $fullTicketTmpPath;
-                $file              = $_FILES['files']['name'][$k];
-                $path              = pathinfo($file);
-                // remove spaces, apostrophes, quotes and parentheses in filename
-                $filename          = preg_replace('/[\s\'"()]/', '_', $path['filename']);
-                $ext               = $path['extension'];
-                $temp_name         = $_FILES['files']['tmp_name'][$k];
-                $path_filename_ext = $target_dir . $filename . "." . $ext;
-
-                $path_filename_ext = str_replace('\\', '/', $path_filename_ext);
-
-                if (file_exists($path_filename_ext)) {
-                    echo "Sorry, file already exists.";
-                } else {
-                    move_uploaded_file($temp_name, $path_filename_ext);
-                    global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
-
-                    // Create thumbs
-                    $imgThumbLarge = vignette($path_filename_ext, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE, '_large');
-                    $imgThumbMedium = vignette($path_filename_ext, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM, '_medium');
-                    $imgThumbSmall = vignette($path_filename_ext, $maxwidthsmall, $maxheightsmall, '_small');
-                    // Create mini thumbs for image (Ratio is near 16/9)
-                    $imgThumbMini = vignette($path_filename_ext, 30, 30, '_mini');
-                }
-            }
-        }
-    }
-    // Remove file
-    if ($action == 'removefile') {
-        include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-        $filetodelete = GETPOST('filetodelete');
-
-        $ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp';
-        //Add files linked
-        $ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp/ticket/' . $ticketTmpId . '/';
-        $fileList          = dol_dir_list($ticket_upload_dir);
-
-        if (is_file($ticket_upload_dir . $filetodelete)) {
-            //Delete file
-            dol_delete_file($ticket_upload_dir . $filetodelete);
-
-            //Delete file thumbs
-            $thumbs_names = getAllThumbsNames($filename);
-            if (!empty($thumbs_names)) {
-                foreach($thumbs_names as $thumb_name) {
-                    $thumb_fullname  = $ticket_upload_dir . 'thumbs/' . $thumb_name;
-                    if (file_exists($thumb_fullname)) {
-                        unlink($thumb_fullname);
-                    }
-                }
-            }
-        }
-        $action = '';
     }
 }
 
@@ -479,7 +435,7 @@ $moreJS = ['/saturne/js/includes/signature-pad.min.js'];
 $conf->dol_hide_topmenu  = 1;
 $conf->dol_hide_leftmenu = 1;
 
-saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card page-signature'); ?>
+saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card page-public-ticket page-signature'); ?>
 
 <script>
     $(document).ready(function() {
@@ -489,11 +445,37 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 </script>
 
 <?php if ($entity > 0) {
-	if ( ! $conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE) {
+	if (!$publicInterfaceOpen) {
 		print '<div class="error">' . $langs->trans('TicketPublicInterfaceForbidden') . '</div>';
 		$db->close();
 		exit();
 	}
+
+	// The PIN code of the entity is asked before the declaration form (#5549)
+	if (!$publicPinUnlocked) {
+		print '<div class="ticketpublicarea digirisk-page-container public-ticket-pin">';
+		print load_fiche_titre($langs->trans('CreateTicket'), '', 'digiriskdolibarr_color@digiriskdolibarr');
+		print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?entity=' . $entity . '" class="public-ticket-pin__form">';
+		print '<input type="hidden" name="token" value="' . newToken() . '">';
+		print '<input type="hidden" name="action" value="checkPin">';
+		print '<input type="hidden" name="entity" value="' . $entity . '">';
+		print '<label for="public-ticket-pin" class="public-ticket-pin__prompt">' . $langs->trans('TicketPublicInterfacePinPrompt') . '</label>';
+		if ($publicPinError !== '') {
+			print '<div class="error public-ticket-pin__error">' . dol_escape_htmltag($publicPinError) . '</div>';
+		}
+		print '<input type="password" id="public-ticket-pin" name="pin" class="public-ticket-pin__input" inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="off" autofocus required>';
+		print '<button type="submit" class="wpeo-button public-ticket-pin__submit"><i class="fas fa-unlock pictofixedwidth"></i>' . $langs->trans('Validate') . '</button>';
+		print '</form>';
+		print '</div>';
+
+		llxFooter('', 'public');
+		$db->close();
+		exit;
+	}
+
+	// A photo picked in the media block opens in the editor first. The editor binds itself to its modal
+	// once, when the page loads: the modal stays out of the container a category choice reloads
+	include dol_buildpath('/saturne/core/tpl/medias/photo_editor_modal.tpl.php');
 
 	print '<div class="ticketpublicarea digirisk-page-container">';
 
@@ -505,7 +487,6 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 	print '<input type="hidden" name="entity" value="'. $entity .'">';
 	print '<input type="hidden" id="parentCategory" name="parentCategory" value="' . GETPOST('parentCategory') . '">';
 	print '<input type="hidden" id="subCategory" name="subCategory" value="' . GETPOST('subCategory') . '">';
-	print '<input type="hidden" id="ticket_id" name="ticket_id" value="' . $ticketTmpId . '">';
 	print '<input type="hidden" name="id" value="' . $object->id . '">';
 
 	print dol_get_fiche_head(array(), '0', '', 1);
@@ -697,58 +678,28 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
                             $out .= '<textarea name="message" id="message" required>' . GETPOST('message') . '</textarea>';
 							break;
 						case 'photo':
-                            $out .= <<<HTML
-                                <div class="wpeo-gridlayout grid-2">
-                                    <span class="form-label">{$langs->trans("FilesLinked")}</span>
-                                    <label class="wpeo-button button-blue" for="sendfile">
-                                        <i class="fas fa-image button-icon"></i>
-                                        <span class="button-label">{$langs->trans('AddDocument')}</span>
-                                        <input type="file" name="userfile[]" multiple="multiple" id="sendfile" onchange="window.digiriskdolibarr.ticket.tmpStockFile()"  style="display: none"/>
-                                    </label>
-                                </div>
-                            HTML;
-							$out .= '<div id="sendFileForm">';
-							$out .= '<div id="fileLinkedTable" class="tableforinputfields">';
-							$out .= '<div class="wpeo-table table-flex table-3 files-uploaded">';
-							$fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp/ticket/' . $ticketTmpId . '/thumbs/');
-							if (!empty($fileLinkedList)) {
-								foreach ($fileLinkedList as $fileLinked) {
-									if (!preg_match('/mini/', $fileLinked['name'])) {
-										continue;
-									}
-									$out .= '<div class="table-row">';
-									$out .= '<div class="table-cell table-50 table-padding-0">';
-									$out .= '<img class="photo"  width="' . $maxHeight . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/temp/ticket/' . $ticketTmpId . '/thumbs/' . $fileLinked['name']) . '" title="' . dol_escape_htmltag($alt) . '">';
-									$out .= '</div>';
-									$out .= '<div class="table-cell">';
-									$out .= preg_replace('/_mini/', '', $fileLinked['name']);
-									$out .= '</div>';
-									$out .= '<div class="table-cell table-50 table-end table-padding-0">';
-									$out .= '<div class="linked-file-delete wpeo-button button-square-50 button-transparent" value="' . $fileLinked['name'] . '"><i class="fas fa-trash button-icon"></i></div>';
-									$out .= '</div></div>';
-								}
-							} else {
-								$out .= '<div class="table-row">';
-								$out .= '<div class="table-cell">' . $langs->trans('NoFileLinked') . '</div></div>';
-							}
-							$out .= '</div></div></div>';
+							// Photos and voice notes, sent as soon as they are picked or recorded
+							$out .= '<span class="form-label">' . $langs->trans('FilesLinked') . '</span>';
+							$out .= '<div class="ticket-media-block">' . digiriskTicketPublicMediaBlock($ticketUploadSubDir) . '</div>';
 							break;
 						case 'digiriskdolibarr_ticket_email':
 							$out .= '<input type="' . $fields[$key]['type'] . '" name="' . ($fields[$key]['name'] ?? 'options_' . $key) . '" id="' . ($fields[$key]['name'] ?? 'options_' . $key) . '" value="' . GETPOST($fields[$key]['name'] ?? 'options_' . $key) . '"' . ($required ? 'required' : '') . '/>';
 							break;
                         case 'digiriskdolibarr_ticket_service':
+                            // Kept like the other fields when a refused declaration shows the form again (#5626)
+                            $postedService = GETPOSTINT('options_' . $key) > 0 ? GETPOSTINT('options_' . $key) : '';
                             if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT') == 1) {
                                 $digiriskelementlabel = [];
                                 foreach ($digiriskelement as $element) {
                                     $digiriskelementlabel[$element->id] = $element->label;
                                 }
-                                $out .= Form::selectarray('options_' . $key, $digiriskelementlabel, '', 1);
+                                $out .= Form::selectarray('options_' . $key, $digiriskelementlabel, $postedService, 1);
                             } else {
                                 $digiriskelementlabel = [];
                                 foreach ($digiriskelement as $element) {
                                     $digiriskelementlabel[$element->id] = $element->ref . ' - ' . $element->label;
                                 }
-                                $out .= Form::selectarray('options_' . $key, $digiriskelementlabel, '', 1);
+                                $out .= Form::selectarray('options_' . $key, $digiriskelementlabel, $postedService, 1);
                             }
                             break;
                         case 'digiriskdolibarr_ticket_location':
@@ -801,6 +752,7 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 					print($out);
 				}
             print '</div>';
+
             if (!empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
                 require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
                 print '<div class="center"><label for="email"><span class="fieldrequired">' . $langs->trans("SecurityCode") . '</span><span style="color:red"> *</span></label>';
@@ -834,16 +786,17 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
             }
 
             // Load Saturne libraries
-            require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
-            require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+            dol_include_once('/saturne/lib/saturne_functions.lib.php');
+            dol_include_once('/saturne/class/saturnesignature.class.php');
 
             $signatory = new SaturneSignature($db, $moduleNameLowerCase, $object->element);
 
             $previousStatus        = $object->status;
             $object->status        = $object::STATUS_READ; // Special case because public answer need draft status object to complete question
             $moreParams['moreCSS'] = 'hidden';             // Needed for prevent click on signature button action
+            $objectType            = $object->element;     // The signature template locates the object document with it
             print '<div style="margin-top: 2em;">';
-            require_once __DIR__ . '/../../../saturne/core/tpl/signature/public_signature_view.tpl.php';
+            require_once dol_buildpath('/saturne/core/tpl/signature/public_signature_view.tpl.php');
             print '</div>';
             $object->status = $previousStatus;
             print '<input type="hidden" name="signature" value="">';

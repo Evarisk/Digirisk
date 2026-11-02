@@ -355,11 +355,18 @@ li.route {
 
     .chevron {
       width: 24px;
+      /* Full row height, padding included: a click a bit above or below the arrow still toggles */
+      align-self: stretch;
+      margin: -8px 0;
       cursor: pointer;
       color: #666;
       display: flex;
       align-items: center;
       justify-content: center;
+
+      &:has(.chevron-empty) {
+        cursor: default;
+      }
 
       .chevron-empty {
         color: #d0d0d0;

@@ -90,7 +90,7 @@ if ($action == "save" && empty($cancel)) {
 }
 
 // Actions set_mod, update_mask and the set_/del_ switch of the module constants
-require_once __DIR__ . '/../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
+require_once dol_buildpath('/saturne/core/tpl/actions/admin_conf_actions.tpl.php');
 
 /*
  * View
@@ -156,7 +156,7 @@ print '</tr>';
 
 print '<tr class="liste_titre">';
 print '<th class="liste_titre" colspan="2">'.$langs->trans("DigiriskActionsEvents").'</th>';
-print '<th class="liste_titre"><a href="'.$_SERVER["PHP_SELF"].'?action=selectall&search_event='. urlencode($searchEvent) . '">'.$langs->trans("All").'</a>/<a href="'.$_SERVER["PHP_SELF"].'?action=selectnone'.($param ? $param : '').'">'.$langs->trans("None").'</a></th>';
+print '<th class="liste_titre"><a href="'.$_SERVER["PHP_SELF"].'?action=selectall&token='.newToken().'&search_event='. urlencode($searchEvent) . '">'.$langs->trans("All").'</a>/<a href="'.$_SERVER["PHP_SELF"].'?action=selectnone&token='.newToken().($param ? $param : '').'">'.$langs->trans("None").'</a></th>';
 print '</tr>';
 
 // Show each trigger (list is in c_digiriskdolibarr_action_trigger)

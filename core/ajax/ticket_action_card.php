@@ -89,7 +89,7 @@ if ($ticketId <= 0 || empty($action)) {
 
 $object = new Ticket($db);
 if ($object->fetch($ticketId) <= 0 || $object->id <= 0) {
-    respond(false, $langs->transnoentities('RecordNotFound'));
+    respond(false, $langs->transnoentities('ErrorRecordNotFound'));
 }
 
 /**
@@ -474,7 +474,7 @@ switch ($action) {
         $real      = realpath($target);
         $realDir   = realpath($uploadDir);
         if (!$real || !$realDir || strpos($real, $realDir . DIRECTORY_SEPARATOR) !== 0) {
-            respond(false, $langs->transnoentities('RecordNotFound'));
+            respond(false, $langs->transnoentities('ErrorRecordNotFound'));
         }
         $ok = dol_delete_file($real, 0, 0, 0, $object);
         if (!$ok) {
@@ -495,13 +495,13 @@ switch ($action) {
         require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
         $catObj = new Categorie($db);
         if ($catObj->fetch($categoryId) <= 0) {
-            respond(false, $langs->transnoentities('RecordNotFound'));
+            respond(false, $langs->transnoentities('ErrorRecordNotFound'));
         }
         // After fetch(), $catObj->type is the integer code from llx_categorie.type (12 for ticket).
         // MAP_ID translates the symbolic name to that int — robust against future renumbering.
         $expectedTicketTypeId = (int) ($catObj->MAP_ID['ticket'] ?? 12);
         if ((int) $catObj->type !== $expectedTicketTypeId) {
-            respond(false, $langs->transnoentities('RecordNotFound'));
+            respond(false, $langs->transnoentities('ErrorRecordNotFound'));
         }
         if ($action === 'add_category') {
             $res = $catObj->add_type($object, 'ticket');

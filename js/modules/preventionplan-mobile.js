@@ -57,8 +57,9 @@ window.digiriskdolibarr.preventionplanmobile.init = function() {
     // document: bind only when the prevention plan form or success screen is the one on screen.
     var form = $('.digirisk-mobile-form--preventionplan');
     var successBlock = $('.digirisk-mobile-extsign--preventionplan');
-    // A plan locked from Dolibarr may have no exterior signatory block, it can still be archived here
-    var archiveModal = $('.digirisk-mobile-archive-modal');
+    // A plan locked from Dolibarr may have no exterior signatory block, it can still be archived here.
+    // The fire permit success screen has its own archive modal, handled by its own module
+    var archiveModal = $('.digirisk-mobile-archive-modal--preventionplan');
 
     if (!form.length && !successBlock.length && !archiveModal.length) {
         return;

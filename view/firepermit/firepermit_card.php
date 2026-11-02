@@ -36,7 +36,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.formprojet.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 // Load Saturne libraries.
-require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+dol_include_once('/saturne/class/saturnesignature.class.php');
 
 // Load DigiriskDolibarr libraries.
 require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
@@ -519,13 +519,13 @@ if (empty($reshook)) {
 	}
 
     // Actions set_thirdparty, set_project
-    require_once __DIR__ . '/../../../saturne/core/tpl/actions/banner_actions.tpl.php';
+    require_once dol_buildpath('/saturne/core/tpl/actions/banner_actions.tpl.php');
 
 	// Actions builddoc, forcebuilddoc, remove_file.
-	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
+	require_once dol_buildpath('/saturne/core/tpl/documents/documents_action.tpl.php');
 
 	// Action to generate pdf from odt file
-	require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
+	require_once dol_buildpath('/saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php');
 
 	// Action to set status STATUS_INPROGRESS
 	if ($action == 'confirm_setInProgress') {
@@ -1450,7 +1450,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					//Actions buttons
 					if ($object->status == 1) {
 						print '<td class="center">';
-						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&action=editline&lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
+						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&action=editline&token=' . newToken() . '&lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
 						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&action=deleteline&lineid=' . $item->id . '&token=' . newToken() . '">';
 						print img_delete();
 						print '</a>';

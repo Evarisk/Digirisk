@@ -1,0 +1,124 @@
+/* Digirisk modern theme: risk lists, assessments, tasks and cotation chips.
+   The cotation colours keep their meaning (grey, yellow, red, black): only the shape changes. */
+
+#{$dr-scope} {
+  /* ---- Cotation chips ---- */
+
+  .risk-evaluation-cotation {
+    border-radius: $dr-radius;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.08);
+
+    &.selected-cotation {
+      box-shadow: 0 0 0 3px rgba(13, 138, 255, 0.35);
+    }
+  }
+
+  /* ---- Assessment and task boxes inside the risk rows ---- */
+
+  td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .standard),
+  .riskassessment-tasks .riskassessment-task-container,
+  .riskassessment-task-container {
+    border: 1px solid $dr-border;
+    border-radius: 12px;
+    background: $dr-surface-soft;
+    padding: 10px;
+  }
+
+  .riskassessment-tasks .riskassessment-task-container + .riskassessment-task-container {
+    margin-top: 8px;
+  }
+
+  .risk-evaluation-container .risk-evaluation-single {
+    gap: 4px;
+
+    .risk-evaluation-reference,
+    .riskassessment-task-reference {
+      font-weight: 700;
+      color: $dr-text;
+    }
+
+    .risk-evaluation-date,
+    .risk-evaluation-author {
+      color: $dr-muted;
+    }
+
+    .risk-evaluation-comment {
+      color: $dr-text;
+    }
+
+    .photo img,
+    .risk-evaluation-photo,
+    .media-container img {
+      border-radius: $dr-radius-sm;
+    }
+  }
+
+  /* "Liste des évaluations (1)" / "Liste des tâches (2)" headers in the rows */
+  .table-cell-header {
+    .table-cell-header-label strong {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: $dr-muted;
+    }
+  }
+
+  .riskassessment-task-data {
+    color: $dr-text-soft;
+
+    .riskassessment-task-reference a {
+      font-weight: 700;
+    }
+  }
+
+  .riskassessment-task-progress {
+    border-radius: $dr-radius-pill;
+    font-weight: 700;
+  }
+
+  .riskassessment-task-title {
+    color: $dr-text;
+  }
+
+  /* The task dates of the risk modal lay their icon over the field, the budget its currency.
+     The field padding of _forms.scss outranks modal/_risk.scss and took that room back: the
+     icon covered the day. Same selector as _forms.scss, the field classes make it win */
+  .riskassessment-task-field {
+    &.has-icon :is(#{$dr-input-selector}):not(.select2-search__field):not(.form-field):not(.cke_source) {
+      padding-left: 30px;
+    }
+
+    .riskassessment-task-budget:is(#{$dr-input-selector}):not(.select2-search__field):not(.form-field):not(.cke_source) {
+      padding-right: 20px;
+    }
+  }
+
+  .danger-category-pic {
+    border-radius: $dr-radius-sm;
+  }
+
+  /* ---- Risk counters of the banners ---- */
+
+  .banner-risk-badges,
+  .risk-badges {
+    .badge,
+    span[class*="badge"] {
+      border-radius: $dr-radius-sm;
+    }
+  }
+
+  /* Category picker (dropdown grid of the danger categories) */
+  .wpeo-dropdown.category-danger .saturne-dropdown-content,
+  .wpeo-dropdown.dropdown-grid .saturne-dropdown-content {
+    padding: 8px;
+    border-radius: $dr-radius-lg;
+  }
+
+  .wpeo-dropdown.category-danger .item:hover {
+    border-radius: $dr-radius-sm;
+    background: $dr-surface-soft;
+  }
+}

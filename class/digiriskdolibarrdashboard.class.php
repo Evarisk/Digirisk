@@ -76,6 +76,11 @@ class DigiriskDolibarrDashboard
             }
         }
 
+        if (!empty($array['Risk']['widgets']) && isset($array['DigiriskResources'])) {
+            $array['DigiriskResources']['widgets'] = array_merge($array['DigiriskResources']['widgets'] ?? [], $array['Risk']['widgets']);
+            unset($array['Risk']['widgets']);
+        }
+
         return $array;
     }
 

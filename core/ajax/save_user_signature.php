@@ -49,6 +49,9 @@ if (!$user->hasRight('digiriskdolibarr', 'preventionplan', 'write') && !$user->h
 
 $action = GETPOST('action', 'aZ09');
 
+// Jeton anti-CSRF exige, quel que soit le reglage
+digiriskMobileCheckToken($action);
+
 if ($action === 'save') {
     // Read the base64 data URL from the raw body to avoid GETPOST sanitizing the payload.
     $data      = json_decode(file_get_contents('php://input'), true);

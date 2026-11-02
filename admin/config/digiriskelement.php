@@ -59,7 +59,7 @@ saturne_check_access($permissiontoread);
  */
 
 // Actions set_mod, update_mask
-require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
+require_once dol_buildpath('/saturne/core/tpl/actions/admin_conf_actions.tpl.php');
 
 if ($action == 'update') {
     $digiriskElementDepthGraph = GETPOST('DigiriskElementDepthGraph', 'int');
@@ -103,13 +103,13 @@ $object = new Groupment($db);
 print load_fiche_titre($pictos['groupment'] . $langs->trans('GroupmentManagement'), '', '');
 print '<hr>';
 
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php');
 
 $object = new WorkUnit($db);
 
 print load_fiche_titre($pictos['workunit'] . $langs->trans('WorkUnitManagement'), '', '');
 
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php');
 print '<hr>';
 
 print load_fiche_titre($langs->trans('Config'), '', '');
@@ -148,7 +148,7 @@ $constArray[$moduleNameLowerCase] = [
 		'code'        => 'DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT',
 	],
 ];
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_const_view.tpl.php');
 
 // Page end
 print dol_get_fiche_end();

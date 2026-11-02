@@ -56,4 +56,4 @@ $moreParams = [
     'specialModuleNameLowerCase' => 'digirisk'
 ];
 
-require_once __DIR__ . '/../saturne/core/tpl/index/index_view.tpl.php';
+require_once dol_buildpath('/saturne/core/tpl/index/index_view.tpl.php');

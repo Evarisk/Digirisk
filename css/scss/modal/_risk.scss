@@ -21,25 +21,470 @@
   flex-wrap: wrap;
 }
 
-/** The add modal hugs its content: a risk form is far shorter than the 560px of the generic
-    modal, which left a large empty area under the task section. Same treatment as the
-    evaluation modals, and only the content scrolls when the advanced method grid is taller
-    than the window. */
+$risk-add-trail-width: 250px;
+$risk-add-trail-line: rgba(0, 0, 0, 0.1);
+
+/** The add modal is laid out in two columns: the steps trail on the left, the form on the right with the add
+    button in a footer under it. Each step is placed in the content grid on the row of its section, so it stands
+    in front of it, and the line between the columns runs from the header down to the bottom of the modal. The
+    danger picker opened from the first step covers the form column. The modal hugs its form, and only the
+    content scrolls when the advanced method grid is taller than the window. */
 .risk-add-modal .modal-container {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: $risk-add-trail-width minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  max-width: 1100px;
   height: auto;
   max-height: calc(100% - 4em);
 
   .modal-header {
+    grid-column: 1 / -1;
     height: auto;
-    flex: 0 0 auto;
   }
-  /** min-height: 0 lets the flex item shrink below its content so its own overflow-y takes over */
+  /** The content spans both columns: the first column of its own grid is the trail one of the modal */
   .modal-content {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: $risk-add-trail-width minmax(0, 1fr);
+    column-gap: 2em;
+    align-content: start;
     height: auto;
     min-height: 0;
-    flex: 1 1 auto;
+    padding: 1.25em 2em 0.5em 0;
+    background: linear-gradient(to right, transparent $risk-add-trail-width, $risk-add-trail-line $risk-add-trail-width, $risk-add-trail-line $risk-add-trail-width + 1px, transparent $risk-add-trail-width + 1px);
+
+    > * {
+      grid-column: 2;
+    }
+    /** A step goes on the next row, in front of the section that follows it */
+    > .risk-add-step {
+      grid-column: 1;
+    }
+  }
+  /** Both end lines are given: on an absolutely positioned item, an auto end line is the edge of the modal,
+      and the picker would also cover the footer */
+  .risk-add-danger-panel {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+    border-left: 1px solid $risk-add-trail-line;
+  }
+  /** Its left border carries on the line between the columns down to the bottom of the modal */
+  .modal-footer {
+    grid-column: 2;
+    grid-row: 3;
+    height: auto;
+    border-left: 1px solid $risk-add-trail-line;
+
+    .wpeo-button {
+      margin-bottom: 0;
+    }
+  }
+
+  /** Small screens: one column, each step heads its section */
+  @media (max-width: $media__medium) {
+    grid-template-columns: minmax(0, 1fr);
+
+    .modal-content {
+      display: block;
+      padding: 1em 2em 0.5em;
+      background: none;
+    }
+    .risk-add-danger-panel,
+    .modal-footer {
+      grid-column: 1 / -1;
+      border-left: 0;
+    }
+  }
+}
+
+/** A step of the trail, in front of its section: done, current or still to do. The offset lowers the marker to
+    the title of its section, the marker size places the line under it */
+.risk-add-modal .risk-add-step {
+  --risk-add-step-offset: 0px;
+  --risk-add-step-marker: 32px;
+  position: relative;
+  padding: var(--risk-add-step-offset) 16px 1em 20px;
+
+  /** Lines from the step before down to this marker, and from this marker down to the step after: they meet
+      at the edge of the rows, and turn blue once the step they leave is done */
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 41px;
+    width: 2px;
+    border-radius: 1px;
+    background: rgba(0, 0, 0, 0.12);
+    transition: background 0.3s ease-out;
+  }
+  &::before {
+    top: 0;
+    height: max(0px, calc(var(--risk-add-step-offset) - 2px));
+  }
+  &::after {
+    top: calc(var(--risk-add-step-offset) + var(--risk-add-step-marker) + 2px);
+    bottom: 0;
+  }
+  &.previous-done::before,
+  &.done::after {
+    background: $color__primary;
+  }
+  &.risk-add-step-last::after {
+    display: none;
+  }
+
+  /** The task section opens with a margin, a rule and a padding: the step comes down to its title */
+  &[data-step="task"] {
+    --risk-add-step-offset: calc(2em + 1px);
+  }
+
+  .risk-add-step-button {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  /** A done marker is already blue: colouring its icon too would erase the check */
+  &:not(.done) .risk-add-step-button:hover .risk-add-step-marker {
+    border-color: $color__primary;
+    color: $color__primary;
+  }
+
+  /** Markers stand in a 44px column, the width of the danger one, so the line runs through their centres */
+  .risk-add-step-marker {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: var(--risk-add-step-marker);
+    height: var(--risk-add-step-marker);
+    margin: 0 6px;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    background: #fff;
+    color: rgba(0, 0, 0, 0.4);
+    font-size: 13px;
+    transition: all 0.2s ease-out;
+  }
+
+  .risk-add-step-icon-done {
+    display: none;
+  }
+
+  /** min-width: 0 lets a long danger name or task label end in an ellipsis */
+  .risk-add-step-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding-top: 6px;
+  }
+
+  .risk-add-step-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.8);
+    transition: color 0.2s ease-out;
+
+    required {
+      font-size: 16px;
+      line-height: 0.9;
+      color: $color__red;
+      vertical-align: text-top;
+    }
+  }
+
+  .risk-add-step-summary {
+    margin-top: 2px;
+    overflow: hidden;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    /** Same colours as the cotation picked in the form, at the size of a line of text */
+    .risk-evaluation-cotation {
+      display: inline-block;
+      min-width: 0;
+      height: 20px;
+      margin: 2px 0 0;
+      padding: 0 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      line-height: 20px;
+    }
+  }
+
+  &.current {
+    .risk-add-step-marker {
+      border-color: $color__primary;
+      color: $color__primary;
+      box-shadow: 0 0 0 4px rgba($color__primary, 0.15);
+    }
+    .risk-add-step-label {
+      color: $color__primary;
+    }
+  }
+
+  &.done {
+    .risk-add-step-marker {
+      border-color: $color__primary;
+      background: $color__primary;
+      color: #fff;
+      animation: risk-add-step-done 0.3s ease-out;
+    }
+    .risk-add-step-icon-todo {
+      display: none;
+    }
+    .risk-add-step-icon-done {
+      display: inline-block;
+    }
+    .risk-add-step-summary {
+      color: rgba(0, 0, 0, 0.75);
+    }
+  }
+
+  /** First step: the danger is picked here, its pictogram takes the place of the marker once chosen */
+  &.risk-add-step-danger {
+    --risk-add-step-marker: 44px;
+
+    &::before {
+      display: none;
+    }
+
+    .risk-add-step-button {
+      align-items: center;
+    }
+
+    .risk-add-step-marker {
+      margin: 0;
+      overflow: hidden;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    .risk-add-step-danger-pic {
+      display: none;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .risk-add-step-text {
+      padding-top: 0;
+    }
+
+    .risk-add-step-chevron {
+      flex: none;
+      margin-left: auto;
+      color: rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease-out, color 0.2s ease-out;
+    }
+
+    .risk-add-step-button:hover .risk-add-step-chevron,
+    &.open .risk-add-step-chevron {
+      color: $color__primary;
+      transform: translateX(3px);
+    }
+
+    &.done {
+      .risk-add-step-marker {
+        background: #fff;
+      }
+      .risk-add-step-danger-pic {
+        display: block;
+      }
+    }
+  }
+
+  /** Small screens: the step heads its section, without joining line */
+  @media (max-width: $media__medium) {
+    padding: 0 0 0.75em;
+
+    &::before,
+    &::after,
+    .risk-add-step-chevron {
+      display: none;
+    }
+
+    .risk-add-step-button {
+      align-items: center;
+    }
+
+    .risk-add-step-text {
+      padding-top: 0;
+    }
+
+    /** The rule of the task section moves above its step, which now heads it */
+    &[data-step="task"] {
+      margin-top: 1em;
+      padding-top: 1em;
+      border-top: 1px solid rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+@media (max-width: $media__medium) {
+  .risk-add-modal .wpeo-modal[class*="modal-risk"] .modal-container .riskassessment-task {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+}
+
+@keyframes risk-add-step-done {
+  0% {
+    transform: scale(0.6);
+  }
+  70% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/** Danger picker: tiles of pictogram and name, as in the mobile picker, laid over the form */
+.risk-add-modal .risk-add-danger-panel {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: none;
+  flex-direction: column;
+  padding: 1.25em 2em 0;
+  background: #fff;
+
+  &.active {
+    display: flex;
+    animation: risk-add-danger-panel-in 0.2s ease-out;
+  }
+
+  .risk-add-danger-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1em;
+
+    .section-title {
+      margin-bottom: 0;
+      white-space: nowrap;
+    }
+  }
+
+  .risk-add-danger-search-field {
+    position: relative;
+    flex: 1;
+    max-width: 320px;
+    margin-left: auto;
+
+    i {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+    }
+
+    /** The theme forces the padding of the inputs: without !important the text runs under the magnifier */
+    input {
+      width: 100%;
+      height: 32px;
+      box-sizing: border-box;
+      padding-left: 30px !important;
+    }
+  }
+
+  .risk-add-danger-grid {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    align-content: start;
+    gap: 8px;
+    padding-bottom: 1em;
+  }
+
+  .risk-add-danger-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fff;
+    font: inherit;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s ease-out, background 0.15s ease-out;
+
+    &:hover,
+    &:focus-visible {
+      border-color: $color__primary;
+      background: rgba($color__primary, 0.06);
+    }
+
+    &.selected {
+      border-color: $color__primary;
+      box-shadow: 0 0 0 2px rgba($color__primary, 0.25);
+    }
+
+    &.filtered-out {
+      display: none;
+    }
+
+    img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+    }
+
+    span {
+      font-size: 11px;
+      line-height: 1.2;
+      color: #475569;
+    }
+  }
+
+  .risk-add-danger-empty {
+    padding: 2em 0;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+@keyframes risk-add-danger-panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/** Section brought on screen from the trail */
+.risk-add-modal .risk-add-section-flash {
+  border-radius: 6px;
+  animation: risk-add-section-flash 1s ease-out;
+}
+
+@keyframes risk-add-section-flash {
+  from {
+    background-color: rgba($color__primary, 0.15);
+  }
+  to {
+    background-color: transparent;
   }
 }
 
@@ -118,26 +563,6 @@
       line-height: 1.3 !important;
       resize: vertical;
     }
-  }
-}
-
-/** Medias linked to a risk / a risk assessment
-    The media action buttons overflow their container (top: -10px / bottom: -10px), so stacked medias
-    cover each other and steal their neighbour clicks: keep them spaced on a wrapping row */
-.element-linked-medias {
-  .add-medias td {
-    vertical-align: top;
-    // Dolibarr underlines the cells of every table nested in a .noborder list, and the modal is
-    // printed inside the risk list: that rule drew a stray line under the upload buttons.
-    border-bottom: 0 !important;
-  }
-
-  .element-linked-medias-list {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    gap: 24px 16px;
-    max-width: 200px;
   }
 }
 

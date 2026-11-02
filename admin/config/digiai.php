@@ -62,7 +62,7 @@ if ($action == 'update') {
     }
 }
 // Actions set_mod, update_mask
-require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
+require_once dol_buildpath('/saturne/core/tpl/actions/admin_conf_actions.tpl.php');
 
 /*
  * View
@@ -100,7 +100,7 @@ print '</tr>';
 
 print '<tr class="oddeven"><td><label for="OpenAIApiKey">' . $langs->trans("OpenAIApiKey") . '</label></td>';
 print '<td>' . $langs->trans("OpenAIApiKeyDescription") . '</td>';
-print '<td><input type="text" name="OpenAIApiKey" value="' . $conf->global->DIGIRISKDOLIBARR_CHATGPT_API_KEY . '"></td>';
+print '<td><input type="text" name="OpenAIApiKey" value="' . dol_escape_htmltag(getDolGlobalString('DIGIRISKDOLIBARR_CHATGPT_API_KEY')) . '"></td>';
 print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 print '</td></tr>';
 

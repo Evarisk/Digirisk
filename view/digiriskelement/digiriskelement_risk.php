@@ -295,12 +295,16 @@ if ($sharedrisks) {
 				}
 				$riskAssessmentsOfRisk = $riskAssessmentsOrderedByRisk[$risks->id];
 
+				// A shared risk whose assessments are all drafts or deleted has no validated one: the empty
+				// RiskAssessment keeps the cotation at 0 instead of a fatal error on the whole risk page
+				$lastEvaluation = null;
 				if (is_array($riskAssessmentsOfRisk) && !empty($riskAssessmentsOfRisk)) {
-					$lastEvaluation    = array_filter($riskAssessmentsOfRisk, function($lastRiskAssessment) {
+					$validatedRiskAssessments = array_filter($riskAssessmentsOfRisk, function($lastRiskAssessment) {
 						return $lastRiskAssessment->status == 1;
 					});
-					$lastEvaluation = array_shift($lastEvaluation);
-				} else {
+					$lastEvaluation = array_shift($validatedRiskAssessments);
+				}
+				if (!is_object($lastEvaluation)) {
 					$lastEvaluation = new RiskAssessment($db);
 				}
 
