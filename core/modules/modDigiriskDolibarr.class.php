@@ -36,7 +36,7 @@ class modDigiriskdolibarr extends DolibarrModules
 	/**
 	 * @var int[] Minimum version of Saturne required by module, same format as need_dolibarr_version: checked by init() and by the Saturne index page
 	 */
-	public $need_saturne_version = [23, 6];
+	public $need_saturne_version = [23, 7, 0];
 
 	/**
 	 * @var DoliDB Database handler
@@ -392,7 +392,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '23.6.0';
+		$this->version         = '23.7.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr_color@digiriskdolibarr';
 
