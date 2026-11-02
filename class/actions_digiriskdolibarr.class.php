@@ -578,6 +578,7 @@ class ActionsDigiriskdolibarr
                 // Not while the GP/UT is being edited: rewriting the cell would wipe its edit form
                 $isEditingService = GETPOST('action') == 'edit_extras' && GETPOST('attribute') == 'digiriskdolibarr_ticket_service';
                 if (!empty($object->array_options['options_digiriskdolibarr_ticket_service']) && !$isEditingService) {
+                    require_once __DIR__ . '/digiriskelement.class.php';
                     $digiriskelement    = new DigiriskElement($db);
                     $res = $digiriskelement->fetch((int)$object->array_options['options_digiriskdolibarr_ticket_service']);
                     if ($res > 0) {
