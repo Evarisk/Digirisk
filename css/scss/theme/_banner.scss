@@ -111,6 +111,31 @@
       border-bottom: none !important;
     }
 
+    /* Eldy paints every cell (.fichecenter .tableforfield tr td) and the theme every tr.oddeven: their square
+       corners covered the rounded corners of the card. The table already carries the white; done on all the
+       rows because ReedCRM hides the empty ones, so the first and last visible rows vary */
+    > tbody > tr:not(.liste_titre),
+    > tbody > tr:not(.liste_titre) > td {
+      background-color: transparent;
+    }
+
+    /* Rows that keep a background (header of the attendants tables, hovered row) */
+    > tbody > tr:first-of-type > td:first-child {
+      border-top-left-radius: $dr-radius-lg - 1px;
+    }
+
+    > tbody > tr:first-of-type > td:last-child {
+      border-top-right-radius: $dr-radius-lg - 1px;
+    }
+
+    > tbody > tr:last-of-type > td:first-child {
+      border-bottom-left-radius: $dr-radius-lg - 1px;
+    }
+
+    > tbody > tr:last-of-type > td:last-child {
+      border-bottom-right-radius: $dr-radius-lg - 1px;
+    }
+
     > tbody > tr > td.titlefield,
     > tbody > tr > td.titlefieldcreate,
     > tbody > tr > td:first-child:not(:only-child) {

@@ -16,28 +16,30 @@
   }
 
   /* Rounded corners carried by the corner cells, so that nothing has to be clipped
-     (dropdowns and tooltips open from inside the rows) */
+     (dropdowns and tooltips open from inside the rows).
+     Rows taken by type: a <style> or <script> can follow the last row (ticket setup page).
+     !important: the cotation cells of the dashboard tables cancel their radius inline (Risk class) */
   table.liste,
   table.noborder:not(.nobordernopadding),
   table.formdoc {
-    > tbody > tr:first-child > td:first-child,
-    > tbody > tr:first-child > th:first-child,
-    > thead > tr:first-child > th:first-child {
-      border-top-left-radius: $dr-radius-lg - 1px;
+    > tbody > tr:first-of-type > td:first-child,
+    > tbody > tr:first-of-type > th:first-child,
+    > thead > tr:first-of-type > th:first-child {
+      border-top-left-radius: $dr-radius-lg - 1px !important;
     }
 
-    > tbody > tr:first-child > td:last-child,
-    > tbody > tr:first-child > th:last-child,
-    > thead > tr:first-child > th:last-child {
-      border-top-right-radius: $dr-radius-lg - 1px;
+    > tbody > tr:first-of-type > td:last-child,
+    > tbody > tr:first-of-type > th:last-child,
+    > thead > tr:first-of-type > th:last-child {
+      border-top-right-radius: $dr-radius-lg - 1px !important;
     }
 
-    > tbody > tr:last-child > td:first-child {
-      border-bottom-left-radius: $dr-radius-lg - 1px;
+    > tbody > tr:last-of-type > td:first-child {
+      border-bottom-left-radius: $dr-radius-lg - 1px !important;
     }
 
-    > tbody > tr:last-child > td:last-child {
-      border-bottom-right-radius: $dr-radius-lg - 1px;
+    > tbody > tr:last-of-type > td:last-child {
+      border-bottom-right-radius: $dr-radius-lg - 1px !important;
     }
   }
 
