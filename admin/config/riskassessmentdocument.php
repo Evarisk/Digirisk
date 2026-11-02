@@ -84,12 +84,13 @@ if (saturne_check_admin_write_access() && getDolGlobalInt('DIGIRISKDOLIBARR_RISK
     dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_KEY', bin2hex(random_bytes(24)), 'chaine', 0, '', $conf->entity);
 }
 
-// The strenuousness, psychosocial and register tabs of the overview are shown until switched off:
-// created here for an installation updated without reactivating the module, whose switches would read off
+// The strenuousness, psychosocial and register tabs of the overview, and its export, are shown until
+// switched off: created here for an installation updated without reactivating the module, whose switches
+// would read off
 if (saturne_check_admin_write_access()) {
-    foreach (DIGIRISK_RISK_OVERVIEW_TAB_CONSTS as $riskOverviewTabConst) {
-        if (!isset($conf->global->$riskOverviewTabConst)) {
-            dolibarr_set_const($db, $riskOverviewTabConst, 1, 'integer', 0, '', $conf->entity);
+    foreach (array_merge(DIGIRISK_RISK_OVERVIEW_TAB_CONSTS, [DIGIRISK_RISK_OVERVIEW_EXPORT_CONST]) as $riskOverviewSwitchConst) {
+        if (!isset($conf->global->$riskOverviewSwitchConst)) {
+            dolibarr_set_const($db, $riskOverviewSwitchConst, 1, 'integer', 0, '', $conf->entity);
         }
     }
 }
@@ -374,6 +375,12 @@ foreach ($riskOverviewTabSwitches as $riskOverviewTab => $riskOverviewTabLabels)
     print '<td class="center">' . ajax_constantonoff(DIGIRISK_RISK_OVERVIEW_TAB_CONSTS[$riskOverviewTab], [], null, 0, 0, 0, 2, 0, 1, '', '', 'inline-block', 0, '', saturne_check_admin_write_access() ? 0 : 1) . '</td>';
     print '</tr>';
 }
+// The same tables as an Excel workbook, for anyone holding the link: on until switched off
+print '<tr class="oddeven">';
+print '<td>' . $langs->trans('RiskOverviewPublicExport') . '</td>';
+print '<td>' . $langs->trans('RiskOverviewPublicExportHelp') . '</td>';
+print '<td class="center">' . ajax_constantonoff(DIGIRISK_RISK_OVERVIEW_EXPORT_CONST, [], null, 0, 0, 0, 2, 0, 1, '', '', 'inline-block', 0, '', saturne_check_admin_write_access() ? 0 : 1) . '</td>';
+print '</tr>';
 // A name and a phone number on a public page: off until asked
 print '<tr class="oddeven">';
 print '<td>' . $langs->trans('RiskOverviewPublicResponsible') . '</td>';

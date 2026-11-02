@@ -73,6 +73,14 @@ Subtitle                                = Sous-titre
 # DigiriskElement - DigiriskElement
 DigiriskElementDepthGraph            = Niveau de profondeur dans les graphiques des éléments Digirisk
 DigiriskElementDepthGraphDescription = Cette option permet de choisir le niveau de profondeur dans les graphiques des éléments Digirisk <br> Défaut : Niveau 1
+NbPeopleInCompany                    = Nombre de personnes dans l'entreprise
+NbPeopleInCompanyDescription         = Base du pourcentage de personnes présentes saisi sur chaque GP/UT. C'est le nombre de salariés de la configuration de la société, repris aussi par les indicateurs des accidents.<br>Laisser vide pour le calculer à partir des utilisateurs salariés actifs (valeur affichée en grisé).
+PeoplePercentage                     = Personnes présentes
+PeoplePercentageHelp                 = Pourcentage des personnes de l'entreprise présentes dans ce GP/UT. Le nombre de personnes en est déduit à partir de l'effectif de l'entreprise, réglé dans la configuration des GP/UT.
+PeoplePercentageOfWorkforce          = de l'effectif de l'entreprise (%s personnes)
+PeoplePercentageNoWorkforce          = de l'effectif de l'entreprise, qui n'est pas encore renseigné
+PeoplePercentageValue                = %s de l'effectif, soit %s personne(s) sur %s
+ErrorPeoplePercentage                = Le pourcentage de personnes présentes doit être compris entre 0 et 100.
 
 # WHSRegister = Registre SST
 TicketsPublicInterfaceConfig         = Configuration de l'interface publique des tickets
@@ -1089,6 +1097,12 @@ RiskNotEdited                            = Erreur lors de l'édition du risque
 RiskList                                 = Listing de risques
 AddRiskTitle                             = Ajout du risque
 AddRiskButton                            = Ajouter le risque
+RiskAddStepDangerHint                    = Choisir un danger
+RiskAddStepAssessmentHint                = Choisir une cotation
+RiskAddStepOptional                      = Facultatif
+RiskAddStepCategoriesDone                = %s catégorie(s)
+RiskAddDangerSearch                      = Rechercher un danger
+RiskAddDangerNoMatch                     = Aucun danger ne correspond à la recherche
 EditRisk                                 = Édition du risque
 LinkedRisk                               = Risque lié
 RiskCategory                             = Cat.
@@ -1384,6 +1398,8 @@ TaskWellCreated                          = Tâche créée
 TaskNotCreated                           = Erreur lors de la création de la tâche
 TaskWellEdited                           = Tâche éditée
 TaskNotEdited                            = Erreur lors de l'édition de la tâche
+RiskReassessProposal                     = Tâche terminée : réévaluer le risque ?
+RiskReassessProposalButton               = Réévaluer
 TaskWellDeleted                          = Tâche supprimée
 TaskNotDeleted                           = Erreur lors de la suppression de la tâche
 TasksManagement                          = Gestion des tâches
@@ -1865,6 +1881,10 @@ CharRemaining                       = Caractères restants
 NumberOfLinkedFiles                 = Nombre de fichiers joints
 ChooseAnImage                       = Choisir une image
 
+# Action Plan - Rights - Droits
+ReadActionPlan                      = Consulter le PAPRIPACT
+WriteActionPlan                     = Modifier les actions correctives depuis le PAPRIPACT
+
 # Action Plan - Gantt / Kanban
 ActionPlanGantt                     = Diagramme de Gantt
 ActionPlanKanban                    = Kanban
@@ -2128,6 +2148,13 @@ TicketKanbanFilterNoMessage            = Aucun message
 TicketKanbanFilterMessageLess7         = Il y a moins de 7 jours
 TicketKanbanFilterMessageMore7         = Il y a plus de 7 jours
 TicketKanbanFilterMessageMore30        = Il y a plus de 30 jours
+TicketKanbanFilterRef                  = Numéro
+TicketKanbanFilterRefPlaceholder       = Réf. du ticket
+TicketKanbanFilterDate                 = Créé du
+TicketKanbanFilterDateFrom             = Créé à partir de ce jour
+TicketKanbanFilterDateTo               = au
+TicketKanbanFilterDateToHelp           = Créé jusqu'à ce jour inclus
+TicketKanbanFilterService              = GP/UT
 
 # ===========================================================================
 # Ticket — traçabilité des modifications — issue #4885
@@ -2896,6 +2923,8 @@ RiskOverviewPublicPsychosocial           = Risques psychosociaux
 RiskOverviewPublicPsychosocialHelp       = Affiche l'onglet des risques psychosociaux et leur colonne dans l'onglet Risques
 RiskOverviewPublicRegisters              = Registres
 RiskOverviewPublicRegistersHelp          = Affiche l'onglet du nombre de tickets de chaque registre. Le survol d'un nombre montre ses derniers tickets : référence, date, statut, catégorie et objet (ni le message ni le déclarant).
+RiskOverviewPublicExport                 = Export Excel
+RiskOverviewPublicExportHelp             = Affiche le bouton qui télécharge les tableaux de la synthèse en classeur Excel, un onglet par tableau
 RiskOverviewPublicResponsible            = Responsable à prévenir
 RiskOverviewPublicResponsibleHelp        = Affiche dans l'en-tête le responsable à prévenir (onglet Sécurité de Société/Organisation) et le téléphone professionnel de sa fiche utilisateur
 RiskOverviewPublicPin                    = Code PIN

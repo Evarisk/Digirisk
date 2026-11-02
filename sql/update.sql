@@ -333,3 +333,6 @@ DELETE FROM llx_document_model WHERE nom = 'riskassessmentdocumentsynthesis' AND
 INSERT INTO llx_document_model (nom, type, entity, libelle, description) VALUES ('riskassessmentdocumentpdf', 'riskassessmentdocument', 1, 'DU-A4-PORTRAIT', NULL) ON DUPLICATE KEY UPDATE libelle = VALUES(libelle);
 INSERT INTO llx_document_model (nom, type, entity, libelle, description) VALUES ('riskassessmentdocumentguide', 'riskassessmentdocument', 1, 'DU-MODE-EMPLOI-A4', NULL) ON DUPLICATE KEY UPDATE libelle = VALUES(libelle);
 INSERT INTO llx_document_model (nom, type, entity, libelle, description) VALUES ('csepresentationdocument', 'riskassessmentdocument', 1, 'CSE-DIAPOSITIVES-16-9', NULL) ON DUPLICATE KEY UPDATE libelle = VALUES(libelle);
+
+-- 23.6.x - Share of the company workforce present in each GP/UT, NULL while it is not entered (issue #5541)
+ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD people_percentage double(24,8) NULL AFTER show_in_selector;

@@ -71,6 +71,14 @@ Subtitle                                = Subtitle
 # DigiriskElement
 DigiriskElementDepthGraph            = Depth level in the Digirisk element graphs
 DigiriskElementDepthGraphDescription = This option sets the depth level used in the Digirisk element graphs <br> Default: level 1
+NbPeopleInCompany                    = Number of people in the company
+NbPeopleInCompanyDescription         = Base of the percentage of people present entered on each GP/UT. It is the number of employees of the company setup, also used by the accident indicators.<br>Leave empty to compute it from the active employee users (value shown in grey).
+PeoplePercentage                     = People present
+PeoplePercentageHelp                 = Percentage of the people of the company present in this GP/UT. The number of people is deduced from it with the workforce of the company, set in the GP/UT setup.
+PeoplePercentageOfWorkforce          = of the workforce of the company (%s people)
+PeoplePercentageNoWorkforce          = of the workforce of the company, which is not entered yet
+PeoplePercentageValue                = %s of the workforce, i.e. %s people out of %s
+ErrorPeoplePercentage                = The percentage of people present must be between 0 and 100.
 
 # WHSRegister = Occupational health and safety register
 TicketsPublicInterfaceConfig         = Ticket public interface setup
@@ -1087,6 +1095,12 @@ RiskNotEdited                            = Error while editing the risk
 RiskList                                 = Risks listing
 AddRiskTitle                             = Adding the risk
 AddRiskButton                            = Add the risk
+RiskAddStepDangerHint                    = Pick a hazard
+RiskAddStepAssessmentHint                = Pick a rating
+RiskAddStepOptional                      = Optional
+RiskAddStepCategoriesDone                = %s category(ies)
+RiskAddDangerSearch                      = Search a hazard
+RiskAddDangerNoMatch                     = No hazard matches the search
 EditRisk                                 = Risk editing
 LinkedRisk                               = Linked risk
 RiskCategory                             = Cat.
@@ -1379,6 +1393,8 @@ TaskWellCreated                          = Task created
 TaskNotCreated                           = Error while creating the task
 TaskWellEdited                           = Task edited
 TaskNotEdited                            = Error while editing the task
+RiskReassessProposal                     = Task done: assess the risk again?
+RiskReassessProposalButton               = Reassess
 TaskWellDeleted                          = Task deleted
 TaskNotDeleted                           = Error while deleting the task
 TasksManagement                          = Task management
@@ -1860,6 +1876,10 @@ CharRemaining                       = Characters remaining
 NumberOfLinkedFiles                 = Number of attached files
 ChooseAnImage                       = Choose an image
 
+# Action Plan - Rights
+ReadActionPlan                      = Read the PAPRIPACT
+WriteActionPlan                     = Edit the corrective actions from the PAPRIPACT
+
 # Action Plan - Gantt / Kanban
 ActionPlanGantt                     = Gantt chart
 ActionPlanKanban                    = Kanban
@@ -2113,6 +2133,13 @@ TicketKanbanFilterNoMessage            = No message
 TicketKanbanFilterMessageLess7         = Less than 7 days ago
 TicketKanbanFilterMessageMore7         = More than 7 days ago
 TicketKanbanFilterMessageMore30        = More than 30 days ago
+TicketKanbanFilterRef                  = Number
+TicketKanbanFilterRefPlaceholder       = Ticket ref.
+TicketKanbanFilterDate                 = Created from
+TicketKanbanFilterDateFrom             = Created on or after this day
+TicketKanbanFilterDateTo               = to
+TicketKanbanFilterDateToHelp           = Created on or before this day
+TicketKanbanFilterService              = GP/UT
 
 # ===========================================================================
 # Ticket — modification traceability — issue #4885
@@ -2884,6 +2911,8 @@ RiskOverviewPublicPsychosocial           = Psychosocial risks
 RiskOverviewPublicPsychosocialHelp       = Shows the psychosocial risk tab and their column in the Risks tab
 RiskOverviewPublicRegisters              = Registers
 RiskOverviewPublicRegistersHelp          = Shows the tab of the number of tickets of each register. Hovering a number shows its latest tickets: ref, date, status, category and subject (neither the message nor who declared it).
+RiskOverviewPublicExport                 = Excel export
+RiskOverviewPublicExportHelp             = Shows the button that downloads the tables of the overview as an Excel workbook, one sheet per table
 RiskOverviewPublicResponsible            = Responsible person to notify
 RiskOverviewPublicResponsibleHelp        = Shows in the header the responsible person to notify (Security tab of Company/Organization) and the office phone of their user card
 RiskOverviewPublicPin                    = PIN code

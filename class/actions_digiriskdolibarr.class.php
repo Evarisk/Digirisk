@@ -578,6 +578,7 @@ class ActionsDigiriskdolibarr
                 // Not while the GP/UT is being edited: rewriting the cell would wipe its edit form
                 $isEditingService = GETPOST('action') == 'edit_extras' && GETPOST('attribute') == 'digiriskdolibarr_ticket_service';
                 if (!empty($object->array_options['options_digiriskdolibarr_ticket_service']) && !$isEditingService) {
+                    require_once __DIR__ . '/digiriskelement.class.php';
                     $digiriskelement    = new DigiriskElement($db);
                     $res = $digiriskelement->fetch((int)$object->array_options['options_digiriskdolibarr_ticket_service']);
                     if ($res > 0) {
@@ -874,6 +875,15 @@ class ActionsDigiriskdolibarr
 
                         // Sans projet identifié, getTasksArray() agrégerait les tâches de toute l'instance
                         if ($projectId <= 0) {
+                            return 0;
+                        }
+
+                        // Indicateurs du plan d'action : seulement sur les projets gérés par Digirisk
+                        $digiriskProjectIds = [];
+                        foreach (['DU', 'ENVIRONMENT', 'ACCIDENT', 'PREVENTIONPLAN', 'FIREPERMIT', 'TICKET'] as $projectType) {
+                            $digiriskProjectIds[] = getDolGlobalInt('DIGIRISKDOLIBARR_' . $projectType . '_PROJECT');
+                        }
+                        if (!in_array((int) $projectId, $digiriskProjectIds, true)) {
                             return 0;
                         }
 
@@ -2631,6 +2641,11 @@ class ActionsDigiriskdolibarr
      */
     public function saturneExtendGetObjectsMetadata(array $parameters): int
     {
+        // Paths relative to DOL_DOCUMENT_ROOT as installed (custom/digiriskdolibarr on a standard install): Saturne < 23.3.0 and older
+        // readers prepend DOL_DOCUMENT_ROOT, newer ones use dol_buildpath(). Bare name only outside the main document root
+        $moduleDir  = dol_buildpath('/digiriskdolibarr', 0);
+        $modulePath = strpos($moduleDir, DOL_DOCUMENT_ROOT . '/') === 0 ? substr($moduleDir, strlen(DOL_DOCUMENT_ROOT) + 1) : 'digiriskdolibarr';
+
         $objects = [
             'digiriskstandard'      => 'sitemap',
             'digiriskelement'       => 'network-wired',
@@ -2660,9 +2675,9 @@ class ActionsDigiriskdolibarr
                 'label_field'    => 'label',
                 'hook_name_card' => $objectName . 'list',
                 'hook_name_list' => $objectName . 'card',
-                'create_url'     => 'digiriskdolibarr/view/' . $objectName . '/' . $objectName . '_card.php?action=create',
-                'class_path'     => 'digiriskdolibarr/class/' . $objectName . '.class.php',
-                'lib_path'       => 'digiriskdolibarr/lib/digiriskdolibarr_' . $objectName . '.lib.php'
+                'create_url'     => $modulePath . '/view/' . $objectName . '/' . $objectName . '_card.php?action=create',
+                'class_path'     => $modulePath . '/class/' . $objectName . '.class.php',
+                'lib_path'       => $modulePath . '/lib/digiriskdolibarr_' . $objectName . '.lib.php'
             ];
         }
 
@@ -2670,19 +2685,19 @@ class ActionsDigiriskdolibarr
         $objects = ['risk', 'riskassessment', 'risksign'];
         foreach ($objects as $objectName) {
             $objectsMetadata['digiriskdolibarr_' . $objectName]['create_url'] = '';
-            $objectsMetadata['digiriskdolibarr_' . $objectName]['class_path'] = 'digiriskdolibarr/class/riskanalysis/' . $objectName . '.class.php';
-            $objectsMetadata['digiriskdolibarr_' . $objectName]['lib_path']   = 'digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php';
+            $objectsMetadata['digiriskdolibarr_' . $objectName]['class_path'] = $modulePath . '/class/riskanalysis/' . $objectName . '.class.php';
+            $objectsMetadata['digiriskdolibarr_' . $objectName]['lib_path']   = $modulePath . '/lib/digiriskdolibarr_digiriskelement.lib.php';
         }
         // La table de l'enquete accident ne suit pas la regle de nommage des autres objets : sans
         // cette correction, la metadonnee pointe une table inexistante et plus rien ne matche
         // (les fichiers lies, donc la diffusion, cherchent sur src_object_type = table_element)
         $objectsMetadata['digiriskdolibarr_accidentinvestigation']['table_element'] = 'digiriskdolibarr_accident_investigation';
 
-        $objectsMetadata['digiriskdolibarr_digiriskelement']['create_url'] = 'digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0';
+        $objectsMetadata['digiriskdolibarr_digiriskelement']['create_url'] = $modulePath . '/view/digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0';
 
         $objectsMetadata['digiriskdolibarr_evaluator']['create_url'] = '';
-        $objectsMetadata['digiriskdolibarr_evaluator']['class_path'] = 'digiriskdolibarr/class/evaluator.class.php';
-        $objectsMetadata['digiriskdolibarr_evaluator']['lib_path']   = 'digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php';
+        $objectsMetadata['digiriskdolibarr_evaluator']['class_path'] = $modulePath . '/class/evaluator.class.php';
+        $objectsMetadata['digiriskdolibarr_evaluator']['lib_path']   = $modulePath . '/lib/digiriskdolibarr_digiriskelement.lib.php';
 
         // A risk has no label: its description tells it apart when medias are assigned to it
         $objectsMetadata['digiriskdolibarr_risk']['label_field'] = 'description';

@@ -397,11 +397,11 @@ if ($num == 1 && !headers_sent() && ! empty($conf->global->MAIN_SEARCH_DIRECT_OP
 $title    = $langs->trans("ListOfUsers");
 $help_url = 'FR:Module_Digirisk';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.min.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css", "/digiriskdolibarr/css/digiriskdolibarr.min.css");
+$morecss  = array("/saturne/css/saturne.min.css", "/digiriskdolibarr/css/digiriskdolibarr.css", "/digiriskdolibarr/css/digiriskdolibarr.min.css");
 
 // digirisk-horizontal-scroll bounds #id-right to the viewport so the wide user list table
 // scrolls inside its own .div-table-responsive instead of widening the whole page
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss, '', 'digirisk-horizontal-scroll');
+llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss, '', 'saturne-theme digirisk-horizontal-scroll');
 
 $param                                                                      = '';
 if ( ! empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&amp;contextpage=' . urlencode($contextpage);

@@ -24,6 +24,7 @@
  * - $view              string    Current view ('kanban', 'dashboard' or 'gantt')
  * - $viewUrl           string    Page URL carrying the displayed project, year and criteria, without the view
  * - $actionPlanFilters array     Criteria from digiriskActionPlanGetFilters(), carried over to the exports
+ * - $permissiontoread  bool      Whether the user may read the action plan
  * - $user              User      Current user (permission checks)
  * - $langs             Translate Translation object
  */
@@ -44,7 +45,7 @@ $exportAction = $_SERVER['PHP_SELF'] . '?view=' . urlencode($view);
             <span class="ap-export-label"><?php echo $langs->trans('ActionPlanDashboard'); ?></span>
         </a>
     </div>
-    <?php if ($user->hasRight('digiriskdolibarr', 'riskassessmentdocument', 'read')) : ?>
+    <?php if ($permissiontoread) : ?>
         <form method="POST" action="<?php echo $exportAction; ?>" class="ap-export-form">
             <input type="hidden" name="token" value="<?php echo newToken(); ?>">
             <input type="hidden" name="action" value="exportCsv">
