@@ -41,7 +41,7 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
 
             - uses: shivammathur/setup-php@v2
               with:
@@ -85,14 +85,14 @@ jobs:
 
         steps:
             - name: Checkout Digirisk
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
               with:
                   path: htdocs/custom/digiriskdolibarr
 
             # Le module etend SaturneObject et appelle les libs du socle : sans lui, chaque
             # classe heritee remonterait comme inconnue.
             - name: Checkout Saturne
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
               with:
                   repository: Evarisk/Saturne
                   ref: develop
@@ -107,7 +107,7 @@ jobs:
             # vrac a la racine de core/, pas dans un sous-dossier. Sans eux, les include du
             # module remontent en include.fileNotFound.
             - name: Checkout Dolibarr core (sparse)
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
               with:
                   repository: Dolibarr/dolibarr
                   ref: '23.0.0'
@@ -164,7 +164,7 @@ jobs:
                   coverage: none
 
             - name: Cache Composer packages
-              uses: actions/cache@v4
+              uses: actions/cache@v6
               with:
                   path: htdocs/custom/digiriskdolibarr/vendor
                   key: composer-8.1-${{ hashFiles('htdocs/custom/digiriskdolibarr/composer.lock') }}
