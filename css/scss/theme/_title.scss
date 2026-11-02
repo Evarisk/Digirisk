@@ -60,6 +60,49 @@
     }
   }
 
+  /* Saturne keeps dol_optimize_smallscreen at 0 on phones (saturne_get_fiche_head), so
+     print_barre_liste still prints the mass action cell, which select2 sizes at ~200px even
+     while it is hidden: the title row ran wider than the screen and the add buttons of the
+     right cell could only be reached by scrolling. On small screens the row wraps instead,
+     the right cell going under the title when they do not fit side by side. */
+  @media (max-width: $media__medium) {
+    table.table-fiche-title {
+      display: block;
+
+      > tbody {
+        display: block;
+      }
+
+      tr.toptitle {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        column-gap: 8px;
+        height: auto;
+        min-height: 44px;
+
+        /* eldy gives the cell 20px, a table cell grew to the 34px tile but a flex item does not */
+        > td.col-picto {
+          flex-shrink: 0;
+          width: auto;
+        }
+
+        /* Keeps room for the picto, or a long title would be pushed alone onto the next line */
+        > td.col-title {
+          max-width: calc(100% - 50px);
+        }
+
+        > td.col-center .select2-container {
+          width: auto !important;
+        }
+
+        > td.col-right {
+          margin-left: auto;
+        }
+      }
+    }
+  }
+
   /* Titles made of a single div (Digirisk sections) */
   div.titre:not(.inline-block) {
     color: $dr-text;
