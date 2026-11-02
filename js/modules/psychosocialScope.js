@@ -9,8 +9,8 @@
 /**
  * \file    js/modules/psychosocialScope.js
  * \ingroup digiriskdolibarr
- * \brief   Risques psychosociaux de la liste des risques : qualification des unités de travail
- *          sur le groupement de tête, évaluation et plan d'action d'une unité concernée.
+ * \brief   Risques psychosociaux : qualification des unités de travail au niveau 0 (onglet de la
+ *          société), évaluation et plan d'action d'une unité concernée dans sa liste des risques.
  *          Balisage : core/tpl/riskanalysis/risk/digiriskdolibarr_rps_*.tpl.php
  */
 
@@ -90,7 +90,7 @@ window.digiriskdolibarr.psychosocialScope.detachFilesModals = function() {
 window.digiriskdolibarr.psychosocialScope.event = function() {
   const scope = window.digiriskdolibarr.psychosocialScope;
 
-  // Qualification des unités, sur le groupement de tête
+  // Qualification des unités, au niveau 0
   $(document).on('click', '.rps-scope-table .rps-tab', scope.selectTab);
   $(document).on('input', '.rps-scope-table .rps-search-input', scope.filter);
   $(document).on('keydown', '.rps-scope-table .rps-search-input', scope.keepEnter);
@@ -855,7 +855,7 @@ window.digiriskdolibarr.psychosocialScope.toast = function(message, onUndo) {
 };
 
 /**
- * Suit les liens vers le bloc : #rps-unit-ID sur le groupement de tête montre la ligne de l'unité,
+ * Suit les liens vers le bloc : #rps-unit-ID sur l'onglet du niveau 0 montre la ligne de l'unité,
  * #rps-eval sur une unité ouvre son évaluation.
  *
  * @since   23.5.1
