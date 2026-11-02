@@ -2138,6 +2138,13 @@ TicketKanbanFilterNoMessage            = Aucun message
 TicketKanbanFilterMessageLess7         = Il y a moins de 7 jours
 TicketKanbanFilterMessageMore7         = Il y a plus de 7 jours
 TicketKanbanFilterMessageMore30        = Il y a plus de 30 jours
+TicketKanbanFilterRef                  = Numéro
+TicketKanbanFilterRefPlaceholder       = Réf. du ticket
+TicketKanbanFilterDate                 = Créé du
+TicketKanbanFilterDateFrom             = Créé à partir de ce jour
+TicketKanbanFilterDateTo               = au
+TicketKanbanFilterDateToHelp           = Créé jusqu'à ce jour inclus
+TicketKanbanFilterService              = GP/UT
 
 # ===========================================================================
 # Ticket — traçabilité des modifications — issue #4885

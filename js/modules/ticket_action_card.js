@@ -1832,6 +1832,11 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
         window.digiriskdolibarr.ticketPickerKanban.applyFilters();
     });
 
+    // The ref filters while it is typed, not only once the field is left
+    $(document).on('input', '#tacPickerFilters .tac-picker-filters__text', function() {
+        window.digiriskdolibarr.ticketPickerKanban.applyFilters();
+    });
+
     $(document).on('click', '#tacPickerTagFilterReset', function() {
         $('#tacPickerTagFilterSelect').val(null).trigger('change');
     });
@@ -2141,14 +2146,16 @@ window.digiriskdolibarr.ticketPickerKanban.getFilteredTags = function() {
 };
 
 /**
- * Values of the card filters (assignee, progress, age, last message), empty when a filter shows everything.
+ * Values of the card filters (ref, creation dates, GP/UT, assignee, progress, age, last message), empty when a
+ * filter shows everything.
  *
  * @return {Object} Value of each filter, by its data-filter key
  */
 window.digiriskdolibarr.ticketPickerKanban.getCardFilters = function() {
     var filters = {};
     $('#tacPickerFilters .tac-picker-filters__select').each(function() {
-        filters[$(this).data('filter')] = $(this).val() || '';
+        // Trimmed: a ref made of spaces only filters nothing
+        filters[$(this).data('filter')] = String($(this).val() || '').trim();
     });
 
     return filters;
@@ -2156,7 +2163,8 @@ window.digiriskdolibarr.ticketPickerKanban.getCardFilters = function() {
 
 /**
  * Whether a card matches the card filters. Its assignee is read on its select, which follows the reassignments
- * made on the board; its progress, age in seconds and date of last message come from its data attributes.
+ * made on the board; its ref, creation day, GP/UT with the groupments above it, progress, age in seconds and
+ * date of last message come from its data attributes.
  *
  * @param  {jQuery} $card   Kanban card
  * @param  {Object} filters Values of the card filters
@@ -2169,6 +2177,18 @@ window.digiriskdolibarr.ticketPickerKanban.matchCardFilters = function($card, fi
     var elapsed  = parseInt($card.attr('data-elapsed'), 10);
     var lastMsg  = parseInt($card.attr('data-last-msg'), 10) || 0;
     var sinceMsg = Date.now() / 1000 - lastMsg;
+    var ref      = String($card.attr('data-ref') || '').toLowerCase();
+    var dateC    = String($card.attr('data-date-c') || '');
+    var services = String($card.attr('data-services') || '').split(',');
+
+    if (filters.ref && ref.indexOf(filters.ref.toLowerCase()) === -1) return false;
+
+    // Days as YYYY-MM-DD, as given by the date fields, compare as strings
+    if ((filters.datefrom || filters.dateto) && dateC === '') return false;
+    if (filters.datefrom && dateC < filters.datefrom) return false;
+    if (filters.dateto && dateC > filters.dateto) return false;
+
+    if (filters.service && services.indexOf(filters.service) === -1) return false;
 
     if (filters.assignee === 'none' && assignee !== '0') return false;
     if (filters.assignee === 'any' && assignee === '0') return false;
@@ -2247,8 +2267,11 @@ window.digiriskdolibarr.ticketPickerKanban.restoreCardFilters = function() {
 
     $('#tacPickerFilters .tac-picker-filters__select').each(function() {
         var value = saved[$(this).data('filter')] || '';
-        // A user deactivated since the previous visit has no option left: the filter shows everything again
-        if (value && $(this).find('option[value="' + value + '"]').length) {
+        if (!value) {
+            return;
+        }
+        // A user or a GP/UT gone since the previous visit has no option left: the filter shows everything again
+        if (!$(this).is('select') || $(this).find('option').filter(function() { return this.value === value; }).length) {
             $(this).val(value);
         }
     });
