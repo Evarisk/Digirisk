@@ -238,9 +238,15 @@ if (empty($resHook)) {
         $massaction = '';
     }
 
-    // Excel export of every accident matching the filters, the way the list sorts them. Answered before the
-    // list templates of Saturne, so that a generic export of the list never takes its place
-    if ($action == 'export_xlsx' && $xlsxExportAvailable) {
+    // Excel export of every accident matching the filters, the way the list sorts them, or of the accidents checked
+    // through the mass action. Answered before the list templates of Saturne, so that a generic export of the list
+    // never takes its place; the mass action keeps the limit the mass actions of the core apply
+    $xlsxExportIds = [];
+    $checkedIds    = GETPOST('toselect', 'array:int');
+    if ($massaction == 'export_xlsx' && !empty($checkedIds) && count($checkedIds) <= getDolGlobalInt('MAIN_LIMIT_FOR_MASS_ACTIONS', 1000)) {
+        $xlsxExportIds = array_map('intval', $checkedIds);
+    }
+    if (($action == 'export_xlsx' || !empty($xlsxExportIds)) && $xlsxExportAvailable) {
         require_once __DIR__ . '/../../class/digiriskaccidentexport.class.php';
 
         // The query of the list without its paging, run by the template into $resql
@@ -252,13 +258,19 @@ if (empty($resHook)) {
         $accidentIds = [];
         if (isset($resql) && $resql) {
             while ($obj = $db->fetch_object($resql)) {
-                $accidentIds[] = (int) $obj->rowid;
+                // The mass action keeps the checked accidents only, in the order of the list
+                if (empty($xlsxExportIds) || in_array((int) $obj->rowid, $xlsxExportIds, true)) {
+                    $accidentIds[] = (int) $obj->rowid;
+                }
             }
         }
 
         $export = new DigiriskAccidentExport($db);
         if ($searchAll) {
             $export->filters[$langs->transnoentities('XlsxSearch')] = $searchAll;
+        }
+        if (!empty($xlsxExportIds)) {
+            $export->filters[$langs->transnoentities('XlsxSelection')] = $langs->transnoentities('XlsxSelectedLines', count($accidentIds));
         }
         $export->addFieldFilters($object, $search);
         $export->addExtraFieldFilters($extrafields, $object->table_element, $search_array_options);
