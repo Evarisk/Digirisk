@@ -196,6 +196,9 @@ $permissiontodelete = $user->hasRight($object->module, $object->element, 'delete
 // Security check
 saturne_check_access($permissiontoread, $object);
 
+// The Excel export needs the base export of Saturne
+$xlsxExportAvailable = file_exists(dol_buildpath('/saturne/class/saturnexlsxexport.class.php'));
+
 /*
  * Actions
  */
@@ -233,6 +236,82 @@ if (empty($resHook)) {
 
     if (!GETPOST('confirmmassaction', 'alpha') && $massaction != 'presend' && $massaction != 'confirm_presend') {
         $massaction = '';
+    }
+
+    // Excel export of every accident matching the filters, the way the list sorts them, or of the accidents checked
+    // through the mass action. Answered before the list templates of Saturne, so that a generic export of the list
+    // never takes its place; the mass action keeps the limit the mass actions of the core apply
+    $xlsxExportIds = [];
+    $checkedIds    = GETPOST('toselect', 'array:int');
+    if ($massaction == 'export_xlsx' && !empty($checkedIds) && count($checkedIds) <= getDolGlobalInt('MAIN_LIMIT_FOR_MASS_ACTIONS', 1000)) {
+        $xlsxExportIds = array_map('intval', $checkedIds);
+    }
+    if (($action == 'export_xlsx' || !empty($xlsxExportIds)) && $xlsxExportAvailable) {
+        require_once __DIR__ . '/../../class/digiriskaccidentexport.class.php';
+
+        // The query of the list without its paging, run by the template into $resql
+        $limit  = 0;
+        $page   = 0;
+        $offset = 0;
+        require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_build_sql_select.tpl.php');
+
+        $accidentIds = [];
+        if (isset($resql) && $resql) {
+            while ($obj = $db->fetch_object($resql)) {
+                // The mass action keeps the checked accidents only, in the order of the list
+                if (empty($xlsxExportIds) || in_array((int) $obj->rowid, $xlsxExportIds, true)) {
+                    $accidentIds[] = (int) $obj->rowid;
+                }
+            }
+        }
+
+        $export = new DigiriskAccidentExport($db);
+        if ($searchAll) {
+            $export->filters[$langs->transnoentities('XlsxSearch')] = $searchAll;
+        }
+        if (!empty($xlsxExportIds)) {
+            $export->filters[$langs->transnoentities('XlsxSelection')] = $langs->transnoentities('XlsxSelectedLines', count($accidentIds));
+        }
+        $export->addFieldFilters($object, $search);
+        $export->addExtraFieldFilters($extrafields, $object->table_element, $search_array_options);
+
+        // Criteria the list reads on other tables than the accident one
+        $workStopFilterLabels = [Accident::ANY_WORK_STOP_FILTER => 'AccidentWithDIAT', Accident::NO_WORK_STOP_FILTER => 'AccidentWithoutDIAT'];
+        foreach (array_keys(Accident::WORK_STOP_DURATION_LIMITS) as $workStopBucket) {
+            $workStopFilterLabels[$workStopBucket] = ucfirst($workStopBucket);
+        }
+        $registerFilterLabels = [Accident::WITH_REGISTER_FILTER => 'AccidentWithRegister', Accident::WITHOUT_REGISTER_FILTER => 'AccidentWithoutRegister'];
+        if (isset($workStopFilterLabels[$search['workstop'] ?? ''])) {
+            $export->filters[$langs->transnoentities('WorkStopDuration')] = $langs->transnoentities($workStopFilterLabels[$search['workstop']]);
+        }
+        if (isset($registerFilterLabels[$search['register'] ?? ''])) {
+            $export->filters[$langs->transnoentities('AccidentRegister')] = $langs->transnoentities($registerFilterLabels[$search['register']]);
+        }
+        if ($fromId > 0) {
+            $digiriskElement = new DigiriskElement($db);
+            if ($digiriskElement->fetch($fromId) > 0) {
+                $export->filters[$langs->transnoentities('AccidentLocation')] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
+            }
+        } elseif ($fromIdUser > 0) {
+            $userObject = new User($db);
+            if ($userObject->fetch($fromIdUser) > 0) {
+                $export->filters[$langs->transnoentities('User')] = $userObject->getFullName($langs);
+            }
+        }
+        $categoryLabels = [];
+        foreach ($searchCategories ?? [] as $searchCategory) {
+            $category = new Categorie($db);
+            if ((int) ltrim((string) $searchCategory, '+-') > 0 && $category->fetch((int) ltrim((string) $searchCategory, '+-')) > 0) {
+                $categoryLabels[] = (strpos((string) $searchCategory, '-') === 0 ? '- ' : '') . $category->label;
+            }
+        }
+        if (!empty($categoryLabels)) {
+            $export->filters[$langs->transnoentities('Categories')] = implode(', ', $categoryLabels);
+        }
+
+        $export->export($accidentIds, $langs->transnoentities('AccidentXlsxTitle') . '_' . dol_print_date(dol_now(), 'dayhourlog'));
+        $db->close();
+        exit;
     }
 
     // Mass actions
@@ -280,6 +359,7 @@ if ($fromId > 0) {
     }
 }
 
+// The Excel export button is printed by the list header of Saturne, with the filters, the sort and $formMoreParams
 require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_build_sql_select.tpl.php');
 require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_header.tpl.php');
 require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_search_input.tpl.php');

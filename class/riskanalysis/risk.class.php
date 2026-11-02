@@ -292,6 +292,12 @@ class Risk extends SaturneObject
         $array['risks'] = array_merge($array['current']['risks'], $array['shared']['risks']);
         $nbTotalRisks = ['current' => 0,'shared' => 0];
 
+        // A consolidated psychosocial risk carries one line per unit and keeps its factors in
+        // rpsanswer, so it reaches the two tables below with no sub-category of its own. Read
+        // its factors back here: without this, a unit assessed with the consolidated grid is
+        // absent from the RPS tables of the document while it does hold an assessment.
+        $psychosocialFactors = static::getConsolidatedPsychosocialFactors($array['risks']);
+
         foreach ($array['risks'] as $risk) {
             $riskAssessment->cotation = $risk->riskAssessmentCotation;
             $entity                   = ($risk->entity == $conf->entity || (!isModEnabled('multicompany') && empty($risk->entity))) ? 'current' : 'shared';
@@ -332,15 +338,35 @@ class Risk extends SaturneObject
                 // than dropping it, the category table leaves the psychosocial category to these tables
                 $subCategory = is_numeric($risk->sub_category) ? (int) $risk->sub_category : self::SUB_CATEGORY_NOT_SPECIFIED;
 
-                $array[$entity]['riskBySubCategories'][$subCategory][$scale] = ($array[$entity]['riskBySubCategories'][$subCategory][$scale] ?? 0) + 1;
+                // One risk per unit, factors in rpsanswer: the risk feeds the tables through its
+                // factors rather than through its own line, which carries no sub-category
+                $riskFactors = $psychosocialFactors[$risk->id] ?? [];
 
-                if ($subCategory != self::SUB_CATEGORY_NOT_SPECIFIED) {
-                    // The table holds one cell per element and sub-category: when a session assesses
-                    // several factors of the same family on the same date, as the RPS-DU grid does,
-                    // the cell has to report the worst of them rather than the last one read
-                    $lastCotation = $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$subCategory][$risk->riskAssessmentDate] ?? null;
+                if ($subCategory == self::SUB_CATEGORY_NOT_SPECIFIED && !empty($riskFactors)) {
+                    foreach ($riskFactors as $factorPosition => $factorCotation) {
+                        $riskAssessment->cotation = $factorCotation;
+                        $factorScale              = $riskAssessment->getEvaluationScale();
 
-                    $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$subCategory][$risk->riskAssessmentDate] = is_null($lastCotation) ? $riskAssessment->cotation : max($lastCotation, $riskAssessment->cotation);
+                        $array[$entity]['riskBySubCategories'][$factorPosition][$factorScale] = ($array[$entity]['riskBySubCategories'][$factorPosition][$factorScale] ?? 0) + 1;
+
+                        $lastCotation = $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$factorPosition][$risk->riskAssessmentDate] ?? null;
+
+                        $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$factorPosition][$risk->riskAssessmentDate] = is_null($lastCotation) ? $factorCotation : max($lastCotation, $factorCotation);
+                    }
+
+                    // Restore the cotation of the risk itself for the counters that follow
+                    $riskAssessment->cotation = $risk->riskAssessmentCotation;
+                } else {
+                    $array[$entity]['riskBySubCategories'][$subCategory][$scale] = ($array[$entity]['riskBySubCategories'][$subCategory][$scale] ?? 0) + 1;
+
+                    if ($subCategory != self::SUB_CATEGORY_NOT_SPECIFIED) {
+                        // The table holds one cell per element and sub-category: when a session assesses
+                        // several factors of the same family on the same date, as the RPS-DU grid does,
+                        // the cell has to report the worst of them rather than the last one read
+                        $lastCotation = $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$subCategory][$risk->riskAssessmentDate] ?? null;
+
+                        $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$subCategory][$risk->riskAssessmentDate] = is_null($lastCotation) ? $riskAssessment->cotation : max($lastCotation, $riskAssessment->cotation);
+                    }
                 }
             }
             $array['riskByEntities'][$risk->entity]['nbTotalRisks']++;
@@ -798,6 +824,74 @@ class Risk extends SaturneObject
     }
 
     /**
+     * Get the factors of the consolidated psychosocial assessments, by risk
+     *
+     * A psychosocial risk assessed with the consolidated methods holds one assessment for the
+     * whole unit and keeps the level of each factor in llx_digiriskdolibarr_rpsanswer. Both
+     * psychosocial tables of the risk assessment document are built on sub-categories, so they
+     * need those factors rather than the single line of the risk.
+     *
+     * Only the latest assessment of each risk is read, and a factor assessed by several criteria
+     * keeps the worst of them, as the grid itself does.
+     *
+     * @param  array $risks Risks the document is built on
+     * @return array        Cotation of each factor, by risk id then sub-category position
+     */
+    public static function getConsolidatedPsychosocialFactors(array $risks): array
+    {
+        global $db;
+
+        $riskIds = [];
+        foreach ($risks as $risk) {
+            if ($risk->category == self::PSYCHOSOCIAL_CATEGORY_POSITION) {
+                $riskIds[] = (int) $risk->id;
+            }
+        }
+
+        if (empty($riskIds)) {
+            return [];
+        }
+
+        $sql  = 'SELECT ra.fk_risk, ra.rowid AS fk_riskassessment, a.sub_category, a.cotation';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_rpsanswer a';
+        $sql .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_riskassessment ra ON ra.rowid = a.fk_riskassessment';
+        $sql .= ' WHERE ra.status > 0 AND ra.fk_risk IN (' . implode(',', $riskIds) . ')';
+        $sql .= ' ORDER BY ra.fk_risk ASC, ra.rowid ASC';
+
+        $resql = $db->query($sql);
+        if (!$resql) {
+            return [];
+        }
+
+        $factors    = [];
+        $lastOfRisk = [];
+        while ($obj = $db->fetch_object($resql)) {
+            $riskId       = (int) $obj->fk_risk;
+            $assessmentId = (int) $obj->fk_riskassessment;
+
+            // The query is ordered by assessment: a more recent one replaces the previous
+            if (($lastOfRisk[$riskId] ?? 0) < $assessmentId) {
+                $lastOfRisk[$riskId] = $assessmentId;
+                $factors[$riskId]    = [];
+            }
+
+            if ($lastOfRisk[$riskId] != $assessmentId) {
+                continue;
+            }
+
+            // Positions 6 and 7 describe the prevention context and the impact, not an exposure
+            $subCategory = (int) $obj->sub_category;
+            if ($subCategory < 0 || $subCategory > 5) {
+                continue;
+            }
+
+            $factors[$riskId][$subCategory] = max($factors[$riskId][$subCategory] ?? 0, (int) $obj->cotation);
+        }
+
+        return $factors;
+    }
+
+    /**
      * Get the INRS psychosocial risk assessment grid (RPS-DU tool, brochure ED 6403)
      *
      * Each criterion carries the family heading it is printed under in the official grid, the
@@ -937,21 +1031,26 @@ class Risk extends SaturneObject
     /**
      * Get danger sub category scale label
      *
-     * @param $scale
+     * @param  int            $scale       Cotation
+     * @param  Translate|null $outputLangs Language of the document being generated, the user language when null
      * @return mixed
      */
-    public function getDangerSubCategoryScaleLabel($scale) {
+    public function getDangerSubCategoryScaleLabel($scale, $outputLangs = null) {
         global $langs;
+
+        // A generated document carries its own language: the user one printed "Weak" or
+        // "Moderate" in a French risk assessment document generated by an English user
+        $labelLangs = $outputLangs ?? $langs;
         if ($scale < 48) {
-            return $langs->trans('Weak');
+            return $labelLangs->trans('Weak');
         } elseif ($scale < 51) {
-            return $langs->trans('Moderate');
+            return $labelLangs->trans('Moderate');
         } elseif ($scale < 80) {
-            return $langs->trans('High');
+            return $labelLangs->trans('High');
         } else {
             // The cotation scale has a fourth level, which getEvaluationScale() already knows:
             // an unacceptable factor used to be printed as a dash in the risk assessment document
-            return $langs->trans('Extreme');
+            return $labelLangs->trans('Extreme');
         }
     }
 
@@ -1588,14 +1687,21 @@ class Risk extends SaturneObject
     /**
      * Resolve the thumbnail URL of a risk assessment photo, or return the default nophoto placeholder.
      *
-     * @param  string $baseOutputDir Module multidir_output for current entity
-     * @param  string $raRef         RiskAssessment reference
-     * @param  string $raPhoto       RiskAssessment favorite photo filename
-     * @return string                URL to serve the image
+     * The URL is served without login (saturne/utils/viewimage.php): the public overview of the risks
+     * shows it as well.
+     *
+     * @param  string $baseOutputDir   Module multidir_output for current entity
+     * @param  string $raRef           RiskAssessment reference
+     * @param  string $raPhoto         RiskAssessment favorite photo filename
+     * @param  bool   $withPlaceholder False to get an empty string for an assessment without photo
+     * @return string                  URL to serve the image
      */
-    private function resolveDashboardRiskPhotoUrl(string $baseOutputDir, string $raRef, string $raPhoto): string
+    public function resolveDashboardRiskPhotoUrl(string $baseOutputDir, string $raRef, string $raPhoto, bool $withPlaceholder = true): string
     {
         global $conf;
+
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
         if ($raRef !== '') {
             $raSubDir = 'riskassessment/' . $raRef;
@@ -1621,7 +1727,7 @@ class Risk extends SaturneObject
             }
         }
 
-        return DOL_URL_ROOT . '/public/theme/common/nophoto.png';
+        return $withPlaceholder ? DOL_URL_ROOT . '/public/theme/common/nophoto.png' : '';
     }
 
     /**

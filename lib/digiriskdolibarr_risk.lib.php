@@ -52,11 +52,16 @@ function risk_prepare_head(Risk $object): array
  * creation moves them out of, see digiriskRiskAssessmentMovePhotos(). An existing assessment keeps
  * them in its own folder.
  *
+ * A psychosocial assessment also takes the documents of its report (filled grid, minutes), in the
+ * subfolder "documents" of its photos: the gallery and the list of the documents never show the
+ * same file twice.
+ *
  * @param  string              $subDir         Folder of the photos, relative to the module folder
  * @param  RiskAssessment|null $riskAssessment Assessment owning the folder, null for a work folder
+ * @param  bool                $withFiles      Also take documents, not only photos
  * @return string                              HTML of the block
  */
-function digiriskRiskAssessmentMediaBlock(string $subDir, ?RiskAssessment $riskAssessment = null): string
+function digiriskRiskAssessmentMediaBlock(string $subDir, ?RiskAssessment $riskAssessment = null, bool $withFiles = false): string
 {
     global $conf;
 
@@ -64,7 +69,7 @@ function digiriskRiskAssessmentMediaBlock(string $subDir, ?RiskAssessment $riskA
     dol_include_once('/saturne/lib/medias.lib.php');
 
     // The picking button opens the media library of the module, rendered by the risk pages
-    $options = ['show_photo' => true, 'show_audio' => false, 'show_file' => false, 'show_library' => true];
+    $options = ['show_photo' => true, 'show_audio' => false, 'show_file' => $withFiles, 'file_sub_dir' => $subDir . '/documents', 'show_library' => true];
 
     // The lists show one photo of the assessment: the editor lets it be picked among the others
     if ($riskAssessment !== null && $riskAssessment->id > 0) {
@@ -92,9 +97,9 @@ function digiriskRiskAssessmentMediaBlock(string $subDir, ?RiskAssessment $riskA
  * Photo added, taken from the media library or removed from a media block of the risk modals: the
  * Saturne media block posts on the page and expects itself back, refreshed. The folder comes from
  * the browser, so only the work folders of a risk or an assessment being created and the folder of
- * an existing assessment are writable.
+ * an existing assessment are writable. Documents are only taken by a psychosocial assessment.
  *
- * @param  string $action Requested action: anything but uploadPhoto, linkPhoto and deletePhoto returns at once
+ * @param  string $action Requested action: anything but uploadPhoto, linkPhoto, deletePhoto, uploadFile and deleteFile returns at once
  * @return void           Ends the request when it handled the action
  * @throws Exception
  */
@@ -102,7 +107,7 @@ function digiriskRiskAssessmentMediaActions(string $action): void
 {
     global $conf, $db, $langs, $user;
 
-    if (!in_array($action, ['uploadPhoto', 'linkPhoto', 'deletePhoto'], true) || GETPOST('module_name', 'alpha') !== 'digiriskdolibarr') {
+    if (!in_array($action, ['uploadPhoto', 'linkPhoto', 'deletePhoto', 'uploadFile', 'deleteFile'], true) || GETPOST('module_name', 'alpha') !== 'digiriskdolibarr') {
         return;
     }
 
@@ -112,15 +117,23 @@ function digiriskRiskAssessmentMediaActions(string $action): void
     $riskAssessment = null;
     $isAllowed      = false;
 
-    if (preg_match('/^riskassessment\/tmp\/RA0(\/[A-Za-z0-9_-]+)?$/', $subDir)) {
+    // A document goes to the subfolder "documents" of the folder of the block
+    $isDocument = in_array($action, ['uploadFile', 'deleteFile'], true);
+    $blockDir   = $isDocument ? preg_replace('/\/documents$/', '', $subDir) : $subDir;
+
+    if (preg_match('/^riskassessment\/tmp\/RA0(\/[A-Za-z0-9_-]+)?$/', $blockDir)) {
         // Work folder of a new risk, or of a new assessment named after its risk
         $isAllowed = true;
-    } elseif (preg_match('/^riskassessment\/([A-Za-z0-9_-]+)$/', $subDir, $matches) && $matches[1] !== 'tmp') {
+    } elseif (preg_match('/^riskassessment\/([A-Za-z0-9_-]+)$/', $blockDir, $matches) && $matches[1] !== 'tmp') {
         $riskAssessment = new RiskAssessment($db);
         $isAllowed      = $riskAssessment->fetch(0, $matches[1]) > 0;
     }
 
-    if (!$isAllowed) {
+    // The work folder of a psychosocial assessment (digiriskRiskAssessmentPsychosocialWorkDir()), or
+    // the folder of one, also takes documents
+    $withFiles = preg_match('/^riskassessment\/tmp\/RA0\/RPS\d+$/', $blockDir) || ($riskAssessment !== null && $riskAssessment->method == 'rps');
+
+    if (!$isAllowed || ($isDocument && (!$withFiles || $blockDir === $subDir))) {
         http_response_code(403);
         exit;
     }
@@ -128,12 +141,21 @@ function digiriskRiskAssessmentMediaActions(string $action): void
     require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
     require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
-    // Writes the photo with its thumbs, copies it from the library, or removes it with them
+    // Writes the photo with its thumbs, copies it from the library, or removes a photo or a document
     require dol_buildpath('/saturne/core/tpl/actions/media_block_actions.tpl.php');
+
+    // Saturne leaves the documents to the page: any type, without thumbs
+    if ($action == 'uploadFile' && getDolGlobalInt('MAIN_UPLOAD_DOC')) {
+        $fileDir = $conf->digiriskdolibarr->dir_output . '/' . $subDir;
+        if (!dol_is_dir($fileDir)) {
+            dol_mkdir($fileDir);
+        }
+        dol_add_file_process($fileDir, 0, 1, 'userfile', '', null, '', 0);
+    }
 
     // The lists show the favorite photo of an assessment: it must name a photo still in its folder
     if ($riskAssessment !== null) {
-        $photoDir = $conf->digiriskdolibarr->dir_output . '/' . $subDir;
+        $photoDir = $conf->digiriskdolibarr->dir_output . '/' . $blockDir;
 
         if (saturne_favorite_media_needs_update($riskAssessment, 'photo', $photoDir)) {
             $favoritePhoto = '';
@@ -151,13 +173,27 @@ function digiriskRiskAssessmentMediaActions(string $action): void
         }
     }
 
-    print digiriskRiskAssessmentMediaBlock($subDir, $riskAssessment);
+    print digiriskRiskAssessmentMediaBlock($blockDir, $riskAssessment, $withFiles);
     exit;
 }
 
 /**
+ * Work folder of the psychosocial assessment of a work unit, while it is being typed
+ *
+ * Inside the work folder of a new risk, which only moves its own files: the classic risk modals of
+ * the same page never take these.
+ *
+ * @param  int    $elementId Work unit or groupment assessed
+ * @return string            Folder, relative to the module folder
+ */
+function digiriskRiskAssessmentPsychosocialWorkDir(int $elementId): string
+{
+    return 'riskassessment/tmp/RA0/RPS' . $elementId;
+}
+
+/**
  * Move the photos taken while a risk or an assessment was being created into the folder of the
- * new assessment, and make sure it shows one of them
+ * new assessment, and make sure it shows one of them. The documents of a psychosocial report follow.
  *
  * Called before the assessment is created: the favorite photo is set on the object, create()
  * stores it.
@@ -194,6 +230,15 @@ function digiriskRiskAssessmentMovePhotos(string $workDir, RiskAssessment $riskA
             $moved[] = $photo['name'];
         }
     }
+
+    // The documents of a psychosocial report keep their own subfolder
+    foreach (dol_dir_list($workDir . '/documents', 'files') as $document) {
+        if (!dol_is_dir($photoDir . '/documents')) {
+            dol_mkdir($photoDir . '/documents');
+        }
+        dol_move($document['fullname'], $photoDir . '/documents/' . $document['name']);
+    }
+    dol_delete_dir($workDir . '/documents', 1);
 
     // The thumbs of the work folder were made for the photos that just left it. The folder goes
     // with them once empty, the next upload creates it again

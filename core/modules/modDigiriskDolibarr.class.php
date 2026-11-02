@@ -34,6 +34,11 @@ include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 class modDigiriskdolibarr extends DolibarrModules
 {
 	/**
+	 * @var int[] Minimum version of Saturne required by module, same format as need_dolibarr_version: checked by init() and by the Saturne index page
+	 */
+	public $need_saturne_version = [23, 6];
+
+	/**
 	 * @var DoliDB Database handler
 	 */
 	public $db;
@@ -736,6 +741,16 @@ class modDigiriskdolibarr extends DolibarrModules
             // chacune reste activable séparément depuis la configuration des risques
             $i++ => ['DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_METHOD', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_GRID_METHOD', 'integer', 1, '', 0, 'current'],
+            // Public overview of the risks of the GP/UT: closed until opened in the setup, which creates its key
+            $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE', 'integer', 0, '', 0, 'current'],
+            // Its strenuousness, psychosocial and register tabs are shown until switched off
+            $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_PENIBILITY', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_PSYCHOSOCIAL', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_REGISTER', 'integer', 1, '', 0, 'current'],
+            // So is its Excel export, as before the switch existed
+            $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_EXPORT', 'integer', 1, '', 0, 'current'],
+            // The person to notify and their phone only show in its header when asked
+            $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_RESPONSIBLE', 'integer', 0, '', 0, 'current'],
 
 			// CONST RISK ASSESSMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE', 'integer', 1, '', 0, 'current'],
@@ -884,6 +899,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON', 'chaine', 'mod_ticketdocument_standard', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKETDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/ticketdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKETDOCUMENT_DEFAULT_MODEL', 'chaine', 'ticketdocument_odt', '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_TICKETQQOQCPDOCUMENT_ADDON', 'chaine', 'mod_ticketqqoqcpdocument_standard', '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_TICKETQQOQCPDOCUMENT_DEFAULT_MODEL', 'chaine', 'ticketqqoqcpdocument', '', 0, 'current'],
 
 			// CONST PROJECT DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_PROJECTDOCUMENT_ADDON', 'chaine', 'mod_projectdocument_standard', '', 0, 'current'],
@@ -1485,6 +1502,20 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'categoryconfig';
 		$r++;
 
+		/* ACTION PLAN (PAPRIPACT) PERMISSIONS */
+		// Kept last: a permission id derives from its position, inserting it higher would shift the ids already granted.
+		// They open the action plan to the users who only follow up the corrective actions, without the other Digirisk rights.
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
+		$this->rights[$r][1] = $langs->transnoentities('ReadActionPlan');
+		$this->rights[$r][4] = 'actionplan';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
+		$this->rights[$r][1] = $langs->transnoentities('WriteActionPlan');
+		$this->rights[$r][4] = 'actionplan';
+		$this->rights[$r][5] = 'write';
+		$r++;
+
 		// The mobile interfaces and the application create the very same objects as the classic cards:
 		// they rely on preventionplan/write and firepermit/write rather than on rights of their own.
 
@@ -1581,7 +1612,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
             'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'projet\') && !getDolGlobalInt(\'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_MENU_HIDDEN\')',
-            'perms'    => '$user->rights->projet->lire',
+            'perms'    => '$user->rights->digiriskdolibarr->actionplan->read || $user->rights->digiriskdolibarr->riskassessmentdocument->read',
             'target'   => '',
             'user'     => 0,
         ];
@@ -1597,6 +1628,25 @@ class modDigiriskdolibarr extends DolibarrModules
             'position' => 100 + $r,
             'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'categorie\') && $user->rights->digiriskdolibarr->risk->read && getDolGlobalString(\'DIGIRISKDOLIBARR_CATEGORY_ON_RISK\') && !getDolGlobalInt(\'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_MENU_HIDDEN\')',
             'perms'    => '$user->rights->digiriskdolibarr->risk->read',
+            'target'   => '',
+            'user'     => 0,
+        ];
+
+        // The menu shows no entry under a forbidden parent: a user who follows up the action plan without reading the
+        // Document Unique reaches the PAPRIPACT from this top entry. Its own leftmenu keeps it out of the URL rewrites
+        // made on the 'digiriskactionplan' entry above.
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',
+            'type'     => 'left',
+            'titre'    => $langs->trans('PAPRIPACT'),
+            'prefix'   => '<i class="fas fa-tasks pictofixedwidth"></i>',
+            'mainmenu' => 'digiriskdolibarr',
+            'leftmenu' => 'digiriskdolibarr_actionplan',
+            'url'      => '/digiriskdolibarr/view/digiriskstandard/actionplan_list.php?view=kanban',
+            'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+            'position' => 100 + $r,
+            'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'projet\') && !getDolGlobalInt(\'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_MENU_HIDDEN\') && $user->rights->digiriskdolibarr->actionplan->read && !$user->rights->digiriskdolibarr->riskassessmentdocument->read',
+            'perms'    => '$user->rights->digiriskdolibarr->actionplan->read',
             'target'   => '',
             'user'     => 0,
         ];
@@ -1778,7 +1828,7 @@ class modDigiriskdolibarr extends DolibarrModules
         $this->menu[$r++] = [
             'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
             'type'     => 'left',			                // This is a Left menu entry
-            'titre'    => $langs->transnoentities('Ticket'),
+            'titre'    => $langs->transnoentities('Register'),
             'prefix'   => '<i class="fas fa-ticket-alt pictofixedwidth"></i>',
             'mainmenu' => 'digiriskdolibarr',
             'leftmenu' => 'digiriskticket',
@@ -1794,8 +1844,7 @@ class modDigiriskdolibarr extends DolibarrModules
         $this->menu[$r++] = [
             'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskticket',
             'type'     => 'left',
-            'titre'    => $langs->transnoentities('TicketKanban'),
-            'prefix'   => '<i class="fas fa-columns pictofixedwidth"></i>',
+            'titre'    => '<i class="fas fa-columns pictofixedwidth"></i>' . $langs->transnoentities('RegisterKanban'),
             'mainmenu' => 'digiriskdolibarr',
             'leftmenu' => 'digiriskdolibarr_ticketkanban',
             'url'      => '/digiriskdolibarr/view/ticket/ticket_action_card.php',
@@ -1810,7 +1859,7 @@ class modDigiriskdolibarr extends DolibarrModules
         $this->menu[$r++] = [
             'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskticket',
             'type'     => 'left',
-            'titre'    => '<i class="fas fa-list pictofixedwidth"></i>' . $langs->transnoentities('TicketList'),
+            'titre'    => '<i class="fas fa-list pictofixedwidth"></i>' . $langs->transnoentities('RegisterList'),
             'mainmenu' => 'digiriskdolibarr',
             'leftmenu' => 'digiriskdolibarr_ticketlist',
             'url'      => '/ticket/list.php',
@@ -1852,6 +1901,25 @@ class modDigiriskdolibarr extends DolibarrModules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		];
+
+		// The media library page belongs to Saturne : no entry while the installed Saturne does not ship it yet
+		if (file_exists(dol_buildpath('/saturne/view/saturne_medias.php'))) {
+			$this->menu[$r++] = [
+				'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',
+				'type'     => 'left',
+				'titre'    => 'MediaGallery',
+				'prefix'   => '<i class="fas fa-images pictofixedwidth"></i>',
+				'mainmenu' => 'digiriskdolibarr',
+				'leftmenu' => 'digiriskdolibarr_medias',
+				'url'      => '/saturne/view/saturne_medias.php?module_name=digiriskdolibarr',
+				'langs'    => 'medias@saturne',
+				'position' => 100 + $r,
+				'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',
+				'perms'    => '$user->rights->digiriskdolibarr->digiriskelement->read',
+				'target'   => '',
+				'user'     => 0,
+			];
+		}
 
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
@@ -1938,8 +2006,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=ticket,fk_leftmenu=ticketstats',
 			'type'     => 'left',
-			'titre'    => $langs->transnoentities('TicketKanban'),
-			'prefix'   => '<i class="fas fa-columns pictofixedwidth"></i>',
+			'titre'    => '<i class="fas fa-columns pictofixedwidth"></i>' . $langs->transnoentities('TicketKanban'),
 			'mainmenu' => 'ticket',
 			'leftmenu' => 'digiriskticketkanban',
 			'url'      => '/digiriskdolibarr/view/ticket/ticket_action_card.php',
@@ -1955,8 +2022,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=ticket,fk_leftmenu=ticketstats',
 			'type'     => 'left',
-			'titre'    => $langs->transnoentities('List'),
-			'prefix'   => '<i class="fas fa-list pictofixedwidth"></i>',
+			'titre'    => '<i class="fas fa-list pictofixedwidth"></i>' . $langs->transnoentities('List'),
 			'mainmenu' => 'ticket',
 			'leftmenu' => 'digiriskticketlist',
 			'url'      => '/ticket/list.php',
@@ -2254,6 +2320,16 @@ class modDigiriskdolibarr extends DolibarrModules
             return 0;
         }
 
+        // Saturne ships separately: refuse one older than need_saturne_version, it lacks functions this release calls
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
+        dol_include_once('/saturne/core/modules/modSaturne.class.php');
+        $saturneVersion = class_exists('modSaturne') ? (new modSaturne($this->db))->version : '';
+        if (versioncompare(explode('.', $saturneVersion), $this->need_saturne_version) < 0) {
+            $langs->load('admin'); // activateModuleDependNotSatisfied, not loaded when the Saturne index page runs init()
+            $this->error = $langs->trans('activateModuleDependNotSatisfied', $this->name, 'modSaturne >= ' . versiontostring($this->need_saturne_version) . ' (' . ($saturneVersion ?: '-') . ')', $this->name);
+            return 0;
+        }
+
         // Dolibarr runs init() before activating $this->depends : activate them first, their tables (saturne_schedules, ticket...) are filled below
         if (function_exists('saturne_activate_module_dependencies') && saturne_activate_module_dependencies($this) < 0) {
             return 0;
@@ -2327,6 +2403,14 @@ class modDigiriskdolibarr extends DolibarrModules
         delDocumentModel('listingrisksdocument', 'listingrisksdocument');
 		delDocumentModel('listingrisksenvironmentalaction_odt', 'listingrisksenvironmentaldocument');
 		delDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument');
+        // Modeles PDF natifs du document unique : meme raison que les autres PDF ci-dessus,
+        // la reactivation du module rejouerait leur insertion sur une ligne deja presente.
+        // Le DU simplifie (riskassessmentdocumentsynthesis) a ete retire : sa suppression reste
+        // ici pour nettoyer les installations qui l'avaient enregistre
+        delDocumentModel('riskassessmentdocumentsynthesis', 'riskassessmentdocument');
+        delDocumentModel('riskassessmentdocumentpdf', 'riskassessmentdocument');
+        delDocumentModel('riskassessmentdocumentguide', 'riskassessmentdocument');
+        delDocumentModel('csepresentationdocument', 'riskassessmentdocument');
 		delDocumentModel('auditreportdocument_odt', 'auditreportdocument');
 		delDocumentModel('ticketdocument_odt', 'ticketdocument');
         delDocumentModel('papripact_a3_paysage_projectdocument', 'project');
@@ -2335,6 +2419,7 @@ class modDigiriskdolibarr extends DolibarrModules
         delDocumentModel('accidentinvestigationdocument', 'accidentinvestigationdocument');
         delDocumentModel('registerdocument_odt', 'registerdocument');
         delDocumentModel('ticketdocument', 'ticketdocument');
+        delDocumentModel('ticketqqoqcpdocument', 'ticketqqoqcpdocument');
 
 		addDocumentModel('informationssharing_odt', 'informationssharing', 'ODT templates', 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
 		addDocumentModel('legaldisplay_odt', 'legaldisplay', 'ODT templates', 'DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
@@ -2357,9 +2442,13 @@ class modDigiriskdolibarr extends DolibarrModules
         addDocumentModel('listingrisksdocument', 'listingrisksdocument', $langs->transnoentities('ListingRisksDocumentPDF'));
         addDocumentModel('listingrisksenvironmentalaction_odt', 'listingrisksenvironmentaldocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSENVIRONMENTALACTION_ADDON_ODT_PATH');
 		addDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
+        addDocumentModel('riskassessmentdocumentpdf', 'riskassessmentdocument', $langs->transnoentities('DigiriskDuPDF'));
+        addDocumentModel('riskassessmentdocumentguide', 'riskassessmentdocument', $langs->transnoentities('DigiriskGuidePDF'));
+        addDocumentModel('csepresentationdocument', 'riskassessmentdocument', $langs->transnoentities('DigiriskCsePresentationPDF'));
 		addDocumentModel('auditreportdocument_odt', 'auditreportdocument', 'ODT templates', 'DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('ticketdocument_odt', 'ticketdocument', 'ODT templates', 'DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('ticketdocument', 'ticketdocument', $langs->transnoentities('TicketDocumentPDF'));
+        addDocumentModel('ticketqqoqcpdocument', 'ticketqqoqcpdocument', $langs->transnoentities('TicketQqoqcpDocumentPDF'));
 		addDocumentModel('papripact_a3_paysage_projectdocument', 'project', 'PAPRIPACT-A3-PAYSAGE');
         addDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument', 'ODT templates', 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('accidentinvestigationdocument', 'accidentinvestigationdocument', $langs->transnoentities('AccidentInvestigationDocumentPDF'));
@@ -2643,7 +2732,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'fk_firepermit'            => ['Label' => 'FirePermit',            'type' => 'link', 'elementtype' => ['projet_task'], 'position' => $this->numero . 30, 'params' => ['FirePermit:digiriskdolibarr/class/firepermit.class.php:1:(entity:IN:__SHARED_ENTITIES__)' => NULL],                     ],
             'fk_accident'              => ['Label' => 'Accident',              'type' => 'link', 'elementtype' => ['projet_task'], 'position' => $this->numero . 40, 'params' => ['Accident:digiriskdolibarr/class/accident.class.php:1:(entity:IN:__SHARED_ENTITIES__)' => NULL],                         ],
             'fk_accidentinvestigation' => ['Label' => 'AccidentInvestigation', 'type' => 'link',   'elementtype' => ['projet_task'], 'position' => $this->numero . 50, 'params' => ['AccidentInvestigation:digiriskdolibarr/class/accidentinvestigation.class.php:1:(entity:IN:__SHARED_ENTITIES__)' => NULL]],
-            'digirisk_action_type'     => ['Label' => 'DigiriskActionType',    'type' => 'select', 'elementtype' => ['projet_task'], 'position' => $this->numero . 60, 'params' => [1 => 'Curative', 2 => 'Corrective'],                                                                                                                                                       ],
+            'digirisk_action_type'     => ['Label' => 'DigiriskActionType',    'type' => 'select', 'elementtype' => ['projet_task'], 'position' => $this->numero . 60, 'params' => [1 => 'Curative', 2 => 'Corrective', 3 => 'Preventive'],                                                                                                                                    ],
 
             'wp_digi_id' => ['Label' => 'WPDigiID', 'type' => 'int', 'length' => 100, 'elementtype' => ['digiriskdolibarr_digiriskelement'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')"],
             'entity'     => ['Label' => 'Entity',   'type' => 'int', 'length' => 100, 'elementtype' => ['digiriskdolibarr_digiriskelement'], 'position' => $this->numero . 20, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')"],
@@ -2654,6 +2743,15 @@ class modDigiriskdolibarr extends DolibarrModules
             'ticket_category_config' => ['Label' => 'TicketCategoryConfig', 'type' => 'text', 'elementtype' => ['categorie'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('categorie') && isModEnabled('ticket')", 'moreparams' => []],
 
 			'ticket_categories' => ['Label' => 'Categories', 'type' => 'text', 'elementtype' => ['ticket'], 'position' => 1, 'list' => 2, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('categorie') && isModEnabled('ticket')", 'moreparams' => []],
+
+            // QQOQCCP analysis of the ticket (#5549): filled and shown by its own tab and document, hidden from the native card
+            'digiriskdolibarr_qqoqcp_what'    => ['Label' => 'QQOQCPWhat',    'type' => 'text',     'elementtype' => ['ticket'], 'position' => $this->numero . 80, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => []],
+            'digiriskdolibarr_qqoqcp_who'     => ['Label' => 'QQOQCPWho',     'type' => 'chkbxlst', 'elementtype' => ['ticket'], 'position' => $this->numero . 81, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => [], 'params' => ['user:lastname|firstname:rowid' => null]],
+            'digiriskdolibarr_qqoqcp_where'   => ['Label' => 'QQOQCPWhere',   'type' => 'text',     'elementtype' => ['ticket'], 'position' => $this->numero . 82, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => []],
+            'digiriskdolibarr_qqoqcp_when'    => ['Label' => 'QQOQCPWhen',    'type' => 'text',     'elementtype' => ['ticket'], 'position' => $this->numero . 83, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => []],
+            'digiriskdolibarr_qqoqcp_how'     => ['Label' => 'QQOQCPHow',     'type' => 'text',     'elementtype' => ['ticket'], 'position' => $this->numero . 84, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => []],
+            'digiriskdolibarr_qqoqcp_why'     => ['Label' => 'QQOQCPWhy',     'type' => 'text',     'elementtype' => ['ticket'], 'position' => $this->numero . 85, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => []],
+            'digiriskdolibarr_qqoqcp_howmuch' => ['Label' => 'QQOQCPHowMuch', 'type' => 'text',     'elementtype' => ['ticket'], 'position' => $this->numero . 86, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => []],
 
 			'digirisk_identification' => ['Label' => 'DigiriskIdentification', 'type' => 'html', 'elementtype' => ['product'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('product')", 'moreparams' => ['visibility' => 0]],
 			'digirisk_security'       => ['Label' => 'DigiriskSecurity',       'type' => 'html', 'elementtype' => ['product'], 'position' => $this->numero . 20, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('product')", 'moreparams' => ['visibility' => 0]],
@@ -2696,6 +2794,16 @@ class modDigiriskdolibarr extends DolibarrModules
 
             saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 6, 'integer', 0, '', 0);
+        }
+
+        // Tickets of the public interface were saved without a subject until #5588: they get the start of their message
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_SUBJECT_BACKWARD_COMPATIBILITY')) {
+            require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
+
+            // A failure leaves the constant unset, so the next activation tries again
+            if (digiriskdolibarr_ticket_fill_empty_subjects($this->db, (int) $conf->entity) >= 0) {
+                dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_SUBJECT_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
+            }
         }
 
 		//DigiriskElement favorite medias backward compatibility
@@ -3080,6 +3188,12 @@ class modDigiriskdolibarr extends DolibarrModules
             $category->updateExtraField('ticket_category_config');
 
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_REMOVE_TICKET_PUBLIC_INTERFACE_CONST', 1, 'integer', 0, '', $conf->entity);
+        }
+
+        // BACKWARD REMOVE DEAD CSS CONST: _init() skips an empty css entry of module_parts, so the constant written by an
+        // older descriptor stays and every page requests patch_preview_icon.css, a file that never existed (#5550)
+        if (empty($this->module_parts['css']) && getDolGlobalString($this->const_name . '_CSS')) {
+            dolibarr_del_const($this->db, $this->const_name . '_CSS', $conf->entity);
         }
 
         $result = $this->_init($sql, $options);

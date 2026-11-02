@@ -421,6 +421,37 @@ class RiskSign extends SaturneObject
 	}
 
     /**
+     * Get the protections of elements: their risk signs of a personal (OBLIGATION) or collective (epc) protective
+     * equipment, as the simplified risk list of DigiBoard shows them. Read in one pass
+     *
+     * @param  int[] $fkElements Elements to read, every element when empty
+     * @return array             'categories': the protection categories by position, 'byElement': the risk signs of each element
+     */
+    public function getProtectionsByElement(array $fkElements = []): array
+    {
+        $protections = ['categories' => [], 'byElement' => []];
+        foreach ($this->getRiskSignCategories() as $riskSignCategory) {
+            if (preg_match('/^(OBLIGATION|epc)\//', $riskSignCategory['name_thumbnail'] ?? '')) {
+                $protections['categories'][(int) $riskSignCategory['position']] = $riskSignCategory;
+            }
+        }
+        if (empty($protections['categories'])) {
+            return $protections;
+        }
+
+        $filter = 't.status = ' . self::STATUS_VALIDATED . ' AND t.category IN (' . implode(',', array_keys($protections['categories'])) . ')';
+        if (!empty($fkElements)) {
+            $filter .= ' AND t.fk_element IN (' . implode(',', array_map('intval', $fkElements)) . ')';
+        }
+        $riskSigns = saturne_fetch_all_object_type('RiskSign', 'ASC', 'category', 0, 0, ['customsql' => $filter]);
+        foreach (is_array($riskSigns) ? $riskSigns : [] as $riskSign) {
+            $protections['byElement'][(int) $riskSign->fk_element][] = $riskSign;
+        }
+
+        return $protections;
+    }
+
+    /**
      * Write information of trigger description
      *
      * @return string Description to display in actioncomm->note_private

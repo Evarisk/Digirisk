@@ -31,6 +31,7 @@ require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/actions_ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/ticket.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_action.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
@@ -41,17 +42,19 @@ require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 
 global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $user;
 
-saturne_load_langs(['ticket', 'companies', 'projects', 'categories']);
+saturne_load_langs(['ticket', 'companies', 'projects', 'categories', 'other']);
 
 $id      = GETPOSTINT('id');
+$ref     = GETPOST('ref', 'alpha');
 $trackId = GETPOST('track_id', 'alpha');
 $action  = GETPOST('action', 'aZ09');
 
 $now = dol_now();
 
 $object = new Ticket($db);
-if ($id > 0 || !empty($trackId)) {
-    $object->fetch($id, '', $trackId);
+// The previous / next arrows of the banner (dol_banner_tab) open the card by its ref
+if ($id > 0 || !empty($ref) || !empty($trackId)) {
+    $object->fetch($id, $ref, $trackId);
     if ($object->id > 0) {
         $object->fetch_optionals();
     }
@@ -198,17 +201,19 @@ if ($action === 'setproject_ajax' && $permissionToWrite) {
         }
     }
     $object->setProject($newProjectId);
-    $projRef = '';
-    $cardUrl = '';
+    $projRef   = '';
+    $projLabel = '';
+    $cardUrl   = '';
     if ($newProjectId > 0) {
         $proj = new Project($db);
         $proj->fetch($newProjectId);
-        $projRef = trim($proj->ref);
-        $cardUrl = DOL_URL_ROOT . '/projet/card.php?id=' . $newProjectId;
+        $projRef   = trim($proj->ref);
+        $projLabel = $projRef . ($proj->title ? ' - ' . $proj->title : '');
+        $cardUrl   = DOL_URL_ROOT . '/projet/card.php?id=' . $newProjectId;
     }
     digiriskdolibarr_ticket_log_field_change($object, $langs->transnoentities('Project'), $oldProjRef, $projRef, $ticketLogConst);
     header('Content-Type: application/json');
-    print json_encode(['success' => 1, 'id' => $newProjectId, 'name' => $projRef, 'cardurl' => $cardUrl]);
+    print json_encode(['success' => 1, 'id' => $newProjectId, 'name' => $projLabel, 'cardurl' => $cardUrl]);
     exit;
 }
 
@@ -275,10 +280,17 @@ if ($action === 'post_message_ajax' && $permissionToWrite) {
         exit;
     }
     $object->fetch($id);
+    $willMail = (!$private && (!empty($toList) || !empty($ccList)));
+    // Files of the ticket picked in the composer (#4650): attached to the mail, or sent as download links. The
+    // links go in the message itself, so the thread keeps them.
+    $linkedFiles      = $willMail ? digiriskdolibarr_ticket_linked_files($object, GETPOST('linked_files', 'array') ?: []) : [];
+    $linkedFilesLinks = !empty($linkedFiles) && GETPOSTINT('linked_files_as_links');
+    if ($linkedFilesLinks) {
+        $body .= digiriskdolibarr_ticket_files_share_block($linkedFiles, digiriskdolibarr_ticket_files_share_links($object, $linkedFiles));
+    }
     $object->subject = $subject ?: ($object->subject ?? '');
     $object->message = $body;
     $object->private = $private;
-    $willMail = (!$private && (!empty($toList) || !empty($ccList)));
     $newMsgId = $object->createTicketMessage($user, 0, [], [], [], $willMail);
     if (!$newMsgId || $newMsgId <= 0) {
         header('Content-Type: application/json');
@@ -307,17 +319,29 @@ if ($action === 'post_message_ajax' && $permissionToWrite) {
                 $fileNameList[]     = $destFile;
                 $mimeTypeList[]     = dol_mimetype($destFile);
                 $mimeFileNameList[] = $safeName;
-                $ecmFile = new EcmFiles($db);
-                $ecmFile->filepath        = $relDir;
-                $ecmFile->filename        = $safeName;
-                $ecmFile->fullpath_orig   = $safeName;
-                $ecmFile->gen_or_uploaded = 'uploaded';
-                $ecmFile->entity          = $conf->entity;
-                $ecmFile->src_object_type = 'ticket';
-                $ecmFile->src_object_id   = (int) $object->id;
-                $ecmFile->agenda_id       = (int) $newMsgId;
-                if ($ecmFile->create($user) <= 0) {
-                    dol_syslog('ticket conversation: ecm index failed for ' . $destFile, LOG_WARNING);
+                $ecmFile  = new EcmFiles($db);
+                // Label is NOT NULL: the core fills it with the checksum of the file (addFileIntoDatabaseIndex()).
+                // Without it the index was never created, and the message lost its files on reload (#5568).
+                $checksum = (string) md5_file(dol_osencode($destFile));
+                // A file uploaded under the name of a file of the ticket replaces it: its index already exists.
+                if ($ecmFile->fetch(0, '', $relDir . '/' . $safeName) > 0) {
+                    $ecmFile->label     = $checksum;
+                    $ecmFile->agenda_id = (int) $newMsgId;
+                    $ecmResult          = $ecmFile->update($user);
+                } else {
+                    $ecmFile->filepath        = $relDir;
+                    $ecmFile->filename        = $safeName;
+                    $ecmFile->fullpath_orig   = $safeName;
+                    $ecmFile->label           = $checksum;
+                    $ecmFile->gen_or_uploaded = 'uploaded';
+                    $ecmFile->entity          = $conf->entity;
+                    $ecmFile->src_object_type = 'ticket';
+                    $ecmFile->src_object_id   = (int) $object->id;
+                    $ecmFile->agenda_id       = (int) $newMsgId;
+                    $ecmResult                = $ecmFile->create($user);
+                }
+                if ($ecmResult <= 0) {
+                    dol_syslog('ticket conversation: ecm index failed for ' . $destFile . ': ' . implode(', ', $ecmFile->errors), LOG_WARNING);
                 }
             }
         }
@@ -373,11 +397,30 @@ if ($action === 'post_message_ajax' && $permissionToWrite) {
             $mailBody  = ($intro !== '' ? $intro . '<br><br>' : '') . $mailBodyInner . '<br><br>'
                 . $langs->transnoentities('TicketNotificationEmailBodyInfosTrackUrlinternal') . ' : <a href="' . $urlTicket . '">' . $object->track_id . '</a>'
                 . (!empty($signature) ? '<br><br>' . $signature : '');
+            // Files of the ticket attached to the mail (#4650): they already live in the ticket directory,
+            // they only travel with the mail.
+            $mailFileList    = $fileNameList;
+            $mailMimeList    = $mimeTypeList;
+            $mailFileNames   = $mimeFileNameList;
+            $linkedFileNames = [];
+            foreach ($linkedFilesLinks ? [] : $linkedFiles as $ticketFile) {
+                // A file uploaded under the same name has just replaced it: already in the list.
+                if (!in_array($ticketFile['name'], $mailFileNames, true)) {
+                    $mailFileList[]    = $ticketFile['fullname'];
+                    $mailMimeList[]    = dol_mimetype($ticketFile['name']);
+                    $mailFileNames[]   = $ticketFile['name'];
+                    $linkedFileNames[] = $ticketFile['name'];
+                }
+            }
             $from    = getDolGlobalString('TICKET_NOTIFICATION_EMAIL_FROM');
             $replyto = getDolGlobalString('TICKET_NOTIFICATION_EMAIL_REPLYTO');
-            $sentOk  = $object->sendTicketMessageByEmail($mailSubject, $mailBody, 0, $sendto, $sendtocc, $fileNameList, $mimeTypeList, $mimeFileNameList, $from, $replyto);
+            $sentOk  = $object->sendTicketMessageByEmail($mailSubject, $mailBody, 0, $sendto, $mailFileList, $mailMimeList, $mailFileNames, $sendtocc, $from, $replyto);
             // Persist recipients on the actioncomm so past public messages show To/Cc chips.
             $db->query('UPDATE ' . MAIN_DB_PREFIX . "actioncomm SET email_to = '" . $db->escape(implode(',', array_keys($sendto))) . "', email_tocc = '" . $db->escape(implode(',', array_keys($sendtocc))) . "' WHERE id = " . (int) $newMsgId);
+            // The files of the ticket are not attached to the message itself: the thread keeps their names in an event.
+            if ($sentOk && !empty($linkedFileNames)) {
+                digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketFilesSentByMail', implode(', ', $linkedFileNames)), implode("\n", $linkedFileNames), $ticketLogConst);
+            }
             $mailNotice = $sentOk
                 ? ' — ' . $langs->transnoentities('MailSentToNRecipients', (string) count($sendto))
                 : ' — ' . $langs->transnoentities('MailNotSent');
@@ -479,35 +522,16 @@ if ($action === 'delete_message_ajax' && $permissionToWrite) {
     exit;
 }
 
-// The tasks of a ticket hang under a parent task "TKP-<ticket ref>" of the ticket project (#4881).
-$fetchParentTaskId = static function () use ($db, $object): int {
-    if (empty($object->fk_project)) {
-        return 0;
-    }
-    $resql = $db->query('SELECT rowid FROM ' . MAIN_DB_PREFIX . "projet_task WHERE ref = '" . $db->escape('TKP-' . $object->ref) . "' AND fk_projet = " . (int) $object->fk_project);
-    $obj   = $resql ? $db->fetch_object($resql) : null;
-
-    return $obj ? (int) $obj->rowid : 0;
-};
-
-// Action: add a task from the popup (#4881) — the parent task is created along with the first task
+// Action: add a task from the popup (#4881) — the parent task "TKP-<ref>" is created along with the first task
 if ($action === 'add_child_task_modal' && $permissionToWrite && !empty($object->fk_project)) {
     require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
-    $parentTaskId = $fetchParentTaskId();
+    $parentTaskId = digiriskdolibarr_ticket_get_parent_task($db, $object);
     if ($parentTaskId <= 0) {
-        $parentTaskNew = new Task($db);
-        $parentTaskNew->fk_project = $object->fk_project;
-        $parentTaskNew->ref        = 'TKP-' . $object->ref;
-        $parentTaskNew->label      = $langs->trans('Ticket') . ' ' . $object->ref;
-        $parentTaskNew->progress   = 0;
-        $parentTaskId = (int) $parentTaskNew->create($user);
+        $parentTaskId = digiriskdolibarr_ticket_create_parent_task($object, $user, $ticketLogConst);
         if ($parentTaskId <= 0) {
-            setEventMessages($parentTaskNew->error, $parentTaskNew->errors, 'errors');
             header('Location: ' . $url_page_current . '?id=' . $object->id);
             exit;
         }
-        $db->query("UPDATE " . MAIN_DB_PREFIX . "projet_task SET ref = '" . $db->escape($parentTaskNew->ref) . "' WHERE rowid = " . $parentTaskId);
-        digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketTaskCreated', $parentTaskNew->ref), $parentTaskNew->label, $ticketLogConst);
     }
     $t = new Task($db);
     $t->fk_project = $object->fk_project;
@@ -593,21 +617,57 @@ if ($action === 'confirm_set_status' && $permissionToWrite && !GETPOST('cancel')
     setEventMessages($object->error, $object->errors, 'errors');
 }
 
-// Ticket attached-files box — native generate/delete handling for the showdocuments widget (same as the native ticket card).
-$upload_dir         = $conf->ticket->dir_output;
-$permissiontoadd    = $permissionToWrite ? 1 : 0;
-$permissiontodelete = $permissionToWrite ? 1 : 0;
-// Captured before the include: actions_builddoc.inc.php resets $action once it is done.
-$fileActionBefore   = $action;
-$fileNameBefore     = GETPOST('file', 'alpha') ?: GETPOST('urlfile', 'alpha');
-include DOL_DOCUMENT_ROOT . '/core/actions_builddoc.inc.php';
+// Ticket attached-files boxes, as on the native ticket card: the native one (files of the ticket) and the Digirisk one (TicketDocument, #5593).
+$permissiontoadd     = $permissionToWrite ? 1 : 0;
+$permissiontodelete  = $permissionToWrite ? 1 : 0;
+$ticketFile          = (string) GETPOST('file', 'alpha');
+// The Digirisk box only lists ticketdocument/<ref> and its models carry the ticketdocument template directory
+$digiriskDocumentDir = 'ticketdocument/' . dol_sanitizeFileName($object->ref);
+$isDigiriskDocument  = $object->id > 0 && (($action == 'builddoc' && preg_match('/\bticketdocument\b/', GETPOST('model')))
+    || (in_array($action, ['remove_file', 'pdfGeneration'], true) && strpos($ticketFile, $digiriskDocumentDir . '/') === 0));
+$upload_dir          = $isDigiriskDocument ? $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1] : $conf->ticket->dir_output;
 
-// Traceability (#4885) — the attached-files box goes through the native include, which emits no event.
-if ($object->id > 0 && $permissionToWrite && in_array($fileActionBefore, ['builddoc', 'remove_file'], true)) {
-    if ($fileActionBefore === 'builddoc') {
+// Traceability (#4885) — both deletions redirect and exit once done, so the event is written before.
+require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+if ($object->id > 0 && $permissionToWrite && $action == 'remove_file' && $ticketFile !== '' && dol_is_file($upload_dir . '/' . $ticketFile)) {
+    digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketFileDeleted'), basename($ticketFile), $ticketLogConst);
+}
+
+if ($isDigiriskDocument) {
+    if ($action == 'pdfGeneration' && $permissionToWrite) {
+        $error = 0;
+        require dol_buildpath('/saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php');
+
+        $pdfName = dol_sanitizeFileName(pathinfo($ticketFile, PATHINFO_FILENAME) . '.pdf');
+        if (empty($error) && dol_is_file($upload_dir . '/' . dirname($ticketFile) . '/' . $pdfName)) {
+            digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketDocumentGenerated'), $pdfName, $ticketLogConst);
+        }
+        header('Location: ' . $url_page_current . '?track_id=' . urlencode($object->track_id));
+        exit;
+    }
+
+    require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/ticketdocument.class.php';
+
+    $document = new TicketDocument($db);
+    // The ticket belongs to the Dolibarr core and carries no module : without this,
+    // documents_action.tpl.php builds its download link on an empty modulepart
+    $object->module = $moduleNameLowerCase;
+    // Redirected below, once the generation is traced
+    $shouldRedirect = false;
+    require dol_buildpath('/saturne/core/tpl/documents/documents_action.tpl.php');
+
+    // documents_action.tpl.php empties $action when the generation fails
+    if ($action == 'builddoc' && $permissionToWrite) {
+        digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketDocumentGenerated'), basename((string) $document->last_main_doc), $ticketLogConst);
+        header('Location: ' . $url_page_current . '?track_id=' . urlencode($object->track_id));
+        exit;
+    }
+} else {
+    include DOL_DOCUMENT_ROOT . '/core/actions_builddoc.inc.php';
+
+    // actions_builddoc.inc.php empties $action when the generation fails, but not when no model is picked
+    if ($object->id > 0 && $action == 'builddoc' && $permissionToWrite && !is_numeric(GETPOST('model', 'alpha'))) {
         digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketDocumentGenerated'), (string) $object->model_pdf, $ticketLogConst);
-    } else {
-        digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketFileDeleted'), basename((string) $fileNameBefore), $ticketLogConst);
     }
 }
 
@@ -690,14 +750,15 @@ if (isModEnabled('project')) {
     $morehtmlref .= img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="dtc-badge-logo"');
     $morehtmlref .= '<a class="dtc-badge-nav" href="' . dol_escape_htmltag($projUrl) . '" title="' . dol_escape_htmltag($langs->trans('Project')) . '"' . ($hasProject ? '' : ' style="display:none;"') . '><i class="fas fa-project-diagram"></i></a>';
     $projNameClass = 'dtc-project-name dtc-badge-name' . ($permissionToWrite ? ' dtc-inline-edit' : '') . ($hasProject ? '' : ' is-empty');
-    $projNameText  = $hasProject ? dol_escape_htmltag($object->project->ref) : dol_escape_htmltag($emptyProjLabel);
+    $projNameText  = $hasProject ? dol_escape_htmltag($object->project->ref . ($object->project->title ? ' - ' . $object->project->title : '')) : dol_escape_htmltag($emptyProjLabel);
     $projNameTitle = $permissionToWrite ? $langs->trans('SetProject') : $langs->trans('Project');
     $morehtmlref .= '<a class="' . $projNameClass . '" href="' . dol_escape_htmltag($projUrl) . '" title="' . dol_escape_htmltag($projNameTitle) . '">' . $projNameText . '</a>';
     if ($permissionToWrite) {
         require_once DOL_DOCUMENT_ROOT . '/core/class/html.formprojet.class.php';
         $formproject = new FormProjets($db);
         // mode=1 → array; we build a plain <select> (avoids the search-to-select autocompleter), select2-ified by JS on reveal.
-        $projectArray = $formproject->select_projects_list((int) $object->socid, (string) $object->fk_project, 'dtc_project_select', 24, 0, 0, 0, 0, 0, 1, '', 1, 0, '', '', '');
+        // Untruncated title (maxlength 0) so the select2 search also matches the end of long titles.
+        $projectArray = $formproject->select_projects_list((int) $object->socid, (string) $object->fk_project, 'dtc_project_select', 0, 0, 0, 0, 0, 0, 1, '', 1, 0, '', '', '');
         $morehtmlref .= '<span class="dtc-project-selector dtc-inline-selector" style="display:none;">';
         $morehtmlref .= '<select class="dtc-inline-select minwidth200" id="dtc_project_select" name="dtc_project_select">';
         $morehtmlref .= '<option value="0"' . (empty($object->fk_project) ? ' selected' : '') . '></option>';
@@ -708,7 +769,8 @@ if (isModEnabled('project')) {
                     continue;
                 }
                 $selectedAttr = ($projId === (int) $object->fk_project) ? ' selected' : '';
-                $morehtmlref .= '<option value="' . $projId . '"' . $selectedAttr . '>' . dol_escape_htmltag($projLine['value']) . '</option>';
+                // labelx = "ref, title - thirdparty"; value only holds the ref
+                $morehtmlref .= '<option value="' . $projId . '"' . $selectedAttr . '>' . dol_escape_htmltag($projLine['labelx']) . '</option>';
             }
         }
         $morehtmlref .= '</select>';
@@ -721,7 +783,29 @@ $morehtmlref .= '</div>';
 
 $linkback = '<a href="' . dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_action_card.php', 1) . '"><strong>' . $langs->trans('BackToList') . '</strong></a>';
 
-dol_banner_tab($object, 'ref', $linkback, ($user->socid ? 0 : 1), 'ref', 'ref', $morehtmlref);
+// Summary of the corrective and preventive actions under the status (#5549), each counter leads to the actions tab
+$morehtmlstatus = '';
+if (isModEnabled('project') && !empty($object->fk_project) && $user->hasRight('projet', 'lire')) {
+    $actionsCounters = digiriskdolibarr_ticket_count_actions(digiriskdolibarr_ticket_get_actions($db, digiriskdolibarr_ticket_get_parent_task($db, $object)));
+    $actionsUrl      = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_actions.php', 1) . '?id=' . (int) $object->id;
+
+    $morehtmlstatus .= '<div class="dtc-actions-summary">';
+    $morehtmlstatus .= '<span class="dtc-actions-summary__title">' . $langs->trans('TicketActionsSummary') . '</span>';
+    foreach (digiriskdolibarr_ticket_action_sections() as $actionType => $actionSection) {
+        $actionsDone  = $actionsCounters[$actionType]['done'];
+        $actionsTotal = $actionsCounters[$actionType]['total'];
+        $actionsState = $actionsTotal == 0 ? 'none' : ($actionsDone == $actionsTotal ? 'done' : 'open');
+        $actionsTitle = $langs->trans($actionSection['titleKey']) . ' : ' . $langs->trans('XActionsOfY', (string) $actionsDone, (string) $actionsTotal);
+
+        $morehtmlstatus .= '<a class="dtc-actions-summary__item dtc-actions-summary__item--' . $actionsState . '" href="' . dol_escape_htmltag($actionsUrl) . '" title="' . dol_escape_htmltag($actionsTitle) . '">';
+        $morehtmlstatus .= dol_escape_htmltag($langs->trans($actionSection['titleKey']));
+        $morehtmlstatus .= '<span class="dtc-actions-summary__count">' . $actionsDone . ' / ' . $actionsTotal . '</span>';
+        $morehtmlstatus .= '</a>';
+    }
+    $morehtmlstatus .= '</div>';
+}
+
+dol_banner_tab($object, 'ref', $linkback, ($user->socid ? 0 : 1), 'ref', 'ref', $morehtmlref, '', 0, '', $morehtmlstatus);
 
 print '<div class="fichecenter">';
 
@@ -926,6 +1010,10 @@ $genallowed      = $permissionToWrite ? 1 : 0;
 $delallowed      = $permissionToWrite ? 1 : 0;
 print '<div class="dtc-files-box">';
 print $formfileTicket->showdocuments('ticket', $ticketFilesName, $ticketFilesDir, $url_page_current . '?id=' . $object->id, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', '');
+
+// ---- Digirisk documents box (TicketDocument), below the native one as the hook adds it on the native ticket card (#5593) ----
+dol_include_once('/saturne/lib/documents.lib.php');
+print saturne_show_documents('digiriskdolibarr:TicketDocument', $digiriskDocumentDir, $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1] . '/' . $digiriskDocumentDir, $url_page_current . '?id=' . $object->id, $genallowed, $delallowed, getDolGlobalString('DIGIRISKDOLIBARR_TICKETDOCUMENT_DEFAULT_MODEL'), 1, 0, 0, 0, '', '', '', '', '', $object);
 print '</div>';
 
 print '</div>'; // fichehalfleft
@@ -941,7 +1029,7 @@ $parentTaskId = 0;
 $parentTask   = null;
 if (isModEnabled('project')) {
     require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
-    $parentTaskId = $fetchParentTaskId();
+    $parentTaskId = digiriskdolibarr_ticket_get_parent_task($db, $object);
     if ($parentTaskId > 0) {
         $parentTask = new Task($db);
         $parentTask->fetch($parentTaskId);
@@ -1061,12 +1149,18 @@ print '</tbody></table>';
 // ---- Tasks of the ticket (#4881): children of the parent task ----
 $tasksarray = [];
 if ($parentTask) {
+    // The containers of the corrective and preventive actions (#5549) belong to the actions tab
+    $actionContainerIds = [];
+    foreach (array_keys(digiriskdolibarr_ticket_action_sections()) as $actionType) {
+        $actionContainerIds[] = digiriskdolibarr_get_action_container_task($db, $parentTaskId, $actionType);
+    }
+
     $taskObj        = new Task($db);
     $extrafieldsObj = new ExtraFields($db);
     $allTasks       = $taskObj->getTasksArray(null, null, $object->fk_project, 0, 0, '', '-1', '', 0, 0, $extrafieldsObj);
     if (!empty($allTasks)) {
         foreach ($allTasks as $tsk) {
-            if ($tsk->fk_task_parent == $parentTaskId) {
+            if ($tsk->fk_task_parent == $parentTaskId && !in_array((int) $tsk->id, $actionContainerIds, true)) {
                 $tasksarray[] = $tsk;
             }
         }
@@ -1334,6 +1428,8 @@ if ($permissionToWrite) {
         }
         $db->free($resConvTpl);
     }
+    // Files of the ticket (public interface photos, generated documents, earlier attachments) the mail can carry (#4650).
+    $convTicketFiles = digiriskdolibarr_ticket_files_options(digiriskdolibarr_ticket_files($object));
     // Internal agents for @mentions.
     $convAgents = [];
     $resConvAg = $db->query('SELECT rowid, firstname, lastname, login FROM ' . MAIN_DB_PREFIX . 'user WHERE statut = 1 AND entity IN (' . getEntity('user') . ') ORDER BY lastname, firstname');
@@ -1363,6 +1459,13 @@ if ($permissionToWrite) {
             print '<option value="' . (int) $convTplId . '">' . dol_escape_htmltag($convTplLabel) . '</option>';
         }
         print '</select>';
+    }
+    if (!empty($convTicketFiles)) {
+        print '<div class="dtc-composer__linked-files">';
+        print '<span class="dtc-recipients__label" title="' . dol_escape_htmltag($langs->trans('AttachTicketFiles')) . '"><i class="fas fa-paperclip"></i></span>';
+        print $form->multiselectarray('dtc_linked_files', $convTicketFiles, [], 0, 0, 'dtc-linked-files-select', 0, '100%', '', '', $langs->trans('AttachTicketFiles'));
+        print '<label class="dtc-composer__share-links" title="' . dol_escape_htmltag($langs->trans('SendTicketFilesAsShareLinksHelp')) . '"><input type="checkbox" id="dtc_linked_files_as_links" value="1"><i class="fas fa-link"></i>' . $langs->trans('SendTicketFilesAsShareLinks') . '</label>';
+        print '</div>';
     }
     print '</div>';
     print '<div class="dtc-composer__mentions">';

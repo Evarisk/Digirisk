@@ -650,6 +650,10 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
         $moreParam['objectDocument']   = $objectDocument;
         $moreParam['hideTemplateName'] = 1;
 
+        // The document language only knows the module keys when it is the user language itself:
+        // a language picked at generation is a fresh Translate, and every module key came out raw
+        $outputLangs->loadLangs(['main', 'other', 'digiriskdolibarr@digiriskdolibarr']);
+
         return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
     }
 }
