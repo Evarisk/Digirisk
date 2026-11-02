@@ -1954,6 +1954,8 @@ Show                                  = Mostra
 # Kanban ticket — configurazione della registrazione — issue #4753
 # ===========================================================================
 TicketKanban                           = Kanban ticket
+RegisterKanban                         = Kanban registri
+RegisterList                           = Elenco dei registri
 TicketKanbanLogging                    = Kanban ticket — Cronologia delle modifiche
 TicketKanbanLoggingDescription         = Attiva la creazione di eventi durante le modifiche nel kanban
 TicketKanbanLogStatus                  = Modifica dello stato

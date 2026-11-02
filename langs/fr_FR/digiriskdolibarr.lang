@@ -2085,6 +2085,8 @@ Show                                  = Afficher
 # Ticket kanban — admin logging config — issue #4753
 # ===========================================================================
 TicketKanban                           = Kanban tickets
+RegisterKanban                         = Kanban registres
+RegisterList                           = Liste des registres
 TicketKanbanLogging                    = Kanban tickets — Historique des modifications
 TicketKanbanLoggingDescription         = Activer la création d'événements lors des modifications dans le kanban
 TicketKanbanLogStatus                  = Modification du statut
