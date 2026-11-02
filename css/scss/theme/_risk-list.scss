@@ -466,6 +466,48 @@ $rl-badges: (
       color: $rl-muted;
     }
 
+    /* A task of the risk just done: under the header of the assessment cell, an offer to assess it again (#5644) */
+    .risk-reassess-proposal {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      padding: 6px 8px;
+      border: 1px solid rgba($rl-done, 0.35);
+      border-radius: 6px;
+      background: rgba($rl-done, 0.08);
+      font-size: 12px;
+      line-height: 1.35;
+      color: $rl-text;
+
+      &__icon {
+        color: $rl-done;
+      }
+
+      &__text {
+        flex: 1 1 120px;
+      }
+
+      &__open.wpeo-button {
+        padding: 2px 10px;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      &__dismiss {
+        padding: 2px 4px;
+        border: 0;
+        background: none;
+        color: $rl-faint;
+        cursor: pointer;
+
+        &:hover {
+          color: $rl-text;
+        }
+      }
+    }
+
     /* ---- Last assessment: level badge, then author, date and ref, then the comment ---- */
 
     /* Same :not() as theme/_risk.scss, which draws the box this list does without */

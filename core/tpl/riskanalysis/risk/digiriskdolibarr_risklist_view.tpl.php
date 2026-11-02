@@ -216,6 +216,15 @@ print '<input type="hidden" name="contextpage" value="' . $contextpage . '">';
             <div class="notice-close"><i class="fas fa-times"></i></div>
         </div>
     </div>
+    <!-- A task of the risk just done: its row offers to assess the risk again (#5644), see task.js -->
+    <template id="riskReassessProposal">
+        <div class="risk-reassess-proposal">
+            <i class="fas fa-check-circle risk-reassess-proposal__icon"></i>
+            <span class="risk-reassess-proposal__text"><?php echo $langs->trans('RiskReassessProposal'); ?></span>
+            <button type="button" class="wpeo-button button-blue button-radius-2 risk-reassess-proposal__open"><?php echo $langs->trans('RiskReassessProposalButton'); ?></button>
+            <button type="button" class="risk-reassess-proposal__dismiss" aria-label="<?php echo dol_escape_htmltag($langs->trans('Close')); ?>"><i class="fas fa-times"></i></button>
+        </div>
+    </template>
     <div class="messageSuccessTaskDelete notice hidden">
         <input type="hidden" class="valueForDeleteTask1" value="<?php echo $langs->trans('TheTask') . ' ' ?>">
         <input type="hidden" class="valueForDeleteTask2" value="<?php echo ' ' . $langs->trans('HasBeenDeletedF') ?>">

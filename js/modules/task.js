@@ -40,6 +40,42 @@ window.digiriskdolibarr.riskassessmenttask.event = function() {
 	$( document ).on( 'change', '#RiskassessmentTaskTimespentDatemin', window.digiriskdolibarr.riskassessmenttask.selectRiskassessmentTaskTimespentDateMin );
 	$( document ).on( 'keyup', '.riskassessment-task-label', window.digiriskdolibarr.riskassessmenttask.checkRiskassessmentTaskLabelLength );
 	$( document ).on( 'click', '.listingHeaderTaskTooltip', window.digiriskdolibarr.riskassessmenttask.redirectOnSharedTaskConfig );
+	$( document ).on( 'click', '.risk-reassess-proposal__open', window.digiriskdolibarr.riskassessmenttask.openReassessment );
+	$( document ).on( 'click', '.risk-reassess-proposal__dismiss', function() {
+		$(this).closest('.risk-reassess-proposal').remove();
+	});
+};
+
+/**
+ * Offer to assess a risk again, in its row, once one of its tasks is done (#5644). Nothing is offered when
+ * the row has no button to add an assessment: no right to, or a shared or inherited risk.
+ *
+ * @param  {string|number} riskId Id of the risk
+ * @return {void}
+ */
+window.digiriskdolibarr.riskassessmenttask.proposeReassessment = function ( riskId ) {
+	let addButton = $('#risk_row_' + riskId + ' .risk-evaluation-add').first();
+	let template  = document.getElementById('riskReassessProposal');
+	if (!addButton.length || !template) {
+		return;
+	}
+
+	let proposal = $(template.content.firstElementChild.cloneNode(true)).attr('data-risk-id', riskId);
+	$('#risk_row_' + riskId + ' .risk-reassess-proposal').remove();
+	addButton.closest('.table-cell-header').after(proposal);
+};
+
+/**
+ * Open the assessment modal of the risk the proposal is about, as its add button does.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.riskassessmenttask.openReassessment = function () {
+	let proposal = $(this).closest('.risk-reassess-proposal');
+	let riskId   = proposal.attr('data-risk-id');
+
+	proposal.remove();
+	$('#risk_row_' + riskId + ' .risk-evaluation-add').first().trigger('click');
 };
 
 /**
@@ -235,7 +271,8 @@ window.digiriskdolibarr.riskassessmenttask.saveRiskAssessmentTask = function ( e
 
 	let editedRiskAssessmentTaskId = $(this).attr('value');
 	let elementRiskAssessmentTask  = $(this).closest('.modal-container');
-	var riskId                     = $(this).closest('.modal-risk').attr('value');
+	// In the risk list the edit modal sits in the row of its risk, with no .modal-risk above it
+	var riskId                     = $(this).closest('.modal-risk').attr('value') || String($(this).closest('tr.risk-row').attr('id') || '').replace('risk_row_', '');
 	let textToShow                 = '';
 
 	let taskText = elementRiskAssessmentTask.find('.riskassessment-task-label' + editedRiskAssessmentTaskId).val()
@@ -250,6 +287,8 @@ window.digiriskdolibarr.riskassessmenttask.saveRiskAssessmentTask = function ( e
 	} else {
 		taskProgress = '';
 	}
+	// Progress the task had when the modal was drawn: reaching 100 % offers to assess the risk again
+	let previousProgress = parseInt(elementRiskAssessmentTask.find('.riskassessment-task-declared-progress' + editedRiskAssessmentTaskId).prop('defaultValue'), 10);
 
 	let dateStart = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStartEdit' + editedRiskAssessmentTaskId).val();
 	let hourStart = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStartEdit' + editedRiskAssessmentTaskId + 'hour').val();
@@ -299,6 +338,10 @@ window.digiriskdolibarr.riskassessmenttask.saveRiskAssessmentTask = function ( e
 
 			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
 			actionContainerSuccess.removeClass('hidden');
+
+			if (taskProgress === 100 && previousProgress < 100) {
+				window.digiriskdolibarr.riskassessmenttask.proposeReassessment(riskId);
+			}
 		},
 		error: function ( resp ) {
 			$('.wpeo-loader').removeClass('wpeo-loader');
@@ -582,6 +625,11 @@ window.digiriskdolibarr.riskassessmenttask.checkTaskProgress = function ( event 
 
 			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
 			actionContainerSuccess.removeClass('hidden');
+
+			// Checked: the task is now done
+			if (taskProgress === 1) {
+				window.digiriskdolibarr.riskassessmenttask.proposeReassessment(riskId);
+			}
 		},
 		error: function ( resp ) {
 			let actionContainerError = $('.messageErrorTaskEdit');
