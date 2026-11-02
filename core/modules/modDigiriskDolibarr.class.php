@@ -742,6 +742,8 @@ class modDigiriskdolibarr extends DolibarrModules
             $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_PENIBILITY', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_PSYCHOSOCIAL', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_REGISTER', 'integer', 1, '', 0, 'current'],
+            // The person to notify and their phone only show in its header when asked
+            $i++ => ['DIGIRISKDOLIBARR_RISK_OVERVIEW_RESPONSIBLE', 'integer', 0, '', 0, 'current'],
 
 			// CONST RISK ASSESSMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE', 'integer', 1, '', 0, 'current'],

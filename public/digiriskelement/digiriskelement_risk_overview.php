@@ -48,6 +48,7 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/riskassessment.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
@@ -56,8 +57,9 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_riskoverview.lib.php';
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $mysoc;
 
-// Load translation files required by the page: ticket for the status and severity of the register tab
-saturne_load_langs(['ticket']);
+// Load translation files required by the page: ticket for the status and severity of the register tab,
+// companies for the professional identifier of the header
+saturne_load_langs(['companies', 'ticket']);
 
 // Get parameters
 $key    = GETPOST('key', 'alphanohtml');
@@ -67,6 +69,9 @@ $entity = !isModEnabled('multicompany') ? $conf->entity : GETPOSTINT('entity');
 
 if ($entity > 0) {
     $conf->setEntityValues($db, $entity);
+    // $mysoc was read on the entity of the session, or the first one: the company of the page and of its
+    // export is the one of the entity of the link
+    $mysoc->setMysoc($conf);
 }
 
 // A tab hidden in the setup opens the first one
@@ -104,7 +109,11 @@ $pinAsked = $accessAllowed && !digiriskRiskOverviewPinGiven();
 
 $overviewRows    = [];
 $overviewColumns = [];
+$overviewCompany = [];
 if ($accessAllowed && !$pinAsked) {
+    // Logo, name and SIRET of the company in the header, with the person to notify when the setup shows them
+    $overviewCompany = digiriskRiskOverviewCompany($db);
+
     $digiriskElement           = new DigiriskElement($db);
     $activeDigiriskElementList = $digiriskElement->getActiveDigiriskElements();
     if (!is_array($activeDigiriskElementList)) {
