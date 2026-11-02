@@ -25,7 +25,7 @@
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 // Load Saturne libraries.
-require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
+dol_include_once('/saturne/class/saturneobject.class.php');
 
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/riskanalysis/risk.class.php';
@@ -1030,7 +1030,7 @@ class DigiriskElement extends SaturneObject
         global $conf, $langs;
 
         require_once __DIR__ . '/digiriskstandard.class.php';
-        require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
+        dol_include_once('/saturne/class/task/saturnetask.class.php');
 
         $digiriskStandard = new DigiriskStandard($this->db);
         $digiriskStandard->fetch($this->fk_standard);
@@ -1069,13 +1069,26 @@ class DigiriskElement extends SaturneObject
 
         $digiriskElements = $this->fetchDigiriskElementFlat(GETPOSTISSET('id') ? GETPOST('id') : 0);
 
+        // Information tab of a GP/UT: the risks of the element come first. The home dashboard has no id and
+        // already shows the risks of the whole company
+        $currentDigiriskElement = new DigiriskElement($this->db);
+        if (GETPOSTINT('id') > 0 && $currentDigiriskElement->fetch(GETPOSTINT('id')) > 0) {
+            require_once __DIR__ . '/riskanalysis/risk.class.php';
+
+            $risk  = new Risk($this->db);
+            $array = array_merge($array, $risk->loadDigiriskElementDashboard($currentDigiriskElement, $digiriskElements));
+        }
+
         if (empty($dashboardConfig->graphs->DigiriskElementsRepartitionByDepth->hide)) {
             $array['graphs'][] = $this->getDigiriskElementListsByDepth($digiriskElements);
         } else {
             $array['disabledGraphs']['DigiriskElementsRepartitionByDepth'] = $langs->transnoentities('DigiriskElementsRepartitionByDepth');
         }
         if (empty($dashboardConfig->graphs->RisksRepartitionByDigiriskElement->hide)) {
-            $array['graphs'][] = $this->getRisksByDigiriskElement('risk', $digiriskElements);
+            // A work unit contains nothing: its pie had a single part, itself at 100 %
+            if ($currentDigiriskElement->element_type != 'workunit') {
+                $array['graphs'][] = $this->getRisksByDigiriskElement('risk', $digiriskElements);
+            }
         } else {
             $array['disabledGraphs']['RisksRepartitionByDigiriskElement'] = $langs->transnoentities('RisksRepartitionByDigiriskElement');
         }
@@ -1104,7 +1117,7 @@ class DigiriskElement extends SaturneObject
         $array['width']      = '100%';
         $array['height']     = 400;
         $array['type']       = 'pie';
-        $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
+        $array['showlegend'] = ($conf->browser->layout ?? '') == 'phone' ? 1 : 2;
         $array['dataset']    = 1;
 
         // Get current digirisk element and add data in $digiriskElements array
@@ -1159,7 +1172,7 @@ class DigiriskElement extends SaturneObject
         $array['width']      = '100%';
         $array['height']     = 400;
         $array['type']       = 'pie';
-        $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
+        $array['showlegend'] = ($conf->browser->layout ?? '') == 'phone' ? 1 : 2;
         $array['dataset']    = 1;
 
         $children = [];

@@ -25,11 +25,11 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../digiriskelement.class.php';
-require_once __DIR__ . '/../../../saturne/class/task/saturnetask.class.php';
+dol_include_once('/saturne/class/task/saturnetask.class.php');
 require_once __DIR__ . '/riskassessment.class.php';
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../saturne/class/saturneobject.class.php';
+dol_include_once('/saturne/class/saturneobject.class.php');
 
 /**
  * Class for Risk
@@ -138,6 +138,11 @@ class Risk extends SaturneObject
      * @var string Type of risk the dashboard is filtered on, read by the graphs to link to the matching list
      */
     protected string $dashboardRiskType = 'risk';
+
+    /**
+     * @var array|null Filters added to the risk list the graphs link to, null when the graphs must not link at all
+     */
+    protected ?array $dashboardListFilters = [];
 
 	/**
 	 * Constructor
@@ -287,6 +292,12 @@ class Risk extends SaturneObject
         $array['risks'] = array_merge($array['current']['risks'], $array['shared']['risks']);
         $nbTotalRisks = ['current' => 0,'shared' => 0];
 
+        // A consolidated psychosocial risk carries one line per unit and keeps its factors in
+        // rpsanswer, so it reaches the two tables below with no sub-category of its own. Read
+        // its factors back here: without this, a unit assessed with the consolidated grid is
+        // absent from the RPS tables of the document while it does hold an assessment.
+        $psychosocialFactors = static::getConsolidatedPsychosocialFactors($array['risks']);
+
         foreach ($array['risks'] as $risk) {
             $riskAssessment->cotation = $risk->riskAssessmentCotation;
             $entity                   = ($risk->entity == $conf->entity || (!isModEnabled('multicompany') && empty($risk->entity))) ? 'current' : 'shared';
@@ -327,15 +338,35 @@ class Risk extends SaturneObject
                 // than dropping it, the category table leaves the psychosocial category to these tables
                 $subCategory = is_numeric($risk->sub_category) ? (int) $risk->sub_category : self::SUB_CATEGORY_NOT_SPECIFIED;
 
-                $array[$entity]['riskBySubCategories'][$subCategory][$scale] = ($array[$entity]['riskBySubCategories'][$subCategory][$scale] ?? 0) + 1;
+                // One risk per unit, factors in rpsanswer: the risk feeds the tables through its
+                // factors rather than through its own line, which carries no sub-category
+                $riskFactors = $psychosocialFactors[$risk->id] ?? [];
 
-                if ($subCategory != self::SUB_CATEGORY_NOT_SPECIFIED) {
-                    // The table holds one cell per element and sub-category: when a session assesses
-                    // several factors of the same family on the same date, as the RPS-DU grid does,
-                    // the cell has to report the worst of them rather than the last one read
-                    $lastCotation = $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$subCategory][$risk->riskAssessmentDate] ?? null;
+                if ($subCategory == self::SUB_CATEGORY_NOT_SPECIFIED && !empty($riskFactors)) {
+                    foreach ($riskFactors as $factorPosition => $factorCotation) {
+                        $riskAssessment->cotation = $factorCotation;
+                        $factorScale              = $riskAssessment->getEvaluationScale();
 
-                    $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$subCategory][$risk->riskAssessmentDate] = is_null($lastCotation) ? $riskAssessment->cotation : max($lastCotation, $riskAssessment->cotation);
+                        $array[$entity]['riskBySubCategories'][$factorPosition][$factorScale] = ($array[$entity]['riskBySubCategories'][$factorPosition][$factorScale] ?? 0) + 1;
+
+                        $lastCotation = $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$factorPosition][$risk->riskAssessmentDate] ?? null;
+
+                        $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$factorPosition][$risk->riskAssessmentDate] = is_null($lastCotation) ? $factorCotation : max($lastCotation, $factorCotation);
+                    }
+
+                    // Restore the cotation of the risk itself for the counters that follow
+                    $riskAssessment->cotation = $risk->riskAssessmentCotation;
+                } else {
+                    $array[$entity]['riskBySubCategories'][$subCategory][$scale] = ($array[$entity]['riskBySubCategories'][$subCategory][$scale] ?? 0) + 1;
+
+                    if ($subCategory != self::SUB_CATEGORY_NOT_SPECIFIED) {
+                        // The table holds one cell per element and sub-category: when a session assesses
+                        // several factors of the same family on the same date, as the RPS-DU grid does,
+                        // the cell has to report the worst of them rather than the last one read
+                        $lastCotation = $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$subCategory][$risk->riskAssessmentDate] ?? null;
+
+                        $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$subCategory][$risk->riskAssessmentDate] = is_null($lastCotation) ? $riskAssessment->cotation : max($lastCotation, $riskAssessment->cotation);
+                    }
                 }
             }
             $array['riskByEntities'][$risk->entity]['nbTotalRisks']++;
@@ -793,6 +824,74 @@ class Risk extends SaturneObject
     }
 
     /**
+     * Get the factors of the consolidated psychosocial assessments, by risk
+     *
+     * A psychosocial risk assessed with the consolidated methods holds one assessment for the
+     * whole unit and keeps the level of each factor in llx_digiriskdolibarr_rpsanswer. Both
+     * psychosocial tables of the risk assessment document are built on sub-categories, so they
+     * need those factors rather than the single line of the risk.
+     *
+     * Only the latest assessment of each risk is read, and a factor assessed by several criteria
+     * keeps the worst of them, as the grid itself does.
+     *
+     * @param  array $risks Risks the document is built on
+     * @return array        Cotation of each factor, by risk id then sub-category position
+     */
+    public static function getConsolidatedPsychosocialFactors(array $risks): array
+    {
+        global $db;
+
+        $riskIds = [];
+        foreach ($risks as $risk) {
+            if ($risk->category == self::PSYCHOSOCIAL_CATEGORY_POSITION) {
+                $riskIds[] = (int) $risk->id;
+            }
+        }
+
+        if (empty($riskIds)) {
+            return [];
+        }
+
+        $sql  = 'SELECT ra.fk_risk, ra.rowid AS fk_riskassessment, a.sub_category, a.cotation';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_rpsanswer a';
+        $sql .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_riskassessment ra ON ra.rowid = a.fk_riskassessment';
+        $sql .= ' WHERE ra.status > 0 AND ra.fk_risk IN (' . implode(',', $riskIds) . ')';
+        $sql .= ' ORDER BY ra.fk_risk ASC, ra.rowid ASC';
+
+        $resql = $db->query($sql);
+        if (!$resql) {
+            return [];
+        }
+
+        $factors    = [];
+        $lastOfRisk = [];
+        while ($obj = $db->fetch_object($resql)) {
+            $riskId       = (int) $obj->fk_risk;
+            $assessmentId = (int) $obj->fk_riskassessment;
+
+            // The query is ordered by assessment: a more recent one replaces the previous
+            if (($lastOfRisk[$riskId] ?? 0) < $assessmentId) {
+                $lastOfRisk[$riskId] = $assessmentId;
+                $factors[$riskId]    = [];
+            }
+
+            if ($lastOfRisk[$riskId] != $assessmentId) {
+                continue;
+            }
+
+            // Positions 6 and 7 describe the prevention context and the impact, not an exposure
+            $subCategory = (int) $obj->sub_category;
+            if ($subCategory < 0 || $subCategory > 5) {
+                continue;
+            }
+
+            $factors[$riskId][$subCategory] = max($factors[$riskId][$subCategory] ?? 0, (int) $obj->cotation);
+        }
+
+        return $factors;
+    }
+
+    /**
      * Get the INRS psychosocial risk assessment grid (RPS-DU tool, brochure ED 6403)
      *
      * Each criterion carries the family heading it is printed under in the official grid, the
@@ -932,21 +1031,26 @@ class Risk extends SaturneObject
     /**
      * Get danger sub category scale label
      *
-     * @param $scale
+     * @param  int            $scale       Cotation
+     * @param  Translate|null $outputLangs Language of the document being generated, the user language when null
      * @return mixed
      */
-    public function getDangerSubCategoryScaleLabel($scale) {
+    public function getDangerSubCategoryScaleLabel($scale, $outputLangs = null) {
         global $langs;
+
+        // A generated document carries its own language: the user one printed "Weak" or
+        // "Moderate" in a French risk assessment document generated by an English user
+        $labelLangs = $outputLangs ?? $langs;
         if ($scale < 48) {
-            return $langs->trans('Weak');
+            return $labelLangs->trans('Weak');
         } elseif ($scale < 51) {
-            return $langs->trans('Moderate');
+            return $labelLangs->trans('Moderate');
         } elseif ($scale < 80) {
-            return $langs->trans('High');
+            return $labelLangs->trans('High');
         } else {
             // The cotation scale has a fourth level, which getEvaluationScale() already knows:
             // an unacceptable factor used to be printed as a dash in the risk assessment document
-            return $langs->trans('Extreme');
+            return $labelLangs->trans('Extreme');
         }
     }
 
@@ -1306,14 +1410,149 @@ class Risk extends SaturneObject
     }
 
     /**
+     * Load the risk dashboard of the information tab of a GP/UT
+     *
+     * A groupment counts the risks of everything it contains, a work unit only its own. The graphs of a
+     * work unit open the risk list filtered on it; that list filters on one element only and would not
+     * match the counts of a groupment, whose graphs do not link.
+     *
+     * @param  DigiriskElement $digiriskElement GP/UT of the tab
+     * @param  array           $descendants     Elements it contains, as DigiriskElement::fetchDigiriskElementFlat() returns them
+     * @return array                            Widgets, graphs and filters, in the format of load_dashboard()
+     * @throws Exception
+     */
+    public function loadDigiriskElementDashboard(DigiriskElement $digiriskElement, array $descendants = []): array
+    {
+        global $langs;
+
+        $confName        = dol_strtoupper($this->module) . '_DASHBOARD_CONFIG';
+        $dashboardConfig = json_decode(getDolUserString($confName));
+        $array           = ['widgets' => [], 'graphs' => [], 'disabledGraphs' => []];
+
+        $riskType                   = !empty($dashboardConfig->filters->riskType) ? $dashboardConfig->filters->riskType : 'risk';
+        $this->dashboardRiskType    = $riskType;
+        $this->dashboardListFilters = ($digiriskElement->element_type == 'groupment' ? null : ['search_fk_element=' . ((int) $digiriskElement->id)]);
+
+        $fkElements                               = array_merge([(int) $digiriskElement->id], array_map('intval', array_keys($descendants)));
+        $dangerCategories                         = static::getDangerCategories($riskType);
+        $riskByDangerCategoriesAndRiskAssessments = $this->getRiskByDangerCategoriesAndRiskAssessments($dangerCategories, $riskType, ['fkElements' => $fkElements]);
+        $assessmentDates                          = $this->getRiskAssessmentDatesForDashboard($fkElements, $riskType);
+
+        $elementRisksUrl = dol_buildpath('/' . $this->module . '/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . ((int) $digiriskElement->id) . '&risk_type=' . urlencode($riskType);
+        $labels          = [$langs->transnoentities('NumberOfRisks')];
+        $contents        = ['<a href="' . $elementRisksUrl . '">' . ((int) ($riskByDangerCategoriesAndRiskAssessments['totalRisks'] ?? 0)) . '</a>'];
+        foreach ($this->cotations as $cotationLevel => $cotation) {
+            $labels[]   = '<span class="fas fa-square paddingright" style="color: ' . $cotation['color'] . ';"></span>' . $cotation['label'] . ' (' . $cotation['start'] . '-' . $cotation['end'] . ')';
+            $contents[] = (int) ($riskByDangerCategoriesAndRiskAssessments['nbRiskByCotations'][$cotationLevel] ?? 0);
+        }
+        $labels[]   = $langs->transnoentities('LastRiskAssessmentDate');
+        $contents[] = $assessmentDates['lastAssessment'] > 0 ? dol_print_date($assessmentDates['lastAssessment'], 'day') : '-';
+        $labels[]   = $langs->transnoentities('RisksNotReassessedForOneYear');
+        $contents[] = $assessmentDates['notReassessed'];
+
+        $lastRisksWidgetData = $this->getLastRisksForDashboard($riskType, 3, $fkElements);
+        // Keys of their own: the widgets closed on the home dashboard stay shown here, and the other way round
+        $array['widgets'] = [
+            'digiriskelementriskkeyfigures' => [
+                'title'      => $langs->transnoentities('DigiriskElementRiskKeyFigures'),
+                'picto'      => 'fas fa-exclamation-triangle',
+                'pictoColor' => '#D35968',
+                'label'      => $labels,
+                'content'    => $contents,
+                'widgetName' => $langs->transnoentities('DigiriskElementRiskKeyFigures'),
+            ],
+            'digiriskelementlastrisks' => [
+                'title'      => $langs->transnoentities('LastRisksAdded'),
+                'picto'      => 'fas fa-exclamation-triangle',
+                'pictoColor' => '#D35968',
+                'label'      => $lastRisksWidgetData['labels'],
+                'content'    => $lastRisksWidgetData['contents'],
+                'widgetName' => $langs->transnoentities('LastRisksAdded'),
+            ],
+        ];
+
+        $array['graphsFilters'] = [
+            'riskType' => [
+                'title'        => $langs->transnoentities('ShowSelectedRiskTypes'),
+                'type'         => 'selectarray',
+                'filter'       => 'riskType',
+                'values'       => ['risk' => $langs->transnoentities('Risk'), 'riskenvironmental' => $langs->transnoentities('Riskenvironmental')],
+                'currentValue' => $riskType
+        ]];
+
+        if (empty($dashboardConfig->graphs->RisksRepartitionByCotation->hide)) {
+            $array['graphs'][] = $this->getRisksByCotation($riskByDangerCategoriesAndRiskAssessments);
+        } else {
+            $array['disabledGraphs']['RisksRepartitionByCotation'] = $langs->transnoentities('RisksRepartitionByCotation');
+        }
+        if (empty($dashboardConfig->graphs->RisksRepartitionByDangerCategories->hide)) {
+            $array['graphs'][] = $this->getRisksByDangerCategories($dangerCategories, $riskByDangerCategoriesAndRiskAssessments);
+        } else {
+            $array['disabledGraphs']['RisksRepartitionByDangerCategories'] = $langs->transnoentities('RisksRepartitionByDangerCategories');
+        }
+
+        return $array;
+    }
+
+    /**
+     * Get the date of the last assessment of a set of risks and how many were not reassessed for a year
+     *
+     * The date read is the one the risk lists show: the assessment date when DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE
+     * is on, the creation date of the assessment otherwise.
+     *
+     * @param  int[]  $fkElements GP/UT the risks belong to
+     * @param  string $riskType   Risk type ('risk' or 'riskenvironmental')
+     * @return array{lastAssessment: int, notReassessed: int} Timestamp of the last assessment (0 without any) and number of risks last assessed more than a year ago
+     */
+    public function getRiskAssessmentDatesForDashboard(array $fkElements, string $riskType = 'risk'): array
+    {
+        global $conf;
+
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
+
+        $result = ['lastAssessment' => 0, 'notReassessed' => 0];
+        if (empty($fkElements)) {
+            return $result;
+        }
+
+        $dateField = getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE') ? 'COALESCE(lastra.date_riskassessment, lastra.date_creation)' : 'lastra.date_creation';
+        $oneYearAgo = $this->db->idate(dol_time_plus_duree(dol_now(), -1, 'y'));
+
+        $sql  = 'SELECT MAX(' . $dateField . ') as last_assessment,';
+        $sql .= ' SUM(CASE WHEN ' . $dateField . " < '" . $oneYearAgo . "' THEN 1 ELSE 0 END) as not_reassessed";
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as r';
+        $sql .= ' INNER JOIN ' . $this->getLastRiskAssessmentSqlTable() . ' as lastid ON lastid.fk_risk = r.rowid';
+        $sql .= ' INNER JOIN ' . MAIN_DB_PREFIX . (new RiskAssessment($this->db))->table_element . ' as lastra ON lastra.rowid = lastid.rowid';
+        $sql .= ' WHERE r.entity = ' . ((int) $conf->entity);
+        $sql .= ' AND r.status = ' . self::STATUS_VALIDATED;
+        $sql .= " AND r.type = '" . $this->db->escape($riskType) . "'";
+        $sql .= ' AND r.fk_element IN (' . implode(',', array_map('intval', $fkElements)) . ')';
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            dol_syslog(__METHOD__ . ' ' . $this->db->lasterror(), LOG_ERR);
+            return $result;
+        }
+
+        $obj = $this->db->fetch_object($resql);
+        if ($obj) {
+            $result['lastAssessment'] = !empty($obj->last_assessment) ? (int) $this->db->jdate($obj->last_assessment) : 0;
+            $result['notReassessed']  = (int) $obj->not_reassessed;
+        }
+
+        return $result;
+    }
+
+    /**
      * Get the last added validated risks (outside trash) for the dashboard widget.
      *
-     * @param  string $riskType Risk type ('risk' or 'riskenvironmental')
-     * @param  int    $limit    Maximum number of risks to return
+     * @param  string $riskType   Risk type ('risk' or 'riskenvironmental')
+     * @param  int    $limit      Maximum number of risks to return
+     * @param  int[]  $fkElements GP/UT to restrict the risks to, every active one when empty
      * @return array{labels: array<int, string>, contents: array<int, string>}
      * @throws Exception
      */
-    public function getLastRisksForDashboard(string $riskType = 'risk', int $limit = 3): array
+    public function getLastRisksForDashboard(string $riskType = 'risk', int $limit = 3, array $fkElements = []): array
     {
         global $conf, $langs;
 
@@ -1322,6 +1561,9 @@ class Risk extends SaturneObject
 
         $digiriskElement = new DigiriskElement($this->db);
         $activeElements  = $digiriskElement->getActiveDigiriskElements('current');
+        if (is_array($activeElements) && !empty($fkElements)) {
+            $activeElements = array_intersect_key($activeElements, array_flip(array_map('intval', $fkElements)));
+        }
         if (!is_array($activeElements) || empty($activeElements)) {
             return [
                 'labels'   => [$langs->transnoentities('NoData')],
@@ -1445,14 +1687,21 @@ class Risk extends SaturneObject
     /**
      * Resolve the thumbnail URL of a risk assessment photo, or return the default nophoto placeholder.
      *
-     * @param  string $baseOutputDir Module multidir_output for current entity
-     * @param  string $raRef         RiskAssessment reference
-     * @param  string $raPhoto       RiskAssessment favorite photo filename
-     * @return string                URL to serve the image
+     * The URL is served without login (saturne/utils/viewimage.php): the public overview of the risks
+     * shows it as well.
+     *
+     * @param  string $baseOutputDir   Module multidir_output for current entity
+     * @param  string $raRef           RiskAssessment reference
+     * @param  string $raPhoto         RiskAssessment favorite photo filename
+     * @param  bool   $withPlaceholder False to get an empty string for an assessment without photo
+     * @return string                  URL to serve the image
      */
-    private function resolveDashboardRiskPhotoUrl(string $baseOutputDir, string $raRef, string $raPhoto): string
+    public function resolveDashboardRiskPhotoUrl(string $baseOutputDir, string $raRef, string $raPhoto, bool $withPlaceholder = true): string
     {
         global $conf;
+
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
         if ($raRef !== '') {
             $raSubDir = 'riskassessment/' . $raRef;
@@ -1478,7 +1727,7 @@ class Risk extends SaturneObject
             }
         }
 
-        return DOL_URL_ROOT . '/public/theme/common/nophoto.png';
+        return $withPlaceholder ? DOL_URL_ROOT . '/public/theme/common/nophoto.png' : '';
     }
 
     /**
@@ -1501,6 +1750,11 @@ class Risk extends SaturneObject
      */
     protected function getRiskListUrl(array $filters = []): string
     {
+        if ($this->dashboardListFilters === null) {
+            return '';
+        }
+
+        $filters   = array_merge($filters, $this->dashboardListFilters);
         $filters[] = 'risk_type=' . $this->dashboardRiskType;
         $filters[] = 'search_status=' . self::STATUS_VALIDATED;
 
@@ -1742,18 +1996,24 @@ class Risk extends SaturneObject
         $array['width']      = '100%';
         $array['height']     = 400;
         $array['type']       = 'pie';
-        $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
+        // No layout without a User-Agent, which an API client may not send
+        $array['showlegend'] = ($conf->browser->layout ?? '') == 'phone' ? 1 : 2;
         $array['dataset']    = 1;
         $array['labels']     = $this->cotations;
 
-        $array['data'] = $riskByDangerCategoriesAndRiskAssessments['nbRiskByCotations'] ?? [];
+        // In the order of the labels: the colours follow it, the levels came in the order the risks were met
+        // and the legend showed the orange and the red the wrong way round
+        $array['data'] = [];
+        foreach (array_keys($this->cotations) as $cotationLevel) {
+            $array['data'][$cotationLevel] = $riskByDangerCategoriesAndRiskAssessments['nbRiskByCotations'][$cotationLevel] ?? 0;
+        }
 
         $links = [];
         foreach (array_keys($array['data']) as $cotationLevel) {
             $links[] = $this->getRiskListUrl(['search_cotation=' . $cotationLevel]);
         }
 
-        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['links' => $links]);
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['links' => array_filter($links)]);
 
         return $array;
     }
@@ -1838,7 +2098,7 @@ class Risk extends SaturneObject
             $links[]                                     = $this->getRiskListUrl(['search_category=' . $dangerCategory['position']]);
         }
 
-        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['links' => $links]);
+        $array['morehtmlright'] = SaturneDashboard::getGraphOptionsInput(['links' => array_filter($links)]);
 
         return $array;
     }
@@ -1949,7 +2209,13 @@ class Risk extends SaturneObject
         $moreSelects = ['cotation'];
         $join        = ' INNER JOIN ' . MAIN_DB_PREFIX . $this->module . '_digiriskelement AS d ON d.rowid = t.fk_element';
         $join       .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->module . '_riskassessment AS ra ON t.rowid = ra.fk_risk';
-        $filter      = 't.status = ' . self::STATUS_VALIDATED . ($moreParam['filterEntity'] ?? ' AND t.entity = ' . $conf->entity) . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOSTINT('id') : '') . ' AND t.type = \'' . $this->db->escape($type) . '\' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED;
+        // fkElements: the GP/UT to count, a groupment with everything it contains; otherwise the element of the page
+        if (!empty($moreParam['fkElements'])) {
+            $elementFilter = ' AND t.fk_element IN (' . implode(',', array_map('intval', $moreParam['fkElements'])) . ')';
+        } else {
+            $elementFilter = (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOSTINT('id') : '');
+        }
+        $filter      = 't.status = ' . self::STATUS_VALIDATED . ($moreParam['filterEntity'] ?? ' AND t.entity = ' . $conf->entity) . $elementFilter . ' AND t.type = \'' . $this->db->escape($type) . '\' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED;
         $risks       = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => $filter], 'AND', false, false, false, $join, [], $select, $moreSelects);
         if (!is_array($risks) || empty($risks)) {
             return $array;

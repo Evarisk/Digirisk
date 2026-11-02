@@ -40,7 +40,7 @@ require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/legaldisplay.clas
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
-require_once __DIR__ . '/../../../saturne/class/saturneschedules.class.php';
+dol_include_once('/saturne/class/saturneschedules.class.php');
 
 global $db, $conf, $langs, $user, $hookmanager;
 
@@ -68,7 +68,25 @@ $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 $permissiontoread   = $user->rights->digiriskdolibarr->digiriskstandard->read && $user->rights->digiriskdolibarr->legaldisplay->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->legaldisplay->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->legaldisplay->delete;
+// The data comes from the company security configuration: editing it requires the right of that page too
+$permissiontoeditcompanydata = $permissiontoadd && $user->hasRight('digiriskdolibarr', 'adminpage', 'read');
 saturne_check_access($permissiontoread);
+
+// Company data edited on this page: digirisk resource ref => element type used by admin/securityconf.php
+$companyDataResources = [
+	'LabourDoctorSociety'    => 'societe',
+	'LabourDoctorContact'    => 'socpeople',
+	'LabourInspectorSociety' => 'societe',
+	'LabourInspectorContact' => 'socpeople',
+	'SAMU'                   => 'societe',
+	'Pompiers'               => 'societe',
+	'Police'                 => 'societe',
+	'AllEmergencies'         => 'societe',
+	'RightsDefender'         => 'societe',
+	'PoisonControlCenter'    => 'societe',
+	'Responsible'            => 'societe',
+];
+$companyDataDates = [];
 
 /*
  * Actions
@@ -80,14 +98,18 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($reshook)) {
     $error = 0;
+
+    // Action update of the company data
+    require_once __DIR__ . '/../../core/tpl/digiriskdocuments/digiriskdolibarr_companydata_action.tpl.php';
+
     $previousRef = $object->ref;
     $object->ref = '';
 
     // Actions builddoc, forcebuilddoc, remove_file.
-    require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
+    require_once dol_buildpath('/saturne/core/tpl/documents/documents_action.tpl.php');
 
     // Action to generate pdf from odt file
-    require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
+    require_once dol_buildpath('/saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php');
 
     $object->ref = $previousRef;
 }
@@ -120,18 +142,52 @@ $moduleNameLowerCase = 'mycompany';
 saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true);
 $moduleNameLowerCase = 'digiriskdolibarr';
 
-print '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>';
-print '<hr>';
-print '<div class="fichecenter">';
-print '<table class="border centpercent tableforfield">' . "\n";
-
-//JSON Decode and show fields
-require_once __DIR__ . '/../../core/tpl/digiriskdocuments/digiriskdolibarr_legaldisplayfields_view.tpl.php';
-
-print '</table>';
+print '<div class="wpeo-notice notice-info company-data-notice">';
+print '<div class="notice-content"><div class="notice-subtitle">';
+print $langs->trans('LegalDisplayCompanyDataNotice', '<a href="' . dol_buildpath('/digiriskdolibarr/admin/securityconf.php', 1) . '">' . $langs->transnoentitiesnoconv('CompanySecurityData') . '</a>');
+print '</div></div>';
 print '</div>';
 
+$form = new Form($db);
+
+if ($action == 'edit' && $permissiontoeditcompanydata) {
+	$resources = new DigiriskResources($db);
+	$allLinks  = $resources->fetchDigiriskResources();
+
+	print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '" name="legaldisplay_form">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="update">';
+	print '<div class="fichecenter">';
+	print '<table class="border centpercent tableforfieldedit">' . "\n";
+
+	require_once __DIR__ . '/../../core/tpl/digiriskdocuments/digiriskdolibarr_legaldisplayfields_edit.tpl.php';
+
+	print '</table>';
+	print '</div>';
+	print $form->buttonsSaveCancel();
+	print '</form>';
+} else {
+	print '<div class="fichecenter">';
+	print '<table class="border centpercent tableforfield">' . "\n";
+
+	//JSON Decode and show fields
+	require_once __DIR__ . '/../../core/tpl/digiriskdocuments/digiriskdolibarr_legaldisplayfields_view.tpl.php';
+
+	print '</table>';
+	print '</div>';
+}
+
 print dol_get_fiche_end();
+
+if ($action != 'edit') {
+	print '<div class="tabsAction">';
+	if ($permissiontoeditcompanydata) {
+		print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER['PHP_SELF'] . '?action=edit">' . $langs->trans('Modify') . '</a>';
+	} else {
+		print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans('NotEnoughPermissions')) . '">' . $langs->trans('Modify') . '</a>';
+	}
+	print '</div>';
+}
 
 // Document Generation -- Génération des documents
 $dirFiles   = 'legaldisplay';

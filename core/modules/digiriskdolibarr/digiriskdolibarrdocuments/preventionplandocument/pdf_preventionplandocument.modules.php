@@ -25,11 +25,11 @@
  */
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
-require_once __DIR__ . '/../../../../../../saturne/class/saturnesignature.class.php';
-require_once __DIR__ . '/../../../../../../saturne/class/saturneschedules.class.php';
-require_once __DIR__ . '/../../../../../../saturne/lib/medias.lib.php';
-require_once __DIR__ . '/../../../../../../saturne/lib/dolibarr.lib.php';
+dol_include_once('/saturne/core/modules/saturne/modules_saturne.php');
+dol_include_once('/saturne/class/saturnesignature.class.php');
+dol_include_once('/saturne/class/saturneschedules.class.php');
+dol_include_once('/saturne/lib/medias.lib.php');
+dol_include_once('/saturne/lib/dolibarr.lib.php');
 
 require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_function.lib.php';
 

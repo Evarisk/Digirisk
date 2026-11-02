@@ -22,7 +22,7 @@
  */
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
+dol_include_once('/saturne/class/saturneobject.class.php');
 
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 
@@ -205,8 +205,10 @@ class AccidentInvestigation extends SaturneObject
 
     /**
      * @var int Accident ID
+     *          No native type: core/actions_addupdatedelete.inc.php assigns '' when the select is left
+     *          empty, which would raise a TypeError instead of the "field required" message.
      */
-    public int $fk_accident = 0;
+    public $fk_accident = 0;
 
     /**
      * Constructor
@@ -253,7 +255,7 @@ class AccidentInvestigation extends SaturneObject
 		if ($this->status <= self::STATUS_DRAFT) {
 			return 0;
 		}
-		require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+		dol_include_once('/saturne/class/saturnesignature.class.php');
 
 		$signatory = new SaturneSignature($this->db);
 		$signatory->deleteSignatoriesSignatures($this->id, $this->element);
@@ -269,7 +271,7 @@ class AccidentInvestigation extends SaturneObject
     public function getTriggerDescription(): string
     {
         require_once __DIR__ . '/accident.class.php';
-        require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
+        dol_include_once('/saturne/class/task/saturnetask.class.php');
 
         global $langs;
 

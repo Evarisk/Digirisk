@@ -8,4 +8,9 @@
     border: 1px solid rgba(38, 60, 92, 0.25) !important;
     color: $dr-navy !important;
   }
+
+  /* Its status dot takes the same navy: the shared theme fills the dots of status 8 in red */
+  .badge.badge-dot.badge-status8 {
+    background: $dr-navy !important;
+  }
 }

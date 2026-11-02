@@ -111,12 +111,13 @@ print '<div class="risk-card-cotation-panel">';
 print '<div class="risk-card-cotation-panel-title">' . $langs->trans('LastRiskAssessment') . '</div>';
 
 if (is_object($lastRiskAssessment)) {
-    $cotationLevel = $object->getCotationLevel($lastRiskAssessment->cotation);
+    // An assessment saved without its cotation leaves the risk still to assess, as the dashboard counts it
+    $cotationLevel = isset($lastRiskAssessment->cotation) ? $object->getCotationLevel((float) $lastRiskAssessment->cotation) : Risk::COTATION_NOT_ASSESSED;
 
     print '<div class="risk-card-cotation-panel-content">';
     print '<div class="risk-evaluation-cotation" data-scale="' . $lastRiskAssessment->getEvaluationScale() . '">' . ($lastRiskAssessment->method == 'standard' ? ($defaultCotation[$lastRiskAssessment->cotation] ?? 0) : $lastRiskAssessment->cotation) . '</div>';
     print '<div class="risk-card-cotation-panel-data">';
-    print '<div class="risk-card-cotation-level">' . ($cotations[$cotationLevel]['label'] ?? '') . '</div>';
+    print '<div class="risk-card-cotation-level">' . ($cotationLevel == Risk::COTATION_NOT_ASSESSED ? $langs->trans('RiskNotAssessed') : ($cotations[$cotationLevel]['label'] ?? '')) . '</div>';
     print '<div class="risk-card-cotation-meta">';
     print '<i class="fas fa-calendar-alt"></i> ' . dol_print_date((getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE') && !empty($lastRiskAssessment->date_riskassessment)) ? $lastRiskAssessment->date_riskassessment : $lastRiskAssessment->date_creation, 'day');
     if (!empty($usersList[$lastRiskAssessment->fk_user_creat])) {

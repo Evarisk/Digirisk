@@ -27,7 +27,7 @@ require_once __DIR__ . '/../digiriskresources.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../saturne/lib/dolibarr.lib.php';
+dol_include_once('/saturne/lib/dolibarr.lib.php');
 
 /**
  * Class for PreventionPlanDocument

@@ -89,6 +89,9 @@ window.digiriskdolibarr.risk.haveDataInInput = function( elementParent ) {
 			element.find('.risk-evaluation-create.button-disable').removeClass('button-disable');
 		}
 	}
+
+	// Le fil d'Ariane de la modale d'ajout suit les mêmes choix
+	window.digiriskdolibarr.riskAddStepper.refresh(element);
 };
 
 /**
@@ -133,8 +136,8 @@ window.digiriskdolibarr.risk.createRisk = function ( event ) {
 	evaluationText  = window.digiriskdolibarr.risk.sanitizeBeforeRequest(evaluationText)
 	taskText        = window.digiriskdolibarr.risk.sanitizeBeforeRequest(taskText)
 
-	//Risk
-	var category    = elementRisk.find('.risk-category input').val();
+	//Risk : the danger is picked from the steps trail of the modal, outside .risk-content
+	var category    = riskAddModal.find('input[name="risk_category_id"]').val();
 	var description = riskCommentText;
 
 	//Risk assessment
@@ -282,7 +285,8 @@ window.digiriskdolibarr.risk.saveRisk = function ( event ) {
 			let actionContainerSuccess = $('.messageSuccessRiskEdit');
 			if (newParent == id || moveRiskDisabled) {
 				$('.modal-active').removeClass('modal-active')
-				$('.risk-description-'+editedRiskId).html($(resp).find('.risk-description-'+editedRiskId))
+				// The content of the cell, not the cell itself: a cell nested in the cell doubled its padding
+				$('.risk-description-'+editedRiskId).html($(resp).find('.risk-description-'+editedRiskId).html())
 				$('.risk-row-content-' + editedRiskId).find('.risk-category .cell-risk').html($(resp).find('.risk-row-content-' + editedRiskId).find('.risk-category .cell-risk').children())
 				$('.risk-row-content-' + editedRiskId).find('.risk-category').fadeOut(800);
 				$('.risk-row-content-' + editedRiskId).find('.risk-category').fadeIn(800);

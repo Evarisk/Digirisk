@@ -180,7 +180,7 @@ window.digiriskdolibarr.evaluator.openCreateUser = function( event ) {
  *  @return {void}
  * */
 window.digiriskdolibarr.evaluator.createUser = function( event ) {
-	$this =  $(this);
+	let $this  = $(this);
 	let values = {};
 
 	$this.closest('.user-create').find('input, select').each(function() {

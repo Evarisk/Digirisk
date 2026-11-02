@@ -12,8 +12,10 @@
   }
 }
 
-/* On GP/UT panel pages, the full-bleed layout (margin-left: -40px) + wide content (modals, list tables already scrollable in their .div-table-responsive) can exceed the viewport when the left menu is expanded. Clip the residual horizontal overflow so the page never gets a horizontal scrollbar. */
-body:has(.page-ut-gp-list) {
+/* On GP/UT panel pages, the full-bleed layout (margin-left: -40px) + wide content (modals, list tables already scrollable in their .div-table-responsive) can exceed the viewport when the left menu is expanded. Clip the residual horizontal overflow so the page never gets a horizontal scrollbar.
+   The class comes from digirisk_header(): a body:has(.page-ut-gp-list) cost a search of the whole
+   page at each node inserted in it, about 0.7 s of select2 at the load of a risk list. */
+body.digirisk-ut-gp-page {
   overflow-x: hidden;
 }
 
@@ -167,6 +169,8 @@ body.digirisk-horizontal-scroll > #id-container {
     .chevron {
       min-width: 20px;
       width: 20px;
+      /* Same value as the row padding: the toggle keeps the full row height */
+      margin: -5px 0;
       color: rgba(0, 0, 0, 0.6);
       display: flex;
       align-items: center;

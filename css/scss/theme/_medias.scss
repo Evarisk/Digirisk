@@ -1,0 +1,39 @@
+/* Digirisk modern theme: the Saturne media block (camera, gallery, voice note) in the blues of
+   Digirisk instead of the orange, teal and purple of the base component. Back office and public
+   pages alike; the PWA screens keep their own design. */
+
+#{$dr-scope},
+#{$dr-public-scope} {
+  .saturne-media-upload-block .saturne-upload-label,
+  .saturne-start-recording {
+    background-color: $dr-primary;
+    box-shadow: 0 1px 2px rgba(13, 138, 255, 0.35);
+    transition: background-color $dr-transition, box-shadow $dr-transition;
+
+    /* The forms colour the icons of their labels: they would vanish on the navy button */
+    i {
+      color: #fff;
+    }
+
+    &:hover {
+      background-color: $dr-primary-strong;
+      box-shadow: 0 4px 12px rgba(13, 138, 255, 0.3);
+    }
+  }
+
+  /* The base component forces the colour of the gallery button */
+  .saturne-media-upload-block .saturne-upload-label-gallery {
+    background-color: $dr-navy !important;
+    box-shadow: $dr-shadow-sm;
+
+    &:hover {
+      background-color: darken($dr-navy, 6%) !important;
+    }
+  }
+
+  /* Playback once a voice note exists; the disabled grey of the base component stays */
+  .saturne-play-recording:not(:disabled) {
+    background-color: $dr-navy;
+    box-shadow: $dr-shadow-sm;
+  }
+}

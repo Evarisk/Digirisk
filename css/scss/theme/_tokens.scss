@@ -44,6 +44,10 @@ $dr-ring: 0 0 0 3px rgba(13, 138, 255, 0.18);
 $dr-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 $dr-transition: 0.15s ease;
 
+/* Text fields restyled by the shared theme (same list as $theme-input-selector of Saturne): the
+   Digirisk rules that adjust a field repeat that selector to outrank it */
+$dr-input-selector: 'input[type="text"], input[type="number"], input[type="email"], input[type="password"], input[type="search"], input[type="url"], input[type="tel"], input[type="date"], input[type="datetime-local"], input[type="time"], input:not([type]), textarea, select';
+
 /* Uppercase micro label, used for table headers and field labels */
 @mixin dr-label {
   font-size: 11px;

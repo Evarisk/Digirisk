@@ -13,3 +13,10 @@ $color__grey: #ececec;
 $color__blue: #0d8aff;
 $color__green: #47e58e;
 $color__riskenvironmental: #22bf4e;
+
+// Psychosocial risk levels, from a low exposure (green) to an extreme one (dark red)
+$color__rps-low: #3a9d5d;
+$color__rps-moderate: $color__yellow;
+$color__rps-moderate-text: #3a2a00;
+$color__rps-high: $color__red;
+$color__rps-extreme: #8f2222;
