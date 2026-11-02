@@ -2123,6 +2123,13 @@ TicketKanbanFilterNoMessage            = No message
 TicketKanbanFilterMessageLess7         = Less than 7 days ago
 TicketKanbanFilterMessageMore7         = More than 7 days ago
 TicketKanbanFilterMessageMore30        = More than 30 days ago
+TicketKanbanFilterRef                  = Number
+TicketKanbanFilterRefPlaceholder       = Ticket ref.
+TicketKanbanFilterDate                 = Created from
+TicketKanbanFilterDateFrom             = Created on or after this day
+TicketKanbanFilterDateTo               = to
+TicketKanbanFilterDateToHelp           = Created on or before this day
+TicketKanbanFilterService              = GP/UT
 
 # ===========================================================================
 # Ticket — modification traceability — issue #4885

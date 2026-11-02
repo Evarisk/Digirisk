@@ -446,6 +446,7 @@ saturne_header(0, '', $title, $helpUrl);
 $pickerAllUsers          = [];
 $pickerAllCategories     = [];
 $pickerTagFilterOptions  = [];
+$pickerServiceOptions    = [];
 $pickerTicketsJson       = [];
 $pickerTypeColumns       = [];
 $pickerTypeTickets       = [];
@@ -552,10 +553,11 @@ if ($object->id <= 0) {
         . ' t.type_code, t.category_code, t.progress, t.date_close,'
         . ' t.fk_user_assign, t.fk_soc,'
         . ' u.firstname as assign_firstname, u.lastname as assign_lastname, u.photo as assign_photo,'
-        . ' s.nom as company_name'
+        . ' s.nom as company_name, te.digiriskdolibarr_ticket_service as service_id'
         . ' FROM ' . MAIN_DB_PREFIX . 'ticket t'
         . ' LEFT JOIN ' . MAIN_DB_PREFIX . 'user u ON u.rowid = t.fk_user_assign'
         . ' LEFT JOIN ' . MAIN_DB_PREFIX . 'societe s ON s.rowid = t.fk_soc'
+        . ' LEFT JOIN ' . MAIN_DB_PREFIX . 'ticket_extrafields te ON te.fk_object = t.rowid'
         . ' WHERE t.entity IN (' . getEntity('ticket') . ')'
         . $closedLimitClause
         . ' ORDER BY t.datec DESC'
@@ -566,10 +568,11 @@ if ($object->id <= 0) {
             . ' t.type_code, t.category_code, t.progress, t.date_close,'
             . ' t.fk_user_assign, t.fk_soc,'
             . ' u.firstname as assign_firstname, u.lastname as assign_lastname, u.photo as assign_photo,'
-            . ' s.nom as company_name'
+            . ' s.nom as company_name, te.digiriskdolibarr_ticket_service as service_id'
             . ' FROM ' . MAIN_DB_PREFIX . 'ticket t'
             . ' LEFT JOIN ' . MAIN_DB_PREFIX . 'user u ON u.rowid = t.fk_user_assign'
             . ' LEFT JOIN ' . MAIN_DB_PREFIX . 'societe s ON s.rowid = t.fk_soc'
+            . ' LEFT JOIN ' . MAIN_DB_PREFIX . 'ticket_extrafields te ON te.fk_object = t.rowid'
             . ' WHERE t.entity IN (' . getEntity('ticket') . ')'
             . ' AND t.fk_statut IN (' . $closedStatusList . ')'
             . ' ORDER BY t.datec DESC'
@@ -632,7 +635,9 @@ if ($object->id <= 0) {
                 'type_code'       => (string) ($row->type_code ?: ''),
                 'category_code'   => (string) ($row->category_code ?: ''),
                 'date_c'          => $row->datec ? dol_print_date($db->jdate($row->datec), 'day') : '',
-                'progress'        => min(100, max(0, (int) $row->progress)),
+                'date_c_iso'      => $row->datec ? dol_print_date($db->jdate($row->datec), '%Y-%m-%d') : '',
+                'service_id'      => (int) $row->service_id,
+                'progress'      => min(100, max(0, (int) $row->progress)),
                 'elapsed'         => $getTicketElapsedTime($getTicketElapsedSeconds($row)),
                 'elapsed_seconds' => $getTicketElapsedSeconds($row),
                 'last_msg_date'   => 0,
@@ -688,7 +693,9 @@ if ($object->id <= 0) {
                     'type_code'       => (string) ($row->type_code ?: ''),
                     'category_code'   => (string) ($row->category_code ?: ''),
                     'date_c'          => $row->datec ? dol_print_date($db->jdate($row->datec), 'day') : '',
-                    'progress'        => min(100, max(0, (int) $row->progress)),
+                    'date_c_iso'      => $row->datec ? dol_print_date($db->jdate($row->datec), '%Y-%m-%d') : '',
+                    'service_id'      => (int) $row->service_id,
+                    'progress'      => min(100, max(0, (int) $row->progress)),
                     'elapsed'         => $getTicketElapsedTime($getTicketElapsedSeconds($row)),
                     'elapsed_seconds' => $getTicketElapsedSeconds($row),
                     'last_msg_date'   => 0,
@@ -751,6 +758,27 @@ if ($object->id <= 0) {
         }
         unset($t);
     }
+
+    // GP/UT filter options in tree order (#5644). A ticket carries its GP/UT and every groupment above it, so
+    // that picking a groupment also shows the tickets of its work units
+    require_once __DIR__ . '/../../class/digiriskelement.class.php';
+    $serviceElement = new DigiriskElement($db);
+    $serviceParents = [];
+    foreach ($serviceElement->fetchDigiriskElementFlat(0) as $serviceElementId => $serviceLine) {
+        $serviceParents[(int) $serviceElementId] = (int) $serviceLine['object']->fk_parent;
+        $pickerServiceOptions[] = [
+            'id'    => (int) $serviceElementId,
+            'label' => str_repeat('- ', (int) $serviceLine['depth']) . $serviceLine['object']->ref . ' - ' . $serviceLine['object']->label,
+        ];
+    }
+    foreach ($pickerTicketsJson as &$t) {
+        $t['service_ids'] = [];
+        // Bounded by the number of elements, should a parent ever point back to one of its children
+        for ($serviceId = $t['service_id']; isset($serviceParents[$serviceId]) && count($t['service_ids']) < count($serviceParents); $serviceId = $serviceParents[$serviceId]) {
+            $t['service_ids'][] = $serviceId;
+        }
+    }
+    unset($t);
 
     // -----------------------------------------------------------------------
     // Dimension 1 — Type
