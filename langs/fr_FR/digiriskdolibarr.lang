@@ -73,6 +73,14 @@ Subtitle                                = Sous-titre
 # DigiriskElement - DigiriskElement
 DigiriskElementDepthGraph            = Niveau de profondeur dans les graphiques des éléments Digirisk
 DigiriskElementDepthGraphDescription = Cette option permet de choisir le niveau de profondeur dans les graphiques des éléments Digirisk <br> Défaut : Niveau 1
+NbPeopleInCompany                    = Nombre de personnes dans l'entreprise
+NbPeopleInCompanyDescription         = Base du pourcentage de personnes présentes saisi sur chaque GP/UT. C'est le nombre de salariés de la configuration de la société, repris aussi par les indicateurs des accidents.<br>Laisser vide pour le calculer à partir des utilisateurs salariés actifs (valeur affichée en grisé).
+PeoplePercentage                     = Personnes présentes
+PeoplePercentageHelp                 = Pourcentage des personnes de l'entreprise présentes dans ce GP/UT. Le nombre de personnes en est déduit à partir de l'effectif de l'entreprise, réglé dans la configuration des GP/UT.
+PeoplePercentageOfWorkforce          = de l'effectif de l'entreprise (%s personnes)
+PeoplePercentageNoWorkforce          = de l'effectif de l'entreprise, qui n'est pas encore renseigné
+PeoplePercentageValue                = %s de l'effectif, soit %s personne(s) sur %s
+ErrorPeoplePercentage                = Le pourcentage de personnes présentes doit être compris entre 0 et 100.
 
 # WHSRegister = Registre SST
 TicketsPublicInterfaceConfig         = Configuration de l'interface publique des tickets

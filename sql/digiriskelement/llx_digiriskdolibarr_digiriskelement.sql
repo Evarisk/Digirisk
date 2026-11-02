@@ -27,6 +27,7 @@ CREATE TABLE llx_digiriskdolibarr_digiriskelement(
 	element_type     varchar(50),
   photo            varchar(255),
   show_in_selector boolean DEFAULT TRUE NOT NULL,
+  people_percentage double(24,8),
   fk_user_creat    integer NOT NULL,
 	fk_user_modif    integer,
 	fk_parent        integer DEFAULT 0 NOT NULL,

@@ -71,6 +71,14 @@ Subtitle                                = Subtitle
 # DigiriskElement
 DigiriskElementDepthGraph            = Depth level in the Digirisk element graphs
 DigiriskElementDepthGraphDescription = This option sets the depth level used in the Digirisk element graphs <br> Default: level 1
+NbPeopleInCompany                    = Number of people in the company
+NbPeopleInCompanyDescription         = Base of the percentage of people present entered on each GP/UT. It is the number of employees of the company setup, also used by the accident indicators.<br>Leave empty to compute it from the active employee users (value shown in grey).
+PeoplePercentage                     = People present
+PeoplePercentageHelp                 = Percentage of the people of the company present in this GP/UT. The number of people is deduced from it with the workforce of the company, set in the GP/UT setup.
+PeoplePercentageOfWorkforce          = of the workforce of the company (%s people)
+PeoplePercentageNoWorkforce          = of the workforce of the company, which is not entered yet
+PeoplePercentageValue                = %s of the workforce, i.e. %s people out of %s
+ErrorPeoplePercentage                = The percentage of people present must be between 0 and 100.
 
 # WHSRegister = Occupational health and safety register
 TicketsPublicInterfaceConfig         = Ticket public interface setup
