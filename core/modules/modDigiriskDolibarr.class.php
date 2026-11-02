@@ -1786,7 +1786,7 @@ class modDigiriskdolibarr extends DolibarrModules
         $this->menu[$r++] = [
             'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
             'type'     => 'left',			                // This is a Left menu entry
-            'titre'    => $langs->transnoentities('Ticket'),
+            'titre'    => $langs->transnoentities('Register'),
             'prefix'   => '<i class="fas fa-ticket-alt pictofixedwidth"></i>',
             'mainmenu' => 'digiriskdolibarr',
             'leftmenu' => 'digiriskticket',
