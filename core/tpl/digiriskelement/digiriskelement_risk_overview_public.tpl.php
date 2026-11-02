@@ -28,7 +28,7 @@
  *          With a PIN code in the setup, a visitor who has not given it yet only gets its field.
  *
  * Variables : $accessAllowed, $pinAsked, $pinError, $key, $tab, $tabUrl, $exportUrl, $overviewTabNames,
- *             $overviewRows, $overviewColumns, $rpsScale, $registerFilters, $conf, $langs, $mysoc
+ *             $overviewCompany, $overviewRows, $overviewColumns, $rpsScale, $registerFilters, $conf, $langs
  *             (public/digiriskelement/digiriskelement_risk_overview.php)
  */
 
@@ -79,9 +79,25 @@ $emptyCellTitles = [
         <!-- Same header as the other public interfaces (electronic signature, registers): what the page is,
              for whom, and the object it is about, with its download button -->
         <div class="public-card__header wpeo-gridlayout grid-2 grid-gap-2">
-            <div class="header-information">
-                <div class="information-title"><?php echo $langs->trans('RiskOverviewPublicTitle'); ?></div>
-                <div class="information-user"><?php echo dol_escape_htmltag($mysoc->name); ?></div>
+            <div class="header-information risk-overview__company">
+                <?php if (dol_strlen($overviewCompany['logoUrl'])) : ?>
+                    <img class="risk-overview__logo" src="<?php echo dol_escape_htmltag($overviewCompany['logoUrl']); ?>" alt="">
+                <?php endif; ?>
+                <div>
+                    <div class="information-title"><?php echo $langs->trans('RiskOverviewPublicTitle'); ?></div>
+                    <div class="information-user"><?php echo dol_escape_htmltag($overviewCompany['name']); ?></div>
+                    <?php if (dol_strlen($overviewCompany['idProf'])) : ?>
+                        <div class="risk-overview__company-detail"><?php echo dol_escape_htmltag($overviewCompany['idProfLabel'] . ' : ' . $overviewCompany['idProf']); ?></div>
+                    <?php endif; ?>
+                    <?php if (dol_strlen($overviewCompany['responsible'])) : ?>
+                        <div class="risk-overview__company-detail">
+                            <i class="fas fa-user pictofixedwidth"></i><?php echo $langs->trans('ResponsibleToNotify') . ' : ' . dol_escape_htmltag($overviewCompany['responsible']); ?>
+                            <?php if (dol_strlen($overviewCompany['responsiblePhone'])) : ?>
+                                · <a href="tel:<?php echo dol_escape_htmltag(preg_replace('/[^0-9+]/', '', $overviewCompany['responsiblePhone'])); ?>"><i class="fas fa-phone pictofixedwidth"></i><?php echo dol_escape_htmltag($overviewCompany['responsiblePhone']); ?></a>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
             <div class="header-objet">
                 <div class="objet-container">

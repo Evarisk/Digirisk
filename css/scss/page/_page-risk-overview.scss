@@ -97,6 +97,38 @@ body#mainbody.digirisk-risk-overview-public {
     }
   }
 
+  // ---- Header: the logo of the company beside its name, SIRET and person to notify ----
+
+  .risk-overview__company {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .risk-overview__logo {
+    flex: 0 0 auto;
+    max-width: 120px;
+    max-height: 64px;
+    object-fit: contain;
+
+    @media (max-width: $risk-overview-phone) {
+      max-width: 72px;
+      max-height: 48px;
+    }
+  }
+
+  .risk-overview__company-detail {
+    margin-top: 2px;
+    color: $dr-muted;
+    font-size: 13px;
+
+    a {
+      color: inherit;
+      white-space: nowrap;
+    }
+  }
+
   // ---- Tabs, fold and unfold ----
 
   .risk-overview__toolbar {

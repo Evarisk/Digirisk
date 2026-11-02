@@ -233,6 +233,56 @@ function digiriskRiskOverviewPublicUrl(string $tab = ''): string
 }
 
 /**
+ * Company whose risks the overview shows, for the header of the page: the one of the entity of the link
+ * ($mysoc), with its logo and its professional identifier (the SIRET in France). The setup may add the
+ * person to notify of the security setup, with the office phone of their user card.
+ *
+ * @param  DoliDB $db Database handler
+ * @return array      name, logoUrl (empty without a logo file), idProfLabel and idProf (empty when not
+ *                    filled in), responsible and responsiblePhone (empty unless the setup shows them)
+ * @throws Exception
+ */
+function digiriskRiskOverviewCompany(DoliDB $db): array
+{
+    global $conf, $langs, $mysoc;
+
+    $company = ['name' => (string) $mysoc->name, 'logoUrl' => '', 'idProfLabel' => '', 'idProf' => '', 'responsible' => '', 'responsiblePhone' => ''];
+
+    // Saturne already shows the logo above the card when its setup asks it. Served without a session as the
+    // photos of the tooltips: viewimage.php of Dolibarr reads the logo in the entity of the session, if any
+    if (!getDolGlobalInt('SATURNE_SHOW_COMPANY_LOGO')) {
+        $logoFiles = ['logos/thumbs/' . $mysoc->logo_small, 'logos/' . $mysoc->logo, 'logos/thumbs/' . $mysoc->logo_squarred_small, 'logos/' . $mysoc->logo_squarred];
+        foreach ($logoFiles as $logoFile) {
+            if (dol_is_file($conf->mycompany->dir_output . '/' . $logoFile)) {
+                $company['logoUrl'] = dol_buildpath('/saturne/utils/viewimage.php', 1) . '?' . http_build_query(['modulepart' => 'mycompany', 'entity' => $conf->entity, 'file' => $logoFile]);
+                break;
+            }
+        }
+    }
+
+    if (dol_strlen($mysoc->idprof2) && $mysoc->idprof2 != '?') {
+        // "Id. prof. 2 (SIRET)": the name in brackets, as the documents of Dolibarr print it
+        $company['idProfLabel'] = $langs->transcountry('ProfId2', $mysoc->country_code);
+        if (preg_match('/\((.+)\)/', $company['idProfLabel'], $reg)) {
+            $company['idProfLabel'] = $reg[1];
+        }
+        $company['idProf'] = $mysoc->idprof2;
+    }
+
+    if (getDolGlobalInt('DIGIRISKDOLIBARR_RISK_OVERVIEW_RESPONSIBLE')) {
+        $digiriskResources = new DigiriskResources($db);
+        $responsibleId     = $digiriskResources->getSecurityResponsibleId();
+        $responsible       = new User($db);
+        if ($responsibleId > 0 && $responsible->fetch($responsibleId) > 0) {
+            $company['responsible']      = $responsible->getFullName($langs);
+            $company['responsiblePhone'] = (string) $responsible->office_phone;
+        }
+    }
+
+    return $company;
+}
+
+/**
  * Risk list of a groupment or work unit in the application, the worst risks first: where a number of
  * the overview leads. Only a user logged in to Dolibarr reaches it, a visitor gets the login page.
  *

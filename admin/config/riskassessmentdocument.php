@@ -374,6 +374,12 @@ foreach ($riskOverviewTabSwitches as $riskOverviewTab => $riskOverviewTabLabels)
     print '<td class="center">' . ajax_constantonoff(DIGIRISK_RISK_OVERVIEW_TAB_CONSTS[$riskOverviewTab], [], null, 0, 0, 0, 2, 0, 1, '', '', 'inline-block', 0, '', saturne_check_admin_write_access() ? 0 : 1) . '</td>';
     print '</tr>';
 }
+// A name and a phone number on a public page: off until asked
+print '<tr class="oddeven">';
+print '<td>' . $langs->trans('RiskOverviewPublicResponsible') . '</td>';
+print '<td>' . $langs->trans('RiskOverviewPublicResponsibleHelp') . '</td>';
+print '<td class="center">' . ajax_constantonoff('DIGIRISKDOLIBARR_RISK_OVERVIEW_RESPONSIBLE', [], null, 0, 0, 0, 2, 0, 1, '', '', 'inline-block', 0, '', saturne_check_admin_write_access() ? 0 : 1) . '</td>';
+print '</tr>';
 print '<tr class="oddeven">';
 print '<td>' . $langs->trans('RiskOverviewPublicPin') . '</td>';
 print '<td>' . $langs->trans('RiskOverviewPublicPinHelp') . '</td>';
