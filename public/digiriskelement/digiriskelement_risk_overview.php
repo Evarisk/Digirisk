@@ -140,16 +140,19 @@ if ($accessAllowed && !$pinAsked) {
         $overviewRows                = digiriskRiskOverviewAddTickets($db, $overviewRows, $overviewColumns['register'], $registerFilters);
     }
 
-    // The same tables as an Excel workbook, one sheet per tab
-    if ($action == 'export') {
+    // The same tables as an Excel workbook, one sheet per tab, unless the setup keeps them on screen
+    if ($action == 'export' && digiriskRiskOverviewExportAllowed()) {
         digiriskRiskOverviewExportXlsx($overviewRows, $overviewColumns, $rpsScale, in_array('register', $overviewTabNames, true) ? digiriskRiskOverviewRegisterFilterLabel($registerFilters) : '');
         $db->close();
         exit;
     }
 }
 
-// The export keeps the filters of the register tab
-$exportUrl = $_SERVER['PHP_SELF'] . '?' . http_build_query(array_merge(['entity' => $conf->entity, 'key' => $key, 'action' => 'export'], digiriskRiskOverviewRegisterFilterParams($registerFilters)));
+// The export keeps the filters of the register tab; without it, the page has no export button
+$exportUrl = '';
+if (digiriskRiskOverviewExportAllowed()) {
+    $exportUrl = $_SERVER['PHP_SELF'] . '?' . http_build_query(array_merge(['entity' => $conf->entity, 'key' => $key, 'action' => 'export'], digiriskRiskOverviewRegisterFilterParams($registerFilters)));
+}
 
 /*
  * View

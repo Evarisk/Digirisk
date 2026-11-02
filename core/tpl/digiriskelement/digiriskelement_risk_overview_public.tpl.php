@@ -26,6 +26,7 @@
  *          factors (digiriskelement_risk_overview_psychosocial_tooltip.tpl.php). The register tab
  *          counts the tickets of each register (digiriskelement_risk_overview_register_cell.tpl.php).
  *          With a PIN code in the setup, a visitor who has not given it yet only gets its field.
+ *          The export button only shows when the setup allows the export ($exportUrl not empty).
  *
  * Variables : $accessAllowed, $pinAsked, $pinError, $key, $tab, $tabUrl, $exportUrl, $overviewTabNames,
  *             $overviewCompany, $overviewRows, $overviewColumns, $rpsScale, $registerFilters, $conf, $langs
@@ -105,12 +106,14 @@ $emptyCellTitles = [
                         <div class="objet-type"><?php echo $langs->trans('RiskAssessmentDocument'); ?></div>
                         <div class="objet-label"><?php echo $langs->trans('RiskOverviewPublicSubtitle', count($overviewRows), dol_print_date(dol_now(), 'day')); ?></div>
                     </div>
-                    <div class="objet-actions">
-                        <a class="wpeo-button button-square-40 button-rounded button-blue wpeo-tooltip-event" href="<?php echo dol_escape_htmltag($exportUrl); ?>"
-                           aria-label="<?php echo dol_escape_htmltag($langs->trans('RiskOverviewExport')); ?>" data-direction="left">
-                            <i class="fas fa-file-excel button-icon"></i>
-                        </a>
-                    </div>
+                    <?php if (dol_strlen($exportUrl)) : ?>
+                        <div class="objet-actions">
+                            <a class="wpeo-button button-square-40 button-rounded button-blue wpeo-tooltip-event" href="<?php echo dol_escape_htmltag($exportUrl); ?>"
+                               aria-label="<?php echo dol_escape_htmltag($langs->trans('RiskOverviewExport')); ?>" data-direction="left">
+                                <i class="fas fa-file-excel button-icon"></i>
+                            </a>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
