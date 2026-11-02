@@ -26,8 +26,8 @@
     require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
     // Load Saturne libraries
-    require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
-    require_once __DIR__ . '/../../../../../../saturne/lib/medias.lib.php';
+    dol_include_once('/saturne/core/modules/saturne/modules_saturne.php');
+    dol_include_once('/saturne/lib/medias.lib.php');
 
     // Load Digirisk libraries
     require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';

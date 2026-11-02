@@ -33,7 +33,7 @@ require_once __DIR__ . '/digiriskelement.class.php';
 require_once __DIR__ . '/riskanalysis/risk.class.php';
 require_once __DIR__ . '/riskanalysis/riskassessment.class.php';
 require_once __DIR__ . '/../lib/digiriskdolibarr_risk.lib.php';
-require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
+dol_include_once('/saturne/class/task/saturnetask.class.php');
 require_once __DIR__ . '/digiriskdolibarrdocuments/riskassessmentdocument.class.php';
 require_once __DIR__ . '/accident.class.php';
 require_once __DIR__ . '/digiriskresources.class.php';

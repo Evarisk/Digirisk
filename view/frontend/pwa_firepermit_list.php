@@ -36,7 +36,7 @@ require_once __DIR__ . '/../../class/firepermitround.class.php';
 require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
-require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+dol_include_once('/saturne/class/saturnesignature.class.php');
 require_once __DIR__ . '/../../lib/digiriskdolibarr_firepermitround.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_pwa.lib.php';
 

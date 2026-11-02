@@ -102,7 +102,7 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
             ]
         ];
 
-        $array['widgets'] = array_merge($runningTickets, $ticketStats);
+        $array['widgets'] = array_merge($runningTickets, $ticketStats, isModEnabled('project') ? $this->getTicketActions() : []);
 
         // The repartition per user stays first, then the flow, then where the backlog sits
         $array['graphs'] = [
@@ -177,11 +177,13 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
         $array['label'] = [
             $langs->transnoentities('NbOfOpenedTicket'),
             $form->textwithpicto($langs->transnoentities('OldestTicket'), $langs->transnoentities('OldestTicketDescription')),
-            $form->textwithpicto($langs->transnoentities('OldestMessageTicket'), $langs->transnoentities('OldestMessageTicketDescription'))
+            $form->textwithpicto($langs->transnoentities('OldestMessageTicket'), $langs->transnoentities('OldestMessageTicketDescription')),
+            $form->textwithpicto($langs->transnoentities('OpenTicketsAssignedUnassigned'), $langs->transnoentities('OpenTicketsAssignedUnassignedDescription'))
         ];
 
         // Initialize variables
         $openTickets         = 0;
+        $assignedTickets     = 0;
         $oldestTicket        = null;
         $oldestMessageTicket = null;
         $now                 = dol_now();
@@ -197,6 +199,9 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
             foreach ($tickets as $ticket) {
                 if ($this->isOpenTicket($ticket)) {
                     $openTickets++;
+                    if (!empty($ticket->fk_user_assign)) {
+                        $assignedTickets++;
+                    }
                     if ($filter == 'declaration_date') {
                         $ticketDate = !empty($ticket->array_options[$filterDate]) ? strtotime($ticket->array_options[$filterDate]) : 0;
                     } else {
@@ -222,16 +227,86 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
         $array['content'] = [
             $openTickets,
             !empty($oldestTicket) ? dol_print_date($oldestTicketDate, 'day') : $langs->transnoentities('NoData'),
-            !empty($oldestMessageTicket) ? dol_print_date($oldestMessageTicket->datec, 'day') : $langs->transnoentities('NoData')
+            !empty($oldestMessageTicket) ? dol_print_date($oldestMessageTicket->datec, 'day') : $langs->transnoentities('NoData'),
+            $assignedTickets . ' / ' . ($openTickets - $assignedTickets)
         ];
 
         $array['moreContent'] = [
             '',
             !empty($oldestTicket) ? ' (' . convertSecondToTime(roundUpToNextMultiple($now - $oldestTicketDate, 60)) . ')' . $oldestTicket->getNomUrl(2, '', 0, 'paddingleft') : '',
-            !empty($oldestMessageTicket) ? ' (' . convertSecondToTime(roundUpToNextMultiple($now - $oldestMessageTicket->datec, 60)) . ')' . $tickets[$oldestMessageTicket->fk_element]->getNomUrl(2, '', 0, 'paddingleft') : ''
+            !empty($oldestMessageTicket) ? ' (' . convertSecondToTime(roundUpToNextMultiple($now - $oldestMessageTicket->datec, 60)) . ')' . $tickets[$oldestMessageTicket->fk_element]->getNomUrl(2, '', 0, 'paddingleft') : '',
+            ''
         ];
 
         return ['runningTickets' => $array];
+    }
+
+    /**
+     * Get the corrective and preventive actions of the tickets (#5549)
+     *
+     * The actions of a ticket are the project tasks typed by digirisk_action_type (2 corrective, 3 preventive) under
+     * a container task, itself a child of the parent task "TKP-<ref>" of the ticket. They are read in one query, the
+     * actions of the accident investigations, which hang under other parents, are left out.
+     *
+     * @return array Widget of the actions in progress, done and late, each split into corrective and preventive
+     */
+    public function getTicketActions(): array
+    {
+        global $form, $langs;
+
+        // Widget title parameters
+        $array['title']      = $langs->transnoentities('TicketActionsTab');
+        $array['widgetName'] = 'TicketActions';
+        $array['picto']      = 'fas fa-tasks';
+        $array['pictoColor'] = '#E9AD4F';
+
+        // Widget labels parameters
+        $array['label'] = [
+            $langs->transnoentities('TicketActionsInProgress'),
+            $langs->transnoentities('TicketActionsDone'),
+            $form->textwithpicto($langs->transnoentities('TicketActionsLate'), $langs->transnoentities('TicketActionsLateDescription'))
+        ];
+
+        // Counters of each state, by type of action
+        $counters = ['progress' => [2 => 0, 3 => 0], 'done' => [2 => 0, 3 => 0], 'late' => [2 => 0, 3 => 0]];
+        $now      = dol_now();
+
+        $sql  = 'SELECT ef.digirisk_action_type, t.progress, t.datee';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'projet_task t';
+        $sql .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'projet_task_extrafields ef ON ef.fk_object = t.rowid';
+        $sql .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'projet_task container ON container.rowid = t.fk_task_parent';
+        $sql .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'projet_task parent ON parent.rowid = container.fk_task_parent';
+        $sql .= ' WHERE ef.digirisk_action_type IN (2, 3)';
+        $sql .= " AND parent.ref LIKE 'TKP-%'";
+        $sql .= ' AND t.entity IN (' . getEntity('project') . ')';
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            while ($obj = $this->db->fetch_object($resql)) {
+                $type = (int) $obj->digirisk_action_type;
+                if ((int) $obj->progress >= 100) {
+                    $counters['done'][$type]++;
+                    continue;
+                }
+
+                $counters['progress'][$type]++;
+                $deadline = $this->db->jdate($obj->datee);
+                if (!empty($deadline) && $deadline < $now) {
+                    $counters['late'][$type]++;
+                }
+            }
+            $this->db->free($resql);
+        } else {
+            dol_syslog(__METHOD__ . ' ' . $this->db->lasterror(), LOG_ERR);
+        }
+
+        // Widget content parameters: the total, then how many are corrective and preventive
+        foreach ($counters as $counter) {
+            $array['content'][]     = $counter[2] + $counter[3];
+            $array['moreContent'][] = ' (' . $langs->transnoentities('TicketActionsSplit', (string) $counter[2], (string) $counter[3]) . ')';
+        }
+
+        return ['ticketActions' => $array];
     }
 
     /**

@@ -31,6 +31,23 @@ window.digiriskdolibarr.accident.event = function() {
 	$( document ).on( 'submit', '.sendfile', window.digiriskdolibarr.accident.tmpStockFile );
 	$( document ).on( 'click', '.linked-file-delete-workstop', window.digiriskdolibarr.accident.removeFile );
 	$( document ).on( 'change', '#external_accident', window.digiriskdolibarr.accident.showExternalAccidentLocation );
+	$( document ).on( 'change', '#searchFormList select[name="search_workstop"], #searchFormList select[name="search_register"]', window.digiriskdolibarr.accident.submitListFilter );
+};
+
+/**
+ * Relance la recherche de la liste des accidents au changement d'un filtre du bandeau : la ligne de recherche
+ * et son bouton loupe sont masqués par les filtres par colonne Saturne
+ *
+ * @since   23.5.0
+ * @version 23.5.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.accident.submitListFilter = function() {
+	let form = $( this ).closest( 'form' );
+
+	form.append( '<input type="hidden" name="button_search_x" value="1">' );
+	form.submit();
 };
 
 /**

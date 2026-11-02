@@ -25,7 +25,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 
 
 // Load Saturne libraries.
-require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
+dol_include_once('/saturne/class/saturneobject.class.php');
 
 
 /**

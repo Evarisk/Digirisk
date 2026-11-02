@@ -41,6 +41,7 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 // Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
@@ -444,6 +445,7 @@ saturne_header(0, '', $title, $helpUrl);
 // Kanban picker data — loaded only when no specific ticket is requested.
 $pickerAllUsers          = [];
 $pickerAllCategories     = [];
+$pickerTagFilterOptions  = [];
 $pickerTicketsJson       = [];
 $pickerTypeColumns       = [];
 $pickerTypeTickets       = [];
@@ -498,6 +500,48 @@ if ($object->id <= 0) {
         $db->free($resCats);
     }
 
+    // Tag filter options in tree order. Each tag carries the path of its parents, shown while searching, and
+    // the guides drawn before it: one per ancestor under the root ('line' while that ancestor has siblings
+    // below it, 'blank' otherwise) then its own branch ('mid', or 'last' for the last child of its parent)
+    $tagTree = $categorie->get_full_arbo(Categorie::TYPE_TICKET);
+    if (is_array($tagTree)) {
+        $tagChildren = [];
+        foreach ($tagTree as $tagId => $tag) {
+            // A parent missing from the tree (another entity) leaves its child at the root
+            $tagChildren[isset($tagTree[$tag['fk_parent']]) ? (int) $tag['fk_parent'] : 0][] = (int) $tagId;
+        }
+
+        // A tag without colour takes the one of its closest coloured parent, so that each family reads at a glance
+        /**
+         * @param  int      $parentId    Tag whose children are added, 0 for the root tags
+         * @param  string[] $guides      Guides drawn before the children of $parentId
+         * @param  string[] $path        Labels of $parentId and its ancestors, from the root
+         * @param  string   $parentColor Colour inherited by the children without one
+         * @return void
+         */
+        $addTagBranch = function (int $parentId, array $guides, array $path, string $parentColor) use (&$addTagBranch, &$pickerTagFilterOptions, $tagTree, $tagChildren) {
+            $siblings = $tagChildren[$parentId] ?? [];
+            foreach ($siblings as $index => $tagId) {
+                $isLast   = $index === count($siblings) - 1;
+                $tagLabel = dol_html_entity_decode($tagTree[$tagId]['label'], ENT_QUOTES | ENT_HTML5);
+                $tagColor = !empty($tagTree[$tagId]['color']) ? (string) $tagTree[$tagId]['color'] : $parentColor;
+
+                $pickerTagFilterOptions[] = [
+                    'id'        => $tagId,
+                    'label'     => $tagLabel,
+                    'color'     => $tagColor,
+                    'ancestors' => $path,
+                    'path'      => implode(' › ', $path),
+                    'guides'    => $guides,
+                    'branch'    => $parentId > 0 ? ($isLast ? 'last' : 'mid') : '',
+                ];
+
+                $addTagBranch($tagId, $parentId > 0 ? array_merge($guides, [$isLast ? 'blank' : 'line']) : [], array_merge($path, [$tagLabel]), $tagColor);
+            }
+        };
+        $addTagBranch(0, [], [], '');
+    }
+
     // Tickets with enriched data (assignee, severity, type, group, company).
     // Closed and canceled tickets are limited by the admin config to avoid overloading the board.
     $closedStatusList  = implode(',', [Ticket::STATUS_CLOSED, Ticket::STATUS_CANCELED]);
@@ -505,7 +549,7 @@ if ($object->id <= 0) {
     $closedLimitClause = $closedLimit > 0 ? ' AND t.fk_statut NOT IN (' . $closedStatusList . ')' : '';
 
     $sqlTickets = 'SELECT t.rowid, t.ref, t.subject, t.fk_statut, t.datec, t.severity_code,'
-        . ' t.type_code, t.category_code,'
+        . ' t.type_code, t.category_code, t.progress, t.date_close,'
         . ' t.fk_user_assign, t.fk_soc,'
         . ' u.firstname as assign_firstname, u.lastname as assign_lastname, u.photo as assign_photo,'
         . ' s.nom as company_name'
@@ -519,7 +563,7 @@ if ($object->id <= 0) {
 
     if ($closedLimit > 0) {
         $sqlClosed = 'SELECT t.rowid, t.ref, t.subject, t.fk_statut, t.datec, t.severity_code,'
-            . ' t.type_code, t.category_code,'
+            . ' t.type_code, t.category_code, t.progress, t.date_close,'
             . ' t.fk_user_assign, t.fk_soc,'
             . ' u.firstname as assign_firstname, u.lastname as assign_lastname, u.photo as assign_photo,'
             . ' s.nom as company_name'
@@ -531,6 +575,24 @@ if ($object->id <= 0) {
             . ' ORDER BY t.datec DESC'
             . ' LIMIT ' . (int) $closedLimit;
     }
+
+    // Time elapsed since creation, stopped at the closing date: in seconds for the filters of the board, and
+    // in the format of the ticket card for the card itself
+    $now                     = dol_now();
+    $getTicketElapsedSeconds = static function ($row) use ($db, $now): int {
+        $dateCreation = $db->jdate($row->datec);
+        if (empty($dateCreation)) {
+            return -1;
+        }
+        $isClosed = in_array((int) $row->fk_statut, [Ticket::STATUS_CLOSED, Ticket::STATUS_CANCELED]);
+        $dateEnd  = ($isClosed && !empty($row->date_close)) ? $db->jdate($row->date_close) : $now;
+
+        return max(0, $dateEnd - $dateCreation);
+    };
+    $getTicketElapsedTime = static function (int $seconds): string {
+        return $seconds < 0 ? '' : convertSecondToTime(roundUpToNextMultiple($seconds, 60));
+    };
+
     $resTickets = $db->query($sqlTickets);
     $ticketIds  = [];
     if ($resTickets) {
@@ -570,6 +632,10 @@ if ($object->id <= 0) {
                 'type_code'       => (string) ($row->type_code ?: ''),
                 'category_code'   => (string) ($row->category_code ?: ''),
                 'date_c'          => $row->datec ? dol_print_date($db->jdate($row->datec), 'day') : '',
+                'progress'        => min(100, max(0, (int) $row->progress)),
+                'elapsed'         => $getTicketElapsedTime($getTicketElapsedSeconds($row)),
+                'elapsed_seconds' => $getTicketElapsedSeconds($row),
+                'last_msg_date'   => 0,
                 'company_name'    => $row->company_name ?: '',
                 'assign_id'       => $assignId,
                 'assign_fullname' => $assignFullname,
@@ -622,6 +688,10 @@ if ($object->id <= 0) {
                     'type_code'       => (string) ($row->type_code ?: ''),
                     'category_code'   => (string) ($row->category_code ?: ''),
                     'date_c'          => $row->datec ? dol_print_date($db->jdate($row->datec), 'day') : '',
+                    'progress'        => min(100, max(0, (int) $row->progress)),
+                    'elapsed'         => $getTicketElapsedTime($getTicketElapsedSeconds($row)),
+                    'elapsed_seconds' => $getTicketElapsedSeconds($row),
+                    'last_msg_date'   => 0,
                     'company_name'    => $row->company_name ?: '',
                     'assign_id'       => $assignId,
                     'assign_fullname' => $assignFullname,
@@ -654,9 +724,29 @@ if ($object->id <= 0) {
             }
             $db->free($resTktCats);
         }
+
+        // Last message of every ticket in one query: fk_element IN (...) keeps the actioncomm index
+        $sqlLastMsg = 'SELECT a.fk_element, MAX(a.datep) as last_msg_date'
+            . ' FROM ' . MAIN_DB_PREFIX . 'actioncomm a'
+            . ' WHERE a.fk_element IN (' . implode(',', $ticketIds) . ')'
+            . " AND a.elementtype = 'ticket'"
+            . " AND a.code LIKE 'TICKET_MSG%'"
+            . ' GROUP BY a.fk_element';
+        $resLastMsg      = $db->query($sqlLastMsg);
+        $lastMsgByTicket = [];
+        if ($resLastMsg) {
+            while ($row = $db->fetch_object($resLastMsg)) {
+                $lastMsgByTicket[(int) $row->fk_element] = $db->jdate($row->last_msg_date);
+            }
+            $db->free($resLastMsg);
+        }
+
         foreach ($pickerTicketsJson as &$t) {
             if (isset($catsByTicket[$t['id']])) {
                 $t['categories'] = $catsByTicket[$t['id']];
+            }
+            if (!empty($lastMsgByTicket[$t['id']])) {
+                $t['last_msg_date'] = $lastMsgByTicket[$t['id']];
             }
         }
         unset($t);

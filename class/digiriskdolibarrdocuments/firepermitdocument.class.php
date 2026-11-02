@@ -22,7 +22,7 @@
  */
 
 // Load Saturne libraries.
-require_once __DIR__ . '/../../../saturne/class/saturnedocuments.class.php';
+dol_include_once('/saturne/class/saturnedocuments.class.php');
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../digiriskdocuments.class.php';

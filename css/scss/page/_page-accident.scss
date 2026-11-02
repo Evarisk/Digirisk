@@ -1,0 +1,61 @@
+/* Digirisk modern theme: accident list */
+
+#{$dr-scope} {
+  /* Share of the accident file filled in: a thin bar and its percentage on one line */
+  .accident-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 110px;
+
+    &__bar {
+      flex: 1 1 auto;
+      width: auto;
+      height: 6px;
+      border: 0;
+      border-radius: $dr-radius-pill;
+      background: $dr-border;
+      overflow: hidden;
+      appearance: none;
+
+      &::-webkit-progress-bar {
+        border-radius: $dr-radius-pill;
+        background: $dr-border;
+      }
+
+      &::-webkit-progress-value {
+        border-radius: $dr-radius-pill;
+        background: $dr-primary;
+      }
+
+      &::-moz-progress-bar {
+        border-radius: $dr-radius-pill;
+        background: $dr-primary;
+      }
+    }
+
+    &__value {
+      flex: none;
+      min-width: 38px;
+      text-align: right;
+      font-size: 12px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: $dr-text-soft;
+    }
+
+    &--complete {
+      .accident-progress__bar::-webkit-progress-value {
+        background: $dr-success;
+      }
+
+      .accident-progress__bar::-moz-progress-bar {
+        background: $dr-success;
+      }
+
+      .accident-progress__value {
+        color: $dr-success;
+      }
+    }
+  }
+}

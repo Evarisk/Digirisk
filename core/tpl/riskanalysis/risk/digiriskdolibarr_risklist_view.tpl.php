@@ -7,7 +7,8 @@ $selectedfields_label = 'risklist_selectedfields';
 // Selection of new fields
 require __DIR__ . '/../../../../class/actions_changeselectedfields.php';
 
-print '<div class="fichecenter risklist wpeo-wrap">';
+// risk-list-simplified: same look as the simplified risk list of DigiBoard, see theme/_risk-list.scss
+print '<div class="fichecenter risklist risk-list-simplified wpeo-wrap">';
 print '<form method="POST" id="searchFormListRisks" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . ($object->element == 'digiriskelement' ? '?id=' . $object->id : '?mainmenu=digiriskdolibarr') . '">' . "\n";
 print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
@@ -316,6 +317,12 @@ $taskNextValue             = $refTaskMod->getNextValue('', $task);
 $timeSpentSortedByTasks    = $digiriskTask->fetchAllTimeSpentAllUsers('AND fk_element > 0', 'element_datehour', 'DESC', 1);
 $dangerCategories          = Risk::getDangerCategories($riskType);
 
+// Protection column: the protections of the element of each risk. Not one of the selectable fields: a user who saved
+// his own selection would never see it, as Dolibarr unchecks every field missing from that selection
+require_once __DIR__ . '/../../../../class/riskanalysis/risksign.class.php';
+$riskSign    = new RiskSign($db);
+$protections = $riskSign->getProtectionsByElement($allRisks ? [] : [(int) $id]);
+
 // The list is paginated and both collections are only read by id, so they load their entries
 // on demand instead of instantiating every user and every risk assessment of the database
 $usersList                    = digirisk_get_user_list();
@@ -495,7 +502,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
         $newcardbutton .= '</div>';
 
         // Bouton pour les risques psychosociaux
-        if (getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_METHOD', 1)) {
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_RPS_SCOPE_BLOCK', 1) && getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_METHOD', 1)) {
             $newcardbutton .= '<div class="psychosocial-risk-add wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open" style="margin-left: 10px;" aria-label="' . $langs->trans('AddPsychosocialRisk') . '" value="' . $object->id . '">';
             $newcardbutton .= '<i class="fas fa-brain button-icon"></i><i class="fas fa-plus-circle button-add animated"></i>';
             $newcardbutton .= '	<input type="hidden" class="modal-options" data-modal-to-open="psychosocial_risk_add" data-from-id="'. $object->id .'" data-from-type="digiriskelement" data-from-subtype="photo" data-from-subdir="photos"/>';
@@ -504,7 +511,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
         // Bouton de la grille RPS-DU de l'INRS, la seconde méthode d'évaluation des risques
         // psychosociaux : elle n'a pas de sens sur l'onglet des risques environnementaux
-        if ($riskType == 'risk' && getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_GRID_METHOD', 1)) {
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_RPS_SCOPE_BLOCK', 1) && $riskType == 'risk' && getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_GRID_METHOD', 1)) {
             $newcardbutton .= '<div class="psychosocial-risk-grid-add wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open" aria-label="' . $langs->trans('AddPsychosocialRiskGrid') . '" value="' . $object->id . '">';
             $newcardbutton .= '<i class="fas fa-clipboard-list button-icon"></i><i class="fas fa-plus-circle button-add animated"></i>';
             $newcardbutton .= '	<input type="hidden" class="modal-options" data-modal-to-open="psychosocial_risk_grid_add" data-from-id="'. $object->id .'"/>';
@@ -521,12 +528,12 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
         $newcardbutton = '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="' . $langs->trans('PermissionDenied') . '" data-direction="left" value="' . $object->id . '"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
 
         // Bouton désactivé pour les risques psychosociaux
-        if (getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_METHOD', 1)) {
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_RPS_SCOPE_BLOCK', 1) && getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_METHOD', 1)) {
             $newcardbutton .= '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" style="margin-left: 10px;" aria-label="' . $langs->trans('PermissionDenied') . '" data-direction="left" value="' . $object->id . '"><i class="fas fa-brain button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
         }
 
         // Bouton désactivé pour la grille RPS-DU
-        if ($riskType == 'risk' && getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_GRID_METHOD', 1)) {
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_RPS_SCOPE_BLOCK', 1) && $riskType == 'risk' && getDolGlobalInt('DIGIRISKDOLIBARR_PSYCHOSOCIAL_RISK_GRID_METHOD', 1)) {
             $newcardbutton .= '<div class="psychosocial-risk-grid-add wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="' . $langs->trans('PermissionDenied') . '" data-direction="left" value="' . $object->id . '"><i class="fas fa-clipboard-list button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
         }
     } ?>
@@ -537,18 +544,9 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                 <!-- Modal-Header -->
                 <div class="modal-header">
                     <h2 class="modal-title"><?php print digirisk_trans_risk_type('Add', $riskType, 'Title') . ' ' . $refRiskMod->getNextValue($risk); ?></h2>
-                    <?php if ($permissiontoadd) : ?>
-                        <div class="risk-create wpeo-button button-primary button-disable modal-close modal-header-action">
-                            <span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
-                        </div>
-                    <?php else : ?>
-                        <div class="wpeo-button button-grey wpeo-tooltip-event modal-header-action" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
-                            <span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
-                        </div>
-                    <?php endif;?>
                     <div class="modal-close"><i class="fas fa-times"></i></div>
                 </div>
-                <!-- Modal-ADD Risk Content-->
+                <!-- Modal-ADD Risk Content : chaque étape du fil d'Ariane précède sa section, la grille les met en face -->
                 <div class="modal-content" id="#modalContent">
                     <!-- PHOTO -->
                     <div class="messageSuccessSavePhoto notice hidden">
@@ -567,36 +565,37 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                             <div class="notice-close"><i class="fas fa-times"></i></div>
                         </div>
                     </div>
-                    <div class="risk-content">
-                        <div class="risk-category">
-                            <span class="title"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
-                            <div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
-                                <input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined" />
-                                <input class="input-risk-description-prefill" type="hidden" name="risk_description_prefill" value="<?php echo getDolGlobalInt('DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL'); ?>" />
-                                <div class="dropdown-toggle dropdown-add-button button-cotation">
-                                    <span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add"></i></span>
-                                    <img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
-                                </div>
-                                <ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
-                                    <?php
-                                    if ( ! empty($dangerCategories) ) :
-                                        foreach ($dangerCategories as $dangerCategory) : ?>
-                                            <li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" data-name="<?php echo dol_escape_htmltag($dangerCategory['name']) ?>" aria-label="<?php echo $risk->formatDangerCategoryTooltip($dangerCategory) ?>">
-                                                <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
-                                            </li>
-                                        <?php endforeach;
-                                    endif; ?>
-                                </ul>
-                            </div>
-                        </div>
-                        <?php if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) : ?>
+                    <!-- Étape du danger : il se choisit ici, la description reste dans le formulaire -->
+                    <div class="risk-add-step risk-add-step-danger current" data-step="risk" data-section=".risk-content" data-panel="1" data-required="1" data-auto-advance="1">
+                        <input class="input-hidden-danger" type="hidden" name="risk_category_id" value="undefined" />
+                        <input class="input-risk-description-prefill" type="hidden" name="risk_description_prefill" value="<?php echo getDolGlobalInt('DIGIRISKDOLIBARR_RISK_DESCRIPTION_PREFILL'); ?>" />
+                        <button type="button" class="risk-add-step-button">
+                            <span class="risk-add-step-marker"><i class="fas fa-exclamation-triangle risk-add-step-icon-todo"></i><img class="risk-add-step-danger-pic" alt=""/></span>
+                            <span class="risk-add-step-text">
+                                <span class="risk-add-step-label"><?php echo $langs->trans('Risk'); ?><required>*</required></span>
+                                <span class="risk-add-step-summary" data-hint="<?php echo dol_escape_htmltag($langs->trans('RiskAddStepDangerHint')); ?>"><?php echo $langs->trans('RiskAddStepDangerHint'); ?></span>
+                            </span>
+                            <i class="fas fa-chevron-right risk-add-step-chevron"></i>
+                        </button>
+                    </div>
+                    <?php if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) : ?>
+                        <div class="risk-content">
                             <div class="risk-description">
                                 <span class="title"><?php echo $langs->trans('Description'); ?></span>
                                 <?php print '<textarea name="riskComment" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
                             </div>
-                        <?php endif; ?>
-                    </div>
+                        </div>
+                    <?php endif; ?>
                     <?php if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) : ?>
+                        <div class="risk-add-step" data-step="categories" data-section=".risk-categories">
+                            <button type="button" class="risk-add-step-button">
+                                <span class="risk-add-step-marker"><i class="fas fa-tags risk-add-step-icon-todo"></i><i class="fas fa-check risk-add-step-icon-done"></i></span>
+                                <span class="risk-add-step-text">
+                                    <span class="risk-add-step-label"><?php echo $langs->trans('Categories'); ?></span>
+                                    <span class="risk-add-step-summary" data-hint="<?php echo dol_escape_htmltag($langs->trans('RiskAddStepOptional')); ?>" data-done="<?php echo dol_escape_htmltag($langs->trans('RiskAddStepCategoriesDone')); ?>"><?php echo $langs->trans('RiskAddStepOptional'); ?></span>
+                                </span>
+                            </button>
+                        </div>
                         <div class="risk-categories"><span class="title"><?php echo $langs->trans("Categories"); ?></span>
                             <?php $categoryArborescence = $form->select_all_categories('digiriskrisk', '', 'parent', 64, 0, 1);
                             print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, GETPOST('categories', 'array'), '', 0, 'minwidth100imp widthcentpercentminusxx maxwidth400'); ?>
@@ -605,6 +604,15 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                             </a>
                         </div><hr>
                     <?php endif; ?>
+                    <div class="risk-add-step<?php echo $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT ? '' : ' risk-add-step-last'; ?>" data-step="evaluation" data-section=".risk-evaluation-container" data-required="1" data-auto-advance="1">
+                        <button type="button" class="risk-add-step-button">
+                            <span class="risk-add-step-marker"><i class="fas fa-chart-line risk-add-step-icon-todo"></i><i class="fas fa-check risk-add-step-icon-done"></i></span>
+                            <span class="risk-add-step-text">
+                                <span class="risk-add-step-label"><?php echo $langs->trans('RiskAssessment'); ?><required>*</required></span>
+                                <span class="risk-add-step-summary" data-hint="<?php echo dol_escape_htmltag($langs->trans('RiskAddStepAssessmentHint')); ?>"><?php echo $langs->trans('RiskAddStepAssessmentHint'); ?></span>
+                            </span>
+                        </button>
+                    </div>
                     <div class="risk-evaluation-container standard">
                         <div class="risk-evaluation-header risk-evaluation-header-split">
                             <div class="risk-evaluation-header-left">
@@ -704,6 +712,15 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                         </div>
                     </div>
                     <?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) : ?>
+                        <div class="risk-add-step risk-add-step-last" data-step="task" data-section=".riskassessment-task" data-focus="input[name='label']">
+                            <button type="button" class="risk-add-step-button">
+                                <span class="risk-add-step-marker"><i class="fas fa-tasks risk-add-step-icon-todo"></i><i class="fas fa-check risk-add-step-icon-done"></i></span>
+                                <span class="risk-add-step-text">
+                                    <span class="risk-add-step-label"><?php echo $langs->trans('Task'); ?></span>
+                                    <span class="risk-add-step-summary" data-hint="<?php echo dol_escape_htmltag($langs->trans('RiskAddStepOptional')); ?>"><?php echo $langs->trans('RiskAddStepOptional'); ?></span>
+                                </span>
+                            </button>
+                        </div>
                         <div class="riskassessment-task">
                             <div class="riskassessment-task-header">
                                 <span class="section-title"><?php echo $langs->trans('Task'); ?></span>
@@ -744,7 +761,39 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                         </div>
                     <?php endif; ?>
                 </div>
-
+                <!-- Choix du danger, ouvert depuis la première étape du fil : il recouvre le formulaire, en tuiles
+                     pictogramme + nom comme le sélecteur de l'interface mobile -->
+                <div class="risk-add-danger-panel">
+                    <div class="risk-add-danger-panel-header">
+                        <span class="section-title"><?php echo $langs->trans('RiskAddStepDangerHint'); ?></span>
+                        <div class="risk-add-danger-search-field">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="risk-add-danger-search" placeholder="<?php echo dol_escape_htmltag($langs->trans('RiskAddDangerSearch')); ?>" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="risk-add-danger-grid">
+                        <?php foreach ((array) $dangerCategories as $dangerCategory) :
+                            // The name is written on the tile: only the hardship categories have more to tell in a tooltip
+                            $hasDangerTooltip = !empty($dangerCategory['reference']); ?>
+                            <button type="button" class="risk-add-danger-option<?php echo $hasDangerTooltip ? ' wpeo-tooltip-event' : ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" data-name="<?php echo dol_escape_htmltag($dangerCategory['name']) ?>"<?php echo $hasDangerTooltip ? ' aria-label="' . $risk->formatDangerCategoryTooltip($dangerCategory) . '"' : ''; ?>>
+                                <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" alt="" loading="lazy" width="48" height="48">
+                                <span><?php echo dol_escape_htmltag($dangerCategory['name']) ?></span>
+                            </button>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="risk-add-danger-empty hidden"><?php echo $langs->trans('RiskAddDangerNoMatch'); ?></div>
+                </div>
+                <div class="modal-footer">
+                    <?php if ($permissiontoadd) : ?>
+                        <div class="risk-create wpeo-button button-primary button-disable modal-close">
+                            <span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
+                        </div>
+                    <?php else : ?>
+                        <div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
+                            <span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
@@ -793,6 +842,25 @@ $varpage  = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
 $selectedfields  = $form->multiSelectArrayWithCheckbox('risklist_selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 $selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
+
+// RPS : la qualification des unites de travail se prend une seule fois, au niveau 0
+// (onglet Risques psychosociaux de la societe, view/digiriskstandard/digiriskstandard_psychosocial.php)
+// et commande ensuite l'affichage du risque psychosocial sur chaque unite.
+require __DIR__ . '/digiriskdolibarr_rps_scope_data.tpl.php';
+if (isset($object) && $object->element == 'digiriskelement' && isset($rpsStateByUnit[(int) $object->id])) {
+    // Unite de travail : sa ligne psychosociale, evaluable sur place si elle est concernee,
+    // sinon un rappel de sa qualification, qui se prend au niveau 0
+    $rpsUnitLine = null;
+    foreach ($rpsLines as $rpsCandidate) {
+        if ((int) $rpsCandidate['id'] === (int) $object->id) {
+            $rpsUnitLine = $rpsCandidate;
+        }
+    }
+    require __DIR__ . '/digiriskdolibarr_rps_unit_view.tpl.php';
+    if ($rpsStateByUnit[(int) $object->id] === 1) {
+        require __DIR__ . '/digiriskdolibarr_rps_eval_modal.tpl.php';
+    }
+}
 
 print '<div class="div-table-responsive">'; // You can use div-table-responsive-no-min if you dont need reserved height for your table
 ?>
@@ -856,6 +924,9 @@ foreach ($evaluation->fields as $key => $val) {
         }
         print '</td>';
     }
+    if ($key == 'cotation') {
+        print '<td class="liste_titre"></td>';
+    }
 }
 
 // Extra fields
@@ -889,6 +960,9 @@ foreach ($evaluation->fields as $key => $val) {
     if ( ! empty($arrayfields['evaluation.' . $key]['checked'])) {
         print getTitleFieldOfList($arrayfields['evaluation.' . $key]['label'], 0, $_SERVER['PHP_SELF'], 'evaluation.' . $key, '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : '')) . "\n";
     }
+    if ($key == 'cotation') {
+        print getTitleFieldOfList('Protection', 0, $_SERVER['PHP_SELF'], '', '', $param, '', $sortfield, $sortorder, 'risk-protection ') . "\n";
+    }
 }
 
 // Extra fields
@@ -907,8 +981,9 @@ print '</tr>' . "\n";
 // --------------------------------------------------------------------
 
 // contenu
-$i          = 0;
-$totalarray = array('nbfield' => 0);
+$i               = 0;
+$totalarray      = array('nbfield' => 0);
+$rpsRowShownFor  = [];
 
 while ($i < ($limit ? min($num, $limit) : $num)) {
     $obj = $db->fetch_object($resql);
@@ -917,6 +992,34 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 
     // Store properties in $risk
     $risk->setVarsFromFetchObj($obj);
+
+    // RPS : la liste des risques ne montre jamais plus d'une ligne psychosociale par unite.
+    // Les risques portant un facteur - un par critere avec la grille RPS-DU, un par facteur
+    // avec "Faire le point" - sont le detail de l'evaluation, pas des risques a lister : ils
+    // se lisent dans le bloc psychosocial. Seul le risque consolide, celui qui ne porte pas de
+    // facteur, reste dans la liste, et seulement si l'unite est declaree concernee.
+    if ($risk->category == Risk::PSYCHOSOCIAL_CATEGORY_POSITION) {
+        $rpsSubCategory = ($risk->sub_category === null || $risk->sub_category === '') ? -1 : (int) $risk->sub_category;
+
+        if ($rpsSubCategory >= 0) {
+            $i++;
+            continue;
+        }
+
+        // Le tableau n'est renseigne que pour les unites de travail : un groupement n'est pas filtre
+        if (isset($rpsStateByUnit[(int) $object->id]) && $rpsStateByUnit[(int) $object->id] !== 1) {
+            $i++;
+            continue;
+        }
+
+        // Une ligne psychosociale au maximum par element : les doublons nes de clics repetes
+        // sur les anciennes methodes d'ajout ne reviennent pas encombrer la liste.
+        if (!empty($rpsRowShownFor[(int) $risk->fk_element])) {
+            $i++;
+            continue;
+        }
+        $rpsRowShownFor[(int) $risk->fk_element] = 1;
+    }
 
     // Show here line of result
     print '<tr class="oddeven risk-row risk_row_' . $risk->id . ' risk-row-content-' . $risk->id . '" id="risk_row_' . $risk->id . '">';
@@ -1085,7 +1188,12 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
                 if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 ) {
                     print $langs->trans('RiskDescriptionNotActivated');
                 } else {
-                    print dol_trunc($risk->description, 120);
+                    print '<div class="risk-description-text">' . dol_escape_htmltag(dol_trunc($risk->description, 120), 0, 1) . '</div>';
+                    // The picto of the previous column only names its danger category on hover
+                    $dangerCategoryName = $risk->getDangerCategoryName($risk, $riskType);
+                    if ($dangerCategoryName !== -1) {
+                        print '<div class="risk-description-category">' . dol_escape_htmltag($dangerCategoryName) . '</div>';
+                    }
                 }
             } else print $risk->showOutputField($val, $key, $risk->$key, '');
             print '</td>';
@@ -1104,6 +1212,8 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
         elseif ($key == 'ref') $cssforfield      .= ($cssforfield ? ' ' : '') . 'nowrap';
         elseif ($key == 'cotation') $cssforfield .= ($cssforfield ? ' ' : '') . 'risk-evaluation-list-container-' . $risk->id;
         elseif ($key == 'has_tasks') $cssforfield .= ($cssforfield ? ' ' : '') . 'tasks-list-container-' . $risk->id;
+        // Read before the cotation cell: the assessment edit modal it includes reuses $key
+        $protectionAfterCell = ($key == 'cotation');
         if ( ! empty($arrayfields['evaluation.' . $key]['checked'])) {
             print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="vertical-align: top;">';
             if ($key == 'cotation') {
@@ -1119,6 +1229,9 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
                 if ( ! $i) $totalarray['pos'][$totalarray['nbfield']] = 'r.' . $key;
                 $totalarray['val']['r.' . $key]                      += $lastEvaluation->$key;
             }
+        }
+        if ($protectionAfterCell) {
+            require __DIR__ . '/digiriskdolibarr_riskprotection_view.tpl.php';
         }
     }
 
@@ -1146,7 +1259,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 
 // If no record found
 if ($num == 0) {
-    $colspan = 1;
+    $colspan = 2; // The action column and the protection one, which are not selectable fields
     foreach ($arrayfields as $key => $val) { if ( ! empty($val['checked'])) $colspan++; }
     print '<tr><td colspan="' . $colspan . '" class="opacitymedium">' . $langs->trans("NoRecordFound") . '</td></tr>';
 }

@@ -1,0 +1,124 @@
+@import "../theme/tokens";
+
+// Quick user creation form under the user list (view/digiriskusers.php): one card whose fields share
+// the same height, with their label above, and that wraps on narrow screens
+#{$dr-scope} .digirisk-user-create {
+  @include dr-card;
+  container-type: inline-size;
+  margin-top: 16px;
+  padding: 16px 20px 20px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  &__icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: $dr-radius;
+    background: $dr-primary-soft;
+    color: $dr-primary;
+    font-size: 15px;
+  }
+
+  &__title {
+    font-size: 15px;
+    font-weight: 700;
+    color: $dr-text;
+  }
+
+  &__hint {
+    margin-top: 2px;
+    font-size: 12.5px;
+    color: $dr-muted;
+  }
+
+  &__fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1.4fr) auto;
+    align-items: end;
+    gap: 14px 16px;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+
+    label {
+      @include dr-label;
+    }
+
+    input {
+      width: 100%;
+      height: 36px;
+      margin: 0;
+    }
+
+    .select2-container {
+      width: 100% !important;
+    }
+
+    .select2-container--default .select2-selection--single {
+      height: 36px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+      padding-left: 10px;
+      line-height: 34px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+      height: 34px;
+    }
+  }
+
+  &__required {
+    color: $dr-danger;
+  }
+
+  &__submit.wpeo-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 36px;
+    padding: 0 16px;
+    font-size: 14px;
+    white-space: nowrap;
+
+    .button-icon ~ span {
+      margin-left: 0;
+    }
+  }
+
+  // Three columns: the button takes the free cell next to the group
+  @container (max-width: 980px) {
+    &__fields {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    &__actions {
+      justify-self: end;
+    }
+  }
+
+  @container (max-width: 560px) {
+    &__fields {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    &__actions,
+    &__submit.wpeo-button {
+      width: 100%;
+    }
+  }
+}

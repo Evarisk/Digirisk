@@ -27,8 +27,8 @@ require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
-require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
-require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+dol_include_once('/saturne/class/saturneobject.class.php');
+dol_include_once('/saturne/class/saturnesignature.class.php');
 
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/digiriskdocuments.class.php';
@@ -1009,7 +1009,8 @@ class Accident extends SaturneObject
         $filters[] = digirisk_get_date_range_filter(
             'search_accident_date',
             empty($dateStart) ? $this->dashboardDateStart : $dateStart,
-            empty($dateEnd) ? $this->dashboardDateEnd : $dateEnd
+            empty($dateEnd) ? $this->dashboardDateEnd : $dateEnd,
+            '_dt'
         );
 
         return dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . '?' . implode('&', array_filter($filters));
@@ -1156,6 +1157,44 @@ class Accident extends SaturneObject
             $user->fetch($victimSignatory->element_id);
         }
         return $user;
+    }
+
+    /**
+     * Get the share of the accident information filled in, as counted by the gauge of the card
+     *
+     * The location counts only when the accident has a kind of location, through the field matching that kind
+     *
+     * @param  User|null $userVictim Victim already loaded by the caller, null to load it here
+     * @return float                 Percentage of the information filled in, from 0 to 100
+     * @throws Exception
+     */
+    public function getProgress(?User $userVictim = null): float
+    {
+        $userVictim = $userVictim ?? $this->getUserVictim();
+
+        $accidentData = [$this->ref, $this->label, (!empty($this->accident_type) ? $this->accident_type : 0), $this->accident_date, $this->description];
+        switch ($this->external_accident) {
+            case 1:
+                $accidentData[] = $this->fk_element > 0 ? $this->fk_element : $this->fk_standard;
+                break;
+            case 2:
+                $accidentData[] = $this->fk_soc;
+                break;
+            case 3:
+                $accidentData[] = $this->accident_location;
+                break;
+        }
+        $accidentData[] = $userVictim->id > 0 ? $userVictim->id : '';
+
+        $accidentLesion  = new AccidentLesion($this->db);
+        $accidentLesions = $accidentLesion->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . ((int) $this->id)]);
+        $accidentData[]  = (is_array($accidentLesions) && !empty($accidentLesions)) ? count($accidentLesions) : '';
+
+        $filledData = array_filter($accidentData, function ($data) {
+            return dol_strlen((string) $data) > 0;
+        });
+
+        return count($filledData) / count($accidentData) * 100;
     }
 
     /**

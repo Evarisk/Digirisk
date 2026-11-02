@@ -5,7 +5,9 @@
 	<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 		<div class="risk-evaluation-single risk-evaluation-single-<?php echo $risk->id ?>">
 			<div class="risk-evaluation-cotation risk-evaluation-list modal-open" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->getEvaluationScale() ?>">
-				<span><?php echo ($lastEvaluation->method == 'standard' ? $defaultCotation[$lastEvaluation->cotation] ?? 0 : $lastEvaluation->cotation); ?></span>
+				<?php // The level of the scale spelled out before the cotation, "Risque à traiter (65)" ?>
+				<span class="risk-evaluation-cotation-level"><?php echo dol_escape_htmltag($risk->getCotations()[$lastEvaluation->getEvaluationScale()]['label'] ?? ''); ?></span>
+				<span class="risk-evaluation-cotation-value"><?php echo ($lastEvaluation->method == 'standard' ? $defaultCotation[$lastEvaluation->cotation] ?? 0 : $lastEvaluation->cotation); ?></span>
 			</div>
 			<div class="photo riskassessment-photo-<?php echo $lastEvaluation->id; ?>" style="margin:auto">
 				<?php
@@ -24,9 +26,8 @@
 						echo $userAuthor->getNomUrl(-1); ?>
 					</span>
 				</div>
-				<div class="risk-evaluation-comment wordbreak">
-					<?php print nl2br(dol_trunc($lastEvaluation->comment, 120)); ?>
-				</div>
+				<?php // On one line, so that an assessment without comment leaves the block :empty ?>
+				<div class="risk-evaluation-comment wordbreak"><?php print nl2br(dol_trunc($lastEvaluation->comment, 120)); ?></div>
 			</div>
 			<!-- BUTTON MODAL RISK EVALUATION ADD  -->
 			<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>

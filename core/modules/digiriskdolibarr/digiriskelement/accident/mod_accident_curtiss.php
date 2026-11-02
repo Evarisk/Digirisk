@@ -23,7 +23,7 @@
  */
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
+dol_include_once('/saturne/core/modules/saturne/modules_saturne.php');
 
 /**
  * Class of file that contains the numbering module rules curtiss
