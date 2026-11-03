@@ -125,7 +125,7 @@ if (!empty($rpsAssessmentByElement[(int) $object->id]['id'])) {
 
         <div class="rps-unit-score">
             <?php if ($rpsUnitLine['done']) : ?>
-                <b class="rps-num"><?php echo number_format($rpsUnitLine['average'], 2, ',', ' '); ?></b>
+                <b class="rps-num"><?php echo price($rpsUnitLine['average'], 0, $langs, 0, 2, 2); ?></b>
                 <span class="rps-unit-max">/ 4</span>
                 <span class="rps-band" data-scale="<?php echo (int) $rpsUnitLine['band']; ?>"><?php echo $rpsScaleLabels[$rpsUnitLine['band']]; ?></span>
             <?php else : ?>
