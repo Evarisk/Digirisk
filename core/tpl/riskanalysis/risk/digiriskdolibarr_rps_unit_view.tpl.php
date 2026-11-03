@@ -42,20 +42,20 @@ if ($rpsUnitState !== 1) : ?>
         <span class="rps-head-icon"><i class="fas fa-brain"></i></span>
         <div class="rps-unit-notice-text">
             <span class="rps-head-title">
-                Risques psychosociaux
-                <span class="rps-state" data-state="<?php echo $rpsUnitState; ?>"><?php echo $rpsUnitState === 0 ? 'Non concernée' : 'À qualifier'; ?></span>
+                <?php echo $langs->trans('PsychosocialRisks'); ?>
+                <span class="rps-state" data-state="<?php echo $rpsUnitState; ?>"><?php echo $langs->trans($rpsUnitState === 0 ? 'PsychosocialStateNotConcerned' : 'PsychosocialStateToQualify'); ?></span>
             </span>
             <span class="rps-head-sub">
                 <?php if ($rpsUnitState === 0) : ?>
-                    Motif : <?php echo dol_escape_htmltag(trim($rpsUnitLine['reason']) !== '' ? $rpsUnitLine['reason'] : 'non renseigné'); ?>
+                    <?php echo $langs->trans('PsychosocialReasonLabel'); ?> <?php echo trim($rpsUnitLine['reason']) !== '' ? dol_escape_htmltag($rpsUnitLine['reason']) : $langs->trans('PsychosocialReasonMissing'); ?>
                 <?php else : ?>
-                    Exposition pas encore tranchée : la ligne des risques psychosociaux apparaîtra ici une fois l'unité déclarée concernée.
+                    <?php echo $langs->trans('PsychosocialUnitToQualifyNotice'); ?>
                 <?php endif; ?>
             </span>
         </div>
         <?php if ($rpsRootAccess) : ?>
             <a class="wpeo-button button-grey button-size-small" href="<?php echo $rpsRootUrl; ?>">
-                Qualifier sur <?php echo dol_escape_htmltag($rpsRootRef); ?> <i class="fas fa-arrow-right"></i>
+                <?php echo dol_escape_htmltag($langs->transnoentities('PsychosocialQualifyOn', $rpsRootRef)); ?> <i class="fas fa-arrow-right"></i>
             </a>
         <?php endif; ?>
     </div>
@@ -96,17 +96,18 @@ if (!empty($rpsAssessmentByElement[(int) $object->id]['id'])) {
 
 ?>
 <div class="rps-scope rps-unit-card" data-element="<?php echo (int) $object->id; ?>" data-endpoint="<?php echo dol_buildpath('/digiriskdolibarr/core/ajax/save_rps_assessment.php', 1); ?>"
-     data-scale-labels="<?php echo dol_escape_htmltag(json_encode($rpsScaleLabels)); ?>">
+     data-scale-labels="<?php echo dol_escape_htmltag(json_encode($rpsScaleLabels)); ?>"
+     data-labels="<?php echo dol_escape_htmltag(json_encode($rpsJsLabels)); ?>">
 
     <div class="rps-unit-line">
         <span class="rps-head-icon"><i class="fas fa-brain"></i></span>
 
         <div class="rps-unit-title">
-            <span class="rps-head-title">Risques psychosociaux</span>
+            <span class="rps-head-title"><?php echo $langs->trans('PsychosocialRisks'); ?></span>
             <span class="rps-unit-sub">
-                <span class="rps-state" data-state="1">Concernée</span>
+                <span class="rps-state" data-state="1"><?php echo $langs->trans('PsychosocialStateConcerned'); ?></span>
                 <?php if ($rpsRootAccess) : ?>
-                    qualifiée sur <a href="<?php echo $rpsRootUrl; ?>"><?php echo dol_escape_htmltag($rpsRootRef); ?></a>
+                    <?php echo $langs->trans('PsychosocialQualifiedOn'); ?> <a href="<?php echo $rpsRootUrl; ?>"><?php echo dol_escape_htmltag($rpsRootRef); ?></a>
                 <?php endif; ?>
             </span>
         </div>
@@ -116,7 +117,7 @@ if (!empty($rpsAssessmentByElement[(int) $object->id]['id'])) {
                 $rpsLevel = (int) ($rpsUnitLine['levels'][$rpsPosition] ?? 0); ?>
                 <span class="rps-factor">
                     <span class="rps-cell" data-scale="<?php echo $rpsLevel; ?>"
-                          title="<?php echo dol_escape_htmltag($langs->trans($rpsSub['label']) . ' — ' . ($rpsLevel ? $rpsScale[$rpsLevel]['label'] : 'non évalué')); ?>"><?php echo $rpsLevel ?: ''; ?></span>
+                          title="<?php echo dol_escape_htmltag($langs->trans($rpsSub['label']) . ' — ' . ($rpsLevel ? $rpsScale[$rpsLevel]['label'] : $langs->trans('PsychosocialFactorNotAssessed'))); ?>"><?php echo $rpsLevel ?: ''; ?></span>
                     <abbr class="rps-factor-key" title="<?php echo dol_escape_htmltag($langs->trans($rpsSub['label'])); ?>">F<?php echo (int) $rpsPosition + 1; ?></abbr>
                 </span>
             <?php endforeach; ?>
@@ -128,52 +129,52 @@ if (!empty($rpsAssessmentByElement[(int) $object->id]['id'])) {
                 <span class="rps-unit-max">/ 4</span>
                 <span class="rps-band" data-scale="<?php echo (int) $rpsUnitLine['band']; ?>"><?php echo $rpsScaleLabels[$rpsUnitLine['band']]; ?></span>
             <?php else : ?>
-                <span class="rps-unit-none">Non évaluée</span>
+                <span class="rps-unit-none"><?php echo $langs->trans('PsychosocialUnitNotAssessed'); ?></span>
             <?php endif; ?>
         </div>
 
         <div class="rps-unit-date">
             <?php if (!empty($rpsUnitLine['date'])) : ?>
-                Évaluée le<br><b><?php echo dol_print_date(strtotime($rpsUnitLine['date']), 'day'); ?></b>
+                <?php echo $langs->trans('PsychosocialAssessedOn'); ?><br><b><?php echo dol_print_date(strtotime($rpsUnitLine['date']), 'day'); ?></b>
             <?php endif; ?>
             <?php if ($rpsUnitFilled > 0 && $rpsUnitFilled < $rpsUnitTotal) : ?>
-                <br><span class="rps-attention"><?php echo $rpsUnitTotal - $rpsUnitFilled; ?> facteur<?php echo ($rpsUnitTotal - $rpsUnitFilled) > 1 ? 's' : ''; ?> à coter</span>
+                <br><span class="rps-attention"><?php echo $langs->trans(($rpsUnitTotal - $rpsUnitFilled) > 1 ? 'PsychosocialFactorsToRate' : 'PsychosocialFactorToRate', $rpsUnitTotal - $rpsUnitFilled); ?></span>
             <?php endif; ?>
         </div>
 
         <div class="rps-unit-buttons">
             <?php if (!empty($rpsUntreated)) : ?>
                 <span class="rps-warn-badge" title="<?php echo dol_escape_htmltag(implode(', ', $rpsUntreatedNames)); ?>">
-                    <i class="fas fa-exclamation-triangle"></i> <?php echo count($rpsUntreated); ?> sans action
+                    <i class="fas fa-exclamation-triangle"></i> <?php echo $langs->trans('PsychosocialWithoutAction', count($rpsUntreated)); ?>
                 </span>
             <?php endif; ?>
             <button type="button" class="wpeo-button button-grey rps-detail-toggle" aria-expanded="false">
                 <i class="fas fa-tasks"></i>
-                <span class="rps-detail-count"><?php echo !empty($rpsTaskList) ? $rpsDoneCount . '/' . count($rpsTaskList) . ' actions' : 'Actions'; ?></span>
+                <span class="rps-detail-count"><?php echo !empty($rpsTaskList) ? $langs->trans('PsychosocialActionsDone', $rpsDoneCount, count($rpsTaskList)) : $langs->trans('PsychosocialActions'); ?></span>
                 <i class="fas fa-chevron-down rps-detail-chevron"></i>
             </button>
             <div class="wpeo-button button-blue modal-open rps-open-eval">
                 <input type="hidden" class="modal-options" data-modal-to-open="rps_eval_modal">
                 <i class="fas fa-clipboard-list"></i>
-                <?php echo $rpsUnitFilled > 0 ? 'Revoir' : 'Évaluer'; ?>
+                <?php echo $langs->trans($rpsUnitFilled > 0 ? 'PsychosocialReview' : 'PsychosocialAssess'); ?>
             </div>
         </div>
     </div>
 
     <div class="rps-unit-detail" hidden>
         <div class="rps-unit-detail-factors">
-            <h5 class="rps-detail-title">Facteurs</h5>
+            <h5 class="rps-detail-title"><?php echo $langs->trans('PsychosocialFactors'); ?></h5>
             <?php foreach ($rpsSubCategories as $rpsPosition => $rpsSub) :
                 $rpsLevel = (int) ($rpsUnitLine['levels'][$rpsPosition] ?? 0); ?>
                 <div class="rps-factor-row">
                     <span class="rps-cell" data-scale="<?php echo $rpsLevel; ?>"><?php echo $rpsLevel ?: ''; ?></span>
                     <span class="rps-factor-name"><b>F<?php echo (int) $rpsPosition + 1; ?></b> <?php echo dol_escape_htmltag($langs->trans($rpsSub['label'])); ?></span>
-                    <span class="rps-factor-level"><?php echo $rpsLevel ? $rpsScale[$rpsLevel]['label'] : 'non coté'; ?></span>
+                    <span class="rps-factor-level"><?php echo $rpsLevel ? $rpsScale[$rpsLevel]['label'] : $langs->trans('PsychosocialFactorNotRated'); ?></span>
                 </div>
             <?php endforeach; ?>
 
             <?php if ($rpsLastAssessment !== null) : ?>
-                <h5 class="rps-detail-title rps-report-title">Rapport de l'évaluation du <?php echo dol_print_date($rpsLastAssessment->date_riskassessment, 'day'); ?></h5>
+                <h5 class="rps-detail-title rps-report-title"><?php echo $langs->trans('PsychosocialAssessmentReportOf', dol_print_date($rpsLastAssessment->date_riskassessment, 'day')); ?></h5>
                 <div class="rps-report">
                     <?php print digiriskRiskAssessmentMediaBlock('riskassessment/' . $rpsLastAssessment->ref, $rpsLastAssessment, true); ?>
                 </div>
@@ -181,31 +182,31 @@ if (!empty($rpsAssessmentByElement[(int) $object->id]['id'])) {
         </div>
 
         <div class="rps-unit-detail-actions">
-            <h5 class="rps-detail-title">Actions de prévention</h5>
+            <h5 class="rps-detail-title"><?php echo $langs->trans('PreventionActions'); ?></h5>
             <?php if (empty($rpsTaskList)) : ?>
-                <div class="rps-actions-empty">Aucune action de prévention pour l'instant.</div>
+                <div class="rps-actions-empty"><?php echo $langs->trans('PsychosocialNoPreventionAction'); ?></div>
             <?php else : ?>
                 <div class="rps-actions-list">
                     <?php foreach ($rpsTaskList as $rpsTask) : ?>
                         <div class="rps-action-item<?php echo $rpsTask['done'] ? ' is-done' : ''; ?>" data-task="<?php echo (int) $rpsTask['id']; ?>">
-                            <input type="checkbox" class="rps-task-done" title="Marquer l'action comme faite" <?php echo $rpsTask['done'] ? 'checked' : ''; ?>>
+                            <input type="checkbox" class="rps-task-done" title="<?php echo dol_escape_htmltag($langs->trans('PsychosocialMarkActionDone')); ?>" <?php echo $rpsTask['done'] ? 'checked' : ''; ?>>
                             <a class="rps-action-ref" href="<?php echo DOL_URL_ROOT . '/projet/tasks/task.php?id=' . (int) $rpsTask['id']; ?>"
-                               title="Ouvrir la tâche"><?php echo dol_escape_htmltag($rpsTask['ref']); ?></a>
+                               title="<?php echo dol_escape_htmltag($langs->trans('PsychosocialOpenTask')); ?>"><?php echo dol_escape_htmltag($rpsTask['ref']); ?></a>
                             <span class="rps-action-label" title="<?php echo dol_escape_htmltag($rpsTask['label']); ?>"><?php echo dol_escape_htmltag($rpsTask['text']); ?></span>
                             <?php if ($rpsTask['factor'] !== null) : ?>
                                 <abbr class="rps-task-factor" title="<?php echo dol_escape_htmltag($langs->trans($rpsSubCategories[$rpsTask['factor']]['label'])); ?>">F<?php echo (int) $rpsTask['factor'] + 1; ?></abbr>
                             <?php endif; ?>
-                            <select class="rps-task-owner" title="Responsable de l'action">
-                                <option value="">Sans responsable</option>
+                            <select class="rps-task-owner" title="<?php echo dol_escape_htmltag($langs->trans('PsychosocialActionOwner')); ?>">
+                                <option value=""><?php echo $langs->trans('PsychosocialNoOwner'); ?></option>
                                 <?php foreach ($rpsUsers as $rpsUserId => $rpsUserName) : ?>
                                     <option value="<?php echo (int) $rpsUserId; ?>" <?php echo $rpsTask['owner_id'] == $rpsUserId ? 'selected' : ''; ?>>
                                         <?php echo dol_escape_htmltag($rpsUserName); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <input type="date" class="rps-task-due" title="Échéance"
+                            <input type="date" class="rps-task-due" title="<?php echo dol_escape_htmltag($langs->trans('PsychosocialDueDate')); ?>"
                                    value="<?php echo !empty($rpsTask['due']) ? dol_print_date(strtotime($rpsTask['due']), '%Y-%m-%d') : ''; ?>">
-                            <button type="button" class="wpeo-button button-transparent button-square-30 rps-task-delete" title="Supprimer l'action">
+                            <button type="button" class="wpeo-button button-transparent button-square-30 rps-task-delete" title="<?php echo dol_escape_htmltag($langs->trans('PsychosocialDeleteAction')); ?>">
                                 <i class="fas fa-trash button-icon"></i>
                             </button>
                         </div>
@@ -216,7 +217,7 @@ if (!empty($rpsAssessmentByElement[(int) $object->id]['id'])) {
             <?php if (!empty($rpsUnitLine['assessed'])) : ?>
                 <?php // Pas de <form> : le bloc est deja dans le formulaire de la liste des risques ?>
                 <div class="rps-task-add">
-                    <select class="rps-task-add-factor" title="Facteur visé par l'action">
+                    <select class="rps-task-add-factor" title="<?php echo dol_escape_htmltag($langs->trans('PsychosocialActionFactor')); ?>">
                         <?php foreach ($rpsSubCategories as $rpsPosition => $rpsSub) :
                             $rpsLevel = (int) ($rpsUnitLine['levels'][$rpsPosition] ?? 0); ?>
                             <option value="<?php echo (int) $rpsPosition; ?>"<?php echo $rpsPosition === $rpsDefaultFactor ? ' selected' : ''; ?>>
@@ -224,26 +225,25 @@ if (!empty($rpsAssessmentByElement[(int) $object->id]['id'])) {
                             </option>
                         <?php endforeach; ?>
                     </select>
-                    <input type="text" class="rps-task-add-label" placeholder="Nouvelle action de prévention…" autocomplete="off" aria-label="Nouvelle action de prévention">
-                    <button type="button" class="wpeo-button button-grey button-size-small rps-task-add-submit"><i class="fas fa-plus"></i> Ajouter</button>
+                    <input type="text" class="rps-task-add-label" placeholder="<?php echo dol_escape_htmltag($langs->trans('PsychosocialNewPreventionAction')); ?>…" autocomplete="off" aria-label="<?php echo dol_escape_htmltag($langs->trans('PsychosocialNewPreventionAction')); ?>">
+                    <button type="button" class="wpeo-button button-grey button-size-small rps-task-add-submit"><i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?></button>
                 </div>
             <?php else : ?>
-                <div class="rps-actions-empty">Les actions s'ajoutent une fois l'unité évaluée : elles se rattachent à son évaluation.</div>
+                <div class="rps-actions-empty"><?php echo $langs->trans('PsychosocialActionsAfterAssessment'); ?></div>
             <?php endif; ?>
         </div>
     </div>
 
-    <?php if (count($rpsUnitLine['orphans']) > 1) : ?>
+    <?php if (count($rpsUnitLine['orphans']) > 1) :
+        // Les references des risques sont des donnees : echappees a part, puis glissees a la place du second %s
+        $rpsOrphanRefs = implode(', ', array_slice($rpsUnitLine['orphans'], 0, 5)) . (count($rpsUnitLine['orphans']) > 5 ? '…' : ''); ?>
         <div class="rps-note">
             <span>
                 <i class="fas fa-info-circle"></i>
-                L'évaluation de cette unité repose encore sur <b><?php echo count($rpsUnitLine['orphans']); ?> risques psychosociaux distincts</b>
-                (<?php echo dol_escape_htmltag(implode(', ', array_slice($rpsUnitLine['orphans'], 0, 5))); ?><?php echo count($rpsUnitLine['orphans']) > 5 ? '…' : ''; ?>),
-                un par critère. Ils ne figurent pas dans la liste des risques, leur détail se lit ci-dessus.
-                Les consolider les remplace par une seule évaluation et range les originaux dans les archives de l'unité.
+                <?php echo str_replace('%s', dol_escape_htmltag($rpsOrphanRefs), $langs->trans('PsychosocialOrphansNote', count($rpsUnitLine['orphans']), '%s')); ?>
             </span>
             <button type="button" class="wpeo-button button-grey button-size-small rps-consolidate" data-element="<?php echo (int) $object->id; ?>">
-                <i class="fas fa-compress"></i> Consolider en une ligne
+                <i class="fas fa-compress"></i> <?php echo $langs->trans('PsychosocialConsolidateOneLine'); ?>
             </button>
         </div>
     <?php endif; ?>

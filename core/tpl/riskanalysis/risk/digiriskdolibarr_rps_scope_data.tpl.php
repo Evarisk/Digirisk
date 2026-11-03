@@ -22,7 +22,7 @@
  *             (outil RPS-DU de l INRS, ED 6403).
  *
  * Variables attendues : $activeDigiriskElementList, $langs, $db
- * Variables produites  : $rpsLines, $rpsStateByUnit, $rpsScale, $rpsSubCategories
+ * Variables produites  : $rpsLines, $rpsStateByUnit, $rpsScale, $rpsSubCategories, $rpsJsLabels
  */
 
 global $conf, $db, $langs;
@@ -52,6 +52,38 @@ $rpsScale = [
 $rpsScaleLabels = [];
 foreach ($rpsScale as $rpsScaleLevel => $rpsScaleMeta) {
     $rpsScaleLabels[$rpsScaleLevel] = $rpsScaleMeta['range'] . ' · ' . $rpsScaleMeta['label'];
+}
+
+// Messages de js/modules/psychosocialScope.js, deposes en data-labels sur les blocs .rps-scope.
+// Sans entites HTML, le JS les ecrit en texte ; les %s restent pour lui.
+$rpsJsLabels = [];
+$rpsJsKeys   = [
+    'notRated'              => 'PsychosocialRatingNone',
+    'stateConcerned'        => 'PsychosocialStateConcerned',
+    'stateNotConcerned'     => 'PsychosocialStateNotConcerned',
+    'stateToQualify'        => 'PsychosocialStateToQualify',
+    'unitSelected'          => 'PsychosocialUnitSelected',
+    'unitsSelected'         => 'PsychosocialUnitsSelected',
+    'unitsCount'            => 'PsychosocialUnitsCount',
+    'qualificationNotSaved' => 'PsychosocialQualificationNotSaved',
+    'reasonSaved'           => 'PsychosocialReasonSaved',
+    'reasonTitle'           => 'PsychosocialNonExposureReason',
+    'reasonPlaceholder'     => 'PsychosocialReasonPlaceholder',
+    'cancel'                => 'Cancel',
+    'validate'              => 'Validate',
+    'undo'                  => 'PsychosocialUndo',
+    'rateAtLeastOne'        => 'PsychosocialRateAtLeastOneCriterion',
+    'saveFailed'            => 'PsychosocialSaveFailed',
+    'consolidating'         => 'PsychosocialConsolidating',
+    'consolidationFailed'   => 'PsychosocialConsolidationFailed',
+    'updateFailed'          => 'PsychosocialUpdateFailed',
+    'actions'               => 'PsychosocialActions',
+    'actionsDone'           => 'PsychosocialActionsDone',
+    'confirmDeleteAction'   => 'PsychosocialConfirmDeleteAction',
+    'actionNotSaved'        => 'PsychosocialActionNotSaved',
+];
+foreach ($rpsJsKeys as $rpsJsKey => $rpsLangKey) {
+    $rpsJsLabels[$rpsJsKey] = $langs->transnoentities($rpsLangKey, '%s', '%s');
 }
 
 if (!function_exists('rps_scope_level')) {
