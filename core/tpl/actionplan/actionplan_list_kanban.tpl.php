@@ -11,6 +11,7 @@
  * - $globalTaskCount    int    Total number of corrective actions
  * - $langs              Translate
  * - $projectId          int    Displayed project ID
+ * - $permissiontoedit   bool   Whether the user may edit the corrective actions, the board is read-only otherwise
  */
 
 // Number of cards rendered live per column; the rest are lazy-loaded by the JS module
@@ -62,7 +63,7 @@ $globalColor  = !empty($globalColumn) ? $globalColumn['color'] : '#999999';
     </div>
 </div>
 
-<div class="kanban-board" data-token="<?= newToken() ?>">
+<div class="kanban-board<?= $permissiontoedit ? '' : ' kanban-board-readonly' ?>" data-token="<?= newToken() ?>">
     <?php foreach ($kanbanColumns as $colDef) :
         $colKey = $colDef['key'];
     ?>

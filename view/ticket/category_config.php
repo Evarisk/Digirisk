@@ -37,6 +37,9 @@ require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formmail.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 
+// load DigiriskDolibarr libraries
+require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
+
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -275,7 +278,7 @@ print '</td><td class="center">';
 $formMail->fetchAllEMailTemplate('ticket_send', $user, $langs);
 $emailTemplateLabels = [];
 foreach ($formMail->lines_model as $emailTemplateLine) {
-    $emailTemplateLabels[$emailTemplateLine->id] = $emailTemplateLine->label;
+    $emailTemplateLabels[$emailTemplateLine->id] = digiriskdolibarr_mail_template_label((string) $emailTemplateLine->label);
 }
 if (!empty($emailTemplateLabels)) {
     print Form::selectarray('mail_template', $emailTemplateLabels, $ticketCategoryConfig->mail_template ?? '', 1);

@@ -36,3 +36,4 @@ define('MAIN_DB_PREFIX', 'llx_');
 define('GETPOST_ALLOWHTML', 1);
 define('ODTPHP_PATH', $dolibarrRoot . '/includes/odtphp/');
 define('TCPDF_PATH', $dolibarrRoot . '/includes/tecnickcom/tcpdf/');
+define('PHPEXCELNEW_PATH', $dolibarrRoot . '/includes/phpoffice/phpspreadsheet/src/PhpSpreadsheet/');

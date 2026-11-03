@@ -27,6 +27,7 @@
  *   $pickerAllUsers           array  Active internal users
  *   $pickerAllCategories      array  All ticket tag categories
  *   $pickerTagFilterOptions   array  Ticket tags in tree order, for the tag filter
+ *   $pickerServiceOptions     array  GP/UT in tree order, for the GP/UT filter
  *   $pickerTicketsJson       array  All ticket data (flat)
  *   $pickerTypeColumns        array  Column defs for Type dimension
  *   $pickerTypeTickets        array  Tickets grouped by type_code
@@ -93,7 +94,13 @@ function renderDimKanban($columns, $colTickets, $dim, $allUsers, $allCats, $allS
                     ?>
                     <div class="kanban-card tac-picker-card"
                          data-ticket-id="<?= (int) $t['id'] ?>"
-                         data-dim-value="<?= dol_escape_htmltag((string) $t[$dimValueField]) ?>">
+                         data-dim-value="<?= dol_escape_htmltag((string) $t[$dimValueField]) ?>"
+                         data-ref="<?= dol_escape_htmltag($t['ref']) ?>"
+                         data-date-c="<?= dol_escape_htmltag($t['date_c_iso']) ?>"
+                         data-services="<?= implode(',', $t['service_ids']) ?>"
+                         data-progress="<?= (int) $t['progress'] ?>"
+                         data-elapsed="<?= (int) $t['elapsed_seconds'] ?>"
+                         data-last-msg="<?= (int) $t['last_msg_date'] ?>">
 
                         <div class="kanban-card-header">
                             <a href="<?= dol_escape_htmltag($t['url']) ?>" class="kanban-card-ref"><?= dol_escape_htmltag($t['ref']) ?></a>
@@ -136,6 +143,23 @@ function renderDimKanban($columns, $colTickets, $dim, $allUsers, $allCats, $allS
                             <a href="<?= dol_escape_htmltag($t['url']) ?>" class="tac-picker-card__subject-link" title="<?= dol_escape_htmltag($langs->trans('OpenTicket') !== 'OpenTicket' ? $langs->trans('OpenTicket') : 'Ouvrir') ?>">
                                 <i class="fas fa-external-link-alt"></i>
                             </a>
+                        </div>
+
+                        <div class="tac-picker-card__indicators">
+                            <span class="tac-picker-card__progress" title="<?= dol_escape_htmltag($langs->trans('Progression')) ?>">
+                                <span class="tac-picker-card__progress-track"><span class="tac-picker-card__progress-fill" style="width:<?= (int) $t['progress'] ?>%"></span></span>
+                                <?= (int) $t['progress'] ?> %
+                            </span>
+                            <?php if ($t['elapsed'] !== '') : ?>
+                                <span class="tac-picker-card__elapsed" title="<?= dol_escape_htmltag($langs->trans('TicketElapsedTimeHelp')) ?>">
+                                    <i class="fas fa-hourglass-half"></i> <?= dol_escape_htmltag($t['elapsed']) ?>
+                                </span>
+                            <?php endif; ?>
+                            <?php if (!empty($t['last_msg_date'])) : ?>
+                                <span class="tac-picker-card__last-msg" title="<?= dol_escape_htmltag($langs->trans('TicketLastMessageDate') . ' : ' . dol_print_date($t['last_msg_date'], 'dayhour', 'tzuser')) ?>">
+                                    <i class="fas fa-comment-dots"></i> <?= dol_print_date($t['last_msg_date'], 'day', 'tzuser') ?>
+                                </span>
+                            <?php endif; ?>
                         </div>
 
                         <div class="kanban-card-contacts">
@@ -270,6 +294,66 @@ function renderDimKanban($columns, $colTickets, $dim, $allUsers, $allCats, $allS
             </button>
         </div>
     <?php endif; ?>
+
+    <!-- Filters on what the cards show (#5549): assignee, progress, age and last message, applied client side
+         together with the tags -->
+    <?php
+    $cardFilters = [
+        'assignee' => ['icon' => 'fa-user', 'label' => 'TicketKanbanFilterAssignee', 'options' => ['none' => 'TicketKanbanFilterUnassigned', 'any' => 'TicketKanbanFilterAssigned']],
+        'progress' => ['icon' => 'fa-tasks', 'label' => 'Progression', 'options' => ['none' => 'TicketKanbanFilterProgressNone', 'running' => 'TicketKanbanFilterProgressRunning', 'done' => 'TicketKanbanFilterProgressDone']],
+        'age'      => ['icon' => 'fa-hourglass-half', 'label' => 'TicketKanbanFilterAge', 'options' => ['lt7' => 'TicketKanbanFilterAgeLess7', '7to30' => 'TicketKanbanFilterAge7To30', 'gt30' => 'TicketKanbanFilterAgeMore30']],
+        'message'  => ['icon' => 'fa-comment-dots', 'label' => 'TicketKanbanFilterLastMessage', 'options' => ['none' => 'TicketKanbanFilterNoMessage', 'lt7' => 'TicketKanbanFilterMessageLess7', 'gt7' => 'TicketKanbanFilterMessageMore7', 'gt30' => 'TicketKanbanFilterMessageMore30']],
+    ];
+    ?>
+    <div class="tac-picker-tagfilter tac-picker-filters" id="tacPickerFilters">
+        <!-- Two rows, each as wide as its filters: on a single one, the bar would run past a laptop screen -->
+        <div class="tac-picker-filters__row">
+            <span class="tac-picker-tagfilter__label"><i class="fas fa-filter"></i> <?= $langs->trans('TicketKanbanFilters') ?></span>
+            <!-- Ref, creation date and GP/UT of the ticket (#5644): a groupment also keeps the tickets of its work units -->
+            <label class="tac-picker-filters__item">
+                <span class="tac-picker-filters__name"><i class="fas fa-hashtag"></i> <?= $langs->trans('TicketKanbanFilterRef') ?></span>
+                <input type="search" class="tac-picker-filters__select tac-picker-filters__text" data-filter="ref" placeholder="<?= dol_escape_htmltag($langs->trans('TicketKanbanFilterRefPlaceholder')) ?>" autocomplete="off">
+            </label>
+            <span class="tac-picker-filters__item">
+                <span class="tac-picker-filters__name"><i class="fas fa-calendar-alt"></i> <?= $langs->trans('TicketKanbanFilterDate') ?></span>
+                <input type="date" class="tac-picker-filters__select" data-filter="datefrom" title="<?= dol_escape_htmltag($langs->trans('TicketKanbanFilterDateFrom')) ?>">
+                <span class="tac-picker-filters__name"><?= $langs->trans('TicketKanbanFilterDateTo') ?></span>
+                <input type="date" class="tac-picker-filters__select" data-filter="dateto" title="<?= dol_escape_htmltag($langs->trans('TicketKanbanFilterDateToHelp')) ?>">
+            </span>
+            <?php if (!empty($pickerServiceOptions)) : ?>
+                <label class="tac-picker-filters__item">
+                    <span class="tac-picker-filters__name"><i class="fas fa-network-wired"></i> <?= $langs->trans('TicketKanbanFilterService') ?></span>
+                    <select class="tac-picker-filters__select" data-filter="service">
+                        <option value=""><?= $langs->trans('TicketKanbanFilterAll') ?></option>
+                        <?php foreach ($pickerServiceOptions as $serviceOption) : ?>
+                            <option value="<?= (int) $serviceOption['id'] ?>"><?= dol_escape_htmltag($serviceOption['label']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
+            <?php endif; ?>
+        </div>
+        <div class="tac-picker-filters__row">
+            <?php foreach ($cardFilters as $filterKey => $cardFilter) : ?>
+                <label class="tac-picker-filters__item">
+                    <span class="tac-picker-filters__name"><i class="fas <?= $cardFilter['icon'] ?>"></i> <?= $langs->trans($cardFilter['label']) ?></span>
+                    <select class="tac-picker-filters__select" data-filter="<?= $filterKey ?>">
+                        <option value=""><?= $langs->trans('TicketKanbanFilterAll') ?></option>
+                        <?php foreach ($cardFilter['options'] as $optionValue => $optionLabel) : ?>
+                            <option value="<?= $optionValue ?>"><?= $langs->trans($optionLabel) ?></option>
+                        <?php endforeach; ?>
+                        <?php if ($filterKey === 'assignee') : ?>
+                            <?php foreach ($pickerAllUsers as $u) : ?>
+                                <option value="<?= (int) $u['id'] ?>"><?= dol_escape_htmltag($u['fullname']) ?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </label>
+            <?php endforeach; ?>
+            <button type="button" class="tac-picker-tagfilter__reset" id="tacPickerFiltersReset">
+                <i class="fas fa-eraser"></i> <?= $langs->trans('RemoveFilter') ?>
+            </button>
+        </div>
+    </div>
 
     <!-- Tab navigation -->
     <div class="tac-dim-tabs" id="tacDimTabs">

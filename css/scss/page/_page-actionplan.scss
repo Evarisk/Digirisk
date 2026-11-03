@@ -86,6 +86,33 @@
     }
 }
 
+/* Kanban / dashboard switch: two export buttons joined into one segmented control */
+.ap-view-switch {
+    display: inline-flex;
+    margin-right: 8px;
+}
+
+.ap-view-btn {
+    border-radius: 0;
+
+    &:first-child {
+        border-radius: 6px 0 0 6px;
+    }
+
+    &:last-child {
+        margin-left: -1px;
+        border-radius: 0 6px 6px 0;
+    }
+
+    &.active,
+    &.active:hover {
+        position: relative;
+        background: #3085d6;
+        border-color: #3085d6;
+        color: #fff;
+    }
+}
+
 /* On narrow screens, drop the toolbar below the tabs to avoid overlap */
 @media (max-width: 767px) {
     .actionplan-export-toolbar {
@@ -750,6 +777,35 @@
 
     &.kanban-card-dropdown-open {
         z-index: 50;
+    }
+}
+
+/* Read-only board: the action plan is browsed without the right to edit it, nothing invites to drag or edit */
+.kanban-board-readonly {
+    .kanban-card,
+    .kanban-card:active,
+    .kanban-card-label,
+    .kanban-editable-meta,
+    .kanban-date,
+    .kanban-initial-responsible,
+    .kanban-progress-bar {
+        cursor: default;
+    }
+
+    .kanban-card-label:hover,
+    .kanban-editable-meta:hover,
+    .kanban-date:hover {
+        background: none;
+        outline: none;
+    }
+
+    .kanban-initial-responsible:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .kanban-progress-bar:hover {
+        height: 8px;
     }
 }
 

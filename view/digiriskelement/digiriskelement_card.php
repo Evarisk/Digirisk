@@ -41,6 +41,7 @@ require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
 require_once __DIR__ . '/../../class/digiriskelement/workunit.class.php';
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+require_once __DIR__ . '/../../class/evaluator.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/groupmentdocument.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/workunitdocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
@@ -121,6 +122,13 @@ if (empty($reshook)) {
 		}
 	}
 
+	// The share of the company workforce is checked before anything of the form is saved, prevention
+	// officers included: an out of range value sends the user back to the form
+	if (in_array($action, ['add', 'update']) && $permissiontoadd && !$cancel && !DigiriskElement::isValidPeoplePercentage(price2num(GETPOST('people_percentage', 'alphanohtml')))) {
+		setEventMessages($langs->trans('ErrorPeoplePercentage'), [], 'errors');
+		$action = ($action == 'add' ? 'create' : 'edit');
+	}
+
 	// Responsables de la prevention de l'element : enregistres avant l'inclusion ci-dessous, qui
 	// redirige des que l'objet est mis a jour. La creation ne les propose pas, l'element n'a pas
 	// encore d'identifiant auquel les rattacher
@@ -156,10 +164,10 @@ if (empty($reshook)) {
     $object->element = $object->element_type;
 
 	// Actions builddoc, forcebuilddoc, remove_file.
-	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
+	require_once dol_buildpath('/saturne/core/tpl/documents/documents_action.tpl.php');
 
 	// Action to generate pdf from odt file
-    require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
+    require_once dol_buildpath('/saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php');
 
     $object->element = 'digiriskelement';
 
@@ -218,6 +226,11 @@ if (empty($reshook)) {
 
 $form        = new Form($db);
 $formconfirm = '';
+
+// Workforce of the company the share of people present in the element applies to
+$evaluator          = new Evaluator($db);
+$nbEmployees        = $evaluator->getNbEmployees()['nbemployees'];
+$workforceConfigUrl = $user->hasRight('digiriskdolibarr', 'adminpage', 'read') ? dol_buildpath('/digiriskdolibarr/admin/config/digiriskelement.php', 1) : '';
 
 $parameters                        = array('formConfirm' => $formconfirm, 'object' => $object);
 $reshook                           = $hookmanager->executeHooks('formConfirm', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
@@ -296,6 +309,10 @@ if ($action == 'create') {
 	$doleditor->Create();
 	print '</td></tr>';
 
+	// $object holds the parent here: the new element starts without a share of the workforce
+	$peoplePercentage = GETPOST('people_percentage', 'alphanohtml');
+	include __DIR__ . '/../../core/tpl/digiriskelement/digiriskelement_people_percentage_edit.tpl.php';
+
 	print '<input hidden class="flat" type="text" size="36" name="element_type" value="' . $element_type . '">';
 	print '<input hidden class="flat" type="text" size="36" name="fk_parent" value="' . $fkParent . '">';
 
@@ -352,11 +369,17 @@ if (($id || $ref) && $action == 'edit') {
 	$doleditor->Create();
 	print '</td></tr>';
 
+	$peoplePercentage = GETPOSTISSET('people_percentage') ? GETPOST('people_percentage', 'alphanohtml') : (string) $object->people_percentage;
+	include __DIR__ . '/../../core/tpl/digiriskelement/digiriskelement_people_percentage_edit.tpl.php';
+
 	// * Prevention officers - Responsables de la prevention *
 
+	// Sans element (fetch rate), ceux de l'etablissement : ils ne sont rattaches a aucun objet
 	$digiriskResources    = new DigiriskResources($db);
-	$preventionOfficerIds = $digiriskResources->fetchResourcesIdsFromObject('PreventionOfficer', 'digiriskelement', $object->id);
-	$userList             = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', '', 0, 1);
+	$preventionOfficerIds = $object->id > 0
+		? $digiriskResources->fetchResourcesIdsFromObject('PreventionOfficer', 'digiriskelement', $object->id)
+		: $digiriskResources->fetchResourcesIdsFromObject('PreventionOfficer', '', 0);
+	$userList            = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', '', 0, 1);
 
 	print '<tr><td>' . $langs->trans('PreventionOfficers') . '</td><td>';
 	print img_picto('', 'user', 'class="pictofixedwidth"') . $form->multiselectarray('PreventionOfficer', $userList, $preventionOfficerIds, null, null, null, null, '300');
@@ -455,8 +478,11 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 
 	// * Prevention officers - Responsables de la prevention *
 
+	// Vue Societe (sans id) : ceux de l'etablissement, qui ne sont rattaches a aucun objet
 	$digiriskResources    = new DigiriskResources($db);
-	$preventionOfficerIds = $digiriskResources->fetchResourcesIdsFromObject('PreventionOfficer', 'digiriskelement', $object->id);
+	$preventionOfficerIds = $object->id > 0
+		? $digiriskResources->fetchResourcesIdsFromObject('PreventionOfficer', 'digiriskelement', $object->id)
+		: $digiriskResources->fetchResourcesIdsFromObject('PreventionOfficer', '', 0);
 	$preventionOfficers   = [];
 	foreach ($preventionOfficerIds as $preventionOfficerId) {
 		// Un objet par ligne : un fetch en echec laisse l'objet sur les valeurs du precedent
@@ -468,6 +494,22 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 
 	print '<tr><td class="titlefield">' . $langs->trans('PreventionOfficers') . '</td>';
 	print '<td>' . (!empty($preventionOfficers) ? implode(', ', $preventionOfficers) : '<span class="opacitymedium">&mdash;</span>') . '</td></tr>';
+
+	// * People - Personnes presentes *
+
+	if ($object->id > 0) {
+		$nbPeople = $object->getNbPeople($nbEmployees);
+
+		print '<tr><td class="titlefield">' . $form->textwithpicto($langs->trans('PeoplePercentage'), $langs->trans('PeoplePercentageHelp')) . '</td><td>';
+		if ($nbPeople === null) {
+			print '<span class="opacitymedium">&mdash;</span>';
+		} elseif ($nbEmployees > 0) {
+			print $langs->trans('PeoplePercentageValue', price($object->people_percentage, 0, $langs, 1, 0) . ' %', $nbPeople, $nbEmployees);
+		} else {
+			print price($object->people_percentage, 0, $langs, 1, 0) . ' % <span class="opacitymedium">' . $langs->trans('PeoplePercentageNoWorkforce') . '</span>';
+		}
+		print '</td></tr>';
+	}
 
 	print '<tr><td class="titlefield">';
 	print $langs->trans("ShowInSelectOnPublicTicketInterface");

@@ -1,0 +1,871 @@
+/* =============================================
+ * Action plan — dashboard view (PAPRIPACT)
+ * Same look as the ReedCRM home page: key figure tiles, then cards on a twelve column grid.
+ * ============================================= */
+
+$apd-ink:       #1d2433;
+$apd-muted:     #6b7486;
+$apd-line:      rgba(29, 36, 51, .09);
+$apd-surface:   #fff;
+$apd-soft:      #f5f7fa;
+$apd-alert:     #c0392b;
+$apd-done:      #1baf7a;
+$apd-todo:      #2a78d6;
+$apd-late:      #e05353;
+$apd-tones: (
+  progress: #2a78d6,
+  late:     #e05353,
+  budget:   #1baf7a,
+  workload: #6250d6
+);
+
+.actionplan-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+  color: $apd-ink;
+}
+
+.apd-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &.apd-badge--alert {
+    background: rgba($apd-alert, .1);
+    color: $apd-alert;
+  }
+}
+
+/* Key figures: one tile per question, the whole tile opens the board behind the figure */
+.apd-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 600px) {
+    gap: 10px;
+  }
+}
+
+.apd-kpi {
+  --apd-tone: #{$apd-todo};
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 16px 18px;
+  border: 1px solid $apd-line;
+  border-radius: 10px;
+  background: $apd-surface;
+  color: $apd-ink;
+  text-decoration: none;
+  transition: border-color .15s, box-shadow .15s;
+
+  &:hover {
+    border-color: var(--apd-tone);
+    box-shadow: 0 2px 10px rgba(29, 36, 51, .08);
+    text-decoration: none;
+  }
+
+  @each $tone, $color in $apd-tones {
+    &.apd-kpi--#{$tone} {
+      --apd-tone: #{$color};
+    }
+  }
+
+  .apd-kpi__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .apd-kpi__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    color: var(--apd-tone);
+    background: color-mix(in srgb, var(--apd-tone) 12%, transparent);
+  }
+
+  .apd-kpi__title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    color: $apd-muted;
+  }
+
+  .apd-kpi__value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .apd-kpi__detail {
+    font-size: 12.5px;
+    color: $apd-muted;
+  }
+
+  .apd-kpi__alert {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: $apd-alert;
+  }
+
+  // Two tiles a row on a phone: the figure shrinks rather than the tiles piling up
+  @media (max-width: 600px) {
+    padding: 12px;
+
+    .apd-kpi__icon {
+      display: none;
+    }
+
+    .apd-kpi__title {
+      font-size: 11px;
+    }
+
+    .apd-kpi__value {
+      font-size: 20px;
+    }
+  }
+}
+
+/* Cards: twelve columns, the chart and the statuses side by side, then the lists three by three and two by two */
+.apd-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.apd-card {
+  grid-column: span 12;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px 18px;
+  border: 1px solid $apd-line;
+  border-radius: 10px;
+  background: $apd-surface;
+
+  &.apd-card--wide {
+    grid-column: span 8;
+  }
+
+  &.apd-card--narrow,
+  &.apd-card--third {
+    grid-column: span 4;
+  }
+
+  &.apd-card--half {
+    grid-column: span 6;
+  }
+
+  @media (max-width: 1200px) {
+    &.apd-card--wide,
+    &.apd-card--narrow,
+    &.apd-card--half {
+      grid-column: span 12;
+    }
+
+    &.apd-card--third {
+      grid-column: span 6;
+    }
+  }
+
+  @media (max-width: 767px) {
+    &.apd-card--third {
+      grid-column: span 12;
+    }
+  }
+
+  .apd-card__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 12px;
+  }
+
+  .apd-card__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 15px;
+    // The module font draws 600 as a semibold, the ReedCRM home page reads bold
+    font-weight: 700;
+    color: $apd-ink;
+
+    i {
+      color: $apd-muted;
+    }
+  }
+
+  .apd-card__figure {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .apd-card__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 500;
+    white-space: nowrap;
+
+    i {
+      font-size: .85em;
+    }
+  }
+
+  .apd-card__footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid $apd-line;
+    font-size: 12.5px;
+    color: $apd-muted;
+  }
+}
+
+.apd-empty {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 18px 4px;
+  font-size: 13px;
+  color: $apd-muted;
+}
+
+.apd-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 12px;
+  color: $apd-muted;
+
+  .apd-legend__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    &:before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+    }
+
+    &.apd-legend__item--done:before {
+      background: $apd-done;
+    }
+
+    &.apd-legend__item--todo:before {
+      background: $apd-todo;
+    }
+
+    &.apd-legend__item--late:before {
+      background: $apd-late;
+    }
+
+    &.apd-legend__item--total:before {
+      background: $apd-muted;
+      opacity: .3;
+    }
+
+    &.apd-legend__item--done-level:before {
+      background: $apd-muted;
+    }
+  }
+}
+
+/* Due dates by month: the bars are drawn in a stretched SVG, the axis and the months in HTML so their text keeps its
+   size. The plot grows with its card, as high as the statuses next to it. */
+.apd-chart {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  grid-template-rows: minmax(220px, 1fr) auto;
+  row-gap: 6px;
+
+  .apd-chart__ticks {
+    position: relative;
+  }
+
+  .apd-chart__tick {
+    position: absolute;
+    right: 10px;
+    font-size: 11px;
+    color: $apd-muted;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    transform: translateY(-50%);
+
+    @for $i from 1 through 5 {
+      &:nth-child(#{$i}) {
+        top: ($i - 1) * 25%;
+      }
+    }
+  }
+
+  .apd-chart__plot {
+    position: relative;
+    border-bottom: 1px solid rgba(29, 36, 51, .25);
+    background-image: linear-gradient(to bottom, $apd-line 1px, transparent 1px);
+    background-size: 100% 25%;
+  }
+
+  .apd-chart__bars {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .apd-chart__bar--done {
+    fill: $apd-done;
+  }
+
+  .apd-chart__bar--todo {
+    fill: $apd-todo;
+  }
+
+  .apd-chart__bar--late {
+    fill: $apd-late;
+  }
+
+  .apd-chart__hit {
+    fill: transparent;
+
+    &.is-hovered {
+      fill: rgba(29, 36, 51, .05);
+    }
+  }
+
+  .apd-chart__months {
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    font-size: 11.5px;
+    color: $apd-muted;
+    text-align: center;
+    text-transform: capitalize;
+  }
+
+  .apd-chart__tooltip {
+    position: absolute;
+    top: 8px;
+    z-index: 5;
+    min-width: 160px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: $apd-ink;
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.5;
+    pointer-events: none;
+    box-shadow: 0 4px 14px rgba(29, 36, 51, .2);
+    transform: translateX(-50%);
+
+    strong {
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .apd-chart__tooltip-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .apd-chart__tooltip-key {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      opacity: .8;
+
+      &:before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+      }
+
+      &.apd-chart__tooltip-key--done:before {
+        background: $apd-done;
+      }
+
+      &.apd-chart__tooltip-key--todo:before {
+        background: $apd-todo;
+      }
+
+      &.apd-chart__tooltip-key--late:before {
+        background: $apd-late;
+      }
+    }
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 32px minmax(0, 1fr);
+
+    .apd-chart__months span:nth-child(even) {
+      visibility: hidden;
+    }
+  }
+}
+
+.apd-chart__table {
+  font-size: 12.5px;
+
+  summary {
+    cursor: pointer;
+    color: $apd-muted;
+  }
+
+  table {
+    margin-top: 8px;
+  }
+}
+
+/* Statuses and risk levels: one row per group, its count as a bar; the risk levels show the finished part over it */
+.apd-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  .apd-bars__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 4px 12px;
+    padding: 8px 6px;
+    border-radius: 8px;
+    color: $apd-ink;
+    text-decoration: none;
+  }
+
+  a.apd-bars__row:hover {
+    background: $apd-soft;
+    text-decoration: none;
+  }
+
+  .apd-bars__row--static {
+    cursor: default;
+  }
+
+  .apd-bars__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    font-size: 13px;
+    font-weight: 500;
+
+    i {
+      width: 14px;
+      color: $apd-muted;
+      text-align: center;
+    }
+  }
+
+  .apd-bars__count {
+    padding: 0 7px;
+    border-radius: 10px;
+    background: $apd-soft;
+    border: 1px solid $apd-line;
+    font-size: 11px;
+    font-weight: 600;
+    color: $apd-muted;
+  }
+
+  .apd-bars__value {
+    font-size: 13px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .apd-bars__bar {
+    grid-column: 1 / -1;
+    display: block;
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: $apd-soft;
+  }
+
+  .apd-bars__total {
+    opacity: .3;
+  }
+
+  .apd-bars__sub {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 10px;
+    font-size: 11.5px;
+    color: $apd-muted;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .apd-bars__late {
+    font-weight: 600;
+    color: $apd-alert;
+  }
+}
+
+/* Points to look after: what, why, and how many on the right */
+.apd-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  .apd-list__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 0;
+    border-top: 1px solid $apd-line;
+
+    &:first-child {
+      border-top: 0;
+      padding-top: 2px;
+    }
+  }
+
+  .apd-list__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba($apd-done, .1);
+    color: $apd-done;
+    font-size: 12px;
+
+    &.apd-list__icon--alert {
+      background: rgba($apd-alert, .1);
+      color: $apd-alert;
+    }
+  }
+
+  .apd-list__main {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .apd-list__title {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .apd-list__meta {
+    font-size: 12px;
+    color: $apd-muted;
+  }
+
+  .apd-list__value {
+    flex: 0 0 auto;
+    font-size: 15px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: $apd-muted;
+
+    &.apd-list__value--alert {
+      color: $apd-alert;
+    }
+  }
+}
+
+/* Next due dates: a calendar tile per action, as the reminders of the ReedCRM home page */
+.apd-upcoming {
+  .apd-upcoming__count {
+    flex: 0 0 auto;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: $apd-todo;
+    background: rgba($apd-todo, .12);
+    border-radius: 11px;
+  }
+
+  .apd-upcoming__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .apd-upcoming__item {
+    display: flex;
+    align-items: flex-start;
+    gap: .7em;
+    padding: .65em 0;
+    border-top: 1px solid $apd-line;
+
+    &:first-child {
+      padding-top: .15em;
+      border-top: 0;
+    }
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+  }
+
+  .apd-upcoming__tile {
+    flex: 0 0 auto;
+    width: 44px;
+    padding: 5px 0 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.05;
+    background: rgba($apd-todo, .09);
+    border-radius: 10px;
+  }
+
+  .apd-upcoming__day {
+    font-size: 17px;
+    font-weight: 700;
+    color: $apd-ink;
+  }
+
+  .apd-upcoming__month {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: $apd-todo;
+  }
+
+  .apd-upcoming__content {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: .2em;
+  }
+
+  .apd-upcoming__label {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: $apd-ink;
+    text-decoration: none;
+
+    &:hover {
+      color: $apd-todo;
+    }
+  }
+
+  .apd-upcoming__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .15em .9em;
+    font-size: 12px;
+    color: $apd-muted;
+
+    i {
+      margin-right: 4px;
+      font-size: .9em;
+    }
+  }
+}
+
+/* Late actions: the most overdue first, the delay on the right */
+.apd-feed {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  .apd-feed__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 9px 0;
+    border-top: 1px solid $apd-line;
+
+    &:first-child {
+      border-top: 0;
+      padding-top: 2px;
+    }
+  }
+
+  .apd-feed__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba($apd-alert, .1);
+    color: $apd-alert;
+    font-size: 12px;
+  }
+
+  .apd-feed__main {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .apd-feed__label {
+    font-size: 13px;
+    font-weight: 600;
+    color: $apd-ink;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .apd-feed__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 12px;
+    font-size: 12px;
+    color: $apd-muted;
+
+    i {
+      margin-right: 4px;
+      font-size: .9em;
+    }
+  }
+
+  .apd-feed__aside {
+    display: inline-flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    font-size: 12px;
+    color: $apd-muted;
+    white-space: nowrap;
+  }
+}
+
+/* GP/UT: fixed layout, the GP/UT takes what the counts leave and is cut with an ellipsis */
+.apd-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  .apd-table__nb {
+    width: 90px;
+  }
+
+  .apd-table__budget {
+    width: 110px;
+  }
+
+  th {
+    padding: 0 8px 8px;
+    border-bottom: 1px solid $apd-line;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: .03em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: $apd-muted;
+
+    &.right {
+      text-align: right;
+    }
+  }
+
+  td {
+    padding: 8px;
+    border-bottom: 1px solid $apd-line;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-variant-numeric: tabular-nums;
+  }
+
+  tr:last-child td {
+    border-bottom: 0;
+  }
+
+  // A small inset: the responsive wrapper clips the first and the last letter of the uppercase headers otherwise
+  th:first-child,
+  td:first-child {
+    padding-left: 2px;
+  }
+
+  th:last-child,
+  td:last-child {
+    padding-right: 2px;
+  }
+
+  .apd-table__alert {
+    font-weight: 600;
+    color: $apd-alert;
+  }
+
+  // On a phone the GP/UT keeps the room, its budget stays on the Kanban
+  @media (max-width: 600px) {
+    .apd-table__nb {
+      width: 64px;
+    }
+
+    th.apd-table__budget,
+    td:last-child {
+      display: none;
+    }
+  }
+}

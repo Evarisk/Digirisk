@@ -39,6 +39,10 @@ $background-colors: (
     border: 1px solid rgba(0,0,0,0.1);
     padding: 0.8em 0.4em;
     position: relative;
+    // Le fond d'une case cochée est un ::after en z-index -1 : sans contexte d'empilement propre à la
+    // case, il passait sous le fond de n'importe quel ancêtre (une règle .modal-content d'un autre
+    // module, Digirisk#5394), et la sélection n'était plus qu'un texte blanc sur fond blanc.
+    isolation: isolate;
 
     @media (max-width: $media__small) {
       width: 100% !important;

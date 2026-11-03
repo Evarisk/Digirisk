@@ -101,7 +101,7 @@ if ($action == 'setMediaInfos') {
 }
 
 // Actions set_mod, update_mask and the set_/del_ switch of the module constants
-require_once __DIR__ . '/../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
+require_once dol_buildpath('/saturne/core/tpl/actions/admin_conf_actions.tpl.php');
 
 /*
  * View

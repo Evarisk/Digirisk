@@ -114,7 +114,7 @@ if ($action == 'ajax_add_protection' && $permissiontoadd) {
         // Update date with DB tms
         $prots[count($prots) - 1]['date'] = $ajRisk->tms;
         $ajRisk->protections_json = json_encode($prots, JSON_UNESCAPED_UNICODE);
-        $db->query('UPDATE ' . MAIN_DB_PREFIX . 'product_risk SET protections_json = \'' . $db->escape($ajRisk->protections_json) . '\' WHERE rowid = ' . $riskId);
+        $db->query('UPDATE ' . MAIN_DB_PREFIX . $ajRisk->table_element . ' SET protections_json = \'' . $db->escape($ajRisk->protections_json) . '\' WHERE rowid = ' . $riskId);
         echo json_encode(['ok' => true, 'count' => count($prots)]);
     } else {
         echo json_encode(['ok' => false]);
@@ -160,7 +160,7 @@ if ($action == 'ajax_save_prot_comment' && $permissiontoadd) {
             // Update date with DB tms
             $prots[$protIdx]['date'] = $ajRisk->tms;
             $ajRisk->protections_json = json_encode($prots, JSON_UNESCAPED_UNICODE);
-            $db->query('UPDATE ' . MAIN_DB_PREFIX . 'product_risk SET protections_json = \'' . $db->escape($ajRisk->protections_json) . '\' WHERE rowid = ' . $riskId);
+            $db->query('UPDATE ' . MAIN_DB_PREFIX . $ajRisk->table_element . ' SET protections_json = \'' . $db->escape($ajRisk->protections_json) . '\' WHERE rowid = ' . $riskId);
             echo json_encode(['ok' => true, 'date' => dol_print_date($ajRisk->tms, 'dayhour')]);
         } else {
             echo json_encode(['ok' => false]);
@@ -284,7 +284,7 @@ if ($action == 'delete_risk_photo' && $permissiontoadd) {
 // â”€â”€ Page output â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $form  = new Form($db);
 $title = $langs->trans('Product') . ' - ' . $langs->trans('Risks');
-llxHeader('', $title, '', '', 0, 0, ['/saturne/js/saturne.min.js'], ['/saturne/css/saturne.min.css', '/digiriskdolibarr/css/digiriskdolibarr.min.css']);
+llxHeader('', $title, '', '', 0, 0, ['/saturne/js/saturne.min.js'], ['/saturne/css/saturne.min.css', '/digiriskdolibarr/css/digiriskdolibarr.min.css'], '', 'saturne-theme');
 
 $head  = product_prepare_head($object);
 $titre = $langs->trans('CardProduct' . $object->type);

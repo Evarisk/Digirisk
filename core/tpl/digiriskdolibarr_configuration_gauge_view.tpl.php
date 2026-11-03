@@ -24,9 +24,9 @@ if (!isset($kCounter)) {
     $kCounter                        = $GLOBALS['digiriskGaugeCounter'];
 }
 ?>
-<div class="chart-container <?php echo $morecssGauge ?>" style=" width:50px">
+<div class="chart-container digirisk-gauge <?php echo $morecssGauge ?>" style=" width:50px">
 	<div class="wpeo-gridlayout grid-2">
-		<canvas class="" id="advancementGauge<?php echo $kCounter?>" width="40" height="40" style="width:50px !important"></canvas>
+		<canvas class="" id="advancementGauge<?php echo $kCounter?>" width="28" height="28"></canvas>
 		<?php if (empty($move_title_gauge)) : ?>
 			<h3 class="">
 				<?php echo price2Num(($counter / $maxnumber) * 100, 2) . '%' ?>
@@ -38,13 +38,20 @@ if (!isset($kCounter)) {
 		const ctx<?php echo $kCounter?> = document.getElementById('advancementGauge<?php echo $kCounter?>').getContext('2d');
 		const advancementGauge<?php echo $kCounter?> = new Chart(ctx<?php echo $kCounter?>, {
 			type: 'doughnut',
+			// Syntaxe Chart.js 3 (celui de Dolibarr) : sous options.legend, la legende vide restait
+			// affichee et repoussait l'anneau hors du canevas.
+			// Taille fixe : en mode responsive, le graphique prenait la largeur du bloc parent (titre
+			// compris) puis le canevas etait reduit a 28 px, l'anneau devenant minuscule
 			options: {
-				legend: {
-					display: false
-				},
-				tooltips: {
-					enabled: false
-				},
+				responsive: false,
+				plugins: {
+					legend: {
+						display: false
+					},
+					tooltip: {
+						enabled: false
+					}
+				}
 			},
 			data: {
 				datasets: [{

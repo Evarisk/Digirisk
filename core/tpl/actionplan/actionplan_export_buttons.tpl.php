@@ -18,11 +18,13 @@
 /**
  * \file    core/tpl/actionplan/actionplan_export_buttons.tpl.php
  * \ingroup digiriskdolibarr
- * \brief   Top-right export toolbar for the action plan (CSV / A3 PDF / Gantt PNG)
+ * \brief   Top-right toolbar for the action plan: view switch (Kanban / dashboard) and exports (CSV / A3 PDF / Gantt PNG)
  *
  * Variables expected from calling PHP:
- * - $view              string    Current view ('kanban' or 'gantt')
+ * - $view              string    Current view ('kanban', 'dashboard' or 'gantt')
+ * - $viewUrl           string    Page URL carrying the displayed project, year and criteria, without the view
  * - $actionPlanFilters array     Criteria from digiriskActionPlanGetFilters(), carried over to the exports
+ * - $permissiontoread  bool      Whether the user may read the action plan
  * - $user              User      Current user (permission checks)
  * - $langs             Translate Translation object
  */
@@ -33,7 +35,17 @@ $exportAction = $_SERVER['PHP_SELF'] . '?view=' . urlencode($view);
 ?>
 
 <div class="actionplan-export-toolbar">
-    <?php if ($user->hasRight('digiriskdolibarr', 'riskassessmentdocument', 'read')) : ?>
+    <div class="ap-view-switch">
+        <a class="ap-export-btn ap-view-btn<?php echo ($view == 'kanban') ? ' active' : ''; ?>" href="<?php echo dol_escape_htmltag($viewUrl . '&view=kanban'); ?>" title="<?php echo dol_escape_htmltag($langs->trans('ActionPlanKanban')); ?>">
+            <i class="fas fa-columns"></i>
+            <span class="ap-export-label"><?php echo $langs->trans('ActionPlanKanban'); ?></span>
+        </a>
+        <a class="ap-export-btn ap-view-btn<?php echo ($view == 'dashboard') ? ' active' : ''; ?>" href="<?php echo dol_escape_htmltag($viewUrl . '&view=dashboard'); ?>" title="<?php echo dol_escape_htmltag($langs->trans('ActionPlanDashboard')); ?>">
+            <i class="fas fa-chart-pie"></i>
+            <span class="ap-export-label"><?php echo $langs->trans('ActionPlanDashboard'); ?></span>
+        </a>
+    </div>
+    <?php if ($permissiontoread) : ?>
         <form method="POST" action="<?php echo $exportAction; ?>" class="ap-export-form">
             <input type="hidden" name="token" value="<?php echo newToken(); ?>">
             <input type="hidden" name="action" value="exportCsv">
