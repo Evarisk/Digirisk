@@ -41,7 +41,7 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
 
             - uses: shivammathur/setup-php@v2
               with:
@@ -68,20 +68,31 @@ jobs:
             - name: Parite fr_FR / en_US
               run: php dev/ci/lang-parity.php
 
+            # PHP resout __DIR__ vers la cible d'un lien symbolique : un module installe dans
+            # htdocs/custom par symlink cherche alors Saturne a cote de la cible et meurt en
+            # fatale. Seul l'amorcage vers saturne.main.inc.php, execute avant main.inc.php
+            # (dol_buildpath n'y existe pas encore), garde le chemin relatif.
+            - name: Inclusions de Saturne
+              run: |
+                  if grep -rnE "(__DIR__|dirname\(__FILE__\))[^;]*['\"]/?(\.\./)+saturne/" --include='*.php' --exclude-dir=vendor --exclude-dir=node_modules . | grep -v 'saturne/saturne\.main\.inc\.php'; then
+                    echo "::error::Inclusion relative de Saturne : dol_include_once('/saturne/...') pour une classe ou une lib, require(_once) dol_buildpath('/saturne/...') pour un template, file_exists(dol_buildpath('/saturne/...')) pour une garde."
+                    exit 1
+                  fi
+
     phpstan:
         name: PHPStan
         runs-on: ubuntu-latest
 
         steps:
             - name: Checkout Digirisk
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
               with:
                   path: htdocs/custom/digiriskdolibarr
 
             # Le module etend SaturneObject et appelle les libs du socle : sans lui, chaque
             # classe heritee remonterait comme inconnue.
             - name: Checkout Saturne
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
               with:
                   repository: Evarisk/Saturne
                   ref: develop
@@ -96,7 +107,7 @@ jobs:
             # vrac a la racine de core/, pas dans un sous-dossier. Sans eux, les include du
             # module remontent en include.fileNotFound.
             - name: Checkout Dolibarr core (sparse)
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
               with:
                   repository: Dolibarr/dolibarr
                   ref: '23.0.0'
@@ -123,6 +134,8 @@ jobs:
                       htdocs/fourn/class
                       htdocs/includes/odtphp
                       htdocs/includes/parsedown
+                      htdocs/includes/phpoffice/phpspreadsheet/src
+                      htdocs/includes/Psr/autoloader.php
                       htdocs/includes/restler/framework
                       htdocs/includes/tecnickcom/tcpdf/tcpdf.php
                       htdocs/includes/tecnickcom/tcpdf/tcpdf_barcodes_1d.php
@@ -151,7 +164,7 @@ jobs:
                   coverage: none
 
             - name: Cache Composer packages
-              uses: actions/cache@v4
+              uses: actions/cache@v6
               with:
                   path: htdocs/custom/digiriskdolibarr/vendor
                   key: composer-8.1-${{ hashFiles('htdocs/custom/digiriskdolibarr/composer.lock') }}
@@ -171,3 +184,13 @@ jobs:
             - name: Run PHPStan
               working-directory: htdocs/custom/digiriskdolibarr
               run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G --error-format=github
+
+    # API de Saturne absente de sa derniere version publiee (Evarisk/Saturne#1844) : la CI analyse le
+    # module contre Saturne develop, un client qui installe le zip publie planterait sur un tel appel.
+    # Rouge seulement si la PR en introduit un, annotations pour ceux deja sur la base. Contexte
+    # « Saturne / API publiee », non requis : il informe sans bloquer le merge.
+    saturne-api:
+        name: Saturne
+        uses: Evarisk/Saturne/.github/workflows/published-api-reusable.yml@develop
+        with:
+            module: digiriskdolibarr

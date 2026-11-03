@@ -45,6 +45,14 @@ function digiriskstandard_prepare_head(DigiriskStandard $object): array
     $head[$h][2] = 'standardCard';
     $h++;
 
+    // Qualification des unites de travail face aux risques psychosociaux, prise une seule fois pour toute l'organisation
+    if ($user->rights->digiriskdolibarr->risk->read) {
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_psychosocial.php', 1);
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-brain pictofixedwidth"></i>' . $langs->trans('PsychosocialRisks') : '<i class="fas fa-brain"></i>';
+        $head[$h][2] = 'standardPsychosocial';
+        $h++;
+    }
+
     if ($user->rights->digiriskdolibarr->legaldisplay->read) {
         $head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskstandard/digiriskstandard_legaldisplay.php", 1);
         $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-file pictofixedwidth"></i>' . $langs->trans('LegalDisplay') : '<i class="fas fa-file"></i>';

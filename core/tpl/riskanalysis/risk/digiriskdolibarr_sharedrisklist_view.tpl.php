@@ -3,7 +3,7 @@
 	// Selection of new fields
 	require './../../class/actions_changeselectedfields.php';
 
-	print '<div class="fichecenter sharedrisklist wpeo-wrap">';
+	print '<div class="fichecenter sharedrisklist risk-list-simplified wpeo-wrap">';
 	print '<form method="POST" id="searchFormSharedListRisks" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . ($object->element == 'digiriskelement' ? '?id=' . $object->id : '?mainmenu=digiriskdolibarr') . '">' . "\n";
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
@@ -451,7 +451,12 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 ) {
 					print $langs->trans('RiskDescriptionNotActivated');
 				} else {
-					print dol_trunc($risk->description, 120);
+					print '<div class="risk-description-text">' . dol_escape_htmltag(dol_trunc($risk->description, 120), 0, 1) . '</div>';
+					// The picto of the category column only names its danger category on hover
+					$dangerCategoryName = $risk->getDangerCategoryName($risk, $riskType);
+					if ($dangerCategoryName !== -1) {
+						print '<div class="risk-description-category">' . dol_escape_htmltag($dangerCategoryName) . '</div>';
+					}
 				}
 			} elseif ($key == 'applied_on') {
 				if (!empty($risk->linkedObjectsIds['digiriskdolibarr_digiriskelement']) && is_array($risk->linkedObjectsIds['digiriskdolibarr_digiriskelement'])) {

@@ -39,6 +39,7 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr.lib.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/digiriskelement/workunit.class.php';
 require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
+require_once __DIR__ . '/../../class/evaluator.class.php';
 
 // Translations
 saturne_load_langs(["admin"]);
@@ -59,12 +60,23 @@ saturne_check_access($permissiontoread);
  */
 
 // Actions set_mod, update_mask
-require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
+require_once dol_buildpath('/saturne/core/tpl/actions/admin_conf_actions.tpl.php');
 
 if ($action == 'update') {
     $digiriskElementDepthGraph = GETPOST('DigiriskElementDepthGraph', 'int');
     if ($digiriskElementDepthGraph > -1) {
         dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_DEPTH_GRAPH', $digiriskElementDepthGraph, 'integer', 0, '', $conf->entity);
+    }
+
+    // The workforce the share of each GP/UT applies to is the number of employees of the company
+    // setup: entering it switches that number to manual input, emptying it goes back to the count
+    // of the active employee users
+    if (GETPOSTISSET('DIGIRISKDOLIBARR_NB_EMPLOYEES')) {
+        $nbEmployees = GETPOSTINT('DIGIRISKDOLIBARR_NB_EMPLOYEES');
+        if ($nbEmployees > 0) {
+            dolibarr_set_const($db, 'DIGIRISKDOLIBARR_NB_EMPLOYEES', $nbEmployees, 'integer', 0, '', $conf->entity);
+        }
+        dolibarr_set_const($db, 'DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES', $nbEmployees > 0 ? 1 : 0, 'integer', 0, '', $conf->entity);
     }
 
     setEventMessage($langs->trans('SavedConfig'));
@@ -103,13 +115,13 @@ $object = new Groupment($db);
 print load_fiche_titre($pictos['groupment'] . $langs->trans('GroupmentManagement'), '', '');
 print '<hr>';
 
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php');
 
 $object = new WorkUnit($db);
 
 print load_fiche_titre($pictos['workunit'] . $langs->trans('WorkUnitManagement'), '', '');
 
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php');
 print '<hr>';
 
 print load_fiche_titre($langs->trans('Config'), '', '');
@@ -131,6 +143,16 @@ print '<td><input type="number" name="DigiriskElementDepthGraph" value="' . $con
 print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 print '</td></tr>';
 
+// Empty while the number is computed, which the placeholder then shows
+$nbEmployeesManual = getDolGlobalInt('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES') && getDolGlobalInt('DIGIRISKDOLIBARR_NB_EMPLOYEES') > 0;
+$nbEmployees       = (new Evaluator($db))->getNbEmployees()['nbemployees'];
+
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_NB_EMPLOYEES">' . $langs->trans('NbPeopleInCompany') . '</label></td>';
+print '<td>' . $langs->trans('NbPeopleInCompanyDescription') . '</td>';
+print '<td><input type="number" id="DIGIRISKDOLIBARR_NB_EMPLOYEES" name="DIGIRISKDOLIBARR_NB_EMPLOYEES" min="0" step="1" value="' . ($nbEmployeesManual ? getDolGlobalInt('DIGIRISKDOLIBARR_NB_EMPLOYEES') : '') . '" placeholder="' . $nbEmployees . '"></td>';
+print '<td><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '">';
+print '</td></tr>';
+
 print '</table>';
 print '</form>';
 
@@ -148,7 +170,7 @@ $constArray[$moduleNameLowerCase] = [
 		'code'        => 'DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT',
 	],
 ];
-require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';
+require dol_buildpath('/saturne/core/tpl/admin/object/object_const_view.tpl.php');
 
 // Page end
 print dol_get_fiche_end();

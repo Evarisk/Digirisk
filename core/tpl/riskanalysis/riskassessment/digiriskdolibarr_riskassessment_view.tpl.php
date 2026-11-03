@@ -213,6 +213,7 @@ else : ?>
 		<?php endif; ?>
 	</div>
 </div>
+<div class="risk-evaluation-none"><?php echo $langs->trans('RiskNotAssessed'); ?></div>
 <?php endif;
 $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 ?>

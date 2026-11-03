@@ -40,8 +40,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/project.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 // Load Saturne libraries.
-require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
-require_once __DIR__ . '/../../../saturne/class/task/saturnetask.class.php';
+dol_include_once('/saturne/class/saturnesignature.class.php');
+dol_include_once('/saturne/class/task/saturnetask.class.php');
 
 // Load DigiriskDolibarr librairies
 require_once __DIR__ . '/../../class/accident.class.php';
@@ -195,16 +195,16 @@ if (empty($reshook)) {
 	require_once DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
 
     // Actions save_project.
-    require_once __DIR__ . '/../../../saturne/core/tpl/actions/banner_actions.tpl.php';
+    require_once dol_buildpath('/saturne/core/tpl/actions/banner_actions.tpl.php');
 
     // Actions builddoc, forcebuilddoc, remove_file.
-	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
+	require_once dol_buildpath('/saturne/core/tpl/documents/documents_action.tpl.php');
 
 	// Action to generate pdf from odt file.
-	require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
+	require_once dol_buildpath('/saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php');
 
 	// Action confirm_lock, confirm_archive.
-	require_once __DIR__ . '/../../../saturne/core/tpl/signature/signature_action_workflow.tpl.php';
+	require_once dol_buildpath('/saturne/core/tpl/signature/signature_action_workflow.tpl.php');
 
 	// Actions to send emails.
 	$triggersendname = strtoupper($object->element) . '_SENTBYMAIL';

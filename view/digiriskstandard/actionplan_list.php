@@ -37,11 +37,12 @@ require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formprojet.class.php';
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../saturne/class/task/saturnetask.class.php';
+dol_include_once('/saturne/class/task/saturnetask.class.php');
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
+require_once __DIR__ . '/../../class/actionplandashboard.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_actionplan.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 
@@ -55,7 +56,7 @@ saturne_load_langs();
 $action = GETPOST('action', 'aZ09');
 $view   = GETPOST('view', 'alpha');
 
-if (empty($view) || !in_array($view, ['gantt', 'kanban'])) {
+if (empty($view) || !in_array($view, ['gantt', 'kanban', 'dashboard'])) {
     $view = 'kanban';
 }
 
@@ -112,8 +113,10 @@ if ($projectId > 0 && ($isExplicitChoice || (int) ($_COOKIE[$projectCookieName] 
     $_COOKIE[$projectCookieName] = (string) $projectId;
 }
 
-// Security check
-$permissiontoread = $user->hasRight('digiriskdolibarr', 'riskassessmentdocument', 'read');
+// Security check: the action plan belongs to the Document Unique, its readers keep reading it
+$permissiontoread = $user->hasRight('digiriskdolibarr', 'actionplan', 'read') || $user->hasRight('digiriskdolibarr', 'riskassessmentdocument', 'read');
+// The corrective actions are project tasks: the users allowed to modify the tasks keep editing them from the board
+$permissiontoedit = $user->hasRight('digiriskdolibarr', 'actionplan', 'write') || $user->hasRight('projet', 'creer');
 saturne_check_access($permissiontoread);
 
 // Displayed corrective actions criteria (GP/UT, risk level, tags) — shared by the Kanban, the Gantt and the exports
@@ -164,6 +167,16 @@ function createActionPlanEvent($db, $user, $langs, $task, $constName, $label, $n
 /*
  * Actions
  */
+
+// Every AJAX action of the board modifies a corrective action: refuse them all without the right to edit the action plan
+$boardEditActions = ['updateTaskProgress', 'updateTaskLabel', 'updateTaskResponsible', 'addTaskContributor', 'removeTaskContributor', 'updateTaskMeta', 'updateTaskDate', 'addTaskCategory', 'removeTaskCategory'];
+if (in_array($action, $boardEditActions) && !$permissiontoedit) {
+    header('Content-Type: application/json');
+    http_response_code(403);
+    print json_encode(['success' => 0, 'error' => $langs->transnoentities('NotEnoughPermissions')]);
+    $db->close();
+    exit;
+}
 
 // AJAX action to update task progress from Kanban drag & drop
 if ($action == 'updateTaskProgress' && !empty(GETPOSTINT('task_id'))) {
@@ -555,7 +568,7 @@ if ($action == 'builddoc' && GETPOST('model', 'alpha') == getDolGlobalString('DI
         $moreParams      = ['modulePart' => 'project', 'actionPlanFilters' => $actionPlanFilters];
         $shouldRedirect  = false;
 
-        require __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
+        require dol_buildpath('/saturne/core/tpl/documents/documents_action.tpl.php');
 
         if (!empty($document->last_main_doc)) {
             $downloadUrl = DOL_URL_ROOT . '/document.php?modulepart=project&file=' . urlencode($project->ref . '/' . $document->last_main_doc) . '&entity=' . $conf->entity;
@@ -1110,16 +1123,28 @@ if ($historyYear <= 0) {
     }
 }
 
-// The tabs keep the view, the displayed project, the filter bar criteria and the menu highlight
-$tabUrl = $_SERVER['PHP_SELF'] . '?view=' . urlencode($view) . '&projectid=' . $projectId . digiriskActionPlanFilterUrlParams($actionPlanFilters);
+// Every link of the page keeps the menu highlight
+$menuUrlParams = '';
 if (GETPOST('mainmenu', 'aZ09')) {
-    $tabUrl .= '&mainmenu=' . urlencode(GETPOST('mainmenu', 'aZ09'));
+    $menuUrlParams .= '&mainmenu=' . urlencode(GETPOST('mainmenu', 'aZ09'));
 }
 if (GETPOST('leftmenu', 'aZ09')) {
-    $tabUrl .= '&leftmenu=' . urlencode(GETPOST('leftmenu', 'aZ09'));
+    $menuUrlParams .= '&leftmenu=' . urlencode(GETPOST('leftmenu', 'aZ09'));
 }
 if (GETPOSTINT('idmenu') > 0) {
-    $tabUrl .= '&idmenu=' . GETPOSTINT('idmenu');
+    $menuUrlParams .= '&idmenu=' . GETPOSTINT('idmenu');
+}
+
+// The tabs keep the view, the displayed project and the filter bar criteria
+$tabUrl = $_SERVER['PHP_SELF'] . '?view=' . urlencode($view) . '&projectid=' . $projectId . digiriskActionPlanFilterUrlParams($actionPlanFilters) . $menuUrlParams;
+
+// The view switch keeps the displayed project, year and criteria: Kanban and dashboard show the same corrective actions
+$yearUrlParams = '&projectid=' . $projectId . '&period=' . urlencode($actionPlanFilters['period']) . '&year=' . (int) $actionPlanFilters['year'];
+$viewUrl       = $_SERVER['PHP_SELF'] . '?' . ltrim($yearUrlParams, '&') . digiriskActionPlanFilterUrlParams($actionPlanFilters) . $menuUrlParams;
+
+// Dashboard figures of the corrective actions the Kanban would show, its links open the Kanban of the same project and year
+if ($view === 'dashboard') {
+    $actionPlanDashboard = (new ActionPlanDashboard($tasksJson, $kanbanColumns, $risk->getCotations(), $actionPlanFilters, $_SERVER['PHP_SELF'] . '?view=kanban' . $yearUrlParams . $menuUrlParams))->load_dashboard();
 }
 
 $head = [];
@@ -1149,6 +1174,8 @@ require __DIR__ . '/../../core/tpl/actionplan/actionplan_filters.tpl.php';
 // Include appropriate TPL
 if ($view === 'kanban') {
     require_once __DIR__ . '/../../core/tpl/actionplan/actionplan_list_kanban.tpl.php';
+} elseif ($view === 'dashboard') {
+    require_once __DIR__ . '/../../core/tpl/actionplan/actionplan_dashboard.tpl.php';
 } else {
     require_once __DIR__ . '/../../core/tpl/actionplan/actionplan_list_gantt.tpl.php';
 }

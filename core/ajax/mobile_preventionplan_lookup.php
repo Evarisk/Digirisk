@@ -32,7 +32,7 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 }
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+dol_include_once('/saturne/class/saturnesignature.class.php');
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/preventionplan.class.php';
