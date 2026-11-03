@@ -39,6 +39,9 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_risk.lib.php';
 
 global $conf, $db, $langs, $user;
 
+// Les messages d'erreur sont affiches tels quels par js/modules/psychosocialScope.js
+saturne_load_langs();
+
 header('Content-Type: application/json');
 
 if (empty($user->id) || !$user->hasRight('digiriskdolibarr', 'risk', 'write')) {
@@ -167,7 +170,7 @@ if ($action == 'task_create') {
     $taskLabel = trim((string) ($data['label'] ?? ''));
     if ($taskLabel === '') {
         http_response_code(400);
-        echo json_encode(['error' => "Libellé de l'action manquant"]);
+        echo json_encode(['error' => $langs->transnoentities('PsychosocialActionLabelMissing')]);
         exit;
     }
 
@@ -183,7 +186,7 @@ if ($action == 'task_create') {
     $riskId = ($resql && $db->num_rows($resql) > 0) ? (int) $db->fetch_object($resql)->rowid : 0;
     if ($riskId <= 0) {
         http_response_code(409);
-        echo json_encode(['error' => "Évaluez l'unité avant de lui ajouter une action : l'action se rattache à son évaluation."]);
+        echo json_encode(['error' => $langs->transnoentities('PsychosocialAssessBeforeAction')]);
         exit;
     }
 
@@ -249,14 +252,14 @@ if ($action == 'task_update' || $action == 'task_delete') {
     $resql = $db->query($sql);
     if (!$resql || $db->num_rows($resql) == 0) {
         http_response_code(404);
-        echo json_encode(['error' => 'Action introuvable sur cette unite']);
+        echo json_encode(['error' => $langs->transnoentities('PsychosocialActionNotFoundOnUnit')]);
         exit;
     }
 
     $task = new Task($db);
     if ($task->fetch($taskId) <= 0) {
         http_response_code(404);
-        echo json_encode(['error' => 'Action introuvable']);
+        echo json_encode(['error' => $langs->transnoentities('PsychosocialActionNotFound')]);
         exit;
     }
 

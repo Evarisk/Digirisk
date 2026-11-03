@@ -140,6 +140,24 @@ window.digiriskdolibarr.psychosocialScope.scaleLabel = function(level) {
 };
 
 /**
+ * Message traduit, rendu par le PHP sur le bloc (data-labels) ; chaque %s prend l'argument suivant.
+ *
+ * @since   23.7.1
+ * @version 23.7.1
+ *
+ * @param  {string} key Clé du message (voir $rpsJsLabels dans digiriskdolibarr_rps_scope_data.tpl.php)
+ * @return {string}     Message traduit
+ */
+window.digiriskdolibarr.psychosocialScope.label = function(key) {
+  const labels = $('.rps-scope[data-labels]').first().data('labels') || {};
+  const args   = Array.prototype.slice.call(arguments, 1);
+
+  return String(labels[key] || key).replace(/%s/g, function() {
+    return args.length ? String(args.shift()) : '';
+  });
+};
+
+/**
  * Palier de cotation d'une moyenne de facteurs, avec les bornes de rps_scope_band().
  *
  * @since   23.5.1
@@ -165,15 +183,17 @@ window.digiriskdolibarr.psychosocialScope.bandOf = function(average) {
  * Affiche une cotation sur une pastille .rps-band, ou "non cotée" au palier 0.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @param  {jQuery} band  Pastille de cotation
  * @param  {number} level Palier de 0 à 4
  * @return {void}
  */
 window.digiriskdolibarr.psychosocialScope.setBand = function(band, level) {
+  const scope = window.digiriskdolibarr.psychosocialScope;
+
   band.attr('data-scale', level);
-  window.digiriskdolibarr.psychosocialScope.setText(band, level > 0 ? window.digiriskdolibarr.psychosocialScope.scaleLabel(level) : 'non cotée');
+  scope.setText(band, level > 0 ? scope.scaleLabel(level) : scope.label('notRated'));
 };
 
 /**
@@ -252,13 +272,14 @@ window.digiriskdolibarr.psychosocialScope.post = function(payload) {
  * Libellé d'un état de qualification.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @param  {string} state État : 1, 0 ou -1
  * @return {string}       Libellé de l'état
  */
 window.digiriskdolibarr.psychosocialScope.stateLabel = function(state) {
-  return {'1': 'Concernée', '0': 'Non concernée', '-1': 'À qualifier'}[String(state)] || '';
+  const key = {'1': 'stateConcerned', '0': 'stateNotConcerned', '-1': 'stateToQualify'}[String(state)];
+  return key ? window.digiriskdolibarr.psychosocialScope.label(key) : '';
 };
 
 /**
@@ -401,7 +422,7 @@ window.digiriskdolibarr.psychosocialScope.selectedRows = function(block) {
  * tant qu'une unité est sélectionnée.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @param  {jQuery} block Bloc de qualification
  * @return {void}
@@ -422,7 +443,7 @@ window.digiriskdolibarr.psychosocialScope.refreshSelection = function(block) {
 
   block.find('.rps-bulk').toggleClass('rps-hidden', selected.length === 0);
   block.find('.rps-foot').toggleClass('rps-hidden', selected.length > 0);
-  window.digiriskdolibarr.psychosocialScope.setText(block.find('.rps-bulk-count'), selected.length + (selected.length > 1 ? ' unités sélectionnées' : ' unité sélectionnée'));
+  window.digiriskdolibarr.psychosocialScope.setText(block.find('.rps-bulk-count'), window.digiriskdolibarr.psychosocialScope.label(selected.length > 1 ? 'unitsSelected' : 'unitSelected', selected.length));
 };
 
 /**
@@ -506,7 +527,7 @@ window.digiriskdolibarr.psychosocialScope.setRowState = function(row, state, rea
  * Enregistre la qualification d'une ou plusieurs unités, en un seul appel.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @param  {jQuery} rows   Lignes des unités
  * @param  {string} state  État : 1, 0 ou -1
@@ -514,7 +535,9 @@ window.digiriskdolibarr.psychosocialScope.setRowState = function(row, state, rea
  * @return {Promise}       Vrai une fois enregistré
  */
 window.digiriskdolibarr.psychosocialScope.saveScope = function(rows, state, reason) {
-  return window.digiriskdolibarr.psychosocialScope.post({
+  const scope = window.digiriskdolibarr.psychosocialScope;
+
+  return scope.post({
     action: 'scope',
     fk_elements: rows.map(function() {
       return parseInt($(this).attr('data-element'), 10);
@@ -523,11 +546,11 @@ window.digiriskdolibarr.psychosocialScope.saveScope = function(rows, state, reas
     reason: (reason || '').trim()
   }).then(function(result) {
     if (!result.ok) {
-      window.alert((result.body && result.body.error) ? result.body.error : 'Qualification non enregistrée.');
+      window.alert((result.body && result.body.error) ? result.body.error : scope.label('qualificationNotSaved'));
     }
     return result.ok;
   }).catch(function() {
-    window.alert('Qualification non enregistrée.');
+    window.alert(scope.label('qualificationNotSaved'));
     return false;
   });
 };
@@ -537,7 +560,7 @@ window.digiriskdolibarr.psychosocialScope.saveScope = function(rows, state, reas
  * pour toute la sélection. Le changement se défait depuis la notification qui le confirme.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @param  {jQuery} block   Bloc de qualification
  * @param  {jQuery} rows    Lignes des unités
@@ -579,7 +602,7 @@ window.digiriskdolibarr.psychosocialScope.qualifyRows = function(block, rows, st
       scope.refreshScope(block);
       scope.applyFilters(block);
 
-      const subject = rows.length === 1 ? rows.find('.rps-unit-ref').text().trim() + ' · ' + rows.find('.rps-unit-label').text().trim() : rows.length + ' unités';
+      const subject = rows.length === 1 ? rows.find('.rps-unit-ref').text().trim() + ' · ' + rows.find('.rps-unit-label').text().trim() : scope.label('unitsCount', rows.length);
       scope.toast(subject + ' → ' + scope.stateLabel(state), function() {
         scope.restoreStates(block, before);
       });
@@ -675,7 +698,7 @@ window.digiriskdolibarr.psychosocialScope.bulkApply = function() {
  * Modifie le motif d'une unité non concernée.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @return {void}
  */
@@ -688,7 +711,7 @@ window.digiriskdolibarr.psychosocialScope.editReason = function() {
     scope.saveScope(row, '0', reason).then(function(saved) {
       if (saved) {
         scope.setRowState(row, '0', reason);
-        scope.toast(row.find('.rps-unit-ref').text().trim() + ' · motif enregistré');
+        scope.toast(row.find('.rps-unit-ref').text().trim() + ' · ' + scope.label('reasonSaved'));
       }
     });
   });
@@ -699,7 +722,7 @@ window.digiriskdolibarr.psychosocialScope.editReason = function() {
  * déjà donnés sur ce document unique sont proposés d'un clic.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @param  {jQuery}   anchor   Élément sous lequel placer la bulle
  * @param  {jQuery}   block    Bloc de qualification
@@ -722,7 +745,7 @@ window.digiriskdolibarr.psychosocialScope.askReason = function(anchor, block, co
   });
 
   const popup = $('<div class="rps-pop" role="dialog"></div>');
-  popup.append($('<div class="rps-pop-title"></div>').text('Motif de non-exposition' + (count > 1 ? ' · ' + count + ' unités' : '')));
+  popup.append($('<div class="rps-pop-title"></div>').text(scope.label('reasonTitle') + (count > 1 ? ' · ' + scope.label('unitsCount', count) : '')));
   const chips = $('<div class="rps-pop-chips"></div>');
   Object.keys(reasons).slice(0, 6).forEach(function(reason) {
     chips.append($('<button type="button" class="rps-pop-chip"></button>').text(reason));
@@ -730,10 +753,12 @@ window.digiriskdolibarr.psychosocialScope.askReason = function(anchor, block, co
   if (chips.children().length) {
     popup.append(chips);
   }
-  const input = $('<input type="text" class="rps-pop-input" placeholder="Motif, attendu par le document unique">').val(current);
+  const input = $('<input type="text" class="rps-pop-input">').attr('placeholder', scope.label('reasonPlaceholder')).val(current);
   popup.append(input);
-  popup.append('<div class="rps-pop-actions"><button type="button" class="wpeo-button button-grey button-size-small rps-pop-cancel">Annuler</button>'
-    + '<button type="button" class="wpeo-button button-blue button-size-small rps-pop-ok">Valider</button></div>');
+  popup.append($('<div class="rps-pop-actions"></div>').append(
+    $('<button type="button" class="wpeo-button button-grey button-size-small rps-pop-cancel"></button>').text(scope.label('cancel')),
+    $('<button type="button" class="wpeo-button button-blue button-size-small rps-pop-ok"></button>').text(scope.label('validate'))
+  ));
   $('body').append(popup);
 
   // Sous l'élément, ou au-dessus quand la place manque en bas de l'écran
@@ -830,7 +855,7 @@ window.digiriskdolibarr.psychosocialScope.closeReasonOnEscape = function(event) 
  * Confirme un enregistrement en bas de l'écran, avec de quoi le défaire.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @param  {string}   message Message affiché
  * @param  {Function} onUndo  Appelée par le bouton Annuler, absent sans elle
@@ -843,7 +868,7 @@ window.digiriskdolibarr.psychosocialScope.toast = function(message, onUndo) {
   $('.rps-toast').remove();
   clearTimeout(scope.toastTimer);
   if (onUndo) {
-    toast.append($('<button type="button" class="rps-toast-undo">Annuler</button>').on('click', function() {
+    toast.append($('<button type="button" class="rps-toast-undo"></button>').text(scope.label('undo')).on('click', function() {
       toast.remove();
       onUndo();
     }));
@@ -1075,7 +1100,7 @@ window.digiriskdolibarr.psychosocialScope.showError = function(message) {
  * deviennent des tâches du projet préfixées du facteur.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @return {void}
  */
@@ -1099,7 +1124,7 @@ window.digiriskdolibarr.psychosocialScope.saveAssessment = function() {
   });
 
   if (answers.length === 0) {
-    scope.showError('Cotez au moins un critère avant d\'enregistrer.');
+    scope.showError(scope.label('rateAtLeastOne'));
     return;
   }
 
@@ -1131,10 +1156,10 @@ window.digiriskdolibarr.psychosocialScope.saveAssessment = function() {
       window.location.reload();
       return;
     }
-    scope.showError((result.body && result.body.error) ? result.body.error : 'Enregistrement impossible.');
+    scope.showError((result.body && result.body.error) ? result.body.error : scope.label('saveFailed'));
     button.prop('disabled', false);
   }).catch(function() {
-    scope.showError('Enregistrement impossible.');
+    scope.showError(scope.label('saveFailed'));
     button.prop('disabled', false);
   });
 };
@@ -1143,25 +1168,26 @@ window.digiriskdolibarr.psychosocialScope.saveAssessment = function() {
  * Consolide les risques psychosociaux éclatés d'une unité en une seule évaluation.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @return {void}
  */
 window.digiriskdolibarr.psychosocialScope.consolidate = function() {
+  const scope  = window.digiriskdolibarr.psychosocialScope;
   const button = $(this);
   const label  = button.html();
 
-  button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Consolidation...');
-  window.digiriskdolibarr.psychosocialScope.post({action: 'consolidate', fk_element: parseInt(button.attr('data-element'), 10)}).then(function(result) {
+  button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> ').append(document.createTextNode(scope.label('consolidating')));
+  scope.post({action: 'consolidate', fk_element: parseInt(button.attr('data-element'), 10)}).then(function(result) {
     if (result.ok) {
       window.location.reload();
       return;
     }
     button.prop('disabled', false).html(label);
-    window.alert((result.body && result.body.error) ? result.body.error : 'Consolidation impossible.');
+    window.alert((result.body && result.body.error) ? result.body.error : scope.label('consolidationFailed'));
   }).catch(function() {
     button.prop('disabled', false).html(label);
-    window.alert('Consolidation impossible.');
+    window.alert(scope.label('consolidationFailed'));
   });
 };
 
@@ -1173,7 +1199,7 @@ window.digiriskdolibarr.psychosocialScope.consolidate = function() {
  * Enregistre aussitôt une modification d'action, sans recharger la page ni ouvrir la tâche.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @param  {jQuery}   item    Ligne de l'action
  * @param  {Object}   payload Champs modifiés
@@ -1181,12 +1207,14 @@ window.digiriskdolibarr.psychosocialScope.consolidate = function() {
  * @return {void}
  */
 window.digiriskdolibarr.psychosocialScope.saveTask = function(item, payload, onSaved) {
+  const scope = window.digiriskdolibarr.psychosocialScope;
+
   payload.action     = payload.action || 'task_update';
   payload.task_id    = parseInt(item.attr('data-task'), 10);
   payload.fk_element = parseInt(item.closest('.rps-unit-card').attr('data-element'), 10);
 
   item.addClass('is-saving');
-  window.digiriskdolibarr.psychosocialScope.post(payload).then(function(result) {
+  scope.post(payload).then(function(result) {
     item.removeClass('is-saving');
     if (result.ok) {
       if (onSaved) {
@@ -1194,10 +1222,10 @@ window.digiriskdolibarr.psychosocialScope.saveTask = function(item, payload, onS
       }
       return;
     }
-    window.alert((result.body && result.body.error) ? result.body.error : 'Modification impossible.');
+    window.alert((result.body && result.body.error) ? result.body.error : scope.label('updateFailed'));
   }).catch(function() {
     item.removeClass('is-saving');
-    window.alert('Modification impossible.');
+    window.alert(scope.label('updateFailed'));
   });
 };
 
@@ -1205,16 +1233,17 @@ window.digiriskdolibarr.psychosocialScope.saveTask = function(item, payload, onS
  * Recompte les actions faites d'une unité.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @param  {jQuery} card Bloc de l'unité
  * @return {void}
  */
 window.digiriskdolibarr.psychosocialScope.refreshTaskCount = function(card) {
+  const scope = window.digiriskdolibarr.psychosocialScope;
   const items = card.find('.rps-action-item');
   const done  = items.filter('.is-done').length;
 
-  window.digiriskdolibarr.psychosocialScope.setText(card.find('.rps-detail-count'), items.length ? done + '/' + items.length + ' actions' : 'Actions');
+  scope.setText(card.find('.rps-detail-count'), items.length ? scope.label('actionsDone', done, items.length) : scope.label('actions'));
 };
 
 /**
@@ -1263,7 +1292,7 @@ window.digiriskdolibarr.psychosocialScope.saveTaskDue = function() {
  * Supprime une action, après confirmation.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @return {void}
  */
@@ -1272,7 +1301,7 @@ window.digiriskdolibarr.psychosocialScope.deleteTask = function() {
   const card  = item.closest('.rps-unit-card');
   const label = item.find('.rps-action-label').text().trim();
 
-  if (!window.confirm('Supprimer l\'action "' + label + '" ?')) {
+  if (!window.confirm(window.digiriskdolibarr.psychosocialScope.label('confirmDeleteAction', label))) {
     return;
   }
   window.digiriskdolibarr.psychosocialScope.saveTask(item, {action: 'task_delete'}, function() {
@@ -1357,7 +1386,7 @@ window.digiriskdolibarr.psychosocialScope.restoreDetail = function() {
  * Ajoute une action de prévention sur le facteur choisi, sans repasser par l'évaluation.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @return {void}
  */
@@ -1388,10 +1417,10 @@ window.digiriskdolibarr.psychosocialScope.addTask = function() {
       return;
     }
     button.prop('disabled', false);
-    window.alert((result.body && result.body.error) ? result.body.error : 'Action non enregistrée.');
+    window.alert((result.body && result.body.error) ? result.body.error : scope.label('actionNotSaved'));
   }).catch(function() {
     button.prop('disabled', false);
-    window.alert('Action non enregistrée.');
+    window.alert(scope.label('actionNotSaved'));
   });
 };
 
