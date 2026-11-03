@@ -7,6 +7,26 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 		}
 	}
 }
+
+// Progress of each task, declared or computed from its time spent: the header counts the done ones, the cards show it
+$taskProgresses = [];
+if (!empty($related_tasks) && is_array($related_tasks)) {
+	foreach ($related_tasks as $related_task) {
+		if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
+			$tmparray = $related_task->getSummaryOfTimeSpent();
+			if ($tmparray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
+				$taskProgresses[$related_task->id] = round($tmparray['total_duration'] / $related_task->planned_workload * 100, 2);
+			} else {
+				$taskProgresses[$related_task->id] = 0;
+			}
+		} else {
+			$taskProgresses[$related_task->id] = $related_task->progress;
+		}
+	}
+}
+$tasksDone = count(array_filter($taskProgresses, function ($taskProgress) {
+	return $taskProgress >= 100;
+}));
 ?>
 <div class="wpeo-table riskassessment-tasks riskassessment-tasks<?php echo $risk->id ?>" value="<?php echo $risk->id ?>">
 	<div class="table-cell riskassessment-task-listing-wrapper riskassessment-task-listing-wrapper-<?php echo $risk->id ?>">
@@ -26,7 +46,16 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 		<?php endif; ?>
 		<div class="table-cell-header">
 			<input type="hidden" name="sharedTaskTooltipUrl" value="<?php echo DOL_URL_ROOT . '/custom/multicompany/admin/multicompany.php?action=edit&id=' . $conf->entity;  ?>">
-			<div class="table-cell-header-label"><strong><?php echo $form->textwithpicto($langs->trans('ListingHeaderTask') . ' (' . (($related_tasks && $result) ? count($related_tasks) : 0) . ')', $result == 0 ? $langs->trans('ListingHeaderTaskTooltip') : '', 1, 'help', 'listingHeaderTaskTooltip'); ?></strong></div>
+			<?php if (!empty($related_tasks) && $result) : ?>
+				<?php // Not a table-cell-header-label: the deletion of an assessment rewrites every label of the row with its own counter ?>
+				<div class="table-cell-header-summary">
+					<span class="riskassessment-tasks-done"><?php echo $langs->trans('RiskTasksDone', $tasksDone, count($related_tasks)); ?></span>
+					<progress class="riskassessment-tasks-progress" max="100" value="<?php echo round($tasksDone / count($related_tasks) * 100); ?>"></progress>
+					<span class="riskassessment-tasks-percent"><?php echo round($tasksDone / count($related_tasks) * 100) . ' %'; ?></span>
+				</div>
+			<?php else : ?>
+				<div class="table-cell-header-label"><strong><?php echo $form->textwithpicto($langs->trans('ListingHeaderTask') . ' (' . (($related_tasks && $result) ? count($related_tasks) : 0) . ')', $result == 0 ? $langs->trans('ListingHeaderTaskTooltip') : '', 1, 'help', 'listingHeaderTaskTooltip'); ?></strong></div>
+			<?php endif; ?>
 			<div class="table-cell-header-actions">
 				<?php if ($permissiontoread && $result) : ?>
 					<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('ListRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
@@ -60,16 +89,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 			<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_ALL_TASKS) : ?>
 				<?php $nb_of_tasks_in_progress = 0;
 				foreach ($related_tasks as $related_task) {
-					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
-						$tmparray = $related_task->getSummaryOfTimeSpent();
-						if ($tmparray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
-							$task_progress = round($tmparray['total_duration'] / $related_task->planned_workload * 100, 2);
-						} else {
-							$task_progress = 0;
-						}
-					} else {
-						$task_progress = $related_task->progress;
-					}
+					$task_progress = $taskProgresses[$related_task->id];
 					if ((($conf->global->DIGIRISKDOLIBARR_SHOW_TASKS_DONE) ? $task_progress <= 100 : $task_progress < 100) && $result) {
 						$nb_of_tasks_in_progress++;
 						require __DIR__ . '/digiriskdolibarr_riskassessment_task_single_view.tpl.php';
@@ -90,16 +110,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 				<?php endif; ?>
 			<?php else : ?>
 				<?php $related_task = end($related_tasks);
-				if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
-					$tmparray = $related_task->getSummaryOfTimeSpent();
-					if ($tmparray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
-						$task_progress = round($tmparray['total_duration'] / $related_task->planned_workload * 100, 2);
-					} else {
-						$task_progress = 0;
-					}
-				} else {
-					$task_progress = $related_task->progress;
-				}
+				$task_progress = $taskProgresses[$related_task->id];
 				if ($result > 0) {
 					require __DIR__ . '/digiriskdolibarr_riskassessment_task_single_view.tpl.php';
 				} else { ?>
@@ -267,18 +278,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 						</div>
 						<?php if ( ! empty($related_tasks) && $related_tasks > 0) : ?>
 							<?php foreach ($related_tasks as $related_task) : ?>
-								<?php
-								if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
-									$tmparray = $related_task->getSummaryOfTimeSpent();
-									if ($tmparray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
-										$task_progress = round($tmparray['total_duration'] / $related_task->planned_workload * 100, 2);
-									} else {
-										$task_progress = 0;
-									}
-								} else {
-									$task_progress = $related_task->progress;
-								}
-								?>
+								<?php $task_progress = $taskProgresses[$related_task->id]; ?>
 								<?php if ($result > 0) : ?>
 									<?php require __DIR__ . '/digiriskdolibarr_riskassessment_task_single_view.tpl.php'; ?>
 								<?php endif; ?>
@@ -300,16 +300,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 		<!-- RISK ASSESSMENT TASK EDIT MODALS -->
 		<?php if ( ! empty($related_tasks) && $related_tasks > 0) :
             foreach ($related_tasks as $related_task) :
-                if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
-                    $tmparray = $related_task->getSummaryOfTimeSpent();
-                    if ($tmparray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
-                        $task_progress = round($tmparray['total_duration'] / $related_task->planned_workload * 100, 2);
-                    } else {
-                        $task_progress = 0;
-                    }
-                } else {
-                    $task_progress = $related_task->progress;
-                }
+                $task_progress     = $taskProgresses[$related_task->id];
                 $allTimeSpentArray = $timeSpentSortedByTasks[$related_task->id] ?? []; ?>
 				<div class="wpeo-modal riskassessment-task-edit-modal" id="risk_assessment_task_edit<?php echo $related_task->id ?>">
 					<div class="modal-container wpeo-modal-event">

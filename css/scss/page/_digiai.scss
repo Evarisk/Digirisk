@@ -69,6 +69,12 @@
   margin: auto;
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   animation: fadeIn 0.3s ease-in-out;
+  // Posées jusqu'ici sur un .modal-container nu, elles s'appliquaient à toutes les modals des pages
+  // Digirisk (#5668). Le max-height: 90vh qui les accompagnait n'est pas repris : battu par celui de
+  // Saturne (.wpeo-modal .modal-container), il n'a jamais joué ici et agrandirait la modal.
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 #digiai_modal .modal-header {
@@ -203,12 +209,6 @@
 
 .modal-result-wrapper {
   width: 100%;
-}
-.modal-container {
-  max-height: 90vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
 }
 .modal-result-phase {
   flex: 1;

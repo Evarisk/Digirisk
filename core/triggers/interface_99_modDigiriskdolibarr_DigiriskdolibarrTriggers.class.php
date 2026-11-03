@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '23.6.0';
+		$this->version     = '23.7.0';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -124,7 +124,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
         // Allowed triggers are a list of trigger from other module that should activate this file
 		if (!isModEnabled('digiriskdolibarr') || !$active) {
-			$allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE', 'TICKET_PUBLIC_INTERFACE_CREATE', 'TICKET_SIGN', 'SATURNE_SIGNATURE_SIGN', 'SATURNE_SIGNATURE_SIGN_PUBLIC', 'PRODUCT_CREATE'];
+			$allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_PUBLIC_INTERFACE_CREATE', 'TICKET_SIGN', 'SATURNE_SIGNATURE_SIGN', 'SATURNE_SIGNATURE_SIGN_PUBLIC', 'PRODUCT_CREATE'];
             if (!in_array($action, $allowedTriggers)) {
                 return 0;  // If module is not enabled or trigger is deactivated, we do nothing
             }
@@ -448,15 +448,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$result = $actioncomm->create($user);
 				break;
 
-			case 'TICKET_CREATE' :
-				// Only send this notification for tickets submitted through the DigiRisk public interface.
-				// TICKET_CREATE is fired by Dolibarr core on every ticket creation (back-office, API, ...),
-				// but the email below is built solely from public-interface extrafields.
-				if (getDolGlobalInt('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT') && !empty($object->context['digiriskdolibarrpublicinterface'])) {
-					$this->sendTicketSubmittedMail($object, $user, $langs);
-				}
-				break;
-
 			case 'TICKET_SIGN':
 				$actioncomm->elementtype = 'ticket';
 				$actioncomm->label = $langs->transnoentities('ObjectSignedTrigger', $langs->transnoentities(get_class($object)), $object->ref);
@@ -465,9 +456,16 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
             case 'TICKET_PUBLIC_INTERFACE_CREATE' :
-                require_once __DIR__ . '/../../../saturne/class/saturnemail.class.php';
+                // Sent here and no longer on TICKET_CREATE - issue #5282 : the public form links the
+                // categories of the ticket only once it is created, so __TICKET_TAGS__ came out empty
+                if (getDolGlobalInt('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT')) {
+                    $this->sendTicketSubmittedMail($object, $user, $langs);
+                }
 
-                $categories = $object->getCategoriesCommon('ticket');
+                dol_include_once('/saturne/class/saturnemail.class.php');
+
+                $substitutions = null;
+                $categories    = $object->getCategoriesCommon('ticket');
                 if (is_array($categories) && !empty($categories)) {
                     $category = new Categorie($this->db);
                     foreach ($categories as $categoryID) {
@@ -486,6 +484,15 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
                                 continue;
                             }
 
+                            // The template of a category used to leave as typed, __TICKET_*__ keys and
+                            // __(Key)__ translations included - issue #5282. It gets the substitutions of
+                            // the declaration mail, built once for all the categories of the ticket
+                            if ($substitutions === null) {
+                                $substitutions = $this->ticketSubmittedSubstitutions($object, $langs);
+                            }
+                            $mailSubject = make_substitutions((string) $saturneMail->topic, $substitutions, $langs);
+                            $mailContent = make_substitutions((string) $saturneMail->content, $substitutions, $langs);
+
                             $recipients = explode(',', $categoryConfigs->recipients);
                             foreach ($recipients as $recipientID) {
                                 $userTmp = new User($this->db);
@@ -499,37 +506,22 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
                                     // Create form object
                                     // Send mail (substitutionarray must be done just before this)
-                                    $mailfile = new CMailFile($saturneMail->topic, $sendto, $from, $saturneMail->content, array(), array(), array(), "", "", 0, -1, '', '', $trackid, '', 'ticket');
-                                    if ($mailfile->error) {
-                                        setEventMessages($mailfile->error, $mailfile->errors, 'errors');
+                                    $mailfile = new CMailFile($mailSubject, $sendto, $from, $mailContent, array(), array(), array(), "", "", 0, -1, '', '', $trackid, '', 'ticket');
+                                    if ($mailfile->error || !$mailfile->sendfile()) {
+                                        $langs->load('other');
+                                        $this->logTicketMailFailure($object, $user, $langs, $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto)) . ($mailfile->error ? '<br>' . $mailfile->error : ''));
                                     } else {
-                                        if (1) {
-                                            $result = $mailfile->sendfile();
-                                            if ( ! $result) {
-                                                $langs->load("other");
-                                                $mesg = '<div class="error">';
-                                                if ($mailfile->error) {
-                                                    $mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-                                                    $mesg .= '<br>' . $mailfile->error;
-                                                } else {
-                                                    $mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-                                                }
-                                                $mesg .= '</div>';
-                                                setEventMessages($mesg, null, 'warnings');
-                                            } else {
-                                                $actioncomm->elementtype   = 'ticket';
-                                                $actioncomm->label         = $langs->transnoentities('TicketCreationMailWellSent');
-                                                $actioncomm->note_private  = $langs->transnoentities('TicketCreationMailSent', $sendto) . '<br>';
-                                                $actioncomm->note_private .= $saturneMail->topic . '<br>';
-                                                $actioncomm->note_private .= $saturneMail->content;
-                                                $result = $actioncomm->create($user);
-                                            }
-                                        }
+                                        $actioncomm->elementtype   = 'ticket';
+                                        $actioncomm->label         = $langs->transnoentities('TicketCreationMailWellSent');
+                                        $actioncomm->note_private  = $langs->transnoentities('TicketCreationMailSent', $sendto) . '<br>';
+                                        $actioncomm->note_private .= $mailSubject . '<br>';
+                                        $actioncomm->note_private .= $mailContent;
+                                        $result = $actioncomm->create($user);
                                     }
                                 } else {
-                                    $langs->load("errors");
-                                    setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("MailTo")), null, 'warnings');
-                                    dol_syslog('Try to send email with no recipient defined', LOG_WARNING);
+                                    // A recipient of the category without email, or no sender configured
+                                    $langs->load('errors');
+                                    $this->logTicketMailFailure($object, $user, $langs, $langs->transnoentities('ErrorFieldRequired', $langs->transnoentitiesnoconv(dol_strlen($sendto) ? 'MailFrom' : 'MailTo')) . ' (' . dol_escape_htmltag($userTmp->getFullName($langs)) . ')');
                                 }
                             }
                         }
@@ -1004,16 +996,14 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
         $recipients = $this->ticketSubmittedRecipients();
         if (empty($recipients)) {
             $langs->load('errors');
-            setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MailTo')), null, 'warnings');
-            dol_syslog(__METHOD__ . ' : try to send email with no recipient defined', LOG_WARNING);
+            $this->logTicketMailFailure($object, $user, $langs, $langs->transnoentities('ErrorFieldRequired', $langs->transnoentitiesnoconv('MailTo')));
             return;
         }
 
         $from = getDolGlobalString('MAIN_MAIL_EMAIL_FROM');
         if (!dol_strlen($from)) {
             $langs->load('errors');
-            setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MailFrom')), null, 'warnings');
-            dol_syslog(__METHOD__ . ' : MAIN_MAIL_EMAIL_FROM is empty, no mail sent', LOG_WARNING);
+            $this->logTicketMailFailure($object, $user, $langs, $langs->transnoentities('ErrorFieldRequired', $langs->transnoentitiesnoconv('MailFrom')));
             return;
         }
 
@@ -1031,22 +1021,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
             // Un CMailFile par destinataire, comme le faisait le code d'origine : une adresse
             // invalide n'empeche pas les suivantes d'etre servies
             $mailfile = new CMailFile($subject, $sendto, $from, $message, [], [], [], '', '', 0, -1, '', '', 'tic' . $object->id, '', 'ticket');
-            if ($mailfile->error) {
-                setEventMessages($mailfile->error, $mailfile->errors, 'errors');
-                continue;
-            }
-
-            if ($mailfile->sendfile()) {
+            if (!$mailfile->error && $mailfile->sendfile()) {
                 $sent[] = $sendto;
                 continue;
             }
 
             $langs->load('other');
-            $mesg = '<div class="error">' . $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
-            if ($mailfile->error) {
-                $mesg .= '<br>' . $mailfile->error;
-            }
-            setEventMessages($mesg . '</div>', null, 'warnings');
+            $this->logTicketMailFailure($object, $user, $langs, $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto)) . ($mailfile->error ? '<br>' . $mailfile->error : ''));
         }
 
         if (empty($sent)) {
@@ -1066,6 +1047,39 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
         $actioncomm->percentage   = -1;
         $actioncomm->label        = $langs->transnoentities('TicketCreationMailWellSent');
         $actioncomm->note_private = $langs->transnoentities('TicketCreationMailSent', implode(', ', $sent));
+
+        $actioncomm->create($user);
+    }
+
+    /**
+     * Trace on the ticket a notification of the public interface that did not go (#5610)
+     *
+     * These mails are sent while the confirmation page of an anonymous declarant is built: an event message
+     * showed him the internal addresses and the SMTP error, and made him believe his declaration had failed.
+     * The team reads it in the agenda of the ticket instead.
+     *
+     * @param  CommonObject $object Declared ticket
+     * @param  User         $user   User at the origin of the action
+     * @param  Translate    $langs  Lang object
+     * @param  string       $detail Why the mail did not go, recipient and error included
+     * @return void
+     */
+    protected function logTicketMailFailure($object, User $user, Translate $langs, string $detail)
+    {
+        require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+
+        dol_syslog(__METHOD__ . ' : ticket ' . $object->ref . ' : ' . $detail, LOG_ERR);
+
+        $actioncomm               = new ActionComm($this->db);
+        $actioncomm->type_code    = 'AC_OTH_AUTO';
+        $actioncomm->code         = 'AC_TICKET_CREATE';
+        $actioncomm->elementtype  = 'ticket';
+        $actioncomm->fk_element   = $object->id;
+        $actioncomm->datep        = dol_now();
+        $actioncomm->userownerid  = $user->id;
+        $actioncomm->percentage   = -1;
+        $actioncomm->label        = $langs->transnoentities('TicketCreationMailNotSent');
+        $actioncomm->note_private = $detail;
 
         $actioncomm->create($user);
     }
@@ -1159,7 +1173,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
     }
 
     /**
-     * Substitutions offertes au modele d'email du mail de declaration.
+     * Substitutions offertes au modele d'email du mail de declaration, et depuis #5282 a celui que
+     * porte la categorie du ticket.
      *
      * Les cles __TICKET_* reprennent celles du socle pour les mails de ticket, completees des
      * champs propres au formulaire de declaration. Le GP/UT est un chkbxlst : une declaration
@@ -1196,10 +1211,51 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
         $substitutions['__TICKET_MESSAGE__']          = (string) $object->message;
         $substitutions['__TICKET_DIGIRISK_ELEMENT__'] = implode(', ', $elementLabels);
         $substitutions['__TICKET_DECLARANT__']        = trim(dol_strtoupper($lastname) . ' ' . $firstname);
-        $substitutions['__TICKET_DECLARATION_DATE__'] = !empty($date) ? dol_print_date($date, 'daytext', 'tzuser', $langs) : '';
+        $substitutions['__TICKET_DECLARATION_DATE__'] = !empty($date) ? dol_print_date($date, $this->ticketDeclarationDateFormat($date), 'tzuser', $langs) : '';
         $substitutions['__TICKET_LOCATION__']         = (string) ($object->array_options['options_digiriskdolibarr_ticket_location'] ?? '');
+        $substitutions['__TICKET_TAGS__']             = $this->ticketTags($object);
         $substitutions['__TICKET_MANAGEMENT_URL__']   = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/view/ticket/ticket_card.php?id=' . $object->id;
 
         return $substitutions;
+    }
+
+    /**
+     * Format de la date de declaration - issue #5628
+     *
+     * Le formulaire demande l'heure du signalement, et pour un danger grave et imminent elle
+     * compte : elle est donnee avec le jour. Une heure laissee vide au formulaire arrive a
+     * 00:00, qui n'est alors pas une heure de signalement : seul le jour est donne.
+     *
+     * @param  int|string $date Date de declaration
+     * @return string           Format de dol_print_date()
+     */
+    protected function ticketDeclarationDateFormat($date): string
+    {
+        return dol_print_date($date, '%H:%M', 'tzuser') == '00:00' ? 'daytext' : 'dayhourtext';
+    }
+
+    /**
+     * Libelles des tags du ticket, separes par des virgules - issue #5282
+     *
+     * Meme cle et meme rendu que le socle dans ses mails de ticket. C'est elle qui permet a un
+     * modele de nommer le registre, « Danger grave et imminent » compris : le __TICKET_CATEGORY__
+     * du socle rend le dictionnaire c_ticket_category, pas les tags.
+     *
+     * @param  CommonObject $object Ticket declare
+     * @return string               Libelles, vide quand le ticket n'en porte aucun
+     */
+    protected function ticketTags($object): string
+    {
+        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+
+        $category = new Categorie($this->db);
+
+        // containing() rend l'entier -1 sur erreur SQL
+        $labels = $category->containing($object->id, Categorie::TYPE_TICKET, 'label');
+        if (!is_array($labels)) {
+            return '';
+        }
+
+        return implode(', ', $labels);
     }
 }

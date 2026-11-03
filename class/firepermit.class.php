@@ -26,8 +26,8 @@ require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 
 // Load Saturne libraries.
-require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
-require_once __DIR__ . '/../../saturne/class/saturneschedules.class.php';
+dol_include_once('/saturne/class/saturneobject.class.php');
+dol_include_once('/saturne/class/saturneschedules.class.php');
 
 // Load DigiriskDolibarr libraries.
 
@@ -464,7 +464,7 @@ class FirePermit extends SaturneObject
 
         require_once __DIR__ . '/digiriskresources.class.php';
         require_once __DIR__ . '/preventionplan.class.php';
-        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+        dol_include_once('/saturne/class/saturnesignature.class.php');
 
         $digiriskResources = new DigiriskResources($this->db);
         $saturneSignature  = new SaturneSignature($this->db, $this->module, $this->element);

@@ -77,6 +77,8 @@ parameters:
         - ../../fourn/class/
         - ../../includes/odtphp/
         - ../../includes/parsedown/
+        # Export Excel de la synthese publique des risques (lib/digiriskdolibarr_riskoverview.lib.php)
+        - ../../includes/phpoffice/phpspreadsheet/src/PhpSpreadsheet/
         - ../../includes/restler/framework/
         - ../../mrp/class/
         - ../../product/class/

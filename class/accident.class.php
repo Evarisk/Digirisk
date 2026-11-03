@@ -27,8 +27,8 @@ require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
-require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
-require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+dol_include_once('/saturne/class/saturneobject.class.php');
+dol_include_once('/saturne/class/saturnesignature.class.php');
 
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/digiriskdocuments.class.php';

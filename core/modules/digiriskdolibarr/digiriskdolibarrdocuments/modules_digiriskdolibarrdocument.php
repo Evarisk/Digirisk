@@ -26,8 +26,8 @@
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../../../saturne/core/modules/saturne/modules_saturne.php';
-require_once __DIR__ . '/../../../../../saturne/lib/dolibarr.lib.php';
+dol_include_once('/saturne/core/modules/saturne/modules_saturne.php');
+dol_include_once('/saturne/lib/dolibarr.lib.php');
 
 /**
  * Parent class for documents models
@@ -649,6 +649,10 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
         }
         $moreParam['objectDocument']   = $objectDocument;
         $moreParam['hideTemplateName'] = 1;
+
+        // The document language only knows the module keys when it is the user language itself:
+        // a language picked at generation is a fresh Translate, and every module key came out raw
+        $outputLangs->loadLangs(['main', 'other', 'digiriskdolibarr@digiriskdolibarr']);
 
         return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
     }

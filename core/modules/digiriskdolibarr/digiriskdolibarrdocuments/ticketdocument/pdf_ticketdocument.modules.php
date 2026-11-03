@@ -26,8 +26,8 @@
     require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
     // Load Saturne libraries
-    require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
-    require_once __DIR__ . '/../../../../../../saturne/lib/medias.lib.php';
+    dol_include_once('/saturne/core/modules/saturne/modules_saturne.php');
+    dol_include_once('/saturne/lib/medias.lib.php');
 
     // Load Digirisk libraries
     require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
@@ -88,43 +88,18 @@
          *  @param	TCPDF		$pdf     		Object PDF
          *  @param  Contrat		$object     	Object to show
          *  @param  Translate	$outputlangs	Object lang for output
-         *  @return	float|int                   Return topshift value
+         *  @return	float                       Bottom of the header, logo included
          */
         protected function _pagehead(&$pdf, $object, $outputLangs, $defaultFontSize)
         {
-            global $mysoc;
+            $posY = $this->marge_haute;
+            $posX = ($pdf->GetPageWidth() - $this->marge_gauche - $this->marge_droite) / 2;
 
-            $top_shift = 0;
-            $posX      = $this->marge_gauche;
-            $posY      = $this->marge_haute;
-            // Logo
-            if (!getDolGlobalString('PDF_DISABLE_MYCOMPANY_LOGO')) {
-                if ($mysoc->logo) {
-                    $logoDir = '';
-                    if (getMultidirOutput($object, 'mycompany')) {
-                        $logoDir = getMultidirOutput($object, 'mycompany');
-                    }
-                    if (!getDolGlobalInt('MAIN_PDF_USE_LARGE_LOGO')) {
-                        $logo = $logoDir . '/logos/thumbs/' . $mysoc->logo_small;
-                    } else {
-                        $logo = $logoDir . '/logos/' . $mysoc->logo;
-                    }
-                    if (is_readable($logo)) {
-                        $height = pdf_getHeightForLogo($logo);
-                        $pdf->SetX($posX);
-                        $pdf->Image($logo, $posX, $posY, 0, $height);
-                    } else {
-                        $width = 100;
-                        $pdf->SetTextColor(200, 0, 0);
-                        $pdf->SetFont('', 'B', $defaultFontSize);
-                        $pdf->MultiCell($width, 3, $outputLangs->transnoentities('ErrorLogoFileNotFound', $logo), 0, 'L');
-                        $pdf->MultiCell($width, 3, $outputLangs->transnoentities('ErrorGoToGlobalSetup'), 0, 'L');
-                    }
-                }
-            }
+            // Kept left of the licence picto, and its height given back : the tables start below
+            // it instead of being drawn over it (#5644)
+            $logoHeight = $this->drawCompanyLogo($pdf, $object, $this->marge_gauche, $posY, $posX - $this->marge_gauche - 5);
 
             $legalPicto = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/legalPicto/CreativeCommonsBySa.png';
-            $posX       = ($pdf->GetPageWidth() - $this->marge_gauche - $this->marge_droite) / 2;
             if (file_exists($legalPicto)) {
                 $pdf->SetXY($posX, $posY);
                 $pdf->Image($legalPicto, $posX, $posY, 20, 4);
@@ -137,7 +112,7 @@
             $pdf->writeHTML('<a href="https://www.digirisk.com/">' . $htmlLink . '</a>', true, false, false, false, 'R');
             $pdf->Ln(1);
 
-            return $top_shift;
+            return max($pdf->GetY(), $posY + $logoHeight);
         }
 
         /**
@@ -399,9 +374,9 @@
 
             $pdf->SetFont('', 'B', 12);
 
-            $this->_pagehead($pdf, $object, $outputLangs, $defaultFontSize);
+            $headerBottom = $this->_pagehead($pdf, $object, $outputLangs, $defaultFontSize);
 
-            $pdf->Ln(10);
+            $pdf->SetY($headerBottom + 5);
 
             $startY = $pdf->GetY();
             $startX = $this->marge_gauche + $tableWidth;
@@ -414,22 +389,13 @@
                 $photo     = $photoPath . '/thumbs/' . $thumbName;
             }
 
-            if (!empty($photo) && file_exists($photo)) {
-                list($imgW_px, $imgH_px) = getimagesize($photo);
-
-                $dpi     = 96;
-                $imgW_mm = $imgW_px * 25.4 / $dpi;
-                $imgH_mm = $imgH_px * 25.4 / $dpi;
-                $imgX    = $startX + ($rectWidth - $imgW_mm) / 2;
-                $imgY    = $startY + ($rectHeight - $imgH_mm) / 2;
-
-                $pdf->Rect($startX, $startY, $rectWidth, $rectHeight);
-                $pdf->Image($photo, $imgX - 5, $imgY - 5, 0, 0);
-            } else {
-                $pdf->Rect($startX, $startY, $rectWidth, $rectHeight);
+            $pdf->Rect($startX, $startY, $rectWidth, $rectHeight);
+            // Fitted in its frame : drawn at its size in pixels, a photo spilled over the tables
+            // and off the page (#5644)
+            if (empty($photo) || empty($this->drawImageInBox($pdf, $photo, $startX + 2, $startY + 2, $rectWidth - 4, $rectHeight - 4))) {
                 $pdf->SetFont('', 'I', 9);
                 $pdf->SetXY($startX, $startY + ($rectHeight / 2) - 3);
-                $pdf->Cell($rectWidth, 6, $langs->transnoentities('NoPhoto'), 0, 0, 'C');
+                $pdf->Cell($rectWidth, 6, $langs->transnoentities('NoPhotoYet'), 0, 0, 'C');
             }
 
             $contactListExternal = $object->liste_contact(-1, 'external');
@@ -454,7 +420,11 @@
             $pdf->setY($startY);
             $tables = $this->getTicketPdfTables($pdf, $object, $tableWidth, $pageWidth, $digiriskElement, $userTmp, $contactNames, $allCategories);
             if (!empty($tables) && is_array($tables)) {
-                foreach ($tables as $table) {
+                foreach ($tables as $key => $table) {
+                    // Subject, message and tags take the whole width : below the photo frame
+                    if ($key == 'infos') {
+                        $pdf->SetY(max($pdf->GetY(), $startY + $rectHeight));
+                    }
                     $this->drawTable($pdf, $table, $tableWidth, $this->height, $defaultFontSize);
                 }
             }
