@@ -97,7 +97,8 @@ $rpsTabs        = [
 ?>
 <div class="rps-scope rps-scope-table" data-endpoint="<?php echo dol_buildpath('/digiriskdolibarr/core/ajax/save_rps_assessment.php', 1); ?>"
      data-scale-labels="<?php echo dol_escape_htmltag(json_encode($rpsScaleLabels)); ?>"
-     data-labels="<?php echo dol_escape_htmltag(json_encode($rpsJsLabels)); ?>">
+     data-labels="<?php echo dol_escape_htmltag(json_encode($rpsJsLabels)); ?>"
+     data-decimal="<?php echo dol_escape_htmltag($langs->transnoentitiesnoconv('SeparatorDecimal')); ?>">
 
     <div class="rps-head">
         <span class="rps-head-icon"><i class="fas fa-brain"></i></span>
@@ -110,7 +111,7 @@ $rpsTabs        = [
             <div class="rps-metric">
                 <span class="rps-metric-label"><?php echo $langs->trans('PsychosocialAverage'); ?></span>
                 <span class="rps-metric-value">
-                    <b class="rps-num" id="rps-average"><?php echo $rpsDone > 0 ? number_format($rpsAverage, 2, ',', ' ') : '—'; ?></b> / 4
+                    <b class="rps-num" id="rps-average"><?php echo $rpsDone > 0 ? price($rpsAverage, 0, $langs, 0, 2, 2) : '—'; ?></b> / 4
                 </span>
             </div>
             <span class="rps-band" id="rps-band" data-scale="<?php echo $rpsDone > 0 ? (int) $rpsBand : 0; ?>" title="<?php echo dol_escape_htmltag($langs->trans('PsychosocialMostExposedUnitLevel')); ?>">
@@ -221,7 +222,7 @@ $rpsTabs        = [
                             </td>
                             <td class="rps-col-score">
                                 <?php if ($rpsHasEval) : ?>
-                                    <span class="rps-score"><i class="rps-dot" data-scale="<?php echo rps_scope_band($rpsLineAverage); ?>"></i><b><?php echo number_format($rpsLineAverage, 2, ',', ' '); ?></b></span>
+                                    <span class="rps-score"><i class="rps-dot" data-scale="<?php echo rps_scope_band($rpsLineAverage); ?>"></i><b><?php echo price($rpsLineAverage, 0, $langs, 0, 2, 2); ?></b></span>
                                 <?php endif; ?>
                             </td>
                             <td class="rps-col-date">

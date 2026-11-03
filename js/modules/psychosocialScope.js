@@ -297,10 +297,11 @@ window.digiriskdolibarr.psychosocialScope.normalize = function(text) {
 
 /**
  * Recalcule l'en-tête et les compteurs des onglets après un changement de qualification.
- * La cotation du bloc est celle de l'unité la plus sévère, comme côté PHP.
+ * La cotation du bloc est celle de l'unité la plus sévère, comme côté PHP ; la moyenne prend le
+ * séparateur décimal de la langue (data-decimal du bloc).
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @param  {jQuery} block Bloc de qualification
  * @return {void}
@@ -330,7 +331,7 @@ window.digiriskdolibarr.psychosocialScope.refreshScope = function(block) {
     scope.setText($(this).find('.rps-tab-count'), counts[$(this).attr('data-filter')] || 0);
   });
 
-  scope.setText(block.find('#rps-average'), assessed > 0 ? (sum / assessed).toFixed(2).replace('.', ',') : '—');
+  scope.setText(block.find('#rps-average'), assessed > 0 ? (sum / assessed).toFixed(2).replace('.', block.closest('.rps-scope').attr('data-decimal') || ',') : '—');
   scope.setText(block.find('#rps-done'), assessed);
   scope.setText(block.find('#rps-concerned'), concerned);
   block.find('#rps-bar').val(concerned > 0 ? Math.round(100 * assessed / concerned) : 0);
