@@ -66,9 +66,9 @@ if (!$user->hasRight('ticket', 'read')) {
 }
 
 $permissionToWrite = $user->hasRight('ticket', 'write') && !$user->socid;
-$url_page_current  = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 1);
+$url_page_current  = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1);
 // Kanban AJAX endpoint (reused for on-the-fly tags & assignee — same server behaviour, incl. kanban event logging).
-$kanbanAjaxUrl     = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_action_card.php', 1);
+$kanbanAjaxUrl     = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_action_card.php', 1);
 // Traceability (#4885) — constant gating the agenda event written on every edit made from this card.
 $ticketLogConst    = 'DIGIRISKDOLIBARR_TICKET_LOG_MODIFICATIONS';
 
@@ -433,7 +433,7 @@ if ($action === 'post_message_ajax' && $permissionToWrite) {
     $mentionNames = [];
     if (!empty($mentions)) {
         require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
-        $ticketUrlAbs = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 2) . '?id=' . (int) $object->id;
+        $ticketUrlAbs = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 2) . '?id=' . (int) $object->id;
         $mentionFrom  = getDolGlobalString('TICKET_NOTIFICATION_EMAIL_FROM', getDolGlobalString('MAIN_MAIL_EMAIL_FROM'));
         foreach ($mentions as $mentionUid) {
             $mentionUid = (int) $mentionUid;
@@ -781,13 +781,13 @@ if (isModEnabled('project')) {
 
 $morehtmlref .= '</div>';
 
-$linkback = '<a href="' . dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_action_card.php', 1) . '"><strong>' . $langs->trans('BackToList') . '</strong></a>';
+$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/ticket/ticket_action_card.php', 1) . '"><strong>' . $langs->trans('BackToList') . '</strong></a>';
 
 // Summary of the corrective and preventive actions under the status (#5549), each counter leads to the actions tab
 $morehtmlstatus = '';
 if (isModEnabled('project') && !empty($object->fk_project) && $user->hasRight('projet', 'lire')) {
     $actionsCounters = digiriskdolibarr_ticket_count_actions(digiriskdolibarr_ticket_get_actions($db, digiriskdolibarr_ticket_get_parent_task($db, $object)));
-    $actionsUrl      = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_actions.php', 1) . '?id=' . (int) $object->id;
+    $actionsUrl      = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_actions.php', 1) . '?id=' . (int) $object->id;
 
     $morehtmlstatus .= '<div class="dtc-actions-summary">';
     $morehtmlstatus .= '<span class="dtc-actions-summary__title">' . $langs->trans('TicketActionsSummary') . '</span>';
