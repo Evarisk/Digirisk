@@ -79,6 +79,14 @@ PeoplePercentageOfWorkforce          = of the workforce of the company (%s peopl
 PeoplePercentageNoWorkforce          = of the workforce of the company, which is not entered yet
 PeoplePercentageValue                = %s of the workforce, i.e. %s people out of %s
 ErrorPeoplePercentage                = The percentage of people present must be between 0 and 100.
+PeoplePercentageByElement            = People present in each GP/UT
+PeoplePercentageByElementDescription = Percentage of the people of the company present in each GP/UT, from which their number is deduced. Can also be changed from the card of the GP/UT.
+PeoplePercentageFilledCount          = %s GP/UT entered out of %s
+PeoplePercentageElement              = GP/UT
+PeoplePercentageNbPeopleColumn       = Number of people
+PeoplePercentageNbPeople             = %s people out of %s
+PeoplePercentageWorkforceMissing     = Number of people in the company not entered
+ErrorPeoplePercentageOf              = %s: the percentage of people present must be between 0 and 100. Nothing was saved.
 
 # WHSRegister = Occupational health and safety register
 TicketsPublicInterfaceConfig         = Ticket public interface setup

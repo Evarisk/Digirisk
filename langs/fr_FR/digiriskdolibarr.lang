@@ -81,6 +81,14 @@ PeoplePercentageOfWorkforce          = de l'effectif de l'entreprise (%s personn
 PeoplePercentageNoWorkforce          = de l'effectif de l'entreprise, qui n'est pas encore renseigné
 PeoplePercentageValue                = %s de l'effectif, soit %s personne(s) sur %s
 ErrorPeoplePercentage                = Le pourcentage de personnes présentes doit être compris entre 0 et 100.
+PeoplePercentageByElement            = Personnes présentes par GP/UT
+PeoplePercentageByElementDescription = Pourcentage des personnes de l'entreprise présentes dans chaque GP/UT, d'où est déduit leur nombre. Aussi modifiable depuis la fiche du GP/UT.
+PeoplePercentageFilledCount          = %s GP/UT renseigné(s) sur %s
+PeoplePercentageElement              = GP/UT
+PeoplePercentageNbPeopleColumn       = Nombre de personnes
+PeoplePercentageNbPeople             = %s personne(s) sur %s
+PeoplePercentageWorkforceMissing     = Nombre de personnes dans l'entreprise non renseigné
+ErrorPeoplePercentageOf              = %s : le pourcentage de personnes présentes doit être compris entre 0 et 100. Rien n'a été enregistré.
 
 # WHSRegister = Registre SST
 TicketsPublicInterfaceConfig         = Configuration de l'interface publique des tickets
