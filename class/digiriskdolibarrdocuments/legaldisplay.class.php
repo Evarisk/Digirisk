@@ -90,13 +90,13 @@ class LegalDisplay extends DigiriskDocuments
                 $json['LegalDisplay']['occupational_health_service']['saturday_morning']  = $labourHoursSaturday[0];
                 $json['LegalDisplay']['occupational_health_service']['sunday_morning']    = $labourHoursSunday[0];
 
-                $json['LegalDisplay']['occupational_health_service']['monday_afternoon']    = $labourHoursMonday[1];
-                $json['LegalDisplay']['occupational_health_service']['tuesday_afternoon']   = $labourHoursTuesday[1];
-                $json['LegalDisplay']['occupational_health_service']['wednesday_afternoon'] = $labourHoursWednesday[1];
-                $json['LegalDisplay']['occupational_health_service']['thursday_afternoon']  = $labourHoursThursday[1];
-                $json['LegalDisplay']['occupational_health_service']['friday_afternoon']    = $labourHoursFriday[1];
-                $json['LegalDisplay']['occupational_health_service']['saturday_afternoon']  = $labourHoursSaturday[1];
-                $json['LegalDisplay']['occupational_health_service']['sunday_afternoon']    = $labourHoursSunday[1];
+                $json['LegalDisplay']['occupational_health_service']['monday_afternoon']    = $labourHoursMonday[1] ?? '';
+                $json['LegalDisplay']['occupational_health_service']['tuesday_afternoon']   = $labourHoursTuesday[1] ?? '';
+                $json['LegalDisplay']['occupational_health_service']['wednesday_afternoon'] = $labourHoursWednesday[1] ?? '';
+                $json['LegalDisplay']['occupational_health_service']['thursday_afternoon']  = $labourHoursThursday[1] ?? '';
+                $json['LegalDisplay']['occupational_health_service']['friday_afternoon']    = $labourHoursFriday[1] ?? '';
+                $json['LegalDisplay']['occupational_health_service']['saturday_afternoon']  = $labourHoursSaturday[1] ?? '';
+                $json['LegalDisplay']['occupational_health_service']['sunday_afternoon']    = $labourHoursSunday[1] ?? '';
 			}
 
 			$labour_doctor_contact = new Contact($this->db);
@@ -136,13 +136,13 @@ class LegalDisplay extends DigiriskDocuments
                 $json['LegalDisplay']['detective_work']['saturday_morning']  = $detectiveHoursSaturday[0];
                 $json['LegalDisplay']['detective_work']['sunday_morning']    = $detectiveHoursSunday[0];
 
-                $json['LegalDisplay']['detective_work']['monday_afternoon']    = $detectiveHoursMonday[1];
-                $json['LegalDisplay']['detective_work']['tuesday_afternoon']   = $detectiveHoursTuesday[1];
-                $json['LegalDisplay']['detective_work']['wednesday_afternoon'] = $detectiveHoursWednesday[1];
-                $json['LegalDisplay']['detective_work']['thursday_afternoon']  = $detectiveHoursThursday[1];
-                $json['LegalDisplay']['detective_work']['friday_afternoon']    = $detectiveHoursFriday[1];
-                $json['LegalDisplay']['detective_work']['saturday_afternoon']  = $detectiveHoursSaturday[1];
-                $json['LegalDisplay']['detective_work']['sunday_afternoon']    = $detectiveHoursSunday[1];
+                $json['LegalDisplay']['detective_work']['monday_afternoon']    = $detectiveHoursMonday[1] ?? '';
+                $json['LegalDisplay']['detective_work']['tuesday_afternoon']   = $detectiveHoursTuesday[1] ?? '';
+                $json['LegalDisplay']['detective_work']['wednesday_afternoon'] = $detectiveHoursWednesday[1] ?? '';
+                $json['LegalDisplay']['detective_work']['thursday_afternoon']  = $detectiveHoursThursday[1] ?? '';
+                $json['LegalDisplay']['detective_work']['friday_afternoon']    = $detectiveHoursFriday[1] ?? '';
+                $json['LegalDisplay']['detective_work']['saturday_afternoon']  = $detectiveHoursSaturday[1] ?? '';
+                $json['LegalDisplay']['detective_work']['sunday_afternoon']    = $detectiveHoursSunday[1] ?? '';
 			}
 
 			$labourInspectorContact = new Contact($this->db);
