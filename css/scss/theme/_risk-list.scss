@@ -680,11 +680,13 @@ $rl-badges: (
         }
       }
 
+      /* The comment says why the risk has this cotation: in the color of the text, not in small grey italics under
+         the author */
       .risk-evaluation-comment {
-        margin-top: 3px;
-        font-size: 11px;
-        font-style: italic;
-        color: $rl-head-text;
+        margin-top: 4px;
+        font-size: 12px;
+        line-height: 1.45;
+        color: $rl-text;
 
         &::before {
           content: '\00AB\00A0';
