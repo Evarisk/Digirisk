@@ -1468,7 +1468,8 @@ print '<input type="hidden" name="fk_element" value="0">';
 					print '<div class="backend-protections" id="backend-protections-' . $item->id . '">';
 					$catProtections = array_filter($planProtections, function($p) use ($item) { return $p['risk_category'] == $item->category; });
 					foreach ($catProtections as $idx => $p) {
-						$thumb = dol_buildpath('/digiriskdolibarr/img/protections/' . $p['position'] . '.png', 1);
+						// A protection is stored by its position in signalisationCategories.json, which gives its picture
+						$thumb = dol_buildpath('/digiriskdolibarr/img/' . ($protectionMap[$p['position']]['name_thumbnail'] ?? ''), 1);
 						print '<div style="display:flex; align-items:center; margin-bottom:5px;">';
 						print '<img src="'.$thumb.'" style="height:30px; margin-right:5px;">';
 						print '<input type="hidden" name="backend_protection_position[]" value="'.$p['position'].'">';
@@ -1544,9 +1545,10 @@ print '<input type="hidden" name="fk_element" value="0">';
 						print '<span class="opacitymedium">&mdash;</span>';
 					} else {
 						foreach ($catProtections as $p) {
-							$thumb = dol_buildpath('/digiriskdolibarr/img/protections/' . $p['position'] . '.png', 1);
+							// A protection is stored by its position in signalisationCategories.json, which gives its picture and name
+							$thumb = dol_buildpath('/digiriskdolibarr/img/' . ($protectionMap[$p['position']]['name_thumbnail'] ?? ''), 1);
 							print '<div style="display:flex; align-items:center; margin-bottom:2px;">';
-							print '<img src="'.$thumb.'" style="height:24px; margin-right:5px;" title="'.dol_escape_htmltag($p['name'] ?? '').'">';
+							print '<img src="'.$thumb.'" style="height:24px; margin-right:5px;" title="'.dol_escape_htmltag($protectionMap[$p['position']]['name'] ?? '').'">';
 							if (!empty($p['comment'])) print '<span>'.dol_escape_htmltag($p['comment']).'</span>';
 							print '</div>';
 						}
