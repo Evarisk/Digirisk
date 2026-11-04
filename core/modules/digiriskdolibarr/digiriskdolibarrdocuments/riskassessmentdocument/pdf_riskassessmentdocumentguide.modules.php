@@ -986,7 +986,7 @@ class pdf_riskassessmentdocumentguide extends ModelePDFDigiriskDolibarrDocument
             foreach ($row as $category) {
                 $this->card($pdf, $x, $y, $cellWidth, $cellH, $this->surface);
 
-                $path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $category['thumbnail_name'] . '.png';
+                $path = dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $category['thumbnail_name'] . '.png', 0);
                 if (is_readable($path)) {
                     $pdf->Image($path, $x + 2.5, $y + (($cellH - $picto) / 2), $picto, $picto, '', '', '', false, 300, '', false, false, 0, 'CM');
                 }

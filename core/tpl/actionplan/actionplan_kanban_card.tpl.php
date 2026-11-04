@@ -42,12 +42,12 @@
             $cotColor = !empty($rd['cotation_color']) ? $rd['cotation_color'] : '#ececec';
             $textColor = in_array($cotColor, ['#2b2b2b', '#e05353']) ? '#fff' : '#333';
             // Build risk URL matching getNomUrl: ?id=fk_element
-            $riskUrl = !empty($rd['fk_element']) ? DOL_URL_ROOT . '/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php?id=' . $rd['fk_element'] : '';
+            $riskUrl = !empty($rd['fk_element']) ? dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $rd['fk_element'] : '';
         ?>
             <a href="<?= $riskUrl ?>" class="kanban-card-risk kanban-risk-tooltip-trigger" style="background:<?= $cotColor ?>;color:<?= $textColor ?>" target="_blank">
                 <?php // The danger category thumbnail names the kind of risk, where the warning sign was the same for all — issue #5235 ?>
                 <?php if (!empty($rd['category_picto'])) : ?>
-                    <img class="kanban-risk-picto" src="<?= DOL_URL_ROOT ?>/custom/digiriskdolibarr/img/categorieDangers/<?= dol_escape_htmltag($rd['category_picto']) ?>.png" alt="" title="<?= dol_escape_htmltag($rd['category_name']) ?>">
+                    <img class="kanban-risk-picto" src="<?= dol_escape_htmltag(dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $rd['category_picto'] . '.png', 1)) ?>" alt="" title="<?= dol_escape_htmltag($rd['category_name']) ?>">
                 <?php else : ?>
                     <i class="fas fa-exclamation-triangle"></i>
                 <?php endif; ?>
@@ -102,7 +102,7 @@
     <!-- GP/UT carrying the linked risk -->
     <?php if (!empty($t['element_ref'])) : ?>
         <div class="kanban-card-element">
-            <a href="<?= DOL_URL_ROOT ?>/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php?id=<?= (int) $t['element_id'] ?>"
+            <a href="<?= dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) ?>?id=<?= (int) $t['element_id'] ?>"
                class="kanban-element-badge kanban-element-<?= dol_escape_htmltag($t['element_type']) ?>" target="_blank"
                title="<?= dol_escape_htmltag($t['element_ref'] . ' - ' . $t['element_label']) ?>">
                 <i class="fas fa-sitemap"></i>

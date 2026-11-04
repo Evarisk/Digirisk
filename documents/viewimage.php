@@ -22,8 +22,8 @@
  *		\file       digiriskdolibarr/documents/viewimage.php
  *		\brief      Wrapper to show images into Dolibarr screens.
  *		\remarks    Call to wrapper is :
- *					DOL_URL_ROOT.'/custom/digiriskdolibarr/documents/viewimage.php?modulepart=diroffile&file=relativepathofofile&cache=0
- *					DOL_URL_ROOT.'/custom/digiriskdolibarr/documents/viewimage.php?hashp=sharekey
+ *					dol_buildpath('/digiriskdolibarr/documents/viewimage.php', 1).'?modulepart=diroffile&file=relativepathofofile&cache=0
+ *					dol_buildpath('/digiriskdolibarr/documents/viewimage.php', 1).'?hashp=sharekey
  */
 
 if (!defined('NOREQUIRESOC')) {

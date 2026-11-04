@@ -130,10 +130,10 @@ class ActionsDigiriskdolibarr
             $elementType = $parameters['elementType'];
             
             $map = [
-                'digiriskaccident' => ['classfile' => 'accident', 'classname' => 'Accident', 'classpath' => 'custom/digiriskdolibarr/class'],
-                'digiriskpreventionplan' => ['classfile' => 'preventionplan', 'classname' => 'PreventionPlan', 'classpath' => 'custom/digiriskdolibarr/class'],
-                'digiriskfirepermit' => ['classfile' => 'firepermit', 'classname' => 'FirePermit', 'classpath' => 'custom/digiriskdolibarr/class'],
-                'digiriskrisk' => ['classfile' => 'risk', 'classname' => 'Risk', 'classpath' => 'custom/digiriskdolibarr/class/riskanalysis']
+                'digiriskaccident' => ['classfile' => 'accident', 'classname' => 'Accident', 'classpath' => 'digiriskdolibarr/class'],
+                'digiriskpreventionplan' => ['classfile' => 'preventionplan', 'classname' => 'PreventionPlan', 'classpath' => 'digiriskdolibarr/class'],
+                'digiriskfirepermit' => ['classfile' => 'firepermit', 'classname' => 'FirePermit', 'classpath' => 'digiriskdolibarr/class'],
+                'digiriskrisk' => ['classfile' => 'risk', 'classname' => 'Risk', 'classpath' => 'digiriskdolibarr/class/riskanalysis']
             ];
 
             if (isset($map[$elementType])) {
@@ -199,8 +199,8 @@ class ActionsDigiriskdolibarr
         // La modale du suivi de temps s'appuie sur la librairie Saturne, absente des pages natives
         if (preg_match('/ticketcard|projecttasktime/', $parameters['context'])) {
             $resourcesRequired = [
-                'css' => '/custom/saturne/css/saturne.min.css',
-                'js'  => '/custom/saturne/js/saturne.min.js'
+                'css' => '/saturne/css/saturne.min.css',
+                'js'  => '/saturne/js/saturne.min.js'
             ];
 
             $out  = '<!-- Includes CSS added by module saturne -->';
@@ -508,7 +508,7 @@ class ActionsDigiriskdolibarr
 			if (getDolGlobalString('MAIN_INFO_SOCIETE_COUNTRY') == '1:FR:France') {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 				$form      = new Form($db);
-                $pictopath = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
+                $pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
                 $pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
 				$idcc_form = digirisk_select_dictionary('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', getDolGlobalString('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE'), 1, '', '', 'minwidth100');
 				$pee_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PEE_ENABLED" '. (getDolGlobalInt('DIGIRISKDOLIBARR_PEE_ENABLED') ? 'checked' : '') .'>';
@@ -689,7 +689,7 @@ class ActionsDigiriskdolibarr
                     $signatureTab .= '<td id="ticket_extras_digiriskdolibarr_ticket_signature_'. $object->id .'" class="valuefield ticket_extras_digiriskdolibarr_ticket_signature wordbreak">';
                     $signatureTab .= $object->array_options['options_digiriskdolibarr_condition_message'] ?? '';
                     if ($signature && !empty($signature->signature)) {
-                        $signatureTab .= ' <button type="button" class="wpeo-button button-blue" onclick="window.open(\'' . dol_buildpath('/custom/saturne/public/signature/add_signature.php?track_id=' . $signature->signature_url . '&entity=' . $conf->entity . '&module_name=ticket&object_type=' . $object->element . '&document_type=TicketDocument', 3) . '\', \'_blank\')"><i class="fas fa-eye"></i></button>';
+                        $signatureTab .= ' <button type="button" class="wpeo-button button-blue" onclick="window.open(\'' . dol_buildpath('/saturne/public/signature/add_signature.php?track_id=' . $signature->signature_url . '&entity=' . $conf->entity . '&module_name=ticket&object_type=' . $object->element . '&document_type=TicketDocument', 3) . '\', \'_blank\')"><i class="fas fa-eye"></i></button>';
                     }
                     $signatureTab .= '</td>';
                     $signatureTab .= '</tr>';
@@ -747,7 +747,7 @@ class ActionsDigiriskdolibarr
                 $out .= $langs->transnoentities('UserGroup');
                 $out .= '</td><td class="valuefieldcreate_ticket_user_group">';
                 $out .= img_picto('', $userGroup->picto, 'class="pictofixedwidth"') . Form::selectarray('user_group', $userGroups, getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP'), -1, 0, 0, 'disabled', '', 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
-                $out .= ' <a href="' . dol_buildpath('/custom/digiriskdolibarr/admin/ticket/ticket.php#userGroup', 1) . '" title="' . $langs->trans('ConfigureDefaultUserGroup') . '" target="_blank">';
+                $out .= ' <a href="' . dol_buildpath('/digiriskdolibarr/admin/ticket/ticket.php', 1) . '#userGroup" title="' . $langs->trans('ConfigureDefaultUserGroup') . '" target="_blank">';
                 $out .= img_picto($langs->trans('ConfigureDefaultUserGroup'), 'setup', 'class="pictofixedwidth opacitymedium"');
                 $out .= '</a>';
                 $out .= '</td></tr>';
@@ -890,7 +890,7 @@ class ActionsDigiriskdolibarr
                     $signatory = array_shift($signatories);
                     if (dol_strlen( $signatory->signature_url ) > 0) {
                         $picto        = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
-                        $signatureUrl = dol_buildpath('custom/saturne/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=digiriskdolibarr&object_type=' . $object->element . '&document_type=TicketDocument', 3);
+                        $signatureUrl = dol_buildpath('/saturne/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=digiriskdolibarr&object_type=' . $object->element . '&document_type=TicketDocument', 3);
 
                         $out  = '<tr class="trextrafields_collapse_' . $object->id . '"><td class="titlefield">' . $picto . $langs->trans('Signature') . '</td>';
                         $out .= '<td id="ticket_extras_digiriskdolibarr_ticket_signature_'. $object->id . '" class="valuefield ticket_extras_digiriskdolibarr_ticket_signature wordbreak copy-signatureurl-container">';
@@ -1457,7 +1457,7 @@ class ActionsDigiriskdolibarr
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
 		if (strpos($parameters['context'], 'mainloginpage') !== false) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			if ($conf->global->DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION > 0) {
-				$value = dol_buildpath('/custom/digiriskdolibarr/digiriskdolibarrindex.php?idmenu=1319&mainmenu=digiriskdolibarr&leftmenu=', 1);
+				$value = dol_buildpath('/digiriskdolibarr/digiriskdolibarrindex.php?idmenu=1319&mainmenu=digiriskdolibarr&leftmenu=', 1);
 			} else {
 				$value = '';
 			}
@@ -2676,7 +2676,7 @@ class ActionsDigiriskdolibarr
 
             $position += 10;
             $picto     = 'fontawesome_fa-' . $picto . '_fas_#d35968';
-            $url       = dol_buildpath('custom/digiriskdolibarr/' . $listPath, 1) . (strpos($listPath, '?') !== false ? '&' : '?') . 'mainmenu=digiriskdolibarr';
+            $url       = dol_buildpath('/digiriskdolibarr/' . $listPath, 1) . (strpos($listPath, '?') !== false ? '&' : '?') . 'mainmenu=digiriskdolibarr';
 
             $searchEntries['searchinto' . $rightName] = [
                 'position' => $moduleNum . sprintf('%02d', $position),

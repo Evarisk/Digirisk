@@ -205,7 +205,7 @@ function digiriskGetPreventionPlanSignatureUrl(SaturneSignature $signatory): str
         return '';
     }
 
-    return dol_buildpath('/custom/saturne/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=digiriskdolibarr&object_type=preventionplan&document_type=PreventionPlanDocument', 3);
+    return dol_buildpath('/saturne/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=digiriskdolibarr&object_type=preventionplan&document_type=PreventionPlanDocument', 3);
 }
 
 /**

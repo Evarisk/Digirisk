@@ -124,9 +124,9 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 						$tmpArray['key_unique'] = $line->ref;
 						$tmpArray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
 						$tmpArray['action'] = $line->description;
-						$tmpArray['risk_photo'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory(
+						$tmpArray['risk_photo'] = dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory(
 								$line
-							) . '.png';
+							) . '.png', 0);
 						$tmpArray['nomPicto'] = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $risk->getDangerCategoryName(
 							$line
 						) : ' ');

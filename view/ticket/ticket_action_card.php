@@ -421,7 +421,7 @@ if ($action == 'createTicket' && $permissionToWrite) {
             }
         }
 
-        $detailUrl = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . $newId;
+        $detailUrl = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . $newId;
         print json_encode(['success' => 1, 'id' => $newId, 'ref' => $newTicket->ref, 'url' => $detailUrl]);
     } else {
         $errMsg = $newTicket->error ?: implode(', ', $newTicket->errors ?: []);
@@ -617,7 +617,7 @@ if ($object->id <= 0) {
                 }
             }
 
-            $detailUrl = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $row->rowid;
+            $detailUrl = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $row->rowid;
 
             $sevCode  = strtoupper((string) ($row->severity_code ?: ''));
             $sevTrans = $sevCode !== '' ? $langs->trans('TicketSeverityShort' . $sevCode) : '';
@@ -676,7 +676,7 @@ if ($object->id <= 0) {
                     }
                 }
 
-                $detailUrl = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $row->rowid;
+                $detailUrl = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $row->rowid;
                 $sevCode   = strtoupper((string) ($row->severity_code ?: ''));
                 $sevTrans  = $sevCode !== '' ? $langs->trans('TicketSeverityShort' . $sevCode) : '';
                 if ($sevTrans === 'TicketSeverityShort' . $sevCode) {

@@ -356,7 +356,7 @@ if ($sharedrisksigns) {
 			$nameEntity = dolibarr_get_const($db, 'MAIN_INFO_SOCIETE_NOM', $risksigns->entity);
 
 			if (!array_key_exists($digiriskelementtmp->id, $deleted_elements)) {
-				$photoRiskSign = '<img class="danger-category-pic hover" src=' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksigns->getRiskSignCategory($risksigns) . '>';
+				$photoRiskSign = '<img class="danger-category-pic hover" src=' . dol_buildpath('/digiriskdolibarr/img/' . $risksigns->getRiskSignCategory($risksigns), 1) . '>';
 
 				$importValue = '<div class="importsharedrisksign"><span class="importsharedrisksign-ref">' . 'S' . $risksigns->entity . '</span>';
 				$importValue .= '<span>' . dol_trunc($nameEntity, 32) . '</span>';

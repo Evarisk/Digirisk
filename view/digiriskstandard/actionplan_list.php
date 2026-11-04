@@ -874,9 +874,9 @@ if (!empty($taskRiskMap)) {
                         $thumbName = preg_replace('/(\.\w+)$/', '_small$1', $raFile);
                         $thumbPath = $raDir . '/thumbs/' . $thumbName;
                         if (file_exists($thumbPath)) {
-                            $raPhotoUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('riskassessment/' . $lastRA->ref . '/thumbs/' . $thumbName);
+                            $raPhotoUrl = dol_buildpath('/digiriskdolibarr/documents/viewimage.php', 1) . '?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('riskassessment/' . $lastRA->ref . '/thumbs/' . $thumbName);
                         } else {
-                            $raPhotoUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('riskassessment/' . $lastRA->ref . '/' . $raFile);
+                            $raPhotoUrl = dol_buildpath('/digiriskdolibarr/documents/viewimage.php', 1) . '?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('riskassessment/' . $lastRA->ref . '/' . $raFile);
                         }
                         break;
                     }

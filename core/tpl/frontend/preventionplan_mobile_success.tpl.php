@@ -181,7 +181,7 @@ $successCustomFactsHtml = '';
 // Public spread page, shareable straight away with the people who have to join and sign this plan.
 // Only relevant when DoliLetter (which serves the spread public page) is enabled.
 $successShareUrl = isModEnabled('doliletter')
-    ? dol_buildpath('/custom/doliletter/public/spread/add_spread.php', 3) . '?id=' . $object->id . '&object_type=digiriskdolibarr_preventionplan'
+    ? dol_buildpath('/doliletter/public/spread/add_spread.php', 3) . '?id=' . $object->id . '&object_type=digiriskdolibarr_preventionplan'
     : '';
 
 $successShareEnabled = $ppExtSigned && ($object->status >= PreventionPlan::STATUS_LOCKED);
@@ -202,7 +202,7 @@ if ($ppHasDocument) {
         $successViewLabel = $langs->trans('MobileSuccessViewDocument');
     }
 } else {
-    $successViewUrl = dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php', 1) . '?id=' . $object->id;
+    $successViewUrl = dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_card.php', 1) . '?id=' . $object->id;
     $successViewLabel  = $langs->trans('MobilePPViewPlan');
 }
 // Confirmation banner, only when arriving right after the form was saved (not when the plan is

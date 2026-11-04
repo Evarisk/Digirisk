@@ -48,7 +48,7 @@ $tasksDone = count(array_filter($taskProgresses, function ($taskProgress) {
 			} ?>
 		<?php endif; ?>
 		<div class="table-cell-header">
-			<input type="hidden" name="sharedTaskTooltipUrl" value="<?php echo DOL_URL_ROOT . '/custom/multicompany/admin/multicompany.php?action=edit&id=' . $conf->entity;  ?>">
+			<input type="hidden" name="sharedTaskTooltipUrl" value="<?php echo dol_buildpath('/multicompany/admin/multicompany.php', 1) . '?action=edit&id=' . $conf->entity;  ?>">
 			<?php if (!empty($related_tasks) && $result) : ?>
 				<?php // Not a table-cell-header-label: the deletion of an assessment rewrites every label of the row with its own counter ?>
 				<div class="table-cell-header-summary">

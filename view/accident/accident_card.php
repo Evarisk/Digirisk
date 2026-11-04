@@ -1097,7 +1097,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $langs->transnoentities("Victim");
 	print '</td>';
 	print '<td>';
-	print '<a href="' . DOL_URL_ROOT . '/custom/saturne/view/saturne_attendants.php?' . http_build_query([
+	print '<a href="' . dol_buildpath('/saturne/view/saturne_attendants.php', 1) . '?' . http_build_query([
 		'id' => $object->id,
 		'module_name' => $object->module,
 		'object_type' => $object->element,
@@ -1157,7 +1157,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
             // Create Investigation
             $displayButton = $onPhone ? '<i class="fas fa-search-plus fa-2x"></i>' : '<i class="fas fa-search-plus"></i> ' . $langs->trans('AccidentInvestigation');
-            print '<a class="butAction" id="actionButtonCreateInvestigation" href="'. dol_buildpath('/custom/digiriskdolibarr/view/accidentinvestigation/accidentinvestigation_card.php?action=create&fk_accident=' . $id, 1) .'">' . $displayButton . '</a>';
+            print '<a class="butAction" id="actionButtonCreateInvestigation" href="'. dol_buildpath('/digiriskdolibarr/view/accidentinvestigation/accidentinvestigation_card.php?action=create&fk_accident=' . $id, 1) .'">' . $displayButton . '</a>';
 
 			// Lock.
 			$displayButton = $onPhone ? '<i class="fas fa-lock fa-2x"></i>' : '<i class="fas fa-lock"></i>' . ' ' . $langs->trans('Lock');

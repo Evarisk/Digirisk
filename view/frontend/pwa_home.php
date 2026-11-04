@@ -45,9 +45,9 @@ $canReadPreventionPlan = $user->hasRight('digiriskdolibarr', 'preventionplan', '
 $canReadFirePermit     = $user->hasRight('digiriskdolibarr', 'firepermit', 'read');
 saturne_check_access($canReadPreventionPlan || $canReadFirePermit);
 
-$listPreventionPlanUrl = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_preventionplan_list.php', 1);
-$listFirePermitUrl     = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_firepermit_list.php', 1);
-$listFireWatchUrl      = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_firepermit_rounds.php', 1);
+$listPreventionPlanUrl = dol_buildpath('/digiriskdolibarr/view/frontend/pwa_preventionplan_list.php', 1);
+$listFirePermitUrl     = dol_buildpath('/digiriskdolibarr/view/frontend/pwa_firepermit_list.php', 1);
+$listFireWatchUrl      = dol_buildpath('/digiriskdolibarr/view/frontend/pwa_firepermit_rounds.php', 1);
 
 // Counters: one tile per status worth acting on, each linking to the matching filtered list
 $homeTiles = [];

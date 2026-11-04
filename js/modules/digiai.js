@@ -250,7 +250,7 @@ window.digiriskdolibarr.digiai.displayResults = function(risks) {
   let tbody = table.find('tbody');
   tbody.empty();
 
-  let dolUrlRoot = $('#dol_url_root').val();
+  let moduleUrlRoot = window.digiriskdolibarr.risk_table_common.getModuleUrlRoot();
   const categoryMap = window.digiriskdolibarr.categoryMap;
 
   risks.forEach((risque, index) => {
@@ -268,7 +268,7 @@ window.digiriskdolibarr.digiai.displayResults = function(risks) {
     let actionsContainer = window.digiriskdolibarr.risk_table_common.createActionsContainer(prevention_actions);
 
     let riskImgContainer = window.digiriskdolibarr.risk_table_common.createCategoryImage(
-      dolUrlRoot + '/custom/digiriskdolibarr/img/categorieDangers/' + title + '.png',
+      moduleUrlRoot + '/img/categorieDangers/' + title + '.png',
       categoryMap[title] || 'Catégorie inconnue'
     );
 
@@ -297,7 +297,7 @@ window.digiriskdolibarr.digiai.displayResults = function(risks) {
  */
 window.digiriskdolibarr.digiai.handleSubmitButton = function() {
   let token = window.saturne.toolbox.getToken();
-  let dolUrlRoot = $('#dol_url_root').val();
+  let moduleUrlRoot = window.digiriskdolibarr.risk_table_common.getModuleUrlRoot();
 
   $('#submit_selected_risks').off('click').on('click', function () {
     const selectedRows = $('input.select-risk:checked').closest('tr');
@@ -311,7 +311,7 @@ window.digiriskdolibarr.digiai.handleSubmitButton = function() {
       const riskData = window.digiriskdolibarr.risk_table_common.extractRiskDataFromRow(row);
 
       $.ajax({
-        url: dolUrlRoot + '/custom/digiriskdolibarr/core/ajax/create_risk.php?token=' + token,
+        url: moduleUrlRoot + '/core/ajax/create_risk.php?token=' + token,
         method: 'POST',
         data: JSON.stringify(riskData),
         contentType: 'application/json',

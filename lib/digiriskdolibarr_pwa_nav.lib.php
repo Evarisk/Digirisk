@@ -44,7 +44,7 @@ function digiriskPwaNavGetItems(User $user): array
 {
     global $langs;
 
-    $frontendBase = dol_buildpath('/custom/digiriskdolibarr/view/frontend/', 1);
+    $frontendBase = dirname(dol_buildpath('/digiriskdolibarr/view/frontend/index.php', 1)) . '/';
     $items        = [];
 
     $items['home'] = [

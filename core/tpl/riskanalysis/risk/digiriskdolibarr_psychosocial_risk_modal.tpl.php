@@ -146,7 +146,7 @@ foreach ($predefinedPsychosocialRisks as $risks) {
                                         </td>
                                         <td class="psychosocial-cell-category">
                                             <div class="risk-category-container">
-                                                <img src="<?php echo DOL_URL_ROOT; ?>/custom/digiriskdolibarr/img/categorieDangers/rps_v2.png"
+                                                <img src="<?php echo dol_buildpath('/digiriskdolibarr/img/categorieDangers/rps_v2.png', 1); ?>"
                                                      class="risk-category-pic"
                                                      alt="<?php echo dol_escape_htmltag($risk['category']); ?>">
                                                 <input hidden class="sub-category"

@@ -147,7 +147,7 @@ print '<hr>';
 else :
 		print '<div class="wpeo-notice notice-warning notice-red">';
 		print '<div class="notice-content">';
-		print '<a href="' . dol_buildpath('/custom/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=' . $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD, 2) . '">' . '<b><div class="notice-subtitle">'.$langs->trans("YouDontHaveOrganization") . '</b></a>';
+		print '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=' . $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD, 2) . '">' . '<b><div class="notice-subtitle">'.$langs->trans("YouDontHaveOrganization") . '</b></a>';
 		print '</div>';
 		print '</div>';
 		print '</div>';

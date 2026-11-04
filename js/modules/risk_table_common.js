@@ -7,6 +7,20 @@
 window.digiriskdolibarr.risk_table_common = {};
 
 /**
+ * URL racine du module, résolue côté serveur par dol_buildpath() : le module peut être installé
+ * dans une autre racine que htdocs/custom. La valeur vient du champ caché #digiriskdolibarr_url_root
+ * que portent la liste des risques et la page DigiAI.
+ *
+ * @since   23.7.1
+ * @version 23.7.1
+ *
+ * @return {string} URL racine du module, sans barre finale
+ */
+window.digiriskdolibarr.risk_table_common.getModuleUrlRoot = function() {
+  return $('#digiriskdolibarr_url_root').val();
+};
+
+/**
  * Création du système de cotation pour un risque
  *
  * @param {number} cotation - La cotation du risque
@@ -150,7 +164,7 @@ window.digiriskdolibarr.risk_table_common.createDescriptionTextarea = function(d
  */
 window.digiriskdolibarr.risk_table_common.submitRisks = function(risksData, successCallback, errorCallback) {
   const token = window.saturne.toolbox.getToken();
-  const dolUrlRoot = $('#dol_url_root').val() || window.location.origin;
+  const moduleUrlRoot = window.digiriskdolibarr.risk_table_common.getModuleUrlRoot();
 
   let completedRequests = 0;
   let failedRequests = 0;
@@ -158,7 +172,7 @@ window.digiriskdolibarr.risk_table_common.submitRisks = function(risksData, succ
 
   risksData.forEach((riskData, index) => {
     $.ajax({
-      url: dolUrlRoot + '/custom/digiriskdolibarr/core/ajax/create_risk.php?token=' + token,
+      url: moduleUrlRoot + '/core/ajax/create_risk.php?token=' + token,
       method: 'POST',
       data: JSON.stringify(riskData),
       contentType: 'application/json',

@@ -86,41 +86,41 @@ $manifest->name       = 'DigiriskDolibarr';
 $manifest->icons      = [];
 
 $img               = new stdClass();
-$img->src          = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr_color.svg', 1);
+$img->src          = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color.svg', 1);
 $img->type         = 'image/svg+xml';
 $img->sizes        = '150x150';
 $manifest->icons[] = $img;
 
 $img               = new stdClass();
-$img->src          = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr_color_192.png', 1);
+$img->src          = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color_192.png', 1);
 $img->type         = 'image/png';
 $img->sizes        = '192x192';
 $manifest->icons[] = $img;
 
 $img               = new stdClass();
-$img->src          = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr_color_512.png', 1);
+$img->src          = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color_512.png', 1);
 $img->type         = 'image/png';
 $img->sizes        = '512x512';
 $manifest->icons[] = $img;
 
-$manifest->id               = dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 1);
-$manifest->start_url        = dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 1);
+$manifest->id               = dol_buildpath('/digiriskdolibarr/public/ticket/create_ticket.php', 1);
+$manifest->start_url        = dol_buildpath('/digiriskdolibarr/public/ticket/create_ticket.php', 1);
 $manifest->background_color = '#ffffff';
 $manifest->display          = 'standalone';
 $manifest->display_override = ['window-controls-overlay'];
-$manifest->scope            = dol_buildpath('/custom/digiriskdolibarr/', 1);
+$manifest->scope            = dirname(dol_buildpath('/digiriskdolibarr/manifest.json.php', 1)) . '/';
 $manifest->theme_color      = '#ffffff';
 $manifest->description      = 'Gérez les risques de votre entreprise et créez votre Document Unique en toute simplicité';
 
 $img                     = new stdClass();
-$img->src                = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr_color_512.png', 1);
+$img->src                = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color_512.png', 1);
 $img->type               = 'image/png';
 $img->sizes              = '512x512';
 $img->form_factor        = 'narrow';
 $manifest->screenshots[] = $img;
 
 $img                     = new stdClass();
-$img->src                = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr_color_512.png', 1);
+$img->src                = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color_512.png', 1);
 $img->type               = 'image/png';
 $img->sizes              = '512x512';
 $img->form_factor        = 'wide';

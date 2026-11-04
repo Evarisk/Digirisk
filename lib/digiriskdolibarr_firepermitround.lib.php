@@ -195,7 +195,7 @@ function digiriskFirePermitRoundsPublicUrl(int $firePermitId = 0): string
         $params['id'] = $firePermitId;
     }
 
-    return dol_buildpath('/custom/digiriskdolibarr/public/firepermit/firepermit_rounds.php', 3) . '?' . http_build_query($params);
+    return dol_buildpath('/digiriskdolibarr/public/firepermit/firepermit_rounds.php', 3) . '?' . http_build_query($params);
 }
 
 /**

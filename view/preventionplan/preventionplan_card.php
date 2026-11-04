@@ -819,7 +819,7 @@ if ($action == 'create') {
 	//External society -- Société extérieure
 	print '<tr><td class="fieldrequired minwidth400">' . img_picto('', 'building') . ' ' . $langs->trans("ExtSociety") . '</td><td>';
 	$events    = array();
-	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
+	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
 	print $form->select_company(GETPOST('ext_society'), 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '</td></tr>';
@@ -862,10 +862,10 @@ if ($action == 'create') {
 	print '</td>';
 	print '<td>';
 	$events    = array();
-	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labour_inspector_contact', 'params' => array('add-customer-contact' => 'disabled'));
+	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labour_inspector_contact', 'params' => array('add-customer-contact' => 'disabled'));
 	print $form->select_company((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: 0)), 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
-	print '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/admin/securityconf.php' . '" target="_blank">' . $langs->trans("ConfigureLabourInspector") . '</a>';
+	print '<a href="' . dol_buildpath('/digiriskdolibarr/admin/securityconf.php', 1) . '" target="_blank">' . $langs->trans("ConfigureLabourInspector") . '</a>';
 	print '</td></tr>';
 	$labourInspectorContactId        = (GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : ($allLinks['LabourInspectorContact']->id[0] ?: -1));
 
@@ -974,7 +974,7 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td>';
 	print '<td>';
 	$events    = array();
-	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
+	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
 	//For external user force the company to user company
 	if ( ! empty($user->socid)) {
 		print $form->select_company($user->socid, 'ext_society', '', 1, 1, 0, $events, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
@@ -1048,10 +1048,10 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td>';
 	print '<td>';
 	$events    = array();
-	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labour_inspector_contact', 'params' => array('add-customer-contact' => 'disabled'));
+	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labour_inspector_contact', 'params' => array('add-customer-contact' => 'disabled'));
 	print $form->select_company($labourInspectorSociety !== null ? $labourInspectorSociety->id : '', 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
-	print '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/admin/securityconf.php' . '" target="_blank">' . $langs->trans("ConfigureLabourInspector") . '</a>';
+	print '<a href="' . dol_buildpath('/digiriskdolibarr/admin/securityconf.php', 1) . '" target="_blank">' . $langs->trans("ConfigureLabourInspector") . '</a>';
 	print '</td></tr>';
 
 	// A defaut de ressource enregistree, le contact vient du formulaire : c'est un identifiant,
@@ -1266,7 +1266,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$attendants  = count($signatory->fetchSignatory('MasterWorker', $object->id, 'preventionplan'));
 	$attendants += count($signatory->fetchSignatory('ExtSocietyResponsible', $object->id, 'preventionplan'));
 	$attendants += count($signatory->fetchSignatory('ExtSocietyAttendant', $object->id, 'preventionplan'));
-	$url         = dol_buildpath('/custom/saturne/view/saturne_attendants.php?id=' . $object->id . '&module_name=DigiriskDolibarr&object_type=' . $object->element . '&document_type=PreventionPlanDocument', 3);
+	$url         = dol_buildpath('/saturne/view/saturne_attendants.php?id=' . $object->id . '&module_name=DigiriskDolibarr&object_type=' . $object->element . '&document_type=PreventionPlanDocument', 3);
 	$displayButton = $onPhone ? '<i class="fas fa-plus fa-2x"></i>' : '<i class="fas fa-plus"></i> ' . $langs->trans('AddAttendants');
 	print '<a ' . ($object->status == 1 ? 'href="' .  $url . '"' : '') . '">' . $attendants;
 	print '<span class="' . ($object->status == $object::STATUS_DRAFT ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonAddAttendants" title="' . dol_escape_htmltag($langs->trans("PreventionPlanMustBeInProgress")) . '">' .  $displayButton . '</span></a>';
@@ -1296,7 +1296,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			// Modify
 			$displayButton = $onPhone ? '<i class="fas fa-edit fa-2x"></i>' : '<i class="fas fa-edit"></i>' . ' ' . $langs->trans('Modify');
 			if ($object->status == $object::STATUS_DRAFT) {
-				print '<a class="butAction" id="actionButtonEdit" href="' . dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1) . '?id=' . $object->id . '">' . $displayButton . '</a>';
+				print '<a class="butAction" id="actionButtonEdit" href="' . dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1) . '?id=' . $object->id . '">' . $displayButton . '</a>';
 			} else {
 				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('PreventionPlanMustBeInProgress')) . '">' . $displayButton . '</span>';
 			}
@@ -1320,7 +1320,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			// Sign
 			$displayButton = $onPhone ? '<i class="fas fa-signature fa-2x"></i>' : '<i class="fas fa-signature"></i>' . ' ' . $langs->trans('Sign');
 			if ($object->status == $object::STATUS_VALIDATED && !$signatory->checkSignatoriesSignatures($object->id, $object->element)) {
-				print '<a class="butAction" id="actionButtonSign" href="' . dol_buildpath('/custom/saturne/view/saturne_attendants.php?id=' . $object->id . '&module_name=DigiriskDolibarr&object_type=' . $object->element . '&document_type=PreventionPlanDocument', 3) . '">' . $displayButton . '</a>';
+				print '<a class="butAction" id="actionButtonSign" href="' . dol_buildpath('/saturne/view/saturne_attendants.php?id=' . $object->id . '&module_name=DigiriskDolibarr&object_type=' . $object->element . '&document_type=PreventionPlanDocument', 3) . '">' . $displayButton . '</a>';
 			} else {
 				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToSign', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 			}
@@ -1386,7 +1386,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsPreventionPlanRisk') . '</td>';
 		print '</tr>';
 
-		$signalisationFile       = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json';
+		$signalisationFile       = dol_buildpath('/digiriskdolibarr/js/json/signalisationCategories.json', 0);
 		$allSigs                 = file_exists($signalisationFile) ? (json_decode(file_get_contents($signalisationFile), true) ?: []) : [];
 		$protectionMap = [];
 		foreach ($allSigs as $sig) {
@@ -1430,7 +1430,7 @@ print '<input type="hidden" name="fk_element" value="0">';
 							<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
 								 aria-label="<?php echo $risk->getDangerCategoryTooltip($item) ?>">
 								<img class="danger-category-pic hover"
-									 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($item) . '.png'; ?>"/>
+									 src="<?php echo dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($item) . '.png', 1); ?>"/>
 							</div>
 						</div>
 
@@ -1445,7 +1445,7 @@ print '<input type="hidden" name="fk_element" value="0">';
 										data-name="<?php echo dol_escape_htmltag($dangerCategory['name']) ?>"
 										aria-label="<?php echo $risk->formatDangerCategoryTooltip($dangerCategory) ?>">
 										<img
-											src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png' ?>"
+											src="<?php echo dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png', 1) ?>"
 											class="attachment-thumbail size-thumbnail photo photowithmargin" alt="">
 									</li>
 								<?php endforeach;
@@ -1468,7 +1468,8 @@ print '<input type="hidden" name="fk_element" value="0">';
 					print '<div class="backend-protections" id="backend-protections-' . $item->id . '">';
 					$catProtections = array_filter($planProtections, function($p) use ($item) { return $p['risk_category'] == $item->category; });
 					foreach ($catProtections as $idx => $p) {
-						$thumb = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/protections/' . $p['position'] . '.png';
+						// A protection is stored by its position in signalisationCategories.json, which gives its picture
+						$thumb = dol_buildpath('/digiriskdolibarr/img/' . ($protectionMap[$p['position']]['name_thumbnail'] ?? ''), 1);
 						print '<div style="display:flex; align-items:center; margin-bottom:5px;">';
 						print '<img src="'.$thumb.'" style="height:30px; margin-right:5px;">';
 						print '<input type="hidden" name="backend_protection_position[]" value="'.$p['position'].'">';
@@ -1479,7 +1480,7 @@ print '<input type="hidden" name="fk_element" value="0">';
 					print '</div>';
 					print '<div style="margin-top:5px;">';
 					print '<div onclick="addProtectionRow(' . $item->id . ')" style="display:inline-block; cursor:pointer; width:40px; height:40px;" title="' . dol_escape_htmltag($langs->trans('AddProtection')) . '">';
-					print '<img src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/OBLIGATION/OBLIGATION-general.jpg" style="width:100%; height:100%; object-fit:contain; border-radius:4px;" alt="+ EPI">';
+					print '<img src="' . dol_buildpath('/digiriskdolibarr/img/OBLIGATION/OBLIGATION-general.jpg', 1) . '" style="width:100%; height:100%; object-fit:contain; border-radius:4px;" alt="+ EPI">';
 					print '</div>';
 					print '</div>';
 					print '</td>';
@@ -1521,7 +1522,7 @@ print '<input type="hidden" name="fk_element" value="0">';
 					$dangerName  = $risk->getDangerCategoryName($item);
 					if ($dangerThumb != -1) {
 						print '<div class="cell-risk-view">';
-						print '<img class="cell-risk-view__pic" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerThumb . '.png" alt="" title="' . dol_escape_htmltag($dangerName) . '">';
+						print '<img class="cell-risk-view__pic" src="' . dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $dangerThumb . '.png', 1) . '" alt="" title="' . dol_escape_htmltag($dangerName) . '">';
 						print '<span class="cell-risk-view__name">' . dol_escape_htmltag($dangerName) . '</span>';
 						print '</div>';
 					} else {
@@ -1544,9 +1545,10 @@ print '<input type="hidden" name="fk_element" value="0">';
 						print '<span class="opacitymedium">&mdash;</span>';
 					} else {
 						foreach ($catProtections as $p) {
-							$thumb = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/protections/' . $p['position'] . '.png';
+							// A protection is stored by its position in signalisationCategories.json, which gives its picture and name
+							$thumb = dol_buildpath('/digiriskdolibarr/img/' . ($protectionMap[$p['position']]['name_thumbnail'] ?? ''), 1);
 							print '<div style="display:flex; align-items:center; margin-bottom:2px;">';
-							print '<img src="'.$thumb.'" style="height:24px; margin-right:5px;" title="'.dol_escape_htmltag($p['name'] ?? '').'">';
+							print '<img src="'.$thumb.'" style="height:24px; margin-right:5px;" title="'.dol_escape_htmltag($protectionMap[$p['position']]['name'] ?? '').'">';
 							if (!empty($p['comment'])) print '<span>'.dol_escape_htmltag($p['comment']).'</span>';
 							print '</div>';
 						}
@@ -1631,7 +1633,7 @@ print '<input type="hidden" name="fk_element" value="0">';
 								data-name="<?php echo dol_escape_htmltag($dangerCategory['name']) ?>"
 								aria-label="<?php echo $risk->formatDangerCategoryTooltip($dangerCategory) ?>">
 								<img
-									src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png' ?>"
+									src="<?php echo dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png', 1) ?>"
 									class="attachment-thumbail size-thumbnail photo photowithmargin" alt="">
 							</li>
 						<?php endforeach;
@@ -1655,7 +1657,7 @@ print '<input type="hidden" name="fk_element" value="0">';
 			print '</div>';
 			print '<div style="margin-top:5px;">';
 			print '<div onclick="addProtectionRow(\'new\')" style="display:inline-block; cursor:pointer; width:40px; height:40px;" title="' . dol_escape_htmltag($langs->trans('AddProtection')) . '">';
-			print '<img src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/OBLIGATION/OBLIGATION-general.jpg" style="width:100%; height:100%; object-fit:contain; border-radius:4px;" alt="+ EPI">';
+			print '<img src="' . dol_buildpath('/digiriskdolibarr/img/OBLIGATION/OBLIGATION-general.jpg', 1) . '" style="width:100%; height:100%; object-fit:contain; border-radius:4px;" alt="+ EPI">';
 			print '</div>';
 			print '</div>';
 			print '</td>';
@@ -1705,7 +1707,7 @@ print '<input type="hidden" name="fk_element" value="0">';
 			if (is_array($preventionplandets) && !empty($preventionplandets)) {
 				$mobileRiskProtections = !empty($object->array_options['options_mobile_protections'])    ? json_decode($object->array_options['options_mobile_protections'], true)    : [];
 				$mobileRiskCompanies   = !empty($object->array_options['options_mobile_risk_companies']) ? json_decode($object->array_options['options_mobile_risk_companies'], true) : [];
-				$signalisationFile     = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json';
+				$signalisationFile     = dol_buildpath('/digiriskdolibarr/js/json/signalisationCategories.json', 0);
 				$signalisationMap      = [];
 				if (file_exists($signalisationFile)) {
 					foreach ((json_decode(file_get_contents($signalisationFile), true) ?: []) as $signalisationItem) {
@@ -1732,7 +1734,7 @@ print '<input type="hidden" name="fk_element" value="0">';
 					// Danger category: picto and name
 					print '<td class="nowraponall">';
 					if ($riskThumb != -1) {
-						print '<img class="cell-risk-view__pic valignmiddle marginrightonly" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $riskThumb . '.png" alt="" title="' . dol_escape_htmltag($riskName != -1 ? $riskName : '') . '">';
+						print '<img class="cell-risk-view__pic valignmiddle marginrightonly" src="' . dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $riskThumb . '.png', 1) . '" alt="" title="' . dol_escape_htmltag($riskName != -1 ? $riskName : '') . '">';
 					}
 					print '<span class="valignmiddle">' . dol_escape_htmltag($riskName != -1 ? $riskName : $riskLine->ref) . '</span>';
 					print '</td>';
@@ -1764,7 +1766,7 @@ print '<input type="hidden" name="fk_element" value="0">';
 							}
 							$protectionCategory = $signalisationMap[$mobileRiskProtection['position']];
 							$protectionTitle    = $protectionCategory['name'] . (dol_strlen($mobileRiskProtection['comment'] ?? '') ? ' - ' . $mobileRiskProtection['comment'] : '');
-							print '<img class="cell-risk-view__pic marginrightonly" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $protectionCategory['name_thumbnail'] . '" alt="" title="' . dol_escape_htmltag($protectionTitle) . '">';
+							print '<img class="cell-risk-view__pic marginrightonly" src="' . dol_buildpath('/digiriskdolibarr/img/' . $protectionCategory['name_thumbnail'], 1) . '" alt="" title="' . dol_escape_htmltag($protectionTitle) . '">';
 							$riskHasProtection = true;
 						}
 					}

@@ -199,16 +199,16 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 				<div class="digirisk-wrap wpeo-wrap">
 					<div class="navigation-container organization-tree">
 						<div class="society-header">
-							<a class="linkElement" href="<?php echo dol_buildpath('/custom/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=' . $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD, 1);?>">
+							<a class="linkElement" href="<?php echo dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=' . $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD, 1);?>">
 								<span class="icon fas fa-building fa-fw"></span>
 								<div class="title"><?php echo getDolGlobalString('MAIN_INFO_SOCIETE_NOM') ?></div>
 							</a>
                             <?php if ($user->rights->digiriskdolibarr->digiriskelement->write) : ?>
                                 <div class="add-container">
-                                    <a id="newGroupment" href="<?php echo dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0', 1);?>">
+                                    <a id="newGroupment" href="<?php echo dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0', 1);?>">
                                         <div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><strong><?php echo $modGroupment->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
                                     </a>
-                                    <a id="newWorkunit" href="<?php echo dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0', 1);?>">
+                                    <a id="newWorkunit" href="<?php echo dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0', 1);?>">
                                         <div class="wpeo-button button-square-40 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>"><strong><?php echo $modWorkUnit->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
                                     </a>
                                 </div>
@@ -221,10 +221,10 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 							</div>
 						<?php else : ?>
 							<div class="society-header">
-								<a id="newGroupment" href="<?php echo dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0', 1);?>">
+								<a id="newGroupment" href="<?php echo dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0', 1);?>">
 									<div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>"><strong><?php echo $modGroupment->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
 								</a>
-								<a id="newWorkunit" href="<?php echo dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0', 1);?>">
+								<a id="newWorkunit" href="<?php echo dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=workunit&fk_parent=0', 1);?>">
 									<div class="wpeo-button button-square-40 wpeo-tooltip-event" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>"><strong><?php echo $modWorkUnit->prefix; ?></strong><span class="button-add animated fas fa-plus-circle"></span></div>
 								</a>
 							</div>
@@ -458,8 +458,8 @@ function display_recurse_tree($digiriskElementTree, $i = 1)
         $isTrashed   = ((int) $obj->status === DigiriskElement::STATUS_TRASHED);
 
         $navLink = $user->rights->digiriskdolibarr->risk->read
-            ? dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php?id=' . $obj->id . '&risk_type=' . $riskType, 1)
-            : dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?id=' . $obj->id, 1);
+            ? dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php?id=' . $obj->id . '&risk_type=' . $riskType, 1)
+            : dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?id=' . $obj->id, 1);
         ?>
         <?php if ($isTrash) : ?>
         <hr>
@@ -835,9 +835,9 @@ function show_category_image($object, $upload_dir, $noprint = 0)
 			$imgHeight = ($object->imgHeight < $maxHeight) ? $object->imgHeight : $maxHeight;
 
 			if ($noprint) {
-				$out = '<img border="0" width="' . $imgWidth . '" height="' . $imgHeight . '" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=category&entity=' . $object->entity . '&file=' . urlencode($pdir . $filename) . '">';
+				$out = '<img border="0" width="' . $imgWidth . '" height="' . $imgHeight . '" src="' . dol_buildpath('/digiriskdolibarr/documents/viewimage.php', 1) . '?modulepart=category&entity=' . $object->entity . '&file=' . urlencode($pdir . $filename) . '">';
 			} else {
-				print '<img border="0" width="' . $imgWidth . '" height="' . $imgHeight . '" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=category&entity=' . $object->entity . '&file=' . urlencode($pdir . $filename) . '">';
+				print '<img border="0" width="' . $imgWidth . '" height="' . $imgHeight . '" src="' . dol_buildpath('/digiriskdolibarr/documents/viewimage.php', 1) . '?modulepart=category&entity=' . $object->entity . '&file=' . urlencode($pdir . $filename) . '">';
 			}
 
 			//          if ($nbbyrow) print '</td>';

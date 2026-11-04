@@ -181,7 +181,7 @@ $successExtraInfoHtml = digiriskMobileRenderWorkflow($steps, $object->getNomUrl(
 // Public spread page, shareable straight away with the people who have to join and sign this permit.
 // Only relevant when DoliLetter (which serves the spread public page) is enabled.
 $successShareUrl = isModEnabled('doliletter')
-    ? dol_buildpath('/custom/doliletter/public/spread/add_spread.php', 3) . '?id=' . $object->id . '&object_type=digiriskdolibarr_firepermit'
+    ? dol_buildpath('/doliletter/public/spread/add_spread.php', 3) . '?id=' . $object->id . '&object_type=digiriskdolibarr_firepermit'
     : '';
 
 $successShareEnabled      = $fpExtSigned && ($object->status >= FirePermit::STATUS_LOCKED);
@@ -191,7 +191,7 @@ $successShareDisabledText = $langs->trans('MobileFPSpreadAvailableOnceSignedAndL
 // exterieure, puis la surveillance apres travaux, qui ne commence qu'une fois le permis verrouille
 $successExtraBlockFile = [__DIR__ . '/firepermit_mobile_success_extsign.tpl.php'];
 if ($object->status == FirePermit::STATUS_LOCKED || $fpFireWatchStarted) {
-    $fpFireWatchUrl          = ($object->status == FirePermit::STATUS_LOCKED) ? dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_firepermit_rounds.php', 1) . '?id=' . $object->id : '';
+    $fpFireWatchUrl          = ($object->status == FirePermit::STATUS_LOCKED) ? dol_buildpath('/digiriskdolibarr/view/frontend/pwa_firepermit_rounds.php', 1) . '?id=' . $object->id : '';
     $successExtraBlockFile[] = __DIR__ . '/firepermit_mobile_success_firewatch.tpl.php';
 }
 
@@ -199,7 +199,7 @@ if (!empty($fpPdfFiles)) {
     $successViewUrl   = DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('firepermitdocument/' . dol_sanitizeFileName($object->ref) . '/' . $fpPdfFiles[0]['name']);
     $successViewLabel = $langs->trans('MobileSuccessViewDocument');
 } else {
-    $successViewUrl   = dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_card.php', 1) . '?id=' . $object->id;
+    $successViewUrl   = dol_buildpath('/digiriskdolibarr/view/firepermit/firepermit_card.php', 1) . '?id=' . $object->id;
     $successViewLabel = $langs->trans('MobileFPViewPermit');
 }
 $successAgainUrl   = $_SERVER['PHP_SELF'];

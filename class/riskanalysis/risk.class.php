@@ -783,7 +783,7 @@ class Risk extends SaturneObject
      */
     public static function getDangerCategories(string $riskType = 'risk'): array
     {
-        $filePath = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/dangerCategories.json';
+        $filePath = dol_buildpath('/digiriskdolibarr/js/json/dangerCategories.json', 0);
 
         if (!file_exists($filePath)) {
             return [];
@@ -808,7 +808,7 @@ class Risk extends SaturneObject
      */
     public static function getDangerSubCategories(): array
     {
-        $filePath = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/dangerSubCategories.json';
+        $filePath = dol_buildpath('/digiriskdolibarr/js/json/dangerSubCategories.json', 0);
 
         if (!file_exists($filePath)) {
             return [];
@@ -908,7 +908,7 @@ class Risk extends SaturneObject
      */
     public static function getPsychosocialRiskGrid(): array
     {
-        $filePath = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/psychosocialRiskGrid.json';
+        $filePath = dol_buildpath('/digiriskdolibarr/js/json/psychosocialRiskGrid.json', 0);
 
         if (!file_exists($filePath)) {
             return [];
@@ -1139,7 +1139,7 @@ class Risk extends SaturneObject
 	 */
 	public function getFirePermitDangerCategories()
 	{
-		$json_categories = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/firePermitDangerCategories.json');
+		$json_categories = file_get_contents(dol_buildpath('/digiriskdolibarr/js/json/firePermitDangerCategories.json', 0));
 		return json_decode($json_categories, true);
 	}
 
@@ -1609,7 +1609,7 @@ class Risk extends SaturneObject
                 $categoryName = '';
             }
             $categoryPictoUrl = ($categoryThumb !== '-1' && $categoryThumb !== '')
-                ? DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . rawurlencode($categoryThumb) . '.png'
+                ? dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . rawurlencode($categoryThumb) . '.png', 1)
                 : DOL_URL_ROOT . '/public/theme/common/nophoto.png';
 
             // 2. Risk assessment photo (or default nophoto placeholder when the assessment has no photo)
@@ -1722,7 +1722,7 @@ class Risk extends SaturneObject
                         ? $raSubDir . '/thumbs/' . $thumbName
                         : $raSubDir . '/' . $fileName;
 
-                    return DOL_URL_ROOT . '/custom/saturne/utils/viewimage.php?modulepart=digiriskdolibarr&entity=' . ((int) $conf->entity) . '&file=' . urlencode($relFile);
+                    return dol_buildpath('/saturne/utils/viewimage.php', 1) . '?modulepart=digiriskdolibarr&entity=' . ((int) $conf->entity) . '&file=' . urlencode($relFile);
                 }
             }
         }

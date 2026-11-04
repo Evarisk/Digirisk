@@ -201,7 +201,7 @@ function digiriskGetFirePermitSignatureUrl(SaturneSignature $signatory): string
         return '';
     }
 
-    return dol_buildpath('/custom/saturne/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=digiriskdolibarr&object_type=firepermit&document_type=FirePermitDocument', 3);
+    return dol_buildpath('/saturne/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=digiriskdolibarr&object_type=firepermit&document_type=FirePermitDocument', 3);
 }
 
 /**

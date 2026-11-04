@@ -1056,7 +1056,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("GenerateQRCode") . '</td>';
 
 	$targetPath  = $qrCodePath;
-	$urlToEncode = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity;
+	$urlToEncode = dol_buildpath('/digiriskdolibarr/public/ticket/create_ticket.php', 2) . '?entity=' . $conf->entity;
 
 	print '<input hidden name="targetPath" value="'. $targetPath .'">';
 	print '<input hidden name="urlToEncode" value="'. $urlToEncode .'">';
@@ -1067,8 +1067,8 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print '<td class="center">';
 	if (array_key_exists('fullname', $QRCode)) {
 		$urladvanced = getAdvancedPreviewUrl('digiriskdolibarr', 'ticketqrcode/' . $QRCode['name']);
-		print '<a class="clicked-photo-preview" href="'. $urladvanced .'">' . '<img width="200" src="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . 'ticketqrcode/' . $QRCode['name'] .'" alt="' . $langs->transnoentities("TicketPublicInterfaceQRCode") . '"></a>';
-		print '<a id="download" href="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . 'ticketqrcode/' . $QRCode['name'] .'" download="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . 'ticketqrcode/' . $QRCode['name'] .'"><i class="fas fa-download"></i></a>';
+		print '<a class="clicked-photo-preview" href="'. $urladvanced .'">' . '<img width="200" src="'.dol_buildpath('/digiriskdolibarr/documents/viewimage.php', 1) . '?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . 'ticketqrcode/' . $QRCode['name'] .'" alt="' . $langs->transnoentities("TicketPublicInterfaceQRCode") . '"></a>';
+		print '<a id="download" href="'.dol_buildpath('/digiriskdolibarr/documents/viewimage.php', 1) . '?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . 'ticketqrcode/' . $QRCode['name'] .'" download="'.dol_buildpath('/digiriskdolibarr/documents/viewimage.php', 1) . '?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . 'ticketqrcode/' . $QRCode['name'] .'"><i class="fas fa-download"></i></a>';
 	} else {
 		print '<input type="submit" class="button reposition" value="'.$langs->transnoentities('Generate') .'">' ;
 	}
@@ -1112,7 +1112,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 		print '<tr class="oddeven"><td>' . $langs->transnoentities("GenerateQRCode") . '</td>';
 
 		$targetPath = $qrCodePath;
-		$urlToEncode = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php';
+		$urlToEncode = dol_buildpath('/digiriskdolibarr/public/ticket/create_ticket.php', 2);
 
 		print '<input hidden name="targetPath" value="'. $targetPath .'">';
 		print '<input hidden name="urlToEncode" value="'. $urlToEncode .'">';
@@ -1123,8 +1123,8 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 		print '<td class="center">';
 		if (array_key_exists('fullname', $QRCode)) {
 			$urladvanced = getAdvancedPreviewUrl('digiriskdolibarr', 'ticketqrcode/' . $QRCode['name']);
-			print '<a class="clicked-photo-preview" href="'. $urladvanced .'">' . '<img width="200" src="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=1&file=' . 'multicompany/ticketqrcode/' . $QRCode['name'] .'" alt="' . $langs->transnoentities("MultiEntityTicketPublicInterfaceQRCode") . '"></a>';
-			print '<a id="download" href="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=1&file=' . 'multicompany/ticketqrcode/' . $QRCode['name'] .'" download="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr'. '&file=' . 'multicompany/ticketqrcode/' . $QRCode['name'] .'"><i class="fas fa-download"></i></a>';
+			print '<a class="clicked-photo-preview" href="'. $urladvanced .'">' . '<img width="200" src="'.dol_buildpath('/digiriskdolibarr/documents/viewimage.php', 1) . '?modulepart=digiriskdolibarr&entity=1&file=' . 'multicompany/ticketqrcode/' . $QRCode['name'] .'" alt="' . $langs->transnoentities("MultiEntityTicketPublicInterfaceQRCode") . '"></a>';
+			print '<a id="download" href="'.dol_buildpath('/digiriskdolibarr/documents/viewimage.php', 1) . '?modulepart=digiriskdolibarr&entity=1&file=' . 'multicompany/ticketqrcode/' . $QRCode['name'] .'" download="'.dol_buildpath('/digiriskdolibarr/documents/viewimage.php', 1) . '?modulepart=digiriskdolibarr'. '&file=' . 'multicompany/ticketqrcode/' . $QRCode['name'] .'"><i class="fas fa-download"></i></a>';
 		} else {
 			print '<input type="submit" class="button reposition" value="'.$langs->transnoentities('Generate') .'">' ;
 		}

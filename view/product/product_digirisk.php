@@ -51,7 +51,7 @@ foreach ($dangerCategories as $cat) {
     $dangerCatByPos[(int) $cat['position']] = $cat;
 }
 
-$pictoBaseUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/';
+$pictoBaseUrl = dirname(dol_buildpath('/digiriskdolibarr/img/categorieDangers/index.php', 1)) . '/';
 
 // â”€â”€ Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
