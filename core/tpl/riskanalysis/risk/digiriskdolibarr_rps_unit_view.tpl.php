@@ -27,6 +27,9 @@
 
 global $db, $langs, $user;
 
+// The actions open in the Digirisk task card
+require_once __DIR__ . '/../../../../lib/digiriskdolibarr_task.lib.php';
+
 if (empty($rpsUnitLine)) {
     return;
 }
@@ -190,7 +193,7 @@ if (!empty($rpsAssessmentByElement[(int) $object->id]['id'])) {
                     <?php foreach ($rpsTaskList as $rpsTask) : ?>
                         <div class="rps-action-item<?php echo $rpsTask['done'] ? ' is-done' : ''; ?>" data-task="<?php echo (int) $rpsTask['id']; ?>">
                             <input type="checkbox" class="rps-task-done" title="<?php echo dol_escape_htmltag($langs->trans('PsychosocialMarkActionDone')); ?>" <?php echo $rpsTask['done'] ? 'checked' : ''; ?>>
-                            <a class="rps-action-ref" href="<?php echo DOL_URL_ROOT . '/projet/tasks/task.php?id=' . (int) $rpsTask['id']; ?>"
+                            <a class="rps-action-ref" href="<?php echo digiriskdolibarr_task_card_url((int) $rpsTask['id']); ?>"
                                title="<?php echo dol_escape_htmltag($langs->trans('PsychosocialOpenTask')); ?>"><?php echo dol_escape_htmltag($rpsTask['ref']); ?></a>
                             <span class="rps-action-label" title="<?php echo dol_escape_htmltag($rpsTask['label']); ?>"><?php echo dol_escape_htmltag($rpsTask['text']); ?></span>
                             <?php if ($rpsTask['factor'] !== null) : ?>

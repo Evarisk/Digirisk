@@ -199,7 +199,7 @@ foreach ($sectionConfig as $type => $cfg) {
 
         // Ref (link to task)
         print '<td class="nowraponall digirisk-actions__detail">';
-        print '<a href="' . dol_buildpath('/projet/tasks/task.php', 1) . '?id=' . ((int) $row->rowid) . '" target="_blank">';
+        print '<a href="' . digiriskdolibarr_task_card_url((int) $row->rowid) . '" target="_blank">';
         print dol_escape_htmltag($row->ref);
         print '</a></td>';
 
@@ -245,7 +245,7 @@ foreach ($sectionConfig as $type => $cfg) {
 
         // External link
         print '<td class="right">';
-        print '<a href="' . dol_buildpath('/projet/tasks/task.php', 1) . '?id=' . ((int) $row->rowid) . '" target="_blank"';
+        print '<a href="' . digiriskdolibarr_task_card_url((int) $row->rowid) . '" target="_blank"';
         print ' title="' . dol_escape_htmltag($langs->trans('OpenTask')) . ' ' . dol_escape_htmltag($row->ref) . '">';
         print '<i class="fas fa-external-link-alt"></i>';
         print '</a>';
@@ -278,7 +278,7 @@ print '<div class="opacitymedium" style="font-size:0.85em;text-align:right;margi
 print $langs->trans('ActionsAreProjectTasks');
 if ($actionsParentTaskId > 0) {
     print '&nbsp;&mdash;&nbsp;';
-    print '<a href="' . dol_buildpath('/projet/tasks/task.php', 1) . '?id=' . $actionsParentTaskId . '" target="_blank">';
+    print '<a href="' . digiriskdolibarr_task_card_url((int) $actionsParentTaskId) . '" target="_blank">';
     print $langs->trans('SeeProjectTasksView');
     print '</a>';
 }

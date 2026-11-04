@@ -44,6 +44,7 @@ require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_action.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_task.lib.php';
 
 // Load translation files required by the page
 saturne_load_langs(['ticket', 'projects']);

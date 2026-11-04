@@ -1,0 +1,42 @@
+// Digirisk task card (view/task/task_card.php) — wrapped in .digirisk-ticket-card as well, it takes the layout and
+// the on-the-spot editing of the ticket card (_page-ticket-card.scss). Only what differs from it lives here.
+
+.digirisk-task-card {
+    .fichecenter > .fichehalfleft {
+        overflow: hidden;
+    }
+
+    // Shown by js/modules/ticket.js when the responsible is clicked
+    .dtc-assignee-editor {
+        display: none;
+    }
+
+    .kanban-add-tag-btn .fa-plus {
+        font-size: 7px;
+        margin-left: 1px;
+    }
+    .kanban-tag-option .fa-check {
+        margin-left: auto;
+        font-size: 9px;
+        color: #28a745;
+    }
+
+    // ---- What the task comes from ----
+    .dtc-origin-detail {
+        margin-top: 2px;
+        font-size: 0.9em;
+        opacity: 0.7;
+    }
+    // The cotation of the risk, as a small badge next to its ref instead of the block of the risk card
+    .risk-evaluation-cotation.dtc-origin-cotation {
+        display: inline-block;
+        min-width: 0;
+        height: 20px;
+        line-height: 20px;
+        margin: 0 0 0 6px;
+        padding: 0 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        vertical-align: middle;
+    }
+}

@@ -91,6 +91,46 @@ function digiriskdolibarr_ticket_prepare_head(Ticket $object): array
 }
 
 /**
+ * Return the ticket a task belongs to: the one of the parent task "TKP-<ref>" (#4881), the task itself or one it hangs
+ * under, directly or through the container of an action (#5549)
+ *
+ * @param  DoliDB      $db   Database handler
+ * @param  Task        $task Task
+ * @return Ticket|null       Ticket, null when the task belongs to none
+ */
+function digiriskdolibarr_ticket_get_task_ticket(DoliDB $db, Task $task): ?Ticket
+{
+    require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
+
+    // The parent task is at most three levels up, above the container of an action and the action itself
+    $ref          = (string) $task->ref;
+    $parentTaskId = (int) $task->fk_task_parent;
+    for ($level = 0; $level < 4; $level++) {
+        if (strpos($ref, 'TKP-') === 0) {
+            $ticket = new Ticket($db);
+            // The parent task lives in the project of its ticket, see digiriskdolibarr_ticket_get_parent_task()
+            if ($ticket->fetch(0, substr($ref, 4)) > 0 && (int) $ticket->fk_project == (int) $task->fk_project) {
+                return $ticket;
+            }
+            return null;
+        }
+        if ($parentTaskId <= 0) {
+            return null;
+        }
+
+        $resql = $db->query('SELECT ref, fk_task_parent FROM ' . MAIN_DB_PREFIX . 'projet_task WHERE rowid = ' . $parentTaskId);
+        $obj   = $resql ? $db->fetch_object($resql) : null;
+        if (empty($obj)) {
+            return null;
+        }
+        $ref          = (string) $obj->ref;
+        $parentTaskId = (int) $obj->fk_task_parent;
+    }
+
+    return null;
+}
+
+/**
  * Flatten a field value into the one-line, tag-free text used by the traceability log.
  *
  * @param  mixed $value Raw value (may be HTML, an array, a null or a scalar)

@@ -224,13 +224,46 @@ class ActionsDigiriskdolibarr
             $this->resprints .= '<link rel="stylesheet" type="text/css" href="' . saturne_asset_full_url('/digiriskdolibarr/css/digiriskdolibarr.min.css') . '">';
         }
 
-        // The other tabs of the Digirisk ticket card are the native ticket pages (contacts, notes, files, agenda)
-        // or pages of other modules: browsed from the Digirisk menu, they keep the look of the card
-        if ($this->isDigiriskTicketTab($parameters['context'])) {
-            $this->resprints .= '<link rel="stylesheet" type="text/css" href="' . saturne_asset_full_url('/digiriskdolibarr/css/digiriskdolibarr.min.css') . '">';
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the llxHeader function : replacing the parent's function with the one below
+     *
+     * The other tabs of the Digirisk ticket and task cards are the native pages of the object (contacts, notes, files,
+     * agenda, time spent) or pages of other modules: browsed from the Digirisk menu, they keep the look of the card.
+     * Its modern theme is scoped to the saturne-theme class saturne_header() puts on the body, which llxHeader() alone
+     * does not.
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function llxHeader(array $parameters): int
+    {
+        if (!$this->isDigiriskTicketTab($parameters['context']) && !$this->isDigiriskTaskTab($parameters['context'])) {
+            return 0;
         }
 
-        return 0; // or return 1 to replace standard code
+        dol_include_once('/saturne/lib/asset.lib.php');
+
+        // The entries are references to the llxHeader() locals, so the assignments reach the body tag and top_htmlhead()
+        if (!preg_match('/(^|\s)saturne-theme(\s|$)/', (string) $parameters['morecssonbody'])) {
+            $parameters['morecssonbody'] = trim('saturne-theme ' . $parameters['morecssonbody']);
+        }
+        // The lists of the native pages, as the time spent of a task, are wider than the screen: #id-right is a
+        // table-cell, so their own overflow-x never scrolls and the whole page stretches instead.
+        // classforhorizontalscrolloftabs bounds it, digirisk-object-tab fits the height of the list that scrolls
+        // (css/scss/page/_page-object-tabs.scss). The pages of the other modules (fromtype) handle their own lists.
+        if (GETPOST('fromtype', 'alpha') === '') {
+            $parameters['morecssonbody'] .= ' digirisk-object-tab';
+            if (!preg_match('/(^|\s)classforhorizontalscrolloftabs(\s|$)/', $parameters['morecssonbody'])) {
+                $parameters['morecssonbody'] .= ' classforhorizontalscrolloftabs';
+            }
+        }
+        $themeCss                 = array_map('saturne_htmlhead_asset_url', ['/saturne/css/saturne.min.css', '/digiriskdolibarr/css/digiriskdolibarr.min.css']);
+        $parameters['arrayofcss'] = array_values(array_unique(array_merge(is_array($parameters['arrayofcss']) ? $parameters['arrayofcss'] : [], $themeCss)));
+
+        return 0;
     }
 
     /**
@@ -246,6 +279,22 @@ class ActionsDigiriskdolibarr
         }
 
         return preg_match('/\b(contactticketcard|documentticketcard|ticketnote|ticketmessaging|ticketagenda)\b/', $context) || GETPOST('fromtype', 'alpha') === 'ticket';
+    }
+
+    /**
+     * Tell whether the current page is a tab of a task browsed from the Digirisk menu, other than the Digirisk card:
+     * the native card ("Dolibarr card" button), contacts, time spent, notes and files, or a tab of another module
+     *
+     * @param  string $context Hook contexts of the page
+     * @return bool
+     */
+    private function isDigiriskTaskTab(string $context): bool
+    {
+        if (($_SESSION['mainmenu'] ?? '') !== 'digiriskdolibarr' || strpos($_SERVER['PHP_SELF'], '/digiriskdolibarr/') !== false) {
+            return false;
+        }
+
+        return preg_match('/\b(projecttaskcard|projecttaskcontact|projecttasktime|projettasknote|projecttaskdocument)\b/', $context) || GETPOST('fromtype', 'alpha') === 'project_task';
     }
 
     /**
@@ -307,6 +356,16 @@ class ActionsDigiriskdolibarr
             foreach ($parameters['head'] as $key => $tab) {
                 if (($tab[2] ?? '') === 'tabTicket') {
                     $parameters['head'][$key][0] = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $parameters['object']->id;
+                }
+            }
+        }
+
+        // Same for the tabs of a task opened from Digirisk: the "Task" tab leads back to the Digirisk task card
+        if (in_array($tabsType, ['task', 'project_task'], true) && ($parameters['mode'] ?? '') === 'remove' && ($_SESSION['mainmenu'] ?? '') === 'digiriskdolibarr' && ($parameters['object'] ?? null) instanceof Task && $parameters['object']->id > 0) {
+            require_once __DIR__ . '/../lib/digiriskdolibarr_task.lib.php';
+            foreach ($parameters['head'] as $key => $tab) {
+                if (($tab[2] ?? '') === 'task_task') {
+                    $parameters['head'][$key][0] = digiriskdolibarr_task_card_url((int) $parameters['object']->id);
                 }
             }
         }

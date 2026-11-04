@@ -24,6 +24,9 @@
 // Load Saturne libraries
 dol_include_once('/saturne/class/saturnexlsxexport.class.php');
 
+// The actions link to the Digirisk task card
+require_once __DIR__ . '/../lib/digiriskdolibarr_task.lib.php';
+
 /**
  * Class for DigiriskXlsxExport
  *
@@ -136,7 +139,7 @@ class DigiriskXlsxExport extends SaturneXlsxExport
 
             $actionsByOwner[$ownerId][] = [
                 'task'      => $task,
-                'url'       => DOL_MAIN_URL_ROOT . '/projet/tasks/task.php?id=' . $taskId,
+                'url'       => digiriskdolibarr_task_card_url((int) $taskId, 2),
                 'type'      => $langs->transnoentities(self::ACTION_TYPES[$type] ?? 'DigiriskXlsxTask'),
                 'progress'  => $progress,
                 'start'     => $this->getTimestamp($task->dateo),
