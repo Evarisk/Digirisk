@@ -87,7 +87,7 @@ foreach ($gantt['rows'] as $ganttType => $ganttRows) {
     foreach ($ganttRows as $ganttRow) {
         $ganttAction   = $ganttRow['action'];
         $ganttProgress = max(0, min(100, (int) $ganttAction->progress));
-        $ganttTaskUrl  = dol_buildpath('/projet/tasks/task.php', 1) . '?id=' . ((int) $ganttAction->rowid);
+        $ganttTaskUrl  = digiriskdolibarr_task_card_url((int) $ganttAction->rowid);
 
         $ganttDetails   = [$ganttAction->ref . ' - ' . $ganttAction->label];
         $ganttDetails[] = $langs->transnoentities(empty($ganttAction->dateo) ? 'AccidentInvestigationActionCreatedOn' : 'AccidentInvestigationActionStartsOn', dol_print_date($ganttRow['from'], 'day'));

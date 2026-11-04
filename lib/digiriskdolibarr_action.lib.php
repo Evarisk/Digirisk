@@ -278,39 +278,7 @@ function digiriskdolibarr_update_action_field(Task $task, string $field, User $u
             break;
 
         case 'assignee':
-            // The assignee shown is the first executive of the task: only that one is replaced, the others stay
-            $executives = function () use ($task): array {
-                $contacts = $task->liste_contact(-1, 'internal', 0, 'TASKEXECUTIVE');
-                return is_array($contacts) ? $contacts : [];
-            };
-            $current = null;
-            foreach ($executives() as $contact) {
-                if ($current === null || (int) $contact['rowid'] < (int) $current['rowid']) {
-                    $current = $contact;
-                }
-            }
-
-            $userId = GETPOSTINT('value');
-            $change = ['label' => $langs->transnoentities('DigiriskActionAssignedTo'), 'old' => $current !== null ? trim($current['firstname'] . ' ' . $current['lastname']) : '', 'new' => ''];
-            if ($current !== null && (int) $current['id'] === $userId) {
-                $change['new'] = $change['old'];
-                return $change;
-            }
-
-            if ($current !== null && $task->delete_contact((int) $current['rowid']) < 0) {
-                return null;
-            }
-            if ($userId > 0) {
-                if ($task->add_contact($userId, 'TASKEXECUTIVE', 'internal') < 0) {
-                    return null;
-                }
-                foreach ($executives() as $contact) {
-                    if ((int) $contact['id'] === $userId) {
-                        $change['new'] = trim($contact['firstname'] . ' ' . $contact['lastname']);
-                    }
-                }
-            }
-            return $change;
+            return digiriskdolibarr_set_action_assignee($task, GETPOSTINT('value'));
 
         case 'tags':
             $change = ['label' => $langs->transnoentities('Categories'), 'old' => $formatTags($task->id), 'new' => ''];
@@ -327,6 +295,53 @@ function digiriskdolibarr_update_action_field(Task $task, string $field, User $u
 
     if ($task->update($user) <= 0) {
         return null;
+    }
+
+    return $change;
+}
+
+/**
+ * Give an action to someone else. The assignee shown is the first executive of the task: only that one is replaced,
+ * the others stay.
+ *
+ * @param  Task $task   Action, fetched
+ * @param  int  $userId User the action is given to, none below 1
+ * @return array{label: string, old: string, new: string}|null Assignee before and after, for the logs; null if KO, with
+ *                                                              the errors in the task
+ */
+function digiriskdolibarr_set_action_assignee(Task $task, int $userId): ?array
+{
+    global $langs;
+
+    $executives = function () use ($task): array {
+        $contacts = $task->liste_contact(-1, 'internal', 0, 'TASKEXECUTIVE');
+        return is_array($contacts) ? $contacts : [];
+    };
+    $current = null;
+    foreach ($executives() as $contact) {
+        if ($current === null || (int) $contact['rowid'] < (int) $current['rowid']) {
+            $current = $contact;
+        }
+    }
+
+    $change = ['label' => $langs->transnoentities('DigiriskActionAssignedTo'), 'old' => $current !== null ? trim($current['firstname'] . ' ' . $current['lastname']) : '', 'new' => ''];
+    if ($current !== null && (int) $current['id'] === $userId) {
+        $change['new'] = $change['old'];
+        return $change;
+    }
+
+    if ($current !== null && $task->delete_contact((int) $current['rowid']) < 0) {
+        return null;
+    }
+    if ($userId > 0) {
+        if ($task->add_contact($userId, 'TASKEXECUTIVE', 'internal') < 0) {
+            return null;
+        }
+        foreach ($executives() as $contact) {
+            if ((int) $contact['id'] === $userId) {
+                $change['new'] = trim($contact['firstname'] . ' ' . $contact['lastname']);
+            }
+        }
     }
 
     return $change;

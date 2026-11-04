@@ -311,6 +311,16 @@ class ActionsDigiriskdolibarr
             }
         }
 
+        // Same for the tabs of a task opened from Digirisk: the "Task" tab leads back to the Digirisk task card
+        if (in_array($tabsType, ['task', 'project_task'], true) && ($parameters['mode'] ?? '') === 'remove' && ($_SESSION['mainmenu'] ?? '') === 'digiriskdolibarr' && ($parameters['object'] ?? null) instanceof Task && $parameters['object']->id > 0) {
+            require_once __DIR__ . '/../lib/digiriskdolibarr_task.lib.php';
+            foreach ($parameters['head'] as $key => $tab) {
+                if (($tab[2] ?? '') === 'task_task') {
+                    $parameters['head'][$key][0] = digiriskdolibarr_task_card_url((int) $parameters['object']->id);
+                }
+            }
+        }
+
         // Tab of the corrective and preventive actions of a ticket (#5549), right after its contacts. Tested on the
         // object: Dolibarr 23 does not give the type of the tabs to the hook
         $object = $parameters['object'] ?? null;

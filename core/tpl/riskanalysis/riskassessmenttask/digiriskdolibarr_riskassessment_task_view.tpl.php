@@ -1,4 +1,7 @@
 <?php
+// The tasks open in the Digirisk task card
+require_once __DIR__ . '/../../../../lib/digiriskdolibarr_task.lib.php';
+
 $related_tasks = $riskAssessmentTaskList[$risk->id] ?? [];
 if (!empty($related_tasks) && is_array($related_tasks)) {
 	foreach ($related_tasks as $related_task_id => $related_task) {
@@ -306,13 +309,13 @@ $tasksDone = count(array_filter($taskProgresses, function ($taskProgress) {
 					<div class="modal-container wpeo-modal-event">
 						<!-- Modal-Header -->
 						<div class="modal-header">
-							<h2 class="modal-title"><?php echo $langs->trans('TaskEdit') . ' ' . $related_task->getNomUrl(0) ?></h2>
+							<h2 class="modal-title"><?php echo $langs->trans('TaskEdit') . ' ' . digiriskdolibarr_task_get_nom_url($related_task) ?></h2>
 							<div class="modal-close"><i class="fas fa-times"></i></div>
 						</div>
 						<!-- Modal-Content -->
 						<div class="modal-content riskassessment-task-content">
 							<div class="riskassessment-task-data" value="<?php echo $related_task->id ?>">
-								<span class="riskassessment-task-reference" value="<?php echo $related_task->ref ?>"><?php echo $related_task->getNomUrl(0, 'withproject'); ?></span>
+								<span class="riskassessment-task-reference" value="<?php echo $related_task->ref ?>"><?php echo digiriskdolibarr_task_get_nom_url($related_task); ?></span>
 								<span class="riskassessment-task-author">
 									<?php $userAuthor = $usersList[$related_task->fk_user_creat > 0 ? $related_task->fk_user_creat : $user->id];
 									echo $userAuthor->getNomUrl(-1); ?>
@@ -551,7 +554,7 @@ $tasksDone = count(array_filter($taskProgresses, function ($taskProgress) {
 						<div class="modal-container wpeo-modal-event">
 							<!-- Modal-Header -->
 							<div class="modal-header">
-								<h2 class="modal-title"><?php echo $langs->trans('TaskTimeSpentEdit') . ' ' . $related_task->getNomUrl(0, 'withproject') ?></h2>
+								<h2 class="modal-title"><?php echo $langs->trans('TaskTimeSpentEdit') . ' ' . digiriskdolibarr_task_get_nom_url($related_task) ?></h2>
 								<div class="modal-close"><i class="fas fa-times"></i></div>
 							</div>
 							<!-- Modal EDIT RISK ASSESSMENT TASK Content-->
