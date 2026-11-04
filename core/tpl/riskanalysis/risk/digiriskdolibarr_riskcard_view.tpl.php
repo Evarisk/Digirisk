@@ -42,7 +42,7 @@ $dangerCategoryThumbnail = $object->getDangerCategory($object, $riskType);
 
 $moreHtmlRef = '<span class="risk-card-danger-category">';
 if ($dangerCategoryThumbnail != -1) {
-    $moreHtmlRef .= '<img class="risk-card-danger-category-pic" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategoryThumbnail . '.png" alt="">';
+    $moreHtmlRef .= '<img class="risk-card-danger-category-pic" src="' . dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $dangerCategoryThumbnail . '.png', 1) . '" alt="">';
 }
 $moreHtmlRef .= '<span class="risk-card-danger-category-name">' . $object->getDangerCategoryName($object, $riskType) . '</span>';
 $moreHtmlRef .= '</span>';

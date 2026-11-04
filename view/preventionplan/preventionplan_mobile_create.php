@@ -961,7 +961,7 @@ $moreCSS  = [
 
 $conf->dol_hide_topmenu         = 1;
 $conf->dol_hide_leftmenu        = 1;
-$conf->global->MAIN_FAVICON_URL = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/digiriskdolibarr_color.png';
+$conf->global->MAIN_FAVICON_URL = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
 
 llxHeader('', $title, $help_url, '', 0, 0, $moreJS, $moreCSS, '', 'template-pwa digirisk-mobile-create');
 

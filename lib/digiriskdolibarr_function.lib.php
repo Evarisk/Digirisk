@@ -835,9 +835,9 @@ function show_category_image($object, $upload_dir, $noprint = 0)
 			$imgHeight = ($object->imgHeight < $maxHeight) ? $object->imgHeight : $maxHeight;
 
 			if ($noprint) {
-				$out = '<img border="0" width="' . $imgWidth . '" height="' . $imgHeight . '" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=category&entity=' . $object->entity . '&file=' . urlencode($pdir . $filename) . '">';
+				$out = '<img border="0" width="' . $imgWidth . '" height="' . $imgHeight . '" src="' . dol_buildpath('/digiriskdolibarr/documents/viewimage.php', 1) . '?modulepart=category&entity=' . $object->entity . '&file=' . urlencode($pdir . $filename) . '">';
 			} else {
-				print '<img border="0" width="' . $imgWidth . '" height="' . $imgHeight . '" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=category&entity=' . $object->entity . '&file=' . urlencode($pdir . $filename) . '">';
+				print '<img border="0" width="' . $imgWidth . '" height="' . $imgHeight . '" src="' . dol_buildpath('/digiriskdolibarr/documents/viewimage.php', 1) . '?modulepart=category&entity=' . $object->entity . '&file=' . urlencode($pdir . $filename) . '">';
 			}
 
 			//          if ($nbbyrow) print '</td>';

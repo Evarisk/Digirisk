@@ -830,7 +830,7 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 					$logos_list = dol_dir_list($logos_path);
 					if (is_array($logos_list) && !empty($logos_list)) {
 						$logo = array_shift($logos_list);
-						$logo_src = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=mycompany&entity=' . $entityId . '&file=' . urlencode('logos/thumbs/' . $logo['name']);
+						$logo_src = dol_buildpath('/digiriskdolibarr/documents/viewimage.php', 1) . '?modulepart=mycompany&entity=' . $entityId . '&file=' . urlencode('logos/thumbs/' . $logo['name']);
 					} else {
 						$logo_src = DOL_URL_ROOT.'/public/theme/common/nophoto.png';
 					}

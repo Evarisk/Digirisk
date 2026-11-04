@@ -60,7 +60,7 @@ if (is_array($mobileProtections) && !empty($mobileProtections)) {
             continue;
         }
         $protectionCategory = $protectionMap[$mobileProtection['position']];
-        $thumb              = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $protectionCategory['name_thumbnail'];
+        $thumb              = dol_buildpath('/digiriskdolibarr/img/' . $protectionCategory['name_thumbnail'], 1);
         print '<tr class="oddeven">';
         print '<td class="nowraponall">';
         print '<img class="cell-risk-view__pic valignmiddle marginrightonly" src="' . $thumb . '" alt="" title="' . dol_escape_htmltag($protectionCategory['name']) . '">';

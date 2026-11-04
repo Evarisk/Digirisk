@@ -174,7 +174,7 @@ $emptyCellTitles = [
                                         <span class="risk-overview__head-name"><?php echo dol_escape_htmltag($column['shortName']); ?></span>
                                     <?php else : ?>
                                         <span class="risk-overview__head-name"><?php echo dol_escape_htmltag($column['shortName']); ?></span>
-                                        <img class="risk-overview__picto" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . dol_escape_htmltag($column['picto']); ?>" alt="">
+                                        <img class="risk-overview__picto" src="<?php echo dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . dol_escape_htmltag($column['picto']), 1); ?>" alt="">
                                     <?php endif; ?>
                                 </th>
                             <?php endforeach; ?>

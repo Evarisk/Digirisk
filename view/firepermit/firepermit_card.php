@@ -763,7 +763,7 @@ if ($action == 'create') {
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labour_inspector_contact', 'params' => array('add-customer-contact' => 'disabled'));
 	print $form->select_company((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: 0)), 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
-	print '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/admin/securityconf.php' . '" target="_blank">' . $langs->trans("ConfigureLabourInspector") . '</a>';
+	print '<a href="' . dol_buildpath('/digiriskdolibarr/admin/securityconf.php', 1) . '" target="_blank">' . $langs->trans("ConfigureLabourInspector") . '</a>';
 	print '</td></tr>';
 	$labourInspectorContactId = (GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : ($allLinks['LabourInspectorContact']->id[0] ?: -1));
 
@@ -782,7 +782,7 @@ if ($action == 'create') {
 	//FK PREVENTION PLAN
 	print '<tr class="fieldrequired oddeven"><td>' . $langs->trans("PreventionPlanLinked") . '</td><td>';
 	print $preventionplan->select_preventionplan_list(GETPOST('fk_preventionplan'), 'fk_preventionplan', [], '1', 0, [], 0, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
-	print '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("NewPreventionplan") . '"></span></a>';
+	print '<a href="' . dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_card.php', 1) . '?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("NewPreventionplan") . '"></span></a>';
 	print '</td></tr>';
 
     // Categories
@@ -926,7 +926,7 @@ if (($id || $ref) && $action == 'edit') {
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labour_inspector_contact', 'params' => array('add-customer-contact' => 'disabled'));
 	print $form->select_company($labourInspectorSociety !== null ? $labourInspectorSociety->id : '', 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
-	print '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/admin/securityconf.php' . '" target="_blank">' . $langs->trans("ConfigureLabourInspector") . '</a>';
+	print '<a href="' . dol_buildpath('/digiriskdolibarr/admin/securityconf.php', 1) . '" target="_blank">' . $langs->trans("ConfigureLabourInspector") . '</a>';
 	print '</td></tr>';
 
 	// A defaut de ressource enregistree, le contact vient du formulaire : c'est un identifiant,
@@ -1274,7 +1274,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
 							 aria-label="<?php echo $risk->getDangerCategoryTooltip($item) ?>">
 							<img class="danger-category-pic hover"
-								 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($item) . '.png'; ?>"
+								 src="<?php echo dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($item) . '.png', 1); ?>"
 								 alt=""/>
 						</div>
 					</div>
@@ -1378,7 +1378,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 							<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
 								 aria-label="<?php echo $risk->getFirePermitDangerCategoryName($item) ?>">
 								<img class="danger-category-pic hover"
-									 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->getFirePermitDangerCategory($item) . '.png'; ?>"/>
+									 src="<?php echo dol_buildpath('/digiriskdolibarr/img/typeDeTravaux/' . $risk->getFirePermitDangerCategory($item) . '.png', 1); ?>"/>
 							</div>
 						</div>
 
@@ -1392,7 +1392,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 										data-id="<?php echo $dangerCategory['position'] ?>"
 										aria-label="<?php echo $dangerCategory['name'] ?>">
 										<img
-											src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $dangerCategory['thumbnail_name'] . '.png' ?>"
+											src="<?php echo dol_buildpath('/digiriskdolibarr/img/typeDeTravaux/' . $dangerCategory['thumbnail_name'] . '.png', 1) ?>"
 											class="attachment-thumbail size-thumbnail photo photowithmargin" alt="">
 									</li>
 								<?php endforeach;
@@ -1435,7 +1435,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
 							 aria-label="<?php echo $risk->getFirePermitDangerCategoryName($item) ?>">
 							<img class="danger-category-pic hover"
-								 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->getFirePermitDangerCategory($item) . '.png'; ?>"
+								 src="<?php echo dol_buildpath('/digiriskdolibarr/img/typeDeTravaux/' . $risk->getFirePermitDangerCategory($item) . '.png', 1); ?>"
 								 alt=""/>
 						</div>
 					</div>
@@ -1506,7 +1506,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 								data-id="<?php echo $dangerCategory['position'] ?>"
 								aria-label="<?php echo $dangerCategory['name'] ?>">
 								<img
-									src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $dangerCategory['thumbnail_name'] . '.png' ?>"
+									src="<?php echo dol_buildpath('/digiriskdolibarr/img/typeDeTravaux/' . $dangerCategory['thumbnail_name'] . '.png', 1) ?>"
 									class="attachment-thumbail size-thumbnail photo photowithmargin" alt="">
 							</li>
 						<?php endforeach;

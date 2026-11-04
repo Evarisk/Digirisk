@@ -448,7 +448,7 @@ foreach ($signalisationCategories as $signalisationItem) {
                     $blockIndex       = (int) $prefillRiskIndex;
                     $blockPosition    = $prefillRisk['category'];
                     $blockName        = $prefillRiskCat['name'];
-                    $blockThumbnail   = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $prefillRiskCat['thumbnail_name'] . '.png';
+                    $blockThumbnail   = dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $prefillRiskCat['thumbnail_name'] . '.png', 1);
                     $blockDescription = $prefillRisk['description'];
                     $blockCompanyEu   = $prefillRisk['company_eu'];
                     $blockCompanyEe   = $prefillRisk['company_ee'];
@@ -468,7 +468,7 @@ foreach ($signalisationCategories as $signalisationItem) {
                         }
                         $blockProtections[] = [
                             'position'  => $prefillProtection['position'],
-                            'thumbnail' => DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $protectionMap[$prefillProtection['position']]['name_thumbnail'],
+                            'thumbnail' => dol_buildpath('/digiriskdolibarr/img/' . $protectionMap[$prefillProtection['position']]['name_thumbnail'], 1),
                             'name'      => $protectionMap[$prefillProtection['position']]['name'],
                             'comment'   => $prefillProtection['comment'],
                         ];
@@ -536,7 +536,7 @@ foreach ($signalisationCategories as $signalisationItem) {
                     <?php
                     if (!empty($dangerCategories)) {
                         foreach ($dangerCategories as $dangerCategory) {
-                            $thumb = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png';
+                            $thumb = dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png', 1);
                             ?>
                             <div class="digirisk-mobile-risk-option" data-position="<?php print dol_escape_htmltag($dangerCategory['position']); ?>" data-name="<?php print dol_escape_htmltag($dangerCategory['name']); ?>" data-thumbnail="<?php print dol_escape_htmltag($thumb); ?>">
                                 <img src="<?php print $thumb; ?>" alt="">
@@ -564,7 +564,7 @@ foreach ($signalisationCategories as $signalisationItem) {
                         if (strpos($signalisationCategory['name_thumbnail'], 'OBLIGATION/') !== 0) {
                             continue; // keep only the protection (mandatory EPI) pictos
                         }
-                        $thumb = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $signalisationCategory['name_thumbnail'];
+                        $thumb = dol_buildpath('/digiriskdolibarr/img/' . $signalisationCategory['name_thumbnail'], 1);
                         ?>
                         <div class="digirisk-mobile-protection-option" data-position="<?php print dol_escape_htmltag($signalisationCategory['position']); ?>" data-name="<?php print dol_escape_htmltag($signalisationCategory['name']); ?>" data-thumbnail="<?php print dol_escape_htmltag($thumb); ?>">
                             <img src="<?php print $thumb; ?>" alt="">

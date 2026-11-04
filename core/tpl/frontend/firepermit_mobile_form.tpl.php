@@ -397,7 +397,7 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
                     $blockIndex       = (int) $prefillRiskIndex;
                     $blockPosition    = $prefillRisk['category'];
                     $blockName        = $prefillWorkType['name'];
-                    $blockThumbnail   = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $prefillWorkType['thumbnail_name'] . '.png';
+                    $blockThumbnail   = dol_buildpath('/digiriskdolibarr/img/typeDeTravaux/' . $prefillWorkType['thumbnail_name'] . '.png', 1);
                     $blockDescription = $prefillRisk['description'];
                     $blockEquipment   = $prefillRisk['used_equipment'];
 
@@ -413,7 +413,7 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
                         }
                         $blockProtections[] = [
                             'position'  => $prefillProtection['position'],
-                            'thumbnail' => DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $protectionMap[$prefillProtection['position']]['name_thumbnail'],
+                            'thumbnail' => dol_buildpath('/digiriskdolibarr/img/' . $protectionMap[$prefillProtection['position']]['name_thumbnail'], 1),
                             'name'      => $protectionMap[$prefillProtection['position']]['name'],
                             'comment'   => $prefillProtection['comment'],
                         ];
@@ -480,7 +480,7 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
                 <div class="digirisk-mobile-risk-modal__grid">
                     <?php
                     foreach ($workTypes as $workType) {
-                        $thumb = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $workType['thumbnail_name'] . '.png';
+                        $thumb = dol_buildpath('/digiriskdolibarr/img/typeDeTravaux/' . $workType['thumbnail_name'] . '.png', 1);
                         ?>
                         <div class="digirisk-mobile-risk-option" data-position="<?php print dol_escape_htmltag($workType['position']); ?>" data-name="<?php print dol_escape_htmltag($workType['name']); ?>" data-thumbnail="<?php print dol_escape_htmltag($thumb); ?>">
                             <img src="<?php print $thumb; ?>" alt="">
@@ -507,7 +507,7 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
                         if (strpos($signalisationCategory['name_thumbnail'], 'OBLIGATION/') !== 0) {
                             continue; // keep only the protection (mandatory EPI) pictos
                         }
-                        $thumb = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $signalisationCategory['name_thumbnail'];
+                        $thumb = dol_buildpath('/digiriskdolibarr/img/' . $signalisationCategory['name_thumbnail'], 1);
                         ?>
                         <div class="digirisk-mobile-protection-option" data-position="<?php print dol_escape_htmltag($signalisationCategory['position']); ?>" data-name="<?php print dol_escape_htmltag($signalisationCategory['name']); ?>" data-thumbnail="<?php print dol_escape_htmltag($thumb); ?>">
                             <img src="<?php print $thumb; ?>" alt="">

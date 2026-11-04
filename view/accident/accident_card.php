@@ -1097,7 +1097,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $langs->transnoentities("Victim");
 	print '</td>';
 	print '<td>';
-	print '<a href="' . DOL_URL_ROOT . '/custom/saturne/view/saturne_attendants.php?' . http_build_query([
+	print '<a href="' . dol_buildpath('/saturne/view/saturne_attendants.php', 1) . '?' . http_build_query([
 		'id' => $object->id,
 		'module_name' => $object->module,
 		'object_type' => $object->element,

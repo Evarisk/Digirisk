@@ -49,7 +49,7 @@ $dangerCatByPos   = [];
 foreach ($dangerCategories as $cat) {
     $dangerCatByPos[(int) $cat['position']] = $cat;
 }
-$pictoBaseUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/';
+$pictoBaseUrl = dirname(dol_buildpath('/digiriskdolibarr/img/categorieDangers/index.php', 1)) . '/';
 
 // â”€â”€ Signalisation categories (EPI protections â€” OBLIGATION/* only) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $signalisationFile    = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json';
@@ -394,7 +394,7 @@ foreach ($existingRisks as $risk) {
     // Add Protection button (right aligned, matching Saturne media block style)
     if ($permissiontoadd) {
         print '<div style="display: inline-flex; align-items: center; justify-content: center; width: 50px; min-width: 50px; height: 50px; min-height: 50px; cursor: pointer; flex-shrink: 0; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,.05);" onclick="drAddProtection(' . $risk->id . ')" title="' . dol_escape_htmltag($langs->trans('AddProtection')) . '">';
-        print '<img src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/OBLIGATION/OBLIGATION-general.jpg" style="width:100%; height:100%; object-fit:contain; border-radius:12px;" alt="">';
+        print '<img src="' . dol_buildpath('/digiriskdolibarr/img/OBLIGATION/OBLIGATION-general.jpg', 1) . '" style="width:100%; height:100%; object-fit:contain; border-radius:12px;" alt="">';
         print '</div>';
     }
 
@@ -429,7 +429,7 @@ foreach ($existingRisks as $risk) {
         print '<div class="dr-prot-inline" id="dr-prot-container-' . $risk->id . '" data-risk-id="' . $risk->id . '" data-ajax-url="' . $ajaxBaseUrl . '">';
         foreach ($prots as $ki => $prot) {
             $pCat  = $protectionCatByPos[$prot['position']] ?? null;
-            $pThumb = $pCat ? (DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $pCat['name_thumbnail']) : '';
+            $pThumb = $pCat ? (dol_buildpath('/digiriskdolibarr/img/' . $pCat['name_thumbnail'], 1)) : '';
             print '<div class="dr-protection-row" data-prot-index="' . $ki . '">';
             if ($pThumb) {
                 print '<img src="' . dol_escape_htmltag($pThumb) . '" style="width:48px;height:48px;object-fit:contain;flex-shrink:0;" alt="">';
@@ -504,10 +504,10 @@ print '<div class="dr-cat-modal__dialog">';
 print '<div class="dr-cat-modal__header"><span>' . $langs->trans('SelectDangerCategory') . '</span><button type="button" onclick="drCloseCatModal()">&times;</button></div>';
 print '<div class="dr-cat-modal__grid">';
 foreach ($dangerCategories as $cat) {
-    $thumb = dol_escape_htmltag(DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $cat['thumbnail_name'] . '.png');
+    $thumb = dol_escape_htmltag(dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $cat['thumbnail_name'] . '.png', 1));
     $pos   = (int) $cat['position'];
     $name  = dol_escape_htmltag($cat['name']);
-    print '<div class="dr-cat-option" onclick="drSelectCategory(' . $pos . ', \'' . addslashes($cat['name']) . '\', \'' . addslashes(DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $cat['thumbnail_name'] . '.png') . '\')">'
+    print '<div class="dr-cat-option" onclick="drSelectCategory(' . $pos . ', \'' . addslashes($cat['name']) . '\', \'' . addslashes(dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $cat['thumbnail_name'] . '.png', 1)) . '\')">'
         . '<img src="' . $thumb . '" alt="">'
         . '<span>' . $name . '</span>'
         . '</div>';
@@ -521,10 +521,10 @@ print '<div class="dr-cat-modal__dialog">';
 print '<div class="dr-cat-modal__header"><span>' . $langs->trans('SelectProtection') . '</span><button type="button" onclick="drCloseProtModal()">&times;</button></div>';
 print '<div class="dr-cat-modal__grid">';
 foreach ($protectionCategories as $prot) {
-    $thumb = dol_escape_htmltag(DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $prot['name_thumbnail']);
+    $thumb = dol_escape_htmltag(dol_buildpath('/digiriskdolibarr/img/' . $prot['name_thumbnail'], 1));
     $pos   = (int) $prot['position'];
     $name  = dol_escape_htmltag($prot['name']);
-    print '<div class="dr-cat-option" onclick="drSelectProtection(' . $pos . ', \'' . addslashes($prot['name']) . '\', \'' . addslashes(DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $prot['name_thumbnail']) . '\')">'
+    print '<div class="dr-cat-option" onclick="drSelectProtection(' . $pos . ', \'' . addslashes($prot['name']) . '\', \'' . addslashes(dol_buildpath('/digiriskdolibarr/img/' . $prot['name_thumbnail'], 1)) . '\')">'
         . '<img src="' . $thumb . '" alt="">'
         . '<span>' . $name . '</span>'
         . '</div>';
@@ -775,7 +775,7 @@ llxFooter();
 function _dr_print_protection_row(int $idx, $pos, string $comment, array $protCatByPos, Translate $langs): void
 {
     $pCat  = $protCatByPos[$pos] ?? null;
-    $thumb = $pCat ? (DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $pCat['name_thumbnail']) : '';
+    $thumb = $pCat ? (dol_buildpath('/digiriskdolibarr/img/' . $pCat['name_thumbnail'], 1)) : '';
     $name  = $pCat ? $pCat['name'] : '';
     print '<div class="dr-protection-row">';
     print '<input type="hidden" name="protection_position[]" value="' . (int) $pos . '">';

@@ -1214,7 +1214,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
         $substitutions['__TICKET_DECLARATION_DATE__'] = !empty($date) ? dol_print_date($date, $this->ticketDeclarationDateFormat($date), 'tzuser', $langs) : '';
         $substitutions['__TICKET_LOCATION__']         = (string) ($object->array_options['options_digiriskdolibarr_ticket_location'] ?? '');
         $substitutions['__TICKET_TAGS__']             = $this->ticketTags($object);
-        $substitutions['__TICKET_MANAGEMENT_URL__']   = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/view/ticket/ticket_card.php?id=' . $object->id;
+        $substitutions['__TICKET_MANAGEMENT_URL__']   = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 2) . '?id=' . $object->id;
 
         return $substitutions;
     }

@@ -785,7 +785,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                             // The name is written on the tile: only the hardship categories have more to tell in a tooltip
                             $hasDangerTooltip = !empty($dangerCategory['reference']); ?>
                             <button type="button" class="risk-add-danger-option<?php echo $hasDangerTooltip ? ' wpeo-tooltip-event' : ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" data-name="<?php echo dol_escape_htmltag($dangerCategory['name']) ?>"<?php echo $hasDangerTooltip ? ' aria-label="' . $risk->formatDangerCategoryTooltip($dangerCategory) . '"' : ''; ?>>
-                                <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" alt="" loading="lazy" width="48" height="48">
+                                <img src="<?php echo dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png', 1)?>" alt="" loading="lazy" width="48" height="48">
                                 <span><?php echo dol_escape_htmltag($dangerCategory['name']) ?></span>
                             </button>
                         <?php endforeach; ?>
@@ -899,7 +899,7 @@ foreach ($risk->fields as $key => $val) {
                     </div>
                 <?php else : ?>
                     <div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risk->getDangerCategoryTooltip($risk, $riskType) : $risk->getDangerCategoryTooltipByPosition($search[$key], $riskType); ?>">
-                        <img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risk->getDangerCategory($risk, $riskType) : $risk->getDangerCategoryByPosition($search[$key], $riskType)) . '.png'?>" />
+                        <img class="danger-category-pic tooltip hover" src="<?php echo dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risk->getDangerCategory($risk, $riskType) : $risk->getDangerCategoryByPosition($search[$key], $riskType)) . '.png', 1)?>" />
                     </div>
                 <?php endif; ?>
                 <ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
@@ -907,7 +907,7 @@ foreach ($risk->fields as $key => $val) {
                     if ( ! empty($dangerCategories) ) :
                         foreach ($dangerCategories as $dangerCategory) : ?>
                             <li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" data-name="<?php echo dol_escape_htmltag($dangerCategory['name']) ?>" aria-label="<?php echo $risk->formatDangerCategoryTooltip($dangerCategory) ?>">
-                                <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+                                <img src="<?php echo dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png', 1)?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
                             </li>
                         <?php endforeach;
                     endif; ?>
@@ -1063,7 +1063,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
             } elseif ($key == 'category') { ?>
                 <div class="table-cell table-50 cell-risk" data-title="Risque">
                     <div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risk->getDangerCategoryTooltip($risk, $riskType) ?>">
-                        <img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($risk, $riskType) . '.png' ; ?>"/>
+                        <img class="danger-category-pic hover" src="<?php echo dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($risk, $riskType) . '.png', 1) ; ?>"/>
                     </div>
                 </div>
                 <?php
@@ -1110,7 +1110,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 
                                             <input class="input-hidden-danger" type="hidden" name="risk_category_id" value=<?php echo $risk->category ?> />
                                             <div class="dropdown-toggle dropdown-add-button button-cotation">
-                                                <img class="danger-category-pic tooltip wpeo-tooltip-event hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($risk, $riskType) . '.png'?>" aria-label="<?php echo $risk->getDangerCategoryTooltip($risk, $riskType) ?>">
+                                                <img class="danger-category-pic tooltip wpeo-tooltip-event hover" src="<?php echo dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($risk, $riskType) . '.png', 1)?>" aria-label="<?php echo $risk->getDangerCategoryTooltip($risk, $riskType) ?>">
                                             </div>
 
                                             <?php if ($conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT) : ?>
@@ -1119,7 +1119,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
                                                     if ( ! empty($dangerCategories) ) :
                                                         foreach ($dangerCategories as $dangerCategory) : ?>
                                                             <li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" data-name="<?php echo dol_escape_htmltag($dangerCategory['name']) ?>" aria-label="<?php echo $risk->formatDangerCategoryTooltip($dangerCategory) ?>">
-                                                                <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+                                                                <img src="<?php echo dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png', 1)?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
                                                             </li>
                                                         <?php endforeach;
                                                     endif; ?>
@@ -1171,7 +1171,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
                                             <input type="hidden" class="current-element-ref" value="<?php echo $activeDigiriskElementList[$risk->fk_element]->ref; ?>">
                                             <?php print $activeDigiriskElementList[$risk->fk_element]->selectDigiriskElementList($activeDigiriskElementList[$risk->fk_element]->id, 'socid', [], 0, 0, array(), 0, 0, 'disabled maxwidth300', 0, false, 1); ?>
                                         <?php else : ?>
-                                            <?php print '<span class="opacitymedium">' . '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/admin/config/riskassessmentdocument.php" target="_blank">' . $langs->trans('SetConfToMoveRisk') . '</a>' . "</span><br>\n"; ?>
+                                            <?php print '<span class="opacitymedium">' . '<a href="' . dol_buildpath('/digiriskdolibarr/admin/config/riskassessmentdocument.php', 1) . '" target="_blank">' . $langs->trans('SetConfToMoveRisk') . '</a>' . "</span><br>\n"; ?>
                                         <?php endif; ?>
                                     <?php } ?>
 

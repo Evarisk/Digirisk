@@ -19,7 +19,7 @@ foreach ($protectionDescriptions as $protectionCategoryPosition => $protectionCa
     // The name of the sign, then what its risk signs say about it, on one line
     $protectionLabel    = implode(' / ', array_unique(array_filter($protectionCategoryDescriptions, 'strlen')));
     $protectionLabel    = $protectionCategory['name'] . ($protectionLabel !== '' ? ' : ' . $protectionLabel : '');
-    print '<img class="risk-protection-picto" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $protectionCategory['name_thumbnail'] . '" alt="' . dol_escape_htmltag($protectionCategory['name']) . '" title="' . dol_escape_htmltag($protectionLabel) . '" loading="lazy">';
+    print '<img class="risk-protection-picto" src="' . dol_buildpath('/digiriskdolibarr/img/' . $protectionCategory['name_thumbnail'], 1) . '" alt="' . dol_escape_htmltag($protectionCategory['name']) . '" title="' . dol_escape_htmltag($protectionLabel) . '" loading="lazy">';
 }
 print '</td>';
 if ( ! $i) $totalarray['nbfield']++;
