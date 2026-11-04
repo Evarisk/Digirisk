@@ -1,0 +1,17 @@
+@import "../theme/tokens";
+
+// Native pages of the tabs of the Digirisk ticket and task cards (contacts, time spent, notes, files…), given the
+// modern theme by ActionsDigiriskdolibarr::llxHeader(). Their lists scroll sideways inside .div-table-responsive,
+// which Dolibarr keeps 392px high for the menu of the columns to fit in: with few lines, the scrollbar hung far below
+// the list. The list keeps its own height instead.
+#{$dr-scope}.digirisk-object-tab div.fiche > form > div.div-table-responsive,
+#{$dr-scope}.digirisk-object-tab div.fiche > div.tabBar > form > div.div-table-responsive {
+    min-height: 0;
+
+    // The menu of the columns: lib_foot.js lifts it when it would go past the bottom of the window, out of the top of
+    // the list, where it can no more be scrolled to. It opens downwards, its search field first, the list scrolls to
+    // its end.
+    .dropdown dd {
+        top: 0 !important;
+    }
+}
