@@ -877,13 +877,13 @@ if ($action == 'resend_ext_signature_email' && $permissiontoadd) {
 $title    = mb_strtoupper($langs->transnoentities('firepermit'), 'UTF-8');
 $help_url = 'FR:Module_Digirisk';
 $moreJS   = [
-    '/custom/saturne/js/saturne.min.js',
-    '/custom/digiriskdolibarr/js/signature-pad.min.js',
-    '/custom/digiriskdolibarr/js/digiriskdolibarr.min.js',
+    '/saturne/js/saturne.min.js',
+    '/digiriskdolibarr/js/signature-pad.min.js',
+    '/digiriskdolibarr/js/digiriskdolibarr.min.js',
 ];
 $moreCSS  = [
-    '/custom/saturne/css/saturne.min.css',
-    '/custom/digiriskdolibarr/css/digiriskdolibarr.min.css',
+    '/saturne/css/saturne.min.css',
+    '/digiriskdolibarr/css/digiriskdolibarr.min.css',
 ];
 
 $conf->dol_hide_topmenu         = 1;

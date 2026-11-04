@@ -130,10 +130,10 @@ class ActionsDigiriskdolibarr
             $elementType = $parameters['elementType'];
             
             $map = [
-                'digiriskaccident' => ['classfile' => 'accident', 'classname' => 'Accident', 'classpath' => 'custom/digiriskdolibarr/class'],
-                'digiriskpreventionplan' => ['classfile' => 'preventionplan', 'classname' => 'PreventionPlan', 'classpath' => 'custom/digiriskdolibarr/class'],
-                'digiriskfirepermit' => ['classfile' => 'firepermit', 'classname' => 'FirePermit', 'classpath' => 'custom/digiriskdolibarr/class'],
-                'digiriskrisk' => ['classfile' => 'risk', 'classname' => 'Risk', 'classpath' => 'custom/digiriskdolibarr/class/riskanalysis']
+                'digiriskaccident' => ['classfile' => 'accident', 'classname' => 'Accident', 'classpath' => 'digiriskdolibarr/class'],
+                'digiriskpreventionplan' => ['classfile' => 'preventionplan', 'classname' => 'PreventionPlan', 'classpath' => 'digiriskdolibarr/class'],
+                'digiriskfirepermit' => ['classfile' => 'firepermit', 'classname' => 'FirePermit', 'classpath' => 'digiriskdolibarr/class'],
+                'digiriskrisk' => ['classfile' => 'risk', 'classname' => 'Risk', 'classpath' => 'digiriskdolibarr/class/riskanalysis']
             ];
 
             if (isset($map[$elementType])) {
@@ -199,8 +199,8 @@ class ActionsDigiriskdolibarr
         // La modale du suivi de temps s'appuie sur la librairie Saturne, absente des pages natives
         if (preg_match('/ticketcard|projecttasktime/', $parameters['context'])) {
             $resourcesRequired = [
-                'css' => '/custom/saturne/css/saturne.min.css',
-                'js'  => '/custom/saturne/js/saturne.min.js'
+                'css' => '/saturne/css/saturne.min.css',
+                'js'  => '/saturne/js/saturne.min.js'
             ];
 
             $out  = '<!-- Includes CSS added by module saturne -->';

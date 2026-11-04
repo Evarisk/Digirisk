@@ -956,14 +956,14 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->tabs = [];
 		$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
 		$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
-		$this->tabs[] = ['data' => 'mycompany_admin:+security:'. $pictoDigirisk . $langs->trans('Security').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/securityconf.php'];  			// To add a new tab identified by code tabname1
-		$this->tabs[] = ['data' => 'mycompany_admin:+social:'. $pictoDigirisk .$langs->trans('Social').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/socialconf.php'];  					// To add a new tab identified by code tabname1
-		$this->tabs[] = ['data' => 'thirdparty:+schedules:'. $pictoDigirisk .$langs->trans('Schedules').':digiriskdolibarr@digiriskdolibarr:1:/custom/saturne/view/saturne_schedules.php?id=__ID__&element_type=societe&module_name=societe']; // To add a new tab identified by code tabname1
-		$this->tabs[] = ['data' => 'user:+participation:'. $pictoDigirisk .$langs->trans('GP/UTParticipation').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php?fromid=__ID__']; // To add a new tab identified by code tabname1
-        $this->tabs[] = ['data' => 'user:+accidents:'. $pictoDigirisk .$langs->trans('Accidents').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/accident/accident_list.php?fromiduser=__ID__']; // To add a new tab identified by code tabname1
-        $this->tabs[] = ['data' => 'categories_ticket:+config:' . $pictoDigirisk .$langs->trans('WHSRegister') . ':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/ticket/category_config.php?id=__ID__&type=ticket'];
-        $this->tabs[] = ['data' => 'product:+digirisk:'      . $pictoDigirisk . 'Fiche d\'Instruction:digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/product/product_digirisk.php?id=__ID__'];
-        $this->tabs[] = ['data' => 'product:+digirisk_risks:' . $pictoDigirisk . 'Risques:digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/product/product_digirisk_risks.php?id=__ID__'];
+		$this->tabs[] = ['data' => 'mycompany_admin:+security:'. $pictoDigirisk . $langs->trans('Security').':digiriskdolibarr@digiriskdolibarr:1:/digiriskdolibarr/admin/securityconf.php'];  			// To add a new tab identified by code tabname1
+		$this->tabs[] = ['data' => 'mycompany_admin:+social:'. $pictoDigirisk .$langs->trans('Social').':digiriskdolibarr@digiriskdolibarr:1:/digiriskdolibarr/admin/socialconf.php'];  					// To add a new tab identified by code tabname1
+		$this->tabs[] = ['data' => 'thirdparty:+schedules:'. $pictoDigirisk .$langs->trans('Schedules').':digiriskdolibarr@digiriskdolibarr:1:/saturne/view/saturne_schedules.php?id=__ID__&element_type=societe&module_name=societe']; // To add a new tab identified by code tabname1
+		$this->tabs[] = ['data' => 'user:+participation:'. $pictoDigirisk .$langs->trans('GP/UTParticipation').':digiriskdolibarr@digiriskdolibarr:1:/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php?fromid=__ID__']; // To add a new tab identified by code tabname1
+        $this->tabs[] = ['data' => 'user:+accidents:'. $pictoDigirisk .$langs->trans('Accidents').':digiriskdolibarr@digiriskdolibarr:1:/digiriskdolibarr/view/accident/accident_list.php?fromiduser=__ID__']; // To add a new tab identified by code tabname1
+        $this->tabs[] = ['data' => 'categories_ticket:+config:' . $pictoDigirisk .$langs->trans('WHSRegister') . ':digiriskdolibarr@digiriskdolibarr:1:/digiriskdolibarr/view/ticket/category_config.php?id=__ID__&type=ticket'];
+        $this->tabs[] = ['data' => 'product:+digirisk:'      . $pictoDigirisk . 'Fiche d\'Instruction:digiriskdolibarr@digiriskdolibarr:1:/digiriskdolibarr/view/product/product_digirisk.php?id=__ID__'];
+        $this->tabs[] = ['data' => 'product:+digirisk_risks:' . $pictoDigirisk . 'Risques:digiriskdolibarr@digiriskdolibarr:1:/digiriskdolibarr/view/product/product_digirisk_risks.php?id=__ID__'];
 
         // Dictionaries
         $this->dictionaries = [
@@ -1960,7 +1960,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'prefix'   => '<i class="fa fa-ticket-alt pictofixedwidth"></i>',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => '',
-			'url'      => '/custom/digiriskdolibarr/public/ticket/create_ticket.php' . ((!isModEnabled('multicompany')) ? '?entity=' . $conf->entity : ''),
+			'url'      => '/digiriskdolibarr/public/ticket/create_ticket.php' . ((!isModEnabled('multicompany')) ? '?entity=' . $conf->entity : ''),
 			'langs'    => '',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
 			'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && getDolGlobalString(\'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE\')',  // Define condition to show or hide menu entry. Use '!empty($conf->digiriskdolibarr->enabled)' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
