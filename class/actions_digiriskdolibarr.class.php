@@ -129,11 +129,16 @@ class ActionsDigiriskdolibarr
         if (in_array('elementproperties', explode(':', $parameters['context']))) {
             $elementType = $parameters['elementType'];
             
+            // categories/index.php includes DOL_DOCUMENT_ROOT . '/' . classpath, other readers use dol_include_once(): class directory
+            // relative to DOL_DOCUMENT_ROOT (custom/digiriskdolibarr/class on a standard install), bare module path outside the main document root
+            $classDir  = dirname(dol_buildpath('/digiriskdolibarr/class/accident.class.php', 0));
+            $classPath = strpos($classDir, DOL_DOCUMENT_ROOT . '/') === 0 ? substr($classDir, strlen(DOL_DOCUMENT_ROOT) + 1) : 'digiriskdolibarr/class';
+
             $map = [
-                'digiriskaccident' => ['classfile' => 'accident', 'classname' => 'Accident', 'classpath' => 'digiriskdolibarr/class'],
-                'digiriskpreventionplan' => ['classfile' => 'preventionplan', 'classname' => 'PreventionPlan', 'classpath' => 'digiriskdolibarr/class'],
-                'digiriskfirepermit' => ['classfile' => 'firepermit', 'classname' => 'FirePermit', 'classpath' => 'digiriskdolibarr/class'],
-                'digiriskrisk' => ['classfile' => 'risk', 'classname' => 'Risk', 'classpath' => 'digiriskdolibarr/class/riskanalysis']
+                'digiriskaccident' => ['classfile' => 'accident', 'classname' => 'Accident', 'classpath' => $classPath],
+                'digiriskpreventionplan' => ['classfile' => 'preventionplan', 'classname' => 'PreventionPlan', 'classpath' => $classPath],
+                'digiriskfirepermit' => ['classfile' => 'firepermit', 'classname' => 'FirePermit', 'classpath' => $classPath],
+                'digiriskrisk' => ['classfile' => 'risk', 'classname' => 'Risk', 'classpath' => $classPath . '/riskanalysis']
             ];
 
             if (isset($map[$elementType])) {
