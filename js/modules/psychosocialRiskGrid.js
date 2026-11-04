@@ -152,7 +152,7 @@ window.digiriskdolibarr.psychosocialRiskGrid.submitAssessedCriteria = function(e
   $('.psychosocial-grid-error').addClass('hidden');
 
   $.ajax({
-    url: ($('#dol_url_root').val() || window.location.origin) + '/custom/digiriskdolibarr/core/ajax/create_risk.php?token=' + window.saturne.toolbox.getToken(),
+    url: window.digiriskdolibarr.risk_table_common.getModuleUrlRoot() + '/core/ajax/create_risk.php?token=' + window.saturne.toolbox.getToken(),
     method: 'POST',
     data: JSON.stringify({risks: criteria}),
     contentType: 'application/json',

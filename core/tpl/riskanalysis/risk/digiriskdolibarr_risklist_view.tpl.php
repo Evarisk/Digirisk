@@ -808,6 +808,8 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
     </div>
 <?php endif; ?>
     <input type="hidden" id="dol_url_root" value="<?php echo DOL_URL_ROOT; ?>">
+    <?php // Module URL for the JS of the risk modals: the module may live in another root than htdocs/custom ?>
+    <input type="hidden" id="digiriskdolibarr_url_root" value="<?php echo dol_escape_htmltag(dirname(dol_buildpath('/digiriskdolibarr/digiriskdolibarrindex.php', 1))); ?>">
 <?php $title = $archivedRiskList ? $langs->trans('ArchivedRisks') : digirisk_trans_risk_type('DigiriskElement', $riskType, 'sList');
 print '<div class="div-title-and-table-responsive">';
 print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, $risk->picto, 0, $newcardbutton ?? '', '', $limit, 0, 0, 1);
