@@ -514,6 +514,8 @@ class modDigiriskdolibarr extends DolibarrModules
 		//$this->always_enabled = true;								// If true, can't be disabled
 
 		// Constants
+		$docTemplatesDir = $this->getDocTemplatesDir();
+
 		$i = 0;
 		$this->const = [
 			// CONST CONFIGURATION
@@ -537,7 +539,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENTDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON','chaine', 'mod_riskassessmentdocument_standard', '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/riskassessmentdocument/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'riskassessmentdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/riskassessmentdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_DEFAULT_MODEL', 'chaine', 'riskassessmentdocument_odt', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SHOW_TASK_DONE', 'integer', 1, '', 0, 'current'],
@@ -546,7 +548,7 @@ class modDigiriskdolibarr extends DolibarrModules
             // CONST AUDIT REPORT DOCUMENT
             $i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_AUDITREPORTDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_ADDON', 'chaine', 'mod_auditreportdocument_standard', '', 0, 'current'],
-            $i++ => ['DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/auditreportdocument/', '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'auditreportdocument/', '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/auditreportdocument/', '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_DEFAULT_MODEL', 'chaine', 'auditreportdocument_odt', '', 0, 'current'],
 
@@ -563,35 +565,35 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_LEGALDISPLAY_GENERATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON', 'chaine', 'mod_legaldisplay_standard', '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/legaldisplay/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'legaldisplay/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_LEGALDISPLAY_CUSTOM_ADDON_ODT_PATH','chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/legaldisplay/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL', 'chaine', 'legaldisplay_odt', '', 0, 'current'],
 
 			// CONST INFORMATIONS SHARING
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_INFORMATIONSSHARING_GENERATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON', 'chaine', 'mod_informationssharing_standard', '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/informationssharing/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'informationssharing/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_INFORMATIONSSHARING_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/informationssharing/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_INFORMATIONSSHARING_DEFAULT_MODEL', 'chaine', 'informationssharing_odt', '', 0, 'current'],
 
             // CONST REGISTER DOCUMENT
             $i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_REGISTERDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_REGISTERDOCUMENT_ADDON', 'chaine', 'mod_registerdocument_standard', '', 0, 'current'],
-            $i++ => ['DIGIRISKDOLIBARR_REGISTERDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/registerdocument/', '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_REGISTERDOCUMENT_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'registerdocument/', '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_REGISTERDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/registerdocument/', '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_REGISTERDOCUMENT_DEFAULT_MODEL', 'chaine', 'registerdocument_odt', '', 0, 'current'],
 
             // CONST LISTING RISKS DOCUMENT
             $i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSDOCUMENT_ADDON', 'chaine', 'mod_listingrisksdocument_standard', '', 0, 'current'],
-            $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/listingrisksdocument/listingrisksdocument', '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSDOCUMENT_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'listingrisksdocument/listingrisksdocument', '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/listingrisksdocument/', '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSDOCUMENT_DEFAULT_MODEL', 'chaine', 'listingrisksdocument_odt', '', 0, 'current'],
 
             // CONST LISTING RISKS ACTION
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSACTION_GENERATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON', 'chaine', 'mod_listingrisksaction_standard', '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/listingrisksdocument/listingrisksaction/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'listingrisksdocument/listingrisksaction/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSACTION_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/listingrisksaction/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSACTION_DEFAULT_MODEL', 'chaine', 'listingrisksaction_odt', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSACTION_SHOW_TASK_DONE', 'integer', 1, '', 0, 'current'],
@@ -599,14 +601,14 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST LISTING RISKS PHOTO
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSPHOTO_GENERATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON', 'chaine', 'mod_listingrisksphoto_standard', '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/listingrisksdocument/listingrisksphoto/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'listingrisksdocument/listingrisksphoto/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/listingrisksphoto/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_DEFAULT_MODEL', 'chaine', 'listingrisksphoto_odt', '', 0, 'current'],
 
             // CONST LISTING RISKS ENVIRONMENTAL ACTION
             $i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSENVIRONMENTALACTION_GENERATE', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSENVIRONMENTALACTION_ADDON', 'chaine', 'mod_listingrisksenvironmentalaction_standard', '', 0, 'current'],
-            $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSENVIRONMENTALACTION_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/listingrisksenvironmentaldocument/listingrisksenvironmentalaction/', '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSENVIRONMENTALACTION_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'listingrisksenvironmentaldocument/listingrisksenvironmentalaction/', '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSENVIRONMENTALACTION_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/listingrisksenvironmentalaction/', '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSENVIRONMENTALACTION_DEFAULT_MODEL', 'chaine', 'listingrisksenvironmentalaction_odt', '', 0, 'current'],
 
@@ -616,28 +618,28 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST GROUPMENT DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_GROUPMENTDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON', 'chaine', 'mod_groupmentdocument_standard', '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/groupmentdocument/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'groupmentdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/groupmentdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_DEFAULT_MODEL', 'chaine', 'groupmentdocument_odt', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_SHOW_TASK_DONE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENTINHERITED_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/groupmentdocument/groupmentdocumentinherited/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENTINHERITED_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'groupmentdocument/groupmentdocumentinherited/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENTINHERITED_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/groupmentdocumentinherited/', '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENTSHARED_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/groupmentdocument/groupmentdocumentshared/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENTSHARED_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'groupmentdocument/groupmentdocumentshared/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENTSHARED_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/groupmentdocumentshared/', '', 0, 'current'],
 
 
 			// CONST WORKUNIT DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_WORKUNITDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON', 'chaine', 'mod_workunitdocument_standard', '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/workunitdocument/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'workunitdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/workunitdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENT_DEFAULT_MODEL', 'chaine', 'workunitdocument_odt', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENTINHERITED_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/workunitdocument/workunitdocumentinherited/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENTINHERITED_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'workunitdocument/workunitdocumentinherited/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENTINHERITED_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/workunitdocumentinherited/', '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENTSHARED_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/workunitdocument/workunitdocumentshared/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENTSHARED_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'workunitdocument/workunitdocumentshared/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENTSHARED_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/workunitdocumentshared/', '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENTCOMPLETE_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/workunitdocument/workunitdocumentcomplete/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENTCOMPLETE_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'workunitdocument/workunitdocumentcomplete/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENTCOMPLETE_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/workunitdocumentcomplete/', '', 0, 'current'],
 
 			// CONST PREVENTION PLAN
@@ -659,8 +661,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST PREVENTION PLAN DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON', 'chaine', 'mod_preventionplandocument_standard', '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/', '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/specimen/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'preventionplandocument/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'preventionplandocument/specimen/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/preventionplandocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL', 'chaine', 'preventionplandocument_odt', '', 0, 'current'],
 
@@ -691,7 +693,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST FIRE PERMIT DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMITDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON', 'chaine', 'mod_firepermitdocument_standard', '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/firepermitdocument/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'firepermitdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/firepermitdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL', 'chaine', 'firepermitdocument_odt', '', 0, 'current'],
 
@@ -895,7 +897,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			// CONST TICKET DOCUMENT
             $i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TICKETDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/ticketdocument/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH', 'chaine', $docTemplatesDir . 'ticketdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON', 'chaine', 'mod_ticketdocument_standard', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKETDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/ticketdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKETDOCUMENT_DEFAULT_MODEL', 'chaine', 'ticketdocument_odt', '', 0, 'current'],
@@ -942,7 +944,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST ACCIDENT INVESTIGATION DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATIONDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON', 'chaine', 'mod_accidentinvestigationdocument_standard', '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH','chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/accidentinvestigationdocument/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH','chaine', $docTemplatesDir . 'accidentinvestigationdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/accidentinvestigationdocument/', '', 0, 'current'],
             $i   => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_DEFAULT_MODEL', 'chaine', 'template_accidentinvestigationdocument_odt', '', 0, 'current'],
 		];
@@ -3105,8 +3107,8 @@ class modDigiriskdolibarr extends DolibarrModules
 
         // BACKWARD LISTINGRISKSDOCUMENT ODT PATH
         if (getDolGlobalInt('DIGIRISKDOLIBARR_LISTINGRISKSDOCUMENT_BACKWARD_ODT_PATH_SET') == 0) {
-            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/listingrisksdocument/listingrisksaction/', 'chaine', 0, '', $conf->entity);
-            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/listingrisksdocument/listingrisksphoto/', 'chaine', 0, '', $conf->entity);
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH', $this->getDocTemplatesDir() . 'listingrisksdocument/listingrisksaction/', 'chaine', 0, '', $conf->entity);
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH', $this->getDocTemplatesDir() . 'listingrisksdocument/listingrisksphoto/', 'chaine', 0, '', $conf->entity);
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_LISTINGRISKSDOCUMENT_BACKWARD_ODT_PATH_SET', 1, 'integer', 0, '', $conf->entity);
         }
 
@@ -3215,6 +3217,19 @@ class modDigiriskdolibarr extends DolibarrModules
 	}
 
 	/**
+	 * Directory of the document templates shipped with the module, as written in the *_ADDON_ODT_PATH constants
+	 *
+	 * The module may live in htdocs/custom or in an alternative root: the directory is resolved from its real root,
+	 * with DOL_DOCUMENT_ROOT kept as a marker when the module is under it
+	 *
+	 * @return string Directory of the templates, slash ended
+	 */
+	private function getDocTemplatesDir(): string
+	{
+		return str_replace(DOL_DOCUMENT_ROOT, 'DOL_DOCUMENT_ROOT', dol_buildpath('/digiriskdolibarr/documents/doctemplates/'));
+	}
+
+	/**
 	 *  Function called when module is disabled.
 	 *  Remove from database constants, boxes and permissions from Dolibarr database.
 	 *  Data directories are not deleted
@@ -3227,7 +3242,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		global $conf;
 
 		$sql = [];
-		require_once __DIR__ . '/../../../../core/lib/admin.lib.php';
+		require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 		$options = 'noremoverights';
 
 		if (!empty($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING) && $conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING !== 0) {

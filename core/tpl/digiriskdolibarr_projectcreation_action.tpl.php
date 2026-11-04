@@ -611,6 +611,9 @@ if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED == 0) {
 }
 
 if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
+	// Templates shipped with the module, from its real root (htdocs/custom or an alternative root)
+	$docTemplatesDir = str_replace(DOL_DOCUMENT_ROOT, 'DOL_DOCUMENT_ROOT', dol_buildpath('/digiriskdolibarr/documents/doctemplates/'));
+
 	// CONST CONFIGURATION
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_GENERAL_MEANS', dolibarr_get_const($db,'DIGIRISK_GENERAL_MEANS'), 'chaine', 0, 'General means', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_GENERAL_RULES', dolibarr_get_const($db,'DIGIRISK_GENERAL_RULES'), 'chaine', 0, 'General rules', $conf->entity);
@@ -634,7 +637,7 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENTDOCUMENT_CREATE', 1, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON', 'mod_riskassessmentdocument_standard', 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/riskassessmentdocument/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH', $docTemplatesDir . 'riskassessmentdocument/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/riskassessmentdocument/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_DEFAULT_MODEL', 'riskassessmentdocument_odt', 'chaine', 0, '', $conf->entity);
 
@@ -661,42 +664,42 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_LEGALDISPLAY_CREATE', 1, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON', 'mod_legaldisplay_standard', 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/legaldisplay/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH', $docTemplatesDir . 'legaldisplay/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LEGALDISPLAY_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/legaldisplay/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL', 'legaldisplay_odt', 'chaine', 0, '', $conf->entity);
 
 	// CONST INFORMATIONS SHARING
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_INFORMATIONSSHARING_CREATE', 1, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON', 'mod_informationssharing_standard', 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/informationssharing/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH', $docTemplatesDir . 'informationssharing/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/informationssharing/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_DEFAULT_MODEL', 'informationssharing_odt', 'chaine', 0, '', $conf->entity);
 
 	// CONST LISTING RISKS ACTION
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSACTION_CREATE', 1, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON', 'mod_listingrisksenvironmentalaction_standard', 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/listingrisksaction/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH', $docTemplatesDir . 'listingrisksaction/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/listingrisksaction/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_DEFAULT_MODEL', 'listingrisksaction_odt', 'chaine', 0, '', $conf->entity);
 
 	// CONST LISTING RISKS PHOTO
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSPHOTO_CREATE', 1, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON', 'mod_listingrisksphoto_standard', 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/listingrisksphoto/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH', $docTemplatesDir . 'listingrisksphoto/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/listingrisksphoto/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_DEFAULT_MODEL', 'listingrisksphoto_odt', 'chaine', 0, '', $conf->entity);
 
 	// CONST GROUPMENT DOCUMENT
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_GROUPMENTDOCUMENT_CREATE', 1, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON', 'mod_groupmentdocument_standard', 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/groupmentdocument/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH', $docTemplatesDir . 'groupmentdocument/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/groupmentdocument/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_DEFAULT_MODEL', 'groupmentdocument_odt', 'chaine', 0, '', $conf->entity);
 
 	// CONST WORKUNIT DOCUMENT
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_WORKUNITDOCUMENT_CREATE', 1, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON', 'mod_workunitdocument_standard', 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/workunitdocument/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH', $docTemplatesDir . 'workunitdocument/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/workunitdocument/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_DEFAULT_MODEL', 'workunitdocument_odt', 'chaine', 0, '', $conf->entity);
 
@@ -710,8 +713,8 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 	// CONST PREVENTION PLAN DOCUMENT
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDOCUMENT_CREATE', 1, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON', 'mod_preventionplandocument_standard', 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/', 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/specimen/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH', $docTemplatesDir . 'preventionplandocument/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH', $docTemplatesDir . 'preventionplandocument/specimen/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/preventionplandocument/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL', 'preventionplandocument_odt', 'chaine', 0, '', $conf->entity);
 
@@ -725,7 +728,7 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 	// CONST FIRE PERMIT DOCUMENT
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_FIREPERMITDOCUMENT_CREATE', 1, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON', 'mod_firepermitdocument_standard', 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/firepermitdocument/', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH', $docTemplatesDir . 'firepermitdocument/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/firepermitdocument/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL', 'firepermitdocument_odt', 'chaine', 0, '', $conf->entity);
 
