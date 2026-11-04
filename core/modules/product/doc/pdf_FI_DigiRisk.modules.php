@@ -386,7 +386,7 @@ class pdf_FI_DigiRisk extends ModelePDFProduct
             $dangerCatByPos[(int) $cat['position']] = $cat;
         }
 
-        $signalisationFile    = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json';
+        $signalisationFile    = dol_buildpath('/digiriskdolibarr/js/json/signalisationCategories.json', 0);
         $allSignalisations    = file_exists($signalisationFile) ? (json_decode(file_get_contents($signalisationFile), true) ?: []) : [];
         $protectionCategories = array_values(array_filter($allSignalisations, static function ($s) {
             return strpos($s['name_thumbnail'] ?? '', 'OBLIGATION/') === 0;
@@ -396,7 +396,7 @@ class pdf_FI_DigiRisk extends ModelePDFProduct
             $protectionCatByPos[(int) $p['position']] = $p;
         }
 
-        $imgBaseDir = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/';
+        $imgBaseDir = dirname(dol_buildpath('/digiriskdolibarr/img/index.php', 0)) . '/';
 
         $contentSec = '';
         $object->fetch_optionals();

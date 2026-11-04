@@ -36,7 +36,7 @@ foreach ($dangerCategories as $dangerCategoryItem) {
     $dangerMap[$dangerCategoryItem['position']] = $dangerCategoryItem;
 }
 
-$signalisationFile       = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json';
+$signalisationFile       = dol_buildpath('/digiriskdolibarr/js/json/signalisationCategories.json', 0);
 $signalisationCategories = file_exists($signalisationFile) ? (json_decode(file_get_contents($signalisationFile), true) ?: []) : [];
 $protectionMap           = [];
 foreach ($signalisationCategories as $signalisationItem) {

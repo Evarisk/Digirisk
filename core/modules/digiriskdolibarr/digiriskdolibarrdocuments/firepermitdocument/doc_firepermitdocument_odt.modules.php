@@ -127,7 +127,7 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 						$tmpArray['key_unique'] = $line->ref;
 						$tmpArray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
 						$tmpArray['action'] = $line->description;
-						$tmpArray['risk_photo'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($line) . '.png';
+						$tmpArray['risk_photo'] = dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($line) . '.png', 0);
 						$tmpArray['nomPicto'] = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $risk->getDangerCategoryName($line) : ' ');
 						$tmpArray['prevention'] = $line->prevention_method;
 
@@ -156,7 +156,7 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 						$tmpArray['key_unique'] = $line->ref;
 						$tmpArray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
 						$tmpArray['action'] = $line->description;
-						$tmpArray['type_de_travaux_photo'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->getFirePermitDangerCategory($line) . '.png';
+						$tmpArray['type_de_travaux_photo'] = dol_buildpath('/digiriskdolibarr/img/typeDeTravaux/' . $risk->getFirePermitDangerCategory($line) . '.png', 0);
 						$tmpArray['nomPictoT'] = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $risk->getFirePermitDangerCategoryName($line) : ' ');
 						$tmpArray['materiel'] = $line->used_equipment;
 

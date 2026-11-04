@@ -109,7 +109,7 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                 $depthHyphens                     = str_repeat('  ', $digiriskElement['depth']);
                 $tmpArray['digiriskElementLabel'] = $depthHyphens . 'S' . $digiriskElement['object']->entity . ' - ' . $digiriskElement['object']->ref . ' - ' . $digiriskElement['object']->label;
 
-                $tmpArray['picto']                  = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($risk, $risk->type) . '.png';
+                $tmpArray['picto']                  = dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($risk, $risk->type) . '.png', 0);
                 $tmpArray['riskCategoryName']       = getDolGlobalInt('DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME') ? $risk->getDangerCategoryName($risk, $risk->type) : ' ';
                 $tmpArray['ref']                    = $risk->ref . ' - ' . $risk->riskAssessmentRef;
                 $tmpArray['riskAssessmentCotation'] = $risk->riskAssessmentCotation ?: 0;
@@ -338,7 +338,7 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             foreach ($riskSigns as $riskSign) {
                 $tmpArray = [
                     'nomElement'                => 'S' . $riskSign->digiriskElementEntity . ' - ' . $riskSign->digiriskElementRef . ' - ' . $riskSign->digiriskElementLabel,
-                    'recommandation_photo'      => DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/' . $riskSign->getRiskSignCategory($riskSign),
+                    'recommandation_photo'      => dol_buildpath('/digiriskdolibarr/img/' . $riskSign->getRiskSignCategory($riskSign), 0),
                     'identifiantRecommandation' => $riskSign->ref,
                     'recommandationName'        => getDolGlobalInt('DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME') ? $riskSign->getRiskSignCategory($riskSign, 'name') : ' ',
                     'recommandationComment'     => $riskSign->description

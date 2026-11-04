@@ -248,7 +248,7 @@ if ($object->id > 0) {
 
     print '<input hidden id="dol_url_root" value="'. DOL_URL_ROOT .'">';
     print dol_get_fiche_end();
-    $json = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/dangerCategories.json');
+    $json = file_get_contents(dol_buildpath('/digiriskdolibarr/js/json/dangerCategories.json', 0));
 
     // Inclusion de la bibliothèque de médias Saturne
     $moduleNameLowerCase = 'digiriskdolibarr';

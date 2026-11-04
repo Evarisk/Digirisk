@@ -14,7 +14,7 @@
 	//print '<input type="hidden" name="page" value="'.$page.'">';
 	print '<input type="hidden" name="contextpage" value="' . $contextpage . '">';
 	if ($object->fk_parent > 0) {
-		$advanced_method_cotation_json = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
+		$advanced_method_cotation_json = file_get_contents(dol_buildpath('/digiriskdolibarr/js/json/default.json', 0));
 		$advancedCotationMethodArray = json_decode($advanced_method_cotation_json, true);
 
 		$digiriskelement                = new DigiriskElement($db);
@@ -25,7 +25,7 @@
 		$project                        = new Project($db);
 		$DUProject                      = new Project($db);
 
-		$advanced_method_cotation_json  = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
+		$advanced_method_cotation_json  = file_get_contents(dol_buildpath('/digiriskdolibarr/js/json/default.json', 0));
 		$advancedCotationMethodArray = json_decode($advanced_method_cotation_json, true);
 
 		$alldigiriskelement = $digiriskelement->getActiveDigiriskElements();

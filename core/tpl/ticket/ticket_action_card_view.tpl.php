@@ -97,7 +97,7 @@ $assignedCategoryIds = array_map(static fn($c) => (int) $c->id, $ticketCategorie
 
 // Load linked accidents (Digirisk Accident class).
 $linkedAccidents = [];
-$accidentClassPath = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/accident.class.php';
+$accidentClassPath = dol_buildpath('/digiriskdolibarr/class/accident.class.php', 0);
 if (file_exists($accidentClassPath)) {
     require_once $accidentClassPath;
     $accident       = new Accident($db);

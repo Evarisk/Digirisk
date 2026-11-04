@@ -306,7 +306,7 @@ print '<input type="hidden" name="contextpage" value="' . $contextpage . '">';
 
 <?php
 
-$advancedCotationMethodJson  = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
+$advancedCotationMethodJson  = file_get_contents(dol_buildpath('/digiriskdolibarr/js/json/default.json', 0));
 $advancedCotationMethodArray = json_decode($advancedCotationMethodJson, true);
 $digiriskelement             = new DigiriskElement($db);
 $riskAssessment              = new RiskAssessment($db);

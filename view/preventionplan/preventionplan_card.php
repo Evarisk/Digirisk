@@ -1386,7 +1386,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsPreventionPlanRisk') . '</td>';
 		print '</tr>';
 
-		$signalisationFile       = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json';
+		$signalisationFile       = dol_buildpath('/digiriskdolibarr/js/json/signalisationCategories.json', 0);
 		$allSigs                 = file_exists($signalisationFile) ? (json_decode(file_get_contents($signalisationFile), true) ?: []) : [];
 		$protectionMap = [];
 		foreach ($allSigs as $sig) {
@@ -1705,7 +1705,7 @@ print '<input type="hidden" name="fk_element" value="0">';
 			if (is_array($preventionplandets) && !empty($preventionplandets)) {
 				$mobileRiskProtections = !empty($object->array_options['options_mobile_protections'])    ? json_decode($object->array_options['options_mobile_protections'], true)    : [];
 				$mobileRiskCompanies   = !empty($object->array_options['options_mobile_risk_companies']) ? json_decode($object->array_options['options_mobile_risk_companies'], true) : [];
-				$signalisationFile     = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json';
+				$signalisationFile     = dol_buildpath('/digiriskdolibarr/js/json/signalisationCategories.json', 0);
 				$signalisationMap      = [];
 				if (file_exists($signalisationFile)) {
 					foreach ((json_decode(file_get_contents($signalisationFile), true) ?: []) as $signalisationItem) {

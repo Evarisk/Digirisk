@@ -181,7 +181,7 @@ class pdf_firepermitdocument extends pdf_preventionplandocument
         $object->fetch_optionals();
         $protections = !empty($object->array_options['options_mobile_protections']) ? json_decode($object->array_options['options_mobile_protections'], true) : [];
 
-        $signalisationFile = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json';
+        $signalisationFile = dol_buildpath('/digiriskdolibarr/js/json/signalisationCategories.json', 0);
         $signalisationMap  = [];
         if (file_exists($signalisationFile)) {
             foreach ((json_decode(file_get_contents($signalisationFile), true) ?: []) as $signalisationItem) {
@@ -194,7 +194,7 @@ class pdf_firepermitdocument extends pdf_preventionplandocument
         foreach ($lines as $workLine) {
             $category  = (int) $workLine->category;
             $thumb     = $risk->getFirePermitDangerCategory($workLine);
-            $pictoPath = ($thumb != -1) ? DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $thumb . '.png' : '';
+            $pictoPath = ($thumb != -1) ? dol_buildpath('/digiriskdolibarr/img/typeDeTravaux/' . $thumb . '.png', 0) : '';
             $workName  = $risk->getFirePermitDangerCategoryName($workLine);
             $workName  = ($workName != -1) ? (string) $workName : '';
 
@@ -205,7 +205,7 @@ class pdf_firepermitdocument extends pdf_preventionplandocument
                         continue;
                     }
                     $workProtections[] = [
-                        'image'   => DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/' . $signalisationMap[$protection['position']]['name_thumbnail'],
+                        'image'   => dol_buildpath('/digiriskdolibarr/img/' . $signalisationMap[$protection['position']]['name_thumbnail'], 0),
                         'name'    => $signalisationMap[$protection['position']]['name'],
                         'comment' => $protection['comment'] ?? '',
                     ];

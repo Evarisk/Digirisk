@@ -783,7 +783,7 @@ class Risk extends SaturneObject
      */
     public static function getDangerCategories(string $riskType = 'risk'): array
     {
-        $filePath = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/dangerCategories.json';
+        $filePath = dol_buildpath('/digiriskdolibarr/js/json/dangerCategories.json', 0);
 
         if (!file_exists($filePath)) {
             return [];
@@ -808,7 +808,7 @@ class Risk extends SaturneObject
      */
     public static function getDangerSubCategories(): array
     {
-        $filePath = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/dangerSubCategories.json';
+        $filePath = dol_buildpath('/digiriskdolibarr/js/json/dangerSubCategories.json', 0);
 
         if (!file_exists($filePath)) {
             return [];
@@ -908,7 +908,7 @@ class Risk extends SaturneObject
      */
     public static function getPsychosocialRiskGrid(): array
     {
-        $filePath = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/psychosocialRiskGrid.json';
+        $filePath = dol_buildpath('/digiriskdolibarr/js/json/psychosocialRiskGrid.json', 0);
 
         if (!file_exists($filePath)) {
             return [];
@@ -1139,7 +1139,7 @@ class Risk extends SaturneObject
 	 */
 	public function getFirePermitDangerCategories()
 	{
-		$json_categories = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/firePermitDangerCategories.json');
+		$json_categories = file_get_contents(dol_buildpath('/digiriskdolibarr/js/json/firePermitDangerCategories.json', 0));
 		return json_decode($json_categories, true);
 	}
 
