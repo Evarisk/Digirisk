@@ -364,7 +364,7 @@ class AccidentInvestigation extends SaturneObject
 			$this->errors = $object->errors;
 		}
 
-		unset($object->context);
+		unset($object->context['createfromclone']);
 
 		// End.
 		if (!$error) {
