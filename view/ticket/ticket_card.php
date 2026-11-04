@@ -32,6 +32,7 @@ require_once DOL_DOCUMENT_ROOT . '/ticket/class/actions_ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/ticket.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_action.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_task.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
@@ -1170,7 +1171,7 @@ if ($parentTask) {
 print '<table class="border centpercent tableforfield dtc-tasks-table"><tbody>';
 print '<tr class="liste_titre trforfield"><td colspan="6"><div class="dtc-head">' . $fieldPicto('tasks') . $langs->trans('Tasks') . ' <span class="opacitymedium">(' . count($tasksarray) . ')</span>';
 if ($parentTask) {
-    print '<span class="dtc-head-sub">' . $parentTask->getNomUrl(1) . '</span>';
+    print '<span class="dtc-head-sub">' . digiriskdolibarr_task_get_nom_url($parentTask, 1) . '</span>';
 }
 if ($permissionToWrite && isModEnabled('project')) {
     print '<span class="dtc-head-edit">';
@@ -1194,8 +1195,10 @@ if (!empty($tasksarray)) {
     print '<td class="right">' . $langs->trans('Resp') . '</td>';
     print '</tr>';
     foreach ($tasksarray as $t) {
+        // The tasks open in the Digirisk task card, laid out as this one
+        $taskUrl = digiriskdolibarr_task_card_url((int) $t->id);
         print '<tr>';
-        print '<td class="nowraponall">' . $t->getNomUrl(1, 'withproject') . '</td>';
+        print '<td class="nowraponall"><a href="' . dol_escape_htmltag($taskUrl) . '">' . img_picto('', $t->picto, 'class="pictofixedwidth"') . dol_escape_htmltag($t->ref) . '</a></td>';
         print '<td>' . dol_escape_htmltag($t->label) . '</td>';
         print '<td class="center">' . dol_print_date($t->date_start, 'day') . '</td>';
         print '<td class="center">' . dol_print_date($t->date_end, 'day') . '</td>';

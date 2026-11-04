@@ -741,9 +741,10 @@ window.digiriskdolibarr.ticket.addCategoryInline = function(event) {
   var $dropdown = $opt.closest('.kanban-tag-dropdown');
   var $tagsRow  = $opt.closest('.kanban-card-tags');
   var catId     = $opt.data('value');
+  var tagUrl    = String($tagsRow.data('tag-url'));
   $dropdown.removeClass('visible');
   $.ajax({
-    url: $tagsRow.data('tag-url') + '?action=addTicketCategory&ticket_id=' + $tagsRow.data('ticket-id') + '&cat_id=' + catId + '&token=' + window.saturne.toolbox.getToken(),
+    url: tagUrl + window.saturne.toolbox.getQuerySeparator(tagUrl) + 'action=addTicketCategory&ticket_id=' + $tagsRow.data('ticket-id') + '&cat_id=' + catId + '&token=' + window.saturne.toolbox.getToken(),
     type: 'POST',
     dataType: 'json',
     success: function(response) {
@@ -774,9 +775,10 @@ window.digiriskdolibarr.ticket.removeCategoryInline = function(event) {
   var $tag     = $(this).closest('.kanban-tag');
   var $tagsRow = $tag.closest('.kanban-card-tags');
   var catId    = $tag.data('cat-id');
+  var tagUrl   = String($tagsRow.data('tag-url'));
   $tag.css('opacity', '0.4');
   $.ajax({
-    url: $tagsRow.data('tag-url') + '?action=removeTicketCategory&ticket_id=' + $tagsRow.data('ticket-id') + '&cat_id=' + catId + '&token=' + window.saturne.toolbox.getToken(),
+    url: tagUrl + window.saturne.toolbox.getQuerySeparator(tagUrl) + 'action=removeTicketCategory&ticket_id=' + $tagsRow.data('ticket-id') + '&cat_id=' + catId + '&token=' + window.saturne.toolbox.getToken(),
     type: 'POST',
     dataType: 'json',
     success: function(response) {
@@ -1213,6 +1215,10 @@ window.digiriskdolibarr.ticket.editExtrafieldInline = function(event) {
         var displayValue = newValue;
         if (type === 'select') {
           displayValue = $input.find('option[value="' + newValue + '"]').text() || newValue;
+        }
+        // The page may send back the value as it prints it, in plain text: a date, an amount (task card)
+        if (type !== 'textarea' && resp && typeof resp.display === 'string') {
+          displayValue = resp.display;
         }
 
         if (type === 'textarea') {

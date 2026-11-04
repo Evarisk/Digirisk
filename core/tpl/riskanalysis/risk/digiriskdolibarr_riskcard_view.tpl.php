@@ -246,7 +246,7 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_TASK_MANAGEMENT') && $taskView == 'gantt')
     if (!empty($relatedTasks)) {
         foreach ($relatedTasks as $relatedTask) {
             print '<tr class="oddeven">';
-            print '<td class="nowrap">' . $relatedTask->getNomUrl(1, 'withproject') . '</td>';
+            print '<td class="nowrap">' . digiriskdolibarr_task_get_nom_url($relatedTask, 1) . '</td>';
             print '<td>' . dol_escape_htmltag($relatedTask->label) . '</td>';
             print '<td class="nowrap">';
             if ($relatedTask->fk_project > 0 && $project->fetch($relatedTask->fk_project) > 0) {

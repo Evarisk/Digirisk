@@ -2280,6 +2280,7 @@ TicketActionsTabCorrective             = Corrective
 TicketActionsTabPreventive             = Preventive
 TicketActionsSummary                   = Actions summary
 TicketActionsNeedProject               = Link a project to the ticket to add corrective and preventive actions to it
+BackToTicket                           = Back to the register
 TicketPublicInterfacePin               = Declaration PIN code
 TicketPublicInterfacePinHelp           = Leave empty to let everyone declare. With a code of 4 to 12 digits, the public form asks for it before showing: give it to the people allowed to declare.
 TicketPublicInterfacePinNone           = None: open declaration
@@ -3683,3 +3684,12 @@ ActionPlanByElement                  = By GP/WU
 ActionPlanByElementMore              = And %s other GP/WU
 ActionPlanElementTrashed             = GP/WU in the trash
 ActionPlanEmpty                      = No corrective action on this PAPRIPACT
+
+# ===========================================================================
+# Digirisk task card
+# ===========================================================================
+TaskInformations                     = Task information
+TaskPlannedWorkloadHours             = In hours, e.g. 1.5
+TaskDolibarrCard                     = Dolibarr card
+BackToActionPlan                     = Back to the action plan
+BackToAccidentInvestigation          = Back to the investigation
