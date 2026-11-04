@@ -539,11 +539,15 @@ $rl-badges: (
         grid-row: 1;
       }
 
+      /* Never wider than its column: the photo and the edit button of the line used to cover the end of the longest
+         level, "Risque inacceptable (81-100)". The level is cut there, the cotation always shows in full */
       > .risk-evaluation-cotation {
         grid-column: 1;
         justify-self: start;
+        display: flex;
         width: auto;
         min-width: 0;
+        max-width: 100%;
         height: auto;
         margin-right: auto;
         padding: 4px 10px;
@@ -567,7 +571,14 @@ $rl-badges: (
         }
 
         .risk-evaluation-cotation-level {
+          min-width: 0;
           margin-right: 4px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .risk-evaluation-cotation-value {
+          flex: none;
         }
 
         .risk-evaluation-cotation-value::before {

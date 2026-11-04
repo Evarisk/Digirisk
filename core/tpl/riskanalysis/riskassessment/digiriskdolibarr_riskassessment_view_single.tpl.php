@@ -5,8 +5,9 @@
 	<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 		<div class="risk-evaluation-single risk-evaluation-single-<?php echo $risk->id ?>">
 			<div class="risk-evaluation-cotation risk-evaluation-list modal-open" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->getEvaluationScale() ?>">
-				<?php // The level of the scale spelled out before the cotation, "Risque à traiter (65)" ?>
-				<span class="risk-evaluation-cotation-level"><?php echo dol_escape_htmltag($risk->getCotations()[$lastEvaluation->getEvaluationScale()]['label'] ?? ''); ?></span>
+				<?php // The level of the scale spelled out before the cotation, "Risque à traiter (65)", in full on hover when a narrow cell cuts it
+				$cotationLevelLabel = dol_escape_htmltag($risk->getCotations()[$lastEvaluation->getEvaluationScale()]['label'] ?? ''); ?>
+				<span class="risk-evaluation-cotation-level" title="<?php echo $cotationLevelLabel; ?>"><?php echo $cotationLevelLabel; ?></span>
 				<span class="risk-evaluation-cotation-value"><?php echo ($lastEvaluation->method == 'standard' ? $defaultCotation[$lastEvaluation->cotation] ?? 0 : $lastEvaluation->cotation); ?></span>
 			</div>
 			<div class="photo riskassessment-photo-<?php echo $lastEvaluation->id; ?>" style="margin:auto">
