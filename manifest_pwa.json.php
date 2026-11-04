@@ -91,32 +91,32 @@ $manifest->name       = getDolGlobalString('MAIN_INFO_SOCIETE_NOM') . ' - Digiri
 $manifest->icons      = [];
 
 $img               = new stdClass();
-$img->src          = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr_color_192.png', 1);
+$img->src          = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color_192.png', 1);
 $img->type         = 'image/png';
 $img->sizes        = '192x192';
 $manifest->icons[] = $img;
 
 $img               = new stdClass();
-$img->src          = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr_color_512.png', 1);
+$img->src          = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color_512.png', 1);
 $img->type         = 'image/png';
 $img->sizes        = '512x512';
 $manifest->icons[] = $img;
 
 // Android crops the home screen icon to its own shape: this one keeps the logo inside the safe zone
 $img               = new stdClass();
-$img->src          = dol_buildpath('/custom/digiriskdolibarr/img/pwa/icon-maskable-512.png', 1);
+$img->src          = dol_buildpath('/digiriskdolibarr/img/pwa/icon-maskable-512.png', 1);
 $img->type         = 'image/png';
 $img->sizes        = '512x512';
 $img->purpose      = 'maskable';
 $manifest->icons[] = $img;
 
-$manifest->id              = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_home.php', 1);
-$manifest->start_url        = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_home.php', 1);
+$manifest->id              = dol_buildpath('/digiriskdolibarr/view/frontend/pwa_home.php', 1);
+$manifest->start_url        = dol_buildpath('/digiriskdolibarr/view/frontend/pwa_home.php', 1);
 $manifest->background_color = '#ffffff';
 $manifest->display          = 'standalone';
 $manifest->display_override = ['window-controls-overlay'];
 // The mobile creation screens live outside view/frontend/, so the scope covers the whole module
-$manifest->scope            = dol_buildpath('/custom/digiriskdolibarr/', 1);
+$manifest->scope            = dirname(dol_buildpath('/digiriskdolibarr/manifest_pwa.json.php', 1)) . '/';
 $manifest->theme_color      = '#2b7de9';
 $manifest->description      = 'Consultez et créez vos plans de prévention et vos permis de feu depuis votre téléphone.';
 $manifest->lang             = 'fr';
@@ -127,19 +127,19 @@ $manifest->categories       = ['business', 'productivity'];
 $shortcut              = new stdClass();
 $shortcut->name        = 'Plans de prévention';
 $shortcut->short_name  = 'Plans';
-$shortcut->url         = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_preventionplan_list.php', 1);
+$shortcut->url         = dol_buildpath('/digiriskdolibarr/view/frontend/pwa_preventionplan_list.php', 1);
 $manifest->shortcuts[] = $shortcut;
 
 $shortcut              = new stdClass();
 $shortcut->name        = 'Permis de feu';
 $shortcut->short_name  = 'Permis';
-$shortcut->url         = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_firepermit_list.php', 1);
+$shortcut->url         = dol_buildpath('/digiriskdolibarr/view/frontend/pwa_firepermit_list.php', 1);
 $manifest->shortcuts[] = $shortcut;
 
 $shortcut              = new stdClass();
 $shortcut->name        = 'Rondes apres travaux';
 $shortcut->short_name  = 'Rondes';
-$shortcut->url         = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_firepermit_rounds.php', 1);
+$shortcut->url         = dol_buildpath('/digiriskdolibarr/view/frontend/pwa_firepermit_rounds.php', 1);
 $manifest->shortcuts[] = $shortcut;
 
 // Pictures of the install dialog, in display order: the presentation visual first, then one per screen.
@@ -159,7 +159,7 @@ $screenshotLabels = [
 foreach ($screenshots as $formFactor => $screenshot) {
     foreach ($screenshotLabels as $fileSuffix => $label) {
         $img                     = new stdClass();
-        $img->src                = dol_buildpath('/custom/digiriskdolibarr/img/pwa/' . $screenshot['file_prefix'] . $fileSuffix . '.jpg', 1);
+        $img->src                = dol_buildpath('/digiriskdolibarr/img/pwa/' . $screenshot['file_prefix'] . $fileSuffix . '.jpg', 1);
         $img->type               = 'image/jpeg';
         $img->sizes              = $screenshot['sizes'];
         $img->form_factor        = $formFactor;

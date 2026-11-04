@@ -79,7 +79,7 @@ function digiriskdolibarr_ticket_prepare_head(Ticket $object): array
     require_once DOL_DOCUMENT_ROOT . '/core/lib/ticket.lib.php';
 
     $head          = ticket_prepare_head($object);
-    $customCardUrl = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $object->id;
+    $customCardUrl = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $object->id;
 
     foreach ($head as $key => $tab) {
         if (isset($tab[2]) && $tab[2] === 'tabTicket') {
@@ -414,17 +414,17 @@ function ticketstats_prepare_head(): array
     $head = [];
 
     if ($user->hasRight('ticket', 'read')) {
-        $head[$h][0] = dol_buildpath('custom/digiriskdolibarr/view/ticket/ticket_management_dashboard.php', 1);
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_management_dashboard.php', 1);
         $head[$h][1] = $conf->browser->layout == 'classic' ? '<i class="fas fa-chart-line pictofixedwidth"></i>' . $langs->transnoentities('TicketManagementDashboard') : '<i class="fas fa-chart-line"></i>';
         $head[$h][2] = 'dashboard';
         $h++;
 
-        $head[$h][0] = dol_buildpath('custom/digiriskdolibarr/view/ticket/ticketstats.php', 1);
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/ticket/ticketstats.php', 1);
         $head[$h][1] = $conf->browser->layout == 'classic' ? '<i class="fas fa-calendar-alt pictofixedwidth"></i>'  . $langs->trans('ByMonthYear') : '<i class="fas fa-calendar-alt"></i>';
         $head[$h][2] = 'byyear';
         $h++;
 
-        $head[$h][0] = dol_buildpath('custom/digiriskdolibarr/view/ticket/ticketstatscsv.php', 1);
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/ticket/ticketstatscsv.php', 1);
         $head[$h][1] = $conf->browser->layout == 'classic' ? '<i class="fas fa-file-csv pictofixedwidth"></i>' . $langs->trans('ExportCSV') : '<i class="fas fa-file-csv"></i>';
         $head[$h][2] = 'exportcsv';
     }

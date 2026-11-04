@@ -25,8 +25,8 @@
 global $conf, $langs, $mysoc, $user;
 
 $hasSignature     = digiriskIsValidSignature($savedSignature);
-$sirenLookupUrl   = dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_siren_lookup.php', 1);
-$saveSignatureUrl = dol_buildpath('/custom/digiriskdolibarr/core/ajax/save_user_signature.php', 1);
+$sirenLookupUrl   = dol_buildpath('/digiriskdolibarr/core/ajax/mobile_siren_lookup.php', 1);
+$saveSignatureUrl = dol_buildpath('/digiriskdolibarr/core/ajax/save_user_signature.php', 1);
 
 // Danger categories (risks) and signalisation pictos (protections), indexed by position:
 // used both to render the already selected items and to fill the picker modals
@@ -311,7 +311,7 @@ foreach ($signalisationCategories as $signalisationItem) {
             <div class="digirisk-mobile-field">
                 <label><?php print $langs->trans('MobilePPChooseExistingCompany'); ?></label>
                 <!-- Le + ouvre la creation d'un tiers dans un nouvel onglet : la liste est relue au retour -->
-                <div class="digirisk-mobile-picker-row" data-thirdparties-url="<?php print dol_escape_htmltag(dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_thirdparties.php', 1) . '?object_type=preventionplan'); ?>">
+                <div class="digirisk-mobile-picker-row" data-thirdparties-url="<?php print dol_escape_htmltag(dol_buildpath('/digiriskdolibarr/core/ajax/mobile_thirdparties.php', 1) . '?object_type=preventionplan'); ?>">
                     <?php print $form->select_company($prefill['ext_society_id'], 'ext_society_picker', '', '&nbsp;', 0, 0, [], 0, 'digirisk-mobile-society-select maxwidth500'); ?>
                     <a href="<?php print dol_buildpath('/societe/card.php', 1) . '?action=create'; ?>" target="_blank" class="wpeo-button button-blue digirisk-mobile-picker-row__add" title="<?php print dol_escape_htmltag($langs->trans('NewThirdParty')); ?>"><i class="fas fa-plus"></i></a>
                 </div>
@@ -414,7 +414,7 @@ foreach ($signalisationCategories as $signalisationItem) {
             $planTagOptions = $form->select_all_categories('digiriskpreventionplan', '', 'parent', 64, 0, 1);
             $planTagOptions = is_array($planTagOptions) ? $planTagOptions : [];
         ?>
-        <div class="digirisk-mobile-card digirisk-mobile-tags" data-tags-url="<?php print dol_escape_htmltag(dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_tags.php', 1) . '?object_type=preventionplan'); ?>">
+        <div class="digirisk-mobile-card digirisk-mobile-tags" data-tags-url="<?php print dol_escape_htmltag(dol_buildpath('/digiriskdolibarr/core/ajax/mobile_tags.php', 1) . '?object_type=preventionplan'); ?>">
             <div class="digirisk-mobile-card__title">
                 <i class="fas fa-tags"></i> <?php print $langs->trans('MobileTags'); ?>
                 <span class="digirisk-mobile-tooltip digirisk-mobile-tooltip--start" tabindex="0" aria-label="<?php print dol_escape_htmltag($langs->trans('MobileTagsInfo')); ?>">

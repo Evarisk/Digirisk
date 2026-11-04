@@ -85,7 +85,7 @@ if ($id > 0) {
 }
 
 // Once every round is done, the permit is closed from its screen in the application (never automatically)
-$roundsCloseUrl = ($permissiontoadd && $object->id > 0) ? dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_mobile_create.php', 1) . '?created=' . $object->id . '#digirisk-mobile-archive' : '';
+$roundsCloseUrl = ($permissiontoadd && $object->id > 0) ? dol_buildpath('/digiriskdolibarr/view/firepermit/firepermit_mobile_create.php', 1) . '?created=' . $object->id . '#digirisk-mobile-archive' : '';
 
 /*
  * Actions

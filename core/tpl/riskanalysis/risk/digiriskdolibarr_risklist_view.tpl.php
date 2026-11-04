@@ -817,7 +817,7 @@ $corruptedRisks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsq
 if (is_array($corruptedRisks) && !empty($corruptedRisks)) {
     print '<div class="wpeo-notice notice-warning notice-red">';
     print '<div class="notice-content">';
-    print '<a href="' . dol_buildpath('/custom/digiriskdolibarr/view/digirisktools.php', 2) . '">' . '<div class="notice-subtitle"><b>' . $langs->trans('NumberOfRisksCorrupted', count($corruptedRisks)) . ' : ' . $langs->trans('RepairRisks') . '</b></div></a>';
+    print '<a href="' . dol_buildpath('/digiriskdolibarr/view/digirisktools.php', 2) . '">' . '<div class="notice-subtitle"><b>' . $langs->trans('NumberOfRisksCorrupted', count($corruptedRisks)) . ' : ' . $langs->trans('RepairRisks') . '</b></div></a>';
     print '</div>';
     print '</div>';
 }

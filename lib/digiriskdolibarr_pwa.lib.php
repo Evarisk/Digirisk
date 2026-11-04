@@ -361,7 +361,7 @@ function digiriskPwaCardDetails($record, DigiriskResources $digiriskresources, S
 
         $pictoCategories[$record->element] = [];
         foreach ((is_array($categories) ? $categories : []) as $category) {
-            $category['src'] = dol_buildpath('/custom/digiriskdolibarr/img/' . ($isFirePermit ? 'typeDeTravaux' : 'categorieDangers') . '/' . $category['thumbnail_name'] . '.png', 1);
+            $category['src'] = dol_buildpath('/digiriskdolibarr/img/' . ($isFirePermit ? 'typeDeTravaux' : 'categorieDangers') . '/' . $category['thumbnail_name'] . '.png', 1);
 
             $pictoCategories[$record->element][$category['position']] = $category;
         }
