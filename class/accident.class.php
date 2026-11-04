@@ -268,7 +268,7 @@ class Accident extends SaturneObject
         }
 
         // Create clone
-        $object->context = 'createfromclone';
+        $object->context['createfromclone'] = 'createfromclone';
 		$accidentId      = $object->create($user);
 
 		if ($accidentId > 0) {
@@ -287,7 +287,7 @@ class Accident extends SaturneObject
                     foreach($workstops as $workstop) {
                         $workstop->fk_accident = $accidentId;
                         $workstop->ref         = $accidentWorkstop->getNextNumRef();
-                        $workstop->context     = 'createfromclone';
+                        $workstop->context['createfromclone'] = 'createfromclone';
                         $workstop->create($user);
                     }
                 }
@@ -300,7 +300,7 @@ class Accident extends SaturneObject
                     foreach($lesions as $lesion) {
                         $lesion->fk_accident = $accidentId;
                         $lesion->ref         = $lesion->getNextNumRef();
-                        $lesion->context     = 'createfromclone';
+                        $lesion->context['createfromclone'] = 'createfromclone';
                         $lesion->create($user);
                     }
                 }
@@ -309,7 +309,7 @@ class Accident extends SaturneObject
                 $accidentMetadata = new AccidentMetaData($this->db);
                 $accidentMetadata->fetch(0, '', ' AND t.fk_accident =' . $objectId . ' AND t.status = 1');
                 $accidentMetadata->fk_accident = $accidentId;
-                $accidentMetadata->context     = 'createfromclone';
+                $accidentMetadata->context['createfromclone'] = 'createfromclone';
                 $accidentMetadata->create($user);
             }
             if (!empty($options['categories'])) {
