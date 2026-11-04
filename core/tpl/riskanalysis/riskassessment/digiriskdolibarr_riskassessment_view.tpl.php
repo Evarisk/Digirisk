@@ -349,7 +349,7 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
                     <div class="riskassessment-medias">
                         <div class="medias section-title"><i class="fas fa-images"></i> <?php echo $langs->trans('Medias'); ?></div>
                         <?php // The assessment does not exist yet: its creation moves these photos into its folder
-                        print digiriskRiskAssessmentMediaBlock('riskassessment/tmp/RA0/' . $risk->ref); ?>
+                        print digiriskRiskAssessmentMediaBlock(digiriskRiskAssessmentWorkDir($risk->ref)); ?>
                     </div>
 				</div>
 				<!-- RISK EVALUATION SINGLE -->
