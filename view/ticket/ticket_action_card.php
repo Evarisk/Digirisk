@@ -462,30 +462,24 @@ if ($object->id <= 0) {
     // Hidden token for AJAX requests
     print '<input type="hidden" name="token" value="' . newToken() . '">';
 
-    // All active internal users for the assignee picker
-    $sqlUsers = 'SELECT u.rowid, u.firstname, u.lastname, u.photo FROM ' . MAIN_DB_PREFIX . 'user u'
-        . ' WHERE u.statut = 1 AND u.entity IN (' . getEntity('user') . ')'
-        . ' ORDER BY u.lastname, u.firstname';
-    $resUsers = $db->query($sqlUsers);
-    if ($resUsers) {
-        while ($objU = $db->fetch_object($resUsers)) {
-            $photoUrl = '';
-            if (!empty($objU->photo)) {
-                $photoFile = DOL_DATA_ROOT . '/users/' . (int) $objU->rowid . '/' . $objU->photo;
-                if (file_exists($photoFile)) {
-                    $photoUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . $conf->entity
-                        . '&file=' . urlencode($objU->rowid . '/' . $objU->photo)
-                        . '&cache=' . (int) $objU->rowid;
-                }
+    // All active users of the entity for the assignee picker: in the transverse mode of Multicompany, those member of
+    // a group in it, not those whose entity is 1 (#5720)
+    foreach (digiriskdolibarr_ticket_assignable_users() as $assignableUserId => $assignableUser) {
+        $photoUrl = '';
+        if (!empty($assignableUser['photo'])) {
+            $photoFile = DOL_DATA_ROOT . '/users/' . $assignableUserId . '/' . $assignableUser['photo'];
+            if (file_exists($photoFile)) {
+                $photoUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . $conf->entity
+                    . '&file=' . urlencode($assignableUserId . '/' . $assignableUser['photo'])
+                    . '&cache=' . $assignableUserId;
             }
-            $pickerAllUsers[] = [
-                'id'       => (int) $objU->rowid,
-                'fullname' => trim($objU->firstname . ' ' . $objU->lastname),
-                'initials' => strtoupper(mb_substr($objU->firstname, 0, 1) . mb_substr($objU->lastname, 0, 1)),
-                'photo'    => $photoUrl,
-            ];
         }
-        $db->free($resUsers);
+        $pickerAllUsers[] = [
+            'id'       => $assignableUserId,
+            'fullname' => trim($assignableUser['firstname'] . ' ' . $assignableUser['lastname']),
+            'initials' => strtoupper(mb_substr($assignableUser['firstname'], 0, 1) . mb_substr($assignableUser['lastname'], 0, 1)),
+            'photo'    => $photoUrl,
+        ];
     }
 
     // All available ticket categories
@@ -963,17 +957,11 @@ $createFormUsers      = $pickerAllUsers; // already populated when no ticket is 
 
 if ($object->id > 0) {
     // On the detail view the picker arrays are empty — re-fetch users.
-    $sqlU = 'SELECT rowid, firstname, lastname FROM ' . MAIN_DB_PREFIX . 'user'
-        . ' WHERE statut = 1 AND entity IN (' . getEntity('user') . ') ORDER BY lastname, firstname';
-    $resU = $db->query($sqlU);
-    if ($resU) {
-        while ($u = $db->fetch_object($resU)) {
-            $createFormUsers[] = [
-                'id'       => (int) $u->rowid,
-                'fullname' => trim($u->firstname . ' ' . $u->lastname),
-            ];
-        }
-        $db->free($resU);
+    foreach (digiriskdolibarr_ticket_assignable_users() as $assignableUserId => $assignableUser) {
+        $createFormUsers[] = [
+            'id'       => $assignableUserId,
+            'fullname' => trim($assignableUser['firstname'] . ' ' . $assignableUser['lastname']),
+        ];
     }
 }
 

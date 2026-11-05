@@ -747,10 +747,18 @@ class ActionsDigiriskdolibarr
             // picker on an empty group left nobody to assign (#5717)
             if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP') > 0) {
                 require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+                require_once __DIR__ . '/../lib/digiriskdolibarr_ticket.lib.php';
 
                 $userGroup  = new UserGroup($this->db);
                 $userGroups = saturne_fetch_all_object_type('UserGroup');
                 $userGroups = array_column($userGroups, 'nom', 'id');
+
+                // The default group may belong to another entity, as in the transverse mode of Multicompany: the frozen
+                // picker showed an empty group (#5720)
+                $defaultUserGroup = new UserGroup($this->db);
+                if (!isset($userGroups[getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP')]) && $defaultUserGroup->fetch(getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP')) > 0) {
+                    $userGroups[$defaultUserGroup->id] = $defaultUserGroup->name;
+                }
 
                 $out  = '<tr class="field_user_group"><td class="titlefieldmax45 wordbreak">';
                 $out .= $langs->transnoentities('UserGroup');
@@ -761,11 +769,9 @@ class ActionsDigiriskdolibarr
                 $out .= '</a>';
                 $out .= '</td></tr>';
 
-                $userGroupID = GETPOSTISSET('user_group') ? GETPOST('user_group') : getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP');
-                $userGroup->fetch($userGroupID);
-                // Only enabled users can be assigned to a ticket, a disabled one has no business showing up in the list
-                $users = $userGroup->listUsersForGroup('u.statut > 0');
-                $users = array_map(fn($userTmp) => $userTmp->getFullName($langs), $users);
+                $userGroupID = GETPOSTISSET('user_group') ? GETPOSTINT('user_group') : getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP');
+                // Only enabled users can be assigned to a ticket, members of the group in this entity (#5720)
+                $users = array_map(fn($userTmp) => dolGetFirstLastname($userTmp['firstname'], $userTmp['lastname']), digiriskdolibarr_ticket_assignable_users($userGroupID));
 
                 // The current assignee is picked, and kept in the list when outside the group: GETPOSTINT() never
                 // returns null, so "Validate" used to unassign the ticket
@@ -824,10 +830,7 @@ class ActionsDigiriskdolibarr
                 }
 
                 if (GETPOST('action') == 'get_user_group') {
-                    $userGroupID = GETPOST('user_group');
-                    $userGroup->fetch($userGroupID);
-                    $users = $userGroup->listUsersForGroup('u.statut > 0');
-                    $users = array_map(fn($userTmp) => $userTmp->getFullName($langs), $users);
+                    $users = array_map(fn($userTmp) => dolGetFirstLastname($userTmp['firstname'], $userTmp['lastname']), digiriskdolibarr_ticket_assignable_users(GETPOSTINT('user_group')));
 
                     echo '<input type="hidden" name="users_list" value="' . base64_encode(json_encode($users)) . '">';
                 }
