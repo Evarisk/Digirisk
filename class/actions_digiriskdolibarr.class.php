@@ -742,6 +742,10 @@ class ActionsDigiriskdolibarr
 				<?php
             }
 
+            // The assignable users are the members of the default group of the configuration (#4184), shown frozen
+            // (#4476). Without one, the list of Dolibarr stays, filtered by the assignment group when set: the frozen
+            // picker on an empty group left nobody to assign (#5717)
+            if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP') > 0) {
                 require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
 
                 $userGroup  = new UserGroup($this->db);
@@ -763,10 +767,20 @@ class ActionsDigiriskdolibarr
                 $users = $userGroup->listUsersForGroup('u.statut > 0');
                 $users = array_map(fn($userTmp) => $userTmp->getFullName($langs), $users);
 
+                // The current assignee is picked, and kept in the list when outside the group: GETPOSTINT() never
+                // returns null, so "Validate" used to unassign the ticket
+                $assignedUserID = GETPOSTISSET('fk_user_assign') ? GETPOSTINT('fk_user_assign') : (int) $object->fk_user_assign;
+                if ($assignedUserID > 0 && !isset($users[$assignedUserID])) {
+                    $assignedUser = new User($this->db);
+                    if ($assignedUser->fetch($assignedUserID) > 0) {
+                        $users[$assignedUserID] = $assignedUser->getFullName($langs);
+                    }
+                }
+
                 $out .= '<tr class="field_fk_user_assign"><td class="titlefieldmax45 wordbreak">';
                 $out .= $langs->transnoentities('AssignedTo');
                 $out .= '</td><td class="valuefieldcreate_ticket_fk_user_assign">';
-                $out .= img_picto('', $user->picto, 'class="pictofixedwidth"') . Form::selectarray('fk_user_assign', $users, GETPOSTINT('fk_user_assign') ?? $object->fk_user_assign, -1, 0, 0, '', '', 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
+                $out .= img_picto('', $user->picto, 'class="pictofixedwidth"') . Form::selectarray('fk_user_assign', $users, $assignedUserID, -1, 0, 0, '', '', 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
                 $out .= '</td></tr>'; ?>
 
                 <?php if (GETPOST('action') == 'create') : ?>
@@ -817,6 +831,7 @@ class ActionsDigiriskdolibarr
 
                     echo '<input type="hidden" name="users_list" value="' . base64_encode(json_encode($users)) . '">';
                 }
+            }
 
             // Files of the ticket in the native message form (#5581). The form has no hook: the row is moved into
             // it before the form's own script shows or hides the email rows (.email_line) along the checkbox.
