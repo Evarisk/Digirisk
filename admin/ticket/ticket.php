@@ -184,29 +184,17 @@ if ($action == 'generateCategories') {
 	$result = createTicketCategory($langs->transnoentities('Register'), '', '', 1, 'ticket');
 
 	$category = new Categorie($db);
-	$category->fetch($result);
-
-	$category->table_element = 'categorie';
-	$category->array_options['options_ticket_category_config'] = json_encode([
-		"digiriskdolibarr_ticket_lastname_visible" => "on",
-		"digiriskdolibarr_ticket_lastname_required" => "on",
-		"digiriskdolibarr_ticket_firstname_visible" => "on",
-		"digiriskdolibarr_ticket_firstname_required" => "on",
-		"digiriskdolibarr_ticket_phone_visible" => "on",
-		"digiriskdolibarr_ticket_phone_required" => "",
-		"digiriskdolibarr_ticket_service_visible" => "on",
-		"digiriskdolibarr_ticket_service_required" => "on",
-		"digiriskdolibarr_ticket_location_visible" => "on",
-		"digiriskdolibarr_ticket_location_required" => "",
-		"digiriskdolibarr_ticket_date_visible" => "on",
-		"digiriskdolibarr_ticket_date_required" => "on",
-	]);
-	$category->updateExtraField('ticket_category_config');
-
-
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY', $result, 'integer', 0, '', $conf->entity);
 
 	if ($result > 0) {
+		$category->fetch($result);
+
+		// The same defaults as the first entity, email and photos included (#5710)
+		$category->table_element = 'categorie';
+		$category->array_options['options_ticket_category_config'] = json_encode(digiriskdolibarr_ticket_default_category_config());
+		$category->updateExtraField('ticket_category_config');
+
+		// A register that could not be created, one left by a former attempt for instance, kept the error code as main category
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY', $result, 'integer', 0, '', $conf->entity);
 
 		$result2 = createTicketCategory($langs->transnoentities('Accident'), '', 'FFA660', 1, 'ticket', $result,'pictogramme_Accident_32px.png');
 
