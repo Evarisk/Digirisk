@@ -1499,3 +1499,47 @@ function digiriskdolibarr_ticket_preview_field_type(string $fieldKey, string $ex
 
     return $previewTypes[$extraFieldType] ?? 'text';
 }
+
+/**
+ * Enabled users a ticket of the current entity can be assigned to, found as the user selectors of Dolibarr find them
+ * (Form::select_dolusers()) (#5720)
+ *
+ * In the transverse mode of Multicompany every user belongs to entity 1 and reaches the other entities through the
+ * groups they are member of there: filtering on the entity of the user, as UserGroup::listUsersForGroup() does, left
+ * out everybody but the superadmins on any other entity.
+ *
+ * @param  int   $userGroupId Group whose members only are wanted, 0 for all the users of the entity
+ * @return array              Users sorted by name, id => [firstname, lastname, photo]
+ */
+function digiriskdolibarr_ticket_assignable_users(int $userGroupId = 0): array
+{
+    global $conf, $db, $user;
+
+    $groupFilter = $userGroupId > 0 ? ' AND ug.fk_usergroup = ' . $userGroupId : '';
+
+    $sql  = 'SELECT u.rowid, u.firstname, u.lastname, u.photo FROM ' . $db->prefix() . 'user AS u';
+    $sql .= ' WHERE u.statut = 1';
+    if (isModEnabled('multicompany') && $conf->entity == 1 && !empty($user->admin) && empty($user->entity)) {
+        // The superadmin on entity 1 sees the users of every entity
+        $sql .= ' AND u.entity IS NOT NULL';
+        $sql .= $userGroupId > 0 ? ' AND u.rowid IN (SELECT ug.fk_user FROM ' . $db->prefix() . 'usergroup_user AS ug WHERE 1 = 1' . $groupFilter . ')' : '';
+    } elseif (isModEnabled('multicompany') && getDolGlobalInt('MULTICOMPANY_TRANSVERSE_MODE')) {
+        // A user reaches the entity through the groups they are member of in it
+        $sql .= ' AND u.rowid IN (SELECT ug.fk_user FROM ' . $db->prefix() . 'usergroup_user AS ug WHERE ug.entity IN (' . getEntity('usergroup') . ')' . $groupFilter . ')';
+    } else {
+        $sql .= ' AND u.entity IN (' . getEntity('user') . ')';
+        $sql .= $userGroupId > 0 ? ' AND u.rowid IN (SELECT ug.fk_user FROM ' . $db->prefix() . 'usergroup_user AS ug WHERE 1 = 1' . $groupFilter . ')' : '';
+    }
+    $sql .= ' ORDER BY u.lastname, u.firstname';
+
+    $users = [];
+    $resql = $db->query($sql);
+    if ($resql) {
+        while ($obj = $db->fetch_object($resql)) {
+            $users[(int) $obj->rowid] = ['firstname' => (string) $obj->firstname, 'lastname' => (string) $obj->lastname, 'photo' => (string) $obj->photo];
+        }
+        $db->free($resql);
+    }
+
+    return $users;
+}
