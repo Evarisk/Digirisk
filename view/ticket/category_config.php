@@ -97,7 +97,6 @@ if (empty($resHook)) {
         $data['show_description']      = GETPOST('show_description');
         $data['mail_template']         = GETPOST('mail_template');
         $data['recipients']            = implode(',', GETPOST('recipients', 'array'));
-        $data['photo_visible']         = GETPOST('photo_visible');
         $data['external_link']         = GETPOST('external_link');
         $data['external_link_new_tab'] = GETPOST('external_link_new_tab') ? 1 : 0;
         $data['validate_text']         = GETPOST('validate_text', 'restricthtml');
@@ -119,7 +118,9 @@ if (empty($resHook)) {
             }
         }
 
+        // The photos of the public interface are saved like a field: visible, then required only when visible (#5709)
         $extraFields->attributes['ticket']['label']['digiriskdolibarr_ticket_email'] = $langs->trans('Email');
+        $extraFields->attributes['ticket']['label']['photo']                         = $langs->trans('Photo');
         foreach ($extraFields->attributes['ticket']['label'] as $key => $field) {
             $extraFieldVisible  = $key . '_visible';
             $extraFieldRequired = $key . '_required';
@@ -498,20 +499,27 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
                 $isVisible  = $visibleInherited || !empty($ticketCategoryConfig->$extraFieldVisible);
                 $isRequired = $isVisible && ($requiredInherited || !empty($ticketCategoryConfig->$extraFieldRequired));
 
+                // An extrafield created from this page has no label key of its own: its name goes in the generic one
+                $fieldLabelKey = 'Ticket' . ucfirst($label) . 'Visible';
+                $fieldLabel    = $langs->transnoentities($fieldLabelKey);
+                $fieldHelp     = $langs->transnoentities($fieldLabelKey . 'Help');
+                if ($fieldLabel == $fieldLabelKey) {
+                    $fieldLabel = $langs->transnoentities('TicketExtrafieldVisible', $langs->transnoentities($field));
+                    $fieldHelp  = $langs->transnoentities('TicketExtrafieldVisibleHelp', $langs->transnoentities($field));
+                }
+
                 // Extra field visible and required
                 print '<tr class="oddeven dragable-item" data-name="' . $key . '"><td>';
-                print (!empty($fields[$key]['picto']) ? img_picto('', $fields[$key]['picto'], 'class="paddingrightonly"') : getPictoForType($extraFields->attributes['ticket']['type'][$key])) . $form->textwithpicto($langs->transnoentities('Ticket' . ucfirst($label) . 'Visible'), $langs->transnoentities('Ticket' . ucfirst($label) . 'VisibleHelp'), 1, 'info') . '</td>';
+                print (!empty($fields[$key]['picto']) ? img_picto('', $fields[$key]['picto'], 'class="paddingrightonly"') : getPictoForType($extraFields->attributes['ticket']['type'][$key])) . $form->textwithpicto($fieldLabel, $fieldHelp, 1, 'info') . '</td>';
                 print '</td><td class="center">';
                 print '<input type="checkbox" id="' . $extraFieldVisible . '" name="' . $extraFieldVisible . '"' . ($isVisible ? ' checked' : '') . ($visibleInherited ? ' disabled' : '') . '>';
                 if ($visibleInherited) {
                     print $form->textwithtooltip($langs->transnoentities('Inherited'), $langs->transnoentities('PermissionInheritedFromConfig'));
                 }
                 print '</td><td class="center">';
-                if (!in_array($key, ['photo'])) {
-                    print '<input type="checkbox" id="' . $extraFieldRequired . '" name="' . $extraFieldRequired . '"' . ($isRequired ? ' checked=""' : '') . ($requiredInherited || !$isVisible ? ' disabled' : '') . ($requiredInherited ? ' data-inherited="1"' : '') . '>';
-                    if ($requiredInherited) {
-                        print $form->textwithtooltip($langs->transnoentities('Inherited'), $langs->transnoentities('PermissionInheritedFromConfig'));
-                    }
+                print '<input type="checkbox" id="' . $extraFieldRequired . '" name="' . $extraFieldRequired . '"' . ($isRequired ? ' checked=""' : '') . ($requiredInherited || !$isVisible ? ' disabled' : '') . ($requiredInherited ? ' data-inherited="1"' : '') . '>';
+                if ($requiredInherited) {
+                    print $form->textwithtooltip($langs->transnoentities('Inherited'), $langs->transnoentities('PermissionInheritedFromConfig'));
                 }
                 print '</td>';
                 print '<td class="config-move-line">';

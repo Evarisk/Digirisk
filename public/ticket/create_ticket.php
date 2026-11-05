@@ -290,6 +290,15 @@ if (empty($resHook) && $publicInterfaceUsable) {
             }
         }
 
+        // The media block sends the photos and voice notes as soon as they are picked: they wait in the
+        // temporary folder of the session, which a refused declaration keeps for the next try (#5709)
+        if (!empty($config['photo_visible']) && !empty($config['photo_required'])) {
+            if (empty(dol_dir_list($conf->digiriskdolibarr->dir_output . '/' . $ticketUploadSubDir, 'files'))) {
+                setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('FilesLinked')), array(), 'errors');
+                $error++;
+            }
+        }
+
         // Public interface has no third party attached at this point
         $object->ref = $modTicket->getNextValue(null, $object);
 
@@ -679,7 +688,7 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 							break;
 						case 'photo':
 							// Photos and voice notes, sent as soon as they are picked or recorded
-							$out .= '<span class="form-label">' . $langs->trans('FilesLinked') . '</span>';
+							$out .= '<span class="form-label">' . $langs->trans('FilesLinked') . ($required ? '<span style="color:red"> *</span>' : '') . '</span>';
 							$out .= '<div class="ticket-media-block">' . digiriskTicketPublicMediaBlock($ticketUploadSubDir) . '</div>';
 							break;
 						case 'digiriskdolibarr_ticket_email':
