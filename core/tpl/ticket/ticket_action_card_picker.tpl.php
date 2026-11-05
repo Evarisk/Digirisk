@@ -138,7 +138,7 @@ function renderDimKanban($columns, $colTickets, $dim, $allUsers, $allCats, $allS
 
                         <div class="kanban-card-label">
                             <span class="tac-picker-card__subject-text"
-                                  contenteditable="true"
+                                  tabindex="0"
                                   data-ticket-id="<?= (int) $t['id'] ?>"><?= dol_escape_htmltag($t['subject']) ?></span>
                             <a href="<?= dol_escape_htmltag($t['url']) ?>" class="tac-picker-card__subject-link" title="<?= dol_escape_htmltag($langs->trans('OpenTicket') !== 'OpenTicket' ? $langs->trans('OpenTicket') : 'Ouvrir') ?>">
                                 <i class="fas fa-external-link-alt"></i>

@@ -112,7 +112,8 @@ if ($action == 'updateTicketStatus' && !empty(GETPOSTINT('ticket_id'))) {
     $result         = $ticketToUpdate->fetch($ticketId);
 
     if ($result > 0) {
-        $res = $ticketToUpdate->setStatut($newStatus, $user);
+        // The second parameter is the id of the row to update: $user, cast to 1, wrote the status on ticket 1 (#5716)
+        $res = $ticketToUpdate->setStatut($newStatus, null, '', 'TICKET_MODIFY');
         if ($res > 0) {
             createTicketKanbanEvent($db, $user, $ticketToUpdate, 'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_STATUS',
                 'Statut modifié (kanban)', 'Statut modifié → ' . $newStatus);
