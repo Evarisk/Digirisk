@@ -1937,7 +1937,8 @@ $tac-border:       #e5e7eb;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    cursor: text;
+    // Dragged with its card at rest, a text field only while edited (#5716)
+    cursor: inherit;
     border-radius: 3px;
     padding: 1px 3px;
     margin: -1px -3px;
@@ -1950,6 +1951,7 @@ $tac-border:       #e5e7eb;
 
     &:focus,
     &.tac-picker-subject--editing {
+        cursor: text;
         white-space: pre-wrap;
         overflow: visible;
         word-break: break-word;

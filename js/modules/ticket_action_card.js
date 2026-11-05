@@ -1856,9 +1856,18 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
         localStorage.setItem('tacPickerActiveDim', dim);
     });
 
-    // Subject: focus on contenteditable span → store original for rollback.
+    // Subject: editable only while edited, so the card can be dragged by it (#5716). A click that did not
+    // drag the card (the sortable keeps the focus from the mousedown) or Tab opens the editor.
+    $(document).on('click', '.tac-picker-kanban-board .tac-picker-card__subject-text', function() {
+        if (!this.isContentEditable) {
+            this.focus();
+        }
+    });
+
+    // Subject: focus → editable, store original for rollback.
     $(document).on('focus', '.tac-picker-kanban-board .tac-picker-card__subject-text', function() {
         var $span = $(this);
+        this.contentEditable = 'true';
         $span.data('editOriginal', this.innerText || $span.text());
         $span.addClass('tac-picker-subject--editing');
         // Select all text so user can replace immediately.
@@ -1905,6 +1914,7 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
     $(document).on('blur', '.tac-picker-kanban-board .tac-picker-card__subject-text', function() {
         var $span      = $(this);
         $span.removeClass('tac-picker-subject--editing');
+        this.removeAttribute('contenteditable');
         var newSubject = $.trim(this.innerText || this.textContent || '');
         var original   = $span.data('editOriginal') || '';
         var ticketId   = $span.data('ticket-id');
@@ -1919,11 +1929,6 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
 
         var $card = $span.closest('.tac-picker-card');
         window.digiriskdolibarr.ticketPickerKanban.saveSubject(ticketId, newSubject, $span, original, $card);
-    });
-
-    // Prevent drag when clicking the subject text.
-    $(document).on('mousedown', '.tac-picker-kanban-board .tac-picker-card__subject-text', function(e) {
-        e.stopPropagation();
     });
 
     // Severity badge click → show inline select.
@@ -1999,10 +2004,12 @@ window.digiriskdolibarr.ticketPickerKanban.initSortable = function() {
         group:    'updateTicketGroup',
         severity: 'updateTicketSeverity'
     };
-    var cancelSel = '.kanban-responsible-wrapper, .tac-picker-assignee-select, .kanban-tag, '
+    // Only the controls of a card keep it from being dragged: the subject, the reference, the severity badge
+    // and the tags were excluded too, which left the date and the progress bar to grab it by (#5716). A click
+    // that does not drag still reaches them
+    var cancelSel = 'input, textarea, button, select, option, .kanban-responsible-wrapper, '
         + '.kanban-tag-remove, .kanban-add-tag-btn, .kanban-tag-dropdown, .kanban-tag-option, '
-        + '.tac-picker-card__assignee-img, .kanban-initial-responsible, .kanban-card-label, '
-        + '.tac-picker-card__subject-text, .tac-picker-sev-badge, .tac-picker-sev-inline-select';
+        + '.tac-picker-subject--editing';
 
     $.each(dims, function(i, dim) {
         var $cols = $('.kanban-picker-sortable[data-dim="' + dim + '"]');
