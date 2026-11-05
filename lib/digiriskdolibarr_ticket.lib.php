@@ -1316,3 +1316,123 @@ function digiriskdolibarr_ticket_fill_empty_subjects(DoliDB $db, int $entity): i
 
     return count($subjects);
 }
+
+/**
+ * What the preview of the public interface needs to draw a ticket category the way a declarant gets it (#5711)
+ *
+ * The public interface offers the children of the main category, then the children of the one picked: any
+ * other category of the tree is never offered there. Of the configuration, only what the categories above
+ * this one set is read here, the page itself reads its own unsaved settings.
+ *
+ * @param  Categorie $category Ticket category being configured
+ * @return array               offered, levels of category buttons, what the categories above set, own
+ *                             description and address of the public interface on this category
+ */
+function digiriskdolibarr_ticket_category_preview(Categorie $category): array
+{
+    global $conf, $langs;
+
+    $preview = [
+        'offered'     => false,
+        'levels'      => [],
+        'inherited'   => ['show_description' => false, 'use_signatory' => false, 'validate_text' => '', 'success_message' => $langs->transnoentities('YouMustNotifyYourHierarchy')],
+        'description' => '',
+        'url'         => ''
+    ];
+
+    // From the main category down to this one: a category the main one is not above gets an empty path
+    $categoryWays = $category->get_all_ways();
+    $categoryPath = [];
+    foreach ($categoryWays[0] ?? [] as $wayCategory) {
+        if ($wayCategory->id == getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY') || !empty($categoryPath)) {
+            $categoryPath[] = $wayCategory;
+        }
+    }
+    $categoryDepth = count($categoryPath) - 1;
+    if ($categoryDepth < 0 || $categoryDepth > 2) {
+        return $preview;
+    }
+    $preview['offered'] = true;
+
+    // The buttons of each level, the one of the path picked: the main category shows its children, none picked
+    $levelTitles = [getDolGlobalString('DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL'), getDolGlobalString('DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL')];
+    for ($level = 1; $level <= min(2, $categoryDepth + 1); $level++) {
+        $levelCategories = $categoryPath[$level - 1]->get_filles();
+        if (!is_array($levelCategories) || empty($levelCategories)) {
+            break;
+        }
+
+        $levelButtons = [];
+        foreach ($levelCategories as $levelCategory) {
+            $levelButtons[] = [
+                'label'    => $levelCategory->label,
+                'color'    => preg_match('/^[0-9a-f]{6}$/i', (string) $levelCategory->color) ? $levelCategory->color : '',
+                'selected' => isset($categoryPath[$level]) && $categoryPath[$level]->id == $levelCategory->id
+            ];
+        }
+        $preview['levels'][] = ['title' => $levelTitles[$level - 1], 'required' => $level == 1, 'categories' => $levelButtons];
+    }
+
+    // The public interface adds up what each category of the path shows, and takes the deepest texts
+    foreach (array_slice($categoryPath, 0, -1) as $parentCategory) {
+        $parentConfig = json_decode($parentCategory->array_options['options_ticket_category_config'] ?? '', true);
+        $parentConfig = is_array($parentConfig) ? $parentConfig : [];
+        foreach (['show_description', 'use_signatory'] as $configKey) {
+            $preview['inherited'][$configKey] = $preview['inherited'][$configKey] || !empty($parentConfig[$configKey]);
+        }
+        foreach (['validate_text', 'success_message'] as $configKey) {
+            if (!empty($parentConfig[$configKey])) {
+                $preview['inherited'][$configKey] = $parentConfig[$configKey];
+            }
+        }
+    }
+
+    // The main category is never picked, the description shown is the one of the category picked
+    if ($categoryDepth > 0) {
+        $preview['description'] = (string) $category->description;
+    }
+
+    $preview['url'] = dol_buildpath('/digiriskdolibarr/public/ticket/create_ticket.php', 1) . '?entity=' . $conf->entity;
+    if ($categoryDepth > 0) {
+        $preview['url'] .= '&parentCategory=' . $categoryPath[1]->id . ($categoryDepth == 2 ? '&subCategory=' . $categoryPath[2]->id : '');
+    }
+
+    return $preview;
+}
+
+/**
+ * Kind of input the preview of the public interface draws for a field of the ticket category configuration (#5711)
+ *
+ * @param  string $fieldKey       Field, as named by the configuration: an extrafield, or photo
+ * @param  string $extraFieldType Type of the extrafield, empty for photo
+ * @return string                 media, select, date, textarea, checkbox, stars or text
+ */
+function digiriskdolibarr_ticket_preview_field_type(string $fieldKey, string $extraFieldType): string
+{
+    if ($fieldKey == 'photo') {
+        return 'media';
+    }
+    if ($fieldKey == 'digiriskdolibarr_ticket_service') {
+        return 'select';
+    }
+    if ($fieldKey == 'digiriskdolibarr_ticket_location') {
+        return digiriskdolibarr_ticket_location_use_list(digiriskdolibarr_ticket_location_dictionary()) ? 'select' : 'text';
+    }
+
+    $previewTypes = [
+        'date'     => 'date',
+        'datetime' => 'date',
+        'select'   => 'select',
+        'sellist'  => 'select',
+        'chkbxlst' => 'select',
+        'checkbox' => 'select',
+        'radio'    => 'select',
+        'link'     => 'select',
+        'text'     => 'textarea',
+        'html'     => 'textarea',
+        'boolean'  => 'checkbox',
+        'stars'    => 'stars'
+    ];
+
+    return $previewTypes[$extraFieldType] ?? 'text';
+}
