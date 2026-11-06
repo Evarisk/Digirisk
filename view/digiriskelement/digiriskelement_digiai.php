@@ -250,7 +250,8 @@ if ($object->id > 0) {
     // Module URL for the JS of the page: the module may live in another root than htdocs/custom
     print '<input hidden id="digiriskdolibarr_url_root" value="' . dol_escape_htmltag(dirname(dol_buildpath('/digiriskdolibarr/digiriskdolibarrindex.php', 1))) . '">';
     print dol_get_fiche_end();
-    $json = file_get_contents(dol_buildpath('/digiriskdolibarr/js/json/dangerCategories.json', 0));
+    // Danger category labels indexed by picto name, which is what the AI returns as risk title
+    $categoryMap = array_column(Risk::getDangerCategories(), 'name', 'thumbnail_name');
 
     // Inclusion de la bibliothèque de médias Saturne
     $moduleNameLowerCase = 'digiriskdolibarr';
@@ -264,7 +265,7 @@ if ($object->id > 0) {
     ?>
     <script>
         window.digiriskdolibarr = window.digiriskdolibarr || {};
-        window.digiriskdolibarr.categoryMap = <?php echo $json; ?>;
+        window.digiriskdolibarr.categoryMap = <?php echo json_encode($categoryMap); ?>;
     </script>
 <?php
 }
