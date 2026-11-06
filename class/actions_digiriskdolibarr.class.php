@@ -472,14 +472,18 @@ class ActionsDigiriskdolibarr
     public function hookSetManifest(array $parameters): int
     {
         if (strpos($_SERVER['PHP_SELF'], 'digiriskdolibarr') !== false) {
-            // The internal application (prevention plans and fire permits) declares its own manifest,
-            // so it installs separately from the public ticket declaration app.
-            $manifestFile = 'manifest.json.php';
-            foreach (['/view/frontend/', 'preventionplan_mobile_create.php', 'firepermit_mobile_create.php'] as $pwaPath) {
-                if (strpos($_SERVER['PHP_SELF'], $pwaPath) !== false) {
-                    $manifestFile = 'manifest_pwa.json.php';
-                    break;
-                }
+            // A home screen shortcut opens the start_url of the manifest, not the page it was created from:
+            // the public ticket declaration app and the internal application (prevention plans and fire permits)
+            // each declare their own manifest, so a shortcut made on an internal page opens the internal application
+            if (strpos($_SERVER['PHP_SELF'], '/digiriskdolibarr/public/ticket/') !== false) {
+                $manifestFile = 'manifest.json.php';
+            } elseif (strpos($_SERVER['PHP_SELF'], '/digiriskdolibarr/public/') !== false) {
+                // The other public pages (risk overview, fire permit rounds) are opened by a link with its parameters:
+                // without a manifest, the shortcut keeps that link
+                $this->resprints = '';
+                return 1;
+            } else {
+                $manifestFile = 'manifest_pwa.json.php';
             }
 
             // The browser keeps a manifest 3 hours: the version makes an updated one reach it at once
