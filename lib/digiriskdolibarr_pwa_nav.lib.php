@@ -80,6 +80,16 @@ function digiriskPwaNavGetItems(User $user): array
         ];
     }
 
+    // Safety talks: cycles kept as projects, so reading them is a matter of the project rights
+    if (isModEnabled('project') && $user->hasRight('projet', 'lire')) {
+        $items['safetytalks'] = [
+            'url'   => $frontendBase . 'pwa_safetytalk_list.php',
+            'page'  => 'pwa_safetytalk_list.php',
+            'icon'  => 'fa-comments',
+            'label' => $langs->transnoentities('PwaNavSafetyTalks'),
+        ];
+    }
+
     return $items;
 }
 
