@@ -233,7 +233,7 @@ class AccidentInvestigation extends SaturneObject
         $this->fk_project = getDolGlobalInt('DIGIRISKDOLIBARR_ACCIDENT_PROJECT');
 
         $result = parent::create($user, $noTrigger);
-        if ($result > 0 && $this->context != 'createfromclone') {
+        if ($result > 0 && empty($this->context['createfromclone'])) {
             $signatory = new SaturneSignature($this->db, $this->module, $this->element);
 
             $signatory->setSignatory($result, $this->element, 'user', [$user->id], 'Investigator', 1);
@@ -344,7 +344,7 @@ class AccidentInvestigation extends SaturneObject
 		// Create clone
 		$object->causality_tree = '';
 		$object->fk_task        = 0;
-		$object->context        = 'createfromclone';
+		$object->context['createfromclone'] = 'createfromclone';
 		$investigationId        = $object->create($user);
 
 		if ($investigationId > 0) {
@@ -364,7 +364,7 @@ class AccidentInvestigation extends SaturneObject
 			$this->errors = $object->errors;
 		}
 
-		unset($object->context);
+		unset($object->context['createfromclone']);
 
 		// End.
 		if (!$error) {
