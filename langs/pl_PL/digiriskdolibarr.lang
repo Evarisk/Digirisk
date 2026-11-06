@@ -1638,6 +1638,8 @@ GeneratedTicketDocumentDate    = Data eksportu tego zgłoszenia
 DigiriskTemplateDocumentProject = Szablony dokumentów kart projektów Digirisk
 DocumentModelPapripactA3Paysage = Szablony dokumentu raportu prognostycznego dotyczącego zadań projektów
 PapripactFullName               = Roczny Program Zapobiegania Ryzykom Zawodowym i Poprawy Warunków Pracy
+PapripactTaskLabel              = Nazwa zadania
+PapripactRiskDescriptionAssessment = Opis / ocena
 
 # Dokument rejestru
 
