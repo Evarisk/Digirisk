@@ -854,13 +854,13 @@ $varpage  = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 $selectedfields  = $form->multiSelectArrayWithCheckbox('risklist_selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 $selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
 
-// RPS : la qualification des unites de travail se prend une seule fois, au niveau 0
-// (onglet Risques psychosociaux de la societe, view/digiriskstandard/digiriskstandard_psychosocial.php)
-// et commande ensuite l'affichage du risque psychosocial sur chaque unite.
+// RPS : la qualification d'une unite de travail se prend sur sa ligne ci-dessous, ou pour plusieurs
+// unites au niveau 0 (onglet Risques psychosociaux de la societe, view/digiriskstandard/
+// digiriskstandard_psychosocial.php), et commande ensuite l'affichage du risque psychosocial de l'unite.
 require __DIR__ . '/digiriskdolibarr_rps_scope_data.tpl.php';
 if (isset($object) && $object->element == 'digiriskelement' && isset($rpsStateByUnit[(int) $object->id])) {
     // Unite de travail : sa ligne psychosociale, evaluable sur place si elle est concernee,
-    // sinon un rappel de sa qualification, qui se prend au niveau 0
+    // sinon un bandeau de sa qualification, modifiable sur place
     $rpsUnitLine = null;
     foreach ($rpsLines as $rpsCandidate) {
         if ((int) $rpsCandidate['id'] === (int) $object->id) {

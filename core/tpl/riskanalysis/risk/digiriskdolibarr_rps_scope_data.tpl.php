@@ -361,8 +361,8 @@ if (!isset($rpsScopeRows)) {
 
 /* --------------------------------------------------------------------------
  * Perimetre : toutes les unites de travail de l'entite.
- * La qualification est prise une seule fois, au niveau 0, et commande
- * ensuite l'affichage du risque psychosocial sur chaque unite.
+ * La qualification, prise au niveau 0 ou sur la liste des risques de l'unite,
+ * commande ensuite l'affichage du risque psychosocial sur chaque unite.
  * ----------------------------------------------------------------------- */
 
 $rpsLines       = [];

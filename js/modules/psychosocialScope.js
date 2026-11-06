@@ -10,7 +10,8 @@
  * \file    js/modules/psychosocialScope.js
  * \ingroup digiriskdolibarr
  * \brief   Risques psychosociaux : qualification des unités de travail au niveau 0 (onglet de la
- *          société), évaluation et plan d'action d'une unité concernée dans sa liste des risques.
+ *          société) ou sur la liste des risques de l'unité, évaluation et plan d'action d'une unité
+ *          concernée dans sa liste des risques.
  *          Balisage : core/tpl/riskanalysis/risk/digiriskdolibarr_rps_*.tpl.php
  */
 
@@ -26,16 +27,77 @@ window.digiriskdolibarr.psychosocialScope = {};
  * La méthode appelée automatiquement par la bibliothèque DigiriskDolibarr.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @return {void}
  */
 window.digiriskdolibarr.psychosocialScope.init = function() {
   window.digiriskdolibarr.psychosocialScope.event();
+  window.digiriskdolibarr.psychosocialScope.initStateSelects();
   window.digiriskdolibarr.psychosocialScope.restoreDetail();
   window.digiriskdolibarr.psychosocialScope.detachFilesModals();
   window.digiriskdolibarr.psychosocialScope.bindAnswers();
   window.digiriskdolibarr.psychosocialScope.openFromHash();
+};
+
+/**
+ * Passe les pastilles de qualification en select2, comme les autres listes de Dolibarr : sans
+ * recherche pour trois états, à la largeur de leur libellé, chaque état proposé dans sa pastille.
+ * Le select natif reste dessous : son événement change qualifie toujours l'unité.
+ *
+ * @since   23.7.1
+ * @version 23.7.1
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.psychosocialScope.initStateSelects = function() {
+  if (!$.fn.select2) {
+    return;
+  }
+
+  // Par lots, quand la page est libre : 2 à 3 ms par liste, les dizaines d'unités du niveau 0
+  // retardaient son chargement. D'ici là, la liste native, dessinée de la même façon, qualifie déjà.
+  const selects = $('select.rps-state-input:not(.select2-hidden-accessible)').get();
+  const later   = function(callback) {
+    return window.requestIdleCallback ? window.requestIdleCallback(callback) : setTimeout(callback);
+  };
+  const next    = function() {
+    // Une liste relue entre-temps a pu être prise par un appel suivant
+    $(selects.splice(0, 10)).not('.select2-hidden-accessible').select2({
+      width: 'auto',
+      dropdownAutoWidth: true,
+      minimumResultsForSearch: Infinity,
+      dropdownCssClass: 'rps-state-dropdown',
+      templateResult: function(option) {
+        return option.id === undefined ? option.text : $('<span class="rps-state-option"></span>').attr('data-state', option.id).text(option.text);
+      }
+    }).on('select2:open', function(event) {
+      // Le gestionnaire select2:open de Dolibarr donne le focus au champ de recherche, absent ici :
+      // sans id ni name, son sélecteur "input[aria-controls*=]" lève une erreur
+      event.stopPropagation();
+    });
+    if (selects.length) {
+      later(next);
+    }
+  };
+
+  if (selects.length) {
+    later(next);
+  }
+};
+
+/**
+ * Élément visible d'une pastille de qualification : le select2, ou le select natif sans lui.
+ *
+ * @since   23.7.1
+ * @version 23.7.1
+ *
+ * @param  {jQuery} select Select natif de la pastille
+ * @return {jQuery}        Élément sous lequel demander le motif
+ */
+window.digiriskdolibarr.psychosocialScope.stateAnchor = function(select) {
+  const container = select.next('.select2-container');
+  return container.length ? container : select;
 };
 
 /**
@@ -71,12 +133,43 @@ window.digiriskdolibarr.psychosocialScope.bindAnswers = function() {
  * elles restent où elles sont.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @return {void}
  */
 window.digiriskdolibarr.psychosocialScope.detachFilesModals = function() {
-  $('.rps-unit-card .saturne-files-modal, #rps_eval_modal .saturne-files-modal').appendTo(document.body);
+  // Marquées pour être retirées quand la liste des risques est relue (refreshUnit)
+  $('.rps-unit-card .saturne-files-modal, #rps_eval_modal .saturne-files-modal').addClass('rps-detached-modal').appendTo(document.body);
+};
+
+/**
+ * Relit la liste des risques de l'unité, comme après l'ajout d'un risque (risk.js) : sa ligne
+ * psychosociale, sa fenêtre d'évaluation et le risque psychosocial de la liste suivent sa
+ * qualification. Le reste de la page ne bouge pas.
+ *
+ * @since   23.7.1
+ * @version 23.7.1
+ *
+ * @return {Promise} Résolue une fois la liste remplacée
+ */
+window.digiriskdolibarr.psychosocialScope.refreshUnit = function() {
+  const scope = window.digiriskdolibarr.psychosocialScope;
+  const list  = $('.fichecenter.risklist');
+
+  list.addClass('wpeo-loader');
+  return Promise.resolve($.get(document.URL)).then(function(resp) {
+    $('body > .rps-detached-modal').remove();
+    list.html($(resp).find('#searchFormListRisks'));
+    scope.initStateSelects();
+    scope.detachFilesModals();
+    scope.bindAnswers();
+    scope.restoreDetail();
+  }).catch(function() {
+    // Liste illisible : la page entière, qui porte déjà la qualification enregistrée
+    window.location.reload();
+  }).finally(function() {
+    list.removeClass('wpeo-loader');
+  });
 };
 
 /**
@@ -104,6 +197,10 @@ window.digiriskdolibarr.psychosocialScope.event = function() {
   $(document).on('click', '.rps-scope-table .rps-reason', scope.editReason);
   $(document).on('mousedown', scope.closeReasonOutside);
   $(document).on('keydown', scope.closeReasonOnEscape);
+
+  // Qualification de l'unité consultée, depuis sa liste des risques
+  $(document).on('change', '.rps-unit-notice .rps-state-input, .rps-unit-card .rps-state-input', scope.qualifyUnit);
+  $(document).on('click', '.rps-unit-notice .rps-reason', scope.editUnitReason);
 
   // Ligne de l'unité : détail des facteurs et des actions
   $(document).on('click', '.rps-detail-toggle', scope.toggleDetail);
@@ -510,7 +607,7 @@ window.digiriskdolibarr.psychosocialScope.clearSelection = function() {
  * son motif ou le lien d'évaluation.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @param  {jQuery} row    Ligne de l'unité
  * @param  {string} state  État : 1, 0 ou -1
@@ -519,7 +616,8 @@ window.digiriskdolibarr.psychosocialScope.clearSelection = function() {
  */
 window.digiriskdolibarr.psychosocialScope.setRowState = function(row, state, reason) {
   row.attr('data-state', state);
-  row.find('.rps-state-input').val(state);
+  // change.select2 redessine la pastille sans qualifier l'unité une seconde fois
+  row.find('.rps-state-input').val(state).trigger('change.select2');
   row.find('.rps-state-select').attr('data-state', state);
   window.digiriskdolibarr.psychosocialScope.setText(row.find('.rps-reason-text'), state === '0' ? reason : '');
 };
@@ -658,19 +756,20 @@ window.digiriskdolibarr.psychosocialScope.restoreStates = function(block, before
  * Qualifie une unité depuis la liste déroulante de sa ligne.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.7.1
  *
  * @return {void}
  */
 window.digiriskdolibarr.psychosocialScope.qualifyRow = function() {
+  const scope    = window.digiriskdolibarr.psychosocialScope;
   const select   = $(this);
   const row      = select.closest('.rps-row');
   const previous = row.attr('data-state');
 
-  window.digiriskdolibarr.psychosocialScope.qualifyRows(row.closest('.rps-scope'), row, select.val(), {
-    anchor: select,
+  scope.qualifyRows(row.closest('.rps-scope'), row, select.val(), {
+    anchor: scope.stateAnchor(select),
     onCancel: function() {
-      select.val(previous);
+      select.val(previous).trigger('change.select2');
     }
   });
 };
@@ -719,8 +818,84 @@ window.digiriskdolibarr.psychosocialScope.editReason = function() {
 };
 
 /**
+ * Qualifie l'unité consultée depuis la pastille de sa liste des risques, puis relit cette liste :
+ * son état décide de la ligne psychosociale, de la fenêtre d'évaluation et du risque affiché.
+ * Le changement se défait depuis la notification qui le confirme.
+ *
+ * @since   23.7.1
+ * @version 23.7.1
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.psychosocialScope.qualifyUnit = function() {
+  const scope    = window.digiriskdolibarr.psychosocialScope;
+  const select   = $(this);
+  const block    = select.closest('.rps-scope');
+  const state    = select.val();
+  const previous = select.closest('.rps-state-select').attr('data-state');
+  const before   = block.find('.rps-reason').attr('data-reason') || '';
+  const cancel   = function() {
+    select.val(previous).trigger('change.select2');
+  };
+  // La ligne est remplacée par la relecture : on retrouve la nouvelle pour défaire
+  const current = function() {
+    return $('.rps-unit-notice, .rps-unit-card').first();
+  };
+  const save = function(reason) {
+    select.prop('disabled', true);
+    scope.saveScope(block, state, reason).then(function(saved) {
+      if (!saved) {
+        select.prop('disabled', false);
+        cancel();
+        return;
+      }
+      scope.refreshUnit().then(function() {
+        scope.toast(block.attr('data-ref') + ' → ' + scope.stateLabel(state), function() {
+          scope.saveScope(current(), previous, before).then(function(restored) {
+            if (restored) {
+              scope.refreshUnit();
+            }
+          });
+        });
+      });
+    });
+  };
+
+  if (state === '0') {
+    scope.askReason(scope.stateAnchor(select), block, 1, '', save, cancel);
+  } else {
+    save('');
+  }
+};
+
+/**
+ * Modifie le motif de l'unité consultée, déclarée non concernée.
+ *
+ * @since   23.7.1
+ * @version 23.7.1
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.psychosocialScope.editUnitReason = function() {
+  const scope  = window.digiriskdolibarr.psychosocialScope;
+  const button = $(this);
+  const block  = button.closest('.rps-scope');
+
+  scope.askReason(button, block, 1, button.attr('data-reason') || '', function(reason) {
+    scope.saveScope(block, '0', reason).then(function(saved) {
+      if (saved) {
+        button.attr('data-reason', reason);
+        scope.setText(button.find('.rps-reason-text'), reason);
+        scope.toast(block.attr('data-ref') + ' · ' + scope.label('reasonSaved'));
+      }
+    });
+  });
+};
+
+/**
  * Demande le motif de non-exposition dans une bulle, sous l'élément qui l'a déclenchée. Les motifs
- * déjà donnés sur ce document unique sont proposés d'un clic.
+ * déjà donnés sur ce document unique sont proposés d'un clic : ceux des lignes du tableau au niveau 0,
+ * ceux des autres unités (data-reasons) sur la page d'une unité.
  *
  * @since   23.5.1
  * @version 23.7.1
@@ -743,6 +918,9 @@ window.digiriskdolibarr.psychosocialScope.askReason = function(anchor, block, co
     if (reason !== '') {
       reasons[reason] = true;
     }
+  });
+  (block.data('reasons') || []).forEach(function(reason) {
+    reasons[reason] = true;
   });
 
   const popup = $('<div class="rps-pop" role="dialog"></div>');
@@ -797,7 +975,10 @@ window.digiriskdolibarr.psychosocialScope.askReason = function(anchor, block, co
       validate();
     }
   });
-  input.trigger('focus');
+  // Après coup : le select2 qui a demandé le motif reprend le focus en se refermant
+  setTimeout(function() {
+    input.trigger('focus');
+  });
 };
 
 /**

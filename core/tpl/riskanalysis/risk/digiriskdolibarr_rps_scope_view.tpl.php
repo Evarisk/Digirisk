@@ -19,8 +19,9 @@
  *             groupees sous leur groupement : filtres par etat, recherche, et selection
  *             multiple pour qualifier plusieurs unites d'un coup (js/modules/psychosocialScope.js).
  *
- *             La qualification se prend une seule fois par unite de travail, ici. Elle
- *             commande ensuite la liste des risques de chaque unite : une unite non
+ *             La qualification d'une unite se prend ici, ou sur sa propre liste des risques
+ *             (digiriskdolibarr_rps_unit_view.tpl.php). Elle commande ensuite la liste des
+ *             risques de chaque unite : une unite non
  *             concernee n'affiche pas la ligne du risque psychosocial, une unite concernee
  *             la retrouve a sa place, parmi ses autres risques.
  *
