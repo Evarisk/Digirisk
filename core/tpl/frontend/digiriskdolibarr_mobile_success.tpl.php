@@ -28,7 +28,9 @@
  *                    $successArchiveDisabledText (archive button shown greyed out with this reason, when there is no URL yet),
  *                    $successBannerText (confirmation banner on top, ready to print),
  *                    $successExtraBlockFile (template, or list of templates, of the blocks proper to the object),
- *                    $successFooterBlockFile (same, for discreet secondary actions under the buttons).
+ *                    $successFooterBlockFile (same, for discreet secondary actions under the buttons),
+ *                    $successTopBlockFile (same, on top of the screen, e.g. a bar with the way back and the actions:
+ *                    the buttons at the bottom are then left out by giving no $successViewUrl nor $successAgainUrl).
  */
 
 global $langs;
@@ -36,6 +38,13 @@ global $langs;
 $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successShareUrl) : '';
 ?>
 <div class="pwa-container digirisk-mobile">
+    <?php
+    foreach ((array) ($successTopBlockFile ?? []) as $successTopBlock) {
+        if (file_exists($successTopBlock)) {
+            require $successTopBlock;
+        }
+    }
+    ?>
     <?php if (!empty($successBannerText)) { ?>
     <!-- Confirmation right after the form was saved: stays on screen, unlike a notification -->
     <div class="digirisk-mobile-success-banner" role="status">
@@ -149,15 +158,21 @@ $successQrCode = dol_strlen($successShareUrl) ? digiriskGetQrCodeSvg($successSha
         <i class="fas fa-exclamation-triangle"></i> Module DoliLetter manquant pour la diffusion - Contacter votre administrateur
     </div>
     <?php } ?>
+    <?php if (!empty($successViewUrl) || !empty($successAgainUrl) || !empty($successArchiveUrl) || !empty($successArchiveDisabledText)) { ?>
     <div class="digirisk-mobile-success__actions<?php print (!empty($successArchiveUrl) || !empty($successArchiveDisabledText)) ? ' digirisk-mobile-success__actions--wrap' : ''; ?>">
+        <?php if (!empty($successViewUrl)) { ?>
         <a class="digirisk-mobile-success__button" href="<?php print $successViewUrl; ?>"><?php print dol_escape_htmltag($successViewLabel); ?></a>
+        <?php } ?>
         <?php if (!empty($successArchiveUrl)) { ?>
         <a id="digirisk-mobile-archive" class="digirisk-mobile-success__button digirisk-mobile-archive-open" href="<?php print $successArchiveUrl; ?>"><?php print dol_escape_htmltag($successArchiveLabel); ?></a>
         <?php } elseif (!empty($successArchiveDisabledText)) { ?>
         <span class="digirisk-mobile-success__button digirisk-mobile-success__button--disabled" title="<?php print dol_escape_htmltag($successArchiveDisabledText); ?>"><?php print dol_escape_htmltag($successArchiveLabel); ?></span>
         <?php } ?>
+        <?php if (!empty($successAgainUrl)) { ?>
         <a class="digirisk-mobile-success__button" href="<?php print $successAgainUrl; ?>"><?php print dol_escape_htmltag($successAgainLabel); ?></a>
+        <?php } ?>
     </div>
+    <?php } ?>
 
     <?php
     // Actions secondaires, discretes, sous les boutons (enregistrer le plan de prevention comme trame)

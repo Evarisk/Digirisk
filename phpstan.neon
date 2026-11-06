@@ -57,6 +57,10 @@ parameters:
         - ../saturne/class/
         - ../saturne/core/
         - ../saturne/lib/
+        # La diffusion de DoliLetter, sur laquelle s'appuient les causeries securite
+        # (lib/digiriskdolibarr_safetytalk.lib.php). A garder en phase avec quality.yml.
+        - ../doliletter/class/
+        - ../doliletter/lib/
         - ../../api/class/
         - ../../categories/class/
         - ../../comm/action/class/

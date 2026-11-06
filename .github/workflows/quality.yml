@@ -98,6 +98,16 @@ jobs:
                   ref: develop
                   path: htdocs/custom/saturne
 
+            # Les causeries securite s'appuient sur la diffusion de DoliLetter (feuille de presence,
+            # documents diffuses) : sans lui, ses classes et ses fonctions remonteraient comme inconnues.
+            # A garder en phase avec les scanDirectories de phpstan.neon.
+            - name: Checkout DoliLetter
+              uses: actions/checkout@v7
+              with:
+                  repository: Eoxia/doliletter
+                  ref: develop
+                  path: htdocs/custom/doliletter
+
             # Le coeur Dolibarr est necessaire a la resolution des classes (scanDirectories).
             # Epingle sur la derniere version stable pour que le verdict soit reproductible.
             # A garder en phase avec les scanDirectories de phpstan.neon.
