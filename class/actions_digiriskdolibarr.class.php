@@ -1432,6 +1432,13 @@ class ActionsDigiriskdolibarr
             print dolGetButtonAction($label, '', 'default', $url, '', $user->hasRight('digiriskdolibarr', 'accident', 'write'));
         }
 
+        // Cycle of safety talks or one of its talks: open it in the mobile application
+        $safetyTalkUrl = is_object($object) ? $this->safetyTalkAppUrl($parameters['context'], $object) : '';
+        if (dol_strlen($safetyTalkUrl)) {
+            $label = $conf->browser->layout == 'classic' ? '<i class="fas fa-comments"></i> ' . $langs->trans('SafetyTalkOpenInApp') : '<i class="fas fa-comments fa-2x"></i>';
+            print dolGetButtonAction($label, '', 'default', $safetyTalkUrl, '', $user->hasRight('projet', 'lire'));
+        }
+
         return 0; // or return 1 to replace standard code
     }
 
@@ -2070,7 +2077,56 @@ class ActionsDigiriskdolibarr
             }
         }
 
+        // A cycle of safety talks, or one of its talks, says so on its card, with the way to its mobile screen
+        if (!in_array($action, ['create', 'edit'], true) && is_object($object)) {
+            $safetyTalkUrl = $this->safetyTalkAppUrl($parameters['context'], $object);
+            if (dol_strlen($safetyTalkUrl)) {
+                $picto = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
+                $this->resprints = '<tr><td class="titlefield">' . $picto . $langs->trans($object instanceof Task ? 'SafetyTalk' : 'SafetyTalkCycle') . '</td>';
+                $this->resprints .= '<td><a href="' . dol_escape_htmltag($safetyTalkUrl) . '"><i class="fas fa-comments pictofixedwidth"></i>' . $langs->trans('SafetyTalkOpenInApp') . '</a></td></tr>';
+            }
+        }
+
         return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Mobile screen of a cycle of safety talks (a project with the CAUSERIE tag) or of one of its talks
+     * (a task of such a project), from its Dolibarr card.
+     *
+     * @param  string $context Hook contexts of the page
+     * @param  object $object  Project or task shown
+     * @return string          URL of the screen, empty when the object is no safety talk
+     */
+    private function safetyTalkAppUrl(string $context, object $object): string
+    {
+        global $db, $langs;
+
+        $isProject = strpos($context, 'projectcard') !== false && $object instanceof Project;
+        $isTask    = strpos($context, 'projecttaskcard') !== false && $object instanceof Task;
+        if ((!$isProject && !$isTask) || $object->id <= 0 || !isModEnabled('project')) {
+            return '';
+        }
+
+        require_once __DIR__ . '/../lib/digiriskdolibarr_safetytalk.lib.php';
+
+        $cycle = $object;
+        if ($isTask) {
+            $cycle = new Project($db);
+            if ($cycle->fetch((int) $object->fk_project) <= 0) {
+                return '';
+            }
+        }
+        if (!digiriskSafetyTalkIsCycle($db, $cycle)) {
+            return '';
+        }
+
+        // The cards of the core do not load the translations of the module
+        $langs->load('digiriskdolibarr@digiriskdolibarr');
+
+        return $isTask
+            ? dol_buildpath('/digiriskdolibarr/view/safetytalk/safetytalk_card.php', 1) . '?id=' . $object->id
+            : dol_buildpath('/digiriskdolibarr/view/safetytalk/safetytalk_project.php', 1) . '?id=' . $object->id;
     }
 
     /**
