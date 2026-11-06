@@ -14,15 +14,16 @@
  *             haut de ses risques : un bandeau d'une ligne quand elle est declaree concernee,
  *             dont le detail (facteurs et actions de prevention) se deplie.
  *
- *             La qualification, elle, se prend au niveau 0, sur l'onglet Risques psychosociaux
- *             de la societe : on la rappelle ici avec un lien, mais elle ne se modifie pas depuis
- *             l'unite. Une unite non concernee ou a qualifier n'a qu'un rappel de sa qualification.
+ *             La qualification se prend ici, sur la pastille de l'unite, ou pour plusieurs unites
+ *             a la fois au niveau 0, sur l'onglet Risques psychosociaux de la societe, vers lequel
+ *             renvoie un lien. Une unite non concernee ou a qualifier n'a qu'un bandeau de sa
+ *             qualification.
  *
  *             Les facteurs affiches proviennent de la derniere evaluation consolidee, ou a
  *             defaut des risques psychosociaux deja enregistres sur l'unite.
  *
- * Variables attendues : $rpsUnitLine, $rpsScale, $rpsScaleLabels, $rpsSubCategories, $rpsUsers,
- *                       $rpsAssessmentByElement, $object, $langs
+ * Variables attendues : $rpsUnitLine, $rpsLines, $rpsScale, $rpsScaleLabels, $rpsSubCategories, $rpsUsers,
+ *                       $rpsAssessmentByElement, $rpsJsLabels, $object, $langs
  */
 
 global $db, $langs, $user;
@@ -35,22 +36,68 @@ if (empty($rpsUnitLine)) {
 }
 
 $rpsUnitState = (int) $rpsUnitLine['state'];
-// Le lien vers la qualification suit les droits de l'onglet du niveau 0
+// Le lien vers le tableau de toutes les unites suit les droits de l'onglet du niveau 0
 $rpsRootAccess = $user->hasRight('digiriskdolibarr', 'digiriskstandard', 'read');
 $rpsRootUrl    = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_psychosocial.php', 1) . '#rps-unit-' . (int) $object->id;
 $rpsRootRef    = getDolGlobalString('MAIN_INFO_SOCIETE_NOM');
+$rpsEndpoint   = dol_buildpath('/digiriskdolibarr/core/ajax/save_rps_assessment.php', 1);
+
+// La pastille de l'etat devient la liste du niveau 0 avec le droit qu'exige son enregistrement.
+// Une unite evaluee, ou qui porte encore des risques psychosociaux, reste concernee tant qu'elle
+// n'est pas declaree non concernee : "a qualifier" ne lui est pas propose, l'affichage l'ignorerait
+// (digiriskdolibarr_rps_scope_data.tpl.php)
+$rpsCanQualify    = $user->hasRight('digiriskdolibarr', 'risk', 'write');
+$rpsQualifyStates = [1 => $langs->trans('PsychosocialStateConcerned'), 0 => $langs->trans('PsychosocialStateNotConcerned')];
+if (empty($rpsUnitLine['assessed']) && empty($rpsUnitLine['orphans'])) {
+    $rpsQualifyStates[-1] = $langs->trans('PsychosocialStateToQualify');
+}
+
+if ($rpsCanQualify) {
+    $rpsStateControl  = '<span class="rps-state-select" data-state="' . $rpsUnitState . '">';
+    $rpsStateControl .= '<select class="rps-state-input" aria-label="' . dol_escape_htmltag($langs->transnoentities('PsychosocialQualificationOf', $object->ref)) . '">';
+    foreach ($rpsQualifyStates as $rpsStateValue => $rpsStateLabel) {
+        $rpsStateControl .= '<option value="' . $rpsStateValue . '"' . ($rpsStateValue === $rpsUnitState ? ' selected' : '') . '>' . $rpsStateLabel . '</option>';
+    }
+    $rpsStateControl .= '</select><i class="fas fa-chevron-down"></i></span>';
+} else {
+    $rpsStateLabels  = [1 => 'PsychosocialStateConcerned', 0 => 'PsychosocialStateNotConcerned', -1 => 'PsychosocialStateToQualify'];
+    $rpsStateControl = '<span class="rps-state" data-state="' . $rpsUnitState . '">' . $langs->trans($rpsStateLabels[$rpsUnitState]) . '</span>';
+}
+
+// Motifs deja donnes aux autres unites, proposes d'un clic par la bulle du motif
+$rpsKnownReasons = [];
+foreach ($rpsLines as $rpsLine) {
+    if ($rpsLine['state'] === 0 && trim($rpsLine['reason']) !== '') {
+        $rpsKnownReasons[trim($rpsLine['reason'])] = true;
+    }
+}
+$rpsKnownReasons = array_keys($rpsKnownReasons);
+
+// Attributs lus par js/modules/psychosocialScope.js pour enregistrer la qualification et l'evaluation
+$rpsBlockData  = ' data-element="' . (int) $object->id . '" data-ref="' . dol_escape_htmltag($object->ref) . '" data-endpoint="' . $rpsEndpoint . '"';
+$rpsBlockData .= ' data-scale-labels="' . dol_escape_htmltag(json_encode($rpsScaleLabels)) . '"';
+$rpsBlockData .= ' data-labels="' . dol_escape_htmltag(json_encode($rpsJsLabels)) . '"';
+$rpsBlockData .= ' data-reasons="' . dol_escape_htmltag(json_encode($rpsKnownReasons)) . '"';
 
 if ($rpsUnitState !== 1) : ?>
-    <div class="rps-scope rps-unit-notice" data-state="<?php echo $rpsUnitState; ?>">
+    <div class="rps-scope rps-unit-notice" data-state="<?php echo $rpsUnitState; ?>"<?php echo $rpsBlockData; ?>>
         <span class="rps-head-icon"><i class="fas fa-brain"></i></span>
         <div class="rps-unit-notice-text">
             <span class="rps-head-title">
                 <?php echo $langs->trans('PsychosocialRisks'); ?>
-                <span class="rps-state" data-state="<?php echo $rpsUnitState; ?>"><?php echo $langs->trans($rpsUnitState === 0 ? 'PsychosocialStateNotConcerned' : 'PsychosocialStateToQualify'); ?></span>
+                <?php echo $rpsStateControl; ?>
             </span>
             <span class="rps-head-sub">
-                <?php if ($rpsUnitState === 0) : ?>
-                    <?php echo $langs->trans('PsychosocialReasonLabel'); ?> <?php echo trim($rpsUnitLine['reason']) !== '' ? dol_escape_htmltag($rpsUnitLine['reason']) : $langs->trans('PsychosocialReasonMissing'); ?>
+                <?php if ($rpsUnitState === 0) :
+                    $rpsReasonText = trim($rpsUnitLine['reason']) !== '' ? dol_escape_htmltag($rpsUnitLine['reason']) : $langs->trans('PsychosocialReasonMissing'); ?>
+                    <?php echo $langs->trans('PsychosocialReasonLabel'); ?>
+                    <?php if ($rpsCanQualify) : ?>
+                        <button type="button" class="rps-reason" data-reason="<?php echo dol_escape_htmltag(trim($rpsUnitLine['reason'])); ?>" title="<?php echo dol_escape_htmltag($langs->trans('PsychosocialEditReason')); ?>">
+                            <span class="rps-reason-text"><?php echo $rpsReasonText; ?></span> <i class="fas fa-pen"></i>
+                        </button>
+                    <?php else : ?>
+                        <?php echo $rpsReasonText; ?>
+                    <?php endif; ?>
                 <?php else : ?>
                     <?php echo $langs->trans('PsychosocialUnitToQualifyNotice'); ?>
                 <?php endif; ?>
@@ -58,7 +105,7 @@ if ($rpsUnitState !== 1) : ?>
         </div>
         <?php if ($rpsRootAccess) : ?>
             <a class="wpeo-button button-grey button-size-small" href="<?php echo $rpsRootUrl; ?>">
-                <?php echo dol_escape_htmltag($langs->transnoentities('PsychosocialQualifyOn', $rpsRootRef)); ?> <i class="fas fa-arrow-right"></i>
+                <?php echo dol_escape_htmltag($langs->transnoentities('PsychosocialAllUnitsOn', $rpsRootRef)); ?> <i class="fas fa-arrow-right"></i>
             </a>
         <?php endif; ?>
     </div>
@@ -98,21 +145,21 @@ if (!empty($rpsAssessmentByElement[(int) $object->id]['id'])) {
 }
 
 ?>
-<div class="rps-scope rps-unit-card" data-element="<?php echo (int) $object->id; ?>" data-endpoint="<?php echo dol_buildpath('/digiriskdolibarr/core/ajax/save_rps_assessment.php', 1); ?>"
-     data-scale-labels="<?php echo dol_escape_htmltag(json_encode($rpsScaleLabels)); ?>"
-     data-labels="<?php echo dol_escape_htmltag(json_encode($rpsJsLabels)); ?>">
+<div class="rps-scope rps-unit-card"<?php echo $rpsBlockData; ?>>
 
     <div class="rps-unit-line">
         <span class="rps-head-icon"><i class="fas fa-brain"></i></span>
 
         <div class="rps-unit-title">
-            <span class="rps-head-title"><?php echo $langs->trans('PsychosocialRisks'); ?></span>
-            <span class="rps-unit-sub">
-                <span class="rps-state" data-state="1"><?php echo $langs->trans('PsychosocialStateConcerned'); ?></span>
-                <?php if ($rpsRootAccess) : ?>
-                    <?php echo $langs->trans('PsychosocialQualifiedOn'); ?> <a href="<?php echo $rpsRootUrl; ?>"><?php echo dol_escape_htmltag($rpsRootRef); ?></a>
-                <?php endif; ?>
+            <span class="rps-head-title">
+                <?php echo $langs->trans('PsychosocialRisks'); ?>
+                <?php echo $rpsStateControl; ?>
             </span>
+            <?php if ($rpsRootAccess) : ?>
+                <span class="rps-unit-sub">
+                    <a href="<?php echo $rpsRootUrl; ?>"><?php echo dol_escape_htmltag($langs->transnoentities('PsychosocialAllUnitsOn', $rpsRootRef)); ?></a>
+                </span>
+            <?php endif; ?>
         </div>
 
         <div class="rps-unit-factors">

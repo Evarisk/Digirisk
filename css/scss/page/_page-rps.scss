@@ -537,7 +537,7 @@ $rps-actions-width: 200px;
     white-space: nowrap;
   }
 
-  // Qualification of a row: a native list drawn as the state pill
+  // Qualification of a row: a list drawn as the state pill, native until select2 replaces it
   .rps-state-select {
     position: relative;
     display: inline-block;
@@ -585,6 +585,97 @@ $rps-actions-width: 200px;
 
   div.fiche .rps-state-select[data-state="0"] select.rps-state-input:not(.select2-search__field):not(.form-field):not(.cke_source) {
     background: #eef2f6;
+  }
+
+  // The same pill once select2 replaces the list (psychosocialScope.initStateSelects). Saturne and eldy force
+  // a border and its radius on every select2 of the page, hence the !important
+  .rps-state-select {
+    .select2-container--default .select2-selection--single {
+      height: 26px;
+      min-height: 0;
+      padding: 0 24px 0 11px;
+      border: 0 !important;
+      border-radius: $dr-radius-pill !important;
+      background: $dr-warning-soft;
+      box-shadow: none;
+      cursor: pointer;
+
+      &:focus-visible {
+        box-shadow: $dr-ring;
+      }
+
+      .select2-selection__rendered {
+        padding: 0;
+        color: inherit;
+        font-size: 11.5px;
+        font-weight: 700;
+        line-height: 26px;
+      }
+
+      // The chevron of the pill stays, the one of select2 goes
+      .select2-selection__arrow {
+        display: none;
+      }
+    }
+
+    &[data-state="1"] .select2-container--default .select2-selection--single {
+      background: $dr-primary-soft;
+    }
+
+    &[data-state="0"] .select2-container--default .select2-selection--single {
+      background: #eef2f6;
+    }
+  }
+
+  // Its list, that select2 renders at the end of the page: each state in its own pill. Eldy opens every
+  // select2 list at 300px at least, on the background of the page
+  .select2-dropdown.rps-state-dropdown {
+    min-width: 150px !important;
+    padding: 4px;
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius-sm;
+    background: $dr-surface;
+    box-shadow: $dr-shadow-hover;
+
+    &.select2-dropdown--below {
+      margin-top: 4px;
+    }
+
+    &.select2-dropdown--above {
+      margin-top: -4px;
+    }
+
+    .select2-results__option {
+      padding: 4px 6px;
+      border-radius: 6px;
+      background: transparent;
+    }
+
+    .select2-results__option--highlighted[aria-selected] {
+      background: $dr-bg;
+    }
+  }
+
+  // Eldy whitens every span of the hovered option (color: #fff !important)
+  .rps-state-dropdown .rps-state-option {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: $dr-radius-pill;
+    background: $dr-warning-soft;
+    color: #a16207 !important;
+    font-size: 11.5px;
+    font-weight: 700;
+    line-height: 16px;
+
+    &[data-state="1"] {
+      background: $dr-primary-soft;
+      color: $dr-primary-strong !important;
+    }
+
+    &[data-state="0"] {
+      background: #eef2f6;
+      color: $dr-text-soft !important;
+    }
   }
 
   div.fiche .rps-search input.rps-search-input:not(.select2-search__field):not(.form-field):not(.cke_source) {
@@ -1256,6 +1347,21 @@ $rps-actions-width: 200px;
     flex-direction: column;
     gap: 2px;
     min-width: 0;
+
+    // Reason of a unit out of scope, edited in place like in the table of the root
+    .rps-reason {
+      display: inline-flex;
+      vertical-align: baseline;
+
+      .fa-pen {
+        color: $dr-faint;
+        font-size: 10px;
+      }
+
+      &:hover .fa-pen {
+        color: $dr-primary;
+      }
+    }
   }
 
   // ---- Modals: assessment of a unit and criteria of the grid ----
