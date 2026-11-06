@@ -1638,6 +1638,8 @@ GeneratedTicketDocumentDate    = Data exportului acestui tichet
 DigiriskTemplateDocumentProject = Modele de documente pentru fișele de proiect Digirisk
 DocumentModelPapripactA3Paysage = Modele de document de raport previzional privind sarcinile proiectelor
 PapripactFullName               = Programul Anual de Prevenire a Riscurilor Profesionale și de Îmbunătățire a Condițiilor de Muncă
+PapripactTaskLabel              = Denumirea sarcinii
+PapripactRiskDescriptionAssessment = Descriere / evaluare
 
 # Document de registru
 

@@ -1890,6 +1890,8 @@ GeneratedTicketDocumentDate    = Export date of this ticket
 DigiriskTemplateDocumentProject = Digirisk project sheet document templates
 DocumentModelPapripactA3Paysage = Document templates of the forecast report on the project tasks
 PapripactFullName               = Annual Occupational Risk Prevention and Working Conditions Improvement Program
+PapripactTaskLabel              = Task label
+PapripactRiskDescriptionAssessment = Description / assessment
 
 # Register Document
 

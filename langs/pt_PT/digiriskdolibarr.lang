@@ -1638,6 +1638,8 @@ GeneratedTicketDocumentDate    = Data da exportação deste ticket
 DigiriskTemplateDocumentProject = Modelos de documento das fichas de projeto do Digirisk
 DocumentModelPapripactA3Paysage = Modelos de documento de relatório previsional sobre as tarefas dos projetos
 PapripactFullName               = Programa Anual de Prevenção dos Riscos Profissionais e de Melhoria das Condições de Trabalho
+PapripactTaskLabel              = Designação da tarefa
+PapripactRiskDescriptionAssessment = Descrição / avaliação
 
 # Documento de registo
 

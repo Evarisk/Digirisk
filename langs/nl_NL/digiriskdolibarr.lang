@@ -1638,6 +1638,8 @@ GeneratedTicketDocumentDate    = Exportdatum van dit ticket
 DigiriskTemplateDocumentProject = Documentsjablonen van de projectfiches van Digirisk
 DocumentModelPapripactA3Paysage = Documentsjablonen van het prognoserapport over de projecttaken
 PapripactFullName               = Jaarprogramma voor de Preventie van Beroepsrisico's en de Verbetering van de Arbeidsomstandigheden
+PapripactTaskLabel              = Omschrijving van de taak
+PapripactRiskDescriptionAssessment = Beschrijving / beoordeling
 
 # Registerdocument
 

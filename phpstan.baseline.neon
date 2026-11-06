@@ -2955,13 +2955,13 @@ parameters:
 		-
 			message: '#^Access to an undefined property pdf_papripact_a3_paysage_projectdocument\:\:\$posxelement\.$#'
 			identifier: property.notFound
-			count: 9
+			count: 8
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
 			message: '#^Access to an undefined property pdf_papripact_a3_paysage_projectdocument\:\:\$posxlabel\.$#'
 			identifier: property.notFound
-			count: 12
+			count: 10
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
@@ -3010,18 +3010,6 @@ parameters:
 			message: '#^Access to an undefined property pdf_papripact_a3_paysage_projectdocument\:\:\$result\.$#'
 			identifier: property.notFound
 			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Binary operation "\+" between string and 1 results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 12
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Binary operation "\+" between string and 10 results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 2
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
@@ -3181,49 +3169,7 @@ parameters:
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
 
 		-
-			message: '#^Parameter \#2 \$tab_top of method pdf_papripact_a3_paysage_projectdocument\:\:_tableau\(\) expects string, float\|int given\.$#'
-			identifier: argument.type
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Parameter \#2 \$tab_top of method pdf_papripact_a3_paysage_projectdocument\:\:_tableau\(\) expects string, int given\.$#'
-			identifier: argument.type
-			count: 3
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
 			message: '#^Parameter \#2 \$userp of method Task\:\:getTasksArray\(\) expects User\|null, int given\.$#'
-			identifier: argument.type
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Parameter \#2 \$y of method TCPDF\:\:Rect\(\) expects float, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Parameter \#3 \$tab_height of method pdf_papripact_a3_paysage_projectdocument\:\:_tableau\(\) expects string, \(float\|int\) given\.$#'
-			identifier: argument.type
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Parameter \#3 \$tab_height of method pdf_papripact_a3_paysage_projectdocument\:\:_tableau\(\) expects string, float\|int given\.$#'
-			identifier: argument.type
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Parameter \#3 \$tab_height of method pdf_papripact_a3_paysage_projectdocument\:\:_tableau\(\) expects string, int given\.$#'
-			identifier: argument.type
-			count: 2
-			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
-
-		-
-			message: '#^Parameter \#4 \$h of method TCPDF\:\:Rect\(\) expects float, string given\.$#'
 			identifier: argument.type
 			count: 1
 			path: core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php

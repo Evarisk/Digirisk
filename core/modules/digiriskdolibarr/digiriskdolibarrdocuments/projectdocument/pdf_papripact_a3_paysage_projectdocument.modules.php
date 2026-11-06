@@ -108,6 +108,16 @@ class pdf_papripact_a3_paysage_projectdocument
 	public $marge_basse;
 
 	/**
+	 * @var float X position of the column of the risk description and of its last assessment
+	 */
+	public $posxdescription;
+
+	/**
+	 * @var int Side of the danger category picto, in mm
+	 */
+	private const CATEGORY_PICTO_SIZE = 6;
+
+	/**
 	 * Page orientation
 	 * @var string 'P' or 'Portait' (default), 'L' or 'Landscape'
 	 */
@@ -191,17 +201,18 @@ class pdf_papripact_a3_paysage_projectdocument
         // Define position of columns
         if ($this->orientation == 'L' || $this->orientation == 'Landscape') {
             $this->posxref                   = $this->marge_gauche + 1;           // Start position
-            $this->posxlabel                 = $this->posxref + 25;               // Ref: 35mm
+            $this->posxlabel                 = $this->posxref + 25;               // Ref: 25mm
             $this->posxelement               = $this->posxlabel + 95;             // Label: 95mm (main content)
             $this->posxdatestart             = $this->posxelement + 25;           // GP/UT: 25mm
-            $this->posxdateend               = $this->posxdatestart + 20;         // Start Date: 25mm
-            $this->posxworkload              = $this->posxdateend + 20;           // End Date: 25mm
-            $this->posxbudget                = $this->posxworkload + 30;          // Workload: 30mm
-            $this->posxprogress              = $this->posxbudget + 15;            // Budget: 40mm
-            $this->posxuser                  = $this->posxprogress + 20;          // Progress: 25mm
-            $this->posxrisk                  = $this->posxuser + 30;              // User: 30mm
-            $this->posxriskcategory          = $this->posxrisk + 25;              // Risk: 35mm
-            $this->posxriskassessment        = $this->posxriskcategory + 75;
+            $this->posxdateend               = $this->posxdatestart + 20;         // Start Date: 20mm
+            $this->posxworkload              = $this->posxdateend + 20;           // End Date: 20mm
+            $this->posxbudget                = $this->posxworkload + 16;          // Workload: 16mm
+            $this->posxprogress              = $this->posxbudget + 16;            // Budget: 16mm
+            $this->posxuser                  = $this->posxprogress + 16;          // Progress: 16mm
+            $this->posxrisk                  = $this->posxuser + 12;              // User: 12mm
+            $this->posxriskcategory          = $this->posxrisk + 20;              // Risk: 20mm
+            $this->posxdescription           = $this->posxriskcategory + 55;      // Risk category: 55mm
+            $this->posxriskassessment        = $this->posxdescription + 63;       // Risk description and assessment: 63mm
         } else {
             $this->posxref                   = $this->marge_gauche + 1;
             $this->posxlabel                 = $this->marge_gauche + 25;
@@ -214,6 +225,7 @@ class pdf_papripact_a3_paysage_projectdocument
             $this->posxuser                  = $this->marge_gauche + 140;
             $this->posxrisk                  = $this->marge_gauche + 170;
             $this->posxriskcategory          = $this->marge_gauche + 180;
+            $this->posxdescription           = $this->marge_gauche + 185;
             $this->posxriskassessment        = $this->marge_gauche + 190;
         }
         if ($this->page_largeur < 210) { // To work with US executive format
@@ -228,6 +240,7 @@ class pdf_papripact_a3_paysage_projectdocument
             $this->posxuser                  -= 20;
             $this->posxrisk                  -= 20;
             $this->posxriskcategory          -= 20;
+            $this->posxdescription           -= 20;
             $this->posxriskassessment        -= 20;
         }
 	}
@@ -450,6 +463,30 @@ class pdf_papripact_a3_paysage_projectdocument
                         }
                     }
 
+                    // Danger category: its picto stands before its name
+                    $riskCategoryName  = '';
+                    $riskCategoryPicto = '';
+                    if ($fkRisk > 0) {
+                        $riskType          = $risk->type ?: 'risk';
+                        $riskCategoryName  = $risk->getDangerCategoryName($risk, $riskType);
+                        $riskCategoryName  = ($riskCategoryName === -1) ? '' : $riskCategoryName;
+                        $riskCategoryPicto = dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($risk, $riskType) . '.png', 0);
+                        $riskCategoryPicto = is_readable($riskCategoryPicto) ? $riskCategoryPicto : '';
+                    }
+
+                    // Description of the risk, then the comment of its last assessment, dated as in the other risk documents
+                    $riskDescription   = $fkRisk > 0 ? trim(saturne_flatten_wysiwyg_blocks($risk->description, true)) : '';
+                    // A description prefilled with the category name would only repeat the column next to it
+                    $riskDescription   = ($riskDescription == $riskCategoryName) ? '' : $riskDescription;
+                    $assessmentComment = '';
+                    if (is_object($lastEvaluation)) {
+                        $assessmentComment = trim(saturne_flatten_wysiwyg_blocks($lastEvaluation->comment, true));
+                        $assessmentDate    = (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE') && !empty($lastEvaluation->date_riskassessment)) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation;
+                        if (dol_strlen($assessmentComment) && !empty($assessmentDate) && !getDolGlobalInt('DIGIRISKDOLIBARR_RISKASSESSMENT_HIDE_DATE_IN_DOCUMENT')) {
+                            $assessmentComment = dol_print_date($assessmentDate, 'dayreduceformat', 'tzuser', $outputLangs) . ' : ' . $assessmentComment;
+                        }
+                    }
+
                     $users          = $object->lines[$i]->liste_contact(-1, 'internal');
                     $userExecutives = [];
                     foreach ($users as $gooduser) {
@@ -457,8 +494,6 @@ class pdf_papripact_a3_paysage_projectdocument
                             $userExecutives = $gooduser;
                         }
                     };
-
-                    $risk->category = $fkRisk > 0 ? $risk->getDangerCategoryName($risk) : '';
 
                     // GP/UT carrying the risk — the same element carries many risks, resolve it once.
                     // The column is narrow, the ref sits on its own line above the truncated label.
@@ -475,7 +510,10 @@ class pdf_papripact_a3_paysage_projectdocument
 					$tmpArray = array("cotation" => empty($lastEvaluation->cotation) ? 0 : $lastEvaluation->cotation);
 					$tmpArray += array("task_ref" => $object->lines[$i]->ref);
 					$tmpArray += array("risk_ref" => $risk->ref);
-                    $tmpArray += array("risk_category" => $risk->category);
+                    $tmpArray += array("risk_category" => $riskCategoryName);
+                    $tmpArray += array("risk_category_picto" => $riskCategoryPicto);
+                    $tmpArray += array("risk_description" => $riskDescription);
+                    $tmpArray += array("assessment_comment" => $assessmentComment);
                     $tmpArray += array("element" => $elementText);
 					$tmpArray += array("label" => $object->lines[$i]->label);
 					$tmpArray += array("budget" => $object->lines[$i]->budget_amount);
@@ -506,6 +544,9 @@ class pdf_papripact_a3_paysage_projectdocument
 					$libelleline      = $objectDoc[$i]['label'];
 					$riskref          = $objectDoc[$i]['risk_ref'];
                     $riskcategory     = $objectDoc[$i]['risk_category'];
+                    $riskpicto        = $objectDoc[$i]['risk_category_picto'];
+                    $riskdescription  = $objectDoc[$i]['risk_description'];
+                    $riskcomment      = $objectDoc[$i]['assessment_comment'];
                     $elementline      = $objectDoc[$i]['element'];
 					$lastEvaluation   = $objectDoc[$i]['cotation'];
 					$budget           = price($objectDoc[$i]['budget'], 0, $langs, 1, 0, 0, $conf->currency);
@@ -518,10 +559,9 @@ class pdf_papripact_a3_paysage_projectdocument
 
 					$showpricebeforepagebreak = 1;
 					$pdf->startTransaction();
-					// Label
-					$pdf->SetXY($this->posxlabel, $curY);
-					$pdf->MultiCell($this->posxelement - $this->posxlabel, 3, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
-					$posyafter = $pdf->GetY(); // Y position reached by the label, used below to know if there is still room for the total block
+					// Label, risk description and assessment: the columns tall enough to push the row onto the next page
+					$this->_tallColumns($pdf, $curY, $libelleline, $riskdescription, $riskcomment, $outputLangs, $default_font_size);
+					$posyafter = $pdf->GetY(); // Y position reached by the tallest of them, used below to know if there is still room for the total block
 					$pageposafter = $pdf->getPage();
 					if ($pageposafter > $pageposbefore) { // There is a pagebreak
 						$pdf->rollbackTransaction(true);
@@ -570,10 +610,8 @@ class pdf_papripact_a3_paysage_projectdocument
 								$pdf->setPageOrientation($this->orientation, 1, $heightforfooter); // The only function to edit the bottom margin of current page to set it.
 								$curY = $tab_top_newpage + $heightoftitleline + 1;
 
-								// Label
-								$pdf->SetXY($this->posxlabel, $curY);
-								$posybefore = $pdf->GetY();
-								$pdf->MultiCell($this->posxelement - $this->posxlabel, 6, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
+								// Label, risk description and assessment
+								$this->_tallColumns($pdf, $curY, $libelleline, $riskdescription, $riskcomment, $outputLangs, $default_font_size);
 								$pageposafter = $pdf->getPage();
 								$posyafter    = $pdf->GetY();
 							}
@@ -600,7 +638,7 @@ class pdf_papripact_a3_paysage_projectdocument
 					// Ref of task
 					$pdf->SetXY($this->posxref, $curY);
 					$pdf->MultiCell($this->posxlabel - $this->posxref, 3, $outputLangs->convToOutputCharset($ref), 0, 'L');
-					// The row ends below its tallest column: a wrapped ref, the two lines of the GP/UT or a wrapped risk category can go past the label
+					// The row ends below its tallest column: a wrapped ref, the two lines of the GP/UT or the risk category can go past the label
 					$rowBottom = max($nexY, $pdf->GetY());
 
                     // GP/UT carrying the risk of the task
@@ -637,10 +675,16 @@ class pdf_papripact_a3_paysage_projectdocument
 					$pdf->SetXY($this->posxrisk, $curY);
 					$pdf->MultiCell($this->posxriskcategory - $this->posxrisk, 6, $riskref, 0, 'L');
 
-                    // Risk category
-                    $pdf->SetXY($this->posxriskcategory, $curY);
-                    $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 3); // We restore font
-                    $pdf->MultiCell($this->posxriskassessment - $this->posxriskcategory, 0, $riskcategory, 0, 'L');
+                    // Risk category, its picto on the left of its name
+                    $riskCategoryX = $this->posxriskcategory;
+                    if (dol_strlen($riskpicto)) {
+                        $pdf->Image($riskpicto, $this->posxriskcategory, $curY, self::CATEGORY_PICTO_SIZE, self::CATEGORY_PICTO_SIZE);
+                        $rowBottom     = max($rowBottom, $curY + self::CATEGORY_PICTO_SIZE);
+                        $riskCategoryX += self::CATEGORY_PICTO_SIZE + 1.5;
+                    }
+                    $pdf->SetXY($riskCategoryX, $curY);
+                    $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 3); // We use a smaller font
+                    $pdf->MultiCell($this->posxdescription - $riskCategoryX - 1, 0, $outputLangs->convToOutputCharset($riskcategory), 0, 'L');
                     $rowBottom = max($rowBottom, $pdf->GetY());
                     $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1); // We restore font
 
@@ -792,8 +836,8 @@ class pdf_papripact_a3_paysage_projectdocument
 	 *   Show table for lines
 	 *
 	 *   @param		TCPDF		$pdf     		Object PDF
-	 *   @param		string		$tab_top		Top position of table
-	 *   @param		string		$tab_height		Height of table (rectangle)
+	 *   @param		float		$tab_top		Top position of table
+	 *   @param		float		$tab_height		Height of table (rectangle)
 	 *   @param		int			$nexY			Y
 	 *   @param		Translate	$outputLangs	Langs object
 	 *   @param		int			$hidetop		Hide top bar of array
@@ -825,7 +869,7 @@ class pdf_papripact_a3_paysage_projectdocument
 
         // Task label
         $pdf->SetXY($this->posxlabel, $tab_top + 1);
-        $pdf->MultiCell($this->posxelement - $this->posxlabel, 3, $outputLangs->transnoentities('Label'), 0, 'L');
+        $pdf->MultiCell($this->posxelement - $this->posxlabel, 3, $outputLangs->transnoentities('PapripactTaskLabel'), 0, 'L');
 
         // GP/UT carrying the risk of the task
         $pdf->SetXY($this->posxelement, $tab_top + 1);
@@ -861,11 +905,59 @@ class pdf_papripact_a3_paysage_projectdocument
 
         // Rsk Category
         $pdf->SetXY($this->posxriskcategory, $tab_top + 1);
-        $pdf->MultiCell($this->posxriskassessment - $this->posxriskcategory, 3, $outputLangs->transnoentities('RiskCategoryEdit'), '', 'L');
+        $pdf->MultiCell($this->posxdescription - $this->posxriskcategory, 3, $outputLangs->transnoentities('RiskCategoryEdit'), '', 'L');
+
+        // Risk description and last assessment
+        $pdf->SetXY($this->posxdescription, $tab_top + 1);
+        $pdf->MultiCell($this->posxriskassessment - $this->posxdescription, 3, $outputLangs->transnoentities('PapripactRiskDescriptionAssessment'), '', 'L');
 
         // Risk Evaluation
 		$pdf->SetXY($this->posxriskassessment, $tab_top + 1);
 		$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxriskassessment, 3, $outputLangs->transnoentities('Cot.'), '', 'C');
+	}
+
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+	/**
+	 *  Show the columns of a line that can run over several lines: the label of the task, the description of its
+	 *  risk and the comment of the last assessment. The PDF is left on the page and at the Y of the one ending lowest.
+	 *
+	 *  @param  TCPDF     $pdf               Object PDF
+	 *  @param  float     $curY              Top of the line
+	 *  @param  string    $label             Label of the task
+	 *  @param  string    $riskDescription   Description of the risk
+	 *  @param  string    $assessmentComment Comment of the last assessment of the risk
+	 *  @param  Translate $outputLangs       Langs object
+	 *  @param  int       $defaultFontSize   Default font size
+	 *  @return void
+	 */
+	protected function _tallColumns(&$pdf, $curY, $label, $riskDescription, $assessmentComment, $outputLangs, $defaultFontSize)
+	{
+		$startPage = $pdf->getPage();
+
+		$pdf->SetFont(pdf_getPDFFont($outputLangs), '', $defaultFontSize - 1);
+		$pdf->SetXY($this->posxlabel, $curY);
+		$pdf->MultiCell($this->posxelement - $this->posxlabel, 3, $outputLangs->convToOutputCharset($label), 0, 'L');
+		$endPage = $pdf->getPage();
+		$endY    = $pdf->GetY();
+
+		// The comment of the assessment goes in italics under the description
+		$pdf->setPage($startPage);
+		$pdf->SetXY($this->posxdescription, $curY);
+		foreach (['' => $riskDescription, 'I' => $assessmentComment] as $style => $text) {
+			if (dol_strlen($text)) {
+				$pdf->SetFont(pdf_getPDFFont($outputLangs), $style, $defaultFontSize - 3);
+				$pdf->SetX($this->posxdescription);
+				$pdf->MultiCell($this->posxriskassessment - $this->posxdescription - 1, 3, $outputLangs->convToOutputCharset($text), 0, 'L');
+			}
+		}
+		if ($pdf->getPage() > $endPage || ($pdf->getPage() == $endPage && $pdf->GetY() > $endY)) {
+			$endPage = $pdf->getPage();
+			$endY    = $pdf->GetY();
+		}
+
+		$pdf->setPage($endPage);
+		$pdf->SetY($endY);
+		$pdf->SetFont(pdf_getPDFFont($outputLangs), '', $defaultFontSize - 1);
 	}
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 	/**
