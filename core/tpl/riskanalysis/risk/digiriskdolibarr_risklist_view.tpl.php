@@ -641,7 +641,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                             </div>
                             <div class="risk-evaluation-header-right riskassessment-medias">
                                 <?php // The risk does not exist yet: its creation moves these photos into its first assessment
-                                print digiriskRiskAssessmentMediaBlock('riskassessment/tmp/RA0'); ?>
+                                print digiriskRiskAssessmentMediaBlock(digiriskRiskAssessmentWorkDir()); ?>
                             </div>
                         </div>
 
