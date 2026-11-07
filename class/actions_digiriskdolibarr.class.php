@@ -2844,37 +2844,63 @@ class ActionsDigiriskdolibarr
         // A risk has no label: its description tells it apart when medias are assigned to it
         $objectsMetadata['digiriskdolibarr_risk']['label_field'] = 'description';
 
+        // ucfirst() gives Risksign, the translation key is RiskSign
+        $objectsMetadata['digiriskdolibarr_risksign']['langs'] = 'RiskSign';
+
         $this->results = $objectsMetadata;
 
         return 0; // or return 1 to replace standard code
     }
 
     /**
-     * Overloading the saturneMediaAssignTarget function : a risk shows the photos of its last
-     * assessment, so the medias assigned to it from the library must land there
+     * Overloading the saturneMediaAssignTarget function : the medias assigned from the library must land
+     * where the card of the record shows them. A risk shows the photos of its last assessment, a work
+     * unit or a groupment the ones of its <type>/<ref>/ folder, an accident the ones of photos/, an
+     * accident investigation its causality tree
      *
      * @param  array  $parameters Hook metadata (context, etc...)
      * @param  object $object     Record picked in the list of the library medias
-     * @return int                0 to keep that record, 1 to hand over the one holding its medias
+     * @return int                0 to keep the folder Saturne computes, 1 to give the record and the folder
      * @throws Exception
      */
     public function saturneMediaAssignTarget(array $parameters, $object): int
     {
-        if (!($object instanceof Risk)) {
+        global $conf;
+
+        if (($parameters['moduleName'] ?? 'digiriskdolibarr') !== 'digiriskdolibarr' || !is_object($object)) {
             return 0;
         }
 
-        require_once __DIR__ . '/riskanalysis/riskassessment.class.php';
+        $root = $conf->digiriskdolibarr->multidir_output[$conf->entity];
 
-        $riskAssessment  = new RiskAssessment($this->db);
-        $riskAssessments = $riskAssessment->fetchFromParent($object->id, 1, 'DESC');
-        if (!is_array($riskAssessments) || empty($riskAssessments)) {
-            return 0;
+        switch ($object->element) {
+            case 'risk':
+                require_once __DIR__ . '/riskanalysis/riskassessment.class.php';
+
+                $riskAssessment  = new RiskAssessment($this->db);
+                $riskAssessments = $riskAssessment->fetchFromParent($object->id, 1, 'DESC');
+                if (!is_array($riskAssessments) || empty($riskAssessments)) {
+                    return 0;
+                }
+
+                $lastAssessment = array_shift($riskAssessments);
+                $this->results  = ['object' => $lastAssessment, 'dir' => $root . '/riskassessment/' . $lastAssessment->ref];
+                return 1;
+
+            case 'digiriskelement':
+                $this->results = ['object' => $object, 'dir' => $root . '/' . $object->element_type . '/' . $object->ref];
+                return 1;
+
+            case 'accident':
+                $this->results = ['object' => $object, 'dir' => $root . '/accident/' . $object->ref . '/photos'];
+                return 1;
+
+            case 'accidentinvestigation':
+                $this->results = ['object' => $object, 'dir' => $root . '/accidentinvestigation/' . $object->ref . '/causality_tree', 'favorite_field' => 'causality_tree'];
+                return 1;
         }
 
-        $this->results = ['object' => array_shift($riskAssessments)];
-
-        return 1;
+        return 0;
     }
 
     /**

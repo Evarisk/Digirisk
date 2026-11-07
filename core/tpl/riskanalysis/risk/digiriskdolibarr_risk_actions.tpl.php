@@ -64,7 +64,7 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 				$evaluation->exposition = $exposition;
 			}
 
-			digiriskRiskAssessmentMovePhotos($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0', $evaluation);
+			digiriskRiskAssessmentMovePhotos($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . digiriskRiskAssessmentWorkDir(), $evaluation);
 
 			$result2 = $evaluation->create($user, false);
 
@@ -308,7 +308,7 @@ if ( ! $error && $action == 'addEvaluation' && $permissiontoadd) {
 		$evaluation->exposition = $exposition;
 	}
 
-	digiriskRiskAssessmentMovePhotos($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/' . $risktmp->ref, $evaluation);
+	digiriskRiskAssessmentMovePhotos($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . digiriskRiskAssessmentWorkDir($risktmp->ref), $evaluation);
 
 	$result = $evaluation->create($user);
 

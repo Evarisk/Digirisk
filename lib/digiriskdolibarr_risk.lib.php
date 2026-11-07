@@ -121,8 +121,11 @@ function digiriskRiskAssessmentMediaActions(string $action): void
     $isDocument = in_array($action, ['uploadFile', 'deleteFile'], true);
     $blockDir   = $isDocument ? preg_replace('/\/documents$/', '', $subDir) : $subDir;
 
-    if (preg_match('/^riskassessment\/tmp\/RA0(\/[A-Za-z0-9_-]+)?$/', $blockDir)) {
-        // Work folder of a new risk, or of a new assessment named after its risk
+    // A work folder is the one of the session only (digiriskRiskAssessmentWorkDir()): the one of a new
+    // risk, of a new assessment named after its risk, or of a psychosocial assessment
+    $sessionToken = digiriskRiskAssessmentWorkToken();
+
+    if (preg_match('/^riskassessment\/tmp\/RA0\/(?:[A-Za-z0-9_]+-)?' . preg_quote($sessionToken, '/') . '$/', $blockDir)) {
         $isAllowed = true;
     } elseif (preg_match('/^riskassessment\/([A-Za-z0-9_-]+)$/', $blockDir, $matches) && $matches[1] !== 'tmp') {
         $riskAssessment = new RiskAssessment($db);
@@ -131,7 +134,7 @@ function digiriskRiskAssessmentMediaActions(string $action): void
 
     // The work folder of a psychosocial assessment (digiriskRiskAssessmentPsychosocialWorkDir()), or
     // the folder of one, also takes documents
-    $withFiles = preg_match('/^riskassessment\/tmp\/RA0\/RPS\d+$/', $blockDir) || ($riskAssessment !== null && $riskAssessment->method == 'rps');
+    $withFiles = preg_match('/^riskassessment\/tmp\/RA0\/RPS\d+-' . preg_quote($sessionToken, '/') . '$/', $blockDir) || ($riskAssessment !== null && $riskAssessment->method == 'rps');
 
     if (!$isAllowed || ($isDocument && (!$withFiles || $blockDir === $subDir))) {
         http_response_code(403);
@@ -178,6 +181,36 @@ function digiriskRiskAssessmentMediaActions(string $action): void
 }
 
 /**
+ * Token naming the work folders of the risk modals of the session
+ *
+ * @return string Token, the same for the whole session
+ */
+function digiriskRiskAssessmentWorkToken(): string
+{
+    dol_include_once('/saturne/lib/medias.lib.php');
+
+    return saturne_get_upload_token('digiriskdolibarr_riskassessment');
+}
+
+/**
+ * Work folder of the photos of a risk or an assessment being created
+ *
+ * Named after a token of the session: a folder shared by everyone handed the photo one user took for
+ * a risk to the next risk anyone created, in any work unit, and kept the photos of a cancelled modal
+ * for it as well.
+ *
+ * @param  string $owner Empty for a new risk, the reference of the risk for a new assessment of it,
+ *                       RPS<id> for the psychosocial assessment of a work unit
+ * @return string        Folder, relative to the module folder
+ */
+function digiriskRiskAssessmentWorkDir(string $owner = ''): string
+{
+    $owner = preg_replace('/[^A-Za-z0-9_]/', '', $owner);
+
+    return 'riskassessment/tmp/RA0/' . (dol_strlen($owner) > 0 ? $owner . '-' : '') . digiriskRiskAssessmentWorkToken();
+}
+
+/**
  * Work folder of the psychosocial assessment of a work unit, while it is being typed
  *
  * Inside the work folder of a new risk, which only moves its own files: the classic risk modals of
@@ -188,7 +221,7 @@ function digiriskRiskAssessmentMediaActions(string $action): void
  */
 function digiriskRiskAssessmentPsychosocialWorkDir(int $elementId): string
 {
-    return 'riskassessment/tmp/RA0/RPS' . $elementId;
+    return digiriskRiskAssessmentWorkDir('RPS' . $elementId);
 }
 
 /**
