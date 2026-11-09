@@ -102,24 +102,51 @@ class DigiriskDocuments extends SaturneDocuments
     {
         global $langs;
 
-        $className = $this->parent_type;
-        if (file_exists( __DIR__ . '/digiriskelement/' . $className .'.class.php')) {
-            require_once __DIR__ . '/digiriskelement/' . $className .'.class.php';
-        } else if (file_exists( __DIR__ . '/digiriskdolibarrdocuments/' . $className .'.class.php')) {
-            require_once __DIR__ . '/digiriskdolibarrdocuments/' . $className .'.class.php';
-        }  else {
-            require_once __DIR__ . '/' . $className .'.class.php';
-        }
-
-        $parentElement = new $className($this->db);
-        $parentElement->fetch($this->parent_id);
-
         $ret  = parent::getTriggerDescription();
 
         $ret .= $langs->transnoentities('ElementType') . ' : ' . $this->parent_type . '<br>';
-        $ret .= $langs->transnoentities('ParentElement') . ' : ' . $parentElement->ref . ' ' . $parentElement->label . '<br>';
+
+        $parentElement = $this->fetchParentElement();
+        if (is_object($parentElement)) {
+            $ret .= $langs->transnoentities('ParentElement') . ' : ' . ($parentElement->ref ?? '') . ' ' . ($parentElement->label ?? '') . '<br>';
+        }
+
         $ret .= $langs->transnoentities('LastMainDoc') . ' : ' . $this->last_main_doc . '<br>';
 
         return $ret;
+    }
+
+    /**
+     * Load the object the document describes, from its parent type and ID
+     *
+     * The class sits in a different directory depending on the type (riskassessment is in riskanalysis/),
+     * and a specimen document can carry a type with no class behind it, or an unsaved parent (ID 0)
+     *
+     * @return object|null Parent object, null when it can not be loaded
+     */
+    public function fetchParentElement(): ?object
+    {
+        $className = $this->parent_type;
+        if ($this->parent_id <= 0 || !preg_match('/^[a-z0-9_]+$/i', $className)) {
+            return null;
+        }
+
+        foreach (['digiriskelement/', 'digiriskdolibarrdocuments/', 'riskanalysis/', ''] as $classDir) {
+            $classPath = __DIR__ . '/' . $classDir . $className . '.class.php';
+            if (file_exists($classPath)) {
+                require_once $classPath;
+                break;
+            }
+        }
+        if (!class_exists($className)) {
+            return null;
+        }
+
+        $parentElement = new $className($this->db);
+        if ($parentElement->fetch($this->parent_id) <= 0) {
+            return null;
+        }
+
+        return $parentElement;
     }
 }
