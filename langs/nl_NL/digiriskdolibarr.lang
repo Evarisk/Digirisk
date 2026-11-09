@@ -245,6 +245,16 @@ StaffRepresentatives = Personeelsvertegenwoordigers
 ElectionDate         = Verkiezingsdatum
 ElectionDateCSE      = Verkiezingsdatum van het Sociaal en Economisch Comité
 ElectionDateDP       = Verkiezingsdatum van de personeelsvertegenwoordigers
+CHSCT                          = Comité voor Hygiëne, Veiligheid en Arbeidsomstandigheden (CHSCT)
+F3SCT                          = Gespecialiseerde Commissie voor Gezondheid, Veiligheid en Arbeidsomstandigheden (F3SCT)
+ElectionDateCHSCT              = Aanwijzingsdatum van het Comité voor Hygiëne, Veiligheid en Arbeidsomstandigheden
+ElectionDateF3SCT              = Aanwijzingsdatum van de gespecialiseerde commissie voor gezondheid, veiligheid en arbeidsomstandigheden
+StaffRepresentativeBodies      = Personeelsvertegenwoordigende organen
+StaffRepresentativeBodiesHelp  = Organen waarover het bedrijf beschikt. Elk heeft zijn verkiezingsdatum, zijn vaste leden en zijn plaatsvervangers, in te vullen na het opslaan, overgenomen in de informatieverspreiding.
+StaffBodyMembersCSE            = Leden van het Sociaal en Economisch Comité verkozen op
+StaffBodyMembersCHSCT          = Leden van het Comité voor Hygiëne, Veiligheid en Arbeidsomstandigheden aangewezen op
+StaffBodyMembersF3SCT          = Leden van de gespecialiseerde commissie voor gezondheid, veiligheid en arbeidsomstandigheden aangewezen op
+StaffBodyMembersDP             = Personeelsvertegenwoordigers verkozen op
 
 Titulars                       = Vaste leden
 Alternates                     = Plaatsvervangers
