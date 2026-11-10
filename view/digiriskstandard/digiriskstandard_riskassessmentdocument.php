@@ -209,9 +209,10 @@ if (empty($resHook)) {
         $object->ref = $previousRef;
 
         // The archive rebundles what the generation just produced: chaining it after a failure only
-        // stacks a second, misleading error on top of the real one.
+        // stacks a second, misleading error on top of the real one. The model tells the document
+        // itself from its user guide and its CSE presentation, which leave the archive alone.
         if (!$error) {
-            $result = $document->generateArchiveWithDigiriskElementDocuments($moreparams, $outputlangs, $hidedetails, $hidedesc, $hideref);
+            $result = $document->generateArchiveWithDigiriskElementDocuments($moreparams, $outputlangs, $hidedetails, $hidedesc, $hideref, (string) $model);
             if ($result < 0) {
                 setEventMessages($document->error, $document->errors, 'errors');
                 $error++;

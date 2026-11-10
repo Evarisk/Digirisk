@@ -108,6 +108,13 @@ class RiskAssessmentDocument extends DigiriskDocuments
 	}
 
     /**
+     * Models of the risk assessment document tab that are not the document itself: the user guide
+     * explains it and the CSE presentation presents it. The archive of the groupment and work unit
+     * documents goes with the document only, generating one of these must not rebuild every sheet
+     */
+    public const MODELS_WITHOUT_ARCHIVE = ['riskassessmentdocumentguide', 'csepresentationdocument'];
+
+    /**
      * Generate a ZIP archive with the risk assessment document and all the groupment/workunit documents
      *
      * @param  array     $moreparams  More parameters (digiriskElement, uploadDir, user)
@@ -115,14 +122,20 @@ class RiskAssessmentDocument extends DigiriskDocuments
      * @param  int       $hideDetails Do not show line details
      * @param  int       $hideDesc    Do not show desc
      * @param  int       $hideRef     Do not show ref
-     * @return int                    0 if archive generation is disabled, 1 if OK, -1 if KO
+     * @param  string    $documentModel Model the document was just generated with, "name:template path" for an ODT one
+     * @return int                      0 if archive generation is disabled or not for this model, 1 if OK, -1 if KO
      * @throws Exception
      */
-    public function generateArchiveWithDigiriskElementDocuments($moreparams, $outputLangs, $hideDetails, $hideDesc, $hideRef)
+    public function generateArchiveWithDigiriskElementDocuments($moreparams, $outputLangs, $hideDetails, $hideDesc, $hideRef, string $documentModel = '')
     {
         global $conf, $langs, $user;
 
         if (!getDolGlobalInt('DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS')) {
+            return 0;
+        }
+
+        // Not $model: the method already holds the models of the groupment and work unit documents under that name
+        if (in_array(explode(':', $documentModel)[0], self::MODELS_WITHOUT_ARCHIVE, true)) {
             return 0;
         }
 
