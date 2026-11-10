@@ -138,7 +138,10 @@ class RiskAssessmentDocument extends DigiriskDocuments
             return -1;
         }
 
-        $digiriskElements = $moreparams['digiriskElement']->fetchDigiriskElementFlat(0);
+        // Elements of the current entity only. The default scope also brings the ones other entities
+        // share, whose sheets came out empty, numbered here and filed with the local element of the
+        // same ref. The risks they share to a local element are in its own sheet - issues #5741, #5736
+        $digiriskElements = $moreparams['digiriskElement']->fetchDigiriskElementFlat(0, [], 'current');
         if (!is_array($digiriskElements) || empty($digiriskElements)) {
             $this->error = $langs->trans('ErrorFailToFetchDigiriskElements');
             return -1;
