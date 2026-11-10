@@ -2275,6 +2275,16 @@ TicketKanbanFilterDateFrom             = Created on or after this day
 TicketKanbanFilterDateTo               = to
 TicketKanbanFilterDateToHelp           = Created on or before this day
 TicketKanbanFilterService              = GP/UT
+TicketQuickCloseTooltip                = Close this ticket or change its progress
+TicketQuickCloseTitle                  = Close the ticket
+TicketQuickCloseProgressTitle          = Update the progress
+TicketQuickCloseProgressHelp           = At 100 %, the ticket is closed. Below, only its progress changes.
+TicketQuickCloseCommentPlaceholder     = Added to the ticket as a private message (optional)
+TicketQuickCloseError                  = The ticket could not be updated
+TicketQuickCloseAlreadyClosed          = This ticket is already closed
+TicketQuickCloseLogClosed              = Ticket closed (kanban)
+TicketQuickCloseLogProgress            = Progress changed (kanban)
+TicketQuickCloseLogNote                = Progress → %s
 
 # ===========================================================================
 # Ticket — modification traceability — issue #4885

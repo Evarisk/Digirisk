@@ -1822,6 +1822,135 @@ $tac-border:       #e5e7eb;
     border-radius: 3px;
 }
 
+.tac-picker-card__progress-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+// Percentage of an open ticket, which opens the quick close modal the way the to-do board of ReedCRM closes an event
+.tac-picker-quick-close {
+    padding: 1px 5px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+
+    .tac-picker-quick-close__icon {
+        margin-right: 0;
+        opacity: 0.6;
+    }
+
+    &:hover,
+    &:focus-visible {
+        outline: none;
+        background: rgba($tac-green, 0.14);
+
+        .tac-picker-quick-close__icon {
+            opacity: 1;
+            color: $tac-green;
+        }
+    }
+}
+
+// Quick close modal: short, it hugs its content rather than the fixed size the framework gives its modals
+.wpeo-modal.modal-ticket-quick-close {
+    .modal-container {
+        max-width: 520px;
+        height: auto;
+        max-height: 90vh;
+    }
+
+    .modal-container .modal-header,
+    .modal-container .modal-footer {
+        height: auto;
+    }
+
+    .modal-container .modal-content {
+        height: auto;
+        padding: 16px 24px;
+        overflow-y: auto;
+    }
+
+    .modal-container .modal-footer {
+        padding: 14px 24px 0;
+    }
+
+    // The ticket being closed, so that the right one is on the table
+    .tac-quick-close__ticket {
+        margin-bottom: 14px;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    .tac-quick-close__ref {
+        margin-right: 6px;
+        color: $tac-blue;
+    }
+
+    .tac-quick-close__label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+    // Progress the ticket is left at, a slider and the exact figure kept in step on a single compact row: closing
+    // is what the modal is opened for
+    .tac-quick-close__progress {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+
+        .tac-quick-close__label {
+            margin: 0;
+        }
+    }
+
+    // The padding, border and white box Dolibarr gives every input would frame the slider
+    .tac-quick-close__range {
+        width: 140px;
+        height: 14px;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        accent-color: $tac-green;
+    }
+
+    // Wide enough for "100" next to the spinner arrows
+    .tac-quick-close__value {
+        width: 64px;
+        height: 24px;
+        padding: 0 4px;
+        font-size: 12px;
+    }
+
+    .tac-quick-close__help {
+        display: block;
+        margin: 2px 0 12px;
+        color: $tac-grey;
+        font-size: 11px;
+    }
+
+    .tac-quick-close__comment {
+        width: 100%;
+        box-sizing: border-box;
+        resize: vertical;
+    }
+
+    .tac-quick-close__error {
+        display: none;
+        margin-top: 10px;
+        color: $tac-red;
+        font-size: 12px;
+
+        &.visible {
+            display: block;
+        }
+    }
+}
+
 .tac-picker-card__elapsed,
 .tac-picker-card__last-msg {
     white-space: nowrap;

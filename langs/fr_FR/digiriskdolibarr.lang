@@ -2290,6 +2290,16 @@ TicketKanbanFilterDateFrom             = Créé à partir de ce jour
 TicketKanbanFilterDateTo               = au
 TicketKanbanFilterDateToHelp           = Créé jusqu'à ce jour inclus
 TicketKanbanFilterService              = GP/UT
+TicketQuickCloseTooltip                = Clôturer ce ticket ou changer son avancement
+TicketQuickCloseTitle                  = Clôturer le ticket
+TicketQuickCloseProgressTitle          = Mettre à jour l'avancement
+TicketQuickCloseProgressHelp           = À 100 %, le ticket est clôturé. En dessous, seul son avancement change.
+TicketQuickCloseCommentPlaceholder     = Ajouté au ticket en message privé (facultatif)
+TicketQuickCloseError                  = Le ticket n'a pas pu être mis à jour
+TicketQuickCloseAlreadyClosed          = Ce ticket est déjà clôturé
+TicketQuickCloseLogClosed              = Ticket clôturé (kanban)
+TicketQuickCloseLogProgress            = Avancement modifié (kanban)
+TicketQuickCloseLogNote                = Avancement → %s
 
 # ===========================================================================
 # Ticket — traçabilité des modifications — issue #4885
