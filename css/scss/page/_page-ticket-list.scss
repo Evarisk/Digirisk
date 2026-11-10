@@ -1,0 +1,97 @@
+@import "../theme/tokens";
+
+// Native list of the tickets browsed from the Digirisk menu (list of the registers), given the modern theme and no
+// left menu by ActionsDigiriskdolibarr::llxHeader().
+#{$dr-scope}.digirisk-ticket-list {
+    div.fiche {
+        margin-right: 24px;
+        margin-left: 24px;
+    }
+
+    // Filters above the list: the tag field says what it filters
+    div.liste_titre_bydiv .divsearchfield {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    // The list scrolls in its own box: the column titles stay at its top. The native list has no thead, which the
+    // sticky header of the Saturne lists aims at. The cell of the menu of the columns goes over the others.
+    table.liste > tbody > tr.liste_titre > th,
+    table.liste > tbody > tr.liste_titre > td {
+        position: sticky;
+        top: 0;
+        z-index: 3;
+    }
+
+    table.liste > tbody > tr.liste_titre > .maxwidthsearch {
+        z-index: 4;
+    }
+
+    // Titles on one line: a long one (extrafields) wrapped on four and made the sticky row as high as two lines
+    table.liste > tbody > tr.liste_titre > th.wrapcolumntitle {
+        white-space: nowrap;
+    }
+
+    table.liste > tbody > tr.oddeven > td {
+        vertical-align: middle;
+    }
+
+    // Photo of the author and of the assigned user: the Saturne lists hide every image of their cut cells
+    table.liste td[class*="tdoverflowmax"] img.userphoto {
+        display: inline;
+        vertical-align: middle;
+    }
+
+    // Subject: same size as the other cells, on two lines at most
+    table.liste > tbody > tr.oddeven > td.tdoverflowbydiv > div.twolinesmax {
+        max-width: 320px;
+        font-size: 13.5px;
+        line-height: 1.4;
+        color: $dr-text;
+    }
+
+    // Tags, filled by ActionsDigiriskdolibarr::printFieldListValue(): pills side by side instead of a block per tag
+    table.liste > tbody > tr > td[data-key="ticket.ticket_categories"] {
+        min-width: 220px;
+        max-width: 320px;
+        white-space: normal;
+
+        .noborderoncategories {
+            display: inline-flex;
+            max-width: 100%;
+            margin: 2px 4px 2px 0;
+            padding: 2px 10px 2px 8px;
+            border-radius: $dr-radius-pill;
+            vertical-align: middle;
+            box-sizing: border-box;
+        }
+
+        .categtextwhite {
+            overflow: hidden;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 18px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: #ffffff;
+
+            .fa-tag {
+                padding-right: 5px;
+                font-size: 10px;
+                opacity: 0.85;
+            }
+        }
+    }
+
+    // GP/UT: the reference stays on the line of its label
+    table.liste > tbody > tr > td[data-key="ticket.digiriskdolibarr_ticket_service"] {
+        min-width: 200px;
+        line-height: 1.4;
+        white-space: normal;
+
+        a {
+            white-space: nowrap;
+        }
+    }
+}

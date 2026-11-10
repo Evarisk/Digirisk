@@ -245,7 +245,10 @@ class ActionsDigiriskdolibarr
      */
     public function llxHeader(array $parameters): int
     {
-        if (!$this->isDigiriskTicketTab($parameters['context']) && !$this->isDigiriskTaskTab($parameters['context'])) {
+        global $conf;
+
+        $isTicketList = $this->isDigiriskTicketList($parameters['context']);
+        if (!$isTicketList && !$this->isDigiriskTicketTab($parameters['context']) && !$this->isDigiriskTaskTab($parameters['context'])) {
             return 0;
         }
 
@@ -255,11 +258,17 @@ class ActionsDigiriskdolibarr
         if (!preg_match('/(^|\s)saturne-theme(\s|$)/', (string) $parameters['morecssonbody'])) {
             $parameters['morecssonbody'] = trim('saturne-theme ' . $parameters['morecssonbody']);
         }
-        // The lists of the native pages, as the time spent of a task, are wider than the screen: #id-right is a
-        // table-cell, so their own overflow-x never scrolls and the whole page stretches instead.
-        // classforhorizontalscrolloftabs bounds it, digirisk-object-tab fits the height of the list that scrolls
-        // (css/scss/page/_page-object-tabs.scss). The pages of the other modules (fromtype) handle their own lists.
-        if (GETPOST('fromtype', 'alpha') === '') {
+        if ($isTicketList) {
+            // The list of the registers has many columns: the left menu only takes their room, the top menu leads back.
+            // Read by llxHeader() right after this hook, for this page only (the dol_hide_leftmenu parameter would keep
+            // it hidden on every page of the session). Without the left menu, there is no table-cell to bound.
+            $conf->dol_hide_leftmenu = 1;
+            $parameters['morecssonbody'] .= ' digirisk-ticket-list';
+        } elseif (GETPOST('fromtype', 'alpha') === '') {
+            // The lists of the native pages, as the time spent of a task, are wider than the screen: #id-right is a
+            // table-cell, so their own overflow-x never scrolls and the whole page stretches instead.
+            // classforhorizontalscrolloftabs bounds it, digirisk-object-tab fits the height of the list that scrolls
+            // (css/scss/page/_page-object-tabs.scss). The pages of the other modules (fromtype) handle their own lists.
             $parameters['morecssonbody'] .= ' digirisk-object-tab';
             if (!preg_match('/(^|\s)classforhorizontalscrolloftabs(\s|$)/', $parameters['morecssonbody'])) {
                 $parameters['morecssonbody'] .= ' classforhorizontalscrolloftabs';
@@ -269,6 +278,17 @@ class ActionsDigiriskdolibarr
         $parameters['arrayofcss'] = array_values(array_unique(array_merge(is_array($parameters['arrayofcss']) ? $parameters['arrayofcss'] : [], $themeCss)));
 
         return 0;
+    }
+
+    /**
+     * Tell whether the current page is the native list of the tickets browsed from the Digirisk menu (list of the registers)
+     *
+     * @param  string $context Hook contexts of the page
+     * @return bool
+     */
+    private function isDigiriskTicketList(string $context): bool
+    {
+        return ($_SESSION['mainmenu'] ?? '') === 'digiriskdolibarr' && preg_match('/\/ticket\/list\.php$/', $_SERVER['PHP_SELF']) && preg_match('/\bticketlist\b/', $context);
     }
 
     /**
@@ -1931,7 +1951,7 @@ class ActionsDigiriskdolibarr
 				} else {
 					$searchCategoryTicket = array($searchCategoryTicketList);
 				}
-				$moreforfilter .= Form::multiselectarray('search_category_ticket_list', $categoriesTicketArr, $searchCategoryTicket, 0, 0, 'minwidth300');
+				$moreforfilter .= Form::multiselectarray('search_category_ticket_list', $categoriesTicketArr, $searchCategoryTicket, 0, 0, 'minwidth300', 0, 0, '', '', $langs->transnoentitiesnoconv('Categories'));
 				$moreforfilter .= '</div>';
 			}
 
