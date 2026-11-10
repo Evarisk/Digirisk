@@ -2412,6 +2412,7 @@ class modDigiriskdolibarr extends DolibarrModules
         delDocumentModel('riskassessmentdocumentsynthesis', 'riskassessmentdocument');
         delDocumentModel('riskassessmentdocumentpdf', 'riskassessmentdocument');
         delDocumentModel('riskassessmentdocumentguide', 'riskassessmentdocument');
+        delDocumentModel('riskassessmentdocumentclassic', 'riskassessmentdocument');
         delDocumentModel('csepresentationdocument', 'riskassessmentdocument');
 		delDocumentModel('auditreportdocument_odt', 'auditreportdocument');
 		delDocumentModel('ticketdocument_odt', 'ticketdocument');
@@ -2446,6 +2447,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		addDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('riskassessmentdocumentpdf', 'riskassessmentdocument', $langs->transnoentities('DigiriskDuPDF'));
         addDocumentModel('riskassessmentdocumentguide', 'riskassessmentdocument', $langs->transnoentities('DigiriskGuidePDF'));
+        addDocumentModel('riskassessmentdocumentclassic', 'riskassessmentdocument', $langs->transnoentities('DigiriskDuClassicPDF'));
         addDocumentModel('csepresentationdocument', 'riskassessmentdocument', $langs->transnoentities('DigiriskCsePresentationPDF'));
 		addDocumentModel('auditreportdocument_odt', 'auditreportdocument', 'ODT templates', 'DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('ticketdocument_odt', 'ticketdocument', 'ODT templates', 'DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH');

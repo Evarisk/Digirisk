@@ -1117,12 +1117,16 @@ function digiriskdolibarr_ticket_public_interface_url(): string
 }
 
 /**
- * QR code of the public ticket interface, drawn for the document being generated
+ * QR code of the public ticket interface, for the document being generated
  *
- * Drawn again for every document from the address configured at that moment: a code stored once kept
- * pointing to an address changed since, and a document generated before anyone pressed the button of
- * the configuration printed N/A in its place. The ODT templates resize the image in place to fit their
- * cell, a reason more not to keep it.
+ * Follows the address configured at that moment: a code stored once kept pointing to an address changed
+ * since, and a document generated before anyone pressed the button of the configuration printed N/A in its
+ * place. Drawing it takes about half a second though, and the archive of the risk assessment document draws
+ * one per groupment and work unit, all for the same address. So the code is drawn once per address, and
+ * per version of the drawing, under a name made from both, then copied for each document: the ODT
+ * templates resize the image in place to fit their cell, the copy keeps the drawn one intact. The drawn
+ * code stays out of temp/, which Saturne empties after each ODT document, and out of ticketqrcode/, which
+ * the ticket setup shows whole.
  *
  * @param  string $url Address to encode
  * @return string      Path of the PNG image, empty when it could not be drawn
@@ -1133,9 +1137,24 @@ function digiriskdolibarr_ticket_qrcode_file(string $url): string
 
     require_once __DIR__ . '/digiriskdolibarr_mobile.lib.php';
 
-    $filePath = $conf->digiriskdolibarr->multidir_output[$conf->entity ?: 1] . '/temp/ticketqrcode.png';
+    $outputDir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?: 1];
+    $filePath  = $outputDir . '/temp/ticketqrcode.png';
+    $drawnDir  = $outputDir . '/qrcodecache';
+    $drawn     = $drawnDir . '/ticketqrcode_' . md5($url . '|' . (int) @filemtime(__DIR__ . '/digiriskdolibarr_mobile.lib.php')) . '.png';
 
-    return digiriskGetQrCodePng($url, $filePath) ? $filePath : '';
+    if (!is_file($drawn)) {
+        // Codes of an address or a drawing replaced since
+        foreach (glob($drawnDir . '/ticketqrcode_*.png') ?: [] as $staleFile) {
+            @unlink($staleFile);
+        }
+        if (!digiriskGetQrCodePng($url, $drawn)) {
+            return '';
+        }
+    }
+
+    dol_mkdir(dirname($filePath));
+
+    return @copy($drawn, $filePath) ? $filePath : '';
 }
 
 /**

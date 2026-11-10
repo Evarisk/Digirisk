@@ -3558,6 +3558,67 @@ DigiriskDuOngoing                       = Ongoing:
 DigiriskDuDone                          = Completed:
 DigiriskDuFactor                        = Factor
 
+#
+# Complete risk assessment document in native PDF: the chapters and tables of the ODT template
+#
+DigiriskDuClassicPDF                    = DU PDF
+DigiriskDuClassicPDFDescription         = Complete risk assessment document in native PDF: the chapters and tables of the ODT template, in the style of the PDF documents of the risk assessment
+DigiriskDuClassicAuditPeriod            = Assessment: %s
+DigiriskDuClassicChapterKicker          = Chapter %s
+DigiriskDuClassicSummary                = Contents
+DigiriskDuClassicChapterAdministrative  = Administrative chapter
+DigiriskDuClassicIntro                  = This document presents the results of the occupational risk assessment. The regulatory framework, the rating methods and how to read each table are explained in the user guide of the risk assessment document, generated from the Risk assessment document tab of DigiRisk.
+DigiriskDuClassicMethod                 = Methodology
+DigiriskDuClassicNoSitePlan             = No site plan is attached to the risk assessment document.
+DigiriskDuClassicChapterAssessment      = Assessment chapter
+DigiriskDuClassicOrganisationCharts     = Organisation charts
+DigiriskDuClassicOrganisationChartCompany = Organisation chart of the groupings and work units of %s
+DigiriskDuClassicOrganisationChartShared = Organisation chart of the groupings and work units of the shared framework
+DigiriskDuClassicNoSharedRisk           = You have no shared common risks.
+DigiriskDuClassicDashboard              = Dashboard of your risks
+DigiriskDuClassicRisksByElement         = Number of risks per WU/GP and totals
+DigiriskDuClassicForCompany             = For the establishment
+DigiriskDuClassicForShared              = For the common units of the shared framework
+DigiriskDuClassicElementDescription     = Description of the WU or GP
+DigiriskDuClassicRiskSum                = Sum of risks
+DigiriskDuClassicNoRisk                 = No risk assessed.
+DigiriskDuClassicRisksByCategory        = Percentage of risks per category
+DigiriskDuClassicCategory               = Risk cat.
+DigiriskDuClassicTotals                 = Totals
+DigiriskDuClassicRisksByLevel           = Risk totals per risk level
+DigiriskDuClassicSite                   = Site
+DigiriskDuClassicSiret                  = Company ID
+DigiriskDuClassicEmployeesInvolved      = Employees involved
+DigiriskDuClassicTotalRisks             = Total number of risks
+DigiriskDuClassicRpsCotation            = Psychosocial risk rating per WU/GP
+DigiriskDuClassicRpsCotationIntro       = Level of each psychosocial risk factor, from 1 to 4, and average of the rated factors of each work unit (WU). A grouping (GP) takes the average of its assessed work units.
+DigiriskDuClassicUnitOrGroupment        = WU or GP
+DigiriskDuClassicAverage                = Average
+DigiriskDuClassicRpsLegend              = Levels: 1 low, 2 moderate, 3 high, 4 extreme. NC: no rating (unit not concerned, to qualify or not assessed yet, or factor not rated).
+DigiriskDuClassicRpsAssessment          = Psychosocial risk assessment per WU/GP
+DigiriskDuClassicRpsAssessmentIntro     = You currently have %s WU and GP, you involved %s WU/GP in your psychosocial risk analysis. The assessments obtained with the INRS tools 37 and 42 are summarised below.
+DigiriskDuClassicRpsByLevel             = Number of psychosocial risks per risk level
+DigiriskDuClassicChapterRisks           = Risk prioritisation and annual prevention programme
+DigiriskDuClassicRisksCompany           = Risks of the establishment in descending order with the annual prevention programme
+DigiriskDuClassicRisksShared            = Common risks of the shared framework in descending order with the annual prevention programme
+DigiriskDuClassicRiskRef                = RA Id
+DigiriskDuClassicCotationShort          = Rat.
+DigiriskDuClassicRiskDescription        = Risk description
+DigiriskDuClassicAssessmentComment      = Comments on the assessment
+DigiriskDuClassicPreventionActions      = Actions of the annual prevention programme
+DigiriskDuClassicNoAction               = No action
+DigiriskDuClassicTaskOngoing            = Ongoing
+DigiriskDuClassicTaskLate               = Late
+DigiriskDuClassicTaskDone               = Done
+DigiriskDuClassicDoneHidden             = %s completed action(s), not detailed
+DigiriskDuClassicRegisters              = List of health and safety registers assigned to groupings or work units
+DigiriskDuClassicNoRegister             = No health and safety register.
+DigiriskDuClassicRegisterRef            = Register no.
+DigiriskDuClassicLocation               = Location
+DigiriskDuClassicTags                   = Tags / categories
+DigiriskDuClassicCreationDate           = Creation date
+DigiriskDuClassicMessage                = Initial message
+
 # Excel export
 DigiriskXlsxCurative                    = Curative
 DigiriskXlsxCorrective                  = Corrective

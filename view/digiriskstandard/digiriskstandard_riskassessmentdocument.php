@@ -108,6 +108,10 @@ if ($resHook < 0) {
 }
 
 if (empty($resHook)) {
+    // Site plans: the Saturne media block of the card posts its uploads, its picks from the media
+    // library and its deletions here
+    digiriskstandard_site_plan_media_actions((string) $action, $permissiontoadd, $permissiontodelete);
+
     if ($action == 'update' && $permissiontoadd) {
         $auditStartDate = GETPOST('AuditStartDate', 'none');
         $auditEndDate   = GETPOST('AuditEndDate', 'none');
@@ -141,31 +145,6 @@ if (empty($resHook)) {
         dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD", $method, 'chaine', 0, '', $conf->entity);
         dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES", $sources, 'chaine', 0, '', $conf->entity);
         dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES", $importantNote, 'chaine', 0, '', $conf->entity);
-
-        // Submit file
-        if ( ! empty($conf->global->MAIN_UPLOAD_DOC)) {
-            if ( ! empty($_FILES)) {
-                if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
-                else $userfiles                                           = array($_FILES['userfile']['tmp_name']);
-
-                foreach ($userfiles as $key => $userfile) {
-                    if (empty($_FILES['userfile']['tmp_name'][$key])) {
-                        $error++;
-                        if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
-                            setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
-                        }
-                    }
-                }
-
-                if ( ! $error) {
-                    $filedir = $upload_dir . '/riskassessmentdocument/siteplans/';
-                    array_map('unlink', array_filter((array) glob($filedir . '*')));
-                    if ( ! empty($filedir)) {
-                        $result = digirisk_dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
-                    }
-                }
-            }
-        }
 
         header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $object->id);
         exit;
@@ -209,9 +188,10 @@ if (empty($resHook)) {
         $object->ref = $previousRef;
 
         // The archive rebundles what the generation just produced: chaining it after a failure only
-        // stacks a second, misleading error on top of the real one.
+        // stacks a second, misleading error on top of the real one. The model tells the document
+        // itself from its user guide and its CSE presentation, which leave the archive alone.
         if (!$error) {
-            $result = $document->generateArchiveWithDigiriskElementDocuments($moreparams, $outputlangs, $hidedetails, $hidedesc, $hideref);
+            $result = $document->generateArchiveWithDigiriskElementDocuments($moreparams, $outputlangs, $hidedetails, $hidedesc, $hideref, (string) $model);
             if ($result < 0) {
                 setEventMessages($document->error, $document->errors, 'errors');
                 $error++;
