@@ -575,6 +575,11 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             if (!empty($loadRiskInfos['inheritedDigiriskElements'])) {
                 $moreParam['digiriskElements'] += $loadRiskInfos['inheritedDigiriskElements'];
             }
+            // Same for the risks shared to the element: they belong to an element of another entity,
+            // which names their line (S<entity> - ref - label) - issue #5736
+            if (!empty($loadRiskInfos['sharedDigiriskElements'])) {
+                $moreParam['digiriskElements'] += $loadRiskInfos['sharedDigiriskElements'];
+            }
             // The trend column only makes sense against a period, and one query serves every row.
             // The ids are read from the objects: loadRiskInfos() merges the current and shared
             // risks with array_merge(), which renumbers the keys from zero
