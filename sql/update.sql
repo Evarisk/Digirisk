@@ -336,3 +336,6 @@ INSERT INTO llx_document_model (nom, type, entity, libelle, description) VALUES 
 
 -- 23.6.x - Share of the company workforce present in each GP/UT, NULL while it is not entered (issue #5541)
 ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD people_percentage double(24,8) NULL AFTER show_in_selector;
+
+-- 23.7.x - Complete risk assessment document in native PDF: the chapters and tables of the ODT template
+INSERT INTO llx_document_model (nom, type, entity, libelle, description) VALUES ('riskassessmentdocumentclassic', 'riskassessmentdocument', 1, 'DU PDF', NULL) ON DUPLICATE KEY UPDATE libelle = VALUES(libelle);

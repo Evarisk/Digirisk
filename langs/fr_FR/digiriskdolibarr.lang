@@ -3569,6 +3569,67 @@ DigiriskDuOngoing                       = En cours :
 DigiriskDuDone                          = Terminées :
 DigiriskDuFactor                        = Facteur
 
+#
+# Document unique complet en PDF natif : les chapitres et les tableaux du gabarit ODT
+#
+DigiriskDuClassicPDF                    = DU PDF
+DigiriskDuClassicPDFDescription         = Document unique complet en PDF natif : les chapitres et les tableaux du gabarit ODT, à la charte des documents PDF du DU
+DigiriskDuClassicAuditPeriod            = Démarche d'évaluation : %s
+DigiriskDuClassicChapterKicker          = Chapitre %s
+DigiriskDuClassicSummary                = Sommaire
+DigiriskDuClassicChapterAdministrative  = Chapitre administratif
+DigiriskDuClassicIntro                  = Ce document présente les résultats de l'évaluation des risques professionnels. Le cadre réglementaire, les méthodes de cotation et la façon de lire chaque tableau sont expliqués dans le mode d'emploi du document unique, à générer depuis l'onglet Document unique de DigiRisk.
+DigiriskDuClassicMethod                 = La méthodologie
+DigiriskDuClassicNoSitePlan             = Aucun plan du site n'est joint au document unique.
+DigiriskDuClassicChapterAssessment      = Chapitre évaluation
+DigiriskDuClassicOrganisationCharts     = Organigrammes
+DigiriskDuClassicOrganisationChartCompany = Organigramme des groupements et unités de travail de %s
+DigiriskDuClassicOrganisationChartShared = Organigramme des groupements et unités de travail de la trame EVRP
+DigiriskDuClassicNoSharedRisk           = Vous n'avez pas de risques communs partagés.
+DigiriskDuClassicDashboard              = Tableau de bord sur vos risques
+DigiriskDuClassicRisksByElement         = Nombre de risques par UT/GP et totaux
+DigiriskDuClassicForCompany             = Pour l'établissement
+DigiriskDuClassicForShared              = Pour les unités communes de la trame EVRP
+DigiriskDuClassicElementDescription     = Description de l'UT ou du GP
+DigiriskDuClassicRiskSum                = Somme des risques
+DigiriskDuClassicNoRisk                 = Aucun risque évalué.
+DigiriskDuClassicRisksByCategory        = Pourcentage de risques par catégorie
+DigiriskDuClassicCategory               = Cat. risque
+DigiriskDuClassicTotals                 = Totaux
+DigiriskDuClassicRisksByLevel           = Totaux de risques par niveau de risque
+DigiriskDuClassicSite                   = Site
+DigiriskDuClassicSiret                  = SIRET
+DigiriskDuClassicEmployeesInvolved      = Salariés impliqués
+DigiriskDuClassicTotalRisks             = Nombre total de risques
+DigiriskDuClassicRpsCotation            = Cotation des RPS par UT/GP
+DigiriskDuClassicRpsCotationIntro       = Niveau de chaque facteur de risques psychosociaux, de 1 à 4, et moyenne des facteurs cotés de chaque unité de travail (UT). Un groupement (GP) reprend la moyenne de ses unités de travail évaluées.
+DigiriskDuClassicUnitOrGroupment        = UT ou GP
+DigiriskDuClassicAverage                = Moyenne
+DigiriskDuClassicRpsLegend              = Niveaux : 1 faible, 2 modéré, 3 élevé, 4 extrême. NC : aucune cotation (unité non concernée, à qualifier ou pas encore évaluée, ou facteur non coté).
+DigiriskDuClassicRpsAssessment          = Évaluation des RPS par UT/GP
+DigiriskDuClassicRpsAssessmentIntro     = Vous avez actuellement %s UT et GP, vous avez impliqué %s UT/GP dans votre analyse des RPS. Les évaluations obtenues avec les outils 37 et 42 de l'INRS sont récapitulées ci-dessous.
+DigiriskDuClassicRpsByLevel             = Nombre de RPS par niveau de risque
+DigiriskDuClassicChapterRisks           = Hiérarchisation des risques et programme annuel de prévention
+DigiriskDuClassicRisksCompany           = Risques de l'établissement par ordre décroissant avec le PAPRIPACT
+DigiriskDuClassicRisksShared            = Risques communs de la trame EVRP par ordre décroissant avec le PAPRIPACT
+DigiriskDuClassicRiskRef                = Id RA
+DigiriskDuClassicCotationShort          = Cot.
+DigiriskDuClassicRiskDescription        = Description du risque
+DigiriskDuClassicAssessmentComment      = Commentaires sur l'évaluation
+DigiriskDuClassicPreventionActions      = Actions du programme annuel de prévention
+DigiriskDuClassicNoAction               = Aucune action
+DigiriskDuClassicTaskOngoing            = En cours
+DigiriskDuClassicTaskLate               = En retard
+DigiriskDuClassicTaskDone               = Terminée
+DigiriskDuClassicDoneHidden             = %s action(s) soldée(s), non détaillée(s)
+DigiriskDuClassicRegisters              = Liste des registres santé sécurité affectés à des groupements ou unités de travail
+DigiriskDuClassicNoRegister             = Aucun registre santé sécurité.
+DigiriskDuClassicRegisterRef            = N° du registre
+DigiriskDuClassicLocation               = Lieu
+DigiriskDuClassicTags                   = Tags / catégories
+DigiriskDuClassicCreationDate           = Date de création
+DigiriskDuClassicMessage                = Message initial
+
 # Excel export - Export Excel
 DigiriskXlsxCurative                    = Curative
 DigiriskXlsxCorrective                  = Corrective
