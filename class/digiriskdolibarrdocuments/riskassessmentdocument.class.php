@@ -224,7 +224,9 @@ class RiskAssessmentDocument extends DigiriskDocuments
                 return -1;
             }
 
-            $fileName = pathinfo($this->last_main_doc, PATHINFO_FILENAME);
+            // The sheet just generated, not the risk assessment document ($this): looking for the PDF
+            // of the latter in the folder of the element never found it - issue #5740
+            $fileName = pathinfo($digiriskElementDocument->last_main_doc, PATHINFO_FILENAME);
             if (file_exists($digiriskElementDocumentPath . '/' . $fileName . '.pdf')) {
                 $result = dol_copy($digiriskElementDocumentPath . '/' . $fileName . '.pdf', $digiriskElementDocumentZipPaths[$digiriskElementSingle['object']->element_type] . '/' . $fileName . '.pdf');
                 if ($result < 0) {
