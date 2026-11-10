@@ -268,9 +268,10 @@ class Risk extends SaturneObject
         // settings, the risks of the unit, the inherited ones and the shared ones. The setting lost
         // its last reader when this collection was standardised on loadRiskInfos() - issue #5120.
         // Only for a document scoped on one element: the risk assessment document passes no element
-        // filter and already lists every risk of the entity.
+        // filter and already lists every risk of the entity. The models with tables of their own for
+        // inherited and shared risks (includeInheritedAndShared) printed them twice - issue #5739
         $array['inheritedDigiriskElements'] = [];
-        if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS') && ($moreParam['object'] ?? null) instanceof DigiriskElement) {
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS') && ($moreParam['object'] ?? null) instanceof DigiriskElement && empty($moreParam['includeInheritedAndShared'])) {
             $inherited = $this->fetchInheritedRisks($moreParam, $join, $select, $moreSelects);
             if (!empty($inherited['risks'])) {
                 // Both sides are keyed by risk id, so a risk reachable twice is kept once. The
