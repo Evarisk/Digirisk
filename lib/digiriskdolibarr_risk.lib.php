@@ -56,12 +56,17 @@ function risk_prepare_head(Risk $object): array
  * subfolder "documents" of its photos: the gallery and the list of the documents never show the
  * same file twice.
  *
+ * A risk list renders these modals for every risk while none is open, and a closed modal stays laid
+ * out under opacity 0: its thumbnail would load with the page. It loads when its modal opens
+ * instead (Saturne defer_images), unless the block is already on screen.
+ *
  * @param  string              $subDir         Folder of the photos, relative to the module folder
  * @param  RiskAssessment|null $riskAssessment Assessment owning the folder, null for a work folder
  * @param  bool                $withFiles      Also take documents, not only photos
+ * @param  bool                $deferImages    The block sits in a modal: load its thumbnail when the modal opens
  * @return string                              HTML of the block
  */
-function digiriskRiskAssessmentMediaBlock(string $subDir, ?RiskAssessment $riskAssessment = null, bool $withFiles = false): string
+function digiriskRiskAssessmentMediaBlock(string $subDir, ?RiskAssessment $riskAssessment = null, bool $withFiles = false, bool $deferImages = true): string
 {
     global $conf;
 
@@ -69,7 +74,7 @@ function digiriskRiskAssessmentMediaBlock(string $subDir, ?RiskAssessment $riskA
     dol_include_once('/saturne/lib/medias.lib.php');
 
     // The picking button opens the media library of the module, rendered by the risk pages
-    $options = ['show_photo' => true, 'show_audio' => false, 'show_file' => $withFiles, 'file_sub_dir' => $subDir . '/documents', 'show_library' => true];
+    $options = ['show_photo' => true, 'show_audio' => false, 'show_file' => $withFiles, 'file_sub_dir' => $subDir . '/documents', 'show_library' => true, 'defer_images' => $deferImages];
 
     // The lists show one photo of the assessment: the editor lets it be picked among the others
     if ($riskAssessment !== null && $riskAssessment->id > 0) {
@@ -176,7 +181,8 @@ function digiriskRiskAssessmentMediaActions(string $action): void
         }
     }
 
-    print digiriskRiskAssessmentMediaBlock($blockDir, $riskAssessment, $withFiles);
+    // The block sent back replaces one already on screen
+    print digiriskRiskAssessmentMediaBlock($blockDir, $riskAssessment, $withFiles, false);
     exit;
 }
 
