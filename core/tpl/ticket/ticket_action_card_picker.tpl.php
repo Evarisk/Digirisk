@@ -37,7 +37,7 @@
  *   $pickerSeverityTickets    array  Tickets grouped by severity_code
  *
  * With the write permission on tickets, the percentage of an open ticket opens the quick close modal rendered after the
- * boards (js/modules/ticket_action_card.js, ticketPickerKanban.openQuickClose)
+ * boards (core/tpl/ticket/ticket_quick_close_modal.tpl.php, js/modules/ticket_quick_close.js)
  */
 
 if (empty($conf) || empty($db) || empty($langs) || empty($user)) {
@@ -408,50 +408,12 @@ function renderDimKanban($columns, $colTickets, $dim, $allUsers, $allCats, $allS
 
 </div>
 
-<?php if ($user->hasRight('ticket', 'write')) : ?>
-<!-- Quick close modal, opened by the percentage of an open ticket: at 100 % the ticket is closed, below only its
-     progress changes. Saturne closes any modal on a click on its backdrop, a selection released there included: the JS
-     of the board closes this one itself, only when the press started on the backdrop -->
-<div class="wpeo-modal modal-ticket-quick-close modal-close-only-with-button" id="tacQuickCloseModal"
-     data-closed-status="<?= Ticket::STATUS_CLOSED ?>"
-     data-trans-title-close="<?= dol_escape_htmltag($langs->trans('TicketQuickCloseTitle')) ?>"
-     data-trans-title-progress="<?= dol_escape_htmltag($langs->trans('TicketQuickCloseProgressTitle')) ?>"
-     data-trans-confirm-close="<?= dol_escape_htmltag($langs->trans('TicketActionClose')) ?>"
-     data-trans-confirm-progress="<?= dol_escape_htmltag($langs->trans('Save')) ?>"
-     data-trans-error="<?= dol_escape_htmltag($langs->trans('TicketQuickCloseError')) ?>"
-     data-trans-empty="<?= dol_escape_htmltag($langs->trans('NoTicketsFound')) ?>">
-    <div class="modal-container">
-        <div class="modal-header">
-            <h2 class="modal-title"><?= dol_escape_htmltag($langs->trans('TicketQuickCloseTitle')) ?></h2>
-            <div class="modal-close"><i class="fas fa-times"></i></div>
-        </div>
-        <div class="modal-content">
-            <?php // Which ticket is on the table, filled in by the JS from the clicked card ?>
-            <div class="tac-quick-close__ticket">
-                <span class="tac-quick-close__ref"></span>
-                <span class="tac-quick-close__subject"></span>
-            </div>
-
-            <div class="tac-quick-close__progress">
-                <label class="tac-quick-close__label" for="tacQuickCloseProgress"><?= dol_escape_htmltag($langs->trans('Progression')) ?></label>
-                <input type="range" id="tacQuickCloseProgressRange" class="tac-quick-close__range" min="0" max="100" step="5" value="100">
-                <input type="number" id="tacQuickCloseProgress" class="tac-quick-close__value" min="0" max="100" step="1" value="100">
-                <span>%</span>
-            </div>
-            <span class="tac-quick-close__help"><?= dol_escape_htmltag($langs->trans('TicketQuickCloseProgressHelp')) ?></span>
-
-            <label class="tac-quick-close__label" for="tacQuickCloseComment"><?= dol_escape_htmltag($langs->trans('Comment')) ?></label>
-            <textarea id="tacQuickCloseComment" class="tac-quick-close__comment" rows="4" placeholder="<?= dol_escape_htmltag($langs->trans('TicketQuickCloseCommentPlaceholder')) ?>"></textarea>
-
-            <div class="tac-quick-close__error" aria-live="polite"></div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="wpeo-button button-grey tac-quick-close-cancel"><?= dol_escape_htmltag($langs->trans('Cancel')) ?></button>
-            <button type="button" class="wpeo-button button-blue tac-quick-close-confirm"><i class="fas fa-check"></i>&nbsp;<span class="tac-quick-close__confirm-label"><?= dol_escape_htmltag($langs->trans('TicketActionClose')) ?></span></button>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
+<?php
+// Quick close modal, opened by the percentage of an open ticket
+if ($user->hasRight('ticket', 'write')) {
+    require __DIR__ . '/ticket_quick_close_modal.tpl.php';
+}
+?>
 
 <?php if ($user->hasRight('ticket', 'write')) : ?>
 <!-- Quick-create drawer (slide-in from right) -->

@@ -367,9 +367,10 @@ if ($action == 'updateTicketSubject' && !empty(GETPOSTINT('ticket_id'))) {
     exit;
 }
 
-// AJAX: quick close from the percentage of a kanban card, the way the to-do board of ReedCRM closes an event. At 100 %
-// the ticket is closed as the closing button of its card does it (progress 100, closing date, TICKET_CLOSE trigger),
-// below only its progress changes. The comment is added to the ticket as a private message
+// AJAX: quick close from the percentage of a kanban card or the state of a row of the list of the registers, the way the
+// to-do board of ReedCRM closes an event (js/modules/ticket_quick_close.js). At 100 % the ticket is closed as the
+// closing button of its card does it (progress 100, closing date, TICKET_CLOSE trigger), below only its progress
+// changes. The comment is added to the ticket as a private message
 if ($action == 'quickCloseTicket' && !empty(GETPOSTINT('ticket_id'))) {
     header('Content-Type: application/json');
 
@@ -420,7 +421,14 @@ if ($action == 'quickCloseTicket' && !empty(GETPOSTINT('ticket_id'))) {
             createTicketKanbanEvent($db, $user, $ticketToUpdate, 'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_STATUS',
                 $langs->transnoentities($closing ? 'TicketQuickCloseLogClosed' : 'TicketQuickCloseLogProgress'),
                 $langs->transnoentities('TicketQuickCloseLogNote', $progress . ' %'));
-            print json_encode(['success' => 1, 'progress' => $progress, 'status' => $closing ? Ticket::STATUS_CLOSED : (int) $ticketToUpdate->status, 'closed' => $closing ? 1 : 0]);
+            // The list of the registers shows the new state with the badge of its column
+            print json_encode([
+                'success'     => 1,
+                'progress'    => $progress,
+                'status'      => $closing ? Ticket::STATUS_CLOSED : (int) $ticketToUpdate->status,
+                'status_html' => $ticketToUpdate->getLibStatut(5),
+                'closed'      => $closing ? 1 : 0
+            ]);
         } else {
             $db->rollback();
             $errorMessage = $ticketToUpdate->error ?: implode(', ', $ticketToUpdate->errors ?: []);

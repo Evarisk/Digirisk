@@ -2818,19 +2818,12 @@ window.digiriskdolibarr.ticketPickerKanban.initQuickCreate = function() {
 };
 
 /* ============================================================
- * QUICK CLOSE — the percentage of an open ticket opens a modal that closes it, or only changes its progress, the
- * way the to-do board of ReedCRM closes an event.
+ * QUICK CLOSE — the percentage of an open ticket opens the quick close modal (js/modules/ticket_quick_close.js),
+ * which closes it or only changes its progress, the way the to-do board of ReedCRM closes an event.
  * ============================================================ */
 
 /**
- * Whether the last press inside the quick close modal started on its backdrop.
- *
- * @type {boolean}
- */
-window.digiriskdolibarr.ticketPickerKanban.quickClosePressedOnBackdrop = false;
-
-/**
- * Bind the triggers of the cards and the controls of the quick close modal.
+ * Bind the percentages of the cards to the quick close modal, and show its result on the cards.
  *
  * @return {void}
  */
@@ -2853,45 +2846,8 @@ window.digiriskdolibarr.ticketPickerKanban.initQuickClose = function() {
         }
     });
 
-    $(document).on('click', '#tacQuickCloseModal .modal-close, #tacQuickCloseModal .tac-quick-close-cancel', function() {
-        window.digiriskdolibarr.ticketPickerKanban.closeQuickClose();
-    });
-
-    // The backdrop closes the modal only when the press started on it too: a text selected in the comment and
-    // released outside the frame also ends with a click on the backdrop
-    $(document).on('mousedown', '#tacQuickCloseModal', function(e) {
-        window.digiriskdolibarr.ticketPickerKanban.quickClosePressedOnBackdrop = $(e.target).is('#tacQuickCloseModal');
-    });
-
-    $(document).on('click', '#tacQuickCloseModal', function(e) {
-        if ($(e.target).is('#tacQuickCloseModal') && window.digiriskdolibarr.ticketPickerKanban.quickClosePressedOnBackdrop) {
-            window.digiriskdolibarr.ticketPickerKanban.closeQuickClose();
-        }
-        window.digiriskdolibarr.ticketPickerKanban.quickClosePressedOnBackdrop = false;
-    });
-
-    $(document).on('keydown', function(e) {
-        if (e.key === 'Escape' && $('#tacQuickCloseModal').hasClass('modal-active')) {
-            window.digiriskdolibarr.ticketPickerKanban.closeQuickClose();
-        }
-    });
-
-    // The slider and the exact figure move together, and the modal tells whether it closes the ticket
-    $(document).on('input', '#tacQuickCloseProgressRange', function() {
-        window.digiriskdolibarr.ticketPickerKanban.setQuickCloseProgress($(this).val());
-    });
-
-    // A figure being typed is left alone, only the slider and the wording follow it
-    $(document).on('input', '#tacQuickCloseProgress', function() {
-        window.digiriskdolibarr.ticketPickerKanban.setQuickCloseProgress($(this).val(), true);
-    });
-
-    $(document).on('change', '#tacQuickCloseProgress', function() {
-        window.digiriskdolibarr.ticketPickerKanban.setQuickCloseProgress($(this).val());
-    });
-
-    $(document).on('click', '#tacQuickCloseModal .tac-quick-close-confirm', function() {
-        window.digiriskdolibarr.ticketPickerKanban.saveQuickClose();
+    $(document).on('ticketQuickClosed', function(e, ticketId, response) {
+        window.digiriskdolibarr.ticketPickerKanban.applyQuickClose(ticketId, response);
     });
 };
 
@@ -2902,107 +2858,11 @@ window.digiriskdolibarr.ticketPickerKanban.initQuickClose = function() {
  * @return {void}
  */
 window.digiriskdolibarr.ticketPickerKanban.openQuickClose = function($card) {
-    var $modal = $('#tacQuickCloseModal');
-
-    $modal.attr('data-ticket-id', $card.data('ticket-id'));
-    $modal.find('.tac-quick-close__ref').text($card.attr('data-ref') || '');
-    // Read on the card, which follows the inline edits of the subject
-    $modal.find('.tac-quick-close__subject').text($.trim($card.find('.tac-picker-card__subject-text').first().text()));
-    $modal.find('.tac-quick-close__error').removeClass('visible').text('');
-    $('#tacQuickCloseComment').val('');
-
-    // The modal is opened to close the ticket, a lower progress is a deliberate change
-    window.digiriskdolibarr.ticketPickerKanban.setQuickCloseProgress(100);
-
-    $modal.addClass('modal-active');
-    $('#tacQuickCloseComment').trigger('focus');
-};
-
-/**
- * Close the quick close modal.
- *
- * @return {void}
- */
-window.digiriskdolibarr.ticketPickerKanban.closeQuickClose = function() {
-    $('#tacQuickCloseModal').removeClass('modal-active');
-};
-
-/**
- * Set the progress the ticket is left at. 100 % closes it, below only its progress changes: the title and the
- * confirm button say which of the two is about to happen.
- *
- * @param  {number|string} value      Percentage picked
- * @param  {boolean}       keepTyping Leave the figure being typed untouched
- * @return {void}
- */
-window.digiriskdolibarr.ticketPickerKanban.setQuickCloseProgress = function(value, keepTyping) {
-    var $modal   = $('#tacQuickCloseModal');
-    var progress = window.digiriskdolibarr.ticketPickerKanban.getQuickCloseProgress(value);
-    var closing  = progress === 100;
-
-    $('#tacQuickCloseProgressRange').val(progress);
-    if (!keepTyping) {
-        $('#tacQuickCloseProgress').val(progress);
-    }
-
-    $modal.find('.modal-title').text($modal.attr(closing ? 'data-trans-title-close' : 'data-trans-title-progress'));
-    $modal.find('.tac-quick-close__confirm-label').text($modal.attr(closing ? 'data-trans-confirm-close' : 'data-trans-confirm-progress'));
-};
-
-/**
- * Read a percentage as a whole number between 0 and 100, an empty or unreadable one meaning a closing.
- *
- * @param  {number|string} value Percentage to read, the field of the modal when omitted
- * @return {number}              Percentage
- */
-window.digiriskdolibarr.ticketPickerKanban.getQuickCloseProgress = function(value) {
-    var progress = parseInt(value === undefined ? $('#tacQuickCloseProgress').val() : value, 10);
-
-    return isNaN(progress) ? 100 : Math.max(0, Math.min(100, progress));
-};
-
-/**
- * AJAX — close the ticket of the modal, or save its progress, then show it on its cards.
- *
- * @return {void}
- */
-window.digiriskdolibarr.ticketPickerKanban.saveQuickClose = function() {
-    var $modal   = $('#tacQuickCloseModal');
-    var $confirm = $modal.find('.tac-quick-close-confirm');
-    var $error   = $modal.find('.tac-quick-close__error');
-    var ticketId = parseInt($modal.attr('data-ticket-id'), 10);
-    var token    = window.saturne.toolbox.getToken();
-    var sep      = window.saturne.toolbox.getQuerySeparator(document.URL);
-
-    if (!ticketId || $confirm.prop('disabled')) {
-        return;
-    }
-
-    $confirm.prop('disabled', true);
-    $error.removeClass('visible').text('');
-
-    $.ajax({
-        url:      document.URL + sep + 'action=quickCloseTicket&ticket_id=' + ticketId + '&token=' + token,
-        type:     'POST',
-        data:     {
-            progress: window.digiriskdolibarr.ticketPickerKanban.getQuickCloseProgress(),
-            comment:  $('#tacQuickCloseComment').val()
-        },
-        dataType: 'json',
-        success: function(response) {
-            if (response.success) {
-                window.digiriskdolibarr.ticketPickerKanban.closeQuickClose();
-                window.digiriskdolibarr.ticketPickerKanban.applyQuickClose(ticketId, response);
-            } else {
-                $error.text(response.error || $modal.attr('data-trans-error')).addClass('visible');
-            }
-        },
-        error: function(xhr) {
-            $error.text((xhr.responseJSON && xhr.responseJSON.error) || $modal.attr('data-trans-error')).addClass('visible');
-        },
-        complete: function() {
-            $confirm.prop('disabled', false);
-        }
+    window.digiriskdolibarr.ticketQuickClose.open({
+        id:      $card.data('ticket-id'),
+        ref:     $card.attr('data-ref'),
+        // Read on the card, which follows the inline edits of the subject
+        subject: $.trim($card.find('.tac-picker-card__subject-text').first().text())
     });
 };
 

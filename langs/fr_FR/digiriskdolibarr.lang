@@ -2297,8 +2297,8 @@ TicketQuickCloseProgressHelp           = À 100 %, le ticket est clôturé. En d
 TicketQuickCloseCommentPlaceholder     = Ajouté au ticket en message privé (facultatif)
 TicketQuickCloseError                  = Le ticket n'a pas pu être mis à jour
 TicketQuickCloseAlreadyClosed          = Ce ticket est déjà clôturé
-TicketQuickCloseLogClosed              = Ticket clôturé (kanban)
-TicketQuickCloseLogProgress            = Avancement modifié (kanban)
+TicketQuickCloseLogClosed              = Ticket clôturé (clôture rapide)
+TicketQuickCloseLogProgress            = Avancement modifié (clôture rapide)
 TicketQuickCloseLogNote                = Avancement → %s
 
 # ===========================================================================
