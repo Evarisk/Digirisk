@@ -126,7 +126,8 @@ if (is_array($allRiskAssessment) && !empty($allRiskAssessment)) :
 										</div>
 										<div class="photo riskassessment-photo-<?php echo $lastEvaluation->id; ?>" style="margin:auto">
 											<?php
-											print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, '/riskassessment/' . $lastEvaluation->ref, $lastEvaluation, 'photo', 0, 0, 0, 1);
+											// In the modal listing the assessments: the photo loads when the modal opens
+											print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, '/riskassessment/' . $lastEvaluation->ref, $lastEvaluation, 'photo', 0, 0, 0, 1, '', 1, ['defer_images' => true]);
 											?>
 										</div>
 										<div class="risk-evaluation-content">
@@ -363,7 +364,8 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 								</div>
 								<div class="photo riskassessment-photo-<?php echo $lastRiskAssessment->id > 0 ? $lastRiskAssessment->id : 0 ; echo $risk->id > 0 ? ' risk-' . $risk->id : ' risk-new' ?>">
                                     <?php
-                                        print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastRiskAssessment->ref, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, '/riskassessment/' . $lastRiskAssessment->ref . '/', $lastRiskAssessment, 'photo', 0, 0, 0, 1);
+                                        // In the modal adding an assessment: the photo loads when the modal opens
+                                        print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastRiskAssessment->ref, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, '/riskassessment/' . $lastRiskAssessment->ref . '/', $lastRiskAssessment, 'photo', 0, 0, 0, 1, '', 1, ['defer_images' => true]);
 								    ?>
 								</div>
 								<div class="risk-evaluation-content">
