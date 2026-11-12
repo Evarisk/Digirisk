@@ -2282,8 +2282,8 @@ TicketQuickCloseProgressHelp           = At 100 %, the ticket is closed. Below, 
 TicketQuickCloseCommentPlaceholder     = Added to the ticket as a private message (optional)
 TicketQuickCloseError                  = The ticket could not be updated
 TicketQuickCloseAlreadyClosed          = This ticket is already closed
-TicketQuickCloseLogClosed              = Ticket closed (kanban)
-TicketQuickCloseLogProgress            = Progress changed (kanban)
+TicketQuickCloseLogClosed              = Ticket closed (quick close)
+TicketQuickCloseLogProgress            = Progress changed (quick close)
 TicketQuickCloseLogNote                = Progress → %s
 
 # ===========================================================================

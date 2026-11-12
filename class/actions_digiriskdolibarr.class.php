@@ -57,6 +57,12 @@ class ActionsDigiriskdolibarr
 	protected int $ticketXlsxExportBufferLevel = 0;
 
 	/**
+	 * @var array<int, array{ref: string, subject: string}> Open tickets of the page of the list of the registers, whose
+	 *                                                       state opens the quick close modal
+	 */
+	protected array $ticketQuickCloseRows = [];
+
+	/**
 	 * Constructor
 	 *
 	 *  @param		DoliDB		$db      Database handler
@@ -245,7 +251,7 @@ class ActionsDigiriskdolibarr
      */
     public function llxHeader(array $parameters): int
     {
-        global $conf;
+        global $conf, $user;
 
         $isTicketList = $this->isDigiriskTicketList($parameters['context']);
         if (!$isTicketList && !$this->isDigiriskTicketTab($parameters['context']) && !$this->isDigiriskTaskTab($parameters['context'])) {
@@ -264,6 +270,12 @@ class ActionsDigiriskdolibarr
             // it hidden on every page of the session). Without the left menu, there is no table-cell to bound.
             $conf->dol_hide_leftmenu = 1;
             $parameters['morecssonbody'] .= ' digirisk-ticket-list';
+
+            // The state of an open ticket opens the quick close modal printed by printCommonFooter()
+            if ($user->hasRight('ticket', 'write')) {
+                $quickCloseJs            = array_map('saturne_htmlhead_asset_url', ['/saturne/js/saturne.min.js', '/digiriskdolibarr/js/digiriskdolibarr.min.js']);
+                $parameters['arrayofjs'] = array_values(array_unique(array_merge(is_array($parameters['arrayofjs']) ? $parameters['arrayofjs'] : [], $quickCloseJs)));
+            }
         } elseif (GETPOST('fromtype', 'alpha') === '') {
             // The lists of the native pages, as the time spent of a task, are wider than the screen: #id-right is a
             // table-cell, so their own overflow-x never scrolls and the whole page stretches instead.
@@ -1031,6 +1043,12 @@ class ActionsDigiriskdolibarr
 			}
 		} elseif (strpos($parameters['context'], 'categoryindex') !== false) {	    // do something only for the context 'somecontext1' or 'somecontext2'
             print '<script src="' . saturne_asset_full_url('/digiriskdolibarr/js/digiriskdolibarr.js') . '"></script>';
+        }
+
+        // List of the registers: quick close modal of the open tickets of the page, after the form of the list
+        if (!empty($this->ticketQuickCloseRows) && $this->isDigiriskTicketList($parameters['context'])) {
+            $ticketQuickCloseListTickets = $this->ticketQuickCloseRows;
+            require __DIR__ . '/../core/tpl/ticket/ticket_quick_close_modal.tpl.php';
         }
 
         if (strpos($parameters['context'], 'ticketlist')) {
@@ -2955,7 +2973,13 @@ class ActionsDigiriskdolibarr
 
     public function printFieldListValue($parameters, $object, $action)
     {
-        global $db;
+        global $db, $user;
+
+        // List of the registers: the state of an open ticket opens the quick close modal printed by printCommonFooter()
+        if ($object instanceof Ticket && $this->isDigiriskTicketList($parameters['context']) && $user->hasRight('ticket', 'write')
+            && !in_array((int) $object->status, [Ticket::STATUS_CLOSED, Ticket::STATUS_CANCELED], true)) {
+            $this->ticketQuickCloseRows[(int) $object->id] = ['ref' => (string) $object->ref, 'subject' => (string) $object->subject];
+        }
 
         if (strpos($parameters['context'], 'ticketlist') && isModEnabled('categorie')) {
             $obj = $parameters['object'];

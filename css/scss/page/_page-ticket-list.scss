@@ -84,6 +84,37 @@
         }
     }
 
+    // State of an open ticket, followed by the trigger of the quick close modal added by js/modules/ticket_quick_close.js
+    table.liste > tbody > tr > td.ticket-list-quick-close-cell {
+        white-space: nowrap;
+    }
+
+    .ticket-list-quick-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        margin-left: 4px;
+        border-radius: 50%;
+        vertical-align: middle;
+        color: $dr-faint;
+        cursor: pointer;
+        transition: background 0.15s ease, color 0.15s ease;
+
+        &:hover,
+        &:focus-visible {
+            outline: none;
+            background: $dr-success-soft;
+            color: $dr-success;
+        }
+    }
+
+    // Row just closed, or whose progress just changed, from the modal
+    table.liste > tbody > tr.ticket-list-quick-close-saved > td {
+        background: $dr-success-soft;
+    }
+
     // GP/UT: the reference stays on the line of its label
     table.liste > tbody > tr > td[data-key="ticket.digiriskdolibarr_ticket_service"] {
         min-width: 200px;
