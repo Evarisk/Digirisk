@@ -941,6 +941,10 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_LOCK', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_SENTBYMAIL', 'integer', 1, '', 0, 'current'],
 
+			// CONST JOB SHEET DOCUMENT (fiche de poste, modèle INRS ED 126)
+			$i++ => ['DIGIRISKDOLIBARR_JOBSHEETDOCUMENT_ADDON', 'chaine', 'mod_jobsheetdocument_standard', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_JOBSHEETDOCUMENT_DEFAULT_MODEL', 'chaine', 'jobsheetdocument', '', 0, 'current'],
+
 			// CONST ACCIDENT INVESTIGATION DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATIONDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON', 'chaine', 'mod_accidentinvestigationdocument_standard', '', 0, 'current'],
@@ -2419,6 +2423,7 @@ class modDigiriskdolibarr extends DolibarrModules
         delDocumentModel('orque_projectdocument', 'project');
         delDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument');
         delDocumentModel('accidentinvestigationdocument', 'accidentinvestigationdocument');
+        delDocumentModel('jobsheetdocument', 'jobsheetdocument');
         delDocumentModel('registerdocument_odt', 'registerdocument');
         delDocumentModel('ticketdocument', 'ticketdocument');
         delDocumentModel('ticketqqoqcpdocument', 'ticketqqoqcpdocument');
@@ -2454,6 +2459,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		addDocumentModel('papripact_a3_paysage_projectdocument', 'project', 'PAPRIPACT-A3-PAYSAGE');
         addDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument', 'ODT templates', 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('accidentinvestigationdocument', 'accidentinvestigationdocument', $langs->transnoentities('AccidentInvestigationDocumentPDF'));
+        addDocumentModel('jobsheetdocument', 'jobsheetdocument', $langs->transnoentities('JobSheetDocumentPDF'));
         addDocumentModel('registerdocument_odt', 'registerdocument', 'ODT templates', 'DIGIRISKDOLIBARR_REGISTERDOCUMENT_ADDON_ODT_PATH');
 
 		// The entity conf may have been cloned from another entity (multicompany): the constants can point
