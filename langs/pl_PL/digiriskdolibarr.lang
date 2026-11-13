@@ -245,6 +245,16 @@ StaffRepresentatives = Przedstawiciele pracowników
 ElectionDate         = Data wyborów
 ElectionDateCSE      = Data wyborów Rady Społeczno-Ekonomicznej
 ElectionDateDP       = Data wyborów przedstawicieli pracowników
+CHSCT                          = Komitet ds. Higieny, Bezpieczeństwa i Warunków Pracy (CHSCT)
+F3SCT                          = Wyspecjalizowany Zespół ds. Zdrowia, Bezpieczeństwa i Warunków Pracy (F3SCT)
+ElectionDateCHSCT              = Data powołania Komitetu ds. Higieny, Bezpieczeństwa i Warunków Pracy
+ElectionDateF3SCT              = Data powołania wyspecjalizowanego zespołu ds. zdrowia, bezpieczeństwa i warunków pracy
+StaffRepresentativeBodies      = Organy przedstawicielskie pracowników
+StaffRepresentativeBodiesHelp  = Organy, którymi dysponuje firma. Każdy ma swoją datę wyborów, swoich członków i swoich zastępców, do uzupełnienia po zapisaniu, ujętych w rozpowszechnianiu informacji.
+StaffBodyMembersCSE            = Członkowie Rady Społeczno-Ekonomicznej wybrani dnia
+StaffBodyMembersCHSCT          = Członkowie Komitetu ds. Higieny, Bezpieczeństwa i Warunków Pracy powołani dnia
+StaffBodyMembersF3SCT          = Członkowie wyspecjalizowanego zespołu ds. zdrowia, bezpieczeństwa i warunków pracy powołani dnia
+StaffBodyMembersDP             = Przedstawiciele pracowników wybrani dnia
 
 Titulars                       = Członkowie
 Alternates                     = Zastępcy

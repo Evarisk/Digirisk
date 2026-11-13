@@ -245,6 +245,16 @@ StaffRepresentatives = Personalvertreter
 ElectionDate         = Wahldatum
 ElectionDateCSE      = Wahldatum des Sozial- und Wirtschaftsausschusses
 ElectionDateDP       = Wahldatum der Personalvertreter
+CHSCT                          = Ausschuss für Hygiene, Sicherheit und Arbeitsbedingungen (CHSCT)
+F3SCT                          = Fachausschuss für Gesundheit, Sicherheit und Arbeitsbedingungen (F3SCT)
+ElectionDateCHSCT              = Benennungsdatum des Ausschusses für Hygiene, Sicherheit und Arbeitsbedingungen
+ElectionDateF3SCT              = Benennungsdatum des Fachausschusses für Gesundheit, Sicherheit und Arbeitsbedingungen
+StaffRepresentativeBodies      = Personalvertretungsgremien
+StaffRepresentativeBodiesHelp  = Gremien, über die das Unternehmen verfügt. Jedes hat sein Wahldatum, seine ordentlichen Mitglieder und seine Stellvertreter, nach dem Speichern auszufüllen, in der Informationsverbreitung übernommen.
+StaffBodyMembersCSE            = Mitglieder des Sozial- und Wirtschaftsausschusses, gewählt am
+StaffBodyMembersCHSCT          = Mitglieder des Ausschusses für Hygiene, Sicherheit und Arbeitsbedingungen, benannt am
+StaffBodyMembersF3SCT          = Mitglieder des Fachausschusses für Gesundheit, Sicherheit und Arbeitsbedingungen, benannt am
+StaffBodyMembersDP             = Personalvertreter, gewählt am
 
 Titulars                       = Ordentliche Mitglieder
 Alternates                     = Stellvertreter

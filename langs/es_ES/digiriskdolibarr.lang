@@ -245,6 +245,16 @@ StaffRepresentatives = Delegados de personal
 ElectionDate         = Fecha de elección
 ElectionDateCSE      = Fecha de elección del Comité Social y Económico
 ElectionDateDP       = Fecha de elección de los delegados de personal
+CHSCT                          = Comité de Higiene, Seguridad y Condiciones de Trabajo (CHSCT)
+F3SCT                          = Formación Especializada en Salud, Seguridad y Condiciones de Trabajo (F3SCT)
+ElectionDateCHSCT              = Fecha de designación del Comité de Higiene, Seguridad y Condiciones de Trabajo
+ElectionDateF3SCT              = Fecha de designación de la formación especializada en salud, seguridad y condiciones de trabajo
+StaffRepresentativeBodies      = Órganos de representación del personal
+StaffRepresentativeBodiesHelp  = Órganos de los que dispone la empresa. Cada uno tiene su fecha de elección, sus titulares y sus suplentes, a completar después de guardar, retomados en la difusión de información.
+StaffBodyMembersCSE            = Miembros del Comité Social y Económico elegidos el
+StaffBodyMembersCHSCT          = Miembros del Comité de Higiene, Seguridad y Condiciones de Trabajo designados el
+StaffBodyMembersF3SCT          = Miembros de la formación especializada en salud, seguridad y condiciones de trabajo designados el
+StaffBodyMembersDP             = Delegados de personal elegidos el
 
 Titulars                       = Titulares
 Alternates                     = Suplentes

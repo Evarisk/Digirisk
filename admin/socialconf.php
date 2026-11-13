@@ -55,6 +55,9 @@ $resources = new DigiriskResources($db);
 
 $allLinks = $resources->fetchDigiriskResources();
 
+// Staff representative bodies shown on the page: code => translation key of its name
+$activeStaffBodies = $resources->getActiveStaffRepresentativeBodies();
+
 $hookmanager->initHooks(array('admincompany', 'globaladmin'));
 
 // Security check - Protection if external user
@@ -71,35 +74,40 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($reshook)) {
 	if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
-		// An empty date field explodes to a single element: reading [1] and [2] warned, and the
-		// constant was stored as the string '--', which every consumer then has to special-case
-		$electionDateCSE = explode('/', GETPOST('ElectionDateCSE', 'none'));
-		$electionDateCSE = count($electionDateCSE) == 3 ? $electionDateCSE[2] . '-' . $electionDateCSE[1] . '-' . $electionDateCSE[0] : '';
-
-		$electionDateDP = explode('/', GETPOST('ElectionDateDP', 'none'));
-		$electionDateDP = count($electionDateDP) == 3 ? $electionDateDP[2] . '-' . $electionDateDP[1] . '-' . $electionDateDP[0] : '';
-
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", GETPOST("modalites", 'none'), 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT", GETPOST("permanent", 'none'), 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL", GETPOST("occasional", 'none'), 'chaine', 0, '', $conf->entity);
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_CSE_ELECTION_DATE", $electionDateCSE, 'date', 0, '', $conf->entity);
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_DP_ELECTION_DATE", $electionDateDP, 'date', 0, '', $conf->entity);
 
-		$CSEtitulaires = ! empty(GETPOST('TitularsCSE', 'array')) ? GETPOST('TitularsCSE', 'array') : (GETPOST('TitularsCSE', 'int') > 0 ? array(GETPOST('TitularsCSE', 'int')) : array());
-		$CSEsuppleants = ! empty(GETPOST('AlternatesCSE', 'array')) ? GETPOST('AlternatesCSE', 'array') : (GETPOST('AlternatesCSE', 'int') > 0 ? array(GETPOST('AlternatesCSE', 'int')) : array());
-		$TitularsDP    = ! empty(GETPOST('TitularsDP', 'array')) ? GETPOST('TitularsDP', 'array') : (GETPOST('TitularsDP', 'int') > 0 ? array(GETPOST('TitularsDP', 'int')) : array());
-		$AlternatesDP  = ! empty(GETPOST('AlternatesDP', 'array')) ? GETPOST('AlternatesDP', 'array') : (GETPOST('AlternatesDP', 'int') > 0 ? array(GETPOST('AlternatesDP', 'int')) : array());
+		// Only the bodies shown on the page posted their fields: a body chosen with this save has none yet, and
+		// one left out of the choice keeps its data, found again when it is chosen back
+		foreach (array_keys($activeStaffBodies) as $staffBody) {
+			// An empty date field explodes to a single element: reading [1] and [2] warned, and the
+			// constant was stored as the string '--', which every consumer then has to special-case
+			$electionDate = explode('/', GETPOST('ElectionDate' . $staffBody, 'none'));
+			$electionDate = count($electionDate) == 3 ? $electionDate[2] . '-' . $electionDate[1] . '-' . $electionDate[0] : '';
+			dolibarr_set_const($db, 'DIGIRISKDOLIBARR_' . $staffBody . '_ELECTION_DATE', $electionDate, 'date', 0, '', $conf->entity);
 
-		$resources->setDigiriskResources($db, $user->id, 'TitularsCSE', 'societe', $CSEtitulaires, $conf->entity);
-		$resources->setDigiriskResources($db, $user->id, 'AlternatesCSE', 'societe', $CSEsuppleants, $conf->entity);
-		$resources->setDigiriskResources($db, $user->id, 'TitularsDP', 'societe', $TitularsDP, $conf->entity);
-		$resources->setDigiriskResources($db, $user->id, 'AlternatesDP', 'societe', $AlternatesDP, $conf->entity);
+			foreach (['Titulars', 'Alternates'] as $memberType) {
+				// setDigiriskResources concatenates the ids in its INSERT without quoting them: cast them
+				$memberIds = array_values(array_filter(array_map('intval', GETPOST($memberType . $staffBody, 'array')), function ($memberId) {
+					return $memberId > 0;
+				}));
+				$resources->setDigiriskResources($db, $user->id, $memberType . $staffBody, 'societe', $memberIds, $conf->entity);
+			}
+		}
+
+		// Stored as 'none' when no body is chosen: an empty constant is deleted, and the page would fall back on the ESC
+		$chosenStaffBodies = array_intersect(GETPOST('StaffRepresentativeBodies', 'array'), array_keys(DigiriskResources::getStaffRepresentativeBodies()));
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_STAFF_REPRESENTATIVE_BODIES', !empty($chosenStaffBodies) ? implode(',', $chosenStaffBodies) : 'none', 'chaine', 0, '', $conf->entity);
 
 		$harassmentOfficer = GETPOST('HarassmentOfficer', 'int');
-		$harassmentOfficerCSE = GETPOST('HarassmentOfficerCSE', 'int');
-
 		$resources->setDigiriskResources($db, $user->id, 'HarassmentOfficer', 'user', array($harassmentOfficer), $conf->entity);
-		$resources->setDigiriskResources($db, $user->id, 'HarassmentOfficerCSE', 'user', array($harassmentOfficerCSE), $conf->entity);
+
+		// The ESC harassment officer is only shown with the ESC
+		if (isset($activeStaffBodies['CSE'])) {
+			$harassmentOfficerCSE = GETPOST('HarassmentOfficerCSE', 'int');
+			$resources->setDigiriskResources($db, $user->id, 'HarassmentOfficerCSE', 'user', array($harassmentOfficerCSE), $conf->entity);
+		}
 
 		if (! $error && GETPOSTINT('addUser') > 0) {
 			// Configuration has just been saved, the user can be created without losing it
@@ -128,8 +136,16 @@ $morecss = array("/saturne/css/saturne.min.css", "/digiriskdolibarr/css/digirisk
 
 $counter = 0;
 
-$socialResources = array("TitularsCSE", "AlternatesCSE", "TitularsDP", "AlternatesDP");
-$socialConsts    = array("DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT", "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL", "DIGIRISKDOLIBARR_CSE_ELECTION_DATE", "DIGIRISKDOLIBARR_DP_ELECTION_DATE");
+// The choice may just have been saved without leaving the page
+$activeStaffBodies = $resources->getActiveStaffRepresentativeBodies();
+
+$socialResources = array();
+$socialConsts    = array("DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT", "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL");
+foreach (array_keys($activeStaffBodies) as $staffBody) {
+	$socialResources[] = 'Titulars' . $staffBody;
+	$socialResources[] = 'Alternates' . $staffBody;
+	$socialConsts[]    = 'DIGIRISKDOLIBARR_' . $staffBody . '_ELECTION_DATE';
+}
 
 $maxnumber = count($socialResources) + count($socialConsts);
 
@@ -159,9 +175,6 @@ $resources = new DigiriskResources($db);
 $addUserLink = ' <a class="add-user-link" href="#"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 
 $allLinks = $resources->fetchDigiriskResources();
-
-$electionDateCSE = getDolGlobalString('DIGIRISKDOLIBARR_CSE_ELECTION_DATE');
-$electionDateDP  = getDolGlobalString('DIGIRISKDOLIBARR_DP_ELECTION_DATE');
 
 print '<span class="opacitymedium">' . $langs->trans("DigiriskMenu") . "</span><br>\n";
 print "<br>";
@@ -228,100 +241,56 @@ print $addUserLink;
 print '</td></tr>';
 
 /*
-* Harassment officer CSE
+* Harassment officer CSE, only with the ESC
 */
 
-print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("HarassmentOfficerCSE") . '</th><th>' . $langs->trans("") . '</th></tr>' . "\n";
-$harassmentOfficerCSEIds = $allLinks['HarassmentOfficerCSE']->id ?? [];
-print '<tr>';
-print '<td>' . $langs->trans("ActionOnUser") . '</td>';
-print '<td colspan="3" class="maxwidthonsmartphone">';
-print $form->select_dolusers($harassmentOfficerCSEIds, 'HarassmentOfficerCSE', 1, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300');
-print $addUserLink;
-print '</td></tr>';
+if (isset($activeStaffBodies['CSE'])) {
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("HarassmentOfficerCSE") . '</th><th>' . $langs->trans("") . '</th></tr>' . "\n";
+	$harassmentOfficerCSEIds = $allLinks['HarassmentOfficerCSE']->id ?? [];
+	print '<tr>';
+	print '<td>' . $langs->trans("ActionOnUser") . '</td>';
+	print '<td colspan="3" class="maxwidthonsmartphone">';
+	print $form->select_dolusers($harassmentOfficerCSEIds, 'HarassmentOfficerCSE', 1, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300');
+	print $addUserLink;
+	print '</td></tr>';
+}
 
 /*
-*** ESC -- CSE ***
+*** Staff representative bodies -- Instances représentatives du personnel ***
 */
 
-print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("ESC") . '</th><th>' . $langs->trans("") . '</th></tr>' . "\n";
+$staffBodyLabels = array();
+foreach (DigiriskResources::getStaffRepresentativeBodies() as $staffBody => $staffBodyLabel) {
+	$staffBodyLabels[$staffBody] = $langs->trans($staffBodyLabel);
+}
 
-// * ESC Election Date - Date d'élection du CSE *
-
-print '<tr class="oddeven"><td><label for="ElectionDateCSE">' . $langs->trans("ElectionDate") . '</label></td><td>';
-print $form->selectDate(strtotime($electionDateCSE) ? $electionDateCSE : -1, 'ElectionDateCSE', 0, 0, 0, 'social_form', 1, 1);
-print '</td></tr>';
-
-// * ESC Titulars - Titulaires CSE *
-
-$userlist 	  = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', '', 0, 1);
-$titularsCseIds = $allLinks['TitularsCSE']->id ?? [];
-
-print '<tr>';
-print '<td>' . $form->editfieldkey('Titulars', 'TitularsCSE_id', '', $object, 0) . '</td>';
+print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("StaffRepresentativeBodies") . '</th><th>' . $langs->trans("") . '</th></tr>' . "\n";
+print '<tr class="oddeven"><td><label for="StaffRepresentativeBodies">' . $form->textwithpicto($langs->trans("StaffRepresentativeBodies"), $langs->trans("StaffRepresentativeBodiesHelp")) . '</label></td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
-
-
-print $form->multiselectarray('TitularsCSE', $userlist, $titularsCseIds, null, null, null, null, "300");
-
-print $addUserLink;
-
+// Full names are long: the field takes the width of the cell, up to 750 px
+print $form->multiselectarray('StaffRepresentativeBodies', $staffBodyLabels, array_keys($activeStaffBodies), 0, 0, 'minwidth300 maxwidth750', 0, '100%');
 print '</td></tr>';
 
-// * ESC Alternates - Suppléants CSE *
+// One section per body: its election date, its titulars, its alternates
+$userlist = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', '', 0, 1);
+foreach ($activeStaffBodies as $staffBody => $staffBodyLabel) {
+	$electionDate = getDolGlobalString('DIGIRISKDOLIBARR_' . $staffBody . '_ELECTION_DATE');
 
-$userlist       = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', '', 0, 1);
-$alternatesCseIds = $allLinks['AlternatesCSE']->id ?? [];
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans($staffBodyLabel) . '</th><th>' . $langs->trans("") . '</th></tr>' . "\n";
 
-print '<tr>';
-print '<td>' . $form->editfieldkey('Alternates', 'AlternatesCSE_id', '', $object, 0) . '</td>';
-print '<td colspan="3" class="maxwidthonsmartphone">';
+	print '<tr class="oddeven"><td><label for="ElectionDate' . $staffBody . '">' . $langs->trans('ElectionDate' . $staffBody) . '</label></td><td>';
+	print $form->selectDate(strtotime($electionDate) ? $electionDate : -1, 'ElectionDate' . $staffBody, 0, 0, 0, 'social_form', 1, 1);
+	print '</td></tr>';
 
-print $form->multiselectarray('AlternatesCSE', $userlist, $alternatesCseIds, null, null, null, null, "300");
-
-print $addUserLink;
-
-print '</td></tr>';
-
-/*
-*** Staff Representative -- Délégués du Personnel ***
-*/
-
-print '<table class="noborder centpercent editmode">';
-print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("StaffRepresentatives") . '</th><th>' . $langs->trans("") . '</th></tr>' . "\n";
-
-print '<tr class="oddeven"><td><label for="ElectionDateDP">' . $langs->trans("ElectionDate") . '</label></td><td>';
-print $form->selectDate(strtotime($electionDateDP) ? $electionDateDP : -1, 'ElectionDateDP', 0, 0, 0, 'social_form', 1, 1);
-
-// * Staff Representatives Titulars - Titulaires Délégués du Personnel *
-
-$userlist    = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', '', 0, 1);
-$titularsDpIds = $allLinks['TitularsDP']->id ?? [];
-
-print '<tr>';
-print '<td>' . $form->editfieldkey('Titulars', 'TitularsDP_id', '', $object, 0) . '</td>';
-print '<td colspan="3" class="maxwidthonsmartphone">';
-
-print $form->multiselectarray('TitularsDP', $userlist, $titularsDpIds, null, null, null, null, "300");
-
-print $addUserLink;
-
-print '</td></tr>';
-
-// * Staff Representatives Suppléants - Suppléants Délégués du Personnel *
-
-$userlist      = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', '', 0, 1);
-$alternatesDpIds = $allLinks['AlternatesDP']->id ?? [];
-
-print '<tr>';
-print '<td>' . $form->editfieldkey('Alternates', 'AlternatesDP', '', $object, 0) . '</td>';
-print '<td colspan="3" class="maxwidthonsmartphone">';
-
-print $form->multiselectarray('AlternatesDP', $userlist, $alternatesDpIds, null, null, null, null, "300");
-
-print $addUserLink;
-
-print '</td></tr>';
+	foreach (['Titulars', 'Alternates'] as $memberType) {
+		print '<tr>';
+		print '<td><label for="' . $memberType . $staffBody . '">' . $langs->trans($memberType) . '</label></td>';
+		print '<td colspan="3" class="maxwidthonsmartphone">';
+		print $form->multiselectarray($memberType . $staffBody, $userlist, $allLinks[$memberType . $staffBody]->id ?? [], null, null, null, null, "300");
+		print $addUserLink;
+		print '</td></tr>';
+	}
+}
 
 print '</table>';
 

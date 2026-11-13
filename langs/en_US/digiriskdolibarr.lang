@@ -266,6 +266,16 @@ StaffRepresentatives = Staff representatives
 ElectionDate         = Election date
 ElectionDateCSE      = Social and Economic Committee election date
 ElectionDateDP       = Staff representatives election date
+CHSCT                          = Health, Safety and Working Conditions Committee (CHSCT)
+F3SCT                          = Specialised Health, Safety and Working Conditions Body (F3SCT)
+ElectionDateCHSCT              = Health, Safety and Working Conditions Committee appointment date
+ElectionDateF3SCT              = Specialised health, safety and working conditions body appointment date
+StaffRepresentativeBodies      = Staff representative bodies
+StaffRepresentativeBodiesHelp  = Bodies the company has. Each one has its election date, its full members and its deputy members, to fill in after saving, shown in the information sharing.
+StaffBodyMembersCSE            = Members of the Social and Economic Committee elected on
+StaffBodyMembersCHSCT          = Members of the Health, Safety and Working Conditions Committee appointed on
+StaffBodyMembersF3SCT          = Members of the specialised health, safety and working conditions body appointed on
+StaffBodyMembersDP             = Staff representatives elected on
 
 Titulars                       = Full members
 Alternates                     = Deputy members

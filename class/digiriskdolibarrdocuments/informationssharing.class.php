@@ -92,8 +92,11 @@ class InformationsSharing extends DigiriskDocuments
 				$json['InformationsSharing']['harassment_officer']['phone'] = $harassment_officer->office_phone;
 			}
 
+			$activeStaffBodies = $resources->getActiveStaffRepresentativeBodies();
+
+			// The ESC harassment officer goes with the ESC
 			$harassment_officer_cse = new User($this->db);
-			$result = $harassment_officer_cse->fetch($digirisk_resources['HarassmentOfficerCSE']->id[0]);
+			$result = isset($activeStaffBodies['CSE']) ? $harassment_officer_cse->fetch($digirisk_resources['HarassmentOfficerCSE']->id[0] ?? 0) : 0;
 
 			if ($result > 0) {
 				$json['InformationsSharing']['harassment_officer_cse']['id']    = $harassment_officer_cse->id;
@@ -101,61 +104,38 @@ class InformationsSharing extends DigiriskDocuments
 				$json['InformationsSharing']['harassment_officer_cse']['phone'] = $harassment_officer_cse->office_phone;
 			}
 
-			$json['InformationsSharing']['delegues_du_personnels_date']    	  = (dol_strlen($conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE) > 0 && $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE != '--' ? $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE : '');
-			$json['InformationsSharing']['delegues_du_personnels_titulaires'] = '';
-            $json['InformationsSharing']['delegues_du_personnels_titulairesFullName'] = '';
-			if (!empty ($digirisk_resources['TitularsDP']->id )) {
-				foreach ($digirisk_resources['TitularsDP']->id as $dp_titular) {
-
-					$dp_titulars = new User($this->db);
-					$result = $dp_titulars->fetch($dp_titular);
-					if ($result > 0) {
-						$json['InformationsSharing']['delegues_du_personnels_titulaires']  .= $dp_titulars->firstname . " " . $dp_titulars->lastname . '<br>';
-						$json['InformationsSharing']['delegues_du_personnels_titulairesFullName']  .= $dp_titulars->getNomUrl(1) . '<br>';
+			// Staff representative bodies chosen in the social setup, in display order: their names are translated
+			// when they are shown, in the language of the page or of the document
+			$json['InformationsSharing']['staff_bodies'] = [];
+			foreach (array_keys($activeStaffBodies) as $staffBodyCode) {
+				$electionDate = getDolGlobalString('DIGIRISKDOLIBARR_' . $staffBodyCode . '_ELECTION_DATE');
+				$staffBody    = [
+					'code'          => $staffBodyCode,
+					'election_date' => $electionDate != '--' ? $electionDate : '',
+				];
+				foreach (['titulars' => 'Titulars', 'alternates' => 'Alternates'] as $memberKey => $memberType) {
+					$staffBody[$memberKey]              = '';
+					$staffBody[$memberKey . 'FullName'] = '';
+					foreach ($digirisk_resources[$memberType . $staffBodyCode]->id ?? [] as $memberId) {
+						$member = new User($this->db);
+						if ($member->fetch($memberId) > 0) {
+							$staffBody[$memberKey]              .= $member->firstname . ' ' . $member->lastname . '<br>';
+							$staffBody[$memberKey . 'FullName'] .= $member->getNomUrl(1) . '<br>';
+						}
 					}
 				}
+				$json['InformationsSharing']['staff_bodies'][$staffBodyCode] = $staffBody;
 			}
 
-			$json['InformationsSharing']['delegues_du_personnels_suppleants'] = '';
-            $json['InformationsSharing']['delegues_du_personnels_suppleantsFullName'] = '';
-			if (!empty ($digirisk_resources['AlternatesDP']->id )) {
-				foreach ($digirisk_resources['AlternatesDP']->id as $dp_alternate) {
+			// Tags of the ESC and of the staff delegates from before the choice of the bodies, still read by the custom templates
+			foreach (['CSE' => 'membres_du_comite_entreprise', 'DP' => 'delegues_du_personnels'] as $staffBodyCode => $legacyKey) {
+				$staffBody = $json['InformationsSharing']['staff_bodies'][$staffBodyCode] ?? [];
 
-					$dp_alternates = new User($this->db);
-					$result = $dp_alternates->fetch($dp_alternate);
-					if ($result > 0) {
-						$json['InformationsSharing']['delegues_du_personnels_suppleants']  .= $dp_alternates->firstname . " " . $dp_alternates->lastname . '<br>';
-						$json['InformationsSharing']['delegues_du_personnels_suppleantsFullName']  .= $dp_alternates->getNomUrl(1) . '<br>';
-					}
-				}
-			}
-
-			// CSE
-			$json['InformationsSharing']['membres_du_comite_entreprise_date']       = (dol_strlen($conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE) > 0 && $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE != '--' ? $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE : '');
-			$json['InformationsSharing']['membres_du_comite_entreprise_titulaires'] = '';
-            $json['InformationsSharing']['membres_du_comite_entreprise_titulairesFullName'] = '';
-			if (!empty ($digirisk_resources['TitularsCSE']->id )) {
-				foreach ($digirisk_resources['TitularsCSE']->id as $cse_titular) {
-					$cse_titulars = new User($this->db);
-					$result = $cse_titulars->fetch($cse_titular);
-					if ($result > 0) {
-						$json['InformationsSharing']['membres_du_comite_entreprise_titulaires']  .= $cse_titulars->firstname . " " . $cse_titulars->lastname  . '<br>';
-						$json['InformationsSharing']['membres_du_comite_entreprise_titulairesFullName']  .= $cse_titulars->getNomUrl(1) . '<br>';
-					}
-				}
-			}
-
-			$json['InformationsSharing']['membres_du_comite_entreprise_suppleants'] = '';
-            $json['InformationsSharing']['membres_du_comite_entreprise_suppleantsFullName'] = '';
-			if (!empty ($digirisk_resources['AlternatesCSE']->id )) {
-				foreach ($digirisk_resources['AlternatesCSE']->id as $cse_alternate) {
-					$cse_alternates = new User($this->db);
-					$result = $cse_alternates->fetch($cse_alternate);
-					if ($result > 0) {
-						$json['InformationsSharing']['membres_du_comite_entreprise_suppleants']  .= $cse_alternates->firstname . " " . $cse_alternates->lastname  . '<br>';
-						$json['InformationsSharing']['membres_du_comite_entreprise_suppleantsFullName']  .= $cse_alternates->getNomUrl(1) . '<br>';
-					}
-				}
+				$json['InformationsSharing'][$legacyKey . '_date']               = $staffBody['election_date'] ?? '';
+				$json['InformationsSharing'][$legacyKey . '_titulaires']         = $staffBody['titulars'] ?? '';
+				$json['InformationsSharing'][$legacyKey . '_titulairesFullName'] = $staffBody['titularsFullName'] ?? '';
+				$json['InformationsSharing'][$legacyKey . '_suppleants']         = $staffBody['alternates'] ?? '';
+				$json['InformationsSharing'][$legacyKey . '_suppleantsFullName'] = $staffBody['alternatesFullName'] ?? '';
 			}
 
 			$json = json_encode($json, JSON_UNESCAPED_UNICODE);
