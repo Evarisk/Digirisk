@@ -351,7 +351,21 @@ if (empty($resHook) && $publicInterfaceUsable) {
         }
 
         if (empty($error)) {
-            $result = $object->create($user);
+            // The mail of the declaration (setup of the tickets of Digirisk) is the notification of these tickets: the
+            // mail « New ticket » of the module Ticket would be a second one, to its single address shared by every
+            // module of Dolibarr. Left out for the time of the creation only, as the core does for its automatic copy
+            $digiriskNotifies = getDolGlobalInt('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT') && trim(getDolGlobalString('DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO'), " ,;") !== '';
+            $globalNotifyTo   = getDolGlobalString('TICKET_NOTIFICATION_EMAIL_TO');
+            if ($digiriskNotifies) {
+                $conf->global->TICKET_NOTIFICATION_EMAIL_TO = '';
+            }
+            try {
+                $result = $object->create($user);
+            } finally {
+                if ($digiriskNotifies) {
+                    $conf->global->TICKET_NOTIFICATION_EMAIL_TO = $globalNotifyTo;
+                }
+            }
             $object->fetch($result);
             $track_id = $object->track_id;
 
