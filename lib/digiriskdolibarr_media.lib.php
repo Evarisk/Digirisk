@@ -237,12 +237,17 @@ function digiriskTicketPublicMediaActions(string $action, string $subDir): void
     if ($action == 'uploadPhoto' && getDolGlobalInt('MAIN_UPLOAD_DOC')) {
         // Anyone holding the link can post here: only actual images are written
         $isAllowed = true;
-        foreach ((array) ($_FILES['userfile']['tmp_name'] ?? []) as $uploadedTmpName) {
+        $tmpNames  = (array) ($_FILES['userfile']['tmp_name'] ?? []);
+        $origNames = (array) ($_FILES['userfile']['name'] ?? []);
+
+        foreach ($tmpNames as $key => $uploadedTmpName) {
             if (empty($uploadedTmpName)) {
                 continue;
             }
+            $origName = (string) ($origNames[$key] ?? '');
             $fileInfo = new finfo(FILEINFO_MIME_TYPE);
-            if (strpos((string) $fileInfo->file($uploadedTmpName), 'image/') !== 0) {
+            $mimeType = (string) $fileInfo->file($uploadedTmpName);
+            if (strpos($mimeType, 'image/') !== 0 || $mimeType === 'image/svg+xml' || image_format_supported($origName) < 0) {
                 $isAllowed = false;
                 break;
             }

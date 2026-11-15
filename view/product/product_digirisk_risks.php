@@ -181,8 +181,30 @@ if ($action == 'uploadPhoto' && $permissiontoadd && !empty($conf->global->MAIN_U
     if (!dol_is_dir($uploadDir)) {
         dol_mkdir($uploadDir);
     }
-    $allowOverwrite = GETPOSTINT('overwrite') ? 1 : 0;
-    dol_add_file_process($uploadDir, $allowOverwrite, 1, 'userfile', '', null, '', 1);
+
+    require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+
+    $isImageUpload = true;
+    $uploadedFiles = isset($_FILES['userfile']['tmp_name']) ? (array) $_FILES['userfile']['tmp_name'] : [];
+    $uploadedNames = isset($_FILES['userfile']['name']) ? (array) $_FILES['userfile']['name'] : [];
+
+    foreach ($uploadedFiles as $key => $uploadedTmpName) {
+        if (empty($uploadedTmpName)) {
+            continue;
+        }
+        $origName = (string) ($uploadedNames[$key] ?? '');
+        $fileInfo = new finfo(FILEINFO_MIME_TYPE);
+        $mimeType = (string) $fileInfo->file($uploadedTmpName);
+        if (strpos($mimeType, 'image/') !== 0 || $mimeType === 'image/svg+xml' || image_format_supported($origName) < 0) {
+            $isImageUpload = false;
+            break;
+        }
+    }
+
+    if ($isImageUpload) {
+        $allowOverwrite = GETPOSTINT('overwrite') ? 1 : 0;
+        dol_add_file_process($uploadDir, $allowOverwrite, 1, 'userfile', '', null, '', 1);
+    }
 }
 
 if ($action == 'deletePhoto' && $permissiontoadd) {
