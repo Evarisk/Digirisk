@@ -258,14 +258,20 @@ if (($action == 'uploadPhoto' || $action == 'deletePhoto') && $permissiontoadd) 
 
     if ($action == 'uploadPhoto' && getDolGlobalInt('MAIN_UPLOAD_DOC')) {
         // The media block only sends images, make sure of it before writing anything
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+
         $isImageUpload = true;
         $uploadedFiles = isset($_FILES['userfile']['tmp_name']) ? (array) $_FILES['userfile']['tmp_name'] : [];
-        foreach ($uploadedFiles as $uploadedTmpName) {
+        $uploadedNames = isset($_FILES['userfile']['name']) ? (array) $_FILES['userfile']['name'] : [];
+
+        foreach ($uploadedFiles as $key => $uploadedTmpName) {
             if (empty($uploadedTmpName)) {
                 continue;
             }
+            $origName = (string) ($uploadedNames[$key] ?? '');
             $fileInfo = new finfo(FILEINFO_MIME_TYPE);
-            if (strpos((string) $fileInfo->file($uploadedTmpName), 'image/') !== 0) {
+            $mimeType = (string) $fileInfo->file($uploadedTmpName);
+            if (strpos($mimeType, 'image/') !== 0 || $mimeType === 'image/svg+xml' || image_format_supported($origName) < 0) {
                 $isImageUpload = false;
                 break;
             }
