@@ -1707,6 +1707,7 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
         e.stopPropagation();
         var $wrapper = $(this).closest('.kanban-responsible-wrapper');
         var $select  = $wrapper.find('.tac-picker-assignee-select');
+        window.digiriskdolibarr.ticketPickerKanban.fillAssigneeSelect($select);
         $(this).hide();
         $select.addClass('visible');
         if ($.fn.select2) {
@@ -1777,6 +1778,7 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
             });
         var $dropdown = $(this).siblings('.kanban-tag-dropdown');
         var $card = $(this).closest('.tac-picker-card');
+        window.digiriskdolibarr.ticketPickerKanban.fillTagDropdown($dropdown);
         $dropdown.toggleClass('visible');
         $card.toggleClass('kanban-card-dropdown-open', $dropdown.hasClass('visible'));
     });
@@ -2352,6 +2354,53 @@ window.digiriskdolibarr.ticketPickerKanban.saveDim = function(ticketId, dim, new
             setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
         }
     });
+};
+
+/**
+ * Copy the users of the page template into the assignee select of a card, on its first use (#5762).
+ * The card is printed with its current assignee only, which the card filters read: an assignee missing
+ * from the template (no longer assignable) keeps its own option, so the card does not look unassigned.
+ *
+ * @param  {jQuery} $select The .tac-picker-assignee-select element of the card
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.fillAssigneeSelect = function($select) {
+    if ($select.data('filled')) {
+        return;
+    }
+    var current   = String($select.val() || '0');
+    var $currentO = $select.find('option:selected').clone();
+    var $options  = $('#tacPickerAssigneeTemplate option').clone();
+
+    $select.empty().append($options);
+    if (!$select.find('option').filter(function() { return this.value === current; }).length) {
+        $select.append($currentO);
+    }
+    $select.val(current).data('filled', true);
+};
+
+/**
+ * Copy the tags of the page template into the tag dropdown of a card, on its first use (#5762),
+ * the tags the card already carries being checked.
+ *
+ * @param  {jQuery} $dropdown The .kanban-tag-dropdown element of the card
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.fillTagDropdown = function($dropdown) {
+    if ($dropdown.data('filled')) {
+        return;
+    }
+    var assigned = $dropdown.closest('.tac-picker-card').find('.kanban-card-tags .kanban-tag').map(function() {
+        return String($(this).data('cat-id'));
+    }).get();
+    var $options = $('#tacPickerTagTemplate .kanban-tag-option').clone();
+
+    $options.each(function() {
+        if (assigned.indexOf(String($(this).data('value'))) !== -1) {
+            $(this).addClass('assigned').append('<i class="fas fa-check" style="margin-left:auto;font-size:9px;color:#28a745"></i>');
+        }
+    });
+    $dropdown.empty().append($options).data('filled', true);
 };
 
 /**

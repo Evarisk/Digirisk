@@ -38,6 +38,9 @@
  *
  * With the write permission on tickets, the percentage of an open ticket opens the quick close modal rendered after the
  * boards (core/tpl/ticket/ticket_quick_close_modal.tpl.php, js/modules/ticket_quick_close.js)
+ *
+ * The users and the tags offered on a card are printed once for the page, then copied into a card on its first use
+ * (#5762): printed in every card of the 4 boards, they made the page weigh hundreds of megabytes on large volumes
  */
 
 if (empty($conf) || empty($db) || empty($langs) || empty($user)) {
@@ -48,16 +51,17 @@ if (empty($conf) || empty($db) || empty($langs) || empty($user)) {
 /**
  * Render a single kanban board for one dimension.
  *
+ * A card only carries its current assignee and an empty tag dropdown: the choices come from the templates printed
+ * once by the page (#tacPickerAssigneeTemplate, #tacPickerTagTemplate), copied into the card on its first use
+ *
  * @param  array  $columns     Column definitions  [code => [label, icon, color]]
  * @param  array  $colTickets  Tickets per column  [code => [ticket data, ...]]
  * @param  string $dim         Dimension key: 'type', 'group', 'severity'
- * @param  array  $allUsers    All active users (for assignee select)
- * @param  array  $allCats     All tag categories
  * @param  array  $allSevCols  Severity column definitions (for inline severity select)
  * @param  object $langs       $langs global
  * @return void
  */
-function renderDimKanban($columns, $colTickets, $dim, $allUsers, $allCats, $allSevCols, $langs)
+function renderDimKanban($columns, $colTickets, $dim, $allSevCols, $langs)
 {
     global $user;
 
@@ -195,16 +199,12 @@ function renderDimKanban($columns, $colTickets, $dim, $allUsers, $allCats, $allS
                                     </span>
                                 <?php endif; ?>
 
+                                <?php // Only the current assignee: the card filters read it, the other users come with the first click ?>
                                 <select class="kanban-responsible-select tac-picker-assignee-select" data-ticket-id="<?= (int) $t['id'] ?>">
                                     <option value="0"><?= dol_escape_htmltag($langs->trans('Unassigned')) ?></option>
-                                    <?php foreach ($allUsers as $u) : ?>
-                                        <option value="<?= (int) $u['id'] ?>"
-                                                data-initial="<?= dol_escape_htmltag($u['initials']) ?>"
-                                                data-photo="<?= dol_escape_htmltag($u['photo']) ?>"
-                                                <?= ($t['assign_id'] == $u['id']) ? 'selected' : '' ?>>
-                                            <?= dol_escape_htmltag($u['fullname']) ?>
-                                        </option>
-                                    <?php endforeach; ?>
+                                    <?php if ($hasAssign) : ?>
+                                        <option value="<?= (int) $t['assign_id'] ?>" data-initial="<?= dol_escape_htmltag($t['assign_initials']) ?>" data-photo="<?= dol_escape_htmltag($t['assign_photo']) ?>" selected><?= dol_escape_htmltag($t['assign_fullname']) ?></option>
+                                    <?php endif; ?>
                                 </select>
                             </div>
                         </div>
@@ -223,23 +223,8 @@ function renderDimKanban($columns, $colTickets, $dim, $allUsers, $allCats, $allS
                                 <button class="kanban-add-tag-btn" title="<?= dol_escape_htmltag($langs->trans('AddCategory')) ?>">
                                     <i class="fas fa-tag"></i><i class="fas fa-plus" style="font-size:7px;margin-left:1px"></i>
                                 </button>
-                                <?php $assignedCatIds = array_column($t['categories'], 'id'); ?>
-                                <div class="kanban-tag-dropdown" data-ticket-id="<?= (int) $t['id'] ?>">
-                                    <?php foreach ($allCats as $ac) :
-                                        $isAssigned = in_array($ac['id'], $assignedCatIds);
-                                        $dotColor   = !empty($ac['color']) ? '#' . dol_escape_htmltag($ac['color']) : '#8c8c8c';
-                                    ?>
-                                        <div class="kanban-tag-option<?= $isAssigned ? ' assigned' : '' ?>"
-                                             data-value="<?= (int) $ac['id'] ?>"
-                                             data-color="<?= dol_escape_htmltag($ac['color']) ?>">
-                                            <span class="kanban-tag-dot" style="background:<?= $dotColor ?>"></span>
-                                            <?= dol_escape_htmltag($ac['label']) ?>
-                                            <?php if ($isAssigned) : ?>
-                                                <i class="fas fa-check" style="margin-left:auto;font-size:9px;color:#28a745"></i>
-                                            <?php endif; ?>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
+                                <?php // Filled from #tacPickerTagTemplate on the first click, the tags of the card checked ?>
+                                <div class="kanban-tag-dropdown" data-ticket-id="<?= (int) $t['id'] ?>"></div>
                             </div>
                         </div>
 
@@ -385,23 +370,39 @@ function renderDimKanban($columns, $colTickets, $dim, $allUsers, $allCats, $allS
         </button>
     </div>
 
+    <!-- Users and tags offered on the cards, printed once for the page and copied into a card on its first use (#5762) -->
+    <select class="tac-picker-template" id="tacPickerAssigneeTemplate" hidden disabled>
+        <option value="0"><?= dol_escape_htmltag($langs->trans('Unassigned')) ?></option>
+        <?php foreach ($pickerAllUsers as $u) : ?>
+            <option value="<?= (int) $u['id'] ?>" data-initial="<?= dol_escape_htmltag($u['initials']) ?>" data-photo="<?= dol_escape_htmltag($u['photo']) ?>"><?= dol_escape_htmltag($u['fullname']) ?></option>
+        <?php endforeach; ?>
+    </select>
+    <div class="tac-picker-template" id="tacPickerTagTemplate" hidden>
+        <?php foreach ($pickerAllCategories as $ac) : ?>
+            <div class="kanban-tag-option" data-value="<?= (int) $ac['id'] ?>" data-color="<?= dol_escape_htmltag($ac['color']) ?>">
+                <span class="kanban-tag-dot" style="background:<?= !empty($ac['color']) ? '#' . dol_escape_htmltag($ac['color']) : '#8c8c8c' ?>"></span>
+                <?= dol_escape_htmltag($ac['label']) ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
     <!-- Board panels -->
     <div class="tac-dim-panels" id="tacDimPanels">
 
         <div class="tac-dim-panel active" data-dim="status">
-            <?php renderDimKanban($pickerStatusColumns, $pickerStatusTickets, 'status', $pickerAllUsers, $pickerAllCategories, $pickerSeverityColumns, $langs); ?>
+            <?php renderDimKanban($pickerStatusColumns, $pickerStatusTickets, 'status', $pickerSeverityColumns, $langs); ?>
         </div>
 
         <div class="tac-dim-panel" data-dim="type">
-            <?php renderDimKanban($pickerTypeColumns, $pickerTypeTickets, 'type', $pickerAllUsers, $pickerAllCategories, $pickerSeverityColumns, $langs); ?>
+            <?php renderDimKanban($pickerTypeColumns, $pickerTypeTickets, 'type', $pickerSeverityColumns, $langs); ?>
         </div>
 
         <div class="tac-dim-panel" data-dim="group">
-            <?php renderDimKanban($pickerGroupColumns, $pickerGroupTickets, 'group', $pickerAllUsers, $pickerAllCategories, $pickerSeverityColumns, $langs); ?>
+            <?php renderDimKanban($pickerGroupColumns, $pickerGroupTickets, 'group', $pickerSeverityColumns, $langs); ?>
         </div>
 
         <div class="tac-dim-panel" data-dim="severity">
-            <?php renderDimKanban($pickerSeverityColumns, $pickerSeverityTickets, 'severity', $pickerAllUsers, $pickerAllCategories, $pickerSeverityColumns, $langs); ?>
+            <?php renderDimKanban($pickerSeverityColumns, $pickerSeverityTickets, 'severity', $pickerSeverityColumns, $langs); ?>
         </div>
 
     </div>
