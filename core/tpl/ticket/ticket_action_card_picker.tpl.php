@@ -40,7 +40,9 @@
  * boards (core/tpl/ticket/ticket_quick_close_modal.tpl.php, js/modules/ticket_quick_close.js)
  *
  * The users and the tags offered on a card are printed once for the page, then copied into a card on its first use
- * (#5762): printed in every card of the 4 boards, they made the page weigh hundreds of megabytes on large volumes
+ * (#5762): printed in every card of the 4 boards, they made the page weigh hundreds of megabytes on large volumes.
+ * Only one board is built with the page, the status one or the one asked by kanban_board: the tab of another board
+ * fetches it from this same page (ticketPickerKanban.loadBoard)
  */
 
 if (empty($conf) || empty($db) || empty($langs) || empty($user)) {
@@ -354,20 +356,27 @@ function renderDimKanban($columns, $colTickets, $dim, $allSevCols, $langs)
         </div>
     </div>
 
+    <?php
+    // Only one board is built with the page (#5762), the others are fetched by their tab with kanban_board
+    $pickerBoards = [
+        'status'   => ['icon' => 'fa-list-ol', 'label' => 'Status', 'columns' => $pickerStatusColumns, 'tickets' => $pickerStatusTickets],
+        'type'     => ['icon' => 'fa-tag', 'label' => 'Type', 'columns' => $pickerTypeColumns, 'tickets' => $pickerTypeTickets],
+        'group'    => ['icon' => 'fa-folder', 'label' => 'TicketCategory', 'columns' => $pickerGroupColumns, 'tickets' => $pickerGroupTickets],
+        'severity' => ['icon' => 'fa-exclamation-triangle', 'label' => 'Severity', 'columns' => $pickerSeverityColumns, 'tickets' => $pickerSeverityTickets],
+    ];
+    $pickerActiveBoard = GETPOST('kanban_board', 'aZ09');
+    if (!array_key_exists($pickerActiveBoard, $pickerBoards)) {
+        $pickerActiveBoard = 'status';
+    }
+    ?>
+
     <!-- Tab navigation -->
     <div class="tac-dim-tabs" id="tacDimTabs">
-        <button class="tac-dim-tab active" data-dim="status">
-            <i class="fas fa-list-ol"></i> <?= $langs->trans('Status') ?>
-        </button>
-        <button class="tac-dim-tab" data-dim="type">
-            <i class="fas fa-tag"></i> <?= $langs->trans('Type') ?>
-        </button>
-        <button class="tac-dim-tab" data-dim="group">
-            <i class="fas fa-folder"></i> <?= $langs->trans('TicketCategory') ?>
-        </button>
-        <button class="tac-dim-tab" data-dim="severity">
-            <i class="fas fa-exclamation-triangle"></i> <?= $langs->trans('Severity') ?>
-        </button>
+        <?php foreach ($pickerBoards as $boardDim => $board) : ?>
+            <button class="tac-dim-tab<?= $boardDim === $pickerActiveBoard ? ' active' : '' ?>" data-dim="<?= $boardDim ?>">
+                <i class="fas <?= $board['icon'] ?>"></i> <?= $langs->trans($board['label']) ?>
+            </button>
+        <?php endforeach; ?>
     </div>
 
     <!-- Users and tags offered on the cards, printed once for the page and copied into a card on its first use (#5762) -->
@@ -386,25 +395,17 @@ function renderDimKanban($columns, $colTickets, $dim, $allSevCols, $langs)
         <?php endforeach; ?>
     </div>
 
-    <!-- Board panels -->
-    <div class="tac-dim-panels" id="tacDimPanels">
-
-        <div class="tac-dim-panel active" data-dim="status">
-            <?php renderDimKanban($pickerStatusColumns, $pickerStatusTickets, 'status', $pickerSeverityColumns, $langs); ?>
-        </div>
-
-        <div class="tac-dim-panel" data-dim="type">
-            <?php renderDimKanban($pickerTypeColumns, $pickerTypeTickets, 'type', $pickerSeverityColumns, $langs); ?>
-        </div>
-
-        <div class="tac-dim-panel" data-dim="group">
-            <?php renderDimKanban($pickerGroupColumns, $pickerGroupTickets, 'group', $pickerSeverityColumns, $langs); ?>
-        </div>
-
-        <div class="tac-dim-panel" data-dim="severity">
-            <?php renderDimKanban($pickerSeverityColumns, $pickerSeverityTickets, 'severity', $pickerSeverityColumns, $langs); ?>
-        </div>
-
+    <!-- Board panels: the board of the page, and empty panels filled by their tab -->
+    <div class="tac-dim-panels" id="tacDimPanels" data-trans-error="<?= dol_escape_htmltag($langs->trans('Error')) ?>">
+        <?php foreach ($pickerBoards as $boardDim => $board) : ?>
+            <div class="tac-dim-panel<?= $boardDim === $pickerActiveBoard ? ' active' : '' ?>" data-dim="<?= $boardDim ?>" data-loaded="<?= $boardDim === $pickerActiveBoard ? 1 : 0 ?>">
+                <?php if ($boardDim === $pickerActiveBoard) : ?>
+                    <?php renderDimKanban($board['columns'], $board['tickets'], $boardDim, $pickerSeverityColumns, $langs); ?>
+                <?php else : ?>
+                    <div class="kanban-empty tac-dim-panel__loading"><i class="fas fa-spinner fa-spin"></i></div>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
     </div>
 
 </div>

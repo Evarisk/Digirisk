@@ -1686,14 +1686,58 @@ window.digiriskdolibarr.ticketPickerKanban.init = function() {
     window.digiriskdolibarr.ticketPickerKanban.restoreCardFilters();
     window.digiriskdolibarr.ticketPickerKanban.restoreTagFilter();
 
-    // Restore the last active tab from localStorage.
+    // Restore the last active tab from localStorage, fetching its board when the page came without it (#5762).
     var savedDim = localStorage.getItem('tacPickerActiveDim');
     if (savedDim && $('#tacDimTabs .tac-dim-tab[data-dim="' + savedDim + '"]').length) {
         $('#tacDimTabs .tac-dim-tab').removeClass('active');
         $('#tacDimTabs .tac-dim-tab[data-dim="' + savedDim + '"]').addClass('active');
         $('#tacDimPanels .tac-dim-panel').removeClass('active');
         $('#tacDimPanels .tac-dim-panel[data-dim="' + savedDim + '"]').addClass('active');
+        window.digiriskdolibarr.ticketPickerKanban.loadBoard(savedDim);
     }
+};
+
+/**
+ * Fetch the board of a dimension the page came without (#5762): only one board is built with the page, the others
+ * are rendered by this same page with kanban_board=<dimension> when their tab first shows them. The board fetched
+ * gets its sortable columns, the filters and the column counters like the board of the page; a failed fetch is
+ * retried by the next click on the tab.
+ *
+ * @param  {string} dim Dimension of the board: 'status' | 'type' | 'group' | 'severity'
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.loadBoard = function(dim) {
+    var $panel = $('#tacDimPanels .tac-dim-panel[data-dim="' + dim + '"]');
+    if (!$panel.length || $panel.attr('data-loaded') === '1' || $panel.data('loading')) {
+        return;
+    }
+    var sep     = window.saturne.toolbox.getQuerySeparator(document.URL);
+    var onError = function() {
+        $panel.empty().append($('<div class="kanban-empty"></div>').text($('#tacDimPanels').attr('data-trans-error')));
+    };
+
+    $panel.data('loading', true);
+    $.ajax({
+        url:      document.URL + sep + 'kanban_board=' + encodeURIComponent(dim),
+        type:     'GET',
+        dataType: 'html',
+        success: function(html) {
+            // DOMParser runs none of the scripts of the page fetched: only its board is taken
+            var board = new DOMParser().parseFromString(html, 'text/html').querySelector('.tac-dim-panel[data-dim="' + dim + '"] .tac-picker-kanban-board');
+            if (!board) {
+                onError();
+                return;
+            }
+            $panel.empty().append(document.adoptNode(board)).attr('data-loaded', '1');
+            window.digiriskdolibarr.ticketPickerKanban.applyBoardSettings($panel.find('.tac-picker-kanban-board'));
+            window.digiriskdolibarr.ticketPickerKanban.initBoardSortable(dim);
+            window.digiriskdolibarr.ticketPickerKanban.applyFilters();
+        },
+        error: onError,
+        complete: function() {
+            $panel.data('loading', false);
+        }
+    });
 };
 
 /**
@@ -1857,6 +1901,7 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
         $('#tacDimPanels .tac-dim-panel').removeClass('active');
         $('#tacDimPanels .tac-dim-panel[data-dim="' + dim + '"]').addClass('active');
         localStorage.setItem('tacPickerActiveDim', dim);
+        window.digiriskdolibarr.ticketPickerKanban.loadBoard(dim);
     });
 
     // Subject: editable only while edited, so the card can be dragged by it (#5716). A click that did not
@@ -1989,24 +2034,31 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
 };
 
 /**
- * Initialize jQuery UI Sortable for all three dimension kanban boards.
+ * Initialize jQuery UI Sortable for the boards built with the page.
  * Each board's column bodies use the class kanban-picker-sortable and
  * are connected only within the same board (same data-dim value).
  *
  * @return {void}
  */
 window.digiriskdolibarr.ticketPickerKanban.initSortable = function() {
-    if (!$('.kanban-picker-sortable').length) {
+    $.each(['status', 'type', 'group', 'severity'], function(i, dim) {
+        window.digiriskdolibarr.ticketPickerKanban.initBoardSortable(dim);
+    });
+};
+
+/**
+ * Initialize jQuery UI Sortable on the columns of one board, for the board built with the page and for each board
+ * fetched by its tab (#5762).
+ *
+ * @param  {string} dim Dimension of the board: 'status' | 'type' | 'group' | 'severity'
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.initBoardSortable = function(dim) {
+    var $cols = $('.kanban-picker-sortable[data-dim="' + dim + '"]');
+    if (!$cols.length) {
         return;
     }
 
-    var dims = ['status', 'type', 'group', 'severity'];
-    var actionMap = {
-        status:   'updateTicketStatus',
-        type:     'updateTicketType',
-        group:    'updateTicketGroup',
-        severity: 'updateTicketSeverity'
-    };
     // Only the controls of a card keep it from being dragged: the subject, the reference, the severity badge
     // and the tags were excluded too, which left the date and the progress bar to grab it by (#5716). A click
     // that does not drag still reaches them
@@ -2014,36 +2066,30 @@ window.digiriskdolibarr.ticketPickerKanban.initSortable = function() {
         + '.kanban-tag-remove, .kanban-add-tag-btn, .kanban-tag-dropdown, .kanban-tag-option, '
         + '.tac-picker-subject--editing';
 
-    $.each(dims, function(i, dim) {
-        var $cols = $('.kanban-picker-sortable[data-dim="' + dim + '"]');
-        if (!$cols.length) {
-            return;
-        }
-        $cols.sortable({
-            connectWith:  '.kanban-picker-sortable[data-dim="' + dim + '"]',
-            placeholder:  'kanban-card-placeholder',
-            tolerance:    'pointer',
-            cursor:       'grabbing',
-            cancel:       cancelSel,
-            receive: function(event, ui) {
-                var $card    = ui.item;
-                var $column  = $(this);
-                var ticketId = $card.data('ticket-id');
-                var newVal   = $column.data('dim-value');
+    $cols.sortable({
+        connectWith:  '.kanban-picker-sortable[data-dim="' + dim + '"]',
+        placeholder:  'kanban-card-placeholder',
+        tolerance:    'pointer',
+        cursor:       'grabbing',
+        cancel:       cancelSel,
+        receive: function(event, ui) {
+            var $card    = ui.item;
+            var $column  = $(this);
+            var ticketId = $card.data('ticket-id');
+            var newVal   = $column.data('dim-value');
 
-                $card.data('dim-value', newVal);
+            $card.data('dim-value', newVal);
 
-                $column.find('.kanban-empty').remove();
+            $column.find('.kanban-empty').remove();
 
-                var $source = ui.sender;
-                if ($source.children('.tac-picker-card').length === 0) {
-                    $source.append('<div class="kanban-empty">Aucun ticket</div>');
-                }
-
-                window.digiriskdolibarr.ticketPickerKanban.updateCounts();
-                window.digiriskdolibarr.ticketPickerKanban.saveDim(ticketId, dim, newVal, $card);
+            var $source = ui.sender;
+            if ($source.children('.tac-picker-card').length === 0) {
+                $source.append('<div class="kanban-empty">Aucun ticket</div>');
             }
-        });
+
+            window.digiriskdolibarr.ticketPickerKanban.updateCounts();
+            window.digiriskdolibarr.ticketPickerKanban.saveDim(ticketId, dim, newVal, $card);
+        }
     });
 };
 
@@ -2634,7 +2680,6 @@ window.digiriskdolibarr.ticketPickerKanban.saveSubject = function(ticketId, newS
 window.digiriskdolibarr.ticketPickerKanban.initSettings = function() {
     var $btn      = $('#kanbanPickerSettingsBtn');
     var $popover  = $('#kanbanPickerSettingsPopover');
-    var $board    = $('.tac-picker-kanban-board');
     var $wSlider  = $('#kanbanPickerColWidth');
     var $gSlider  = $('#kanbanPickerColGap');
     var $wVal     = $('#kanbanPickerColWidthVal');
@@ -2649,13 +2694,12 @@ window.digiriskdolibarr.ticketPickerKanban.initSettings = function() {
     if (savedW) {
         $wSlider.val(savedW);
         $wVal.text(savedW + 'px');
-        $board.find('.tac-picker-column').css({'min-width': savedW + 'px', 'max-width': savedW + 'px'});
     }
     if (savedG) {
         $gSlider.val(savedG);
         $gVal.text(savedG + 'px');
-        $board.css('gap', savedG + 'px');
     }
+    window.digiriskdolibarr.ticketPickerKanban.applyBoardSettings($('.tac-picker-kanban-board'));
 
     $btn.on('click', function(e) {
         e.stopPropagation();
@@ -2667,18 +2711,37 @@ window.digiriskdolibarr.ticketPickerKanban.initSettings = function() {
         }
     });
 
+    // The boards are looked up at each move of a slider: those fetched by their tab (#5762) follow too
     $wSlider.on('input', function() {
         var val = $(this).val();
         $wVal.text(val + 'px');
-        $board.find('.tac-picker-column').css({'min-width': val + 'px', 'max-width': val + 'px'});
+        $('.tac-picker-kanban-board').find('.tac-picker-column').css({'min-width': val + 'px', 'max-width': val + 'px'});
         localStorage.setItem('tacPickerKanbanColWidth', val);
     });
     $gSlider.on('input', function() {
         var val = $(this).val();
         $gVal.text(val + 'px');
-        $board.css('gap', val + 'px');
+        $('.tac-picker-kanban-board').css('gap', val + 'px');
         localStorage.setItem('tacPickerKanbanColGap', val);
     });
+};
+
+/**
+ * Give boards the column width and gap kept from the settings popover: the board built with the page at init, then
+ * each board fetched by its tab (#5762).
+ *
+ * @param  {jQuery} $board Boards to set
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.applyBoardSettings = function($board) {
+    var savedW = localStorage.getItem('tacPickerKanbanColWidth');
+    var savedG = localStorage.getItem('tacPickerKanbanColGap');
+    if (savedW) {
+        $board.find('.tac-picker-column').css({'min-width': savedW + 'px', 'max-width': savedW + 'px'});
+    }
+    if (savedG) {
+        $board.css('gap', savedG + 'px');
+    }
 };
 
 // ---------------------------------------------------------------------------
