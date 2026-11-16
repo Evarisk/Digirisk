@@ -30,6 +30,12 @@ if (!defined('FORCE_CKEDITOR')) {
     define('FORCE_CKEDITOR', 1);
 }
 
+// A kanban board fetched by its tab (#5762) is one more read of this page: it must not renew the CSRF token that the
+// page shown holds, which MAIN_SECURITY_CSRF_TOKEN_RENEWAL_ON_EACH_CALL would do
+if (!empty($_GET['kanban_board']) && !defined('NOTOKENRENEWAL')) {
+    define('NOTOKENRENEWAL', 1);
+}
+
 if (file_exists('../digiriskdolibarr.main.inc.php')) {
     require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
 } elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
