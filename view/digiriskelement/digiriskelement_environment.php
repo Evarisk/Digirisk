@@ -69,8 +69,8 @@ $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $c
 
 // Security check
 $permissionToRead   = $user->rights->digiriskdolibarr->digiriskstandard->read && ($user->rights->digiriskdolibarr->listingrisksenvironmentalaction->read);
-$permissiontoadd    = $user->rights->digiriskdolibarr->listingrisksenvironmentalaction->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->listingrisksenvironmentalaction->delete;
+$permissiontoadd    = $user->hasRight('digiriskdolibarr', 'listingrisksenvironmentalaction', 'write');
+$permissiontodelete = $user->hasRight('digiriskdolibarr', 'listingrisksenvironmentalaction', 'delete');
 saturne_check_access($permissionToRead, $object);
 
 /*
