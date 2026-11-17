@@ -2083,14 +2083,17 @@ function digirisk_dol_add_file_process($upload_dir, $allowoverwrite = 0, $donotu
 					global $maxwidthsmall, $maxheightsmall, $maxwidthmini, $maxheightmini;
 
 					include_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+					dol_include_once('/saturne/lib/dolibarr.lib.php');
 
 					// Generate thumbs.
 					if ($generatethumbs) {
 						if (image_format_supported($destfull) == 1) {
 							// Create thumbs
 							// We can't use $object->addThumbs here because there is no $object known
-							vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE, '_large', 50, "thumbs");
-							vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM, '_medium', 50, "thumbs");
+							// The core vignette() only accepts '_small' and '_mini': with '_large' or '_medium' it wrote the image
+							// to a file named 'Bad parameter extName' in the current directory, saturne_vignette() accepts them
+							saturne_vignette($destfull, getDolGlobalInt('DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE'), getDolGlobalInt('DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE'), '_large', 50, 'thumbs');
+							saturne_vignette($destfull, getDolGlobalInt('DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM'), getDolGlobalInt('DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM'), '_medium', 50, 'thumbs');
 							// Used on logon for example
 							$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
 							// Create mini thumbs for image (Ratio is near 16/9)
