@@ -3393,3 +3393,47 @@ function digiriskPreventionPlanDocumentImagesActions(string $action): void
     print digiriskPreventionPlanDocumentImagesBlock($part, true);
     exit;
 }
+
+/**
+ * Read the JSON data extracted from an import archive
+ *
+ * The archive is expected to hold a JSON file named like itself. A missing, unreadable or malformed file returns null
+ * instead of raising a PHP warning, so that the caller can report it and stop the import
+ *
+ * @param  string     $filePath Full path of the JSON file
+ * @return array|null           Decoded data, null when the file is missing or does not hold a JSON object or array
+ */
+function digirisk_read_import_json(string $filePath): ?array
+{
+    if (!is_file($filePath) || !is_readable($filePath)) {
+        return null;
+    }
+
+    $data = json_decode((string) file_get_contents($filePath), true);
+
+    return is_array($data) ? $data : null;
+}
+
+/**
+ * Delete an uploaded import archive and the files it extracted next to it
+ *
+ * @param  string $dir         Directory holding the archive and its extracted files, with a trailing slash
+ * @param  string $archiveName File name of the archive
+ * @return void
+ */
+function digirisk_delete_import_archive(string $dir, string $archiveName): void
+{
+    $zip = new ZipArchive();
+    if ($zip->open($dir . $archiveName) === true) {
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $entry = $zip->getNameIndex($i);
+            // Folders stay, and an entry climbing out of the directory is never followed
+            if ($entry !== false && substr($entry, -1) !== '/' && strpos($entry, '..') === false) {
+                dol_delete_file($dir . $entry, 1);
+            }
+        }
+        $zip->close();
+    }
+
+    dol_delete_file($dir . $archiveName, 1);
+}
