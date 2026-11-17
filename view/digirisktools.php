@@ -137,7 +137,7 @@ if (GETPOST('dataMigrationImport', 'alpha') && ! empty($conf->global->MAIN_UPLOA
 			$digiriskExportArray = digirisk_read_import_json($filedir . $filename);
 			if ($digiriskExportArray === null) {
 				// Nothing to import: drop the uploaded files and keep the import form available
-				digirisk_delete_import_archive($filedir, $_FILES['dataMigrationImportfile']['name'][0]);
+				digirisk_delete_import_archive($upload_dir . '/temp/', $_FILES['dataMigrationImportfile']['name'][0]);
 				setEventMessages($langs->trans('ErrorJsonBadFormatted'), null, 'errors');
 				header('Location: ' . $_SERVER['PHP_SELF']);
 				exit;
@@ -224,7 +224,7 @@ if (GETPOST('dataMigrationImportRisks', 'alpha') && ! empty($conf->global->MAIN_
 			$digiriskExportArray = digirisk_read_import_json($filedir . $filename);
 			if ($digiriskExportArray === null) {
 				// Nothing to import: drop the uploaded files and keep the import form available
-				digirisk_delete_import_archive($filedir, $_FILES['dataMigrationImportRisksfile']['name'][0]);
+				digirisk_delete_import_archive($upload_dir . '/temp/', $_FILES['dataMigrationImportRisksfile']['name'][0]);
 				setEventMessages($langs->trans('ErrorJsonBadFormatted'), null, 'errors');
 				header('Location: ' . $_SERVER['PHP_SELF']);
 				exit;
@@ -333,7 +333,7 @@ if (GETPOST('dataMigrationImportRiskSigns', 'alpha') && ! empty($conf->global->M
 			$digiriskExportArray = digirisk_read_import_json($filedir . $filename);
 			if ($digiriskExportArray === null) {
 				// Nothing to import: drop the uploaded files and keep the import form available
-				digirisk_delete_import_archive($filedir, $_FILES['dataMigrationImportRiskSignsfile']['name'][0]);
+				digirisk_delete_import_archive($upload_dir . '/temp/', $_FILES['dataMigrationImportRiskSignsfile']['name'][0]);
 				setEventMessages($langs->trans('ErrorJsonBadFormatted'), null, 'errors');
 				header('Location: ' . $_SERVER['PHP_SELF']);
 				exit;
@@ -408,7 +408,7 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 			$digiriskExportArray = digirisk_read_import_json($filedir . $filename);
 			if ($digiriskExportArray === null) {
 				// Nothing to import: drop the uploaded files and keep the import form available
-				digirisk_delete_import_archive($filedir, $_FILES['dataMigrationImportGlobalfile']['name'][0]);
+				digirisk_delete_import_archive($upload_dir . '/temp/', $_FILES['dataMigrationImportGlobalfile']['name'][0]);
 				setEventMessages($langs->trans('ErrorJsonBadFormatted'), null, 'errors');
 				header('Location: ' . $_SERVER['PHP_SELF']);
 				exit;
