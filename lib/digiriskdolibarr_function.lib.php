@@ -3393,3 +3393,23 @@ function digiriskPreventionPlanDocumentImagesActions(string $action): void
     print digiriskPreventionPlanDocumentImagesBlock($part, true);
     exit;
 }
+
+/**
+ * Read the JSON data extracted from an import archive
+ *
+ * The archive is expected to hold a JSON file named like itself. A missing, unreadable or malformed file returns null
+ * instead of raising a PHP warning, so that the caller can report it and stop the import
+ *
+ * @param  string     $filePath Full path of the JSON file
+ * @return array|null           Decoded data, null when the file is missing or does not hold a JSON object or array
+ */
+function digirisk_read_import_json(string $filePath): ?array
+{
+    if (!is_file($filePath) || !is_readable($filePath)) {
+        return null;
+    }
+
+    $data = json_decode((string) file_get_contents($filePath), true);
+
+    return is_array($data) ? $data : null;
+}
