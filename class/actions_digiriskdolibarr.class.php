@@ -2868,6 +2868,10 @@ class ActionsDigiriskdolibarr
             $objectsMetadata['digiriskdolibarr_' . $objectName]['class_path'] = $modulePath . '/class/riskanalysis/' . $objectName . '.class.php';
             $objectsMetadata['digiriskdolibarr_' . $objectName]['lib_path']   = $modulePath . '/lib/digiriskdolibarr_digiriskelement.lib.php';
         }
+        // The risk has its own card: risk_prepare_head() lives in its library, needed by the pages of other
+        // modules showing the header of a risk (DoliLetter spread tabs)
+        $objectsMetadata['digiriskdolibarr_risk']['lib_path'] = $modulePath . '/lib/digiriskdolibarr_risk.lib.php';
+
         // La table de l'enquete accident ne suit pas la regle de nommage des autres objets : sans
         // cette correction, la metadonnee pointe une table inexistante et plus rien ne matche
         // (les fichiers lies, donc la diffusion, cherchent sur src_object_type = table_element)
