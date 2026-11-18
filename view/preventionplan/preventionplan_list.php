@@ -231,7 +231,7 @@ if (!isModEnabled('doliletter')) {
 }
 
 // A prevention plan is created from the mobile form, not from the card
-$createUrl = dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1);
+$createUrl = dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1);
 
 require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_build_sql_select.tpl.php');
 require_once dol_buildpath('/saturne/core/tpl/list/objectfields_list_header.tpl.php');

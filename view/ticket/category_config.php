@@ -44,7 +44,7 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-saturne_load_langs(['admin', 'users']);
+saturne_load_langs(['admin', 'users', 'ticket']);
 
 // Get parameters
 $id          = GETPOST('id', 'int');
@@ -97,7 +97,6 @@ if (empty($resHook)) {
         $data['show_description']      = GETPOST('show_description');
         $data['mail_template']         = GETPOST('mail_template');
         $data['recipients']            = implode(',', GETPOST('recipients', 'array'));
-        $data['photo_visible']         = GETPOST('photo_visible');
         $data['external_link']         = GETPOST('external_link');
         $data['external_link_new_tab'] = GETPOST('external_link_new_tab') ? 1 : 0;
         $data['validate_text']         = GETPOST('validate_text', 'restricthtml');
@@ -119,7 +118,9 @@ if (empty($resHook)) {
             }
         }
 
+        // The photos of the public interface are saved like a field: visible, then required only when visible (#5709)
         $extraFields->attributes['ticket']['label']['digiriskdolibarr_ticket_email'] = $langs->trans('Email');
+        $extraFields->attributes['ticket']['label']['photo']                         = $langs->trans('Photo');
         foreach ($extraFields->attributes['ticket']['label'] as $key => $field) {
             $extraFieldVisible  = $key . '_visible';
             $extraFieldRequired = $key . '_required';
@@ -238,6 +239,11 @@ dol_banner_tab($object, 'id', $linkback, ($user->socid ? 0 : 1), 'rowid', 'ref',
 
 print '<div class="fichecenter">';
 print '<div class="underbanner clearboth"></div>';
+
+// The settings, and beside them the preview of the public interface they make (#5711)
+$showPreview = $action != 'createExtra' && getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE') && dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0);
+print '<div class="ticket-category-config' . ($showPreview ? ' ticket-category-config--preview' : '') . '">';
+print '<div class="ticket-category-config__settings">';
 
 if ($action != 'createExtra') {
 $link = img_picto('', 'fa-cog', 'class="paddingrightonly"') . '<a href="' . dol_buildpath('digiriskdolibarr/admin/ticket/ticket.php', 1). '" target="_blank">' . $langs->transnoentities('GeneralConfig') . '</a>';
@@ -498,20 +504,31 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
                 $isVisible  = $visibleInherited || !empty($ticketCategoryConfig->$extraFieldVisible);
                 $isRequired = $isVisible && ($requiredInherited || !empty($ticketCategoryConfig->$extraFieldRequired));
 
+                // An extrafield created from this page has no label key of its own: its name goes in the generic one
+                $fieldLabelKey = 'Ticket' . ucfirst($label) . 'Visible';
+                $fieldLabel    = $langs->transnoentities($fieldLabelKey);
+                $fieldHelp     = $langs->transnoentities($fieldLabelKey . 'Help');
+                if ($fieldLabel == $fieldLabelKey) {
+                    $fieldLabel = $langs->transnoentities('TicketExtrafieldVisible', $langs->transnoentities($field));
+                    $fieldHelp  = $langs->transnoentities('TicketExtrafieldVisibleHelp', $langs->transnoentities($field));
+                }
+
+                // What the preview draws for the field: its label and its input on the public interface (#5711)
+                $previewLabel = $key == 'photo' ? $langs->transnoentities('FilesLinked') : $langs->transnoentities($field);
+                $previewType  = digiriskdolibarr_ticket_preview_field_type($key, (string) ($extraFields->attributes['ticket']['type'][$key] ?? ''));
+
                 // Extra field visible and required
-                print '<tr class="oddeven dragable-item" data-name="' . $key . '"><td>';
-                print (!empty($fields[$key]['picto']) ? img_picto('', $fields[$key]['picto'], 'class="paddingrightonly"') : getPictoForType($extraFields->attributes['ticket']['type'][$key])) . $form->textwithpicto($langs->transnoentities('Ticket' . ucfirst($label) . 'Visible'), $langs->transnoentities('Ticket' . ucfirst($label) . 'VisibleHelp'), 1, 'info') . '</td>';
+                print '<tr class="oddeven dragable-item" data-name="' . $key . '" data-preview-label="' . dol_escape_htmltag($previewLabel) . '" data-preview-type="' . $previewType . '"><td>';
+                print (!empty($fields[$key]['picto']) ? img_picto('', $fields[$key]['picto'], 'class="paddingrightonly"') : getPictoForType($extraFields->attributes['ticket']['type'][$key])) . $form->textwithpicto($fieldLabel, $fieldHelp, 1, 'info') . '</td>';
                 print '</td><td class="center">';
                 print '<input type="checkbox" id="' . $extraFieldVisible . '" name="' . $extraFieldVisible . '"' . ($isVisible ? ' checked' : '') . ($visibleInherited ? ' disabled' : '') . '>';
                 if ($visibleInherited) {
                     print $form->textwithtooltip($langs->transnoentities('Inherited'), $langs->transnoentities('PermissionInheritedFromConfig'));
                 }
                 print '</td><td class="center">';
-                if (!in_array($key, ['photo'])) {
-                    print '<input type="checkbox" id="' . $extraFieldRequired . '" name="' . $extraFieldRequired . '"' . ($isRequired ? ' checked=""' : '') . ($requiredInherited || !$isVisible ? ' disabled' : '') . ($requiredInherited ? ' data-inherited="1"' : '') . '>';
-                    if ($requiredInherited) {
-                        print $form->textwithtooltip($langs->transnoentities('Inherited'), $langs->transnoentities('PermissionInheritedFromConfig'));
-                    }
+                print '<input type="checkbox" id="' . $extraFieldRequired . '" name="' . $extraFieldRequired . '"' . ($isRequired ? ' checked=""' : '') . ($requiredInherited || !$isVisible ? ' disabled' : '') . ($requiredInherited ? ' data-inherited="1"' : '') . '>';
+                if ($requiredInherited) {
+                    print $form->textwithtooltip($langs->transnoentities('Inherited'), $langs->transnoentities('PermissionInheritedFromConfig'));
                 }
                 print '</td>';
                 print '<td class="config-move-line">';
@@ -523,14 +540,19 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
     }
 }
 
-print '</table>';
 if ($action != 'createExtra') {
     print '<div class="center" bis_skin_checked="1">';
     print '<input type="submit" class="button button-save savebtn-2" name="save" value="' . $langs->trans('Save') . '" disabled>';
-    print '<div>';
-    print '</form>';
     print '</div>';
+    print '</form>';
 }
+print '</div>';
+
+if ($showPreview) {
+    $categoryPreview = digiriskdolibarr_ticket_category_preview($object);
+    include __DIR__ . '/../../core/tpl/ticket/ticket_category_preview.tpl.php';
+}
+print '</div>';
 
 // End of page
 print dol_get_fiche_end();

@@ -58,7 +58,8 @@ window.digiriskdolibarr.risk.selectDanger = function( event ) {
 	if (riskDescriptionPrefill == 1) {
 		// L'aria-label sert l'infobulle et contient le bloc réglementaire des catégories de pénibilité : la description ne veut que le nom.
 		var categoryName = element.data('name') || element.closest('.wpeo-tooltip-event').attr('aria-label');
-		element.closest('.risk-content').find('.risk-description textarea').text(categoryName);
+		// val() et non text() : text() ne change que le contenu par défaut, ignoré dès que l'utilisateur a tapé dans le champ
+		element.closest('.risk-content').find('.risk-description textarea').val(categoryName);
 	}
 	var elementParent = $(this).closest('.modal-container');
 

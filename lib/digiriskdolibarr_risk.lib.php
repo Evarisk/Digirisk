@@ -56,12 +56,17 @@ function risk_prepare_head(Risk $object): array
  * subfolder "documents" of its photos: the gallery and the list of the documents never show the
  * same file twice.
  *
+ * A risk list renders these modals for every risk while none is open, and a closed modal stays laid
+ * out under opacity 0: its thumbnail would load with the page. It loads when its modal opens
+ * instead (Saturne defer_images), unless the block is already on screen.
+ *
  * @param  string              $subDir         Folder of the photos, relative to the module folder
  * @param  RiskAssessment|null $riskAssessment Assessment owning the folder, null for a work folder
  * @param  bool                $withFiles      Also take documents, not only photos
+ * @param  bool                $deferImages    The block sits in a modal: load its thumbnail when the modal opens
  * @return string                              HTML of the block
  */
-function digiriskRiskAssessmentMediaBlock(string $subDir, ?RiskAssessment $riskAssessment = null, bool $withFiles = false): string
+function digiriskRiskAssessmentMediaBlock(string $subDir, ?RiskAssessment $riskAssessment = null, bool $withFiles = false, bool $deferImages = true): string
 {
     global $conf;
 
@@ -69,7 +74,7 @@ function digiriskRiskAssessmentMediaBlock(string $subDir, ?RiskAssessment $riskA
     dol_include_once('/saturne/lib/medias.lib.php');
 
     // The picking button opens the media library of the module, rendered by the risk pages
-    $options = ['show_photo' => true, 'show_audio' => false, 'show_file' => $withFiles, 'file_sub_dir' => $subDir . '/documents', 'show_library' => true];
+    $options = ['show_photo' => true, 'show_audio' => false, 'show_file' => $withFiles, 'file_sub_dir' => $subDir . '/documents', 'show_library' => true, 'defer_images' => $deferImages];
 
     // The lists show one photo of the assessment: the editor lets it be picked among the others
     if ($riskAssessment !== null && $riskAssessment->id > 0) {
@@ -121,8 +126,11 @@ function digiriskRiskAssessmentMediaActions(string $action): void
     $isDocument = in_array($action, ['uploadFile', 'deleteFile'], true);
     $blockDir   = $isDocument ? preg_replace('/\/documents$/', '', $subDir) : $subDir;
 
-    if (preg_match('/^riskassessment\/tmp\/RA0(\/[A-Za-z0-9_-]+)?$/', $blockDir)) {
-        // Work folder of a new risk, or of a new assessment named after its risk
+    // A work folder is the one of the session only (digiriskRiskAssessmentWorkDir()): the one of a new
+    // risk, of a new assessment named after its risk, or of a psychosocial assessment
+    $sessionToken = digiriskRiskAssessmentWorkToken();
+
+    if (preg_match('/^riskassessment\/tmp\/RA0\/(?:[A-Za-z0-9_]+-)?' . preg_quote($sessionToken, '/') . '$/', $blockDir)) {
         $isAllowed = true;
     } elseif (preg_match('/^riskassessment\/([A-Za-z0-9_-]+)$/', $blockDir, $matches) && $matches[1] !== 'tmp') {
         $riskAssessment = new RiskAssessment($db);
@@ -131,7 +139,7 @@ function digiriskRiskAssessmentMediaActions(string $action): void
 
     // The work folder of a psychosocial assessment (digiriskRiskAssessmentPsychosocialWorkDir()), or
     // the folder of one, also takes documents
-    $withFiles = preg_match('/^riskassessment\/tmp\/RA0\/RPS\d+$/', $blockDir) || ($riskAssessment !== null && $riskAssessment->method == 'rps');
+    $withFiles = preg_match('/^riskassessment\/tmp\/RA0\/RPS\d+-' . preg_quote($sessionToken, '/') . '$/', $blockDir) || ($riskAssessment !== null && $riskAssessment->method == 'rps');
 
     if (!$isAllowed || ($isDocument && (!$withFiles || $blockDir === $subDir))) {
         http_response_code(403);
@@ -173,8 +181,39 @@ function digiriskRiskAssessmentMediaActions(string $action): void
         }
     }
 
-    print digiriskRiskAssessmentMediaBlock($blockDir, $riskAssessment, $withFiles);
+    // The block sent back replaces one already on screen
+    print digiriskRiskAssessmentMediaBlock($blockDir, $riskAssessment, $withFiles, false);
     exit;
+}
+
+/**
+ * Token naming the work folders of the risk modals of the session
+ *
+ * @return string Token, the same for the whole session
+ */
+function digiriskRiskAssessmentWorkToken(): string
+{
+    dol_include_once('/saturne/lib/medias.lib.php');
+
+    return saturne_get_upload_token('digiriskdolibarr_riskassessment');
+}
+
+/**
+ * Work folder of the photos of a risk or an assessment being created
+ *
+ * Named after a token of the session: a folder shared by everyone handed the photo one user took for
+ * a risk to the next risk anyone created, in any work unit, and kept the photos of a cancelled modal
+ * for it as well.
+ *
+ * @param  string $owner Empty for a new risk, the reference of the risk for a new assessment of it,
+ *                       RPS<id> for the psychosocial assessment of a work unit
+ * @return string        Folder, relative to the module folder
+ */
+function digiriskRiskAssessmentWorkDir(string $owner = ''): string
+{
+    $owner = preg_replace('/[^A-Za-z0-9_]/', '', $owner);
+
+    return 'riskassessment/tmp/RA0/' . (dol_strlen($owner) > 0 ? $owner . '-' : '') . digiriskRiskAssessmentWorkToken();
 }
 
 /**
@@ -188,7 +227,7 @@ function digiriskRiskAssessmentMediaActions(string $action): void
  */
 function digiriskRiskAssessmentPsychosocialWorkDir(int $elementId): string
 {
-    return 'riskassessment/tmp/RA0/RPS' . $elementId;
+    return digiriskRiskAssessmentWorkDir('RPS' . $elementId);
 }
 
 /**

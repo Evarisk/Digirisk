@@ -272,7 +272,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
                 if ($dangerCategory['position'] == 17) {
                     continue;
                 }
-                $tmpArray['picto']            = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png';
+                $tmpArray['picto']            = dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png', 0);
                 $tmpArray['riskCategoryName'] = $dangerCategory['name'];
 
                 $nbRiskByCategory = 0;
@@ -389,7 +389,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
                 }
 
                 foreach ($psychosocialLines as $dangerSubCategory) {
-                    $tmpArray['picto']            = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png';
+                    $tmpArray['picto']            = dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png', 0);
                     $tmpArray['riskCategoryName'] = $dangerSubCategory['name'];
 
                     $nbRiskByCategory = 0;

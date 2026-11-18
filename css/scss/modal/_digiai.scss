@@ -127,8 +127,8 @@
   }
 }
 
-// Modal phases
-.modal-analyse-phase {
+// Modal phases, bornées à la page DigiAI sans changer leur spécificité (#5672)
+:where(#digiai_modal) .modal-analyse-phase {
   .analysis-in-progress {
     text-align: center;
     padding: 20px;
@@ -147,12 +147,12 @@
       border-radius: 50%;
       width: 40px;
       height: 40px;
-      animation: spin 2s linear infinite;
+      animation: digiai-spin 2s linear infinite;
     }
   }
 }
 
-.modal-result-phase {
+:where(#digiai_modal) .modal-result-phase {
   display: none;
 }
 
@@ -202,7 +202,7 @@
 }
 
 // Styles pour les risques précédemment ajoutés
-.previous-risks-list {
+:where(#digiai_modal) .previous-risks-list {
   tr {
     opacity: 0.8;
 
@@ -211,12 +211,6 @@
       cursor: not-allowed;
     }
   }
-}
-
-// Animation du loader
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }
 
 // Responsive design

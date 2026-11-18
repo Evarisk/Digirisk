@@ -30,6 +30,12 @@ if (!defined('FORCE_CKEDITOR')) {
     define('FORCE_CKEDITOR', 1);
 }
 
+// A kanban board fetched by its tab (#5762) is one more read of this page: it must not renew the CSRF token that the
+// page shown holds, which MAIN_SECURITY_CSRF_TOKEN_RENEWAL_ON_EACH_CALL would do
+if (!empty($_GET['kanban_board']) && !defined('NOTOKENRENEWAL')) {
+    define('NOTOKENRENEWAL', 1);
+}
+
 if (file_exists('../digiriskdolibarr.main.inc.php')) {
     require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
 } elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
@@ -112,7 +118,8 @@ if ($action == 'updateTicketStatus' && !empty(GETPOSTINT('ticket_id'))) {
     $result         = $ticketToUpdate->fetch($ticketId);
 
     if ($result > 0) {
-        $res = $ticketToUpdate->setStatut($newStatus, $user);
+        // The second parameter is the id of the row to update: $user, cast to 1, wrote the status on ticket 1 (#5716)
+        $res = $ticketToUpdate->setStatut($newStatus, null, '', 'TICKET_MODIFY');
         if ($res > 0) {
             createTicketKanbanEvent($db, $user, $ticketToUpdate, 'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_STATUS',
                 'Statut modifié (kanban)', 'Statut modifié → ' . $newStatus);
@@ -366,6 +373,80 @@ if ($action == 'updateTicketSubject' && !empty(GETPOSTINT('ticket_id'))) {
     exit;
 }
 
+// AJAX: quick close from the percentage of a kanban card or the state of a row of the list of the registers, the way the
+// to-do board of ReedCRM closes an event (js/modules/ticket_quick_close.js). At 100 % the ticket is closed as the
+// closing button of its card does it (progress 100, closing date, TICKET_CLOSE trigger), below only its progress
+// changes. The comment is added to the ticket as a private message
+if ($action == 'quickCloseTicket' && !empty(GETPOSTINT('ticket_id'))) {
+    header('Content-Type: application/json');
+
+    $ticketId = GETPOSTINT('ticket_id');
+    $progress = GETPOSTISSET('progress') ? min(100, max(0, GETPOSTINT('progress'))) : 100;
+    $comment  = trim(GETPOST('comment', 'restricthtml'));
+
+    $ticketToUpdate = new Ticket($db);
+    if (!$permissionToWrite) {
+        http_response_code(403);
+        print json_encode(['success' => 0, 'error' => $langs->transnoentities('NotEnoughPermissions')]);
+    } elseif ($ticketToUpdate->fetch($ticketId) <= 0) {
+        dol_syslog('ticket_action_card.php quickCloseTicket: ticket not found ticketId=' . $ticketId, LOG_ERR);
+        http_response_code(404);
+        print json_encode(['success' => 0, 'error' => $langs->transnoentities('ErrorRecordNotFound')]);
+    } elseif (in_array((int) $ticketToUpdate->status, [Ticket::STATUS_CLOSED, Ticket::STATUS_CANCELED], true)) {
+        // Closed from another tab or by someone else since the board was loaded
+        http_response_code(409);
+        print json_encode(['success' => 0, 'error' => $langs->transnoentities('TicketQuickCloseAlreadyClosed')]);
+    } else {
+        $closing = $progress === 100;
+        $error   = 0;
+
+        $db->begin();
+
+        if ($closing) {
+            // Same default as the closing form of the ticket card: the third party is told only when the setup asks for it
+            $ticketToUpdate->context['contact_id'] = getDolGlobalString('TICKET_NOTIFY_AT_CLOSING') ? -2 : -3;
+            $result = $ticketToUpdate->close($user);
+        } else {
+            $result = $ticketToUpdate->setProgression($progress);
+        }
+        if ($result <= 0) {
+            $error++;
+        }
+
+        // After the closing, whose emails would otherwise carry the comment as the message of the ticket
+        if (!$error && $comment !== '') {
+            $ticketToUpdate->message = $comment;
+            $ticketToUpdate->private = '1';
+            if ($ticketToUpdate->createTicketMessage($user) <= 0) {
+                $error++;
+            }
+        }
+
+        if (!$error) {
+            $db->commit();
+            createTicketKanbanEvent($db, $user, $ticketToUpdate, 'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_STATUS',
+                $langs->transnoentities($closing ? 'TicketQuickCloseLogClosed' : 'TicketQuickCloseLogProgress'),
+                $langs->transnoentities('TicketQuickCloseLogNote', $progress . ' %'));
+            // The list of the registers shows the new state with the badge of its column
+            print json_encode([
+                'success'     => 1,
+                'progress'    => $progress,
+                'status'      => $closing ? Ticket::STATUS_CLOSED : (int) $ticketToUpdate->status,
+                'status_html' => $ticketToUpdate->getLibStatut(5),
+                'closed'      => $closing ? 1 : 0
+            ]);
+        } else {
+            $db->rollback();
+            $errorMessage = $ticketToUpdate->error ?: implode(', ', $ticketToUpdate->errors ?: []);
+            dol_syslog('ticket_action_card.php quickCloseTicket: failed ticketId=' . $ticketId . ' - ' . $errorMessage, LOG_ERR);
+            http_response_code(500);
+            print json_encode(['success' => 0, 'error' => $errorMessage ?: $langs->transnoentities('TicketQuickCloseError')]);
+        }
+    }
+    $db->close();
+    exit;
+}
+
 // AJAX: quick-create a ticket from the picker drawer
 if ($action == 'createTicket' && $permissionToWrite) {
     header('Content-Type: application/json');
@@ -421,7 +502,7 @@ if ($action == 'createTicket' && $permissionToWrite) {
             }
         }
 
-        $detailUrl = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . $newId;
+        $detailUrl = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . $newId;
         print json_encode(['success' => 1, 'id' => $newId, 'ref' => $newTicket->ref, 'url' => $detailUrl]);
     } else {
         $errMsg = $newTicket->error ?: implode(', ', $newTicket->errors ?: []);
@@ -461,30 +542,24 @@ if ($object->id <= 0) {
     // Hidden token for AJAX requests
     print '<input type="hidden" name="token" value="' . newToken() . '">';
 
-    // All active internal users for the assignee picker
-    $sqlUsers = 'SELECT u.rowid, u.firstname, u.lastname, u.photo FROM ' . MAIN_DB_PREFIX . 'user u'
-        . ' WHERE u.statut = 1 AND u.entity IN (' . getEntity('user') . ')'
-        . ' ORDER BY u.lastname, u.firstname';
-    $resUsers = $db->query($sqlUsers);
-    if ($resUsers) {
-        while ($objU = $db->fetch_object($resUsers)) {
-            $photoUrl = '';
-            if (!empty($objU->photo)) {
-                $photoFile = DOL_DATA_ROOT . '/users/' . (int) $objU->rowid . '/' . $objU->photo;
-                if (file_exists($photoFile)) {
-                    $photoUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . $conf->entity
-                        . '&file=' . urlencode($objU->rowid . '/' . $objU->photo)
-                        . '&cache=' . (int) $objU->rowid;
-                }
+    // All active users of the entity for the assignee picker: in the transverse mode of Multicompany, those member of
+    // a group in it, not those whose entity is 1 (#5720)
+    foreach (digiriskdolibarr_ticket_assignable_users() as $assignableUserId => $assignableUser) {
+        $photoUrl = '';
+        if (!empty($assignableUser['photo'])) {
+            $photoFile = DOL_DATA_ROOT . '/users/' . $assignableUserId . '/' . $assignableUser['photo'];
+            if (file_exists($photoFile)) {
+                $photoUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . $conf->entity
+                    . '&file=' . urlencode($assignableUserId . '/' . $assignableUser['photo'])
+                    . '&cache=' . $assignableUserId;
             }
-            $pickerAllUsers[] = [
-                'id'       => (int) $objU->rowid,
-                'fullname' => trim($objU->firstname . ' ' . $objU->lastname),
-                'initials' => strtoupper(mb_substr($objU->firstname, 0, 1) . mb_substr($objU->lastname, 0, 1)),
-                'photo'    => $photoUrl,
-            ];
         }
-        $db->free($resUsers);
+        $pickerAllUsers[] = [
+            'id'       => $assignableUserId,
+            'fullname' => trim($assignableUser['firstname'] . ' ' . $assignableUser['lastname']),
+            'initials' => strtoupper(mb_substr($assignableUser['firstname'], 0, 1) . mb_substr($assignableUser['lastname'], 0, 1)),
+            'photo'    => $photoUrl,
+        ];
     }
 
     // All available ticket categories
@@ -617,7 +692,7 @@ if ($object->id <= 0) {
                 }
             }
 
-            $detailUrl = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $row->rowid;
+            $detailUrl = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $row->rowid;
 
             $sevCode  = strtoupper((string) ($row->severity_code ?: ''));
             $sevTrans = $sevCode !== '' ? $langs->trans('TicketSeverityShort' . $sevCode) : '';
@@ -676,7 +751,7 @@ if ($object->id <= 0) {
                     }
                 }
 
-                $detailUrl = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $row->rowid;
+                $detailUrl = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $row->rowid;
                 $sevCode   = strtoupper((string) ($row->severity_code ?: ''));
                 $sevTrans  = $sevCode !== '' ? $langs->trans('TicketSeverityShort' . $sevCode) : '';
                 if ($sevTrans === 'TicketSeverityShort' . $sevCode) {
@@ -962,17 +1037,11 @@ $createFormUsers      = $pickerAllUsers; // already populated when no ticket is 
 
 if ($object->id > 0) {
     // On the detail view the picker arrays are empty — re-fetch users.
-    $sqlU = 'SELECT rowid, firstname, lastname FROM ' . MAIN_DB_PREFIX . 'user'
-        . ' WHERE statut = 1 AND entity IN (' . getEntity('user') . ') ORDER BY lastname, firstname';
-    $resU = $db->query($sqlU);
-    if ($resU) {
-        while ($u = $db->fetch_object($resU)) {
-            $createFormUsers[] = [
-                'id'       => (int) $u->rowid,
-                'fullname' => trim($u->firstname . ' ' . $u->lastname),
-            ];
-        }
-        $db->free($resU);
+    foreach (digiriskdolibarr_ticket_assignable_users() as $assignableUserId => $assignableUser) {
+        $createFormUsers[] = [
+            'id'       => $assignableUserId,
+            'fullname' => trim($assignableUser['firstname'] . ' ' . $assignableUser['lastname']),
+        ];
     }
 }
 

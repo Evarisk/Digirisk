@@ -211,9 +211,12 @@ window.digiriskdolibarr.riskAddStepper.selectDanger = function() {
 
 	if ( step.find( '.input-risk-description-prefill' ).val() == 1 ) {
 		let description = modal.find( '.risk-description textarea' );
-		// Le nom ne remplace que le vide ou le nom du danger précédent, jamais ce que l'utilisateur a écrit
-		if ( ! description.val() || description.val() === previousName ) {
-			description.val( option.attr( 'data-name' ) );
+		let newName     = option.attr( 'data-name' );
+		// Le nom du danger précédent est remplacé sur place pour garder ce que l'utilisateur a écrit autour
+		if ( previousName && description.val().indexOf( previousName ) !== -1 ) {
+			description.val( description.val().split( previousName ).join( newName ) );
+		} else {
+			description.val( newName );
 		}
 	}
 

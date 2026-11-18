@@ -26,9 +26,9 @@
 global $conf, $db, $langs, $mysoc, $user;
 
 $hasSignature            = digiriskIsValidSignature($savedSignature);
-$sirenLookupUrl          = dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_siren_lookup.php', 1);
-$saveSignatureUrl        = dol_buildpath('/custom/digiriskdolibarr/core/ajax/save_user_signature.php', 1);
-$preventionPlanLookupUrl = dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_preventionplan_lookup.php', 1);
+$sirenLookupUrl          = dol_buildpath('/digiriskdolibarr/core/ajax/mobile_siren_lookup.php', 1);
+$saveSignatureUrl        = dol_buildpath('/digiriskdolibarr/core/ajax/save_user_signature.php', 1);
+$preventionPlanLookupUrl = dol_buildpath('/digiriskdolibarr/core/ajax/mobile_preventionplan_lookup.php', 1);
 
 // Exclude the elements sitting in the trash from the location picker, like the fire permit card does.
 $deletedElements = $digiriskelement->getMultiEntityTrashList();
@@ -46,7 +46,7 @@ foreach ($workTypes as $workTypeItem) {
     $workTypeMap[$workTypeItem['position']] = $workTypeItem;
 }
 
-$signalisationFile       = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json';
+$signalisationFile       = dol_buildpath('/digiriskdolibarr/js/json/signalisationCategories.json', 0);
 $signalisationCategories = file_exists($signalisationFile) ? (json_decode(file_get_contents($signalisationFile), true) ?: []) : [];
 $protectionMap           = [];
 foreach ($signalisationCategories as $signalisationItem) {
@@ -284,7 +284,7 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
             <div class="digirisk-mobile-card__title"><i class="fas fa-building"></i> <?php print $langs->trans('MobilePPExteriorCompany'); ?></div>
             <div class="digirisk-mobile-field">
                 <label><?php print $langs->trans('MobilePPChooseExistingCompany'); ?></label>
-                <div class="digirisk-mobile-picker-row" data-thirdparties-url="<?php print dol_escape_htmltag(dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_thirdparties.php', 1) . '?object_type=firepermit'); ?>">
+                <div class="digirisk-mobile-picker-row" data-thirdparties-url="<?php print dol_escape_htmltag(dol_buildpath('/digiriskdolibarr/core/ajax/mobile_thirdparties.php', 1) . '?object_type=firepermit'); ?>">
                     <?php print $form->select_company($prefill['ext_society_id'], 'ext_society_picker', '', '&nbsp;', 0, 0, [], 0, 'digirisk-mobile-society-select maxwidth500'); ?>
                     <a href="<?php print dol_buildpath('/societe/card.php', 1) . '?action=create'; ?>" target="_blank" class="wpeo-button button-blue digirisk-mobile-picker-row__add" title="<?php print dol_escape_htmltag($langs->trans('NewThirdParty')); ?>"><i class="fas fa-plus"></i></a>
                 </div>
@@ -363,7 +363,7 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
             $permitTagOptions = $form->select_all_categories('digiriskfirepermit', '', 'parent', 64, 0, 1);
             $permitTagOptions = is_array($permitTagOptions) ? $permitTagOptions : [];
         ?>
-        <div class="digirisk-mobile-card digirisk-mobile-tags" data-tags-url="<?php print dol_escape_htmltag(dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_tags.php', 1) . '?object_type=firepermit'); ?>">
+        <div class="digirisk-mobile-card digirisk-mobile-tags" data-tags-url="<?php print dol_escape_htmltag(dol_buildpath('/digiriskdolibarr/core/ajax/mobile_tags.php', 1) . '?object_type=firepermit'); ?>">
             <div class="digirisk-mobile-card__title">
                 <i class="fas fa-tags"></i> <?php print $langs->trans('MobileTags'); ?>
                 <span class="digirisk-mobile-tooltip digirisk-mobile-tooltip--start" tabindex="0" aria-label="<?php print dol_escape_htmltag($langs->trans('MobileTagsInfo')); ?>">
@@ -397,7 +397,7 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
                     $blockIndex       = (int) $prefillRiskIndex;
                     $blockPosition    = $prefillRisk['category'];
                     $blockName        = $prefillWorkType['name'];
-                    $blockThumbnail   = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $prefillWorkType['thumbnail_name'] . '.png';
+                    $blockThumbnail   = dol_buildpath('/digiriskdolibarr/img/typeDeTravaux/' . $prefillWorkType['thumbnail_name'] . '.png', 1);
                     $blockDescription = $prefillRisk['description'];
                     $blockEquipment   = $prefillRisk['used_equipment'];
 
@@ -413,7 +413,7 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
                         }
                         $blockProtections[] = [
                             'position'  => $prefillProtection['position'],
-                            'thumbnail' => DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $protectionMap[$prefillProtection['position']]['name_thumbnail'],
+                            'thumbnail' => dol_buildpath('/digiriskdolibarr/img/' . $protectionMap[$prefillProtection['position']]['name_thumbnail'], 1),
                             'name'      => $protectionMap[$prefillProtection['position']]['name'],
                             'comment'   => $prefillProtection['comment'],
                         ];
@@ -480,7 +480,7 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
                 <div class="digirisk-mobile-risk-modal__grid">
                     <?php
                     foreach ($workTypes as $workType) {
-                        $thumb = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $workType['thumbnail_name'] . '.png';
+                        $thumb = dol_buildpath('/digiriskdolibarr/img/typeDeTravaux/' . $workType['thumbnail_name'] . '.png', 1);
                         ?>
                         <div class="digirisk-mobile-risk-option" data-position="<?php print dol_escape_htmltag($workType['position']); ?>" data-name="<?php print dol_escape_htmltag($workType['name']); ?>" data-thumbnail="<?php print dol_escape_htmltag($thumb); ?>">
                             <img src="<?php print $thumb; ?>" alt="">
@@ -507,7 +507,7 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
                         if (strpos($signalisationCategory['name_thumbnail'], 'OBLIGATION/') !== 0) {
                             continue; // keep only the protection (mandatory EPI) pictos
                         }
-                        $thumb = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $signalisationCategory['name_thumbnail'];
+                        $thumb = dol_buildpath('/digiriskdolibarr/img/' . $signalisationCategory['name_thumbnail'], 1);
                         ?>
                         <div class="digirisk-mobile-protection-option" data-position="<?php print dol_escape_htmltag($signalisationCategory['position']); ?>" data-name="<?php print dol_escape_htmltag($signalisationCategory['name']); ?>" data-thumbnail="<?php print dol_escape_htmltag($thumb); ?>">
                             <img src="<?php print $thumb; ?>" alt="">

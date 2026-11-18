@@ -52,8 +52,8 @@ if ((int) $object->fk_user_assign > 0) {
     $assignedUser->fetch((int) $object->fk_user_assign);
 }
 
-$backUrl     = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_action_card.php', 1);
-$ajaxUrl     = dol_buildpath('/custom/digiriskdolibarr/core/ajax/ticket_action_card.php', 1);
+$backUrl     = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_action_card.php', 1);
+$ajaxUrl     = dol_buildpath('/digiriskdolibarr/core/ajax/ticket_action_card.php', 1);
 $fullCardUrl = DOL_URL_ROOT . '/ticket/card.php?id=' . (int) $object->id;
 
 // Build the user dropdown options once, shared by the assignee tap-to-edit and (later) other user pickers.
@@ -97,7 +97,7 @@ $assignedCategoryIds = array_map(static fn($c) => (int) $c->id, $ticketCategorie
 
 // Load linked accidents (Digirisk Accident class).
 $linkedAccidents = [];
-$accidentClassPath = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/accident.class.php';
+$accidentClassPath = dol_buildpath('/digiriskdolibarr/class/accident.class.php', 0);
 if (file_exists($accidentClassPath)) {
     require_once $accidentClassPath;
     $accident       = new Accident($db);
@@ -1064,7 +1064,7 @@ if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
                         <li class="tac-list__item tac-list__item--empty">—</li>
                     <?php endif; ?>
                 </ul>
-                <a class="tac-section__edit-link" href="<?php print dol_buildpath('/custom/digiriskdolibarr/view/accident/accident_card.php?action=create&fk_ticket=' . (int) $object->id, 1); ?>">
+                <a class="tac-section__edit-link" href="<?php print dol_buildpath('/digiriskdolibarr/view/accident/accident_card.php?action=create&fk_ticket=' . (int) $object->id, 1); ?>">
                     <i class="fas fa-plus"></i> <?php print $langs->trans('TicketActionLinkAccident'); ?>
                 </a>
             </section>
@@ -1221,7 +1221,7 @@ if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
     // Pre-compute the button list once. Each item: ['kind'=>'link'|'button', html-attrs..., 'label', 'icon', 'variant'].
     $sendMailUrl   = DOL_URL_ROOT . '/ticket/agenda.php?action=presend&mode=init&id=' . (int) $object->id;
     $addMsgUrl     = DOL_URL_ROOT . '/ticket/messaging.php?action=presend&id=' . (int) $object->id;
-    $newAccUrl     = dol_buildpath('/custom/digiriskdolibarr/view/accident/accident_card.php?action=create&fk_ticket=' . (int) $object->id, 1);
+    $newAccUrl     = dol_buildpath('/digiriskdolibarr/view/accident/accident_card.php?action=create&fk_ticket=' . (int) $object->id, 1);
     $newInterUrl   = DOL_URL_ROOT . '/fichinter/card.php?action=create&origin=ticket&originid=' . (int) $object->id;
 
     $actionItems = [

@@ -42,6 +42,7 @@ require_once __DIR__ . '/../class/digiriskelement/workunit.class.php';
 require_once __DIR__ . '/../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../class/riskanalysis/riskassessment.class.php';
 require_once __DIR__ . '/../class/riskanalysis/risksign.class.php';
+require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 
 // Load translation files required by the page
 saturne_load_langs();
@@ -133,8 +134,14 @@ if (GETPOST('dataMigrationImport', 'alpha') && ! empty($conf->global->MAIN_UPLOA
 
 			$filename = preg_replace( '/\.zip/', '.json', $_FILES['dataMigrationImportfile']['name'][0]);
 
-			$json                = file_get_contents($filedir . $filename);
-			$digiriskExportArray = json_decode($json, true);
+			$digiriskExportArray = digirisk_read_import_json($filedir . $filename);
+			if ($digiriskExportArray === null) {
+				// Nothing to import: drop the uploaded files and keep the import form available
+				digirisk_delete_import_archive($upload_dir . '/temp/', $_FILES['dataMigrationImportfile']['name'][0]);
+				setEventMessages($langs->trans('ErrorJsonBadFormatted'), null, 'errors');
+				header('Location: ' . $_SERVER['PHP_SELF']);
+				exit;
+			}
 
 			$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($digiriskExportArray['digiriskelements']['digiriskelements']));
 			foreach ($it as $key => $v) {
@@ -214,8 +221,14 @@ if (GETPOST('dataMigrationImportRisks', 'alpha') && ! empty($conf->global->MAIN_
 
 			$filename = preg_replace( '/\.zip/', '.json', $_FILES['dataMigrationImportRisksfile']['name'][0]);
 
-			$json                = file_get_contents($filedir . $filename);
-			$digiriskExportArray = json_decode($json, true);
+			$digiriskExportArray = digirisk_read_import_json($filedir . $filename);
+			if ($digiriskExportArray === null) {
+				// Nothing to import: drop the uploaded files and keep the import form available
+				digirisk_delete_import_archive($upload_dir . '/temp/', $_FILES['dataMigrationImportRisksfile']['name'][0]);
+				setEventMessages($langs->trans('ErrorJsonBadFormatted'), null, 'errors');
+				header('Location: ' . $_SERVER['PHP_SELF']);
+				exit;
+			}
 
 			//Risk
 			foreach ($digiriskExportArray['risks'] as $digiriskExportRisk) {
@@ -317,8 +330,14 @@ if (GETPOST('dataMigrationImportRiskSigns', 'alpha') && ! empty($conf->global->M
 
 			$filename = preg_replace( '/\.zip/', '.json', $_FILES['dataMigrationImportRiskSignsfile']['name'][0]);
 
-			$json                = file_get_contents($filedir . $filename);
-			$digiriskExportArray = json_decode($json, true);
+			$digiriskExportArray = digirisk_read_import_json($filedir . $filename);
+			if ($digiriskExportArray === null) {
+				// Nothing to import: drop the uploaded files and keep the import form available
+				digirisk_delete_import_archive($upload_dir . '/temp/', $_FILES['dataMigrationImportRiskSignsfile']['name'][0]);
+				setEventMessages($langs->trans('ErrorJsonBadFormatted'), null, 'errors');
+				header('Location: ' . $_SERVER['PHP_SELF']);
+				exit;
+			}
 
 			//RiskSign
 			foreach ($digiriskExportArray['risksigns'] as $digiriskExportRiskSign) {
@@ -386,8 +405,14 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 
 			$filename = preg_replace( '/\.zip/', '.json', $_FILES['dataMigrationImportGlobalfile']['name'][0]);
 
-			$json                = file_get_contents($filedir . $filename);
-			$digiriskExportArray = json_decode($json, true);
+			$digiriskExportArray = digirisk_read_import_json($filedir . $filename);
+			if ($digiriskExportArray === null) {
+				// Nothing to import: drop the uploaded files and keep the import form available
+				digirisk_delete_import_archive($upload_dir . '/temp/', $_FILES['dataMigrationImportGlobalfile']['name'][0]);
+				setEventMessages($langs->trans('ErrorJsonBadFormatted'), null, 'errors');
+				header('Location: ' . $_SERVER['PHP_SELF']);
+				exit;
+			}
 
 			$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($digiriskExportArray['digiriskelements']['digiriskelements']));
 			foreach ($it as $key => $v) {
@@ -664,8 +689,7 @@ if ($action == 'import_global_dolibarr' && ! empty($conf->global->MAIN_UPLOAD_DO
 
 			$filename = preg_replace( '/\.zip/', '.json', $_FILES['file']['name'][0]);
 
-			$json                = file_get_contents($filedir . $filename);
-			$digiriskExportArray = json_decode($json, true);
+			$digiriskExportArray = digirisk_read_import_json($filedir . $filename);
 
             if ($digiriskExportArray != null) {
                 if (is_array($digiriskExportArray['digiriskelements']) && !empty($digiriskExportArray['digiriskelements'])) {
@@ -1176,7 +1200,7 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
                             if (!empty($dangerCategories)) :
                                 foreach ($dangerCategories as $dangerCategory) : ?>
                                     <li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" data-name="<?php echo dol_escape_htmltag($dangerCategory['name']) ?>" aria-label="<?php echo $risk->formatDangerCategoryTooltip($dangerCategory) ?>">
-                                        <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+                                        <img src="<?php echo dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png', 1)?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
                                     </li>
                                 <?php endforeach;
                             endif;
@@ -1184,7 +1208,7 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
                             if (!empty($environmentalCategories)) :
                                 foreach ($environmentalCategories as $environmentalCategory) : ?>
                                     <li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $environmentalCategory['position'] ?>" aria-label="<?php echo $environmentalCategory['name'] ?>">
-                                        <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $environmentalCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+                                        <img src="<?php echo dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $environmentalCategory['thumbnail_name'] . '.png', 1)?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
                                     </li>
                                 <?php endforeach;
                             endif;

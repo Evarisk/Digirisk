@@ -31,7 +31,7 @@ require_once __DIR__ . '/../../../lib/digiriskdolibarr_mobile.lib.php';
 
 // Etat des signatures au moment du rendu : le script ci-dessous le compare a celui du serveur
 $ppSignatureState    = digiriskMobileGetSignatureState($db, $object);
-$ppSignatureStateUrl = dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_preventionplan_signature_state.php', 1);
+$ppSignatureStateUrl = dol_buildpath('/digiriskdolibarr/core/ajax/mobile_preventionplan_signature_state.php', 1);
 
 $ppExtName = trim($ppExtSignatory->firstname . ' ' . $ppExtSignatory->lastname);
 ?>

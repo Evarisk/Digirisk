@@ -68,49 +68,48 @@ $rpsPointScale = [1 => $rpsScale[1], 2 => $rpsScale[2], 3 => $rpsScale[3]];
     <div class="modal-container rps-modal-container">
 
         <div class="modal-header">
-            <h2 class="modal-title"><i class="fas fa-brain"></i> Évaluation des risques psychosociaux</h2>
+            <h2 class="modal-title"><i class="fas fa-brain"></i> <?php echo $langs->trans('PsychosocialAssessmentTitle'); ?></h2>
             <div class="modal-close"><i class="fas fa-times"></i></div>
         </div>
 
         <div class="modal-content">
             <div class="rps-modal-sub">
                 <?php echo dol_escape_htmltag($object->ref . ' · ' . $object->label); ?> &middot;
-                l'enregistrement produit <b>une seule évaluation</b> sur le risque psychosocial de l'unité,
-                quelle que soit la méthode.
+                <?php echo $langs->trans('PsychosocialAssessmentModalSub'); ?>
             </div>
 
             <?php if ($rpsPointEnabled && !empty($rpsGridCriteria)) : ?>
                 <div class="rps-method-bar">
-                    <span class="rps-method-label">Méthode</span>
+                    <span class="rps-method-label"><?php echo $langs->trans('PsychosocialMethod'); ?></span>
                     <span class="rps-method-switch">
                         <button type="button" class="rps-method<?php echo $rpsActiveMethod == 'point' ? ' is-on' : ''; ?>" data-method="point">
                             <?php echo dol_escape_htmltag($langs->trans('PsychosocialRiskMethod')); ?>
-                            <small><?php echo count($rpsSubCategoriesAll); ?> facteurs · 3 niveaux</small>
+                            <small><?php echo $langs->trans('PsychosocialFactorsLevels', count($rpsSubCategoriesAll), 3); ?></small>
                         </button>
                         <button type="button" class="rps-method<?php echo $rpsActiveMethod == 'grid' ? ' is-on' : ''; ?>" data-method="grid">
                             <?php echo dol_escape_htmltag($langs->trans('PsychosocialRiskGridMethod')); ?>
-                            <small><?php echo count($rpsGridCriteria); ?> critères · 4 niveaux</small>
+                            <small><?php echo $langs->trans('PsychosocialCriteriaLevels', count($rpsGridCriteria), 4); ?></small>
                         </button>
                     </span>
-                    <span class="rps-method-hint">Changer de méthode remet la saisie à zéro.</span>
+                    <span class="rps-method-hint"><?php echo $langs->trans('PsychosocialMethodChangeResets'); ?></span>
                 </div>
             <?php endif; ?>
 
             <div class="rps-modal-toolbar">
-                <label>Date de l'évaluation
+                <label><?php echo $langs->trans('PsychosocialAssessmentDate'); ?>
                     <input type="date" id="rps-eval-date" value="<?php echo dol_print_date(dol_now('tzuser'), '%Y-%m-%d'); ?>">
                 </label>
-                <label class="rps-grow">Observation
-                    <input type="text" id="rps-eval-comment" placeholder="Participants, contexte, éléments factuels relevés...">
+                <label class="rps-grow"><?php echo $langs->trans('PsychosocialObservation'); ?>
+                    <input type="text" id="rps-eval-comment" placeholder="<?php echo dol_escape_htmltag($langs->trans('PsychosocialObservationPlaceholder')); ?>">
                 </label>
                 <?php // L'evaluation n'existe pas encore : son enregistrement deplace ces fichiers dans son dossier ?>
-                <div class="rps-eval-report" title="Grille remplie, compte rendu, photos du support… joints à l'évaluation">
-                    <span class="rps-eval-report-label">Rapport</span>
+                <div class="rps-eval-report" title="<?php echo dol_escape_htmltag($langs->trans('PsychosocialReportHelp')); ?>">
+                    <span class="rps-eval-report-label"><?php echo $langs->trans('PsychosocialReport'); ?></span>
                     <div class="rps-report">
                         <?php print digiriskRiskAssessmentMediaBlock(digiriskRiskAssessmentPsychosocialWorkDir((int) $object->id), null, true); ?>
                     </div>
                 </div>
-                <span class="rps-grid-progress"><b id="rps-eval-answered">0</b>/<span id="rps-eval-total">0</span> cotés</span>
+                <span class="rps-grid-progress"><b id="rps-eval-answered">0</b>/<span id="rps-eval-total">0</span> <?php echo $langs->trans('PsychosocialRatedCount'); ?></span>
             </div>
 
             <div class="rps-modal-body">
@@ -128,7 +127,7 @@ $rpsPointScale = [1 => $rpsScale[1], 2 => $rpsScale[2], 3 => $rpsScale[3]];
                                 <div class="rps-grid-criterion">
                                     <span class="rps-grid-name"><?php echo dol_escape_htmltag($langs->trans($rpsSub['label'])); ?></span>
                                     <span class="rps-grid-question">
-                                        <?php echo $rpsIsContext ? 'Contexte : relevé avec l\'évaluation, sans entrer dans la cotation' : 'Facteur d\'exposition'; ?>
+                                        <?php echo $langs->trans($rpsIsContext ? 'PsychosocialContextFactorHint' : 'PsychosocialExposureFactor'); ?>
                                     </span>
                                 </div>
                                 <div class="rps-grid-answers">
@@ -185,12 +184,8 @@ $rpsPointScale = [1 => $rpsScale[1], 2 => $rpsScale[2], 3 => $rpsScale[3]];
 
                 <div class="rps-actions-block" id="rps-eval-actions">
                     <div class="rps-actions-head">
-                        <span class="rps-actions-title">Actions de prévention</span>
-                        <span class="rps-actions-hint">
-                            Une action peut être engagée sur n'importe quel facteur ; ceux cotés Élevé ou Extrême
-                            sont signalés comme à traiter. Elles sont créées comme tâches du projet du document
-                            unique, rattachées au risque psychosocial de l'unité.
-                        </span>
+                        <span class="rps-actions-title"><?php echo $langs->trans('PreventionActions'); ?></span>
+                        <span class="rps-actions-hint"><?php echo $langs->trans('PsychosocialActionsHint'); ?></span>
                     </div>
                     <?php foreach ($rpsSubCategories as $rpsPosition => $rpsSub) : ?>
                         <div class="rps-action-row" data-factor="<?php echo (int) $rpsPosition; ?>">
@@ -198,18 +193,18 @@ $rpsPointScale = [1 => $rpsScale[1], 2 => $rpsScale[2], 3 => $rpsScale[3]];
                             <span class="rps-action-factor"><?php echo dol_escape_htmltag($langs->trans($rpsSub['label'])); ?></span>
                             <input type="text" class="rps-action-input"
                                    data-factor-label="<?php echo dol_escape_htmltag($langs->trans($rpsSub['label'])); ?>"
-                                   placeholder="Action de prévention à engager...">
-                            <select class="rps-action-owner" title="Responsable de l'action">
-                                <option value="">Responsable…</option>
+                                   placeholder="<?php echo dol_escape_htmltag($langs->trans('PsychosocialActionToTakePlaceholder')); ?>">
+                            <select class="rps-action-owner" title="<?php echo dol_escape_htmltag($langs->trans('PsychosocialActionOwner')); ?>">
+                                <option value=""><?php echo $langs->trans('PsychosocialOwner'); ?>…</option>
                                 <?php foreach ($rpsUsers as $rpsUserId => $rpsUserName) : ?>
                                     <option value="<?php echo (int) $rpsUserId; ?>"><?php echo dol_escape_htmltag($rpsUserName); ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <input type="date" class="rps-action-due" title="Échéance de l'action">
+                            <input type="date" class="rps-action-due" title="<?php echo dol_escape_htmltag($langs->trans('PsychosocialActionDueDate')); ?>">
                         </div>
                     <?php endforeach; ?>
                     <button type="button" class="rps-actions-more" id="rps-actions-more">
-                        <i class="fas fa-chevron-down"></i> <span>Agir aussi sur un facteur en dessous du seuil</span>
+                        <i class="fas fa-chevron-down"></i> <span><?php echo $langs->trans('PsychosocialActOnLowerFactor'); ?></span>
                     </button>
                 </div>
 
@@ -227,15 +222,15 @@ $rpsPointScale = [1 => $rpsScale[1], 2 => $rpsScale[2], 3 => $rpsScale[3]];
                     <?php endforeach; ?>
                 </div>
                 <div class="rps-metric">
-                    <span class="rps-metric-label">Cotation retenue pour l'unité</span>
-                    <span class="rps-band" id="rps-eval-band" data-scale="0">non cotée</span>
+                    <span class="rps-metric-label"><?php echo $langs->trans('PsychosocialUnitRating'); ?></span>
+                    <span class="rps-band" id="rps-eval-band" data-scale="0"><?php echo $langs->trans('PsychosocialRatingNone'); ?></span>
                 </div>
             </div>
             <div class="rps-grid-error" id="rps-eval-error" hidden></div>
             <div class="rps-modal-actions">
-                <div class="wpeo-button button-grey modal-close">Annuler</div>
+                <div class="wpeo-button button-grey modal-close"><?php echo $langs->trans('Cancel'); ?></div>
                 <button type="button" class="wpeo-button button-blue" id="rps-eval-save" disabled>
-                    <i class="fas fa-check"></i> Enregistrer l'évaluation
+                    <i class="fas fa-check"></i> <?php echo $langs->trans('PsychosocialSaveAssessment'); ?>
                 </button>
             </div>
         </div>

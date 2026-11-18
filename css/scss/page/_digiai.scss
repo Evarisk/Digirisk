@@ -68,7 +68,7 @@
   max-width: 1000px;
   margin: auto;
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  animation: fadeIn 0.3s ease-in-out;
+  animation: digiai-fade-in 0.3s ease-in-out;
   // Posées jusqu'ici sur un .modal-container nu, elles s'appliquaient à toutes les modals des pages
   // Digirisk (#5668). Le max-height: 90vh qui les accompagnait n'est pas repris : battu par celui de
   // Saturne (.wpeo-modal .modal-container), il n'a jamais joué ici et agrandirait la modal.
@@ -99,224 +99,231 @@
   color: #888;
 }
 
-.image-preview-wrapper {
-  text-align: center;
-  margin-bottom: 25px;
-}
-
-#uploaded-image-preview {
-  max-height: 300px;
-  max-width: 100%;
-  border-radius: 10px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.1);
-  object-fit: contain;
-}
-
-.analysis-in-progress {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.digiai-loader-text {
-  font-size: 1.2em;
-  font-weight: 500;
-  margin-bottom: 10px;
-}
-
-.loader {
-  display: inline-block;
-  width: 45px;
-  height: 45px;
-  border: 5px solid #ccc;
-  border-top: 5px solid #00b894;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
+// Préfixées : spin et fadeIn sont des noms globaux, qu'une autre feuille de la page peut redéfinir
+@keyframes digiai-spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-@keyframes fadeIn {
+@keyframes digiai-fade-in {
   from { opacity: 0; transform: scale(0.98); }
   to { opacity: 1; transform: scale(1); }
 }
 
-.risque-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-  margin-top: 20px;
-  border: 1px solid #ddd;
-}
+// Le reste ne concerne que la page DigiAI, ses onglets et sa modal. Posées à nu, ces règles
+// s'appliquaient à toutes les pages Digirisk : tous les textarea, les pastilles de cotation, .loader… (#5672).
+// :where() les borne sans changer leur spécificité : la cascade de la page DigiAI reste la même.
+:where(#digiai_modal, .digiAI-tab-content) {
+  .image-preview-wrapper {
+    text-align: center;
+    margin-bottom: 25px;
+  }
 
-.risque-table th, .risque-table td {
-  border: 1px solid #ddd;
-  padding: 12px;
-  vertical-align: top;
-}
+  #uploaded-image-preview {
+    max-height: 300px;
+    max-width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    object-fit: contain;
+  }
 
-.risque-table th {
-  background-color: #f3f3f3;
-  text-align: left;
-  color: #333;
-}
+  .analysis-in-progress {
+    text-align: center;
+    margin-bottom: 30px;
+  }
 
-.risque-table tr:nth-child(even) {
-  background-color: #fafafa;
-}
+  .digiai-loader-text {
+    font-size: 1.2em;
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
 
-.risque-table ul {
-  padding-left: 20px;
-  margin: 0;
-}
-.modal-body {
-  display: flex;
-  gap: 30px;
-  min-height: 400px;
-}
+  .loader {
+    display: inline-block;
+    width: 45px;
+    height: 45px;
+    border: 5px solid #ccc;
+    border-top: 5px solid #00b894;
+    border-radius: 50%;
+    animation: digiai-spin 1s linear infinite;
+  }
 
-.modal-left,
-.modal-right {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 300px;
-  position: relative;
-  padding: 20px;
-  box-sizing: border-box;
-}
-#uploaded-image-preview {
-  max-width: 90%;
-  max-height: 300px;
-  border-radius: 10px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
-  object-fit: contain;
-  margin: auto;
-  display: block;
-}
-.modal-analyse-phase {
-  display: block;
-}
 
-.modal-result-phase {
-  width: 100%;
-  padding: 20px 0;
-  animation: fadeIn 0.5s ease;
-}
+  .risque-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-top: 20px;
+    border: 1px solid #ddd;
+  }
 
-.modal-result-wrapper {
-  width: 100%;
-}
-.modal-result-phase {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px;
-}
+  .risque-table th, .risque-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    vertical-align: top;
+  }
 
-/* === STYLE TABLEAU IA === */
+  .risque-table th {
+    background-color: #f3f3f3;
+    text-align: left;
+    color: #333;
+  }
 
-.risque-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-  margin-top: 20px;
-  border: none;
-}
+  .risque-table tr:nth-child(even) {
+    background-color: #fafafa;
+  }
 
-.risque-table th, .risque-table td {
-  padding: 10px;
-  vertical-align: top;
-  border-bottom: 1px solid #ddd;
-}
+  .risque-table ul {
+    padding-left: 20px;
+    margin: 0;
+  }
+  .modal-body {
+    display: flex;
+    gap: 30px;
+    min-height: 400px;
+  }
 
-.risque-table th {
-  background-color: #fafafa;
-  color: #333;
-  font-weight: 600;
-  text-align: left;
-}
+  .modal-left,
+  .modal-right {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    position: relative;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  #uploaded-image-preview {
+    max-width: 90%;
+    max-height: 300px;
+    border-radius: 10px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+    object-fit: contain;
+    margin: auto;
+    display: block;
+  }
+  .modal-analyse-phase {
+    display: block;
+  }
 
-.risque-table tr:last-child td {
-  border-bottom: none;
-}
+  .modal-result-phase {
+    width: 100%;
+    padding: 20px 0;
+    animation: digiai-fade-in 0.5s ease;
+  }
 
-.risque-table img.danger-category-pic {
-  height: 48px;
-  width: 48px;
-  object-fit: contain;
-  border-radius: 6px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
-}
+  .modal-result-wrapper {
+    width: 100%;
+  }
+  .modal-result-phase {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+  }
 
-textarea {
-  width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 8px;
-  font-family: inherit;
-  font-size: 13px;
-  line-height: 1.4;
-  resize: none;
-  overflow: hidden;
-  min-height: 45px;
-  box-sizing: border-box;
-}
+  /* === STYLE TABLEAU IA === */
 
-textarea:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
-}
+  .risque-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-top: 20px;
+    border: none;
+  }
 
-textarea.action-textarea:not(:last-child) {
-  margin-bottom: 6px;
-}
+  .risque-table th, .risque-table td {
+    padding: 10px;
+    vertical-align: top;
+    border-bottom: 1px solid #ddd;
+  }
 
-/* Sélection cotation : curseur main et interaction visuelle */
-.risk-evaluation-cotation {
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
+  .risque-table th {
+    background-color: #fafafa;
+    color: #333;
+    font-weight: 600;
+    text-align: left;
+  }
 
-.risk-evaluation-cotation:hover {
-  opacity: 0.9;
-}
+  .risque-table tr:last-child td {
+    border-bottom: none;
+  }
 
-.risque-table td:first-child {
-  text-align: center;
-  vertical-align: middle;
-}
-.risque-table td:first-child input[type="checkbox"] {
-  transform: scale(1.2); /* optionnel : un peu plus visible */
-}
-.risque-table td:nth-child(2) {
-  text-align: center;
-  vertical-align: middle;
-}
-.risque-table img.danger-category-pic {
-  display: inline-block;
-  height: 48px;
-  width: 48px;
-  object-fit: contain;
-  vertical-align: middle;
-}
-.cotation-standard .title {
-  margin-bottom: 10px; /* Espace entre le titre et les carrés */
-  display: inline-block;
-}
+  .risque-table img.danger-category-pic {
+    height: 48px;
+    width: 48px;
+    object-fit: contain;
+    border-radius: 6px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  }
 
-.cotation-listing {
-  gap: 6px; /* optionnel : espace horizontal entre les carrés */
-}
-.cotation-listing {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px; /* ou même 0 si tu veux zéro espace */
-}
+  textarea {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.4;
+    resize: none;
+    overflow: hidden;
+    min-height: 45px;
+    box-sizing: border-box;
+  }
 
-.risk-evaluation-cotation.cotation {
-  margin: 4px; /* supprime tout espacement résiduel */
+  textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+  }
+
+  textarea.action-textarea:not(:last-child) {
+    margin-bottom: 6px;
+  }
+
+  /* Sélection cotation : curseur main et interaction visuelle */
+  .risk-evaluation-cotation {
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .risk-evaluation-cotation:hover {
+    opacity: 0.9;
+  }
+
+  .risque-table td:first-child {
+    text-align: center;
+    vertical-align: middle;
+  }
+  .risque-table td:first-child input[type="checkbox"] {
+    transform: scale(1.2); /* optionnel : un peu plus visible */
+  }
+  .risque-table td:nth-child(2) {
+    text-align: center;
+    vertical-align: middle;
+  }
+  .risque-table img.danger-category-pic {
+    display: inline-block;
+    height: 48px;
+    width: 48px;
+    object-fit: contain;
+    vertical-align: middle;
+  }
+  .cotation-standard .title {
+    margin-bottom: 10px; /* Espace entre le titre et les carrés */
+    display: inline-block;
+  }
+
+  .cotation-listing {
+    gap: 6px; /* optionnel : espace horizontal entre les carrés */
+  }
+  .cotation-listing {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px; /* ou même 0 si tu veux zéro espace */
+  }
+
+  .risk-evaluation-cotation.cotation {
+    margin: 4px; /* supprime tout espacement résiduel */
+  }
 }

@@ -33,25 +33,24 @@ $rpsGridFamily   = '';
 <div class="wpeo-modal" id="rps_dict_modal">
     <div class="modal-container rps-modal-container">
         <div class="modal-header">
-            <h2 class="modal-title"><i class="fas fa-sliders-h"></i> Critères d'évaluation des risques psychosociaux</h2>
+            <h2 class="modal-title"><i class="fas fa-sliders-h"></i> <?php echo $langs->trans('PsychosocialCriteriaTitle'); ?></h2>
             <div class="modal-close"><i class="fas fa-times"></i></div>
         </div>
 
         <div class="modal-content">
             <div class="rps-modal-sub">
                 <?php echo dol_escape_htmltag($langs->trans('PsychosocialGridSource')); ?> &middot;
-                <?php echo count($rpsGridCriteria); ?> critères, <?php echo count($rpsSubCategories); ?> facteurs.
-                Aujourd'hui figés dans <code>js/json/psychosocialRiskGrid.json</code> : la proposition est d'en faire un
-                dictionnaire modifiable et <b>versionné</b>, chaque évaluation conservant la version qui l'a produite.
+                <?php echo $langs->trans('PsychosocialCriteriaFactorsCount', count($rpsGridCriteria), count($rpsSubCategories)); ?>
+                <?php echo str_replace('%s', '<code>js/json/psychosocialRiskGrid.json</code>', $langs->trans('PsychosocialCriteriaFrozenIn', '%s')); ?>
             </div>
             <table class="rps-dict-table">
                 <thead>
                 <tr>
-                    <th class="rps-dict-position">N°</th>
-                    <th>Critère</th>
-                    <th class="rps-dict-factor">Facteur</th>
-                    <th class="rps-dict-direction">Sens</th>
-                    <th class="rps-dict-active">Active</th>
+                    <th class="rps-dict-position"><?php echo $langs->trans('PsychosocialNumberShort'); ?></th>
+                    <th><?php echo $langs->trans('PsychosocialGridCriterion'); ?></th>
+                    <th class="rps-dict-factor"><?php echo $langs->trans('PsychosocialFactor'); ?></th>
+                    <th class="rps-dict-direction"><?php echo $langs->trans('PsychosocialDirection'); ?></th>
+                    <th class="rps-dict-active"><?php echo $langs->trans('PsychosocialActive'); ?></th>
                     <th class="rps-dict-edit"></th>
                 </tr>
                 </thead>
@@ -73,8 +72,8 @@ $rpsGridFamily   = '';
                             echo isset($rpsSubCategories[$subPosition]) ? dol_escape_htmltag($langs->trans($rpsSubCategories[$subPosition]['label'])) : '&mdash;';
                             ?>
                         </td>
-                        <td class="rps-dict-direction rps-dict-muted" title="<?php echo !empty($criterion['reversed']) ? 'Ressource : « Jamais » est la réponse la plus grave' : 'Contrainte : « Jamais » est la réponse la plus faible'; ?>">
-                            <?php echo !empty($criterion['reversed']) ? 'ressource' : 'contrainte'; ?>
+                        <td class="rps-dict-direction rps-dict-muted" title="<?php echo dol_escape_htmltag($langs->trans(!empty($criterion['reversed']) ? 'PsychosocialResourceHelp' : 'PsychosocialConstraintHelp')); ?>">
+                            <?php echo $langs->trans(!empty($criterion['reversed']) ? 'PsychosocialResource' : 'PsychosocialConstraint'); ?>
                         </td>
                         <td class="rps-dict-active"><i class="fas fa-toggle-on"></i></td>
                         <td class="rps-dict-edit">
@@ -87,13 +86,10 @@ $rpsGridFamily   = '';
         </div>
 
         <div class="modal-footer">
-            <span class="rps-dict-foot-note">
-                Désactiver un critère le retire des futures évaluations sans effacer les réponses déjà collectées :
-                les évaluations signées restent lisibles avec le libellé en vigueur à leur date.
-            </span>
+            <span class="rps-dict-foot-note"><?php echo $langs->trans('PsychosocialCriterionDisableNote'); ?></span>
             <div class="rps-modal-actions">
-                <button type="button" class="wpeo-button button-grey"><i class="fas fa-undo-alt"></i> Restaurer la grille INRS</button>
-                <button type="button" class="wpeo-button button-blue"><i class="fas fa-plus"></i> Nouveau critère</button>
+                <button type="button" class="wpeo-button button-grey"><i class="fas fa-undo-alt"></i> <?php echo $langs->trans('PsychosocialRestoreInrsGrid'); ?></button>
+                <button type="button" class="wpeo-button button-blue"><i class="fas fa-plus"></i> <?php echo $langs->trans('PsychosocialNewCriterion'); ?></button>
             </div>
         </div>
     </div>

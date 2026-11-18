@@ -36,18 +36,20 @@ require_once __DIR__ . '/../../class/firepermit.class.php';
 require_once __DIR__ . '/../../class/firepermitround.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_firepermitround.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_pwa.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_safetytalk.lib.php';
 
 // Global variables definitions
 global $conf, $db, $langs, $user;
 
-// The home screen is the application entry point: reaching it only requires reading one of the two objects
+// The home screen is the application entry point: reaching it only requires reading one of the objects
 $canReadPreventionPlan = $user->hasRight('digiriskdolibarr', 'preventionplan', 'read');
 $canReadFirePermit     = $user->hasRight('digiriskdolibarr', 'firepermit', 'read');
-saturne_check_access($canReadPreventionPlan || $canReadFirePermit);
+$canReadSafetyTalk     = isModEnabled('project') && $user->hasRight('projet', 'lire');
+saturne_check_access($canReadPreventionPlan || $canReadFirePermit || $canReadSafetyTalk);
 
-$listPreventionPlanUrl = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_preventionplan_list.php', 1);
-$listFirePermitUrl     = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_firepermit_list.php', 1);
-$listFireWatchUrl      = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_firepermit_rounds.php', 1);
+$listPreventionPlanUrl = dol_buildpath('/digiriskdolibarr/view/frontend/pwa_preventionplan_list.php', 1);
+$listFirePermitUrl     = dol_buildpath('/digiriskdolibarr/view/frontend/pwa_firepermit_list.php', 1);
+$listFireWatchUrl      = dol_buildpath('/digiriskdolibarr/view/frontend/pwa_firepermit_rounds.php', 1);
 
 // Counters: one tile per status worth acting on, each linking to the matching filtered list
 $homeTiles = [];
@@ -104,6 +106,22 @@ if ($canReadFirePermit) {
         'label' => $langs->transnoentities('PwaTileFireWatchPermits'),
         'count' => $fireWatchCounters['watched'],
         'url'   => $listFireWatchUrl,
+    ];
+}
+if ($canReadSafetyTalk) {
+    $safetyTalkCounters = digiriskSafetyTalkHomeCounters($db, $user);
+    $listSafetyTalkUrl  = dol_buildpath('/digiriskdolibarr/view/frontend/pwa_safetytalk_list.php', 1) . '?status=' . Project::STATUS_VALIDATED;
+    $homeTiles[]        = [
+        'icon'  => 'fa-comments',
+        'label' => $langs->transnoentities('PwaTileSafetyTalkUpcoming'),
+        'count' => $safetyTalkCounters['upcoming'],
+        'url'   => $listSafetyTalkUrl,
+    ];
+    $homeTiles[] = [
+        'icon'  => 'fa-pen-nib',
+        'label' => $langs->transnoentities('PwaTileSafetyTalkToSign'),
+        'count' => $safetyTalkCounters['toSign'],
+        'url'   => $listSafetyTalkUrl,
     ];
 }
 

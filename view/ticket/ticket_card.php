@@ -32,6 +32,7 @@ require_once DOL_DOCUMENT_ROOT . '/ticket/class/actions_ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/ticket.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_action.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_task.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
@@ -66,9 +67,9 @@ if (!$user->hasRight('ticket', 'read')) {
 }
 
 $permissionToWrite = $user->hasRight('ticket', 'write') && !$user->socid;
-$url_page_current  = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 1);
+$url_page_current  = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1);
 // Kanban AJAX endpoint (reused for on-the-fly tags & assignee — same server behaviour, incl. kanban event logging).
-$kanbanAjaxUrl     = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_action_card.php', 1);
+$kanbanAjaxUrl     = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_action_card.php', 1);
 // Traceability (#4885) — constant gating the agenda event written on every edit made from this card.
 $ticketLogConst    = 'DIGIRISKDOLIBARR_TICKET_LOG_MODIFICATIONS';
 
@@ -433,7 +434,7 @@ if ($action === 'post_message_ajax' && $permissionToWrite) {
     $mentionNames = [];
     if (!empty($mentions)) {
         require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
-        $ticketUrlAbs = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 2) . '?id=' . (int) $object->id;
+        $ticketUrlAbs = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 2) . '?id=' . (int) $object->id;
         $mentionFrom  = getDolGlobalString('TICKET_NOTIFICATION_EMAIL_FROM', getDolGlobalString('MAIN_MAIL_EMAIL_FROM'));
         foreach ($mentions as $mentionUid) {
             $mentionUid = (int) $mentionUid;
@@ -781,13 +782,13 @@ if (isModEnabled('project')) {
 
 $morehtmlref .= '</div>';
 
-$linkback = '<a href="' . dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_action_card.php', 1) . '"><strong>' . $langs->trans('BackToList') . '</strong></a>';
+$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/ticket/ticket_action_card.php', 1) . '"><strong>' . $langs->trans('BackToList') . '</strong></a>';
 
 // Summary of the corrective and preventive actions under the status (#5549), each counter leads to the actions tab
 $morehtmlstatus = '';
 if (isModEnabled('project') && !empty($object->fk_project) && $user->hasRight('projet', 'lire')) {
     $actionsCounters = digiriskdolibarr_ticket_count_actions(digiriskdolibarr_ticket_get_actions($db, digiriskdolibarr_ticket_get_parent_task($db, $object)));
-    $actionsUrl      = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_actions.php', 1) . '?id=' . (int) $object->id;
+    $actionsUrl      = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_actions.php', 1) . '?id=' . (int) $object->id;
 
     $morehtmlstatus .= '<div class="dtc-actions-summary">';
     $morehtmlstatus .= '<span class="dtc-actions-summary__title">' . $langs->trans('TicketActionsSummary') . '</span>';
@@ -1170,7 +1171,7 @@ if ($parentTask) {
 print '<table class="border centpercent tableforfield dtc-tasks-table"><tbody>';
 print '<tr class="liste_titre trforfield"><td colspan="6"><div class="dtc-head">' . $fieldPicto('tasks') . $langs->trans('Tasks') . ' <span class="opacitymedium">(' . count($tasksarray) . ')</span>';
 if ($parentTask) {
-    print '<span class="dtc-head-sub">' . $parentTask->getNomUrl(1) . '</span>';
+    print '<span class="dtc-head-sub">' . digiriskdolibarr_task_get_nom_url($parentTask, 1) . '</span>';
 }
 if ($permissionToWrite && isModEnabled('project')) {
     print '<span class="dtc-head-edit">';
@@ -1194,8 +1195,10 @@ if (!empty($tasksarray)) {
     print '<td class="right">' . $langs->trans('Resp') . '</td>';
     print '</tr>';
     foreach ($tasksarray as $t) {
+        // The tasks open in the Digirisk task card, laid out as this one
+        $taskUrl = digiriskdolibarr_task_card_url((int) $t->id);
         print '<tr>';
-        print '<td class="nowraponall">' . $t->getNomUrl(1, 'withproject') . '</td>';
+        print '<td class="nowraponall"><a href="' . dol_escape_htmltag($taskUrl) . '">' . img_picto('', $t->picto, 'class="pictofixedwidth"') . dol_escape_htmltag($t->ref) . '</a></td>';
         print '<td>' . dol_escape_htmltag($t->label) . '</td>';
         print '<td class="center">' . dol_print_date($t->date_start, 'day') . '</td>';
         print '<td class="center">' . dol_print_date($t->date_end, 'day') . '</td>';

@@ -99,7 +99,7 @@
             // it instead of being drawn over it (#5644)
             $logoHeight = $this->drawCompanyLogo($pdf, $object, $this->marge_gauche, $posY, $posX - $this->marge_gauche - 5);
 
-            $legalPicto = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/legalPicto/CreativeCommonsBySa.png';
+            $legalPicto = dol_buildpath('/digiriskdolibarr/img/legalPicto/CreativeCommonsBySa.png', 0);
             if (file_exists($legalPicto)) {
                 $pdf->SetXY($posX, $posY);
                 $pdf->Image($legalPicto, $posX, $posY, 20, 4);
