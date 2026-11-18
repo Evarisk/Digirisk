@@ -918,12 +918,9 @@ if (($id || $ref) && $action == 'edit') {
 
 	print dol_get_fiche_head();
 
-	// Sans ressource liee, fetchResourcesFromObject() rend l'entier 0 : le normaliser en tableau
-	// evite un avertissement a chaque lecture de cle ci-dessous
-	$objectResources   = $digiriskresources->fetchResourcesFromObject('', $object);
-	if (!is_array($objectResources)) {
-		$objectResources = [];
-	}
+	// Toujours un tableau [ref][id] : avec une seule ressource liee, fetchResourcesFromObject('')
+	// rendait l'objet seul, remplace par [] ici, et le selecteur arrivait vide
+	$objectResources   = $digiriskresources->fetchAllResourcesFromObject($object);
 	$objectSignatories = $signatory->fetchSignatory('', $object->id, 'preventionplan');
 	if (!is_array($objectSignatories)) {
 		$objectSignatories = [];

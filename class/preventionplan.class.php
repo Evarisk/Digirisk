@@ -157,7 +157,7 @@ class PreventionPlan extends SaturneObject
 
         // Load signatory and ressources form source object
         $signatories = $signatory->fetchSignatory('', $fromID, $object->element);
-        $resources   = $digiriskResources->fetchResourcesFromObject('', $object);
+        $resources   = $digiriskResources->fetchAllResourcesFromObject($object);
 
         if (!empty($signatories) && $signatories > 0) {
             foreach ($signatories as $arrayRole) {
@@ -195,9 +195,29 @@ class PreventionPlan extends SaturneObject
         $preventionPlanID                   = $object->create($user);
 
         if ($preventionPlanID > 0) {
-            $digiriskResources->setDigiriskResources($this->db, $user->id, 'ExtSociety', 'societe', [array_shift($resources['ExtSociety'])->id], $conf->entity, 'preventionplan', $preventionPlanID, 1);
-            $digiriskResources->setDigiriskResources($this->db, $user->id, 'LabourInspector', 'societe', [array_shift($resources['LabourInspector'])->id], $conf->entity, 'preventionplan', $preventionPlanID, 1);
-            $digiriskResources->setDigiriskResources($this->db, $user->id, 'LabourInspectorAssigned', 'socpeople', [array_shift($resources['LabourInspectorAssigned'])->id], $conf->entity, 'preventionplan', $preventionPlanID, 1);
+            // Only the resources actually linked to the source are copied:
+            // a plan created from the PWA only links its exterior company
+            $resourceTypes = [
+                'ExtSociety'              => 'societe',
+                'LabourInspector'         => 'societe',
+                'LabourInspectorAssigned' => 'socpeople',
+            ];
+            foreach ($resourceTypes as $resourceRef => $resourceType) {
+                if (empty($resources[$resourceRef])) {
+                    continue;
+                }
+                $digiriskResources->setDigiriskResources(
+                    $this->db,
+                    $user->id,
+                    $resourceRef,
+                    $resourceType,
+                    [reset($resources[$resourceRef])->id],
+                    $conf->entity,
+                    'preventionplan',
+                    $preventionPlanID,
+                    1
+                );
+            }
             if (!empty($signatoriesID)) {
                 $signatory->createFromClone($user, $signatoriesID['MasterWorker'], $preventionPlanID);
                 $signatory->createFromClone($user, $signatoriesID['ExtSocietyResponsible'], $preventionPlanID);
@@ -377,7 +397,7 @@ class PreventionPlan extends SaturneObject
 
         $digiriskResources = new DigiriskResources($this->db);
         $saturneSignature  = new SaturneSignature($this->db, $this->module, $this->element);
-        $societies         = $digiriskResources->fetchResourcesFromObject('', $this);
+        $societies         = $digiriskResources->fetchAllResourcesFromObject($this);
         $signatories       = $saturneSignature->fetchSignatories($this->id, $this->element);
 
         $ret  = parent::getTriggerDescription();
@@ -389,7 +409,7 @@ class PreventionPlan extends SaturneObject
                 $ret .= $langs->transnoentities($signatory->role) . ' : ' . $signatory->firstname . ' ' . $signatory->lastname . '<br>';
             }
         }
-        if (is_array($societies) && !empty($societies)) {
+        if (!empty($societies)) {
             foreach ($societies as $societename => $key) {
                 $ret .= $langs->transnoentities($societename) . ' : ';
                 foreach ($key as $societe) {
