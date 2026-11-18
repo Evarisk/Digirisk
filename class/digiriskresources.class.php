@@ -372,6 +372,50 @@ class DigiriskResources extends SaturneObject
 	}
 
     /**
+     * Staff representative bodies a company can have, in display order: code => translation key of its name
+     *
+     * The code names the data of the body: the constant DIGIRISKDOLIBARR_<code>_ELECTION_DATE and the
+     * resources Titulars<code> and Alternates<code>. The staff delegates (DP) come last: the ESC replaced
+     * them in 2020, they stay for the companies that filled them in before
+     *
+     * @return array<string, string>
+     */
+    public static function getStaffRepresentativeBodies(): array
+    {
+        return [
+            'CSE'   => 'ESC',
+            'CHSCT' => 'CHSCT',
+            'F3SCT' => 'F3SCT',
+            'DP'    => 'StaffRepresentatives',
+        ];
+    }
+
+    /**
+     * Staff representative bodies chosen in the social setup, in display order: code => translation key of its name
+     *
+     * Until the setup is saved: the ESC, plus the staff delegates of a company that filled them in, so
+     * that nothing entered before the choice existed disappears from the pages and the documents
+     *
+     * @return array<string, string>
+     * @throws Exception
+     */
+    public function getActiveStaffRepresentativeBodies(): array
+    {
+        $setting = getDolGlobalString('DIGIRISKDOLIBARR_STAFF_REPRESENTATIVE_BODIES');
+        if ($setting !== '') {
+            $codes = explode(',', $setting);
+        } else {
+            $codes    = ['CSE'];
+            $allLinks = $this->fetchDigiriskResources();
+            if (!in_array(getDolGlobalString('DIGIRISKDOLIBARR_DP_ELECTION_DATE'), ['', '--']) || !empty($allLinks['TitularsDP']->id) || !empty($allLinks['AlternatesDP']->id)) {
+                $codes[] = 'DP';
+            }
+        }
+
+        return array_intersect_key(self::getStaffRepresentativeBodies(), array_flip($codes));
+    }
+
+    /**
      * Load dashboard info digirisk resources
      *
      * @return array

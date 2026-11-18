@@ -24,7 +24,8 @@
 /**
  * The following vars must be defined:
  * Global   : $conf, $langs
- * Variable : $form, $formName, $allLinks (DigiriskResources::fetchDigiriskResources())
+ * Variable : $form, $formName, $allLinks (DigiriskResources::fetchDigiriskResources()),
+ *            $activeStaffBodies (DigiriskResources::getActiveStaffRepresentativeBodies())
  */
 
 // Protection to avoid direct call of template
@@ -35,15 +36,16 @@ if (empty($conf) || ! is_object($conf)) {
 
 require __DIR__ . '/digiriskdolibarr_labourfields_edit.tpl.php';
 
-foreach (['HarassmentOfficer', 'HarassmentOfficerCSE'] as $harassmentOfficer) {
+// The ESC harassment officer is only shown with the ESC
+foreach (isset($activeStaffBodies['CSE']) ? ['HarassmentOfficer', 'HarassmentOfficerCSE'] : ['HarassmentOfficer'] as $harassmentOfficer) {
 	print '<tr>';
 	print '<td class="titlefield"><i class="fas fa-user"></i> ' . $langs->trans($harassmentOfficer) . '</td>';
 	print '<td>' . img_picto('', 'user', 'class="pictofixedwidth"') . $form->select_dolusers($allLinks[$harassmentOfficer]->id[0] ?? 0, $harassmentOfficer, 1, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300 maxwidth500 widthcentpercentminusx') . '</td>';
 	print '</tr>';
 }
 
-// Staff representatives: the ESC (CSE) then the staff delegates (DP)
-foreach (['CSE', 'DP'] as $staffBody) {
+// Staff representative bodies chosen in the social setup (CSE, CHSCT, F3SCT, DP)
+foreach (array_keys($activeStaffBodies) as $staffBody) {
 	$electionDate = getDolGlobalString('DIGIRISKDOLIBARR_' . $staffBody . '_ELECTION_DATE');
 
 	print '<tr>';

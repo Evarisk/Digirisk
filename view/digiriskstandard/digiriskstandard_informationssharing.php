@@ -69,6 +69,9 @@ $permissiontodelete = $user->rights->digiriskdolibarr->informationssharing->dele
 $permissiontoeditcompanydata = $permissiontoadd && $user->hasRight('digiriskdolibarr', 'adminpage', 'read');
 saturne_check_access($permissiontoread);
 
+// Staff representative bodies chosen in the social setup: code => translation key of its name
+$activeStaffBodies = (new DigiriskResources($db))->getActiveStaffRepresentativeBodies();
+
 // Company data edited on this page: digirisk resource ref => element type used by admin/securityconf.php and admin/socialconf.php
 $companyDataResources = [
 	'LabourDoctorSociety'    => 'societe',
@@ -76,16 +79,17 @@ $companyDataResources = [
 	'LabourInspectorSociety' => 'societe',
 	'LabourInspectorContact' => 'socpeople',
 	'HarassmentOfficer'      => 'user',
-	'HarassmentOfficerCSE'   => 'user',
-	'TitularsCSE'            => 'societe',
-	'AlternatesCSE'          => 'societe',
-	'TitularsDP'             => 'societe',
-	'AlternatesDP'           => 'societe',
 ];
-$companyDataDates = [
-	'DIGIRISKDOLIBARR_CSE_ELECTION_DATE' => 'ElectionDateCSE',
-	'DIGIRISKDOLIBARR_DP_ELECTION_DATE'  => 'ElectionDateDP',
-];
+$companyDataDates = [];
+// Only the fields shown are saved: the ESC harassment officer goes with the ESC, then each chosen body
+if (isset($activeStaffBodies['CSE'])) {
+	$companyDataResources['HarassmentOfficerCSE'] = 'user';
+}
+foreach (array_keys($activeStaffBodies) as $staffBody) {
+	$companyDataResources['Titulars' . $staffBody]   = 'societe';
+	$companyDataResources['Alternates' . $staffBody] = 'societe';
+	$companyDataDates['DIGIRISKDOLIBARR_' . $staffBody . '_ELECTION_DATE'] = 'ElectionDate' . $staffBody;
+}
 
 /*
  * Actions
