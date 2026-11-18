@@ -737,7 +737,9 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                         $extSignatory = array_shift($extSignatories);
                         $mailResult   = digiriskSendFirePermitSignatureEmail($db, $object, $extSignatory, $thirdparty->name, $user, $langs);
                         if (!$mailResult['sent']) {
-                            setEventMessages($langs->trans('MobilePPWarningEmailNotSentDetail', $mailResult['error']), null, 'warnings');
+                            // One sentence per line of the notification, escaped once: the messages are plain text
+                            $mailMessages = digiriskMobileGetSignatureEmailFailureMessages($mailResult, 'MobileFPSignatureEmailFailedCreated', $langs);
+                            setEventMessages('', array_map('dol_escape_htmltag', $mailMessages), 'warnings');
                         }
                     }
                 }
@@ -856,17 +858,11 @@ if ($action == 'resend_ext_signature_email' && $permissiontoadd) {
         ob_end_clean();
     }
 
-    $errorMsg = !empty($resendResult['error']) ? $resendResult['error'] : '';
-    if (!empty($errorMsg) && function_exists('mb_check_encoding') && !mb_check_encoding($errorMsg, 'UTF-8')) {
-        $errorMsg = mb_convert_encoding($errorMsg, 'UTF-8', 'ISO-8859-1');
-    }
-
     // Le message est pose tel quel dans la page par le JS : les entites HTML de la traduction y
-    // apparaitraient en clair ("n'a pas pu &ecirc;tre envoye"). L'erreur de CMailFile arrive elle-meme
-    // en HTML (entites, <br>) : ramenee a du texte d'abord, sinon elle resterait encodee deux fois
+    // apparaitraient en clair ("n'a pas pu &ecirc;tre envoye"), les messages sont donc du texte brut
     $resendMessage = $resendResult['sent']
         ? $langs->transnoentities('MobilePPSignatureEmailSentTo', $resendResult['email'])
-        : $langs->transnoentities('MobilePPWarningEmailNotSentDetail', dol_string_nohtmltag($errorMsg, 1));
+        : implode(' ', digiriskMobileGetSignatureEmailFailureMessages($resendResult, 'MobileSignatureEmailFailedTo', $langs));
 
     header('Content-Type: application/json');
     echo json_encode([

@@ -1215,12 +1215,13 @@ function digiriskSafetyTalkDelete(DoliDB $db, Task $talk, User $user): int
  * @param  Task      $talk  Talk, fetched
  * @param  User      $user  User sending the emails
  * @param  Translate $langs Translation handler
- * @return array            ['sent' => string[] (emails), 'failed' => string[] (names), 'error' => string]
+ * @return array            ['sent' => string[] (emails), 'failed' => string[] (names), 'error' => string (plain text)]
  */
 function digiriskSafetyTalkSendSignatureLinks(DoliDB $db, Task $talk, User $user, Translate $langs): array
 {
     require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
     dol_include_once('/saturne/class/saturnemail.class.php');
+    require_once __DIR__ . '/digiriskdolibarr_mobile.lib.php';
 
     $langs->loadLangs(['doliletter@doliletter', 'signature@saturne']);
 
@@ -1265,8 +1266,9 @@ function digiriskSafetyTalkSendSignatureLinks(DoliDB $db, Task $talk, User $user
             $signatory->update($user, 1);
             $result['sent'][] = $sendTo;
         } else {
+            // The error of the mail library is explained rather than shown as is, see digiriskMobileExplainMailError()
             $result['failed'][] = doliletter_spread_get_signatory_name($signatory);
-            $result['error']    = dol_string_nohtmltag((string) $mailFile->error, 1);
+            $result['error']    = implode(' ', array_filter(digiriskMobileExplainMailError($mailFile, $user, $langs)));
         }
     }
 

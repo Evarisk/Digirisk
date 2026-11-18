@@ -370,6 +370,140 @@ function digiriskMobileGetSignatureState(DoliDB $db, $object): array
 }
 
 /**
+ * Sort the error of the mail library into what can be told to a user without guessing.
+ *
+ * SMTPs, the library of the "SMTP/SMTPS socket" sending mode, numbers its errors: a connection that
+ * failed carries the system error number (0 when PHP gives none, as when TLS is spoken on a STARTTLS
+ * port), the steps before authentication use 99, 121, 126, 131 and 132, while 120 only quotes the
+ * answer of the server, whatever the command was. The other sending modes are recognised by their
+ * wording. Anything else stays 'other' rather than being explained wrong.
+ *
+ * @param  string $error Error of CMailFile, plain text on one line
+ * @return string        'recipient', 'login', 'server', or 'other' when not sure
+ */
+function digiriskMobileGetMailErrorReason(string $error): string
+{
+    $recipientPatterns = [
+        // Enhanced status codes of RFC 3463: 5.1.1 to 5.1.3, 5.1.6 and 5.1.10 are about the destination mailbox
+        '\b5\.1\.(1|2|3|6|10)\b',
+        'Recipient address',
+        'User unknown',
+        'Transport failed for the following addresses',
+    ];
+    if (preg_match('/' . implode('|', $recipientPatterns) . '/i', $error)) {
+        return 'recipient';
+    }
+
+    // 535 and 5.7.8 are the credentials refused (RFC 4954). SMTPs also says "Invalid Authentication
+    // Credentials" after a server that refused the AUTH command itself: a setup problem, not a password one
+    $askAuthFailed  = strpos($error, 'Error when asking for AUTH') !== false;
+    $badCredentials = !$askAuthFailed && strpos($error, 'Invalid Authentication Credentials') !== false;
+    if ($badCredentials || preg_match('/\b535\b|\b5\.7\.8\b|Failed to authenticate/i', $error)) {
+        return 'login';
+    }
+
+    $smtpsOtherCodes = [101, 102, 110, 120, 130];
+    if (preg_match('/^Error \[(\d+)\]/', $error, $matches) && !in_array((int) $matches[1], $smtpsOtherCodes, true)) {
+        return 'server';
+    }
+
+    $serverPatterns = [
+        'Connection could not be established',
+        'Unable to connect',
+        'timed out',
+        'Failed to send mail with php mail',
+    ];
+    if ($askAuthFailed || preg_match('/' . implode('|', $serverPatterns) . '/i', $error)) {
+        return 'server';
+    }
+
+    return 'other';
+}
+
+/**
+ * Explain in plain words why an email of the application did not leave.
+ *
+ * CMailFile answers in the words of the mail library ("Error [0]: Failed to connect with
+ * stream_context_create or fsockopen host=ssl://smtp.example.com port=587"), which a site manager
+ * cannot act on. The cause gets its own sentence only when it is recognised for sure. The raw error
+ * always goes to the log, and to an administrator, the one able to fix the setup.
+ *
+ * @param  CMailFile $mailFile Email that failed, after its constructor or sendfile()
+ * @param  User      $user     Current user: the technical detail is only shown to an administrator
+ * @param  Translate $langs    Translation handler
+ * @return array               ['cause' => string, 'action' => string, 'detail' => string], plain text,
+ *                             'cause' and 'detail' empty when there is nothing to say
+ */
+function digiriskMobileExplainMailError(CMailFile $mailFile, User $user, Translate $langs): array
+{
+    // Swift Mailer leaves its exceptions in errors[] only
+    $detail = (string) $mailFile->error;
+    if (!dol_strlen($detail) && !empty($mailFile->errors)) {
+        $detail = implode(' ', (array) $mailFile->errors);
+    }
+
+    // The system message of a failed connection comes in the charset of the server, not always UTF-8
+    if (function_exists('mb_check_encoding') && !mb_check_encoding($detail, 'UTF-8')) {
+        $detail = mb_convert_encoding($detail, 'UTF-8', 'ISO-8859-1');
+    }
+    $detail = trim(dol_string_nohtmltag($detail, 1));
+
+    dol_syslog(__FUNCTION__ . ': email to ' . $mailFile->addr_to . ' not sent: ' . $detail, LOG_ERR);
+
+    $reason      = digiriskMobileGetMailErrorReason($detail);
+    $explanation = [
+        'cause'  => '',
+        'action' => $langs->transnoentities($user->admin ? 'MobileMailErrorCheckSetup' : 'MobileMailErrorAskAdmin'),
+        'detail' => '',
+    ];
+
+    if ($reason !== 'other') {
+        $explanation['cause'] = $langs->transnoentities('MobileMailError' . ucfirst($reason));
+    }
+
+    // A refused address is fixed by whoever knows the recipient, not by the administrator
+    if ($reason === 'recipient') {
+        $explanation['action'] = $langs->transnoentities('MobileMailErrorCheckRecipient');
+    }
+
+    if ($user->admin && dol_strlen($detail)) {
+        $explanation['detail'] = $langs->transnoentities('MobileMailErrorDetail', $detail);
+    }
+
+    return $explanation;
+}
+
+/**
+ * Sentences shown when the signature request email of a mobile form did not leave.
+ *
+ * @param  array     $mailResult Result of digiriskSendPreventionPlanSignatureEmail() or of
+ *                               digiriskSendFirePermitSignatureEmail()
+ * @param  string    $leadKey    Translation key of the first sentence, %s being the recipient address
+ * @param  Translate $langs      Translation handler
+ * @return string[]              Sentences, plain text, in reading order
+ */
+function digiriskMobileGetSignatureEmailFailureMessages(array $mailResult, string $leadKey, Translate $langs): array
+{
+    // Stopped before the mail library (no valid address, no email setup): the reason is a sentence part,
+    // translated in HTML by the caller
+    if (empty($mailResult['explanation'])) {
+        $reason = dol_string_nohtmltag((string) $mailResult['error'], 1);
+
+        return [$langs->transnoentities('MobilePPWarningEmailNotSentDetail', $reason)];
+    }
+
+    $explanation = $mailResult['explanation'];
+
+    return array_values(array_filter([
+        $langs->transnoentities($leadKey, $mailResult['email']),
+        $explanation['cause'],
+        $langs->transnoentities('MobileSignatureEmailSignAnyway'),
+        $explanation['action'],
+        $explanation['detail'],
+    ]));
+}
+
+/**
  * Directory holding the photos taken for one risk of a mobile-created object.
  *
  * Keyed by danger category rather than by line ref: the edit path replaces the lines (new refs),

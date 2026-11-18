@@ -253,13 +253,16 @@ function digiriskGetPreventionPlanSignatureEmailTemplate(DoliDB $db, int $templa
  * @param  string           $societyName Raison sociale affichee dans le message
  * @param  User             $user        Utilisateur a l'origine de l'action
  * @param  Translate        $langs       Objet de traduction
- * @return array                         ['sent' => bool, 'error' => string, 'email' => string]
+ * @return array                         ['sent' => bool, 'error' => string, 'email' => string], plus
+ *                                       'explanation' (digiriskMobileExplainMailError()) quand c'est la
+ *                                       librairie d'envoi qui a echoue
  */
 function digiriskSendPreventionPlanSignatureEmail(DoliDB $db, PreventionPlan $plan, SaturneSignature $signatory, string $societyName, User $user, Translate $langs): array
 {
     global $conf;
 
     require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
+    require_once __DIR__ . '/digiriskdolibarr_mobile.lib.php';
 
     $result = ['sent' => false, 'error' => '', 'email' => (string) $signatory->email];
 
@@ -331,15 +334,13 @@ function digiriskSendPreventionPlanSignatureEmail(DoliDB $db, PreventionPlan $pl
         $message = make_substitutions($emailTemplate->content, $substitutions, $langs);
     }
 
+    // L'erreur de la librairie d'envoi ("Error [0]: Failed to connect with ...") n'est pas montree telle
+    // quelle a l'utilisateur de terrain : elle est expliquee, et gardee pour le journal et l'administrateur
     $mailfile = new CMailFile($subject, $signatory->email, $from, $message, $filepath, $mimetype, $filename, '', '', 0, -1, '', '', '', '', 'mail');
-    if ($mailfile->error) {
-        $result['error'] = $mailfile->error;
-
-        return $result;
-    }
-
-    if (!$mailfile->sendfile()) {
-        $result['error'] = $mailfile->error ?: $langs->trans('MobilePPWarningEmailNotSent');
+    if ($mailfile->error || !$mailfile->sendfile()) {
+        $explanation           = digiriskMobileExplainMailError($mailfile, $user, $langs);
+        $result['explanation'] = $explanation;
+        $result['error']       = trim($explanation['cause'] . ' ' . $explanation['action']);
 
         return $result;
     }
