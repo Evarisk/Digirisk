@@ -44,6 +44,7 @@ require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../class/accidentinvestigation.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accidentinvestigation.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_action.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_task.lib.php';
 
 // Load translation files required by the page
 saturne_load_langs();

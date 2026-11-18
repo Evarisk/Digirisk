@@ -51,7 +51,8 @@ $backtopage  = GETPOST('backtopage', 'alpha');
 
 // Load mode employee
 $mode  = GETPOST("mode", 'alpha');
-$group = $conf->global->DIGIRISKDOLIBARR_READERGROUP_SET;
+// The group picked is kept when a refused creation shows the form again (#5722)
+$group = GETPOSTISSET('groupid') ? GETPOSTINT('groupid') : getDolGlobalInt('DIGIRISKDOLIBARR_READERGROUP_SET');
 
 // Load variable for pagination
 $limit     = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
@@ -198,14 +199,13 @@ if (empty($reshook)) {
 if ($action == 'add' && $permissiontoadd) {
 	$error = 0;
 
-	if ( ! $_POST["lastname"]) {
+	if ( ! GETPOST('lastname')) {
 		$error++;
 		setEventMessages($langs->trans("NameNotDefined"), null, 'errors');
 		$action = "create"; // Go back to create page
 	}
-	if ( ! $_POST["login"]) {
-		$login = GETPOST('lastname') . GETPOST('firstname');
-	}
+	// No creation form posts a login: reading $_POST['login'] raised a warning on every creation (#5722)
+	$login = GETPOST('login', 'alphanohtml') ?: GETPOST('lastname') . GETPOST('firstname');
 
 	$email = GETPOST('email', 'alpha');
 	if (empty($email)) {
@@ -219,6 +219,13 @@ if ($action == 'add' && $permissiontoadd) {
 			setEventMessages($langs->trans('ErrorFieldEmail'), array(), 'errors');
 			$error++;
 		}
+	}
+
+	// In the transverse mode of Multicompany a user reaches an entity through their groups in it only: created without
+	// one, the account could not log in here (#5722)
+	if (isModEnabled('multicompany') && getDolGlobalInt('MULTICOMPANY_TRANSVERSE_MODE') && GETPOSTINT('groupid') <= 0) {
+		setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentities('UserGroup')), array(), 'errors');
+		$error++;
 	}
 
 	if ( ! empty($conf->file->main_limit_users)) { // If option to limit users is set
@@ -250,6 +257,11 @@ if ($action == 'add' && $permissiontoadd) {
 		$db->begin();
 
 		$id = $object->create($user);
+		// The group is part of the creation: a user the group could not be set for is not kept, the failure used to be
+		// silent (#5722)
+		if ($id > 0 && GETPOSTINT('groupid') > 0 && $object->SetInGroup(GETPOSTINT('groupid'), $conf->entity) < 0) {
+			$id = -1;
+		}
 		if ($id > 0) {
 			// No quick creation form posts a password: without a default value, the checks below
 			// read an undefined variable (a PHP warning on every creation)
@@ -258,9 +270,8 @@ if ($action == 'add' && $permissiontoadd) {
 				$newpassword = $object->setPassword($user, GETPOST('password'));
 			}
 
-			$object->SetInGroup(GETPOSTINT('groupid'), $conf->entity);
-
-			if ($newpassword < 0) {
+			// setPassword() returns the password, or a negative number: '' < 0 is true in PHP 8 (#5722)
+			if (is_int($newpassword) && $newpassword < 0) {
 				// Echec
 				setEventMessages($langs->trans("ErrorFailedToSetNewPassword"), null, 'errors');
 			} else {
@@ -324,12 +335,22 @@ if (is_array($extrafields->attributes[$object->table_element]['label']) && count
 $sql                                                                                                                                              .= " LEFT JOIN " . MAIN_DB_PREFIX . "societe as s ON u.fk_soc = s.rowid";
 $sql                                                                                                                                              .= " LEFT JOIN " . MAIN_DB_PREFIX . "user as u2 ON u.fk_user = u2.rowid";
 $sql                                                                                                                                              .= " LEFT JOIN " . MAIN_DB_PREFIX . "usergroup_user as g ON u.rowid = g.fk_user";
+// In the transverse mode of Multicompany the memberships of a user are given per entity: only those of this one (#5722)
+$isTransverseMode = isModEnabled('multicompany') && getDolGlobalInt('MULTICOMPANY_TRANSVERSE_MODE');
+if ($isTransverseMode) $sql                                                                                                                       .= " AND g.entity IN (" . getEntity('usergroup') . ")";
 if ( ! empty($search_categ) || ! empty($catid)) $sql                                                                                              .= ' LEFT JOIN ' . MAIN_DB_PREFIX . "categorie_user as cu ON u.rowid = cu.fk_user"; // We'll need this table joined to the select in order to filter by categ
 // Add fields from hooks
 $parameters = array();
 $reshook    = $hookmanager->executeHooks('printUserListWhere', $parameters); // Note that $action and $object may have been modified by hook
 if ($reshook > 0) {
 	$sql .= $hookmanager->resPrint;
+} elseif ($isTransverseMode && !(!empty($user->admin) && empty($user->entity) && $conf->entity == 1)) {
+	// The rule of the user list of Dolibarr in the transverse mode (hook printUserListWhere of Multicompany, which does
+	// not run on this page): the members of a group in the entity, and the superadmins. getEntity('user') is "0,1" (#5722)
+	$sql .= " WHERE (u.rowid IN (SELECT ug.fk_user FROM " . MAIN_DB_PREFIX . "usergroup_user as ug WHERE ug.entity IN (" . getEntity('usergroup') . ")) OR u.entity = 0)";
+} elseif ($isTransverseMode) {
+	// The superadmin on entity 1 sees the users of every entity
+	$sql .= " WHERE u.entity IS NOT NULL";
 } else {
 	$sql .= " WHERE u.entity IN (".getEntity('user').")";
 }

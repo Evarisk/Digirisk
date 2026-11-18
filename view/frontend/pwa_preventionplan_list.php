@@ -72,10 +72,10 @@ list($listRows, $listTotal, $listTotalPages) = digiriskPwaFetchList('PreventionP
 
     return [
         'url'        => ($record->status == PreventionPlan::STATUS_DRAFT)
-            ? dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1) . '?id=' . $record->id
-            : dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1) . '?created=' . $record->id,
+            ? dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1) . '?id=' . $record->id
+            : dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1) . '?created=' . $record->id,
         'editUrl'    => ($record->status == PreventionPlan::STATUS_DRAFT && $user->hasRight('digiriskdolibarr', 'preventionplan', 'write'))
-            ? dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1) . '?id=' . $record->id
+            ? dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1) . '?id=' . $record->id
             : '',
         'ref'        => $record->ref,
         'title'      => $record->label,
@@ -87,7 +87,7 @@ list($listRows, $listTotal, $listTotalPages) = digiriskPwaFetchList('PreventionP
 });
 
 $listCreateUrl = $user->hasRight('digiriskdolibarr', 'preventionplan', 'write')
-    ? dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1)
+    ? dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1)
     : '';
 
 /*

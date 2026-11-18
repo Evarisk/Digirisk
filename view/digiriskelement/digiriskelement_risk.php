@@ -309,7 +309,7 @@ if ($sharedrisks) {
 				}
 
 				if (array_key_exists($digiriskelementtmp->id, $alldigiriskelement)) {
-					$photoRisk = '<img class="danger-category-pic hover" src=' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risks->getDangerCategory($risks, $risks->type) . '.png' . '>';
+					$photoRisk = '<img class="danger-category-pic hover" src=' . dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $risks->getDangerCategory($risks, $risks->type) . '.png', 1) . '>';
 
 					$importValue = '<div class="importsharedrisk"><span class="importsharedrisk-ref">' . 'S' . $risks->entity . '</span>';
 					$importValue .= '<span>' . dol_trunc($entityName[$risks->entity], 32) . '</span>';
@@ -333,7 +333,7 @@ if ($sharedrisks) {
 					$entity = ($conf->entity > 1) ? '/' . $risks->entity : '';
 					$modulepart   = $entity . 'ecm';
 					$path         = DOL_URL_ROOT . '/document.php?modulepart=' . $modulepart . '&attachment=0&file=' . str_replace('/', '%2F', $relativepath) . '/';
-					$pathToThumb  = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/');
+					$pathToThumb  = dol_buildpath('/digiriskdolibarr/documents/viewimage.php', 1) . '?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/');
 					$nophoto      = DOL_URL_ROOT.'/public/theme/common/nophoto.png';
 
 					$importValue .= '<div class="risk-evaluation-photo risk-evaluation-photo-'. ($lastEvaluation->id > 0 ? $lastEvaluation->id : 0) .  ($risk->id > 0 ? ' risk-' . $risk->id : ' risk-new') .' open-medias-linked">';
@@ -343,7 +343,7 @@ if ($sharedrisks) {
 					if (isset($lastEvaluation->photo) && dol_strlen($lastEvaluation->photo) > 0) {
 						$accessallowed = 1;
 						$thumb_name = getThumbName($lastEvaluation->photo);
-						$importValue .=	 '<img width="40" height="40" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/' . $thumb_name) . '" >';
+						$importValue .=	 '<img width="40" height="40" class="photo clicked-photo-preview" src="' . dol_buildpath('/digiriskdolibarr/documents/viewimage.php', 1) . '?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/' . $thumb_name) . '" >';
 					} else {
 						$importValue .=	 '<img width="40" height="40" class="photo clicked-photo-preview" src="'. $nophoto .'" >';
 					}

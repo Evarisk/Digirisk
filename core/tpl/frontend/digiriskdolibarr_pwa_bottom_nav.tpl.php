@@ -51,7 +51,7 @@ $navCurrentPage = basename($_SERVER['PHP_SELF']);
 
 <div class="digirisk-pwa-nav-overlay" data-action="close-pwa-nav-drawer"></div>
 <div class="digirisk-pwa-nav-drawer"
-     data-ajax-url="<?php print dol_escape_htmltag(dol_buildpath('/custom/digiriskdolibarr/core/ajax/save_pwa_nav_favorites.php', 1)); ?>"
+     data-ajax-url="<?php print dol_escape_htmltag(dol_buildpath('/digiriskdolibarr/core/ajax/save_pwa_nav_favorites.php', 1)); ?>"
      data-max-favorites="<?php print DIGIRISKDOLIBARR_PWA_NAV_MAX_FAVORITES; ?>"
      data-add-favorite-label="<?php print dol_escape_htmltag($langs->trans('PwaNavAddFavorite')); ?>"
      data-remove-favorite-label="<?php print dol_escape_htmltag($langs->trans('PwaNavRemoveFavorite')); ?>">

@@ -84,6 +84,57 @@ if ($action == 'update') {
     exit;
 }
 
+// Share of the company workforce present in each GP/UT, entered for all of them at once like on
+// their card. Nothing is saved while a value is out of range: the posted values are shown back
+$permissionToEditElements = $user->hasRight('digiriskdolibarr', 'digiriskelement', 'write');
+$visibleElements          = $digiriskelement->getVisibleElements();
+$postedPeoplePercentages  = [];
+if ($action == 'update_people_percentage' && $permissionToEditElements) {
+    $postedPeoplePercentages = GETPOST('people_percentage', 'array:alphanohtml');
+
+    $errors             = [];
+    $changedPercentages = [];
+    foreach ($visibleElements as $elementId => $visibleElement) {
+        if (!array_key_exists($elementId, $postedPeoplePercentages)) {
+            continue;
+        }
+
+        $peoplePercentage = price2num($postedPeoplePercentages[$elementId]);
+        if (!DigiriskElement::isValidPeoplePercentage($peoplePercentage)) {
+            $errors[] = $langs->trans('ErrorPeoplePercentageOf', dol_escape_htmltag($visibleElement->ref . ' - ' . $visibleElement->label));
+            continue;
+        }
+
+        // Only the changed shares are saved, each update leaves an event in the agenda of the element
+        $peoplePercentage = $peoplePercentage === '' ? null : (float) $peoplePercentage;
+        $oldPercentage    = $visibleElement->people_percentage === null || $visibleElement->people_percentage === '' ? null : (float) $visibleElement->people_percentage;
+        if ($peoplePercentage !== $oldPercentage) {
+            $changedPercentages[$elementId] = $peoplePercentage;
+        }
+    }
+
+    if (empty($errors)) {
+        foreach ($changedPercentages as $elementId => $peoplePercentage) {
+            $element = new DigiriskElement($db);
+            $element->fetch($elementId);
+            $element->people_percentage = $peoplePercentage;
+            if ($element->update($user) < 0) {
+                $errors[] = dol_escape_htmltag($element->ref . ' : ' . $element->error);
+            }
+        }
+    }
+
+    if (empty($errors)) {
+        setEventMessage($langs->trans('SavedConfig'));
+        header('Location: ' . $_SERVER['PHP_SELF']);
+        exit;
+    }
+    setEventMessages('', $errors, 'errors');
+}
+
+// A save that failed opens the modal again on the values to correct
+$openPeoplePercentageModal = !empty($postedPeoplePercentages);
+
 /*
  * View
  */
@@ -153,8 +204,23 @@ print '<td><input type="number" id="DIGIRISKDOLIBARR_NB_EMPLOYEES" name="DIGIRIS
 print '<td><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '">';
 print '</td></tr>';
 
+// The shares of the GP/UT are entered in a modal, it has its own form below
+$nbFilledElements = count(array_filter($visibleElements, function ($visibleElement) {
+    return $visibleElement->people_percentage !== null && $visibleElement->people_percentage !== '';
+}));
+
+print '<tr class="oddeven"><td>' . $langs->trans('PeoplePercentageByElement') . '</td>';
+print '<td>' . $langs->trans('PeoplePercentageByElementDescription') . '</td>';
+print '<td>' . $langs->trans('PeoplePercentageFilledCount', $nbFilledElements, count($visibleElements)) . '</td>';
+print '<td><button type="button" class="button modal-open">';
+print '<input type="hidden" class="modal-options" data-modal-to-open="people_percentage_modal">';
+print $langs->trans($permissionToEditElements ? 'Modify' : 'Show');
+print '</button></td></tr>';
+
 print '</table>';
 print '</form>';
+
+include __DIR__ . '/../../core/tpl/digiriskelement/digiriskelement_people_percentage_config.tpl.php';
 
 /*
  *  Deleted elements

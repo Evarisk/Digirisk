@@ -85,7 +85,7 @@
 							<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($task_progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($task_progress == 100) ? 'checked' : ''; ?>>
 						</span>
 					<?php endif; ?>
-					<span class="riskassessment-task-reference" value="<?php echo $related_task->ref ?>"><?php echo $related_task->getNomUrl(0, 'withproject'); ?></span>
+					<span class="riskassessment-task-reference" value="<?php echo $related_task->ref ?>"><?php echo digiriskdolibarr_task_get_nom_url($related_task); ?></span>
 					<span class="riskassessment-task-author-label" title="<?php echo $related_task->label; ?>">
 						<?php echo dol_trunc($related_task->label, 255); ?>
 					</span>

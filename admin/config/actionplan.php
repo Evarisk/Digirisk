@@ -92,21 +92,10 @@ if ((($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updat
     $EnvironmentProject    = preg_split('/_/', $EnvironmentProject);
 	$taskTimeSpentDuration = GETPOST('TaskTimeSpentDuration', 'alpha');
 
+    // The PAPRIPACT menu entry keeps the Kanban URL declared by the module descriptor: the Kanban page reads
+    // DIGIRISKDOLIBARR_DU_PROJECT by itself, so changing the project must not rewrite the menu
     if ($DUProject[0] > 0 && $DUProject[0] != $conf->global->DIGIRISKDOLIBARR_DU_PROJECT) {
         dolibarr_set_const($db, "DIGIRISKDOLIBARR_DU_PROJECT", $DUProject[0], 'integer', 0, '', $conf->entity);
-
-        $url = '/projet/tasks.php?id=' . $DUProject[0];
-
-        $sql = "UPDATE ".MAIN_DB_PREFIX."menu SET";
-        $sql .= " url='".$db->escape($url)."'";
-        $sql .= " WHERE leftmenu='digiriskactionplan'";
-        $sql .= " AND entity=" . $conf->entity;
-
-        $resql = $db->query($sql);
-        if (!$resql) {
-            $error = "Error ".$db->lasterror();
-            return -1;
-        }
     }
 
     if ($EnvironmentProject[0] > 0 && $EnvironmentProject[0] != $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT) {

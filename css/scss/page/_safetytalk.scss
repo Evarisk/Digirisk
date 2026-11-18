@@ -1,0 +1,802 @@
+/* Copyright (C) 2026 EVARISK <technique@evarisk.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/* Safety talks of the mobile application (view/safetytalk/, view/frontend/pwa_safetytalk_list.php).
+   Built on the cards and fields of the mobile quick creation screens. */
+
+body.digirisk-mobile-create {
+  .digirisk-safetytalk-warning {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+  }
+
+  .digirisk-safetytalk-ref {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+  }
+
+  /* Form fields the quick creation screens do not use, on the forms and on the link form of a talk */
+  .digirisk-safetytalk-form,
+  .digirisk-safetytalk-link-form {
+    .digirisk-mobile-field {
+      input[type="url"],
+      textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 8px 10px;
+        font-size: 14px;
+        font-family: inherit;
+        color: #1e293b;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 7px;
+
+        &:focus {
+          outline: none;
+          border-color: #2b7de9;
+          box-shadow: 0 0 0 2px rgba(43, 125, 233, 0.2);
+        }
+      }
+
+      textarea {
+        resize: vertical;
+      }
+    }
+
+    &__cycle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+
+      i {
+        color: #2b7de9;
+      }
+    }
+  }
+
+  .digirisk-safetytalk-submit {
+    margin-bottom: 10px;
+    color: #ffffff;
+    background: #2b7de9;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+  }
+
+  /* Bar on top of the screens: way back and actions, kept under the fixed header while scrolling */
+  .digirisk-safetytalk-topbar {
+    position: sticky;
+    top: 52px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0 0 10px;
+    padding: 6px 8px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1);
+
+    &__back {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      min-width: 0;
+      padding: 6px 4px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #2b7de9;
+      text-decoration: none;
+
+      span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    &__actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+
+      form {
+        margin: 0;
+      }
+    }
+
+    &__action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 10px;
+      box-sizing: border-box;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: #2b7de9;
+      text-decoration: none;
+      white-space: nowrap;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 17px;
+      cursor: pointer;
+
+      &--primary {
+        color: #ffffff;
+        background: #2b7de9;
+        border-color: #2b7de9;
+      }
+
+      &--danger {
+        color: #dc2626;
+        background: #fef2f2;
+        border-color: #fecaca;
+      }
+    }
+
+    /* On a phone the secondary actions keep their icon only, the main one keeps its label */
+    @media (max-width: 520px) {
+      &__action:not(.digirisk-safetytalk-topbar__action--primary) span {
+        display: none;
+      }
+
+      &__action:not(.digirisk-safetytalk-topbar__action--primary) {
+        padding: 0;
+      }
+    }
+  }
+
+  .digirisk-safetytalk-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2b7de9;
+    text-decoration: none;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 18px;
+    cursor: pointer;
+
+    &--wide {
+      width: 100%;
+      margin-top: 10px;
+    }
+  }
+
+  /* Cycle */
+  .digirisk-safetytalk-cycle {
+    &__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+
+      .digirisk-safetytalk-ref {
+        margin-left: 0;
+      }
+    }
+
+    &__title {
+      margin: 6px 0 4px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    &__description {
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #475569;
+      white-space: pre-line;
+    }
+
+    &__label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+    }
+  }
+
+  .digirisk-safetytalk-people {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+
+    &__chip {
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1e3a8a;
+      background: #e0e7ff;
+      border-radius: 14px;
+    }
+  }
+
+  /* People without Dolibarr account, one row each: firstname, lastname, email, remove */
+  .digirisk-safetytalk-guests__list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .digirisk-safetytalk-guest {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.4fr 34px;
+    gap: 6px;
+    align-items: center;
+
+    input {
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+      padding: 7px 8px;
+      font-size: 13px;
+      font-family: inherit;
+      color: #1e293b;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+
+      &:focus {
+        outline: none;
+        border-color: #2b7de9;
+      }
+
+      /* Email checked while typed: a tick when the server takes it, a warning otherwise */
+      &.digirisk-safetytalk-email--valid,
+      &.digirisk-safetytalk-email--invalid {
+        padding-right: 28px;
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 14px 14px;
+      }
+
+      &.digirisk-safetytalk-email--valid {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%2316a34a' d='M6.4 11.4 3.2 8.2l1.1-1.1 2.1 2.1 5.3-5.3 1.1 1.1z'/%3E%3C/svg%3E");
+        border-color: #16a34a;
+      }
+
+      &.digirisk-safetytalk-email--invalid {
+        background-color: #fef2f2;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%23dc2626'/%3E%3Cpath fill='%23fff' d='M7.2 4h1.6v5H7.2zM7.2 10.4h1.6V12H7.2z'/%3E%3C/svg%3E");
+        border-color: #dc2626;
+      }
+    }
+
+    &__hint {
+      grid-column: 3;
+      font-size: 11px;
+      line-height: 1.3;
+      color: #dc2626;
+    }
+
+    /* Row of a Dolibarr user: name and email as Dolibarr knows them */
+    &--user input {
+      color: #475569;
+      background: #f1f5f9;
+    }
+
+    @media (max-width: 420px) {
+      grid-template-columns: 1fr 1fr 34px;
+
+      input[type="email"] {
+        grid-column: 1 / 3;
+        grid-row: 2;
+      }
+
+      &__hint {
+        grid-column: 1 / 3;
+        grid-row: 3;
+      }
+    }
+  }
+
+  .digirisk-safetytalk-guest-remove,
+  .digirisk-safetytalk-guest-submit {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .digirisk-safetytalk-guest-remove {
+    color: #dc2626;
+    background: #fef2f2;
+  }
+
+  .digirisk-safetytalk-guest-submit {
+    color: #ffffff;
+    background: #2b7de9;
+  }
+
+  .digirisk-safetytalk-person-form {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed #e2e8f0;
+
+    &__title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+
+      i {
+        color: #2b7de9;
+      }
+    }
+  }
+
+  .digirisk-safetytalk-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 14px 2px 8px;
+
+    &__title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e293b;
+      text-transform: uppercase;
+    }
+  }
+
+  /* Talks of a cycle, in the order they are held */
+  .digirisk-safetytalk-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .digirisk-safetytalk-talk {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    color: inherit;
+    text-decoration: none;
+    background: #ffffff;
+    border-left: 4px solid #2b7de9;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+
+    &--today {
+      border-left-color: #f59e0b;
+    }
+
+    &--done {
+      border-left-color: #16a34a;
+    }
+
+    &--undated {
+      border-left-color: #94a3b8;
+    }
+
+    &__picto {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+      color: #2b7de9;
+      background: #f1f5f9;
+      border-radius: 50%;
+
+      img {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+      }
+    }
+
+    &__body {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    &__date {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    &__title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    &__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    &__signed {
+      font-weight: 700;
+      color: #16a34a;
+    }
+
+    &__chevron {
+      color: #94a3b8;
+    }
+  }
+
+  .digirisk-safetytalk-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.4;
+    border-radius: 10px;
+    color: #1d4ed8;
+    background: #dbeafe;
+
+    &--today {
+      color: #92400e;
+      background: #fef3c7;
+    }
+
+    &--done,
+    &--read {
+      color: #166534;
+      background: #dcfce7;
+    }
+
+    &--undated,
+    &--hidden {
+      color: #475569;
+      background: #e2e8f0;
+    }
+
+    &--download {
+      color: #1d4ed8;
+      background: #dbeafe;
+    }
+  }
+
+  /* Theme tiles, as the categories of the public ticket form */
+  .digirisk-safetytalk-themes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+    gap: 8px;
+    max-height: 330px;
+    overflow-y: auto;
+    padding: 2px;
+  }
+
+  .digirisk-safetytalk-theme {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    font-family: inherit;
+    color: #1e293b;
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    cursor: pointer;
+
+    &__picto {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      font-size: 22px;
+      color: #2b7de9;
+
+      img {
+        max-width: 44px;
+        max-height: 44px;
+      }
+    }
+
+    &__label {
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    &.active {
+      background: #eff6ff;
+      border-color: #2b7de9;
+
+      &::after {
+        content: "\f00c";
+        position: absolute;
+        top: 4px;
+        right: 6px;
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        font-size: 11px;
+        color: #2b7de9;
+      }
+    }
+  }
+
+  /* Files of a talk: the photo and file buttons of the media block of Saturne, side by side */
+  .digirisk-safetytalk-media {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px;
+
+    + .digirisk-mobile-help {
+      margin-top: 8px;
+    }
+  }
+
+  .digirisk-safetytalk-files__link {
+    margin-top: 10px;
+  }
+
+  /* Screen of a talk */
+  .digirisk-safetytalk-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 10px;
+
+    &__item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 160px;
+    }
+
+    &__icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 38px;
+      height: 38px;
+      color: #4a55d1;
+      background: #eef2ff;
+      border-radius: 50%;
+
+      img {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+      }
+    }
+
+    &__label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      color: #666666;
+      text-transform: uppercase;
+    }
+
+    &__value {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      color: #000000;
+
+      &--accent {
+        color: #4a55d1;
+      }
+    }
+  }
+
+  .digirisk-safetytalk-signatories {
+    &__list {
+      margin: 10px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    &__item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    &__state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      font-size: 12px;
+      border-radius: 50%;
+
+      &--signed {
+        color: #ffffff;
+        background: #16a34a;
+      }
+
+      &--pending {
+        color: #92400e;
+        background: #fef3c7;
+      }
+    }
+
+    &__who {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+    }
+
+    &__name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    &__status {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    &__open {
+      padding: 6px 8px;
+      color: #2b7de9;
+      font-size: 16px;
+    }
+
+    &__remove {
+      padding: 6px 8px;
+      font-size: 15px;
+      color: #dc2626;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    &__item form {
+      margin: 0;
+    }
+  }
+
+  .digirisk-safetytalk-documents {
+    &__list {
+      margin: 10px 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    &__item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    &__preview {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      overflow: hidden;
+      font-size: 22px;
+      color: #2b7de9;
+      text-decoration: none;
+      background: #f1f5f9;
+      border-radius: 8px;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    &__body {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    &__name {
+      max-width: 100%;
+      overflow: hidden;
+      font-size: 13px;
+      font-weight: 600;
+      color: #0f172a;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &__delete {
+      padding: 6px 8px;
+      font-size: 14px;
+      color: #dc2626;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+  }
+
+  .digirisk-safetytalk-documents__add {
+    margin-top: 6px;
+  }
+
+  .digirisk-safetytalk-link-form {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed #e2e8f0;
+  }
+
+}

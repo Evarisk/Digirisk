@@ -245,7 +245,7 @@ function digiriskRiskOverviewPublicUrl(string $tab = ''): string
         $params['tab'] = $tab;
     }
 
-    return dol_buildpath('/custom/digiriskdolibarr/public/digiriskelement/digiriskelement_risk_overview.php', 3) . '?' . http_build_query($params);
+    return dol_buildpath('/digiriskdolibarr/public/digiriskelement/digiriskelement_risk_overview.php', 3) . '?' . http_build_query($params);
 }
 
 /**

@@ -49,6 +49,7 @@ require_once __DIR__ . '/../../class/accidentinvestigation.class.php';
 require_once __DIR__ . '/../../class/digiriskdocuments/accidentinvestigationdocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accidentinvestigation.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_media.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_task.lib.php';
 
 // Load translation files required by the page
 saturne_load_langs();
@@ -162,7 +163,7 @@ if (empty($reshook)) {
 					$task->fk_task_parent = $result;
                     $task->array_options['options_digirisk_action_type'] = 1;
 					$resOne               = $task->create($user);
-                    $getNomResOne         = $task->getNomUrl(1, '', 'task', 1);
+                    $getNomResOne         = digiriskdolibarr_task_get_nom_url($task, 1, 1);
 
                     $task->fk_project     = $accident->fk_project;
 					$task->ref            = $modTask->getNextValue(0, $task);
@@ -170,7 +171,7 @@ if (empty($reshook)) {
 					$task->fk_task_parent = $result;
                     $task->array_options['options_digirisk_action_type'] = 2;
 					$resTwo               = $task->create($user);
-                    $getNomResTwo         = $task->getNomUrl(1, '', 'task', 1);
+                    $getNomResTwo         = digiriskdolibarr_task_get_nom_url($task, 1, 1);
 
 					if ($resOne > 0 && $resTwo > 0) {
 						setEventMessages('AccidentInvestigationTaskCreated', []);
