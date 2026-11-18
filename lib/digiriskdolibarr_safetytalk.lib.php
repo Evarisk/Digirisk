@@ -56,13 +56,16 @@ const DIGIRISKDOLIBARR_SAFETYTALK_PARTICIPANT = 'PROJECTCONTRIBUTOR';
 const DIGIRISKDOLIBARR_SAFETYTALK_GUESTS_FIELD = 'digirisk_safetytalk_guests';
 
 /**
- * Whether DoliLetter, which serves the spread of the talks, can be used.
+ * Whether DoliLetter, which serves the spread of the talks, can be used: enabled, and recent enough to bring
+ * the documents of a spread (DoliLetter 23.2.0). An older one has the attendance sheet but not the rest, and
+ * the talk screens would stop on an undefined function.
  *
  * @return bool
  */
 function digiriskSafetyTalkSpreadAvailable(): bool
 {
-    return isModEnabled('doliletter') && class_exists('DoliletterAttendanceSheet') && function_exists('doliletter_spread_ensure_attendance_sheet');
+    return isModEnabled('doliletter') && class_exists('DoliletterAttendanceSheet') && function_exists('doliletter_spread_ensure_attendance_sheet')
+        && function_exists('doliletter_spread_get_documents') && defined('DOLILETTER_SPREAD_DOCUMENT_READ');
 }
 
 /**
