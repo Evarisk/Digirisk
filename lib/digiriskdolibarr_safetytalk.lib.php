@@ -1266,7 +1266,16 @@ function digiriskSafetyTalkSendSignatureLinks(DoliDB $db, Task $talk, User $user
             $result['sent'][] = $sendTo;
         } else {
             $result['failed'][] = doliletter_spread_get_signatory_name($signatory);
-            $result['error']    = dol_string_nohtmltag((string) $mailFile->error, 1);
+            // The reason in plain words; the raw error of the mail server, written to the log, is only shown
+            // to an administrator, who can act on it
+            $result['error'] = dol_string_nohtmltag((string) $mailFile->error, 1);
+            if (function_exists('saturne_get_mail_failure')) {
+                $failure         = saturne_get_mail_failure($mailFile, $sendTo);
+                $result['error'] = $failure['reason'];
+                if (dol_strlen($failure['detail']) && !empty($user->admin)) {
+                    $result['error'] .= ' ' . $langs->transnoentities('MailFailureTechnicalDetail', $failure['detail']);
+                }
+            }
         }
     }
 
