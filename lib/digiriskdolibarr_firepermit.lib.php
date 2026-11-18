@@ -201,7 +201,7 @@ function digiriskGetFirePermitSignatureUrl(SaturneSignature $signatory): string
         return '';
     }
 
-    return dol_buildpath('/custom/saturne/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=digiriskdolibarr&object_type=firepermit&document_type=FirePermitDocument', 3);
+    return dol_buildpath('/saturne/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=digiriskdolibarr&object_type=firepermit&document_type=FirePermitDocument', 3);
 }
 
 /**
@@ -310,7 +310,16 @@ function digiriskSendFirePermitSignatureEmail(DoliDB $db, FirePermit $permit, Sa
     }
 
     if (!$mailfile->sendfile()) {
-        $result['error'] = $mailfile->error ?: $langs->trans('MobilePPWarningEmailNotSent');
+        // The reason in plain words; the raw error of the mail server, written to the log, is only shown
+        // to an administrator, who can act on it
+        $result['error'] = $langs->transnoentities('MobilePPWarningEmailNotSent');
+        if (function_exists('saturne_get_mail_failure')) {
+            $failure         = saturne_get_mail_failure($mailfile, $signatory->email);
+            $result['error'] = $failure['reason'];
+            if (dol_strlen($failure['detail']) && !empty($user->admin)) {
+                $result['error'] .= ' ' . $langs->transnoentities('MailFailureTechnicalDetail', $failure['detail']);
+            }
+        }
 
         return $result;
     }

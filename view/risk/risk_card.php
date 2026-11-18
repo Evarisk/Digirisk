@@ -51,6 +51,7 @@ require_once __DIR__ . '/../../class/riskanalysis/riskassessment.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_actionplan.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_risk.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_task.lib.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -178,7 +179,7 @@ if ($taskView == 'gantt') {
             'risk_ref'    => $object->ref,
             'risk_nomurl' => '',
             'responsible' => $responsible,
-            'url'         => DOL_URL_ROOT . '/projet/tasks/task.php?id=' . $relatedTask->id . '&withproject=1'
+            'url'         => digiriskdolibarr_task_card_url((int) $relatedTask->id)
         ];
     }
 }

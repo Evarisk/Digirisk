@@ -130,7 +130,7 @@ if (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
 <div class="public-card__container" data-public-interface="true">
     <div class="public-card__header">
         <div class="header-information center">
-            <div class="left"><a href="<?php echo dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 1); ?>" class="information-back"><i class="fas fa-sm fa-chevron-left paddingright"></i><?php echo $langs->trans('Back'); ?></a></div>
+            <div class="left"><a href="<?php echo dol_buildpath('/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 1); ?>" class="information-back"><i class="fas fa-sm fa-chevron-left paddingright"></i><?php echo $langs->trans('Back'); ?></a></div>
             <div class="information-title"><?php echo $langs->trans('TicketSuccess') . ' ' . $ticketRefDisplay; ?></div>
             <span class="wpeo-notice notice-info left" style="margin-left: 16%; width: 70%">
                 <span class="notice-content">

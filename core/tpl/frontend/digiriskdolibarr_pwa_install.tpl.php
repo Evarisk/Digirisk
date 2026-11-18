@@ -27,7 +27,7 @@
 global $langs;
 ?>
 <div class="digirisk-pwa-install">
-    <img class="digirisk-pwa-install__icon" src="<?php print dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr_color_192.png', 1); ?>" alt="">
+    <img class="digirisk-pwa-install__icon" src="<?php print dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color_192.png', 1); ?>" alt="">
     <div class="digirisk-pwa-install__text">
         <span class="digirisk-pwa-install__title"><?php print $langs->trans('PwaInstallTitle'); ?></span>
         <span class="digirisk-pwa-install__description"><?php print $langs->trans('PwaInstallDescription'); ?></span>

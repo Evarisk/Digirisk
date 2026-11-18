@@ -44,6 +44,7 @@ require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_action.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_task.lib.php';
 
 // Load translation files required by the page
 saturne_load_langs(['ticket', 'projects']);
@@ -208,7 +209,7 @@ if (!empty($object->fk_project)) {
 }
 $morehtmlref .= '</div>';
 
-$linkback = '<a href="' . dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_action_card.php', 1) . '"><strong>' . $langs->trans('BackToList') . '</strong></a>';
+$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/ticket/ticket_action_card.php', 1) . '"><strong>' . $langs->trans('BackToList') . '</strong></a>';
 
 dol_banner_tab($object, 'ref', $linkback, ($user->socid ? 0 : 1), 'ref', 'ref', $morehtmlref);
 

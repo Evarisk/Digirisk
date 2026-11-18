@@ -603,7 +603,7 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
             return $mysoc->name;
         }
 
-        return dol_strlen($object->label ?? '') ? $object->label : $object->ref;
+        return dol_strlen($object->label ?? '') ? $object->label : ($object->ref ?? '');
     }
 
     /**
@@ -689,6 +689,20 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         $moreParam = self::getMoreParam($objectDocument, $moreParam);
 
         $object = $moreParam['object'];
+
+        // Specimen : Saturne construit l'objet decrit a partir du type de document, et aucune classe
+        // listingrisks n'existe, il rend donc un stdClass vide - issue #5708. Le listing decrit
+        // l'etablissement par defaut : le specimen est tire sur le standard actif, sans sa ref comme
+        // depuis la fiche du standard (le fichier reste dans le dossier public_specimen du type)
+        if (!empty($moreParam['specimen']) && empty($object->element)) {
+            require_once __DIR__ . '/../../../../../class/digiriskstandard.class.php';
+
+            $object = new DigiriskStandard($this->db);
+            $object->fetch(getDolGlobalInt('DIGIRISKDOLIBARR_ACTIVE_STANDARD'));
+            $object->ref = '';
+
+            $moreParam['object'] = $object;
+        }
 
         // Les donnees lues une seule fois le sont pour cette generation-ci
         $this->riskInfos = null;
@@ -1651,7 +1665,7 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
      */
     protected function advancedCotationCriteria(): array
     {
-        $path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json';
+        $path = dol_buildpath('/digiriskdolibarr/js/json/default.json', 0);
         if (!is_readable($path)) {
             return [];
         }
@@ -1809,7 +1823,7 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         $elementLabel = str_repeat('  ', (int) $digiriskElement['depth']) . $digiriskElement['object']->ref . ' - ' . $digiriskElement['object']->label;
 
         $categoryName = getDolGlobalInt('DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME') ? $riskLine->getDangerCategoryName($riskLine, $riskLine->type) : '';
-        $pictoPath    = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $riskLine->getDangerCategory($riskLine, $riskLine->type) . '.png';
+        $pictoPath    = dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $riskLine->getDangerCategory($riskLine, $riskLine->type) . '.png', 0);
 
         $cells = [
             $elementLabel,

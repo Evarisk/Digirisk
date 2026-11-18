@@ -325,7 +325,7 @@ class RiskSign extends SaturneObject
 	 */
 	public function getRiskSignCategories()
 	{
-		$json_categories = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json');
+		$json_categories = file_get_contents(dol_buildpath('/digiriskdolibarr/js/json/signalisationCategories.json', 0));
 		return json_decode($json_categories, true);
 	}
 

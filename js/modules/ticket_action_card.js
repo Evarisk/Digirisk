@@ -1681,18 +1681,63 @@ window.digiriskdolibarr.ticketPickerKanban.init = function() {
     window.digiriskdolibarr.ticketPickerKanban.initSortable();
     window.digiriskdolibarr.ticketPickerKanban.initSettings();
     window.digiriskdolibarr.ticketPickerKanban.initQuickCreate();
+    window.digiriskdolibarr.ticketPickerKanban.initQuickClose();
     window.digiriskdolibarr.ticketPickerKanban.initTagFilter();
     window.digiriskdolibarr.ticketPickerKanban.restoreCardFilters();
     window.digiriskdolibarr.ticketPickerKanban.restoreTagFilter();
 
-    // Restore the last active tab from localStorage.
+    // Restore the last active tab from localStorage, fetching its board when the page came without it (#5762).
     var savedDim = localStorage.getItem('tacPickerActiveDim');
     if (savedDim && $('#tacDimTabs .tac-dim-tab[data-dim="' + savedDim + '"]').length) {
         $('#tacDimTabs .tac-dim-tab').removeClass('active');
         $('#tacDimTabs .tac-dim-tab[data-dim="' + savedDim + '"]').addClass('active');
         $('#tacDimPanels .tac-dim-panel').removeClass('active');
         $('#tacDimPanels .tac-dim-panel[data-dim="' + savedDim + '"]').addClass('active');
+        window.digiriskdolibarr.ticketPickerKanban.loadBoard(savedDim);
     }
+};
+
+/**
+ * Fetch the board of a dimension the page came without (#5762): only one board is built with the page, the others
+ * are rendered by this same page with kanban_board=<dimension> when their tab first shows them. The board fetched
+ * gets its sortable columns, the filters and the column counters like the board of the page; a failed fetch is
+ * retried by the next click on the tab.
+ *
+ * @param  {string} dim Dimension of the board: 'status' | 'type' | 'group' | 'severity'
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.loadBoard = function(dim) {
+    var $panel = $('#tacDimPanels .tac-dim-panel[data-dim="' + dim + '"]');
+    if (!$panel.length || $panel.attr('data-loaded') === '1' || $panel.data('loading')) {
+        return;
+    }
+    var sep     = window.saturne.toolbox.getQuerySeparator(document.URL);
+    var onError = function() {
+        $panel.empty().append($('<div class="kanban-empty"></div>').text($('#tacDimPanels').attr('data-trans-error')));
+    };
+
+    $panel.data('loading', true);
+    $.ajax({
+        url:      document.URL + sep + 'kanban_board=' + encodeURIComponent(dim),
+        type:     'GET',
+        dataType: 'html',
+        success: function(html) {
+            // DOMParser runs none of the scripts of the page fetched: only its board is taken
+            var board = new DOMParser().parseFromString(html, 'text/html').querySelector('.tac-dim-panel[data-dim="' + dim + '"] .tac-picker-kanban-board');
+            if (!board) {
+                onError();
+                return;
+            }
+            $panel.empty().append(document.adoptNode(board)).attr('data-loaded', '1');
+            window.digiriskdolibarr.ticketPickerKanban.applyBoardSettings($panel.find('.tac-picker-kanban-board'));
+            window.digiriskdolibarr.ticketPickerKanban.initBoardSortable(dim);
+            window.digiriskdolibarr.ticketPickerKanban.applyFilters();
+        },
+        error: onError,
+        complete: function() {
+            $panel.data('loading', false);
+        }
+    });
 };
 
 /**
@@ -1706,6 +1751,7 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
         e.stopPropagation();
         var $wrapper = $(this).closest('.kanban-responsible-wrapper');
         var $select  = $wrapper.find('.tac-picker-assignee-select');
+        window.digiriskdolibarr.ticketPickerKanban.fillAssigneeSelect($select);
         $(this).hide();
         $select.addClass('visible');
         if ($.fn.select2) {
@@ -1776,6 +1822,7 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
             });
         var $dropdown = $(this).siblings('.kanban-tag-dropdown');
         var $card = $(this).closest('.tac-picker-card');
+        window.digiriskdolibarr.ticketPickerKanban.fillTagDropdown($dropdown);
         $dropdown.toggleClass('visible');
         $card.toggleClass('kanban-card-dropdown-open', $dropdown.hasClass('visible'));
     });
@@ -1854,11 +1901,21 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
         $('#tacDimPanels .tac-dim-panel').removeClass('active');
         $('#tacDimPanels .tac-dim-panel[data-dim="' + dim + '"]').addClass('active');
         localStorage.setItem('tacPickerActiveDim', dim);
+        window.digiriskdolibarr.ticketPickerKanban.loadBoard(dim);
     });
 
-    // Subject: focus on contenteditable span → store original for rollback.
+    // Subject: editable only while edited, so the card can be dragged by it (#5716). A click that did not
+    // drag the card (the sortable keeps the focus from the mousedown) or Tab opens the editor.
+    $(document).on('click', '.tac-picker-kanban-board .tac-picker-card__subject-text', function() {
+        if (!this.isContentEditable) {
+            this.focus();
+        }
+    });
+
+    // Subject: focus → editable, store original for rollback.
     $(document).on('focus', '.tac-picker-kanban-board .tac-picker-card__subject-text', function() {
         var $span = $(this);
+        this.contentEditable = 'true';
         $span.data('editOriginal', this.innerText || $span.text());
         $span.addClass('tac-picker-subject--editing');
         // Select all text so user can replace immediately.
@@ -1905,6 +1962,7 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
     $(document).on('blur', '.tac-picker-kanban-board .tac-picker-card__subject-text', function() {
         var $span      = $(this);
         $span.removeClass('tac-picker-subject--editing');
+        this.removeAttribute('contenteditable');
         var newSubject = $.trim(this.innerText || this.textContent || '');
         var original   = $span.data('editOriginal') || '';
         var ticketId   = $span.data('ticket-id');
@@ -1919,11 +1977,6 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
 
         var $card = $span.closest('.tac-picker-card');
         window.digiriskdolibarr.ticketPickerKanban.saveSubject(ticketId, newSubject, $span, original, $card);
-    });
-
-    // Prevent drag when clicking the subject text.
-    $(document).on('mousedown', '.tac-picker-kanban-board .tac-picker-card__subject-text', function(e) {
-        e.stopPropagation();
     });
 
     // Severity badge click → show inline select.
@@ -1981,59 +2034,62 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
 };
 
 /**
- * Initialize jQuery UI Sortable for all three dimension kanban boards.
+ * Initialize jQuery UI Sortable for the boards built with the page.
  * Each board's column bodies use the class kanban-picker-sortable and
  * are connected only within the same board (same data-dim value).
  *
  * @return {void}
  */
 window.digiriskdolibarr.ticketPickerKanban.initSortable = function() {
-    if (!$('.kanban-picker-sortable').length) {
+    $.each(['status', 'type', 'group', 'severity'], function(i, dim) {
+        window.digiriskdolibarr.ticketPickerKanban.initBoardSortable(dim);
+    });
+};
+
+/**
+ * Initialize jQuery UI Sortable on the columns of one board, for the board built with the page and for each board
+ * fetched by its tab (#5762).
+ *
+ * @param  {string} dim Dimension of the board: 'status' | 'type' | 'group' | 'severity'
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.initBoardSortable = function(dim) {
+    var $cols = $('.kanban-picker-sortable[data-dim="' + dim + '"]');
+    if (!$cols.length) {
         return;
     }
 
-    var dims = ['status', 'type', 'group', 'severity'];
-    var actionMap = {
-        status:   'updateTicketStatus',
-        type:     'updateTicketType',
-        group:    'updateTicketGroup',
-        severity: 'updateTicketSeverity'
-    };
-    var cancelSel = '.kanban-responsible-wrapper, .tac-picker-assignee-select, .kanban-tag, '
+    // Only the controls of a card keep it from being dragged: the subject, the reference, the severity badge
+    // and the tags were excluded too, which left the date and the progress bar to grab it by (#5716). A click
+    // that does not drag still reaches them
+    var cancelSel = 'input, textarea, button, select, option, .kanban-responsible-wrapper, '
         + '.kanban-tag-remove, .kanban-add-tag-btn, .kanban-tag-dropdown, .kanban-tag-option, '
-        + '.tac-picker-card__assignee-img, .kanban-initial-responsible, .kanban-card-label, '
-        + '.tac-picker-card__subject-text, .tac-picker-sev-badge, .tac-picker-sev-inline-select';
+        + '.tac-picker-subject--editing';
 
-    $.each(dims, function(i, dim) {
-        var $cols = $('.kanban-picker-sortable[data-dim="' + dim + '"]');
-        if (!$cols.length) {
-            return;
-        }
-        $cols.sortable({
-            connectWith:  '.kanban-picker-sortable[data-dim="' + dim + '"]',
-            placeholder:  'kanban-card-placeholder',
-            tolerance:    'pointer',
-            cursor:       'grabbing',
-            cancel:       cancelSel,
-            receive: function(event, ui) {
-                var $card    = ui.item;
-                var $column  = $(this);
-                var ticketId = $card.data('ticket-id');
-                var newVal   = $column.data('dim-value');
+    $cols.sortable({
+        connectWith:  '.kanban-picker-sortable[data-dim="' + dim + '"]',
+        placeholder:  'kanban-card-placeholder',
+        tolerance:    'pointer',
+        cursor:       'grabbing',
+        cancel:       cancelSel,
+        receive: function(event, ui) {
+            var $card    = ui.item;
+            var $column  = $(this);
+            var ticketId = $card.data('ticket-id');
+            var newVal   = $column.data('dim-value');
 
-                $card.data('dim-value', newVal);
+            $card.data('dim-value', newVal);
 
-                $column.find('.kanban-empty').remove();
+            $column.find('.kanban-empty').remove();
 
-                var $source = ui.sender;
-                if ($source.children('.tac-picker-card').length === 0) {
-                    $source.append('<div class="kanban-empty">Aucun ticket</div>');
-                }
-
-                window.digiriskdolibarr.ticketPickerKanban.updateCounts();
-                window.digiriskdolibarr.ticketPickerKanban.saveDim(ticketId, dim, newVal, $card);
+            var $source = ui.sender;
+            if ($source.children('.tac-picker-card').length === 0) {
+                $source.append('<div class="kanban-empty">Aucun ticket</div>');
             }
-        });
+
+            window.digiriskdolibarr.ticketPickerKanban.updateCounts();
+            window.digiriskdolibarr.ticketPickerKanban.saveDim(ticketId, dim, newVal, $card);
+        }
     });
 };
 
@@ -2347,6 +2403,53 @@ window.digiriskdolibarr.ticketPickerKanban.saveDim = function(ticketId, dim, new
 };
 
 /**
+ * Copy the users of the page template into the assignee select of a card, on its first use (#5762).
+ * The card is printed with its current assignee only, which the card filters read: an assignee missing
+ * from the template (no longer assignable) keeps its own option, so the card does not look unassigned.
+ *
+ * @param  {jQuery} $select The .tac-picker-assignee-select element of the card
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.fillAssigneeSelect = function($select) {
+    if ($select.data('filled')) {
+        return;
+    }
+    var current   = String($select.val() || '0');
+    var $currentO = $select.find('option:selected').clone();
+    var $options  = $('#tacPickerAssigneeTemplate option').clone();
+
+    $select.empty().append($options);
+    if (!$select.find('option').filter(function() { return this.value === current; }).length) {
+        $select.append($currentO);
+    }
+    $select.val(current).data('filled', true);
+};
+
+/**
+ * Copy the tags of the page template into the tag dropdown of a card, on its first use (#5762),
+ * the tags the card already carries being checked.
+ *
+ * @param  {jQuery} $dropdown The .kanban-tag-dropdown element of the card
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.fillTagDropdown = function($dropdown) {
+    if ($dropdown.data('filled')) {
+        return;
+    }
+    var assigned = $dropdown.closest('.tac-picker-card').find('.kanban-card-tags .kanban-tag').map(function() {
+        return String($(this).data('cat-id'));
+    }).get();
+    var $options = $('#tacPickerTagTemplate .kanban-tag-option').clone();
+
+    $options.each(function() {
+        if (assigned.indexOf(String($(this).data('value'))) !== -1) {
+            $(this).addClass('assigned').append('<i class="fas fa-check" style="margin-left:auto;font-size:9px;color:#28a745"></i>');
+        }
+    });
+    $dropdown.empty().append($options).data('filled', true);
+};
+
+/**
  * Initialise a select2 searchable picker on a card's assignee <select>.
  * Options are already embedded in the DOM (no AJAX source) so it never hits
  * the "Searching…" stall that remote select2 shows in this Dolibarr build.
@@ -2577,7 +2680,6 @@ window.digiriskdolibarr.ticketPickerKanban.saveSubject = function(ticketId, newS
 window.digiriskdolibarr.ticketPickerKanban.initSettings = function() {
     var $btn      = $('#kanbanPickerSettingsBtn');
     var $popover  = $('#kanbanPickerSettingsPopover');
-    var $board    = $('.tac-picker-kanban-board');
     var $wSlider  = $('#kanbanPickerColWidth');
     var $gSlider  = $('#kanbanPickerColGap');
     var $wVal     = $('#kanbanPickerColWidthVal');
@@ -2592,13 +2694,12 @@ window.digiriskdolibarr.ticketPickerKanban.initSettings = function() {
     if (savedW) {
         $wSlider.val(savedW);
         $wVal.text(savedW + 'px');
-        $board.find('.tac-picker-column').css({'min-width': savedW + 'px', 'max-width': savedW + 'px'});
     }
     if (savedG) {
         $gSlider.val(savedG);
         $gVal.text(savedG + 'px');
-        $board.css('gap', savedG + 'px');
     }
+    window.digiriskdolibarr.ticketPickerKanban.applyBoardSettings($('.tac-picker-kanban-board'));
 
     $btn.on('click', function(e) {
         e.stopPropagation();
@@ -2610,18 +2711,37 @@ window.digiriskdolibarr.ticketPickerKanban.initSettings = function() {
         }
     });
 
+    // The boards are looked up at each move of a slider: those fetched by their tab (#5762) follow too
     $wSlider.on('input', function() {
         var val = $(this).val();
         $wVal.text(val + 'px');
-        $board.find('.tac-picker-column').css({'min-width': val + 'px', 'max-width': val + 'px'});
+        $('.tac-picker-kanban-board').find('.tac-picker-column').css({'min-width': val + 'px', 'max-width': val + 'px'});
         localStorage.setItem('tacPickerKanbanColWidth', val);
     });
     $gSlider.on('input', function() {
         var val = $(this).val();
         $gVal.text(val + 'px');
-        $board.css('gap', val + 'px');
+        $('.tac-picker-kanban-board').css('gap', val + 'px');
         localStorage.setItem('tacPickerKanbanColGap', val);
     });
+};
+
+/**
+ * Give boards the column width and gap kept from the settings popover: the board built with the page at init, then
+ * each board fetched by its tab (#5762).
+ *
+ * @param  {jQuery} $board Boards to set
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.applyBoardSettings = function($board) {
+    var savedW = localStorage.getItem('tacPickerKanbanColWidth');
+    var savedG = localStorage.getItem('tacPickerKanbanColGap');
+    if (savedW) {
+        $board.find('.tac-picker-column').css({'min-width': savedW + 'px', 'max-width': savedW + 'px'});
+    }
+    if (savedG) {
+        $board.css('gap', savedG + 'px');
+    }
 };
 
 // ---------------------------------------------------------------------------
@@ -2807,4 +2927,98 @@ window.digiriskdolibarr.ticketPickerKanban.initQuickCreate = function() {
             $(this).find('#tacQcFiles').trigger('click');
         }
     });
+};
+
+/* ============================================================
+ * QUICK CLOSE — the percentage of an open ticket opens the quick close modal (js/modules/ticket_quick_close.js),
+ * which closes it or only changes its progress, the way the to-do board of ReedCRM closes an event.
+ * ============================================================ */
+
+/**
+ * Bind the percentages of the cards to the quick close modal, and show its result on the cards.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.initQuickClose = function() {
+    if (!$('#tacQuickCloseModal').length) {
+        return;
+    }
+
+    // A drag of the card started on the percentage ends without a click: jQuery UI swallows the one that follows it
+    $(document).on('click', '.tac-picker-kanban-board .tac-picker-quick-close', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.digiriskdolibarr.ticketPickerKanban.openQuickClose($(this).closest('.tac-picker-card'));
+    });
+
+    $(document).on('keydown', '.tac-picker-kanban-board .tac-picker-quick-close', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            window.digiriskdolibarr.ticketPickerKanban.openQuickClose($(this).closest('.tac-picker-card'));
+        }
+    });
+
+    $(document).on('ticketQuickClosed', function(e, ticketId, response) {
+        window.digiriskdolibarr.ticketPickerKanban.applyQuickClose(ticketId, response);
+    });
+};
+
+/**
+ * Open the quick close modal for the ticket of a card.
+ *
+ * @param  {jQuery} $card Kanban card whose percentage was clicked
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.openQuickClose = function($card) {
+    window.digiriskdolibarr.ticketQuickClose.open({
+        id:      $card.data('ticket-id'),
+        ref:     $card.attr('data-ref'),
+        // Read on the card, which follows the inline edits of the subject
+        subject: $.trim($card.find('.tac-picker-card__subject-text').first().text())
+    });
+};
+
+/**
+ * Show a quick close on the cards of the ticket, one per board: new progress everywhere and, once closed, no more
+ * trigger and the card of the status board moved to the column of its new status.
+ *
+ * @param  {number} ticketId Ticket row ID
+ * @param  {Object} response Answer of the quickCloseTicket action: progress, status, closed
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.applyQuickClose = function(ticketId, response) {
+    var $cards   = $('.tac-picker-card[data-ticket-id="' + ticketId + '"]');
+    var progress = parseInt(response.progress, 10) || 0;
+
+    $cards.attr('data-progress', progress);
+    $cards.find('.tac-picker-card__progress-fill').css('width', progress + '%');
+    $cards.find('.tac-picker-card__progress-value').text(progress + ' %');
+
+    if (response.closed) {
+        $cards.find('.tac-picker-quick-close')
+            .removeClass('tac-picker-quick-close')
+            .removeAttr('role tabindex title')
+            .find('.tac-picker-quick-close__icon').remove();
+
+        var $statusCard = $cards.filter(function() {
+            return $(this).closest('.kanban-picker-sortable').data('dim') === 'status';
+        });
+        var $source = $statusCard.closest('.kanban-picker-sortable');
+        var $target = $('.kanban-picker-sortable[data-dim="status"][data-dim-value="' + response.status + '"]');
+
+        if ($statusCard.length && $target.length && !$target.is($source)) {
+            $target.find('.kanban-empty').remove();
+            $target.prepend($statusCard);
+            $statusCard.attr('data-dim-value', response.status).data('dim-value', response.status);
+            if (!$source.children('.tac-picker-card').length) {
+                $source.append($('<div class="kanban-empty"></div>').text($('#tacQuickCloseModal').attr('data-trans-empty')));
+            }
+        }
+    }
+
+    $cards.addClass('kanban-card-saved');
+    setTimeout(function() { $cards.removeClass('kanban-card-saved'); }, 2000);
+
+    // The progress filter may now hide the cards, and the counters follow the move
+    window.digiriskdolibarr.ticketPickerKanban.applyFilters();
 };

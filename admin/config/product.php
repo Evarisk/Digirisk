@@ -264,7 +264,7 @@ foreach ($tablesConfig as $tableDef) {
 
 	$svgName = 'digirisk_' . strtolower($key) . '_icon.svg';
 	$hasSvg = file_exists($iconsDir . '/' . $svgName);
-	$svgPath = $hasSvg ? $iconsDir . '/' . $svgName : DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/icons/' . $svgName;
+	$svgPath = $hasSvg ? $iconsDir . '/' . $svgName : dol_buildpath('/digiriskdolibarr/img/icons/' . $svgName, 0);
 
 	$svgDisplay = '';
 	$svgPreviewInline = '';

@@ -57,6 +57,12 @@ class ActionsDigiriskdolibarr
 	protected int $ticketXlsxExportBufferLevel = 0;
 
 	/**
+	 * @var array<int, array{ref: string, subject: string}> Open tickets of the page of the list of the registers, whose
+	 *                                                       state opens the quick close modal
+	 */
+	protected array $ticketQuickCloseRows = [];
+
+	/**
 	 * Constructor
 	 *
 	 *  @param		DoliDB		$db      Database handler
@@ -129,11 +135,16 @@ class ActionsDigiriskdolibarr
         if (in_array('elementproperties', explode(':', $parameters['context']))) {
             $elementType = $parameters['elementType'];
             
+            // categories/index.php includes DOL_DOCUMENT_ROOT . '/' . classpath, other readers use dol_include_once(): class directory
+            // relative to DOL_DOCUMENT_ROOT (custom/digiriskdolibarr/class on a standard install), bare module path outside the main document root
+            $classDir  = dirname(dol_buildpath('/digiriskdolibarr/class/accident.class.php', 0));
+            $classPath = strpos($classDir, DOL_DOCUMENT_ROOT . '/') === 0 ? substr($classDir, strlen(DOL_DOCUMENT_ROOT) + 1) : 'digiriskdolibarr/class';
+
             $map = [
-                'digiriskaccident' => ['classfile' => 'accident', 'classname' => 'Accident', 'classpath' => 'custom/digiriskdolibarr/class'],
-                'digiriskpreventionplan' => ['classfile' => 'preventionplan', 'classname' => 'PreventionPlan', 'classpath' => 'custom/digiriskdolibarr/class'],
-                'digiriskfirepermit' => ['classfile' => 'firepermit', 'classname' => 'FirePermit', 'classpath' => 'custom/digiriskdolibarr/class'],
-                'digiriskrisk' => ['classfile' => 'risk', 'classname' => 'Risk', 'classpath' => 'custom/digiriskdolibarr/class/riskanalysis']
+                'digiriskaccident' => ['classfile' => 'accident', 'classname' => 'Accident', 'classpath' => $classPath],
+                'digiriskpreventionplan' => ['classfile' => 'preventionplan', 'classname' => 'PreventionPlan', 'classpath' => $classPath],
+                'digiriskfirepermit' => ['classfile' => 'firepermit', 'classname' => 'FirePermit', 'classpath' => $classPath],
+                'digiriskrisk' => ['classfile' => 'risk', 'classname' => 'Risk', 'classpath' => $classPath . '/riskanalysis']
             ];
 
             if (isset($map[$elementType])) {
@@ -199,8 +210,8 @@ class ActionsDigiriskdolibarr
         // La modale du suivi de temps s'appuie sur la librairie Saturne, absente des pages natives
         if (preg_match('/ticketcard|projecttasktime/', $parameters['context'])) {
             $resourcesRequired = [
-                'css' => '/custom/saturne/css/saturne.min.css',
-                'js'  => '/custom/saturne/js/saturne.min.js'
+                'css' => '/saturne/css/saturne.min.css',
+                'js'  => '/saturne/js/saturne.min.js'
             ];
 
             $out  = '<!-- Includes CSS added by module saturne -->';
@@ -224,13 +235,72 @@ class ActionsDigiriskdolibarr
             $this->resprints .= '<link rel="stylesheet" type="text/css" href="' . saturne_asset_full_url('/digiriskdolibarr/css/digiriskdolibarr.min.css') . '">';
         }
 
-        // The other tabs of the Digirisk ticket card are the native ticket pages (contacts, notes, files, agenda)
-        // or pages of other modules: browsed from the Digirisk menu, they keep the look of the card
-        if ($this->isDigiriskTicketTab($parameters['context'])) {
-            $this->resprints .= '<link rel="stylesheet" type="text/css" href="' . saturne_asset_full_url('/digiriskdolibarr/css/digiriskdolibarr.min.css') . '">';
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Overloading the llxHeader function : replacing the parent's function with the one below
+     *
+     * The other tabs of the Digirisk ticket and task cards are the native pages of the object (contacts, notes, files,
+     * agenda, time spent) or pages of other modules: browsed from the Digirisk menu, they keep the look of the card.
+     * Its modern theme is scoped to the saturne-theme class saturne_header() puts on the body, which llxHeader() alone
+     * does not.
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function llxHeader(array $parameters): int
+    {
+        global $conf, $user;
+
+        $isTicketList = $this->isDigiriskTicketList($parameters['context']);
+        if (!$isTicketList && !$this->isDigiriskTicketTab($parameters['context']) && !$this->isDigiriskTaskTab($parameters['context'])) {
+            return 0;
         }
 
-        return 0; // or return 1 to replace standard code
+        dol_include_once('/saturne/lib/asset.lib.php');
+
+        // The entries are references to the llxHeader() locals, so the assignments reach the body tag and top_htmlhead()
+        if (!preg_match('/(^|\s)saturne-theme(\s|$)/', (string) $parameters['morecssonbody'])) {
+            $parameters['morecssonbody'] = trim('saturne-theme ' . $parameters['morecssonbody']);
+        }
+        if ($isTicketList) {
+            // The list of the registers has many columns: the left menu only takes their room, the top menu leads back.
+            // Read by llxHeader() right after this hook, for this page only (the dol_hide_leftmenu parameter would keep
+            // it hidden on every page of the session). Without the left menu, there is no table-cell to bound.
+            $conf->dol_hide_leftmenu = 1;
+            $parameters['morecssonbody'] .= ' digirisk-ticket-list';
+
+            // The state of an open ticket opens the quick close modal printed by printCommonFooter()
+            if ($user->hasRight('ticket', 'write')) {
+                $quickCloseJs            = array_map('saturne_htmlhead_asset_url', ['/saturne/js/saturne.min.js', '/digiriskdolibarr/js/digiriskdolibarr.min.js']);
+                $parameters['arrayofjs'] = array_values(array_unique(array_merge(is_array($parameters['arrayofjs']) ? $parameters['arrayofjs'] : [], $quickCloseJs)));
+            }
+        } elseif (GETPOST('fromtype', 'alpha') === '') {
+            // The lists of the native pages, as the time spent of a task, are wider than the screen: #id-right is a
+            // table-cell, so their own overflow-x never scrolls and the whole page stretches instead.
+            // classforhorizontalscrolloftabs bounds it, digirisk-object-tab fits the height of the list that scrolls
+            // (css/scss/page/_page-object-tabs.scss). The pages of the other modules (fromtype) handle their own lists.
+            $parameters['morecssonbody'] .= ' digirisk-object-tab';
+            if (!preg_match('/(^|\s)classforhorizontalscrolloftabs(\s|$)/', $parameters['morecssonbody'])) {
+                $parameters['morecssonbody'] .= ' classforhorizontalscrolloftabs';
+            }
+        }
+        $themeCss                 = array_map('saturne_htmlhead_asset_url', ['/saturne/css/saturne.min.css', '/digiriskdolibarr/css/digiriskdolibarr.min.css']);
+        $parameters['arrayofcss'] = array_values(array_unique(array_merge(is_array($parameters['arrayofcss']) ? $parameters['arrayofcss'] : [], $themeCss)));
+
+        return 0;
+    }
+
+    /**
+     * Tell whether the current page is the native list of the tickets browsed from the Digirisk menu (list of the registers)
+     *
+     * @param  string $context Hook contexts of the page
+     * @return bool
+     */
+    private function isDigiriskTicketList(string $context): bool
+    {
+        return ($_SESSION['mainmenu'] ?? '') === 'digiriskdolibarr' && preg_match('/\/ticket\/list\.php$/', $_SERVER['PHP_SELF']) && preg_match('/\bticketlist\b/', $context);
     }
 
     /**
@@ -246,6 +316,22 @@ class ActionsDigiriskdolibarr
         }
 
         return preg_match('/\b(contactticketcard|documentticketcard|ticketnote|ticketmessaging|ticketagenda)\b/', $context) || GETPOST('fromtype', 'alpha') === 'ticket';
+    }
+
+    /**
+     * Tell whether the current page is a tab of a task browsed from the Digirisk menu, other than the Digirisk card:
+     * the native card ("Dolibarr card" button), contacts, time spent, notes and files, or a tab of another module
+     *
+     * @param  string $context Hook contexts of the page
+     * @return bool
+     */
+    private function isDigiriskTaskTab(string $context): bool
+    {
+        if (($_SESSION['mainmenu'] ?? '') !== 'digiriskdolibarr' || strpos($_SERVER['PHP_SELF'], '/digiriskdolibarr/') !== false) {
+            return false;
+        }
+
+        return preg_match('/\b(projecttaskcard|projecttaskcontact|projecttasktime|projettasknote|projecttaskdocument)\b/', $context) || GETPOST('fromtype', 'alpha') === 'project_task';
     }
 
     /**
@@ -307,6 +393,16 @@ class ActionsDigiriskdolibarr
             foreach ($parameters['head'] as $key => $tab) {
                 if (($tab[2] ?? '') === 'tabTicket') {
                     $parameters['head'][$key][0] = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $parameters['object']->id;
+                }
+            }
+        }
+
+        // Same for the tabs of a task opened from Digirisk: the "Task" tab leads back to the Digirisk task card
+        if (in_array($tabsType, ['task', 'project_task'], true) && ($parameters['mode'] ?? '') === 'remove' && ($_SESSION['mainmenu'] ?? '') === 'digiriskdolibarr' && ($parameters['object'] ?? null) instanceof Task && $parameters['object']->id > 0) {
+            require_once __DIR__ . '/../lib/digiriskdolibarr_task.lib.php';
+            foreach ($parameters['head'] as $key => $tab) {
+                if (($tab[2] ?? '') === 'task_task') {
+                    $parameters['head'][$key][0] = digiriskdolibarr_task_card_url((int) $parameters['object']->id);
                 }
             }
         }
@@ -408,14 +504,18 @@ class ActionsDigiriskdolibarr
     public function hookSetManifest(array $parameters): int
     {
         if (strpos($_SERVER['PHP_SELF'], 'digiriskdolibarr') !== false) {
-            // The internal application (prevention plans and fire permits) declares its own manifest,
-            // so it installs separately from the public ticket declaration app.
-            $manifestFile = 'manifest.json.php';
-            foreach (['/view/frontend/', 'preventionplan_mobile_create.php', 'firepermit_mobile_create.php'] as $pwaPath) {
-                if (strpos($_SERVER['PHP_SELF'], $pwaPath) !== false) {
-                    $manifestFile = 'manifest_pwa.json.php';
-                    break;
-                }
+            // A home screen shortcut opens the start_url of the manifest, not the page it was created from:
+            // the public ticket declaration app and the internal application (prevention plans and fire permits)
+            // each declare their own manifest, so a shortcut made on an internal page opens the internal application
+            if (strpos($_SERVER['PHP_SELF'], '/digiriskdolibarr/public/ticket/') !== false) {
+                $manifestFile = 'manifest.json.php';
+            } elseif (strpos($_SERVER['PHP_SELF'], '/digiriskdolibarr/public/') !== false) {
+                // The other public pages (risk overview, fire permit rounds) are opened by a link with its parameters:
+                // without a manifest, the shortcut keeps that link
+                $this->resprints = '';
+                return 1;
+            } else {
+                $manifestFile = 'manifest_pwa.json.php';
             }
 
             // The browser keeps a manifest 3 hours: the version makes an updated one reach it at once
@@ -449,7 +549,7 @@ class ActionsDigiriskdolibarr
 			if (getDolGlobalString('MAIN_INFO_SOCIETE_COUNTRY') == '1:FR:France') {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 				$form      = new Form($db);
-                $pictopath = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
+                $pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
                 $pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
 				$idcc_form = digirisk_select_dictionary('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', getDolGlobalString('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE'), 1, '', '', 'minwidth100');
 				$pee_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PEE_ENABLED" '. (getDolGlobalInt('DIGIRISKDOLIBARR_PEE_ENABLED') ? 'checked' : '') .'>';
@@ -546,7 +646,7 @@ class ActionsDigiriskdolibarr
                 $fileDir    = $upload_dir . '/' . $dirFiles;
                 $urlSource  = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 
-                $out = saturne_show_documents('digiriskdolibarr:TicketDocument', $dirFiles, $fileDir, $urlSource, $user->rights->ticket->write, $user->rights->ticket->delete, getDolGlobalString('DIGIRISKDOLIBARR_TICKETDOCUMENT_DEFAULT_MODEL'), 1, 0, 0, 0, '', '', '', '', '', $object); ?>
+                $out = saturne_show_documents('digiriskdolibarr:TicketDocument', $dirFiles, $fileDir, $urlSource, $user->hasRight('ticket', 'write'), $user->hasRight('ticket', 'delete'), getDolGlobalString('DIGIRISKDOLIBARR_TICKETDOCUMENT_DEFAULT_MODEL'), 1, 0, 0, 0, '', '', '', '', '', $object); ?>
 
                 <script>
                     jQuery('.fichehalfleft .div-table-responsive-no-min').first().append(<?php echo json_encode($out); ?>);
@@ -630,7 +730,7 @@ class ActionsDigiriskdolibarr
                     $signatureTab .= '<td id="ticket_extras_digiriskdolibarr_ticket_signature_'. $object->id .'" class="valuefield ticket_extras_digiriskdolibarr_ticket_signature wordbreak">';
                     $signatureTab .= $object->array_options['options_digiriskdolibarr_condition_message'] ?? '';
                     if ($signature && !empty($signature->signature)) {
-                        $signatureTab .= ' <button type="button" class="wpeo-button button-blue" onclick="window.open(\'' . dol_buildpath('/custom/saturne/public/signature/add_signature.php?track_id=' . $signature->signature_url . '&entity=' . $conf->entity . '&module_name=ticket&object_type=' . $object->element . '&document_type=TicketDocument', 3) . '\', \'_blank\')"><i class="fas fa-eye"></i></button>';
+                        $signatureTab .= ' <button type="button" class="wpeo-button button-blue" onclick="window.open(\'' . dol_buildpath('/saturne/public/signature/add_signature.php?track_id=' . $signature->signature_url . '&entity=' . $conf->entity . '&module_name=ticket&object_type=' . $object->element . '&document_type=TicketDocument', 3) . '\', \'_blank\')"><i class="fas fa-eye"></i></button>';
                     }
                     $signatureTab .= '</td>';
                     $signatureTab .= '</tr>';
@@ -678,31 +778,51 @@ class ActionsDigiriskdolibarr
 				<?php
             }
 
+            // The assignable users are the members of the default group of the configuration (#4184), shown frozen
+            // (#4476). Without one, the list of Dolibarr stays, filtered by the assignment group when set: the frozen
+            // picker on an empty group left nobody to assign (#5717)
+            if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP') > 0) {
                 require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+                require_once __DIR__ . '/../lib/digiriskdolibarr_ticket.lib.php';
 
                 $userGroup  = new UserGroup($this->db);
                 $userGroups = saturne_fetch_all_object_type('UserGroup');
                 $userGroups = array_column($userGroups, 'nom', 'id');
 
+                // The default group may belong to another entity, as in the transverse mode of Multicompany: the frozen
+                // picker showed an empty group (#5720)
+                $defaultUserGroup = new UserGroup($this->db);
+                if (!isset($userGroups[getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP')]) && $defaultUserGroup->fetch(getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP')) > 0) {
+                    $userGroups[$defaultUserGroup->id] = $defaultUserGroup->name;
+                }
+
                 $out  = '<tr class="field_user_group"><td class="titlefieldmax45 wordbreak">';
                 $out .= $langs->transnoentities('UserGroup');
                 $out .= '</td><td class="valuefieldcreate_ticket_user_group">';
                 $out .= img_picto('', $userGroup->picto, 'class="pictofixedwidth"') . Form::selectarray('user_group', $userGroups, getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP'), -1, 0, 0, 'disabled', '', 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
-                $out .= ' <a href="' . dol_buildpath('/custom/digiriskdolibarr/admin/ticket/ticket.php#userGroup', 1) . '" title="' . $langs->trans('ConfigureDefaultUserGroup') . '" target="_blank">';
+                $out .= ' <a href="' . dol_buildpath('/digiriskdolibarr/admin/ticket/ticket.php', 1) . '#userGroup" title="' . $langs->trans('ConfigureDefaultUserGroup') . '" target="_blank">';
                 $out .= img_picto($langs->trans('ConfigureDefaultUserGroup'), 'setup', 'class="pictofixedwidth opacitymedium"');
                 $out .= '</a>';
                 $out .= '</td></tr>';
 
-                $userGroupID = GETPOSTISSET('user_group') ? GETPOST('user_group') : getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP');
-                $userGroup->fetch($userGroupID);
-                // Only enabled users can be assigned to a ticket, a disabled one has no business showing up in the list
-                $users = $userGroup->listUsersForGroup('u.statut > 0');
-                $users = array_map(fn($userTmp) => $userTmp->getFullName($langs), $users);
+                $userGroupID = GETPOSTISSET('user_group') ? GETPOSTINT('user_group') : getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP');
+                // Only enabled users can be assigned to a ticket, members of the group in this entity (#5720)
+                $users = array_map(fn($userTmp) => dolGetFirstLastname($userTmp['firstname'], $userTmp['lastname']), digiriskdolibarr_ticket_assignable_users($userGroupID));
+
+                // The current assignee is picked, and kept in the list when outside the group: GETPOSTINT() never
+                // returns null, so "Validate" used to unassign the ticket
+                $assignedUserID = GETPOSTISSET('fk_user_assign') ? GETPOSTINT('fk_user_assign') : (int) $object->fk_user_assign;
+                if ($assignedUserID > 0 && !isset($users[$assignedUserID])) {
+                    $assignedUser = new User($this->db);
+                    if ($assignedUser->fetch($assignedUserID) > 0) {
+                        $users[$assignedUserID] = $assignedUser->getFullName($langs);
+                    }
+                }
 
                 $out .= '<tr class="field_fk_user_assign"><td class="titlefieldmax45 wordbreak">';
                 $out .= $langs->transnoentities('AssignedTo');
                 $out .= '</td><td class="valuefieldcreate_ticket_fk_user_assign">';
-                $out .= img_picto('', $user->picto, 'class="pictofixedwidth"') . Form::selectarray('fk_user_assign', $users, GETPOSTINT('fk_user_assign') ?? $object->fk_user_assign, -1, 0, 0, '', '', 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
+                $out .= img_picto('', $user->picto, 'class="pictofixedwidth"') . Form::selectarray('fk_user_assign', $users, $assignedUserID, -1, 0, 0, '', '', 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
                 $out .= '</td></tr>'; ?>
 
                 <?php if (GETPOST('action') == 'create') : ?>
@@ -746,13 +866,11 @@ class ActionsDigiriskdolibarr
                 }
 
                 if (GETPOST('action') == 'get_user_group') {
-                    $userGroupID = GETPOST('user_group');
-                    $userGroup->fetch($userGroupID);
-                    $users = $userGroup->listUsersForGroup('u.statut > 0');
-                    $users = array_map(fn($userTmp) => $userTmp->getFullName($langs), $users);
+                    $users = array_map(fn($userTmp) => dolGetFirstLastname($userTmp['firstname'], $userTmp['lastname']), digiriskdolibarr_ticket_assignable_users(GETPOSTINT('user_group')));
 
                     echo '<input type="hidden" name="users_list" value="' . base64_encode(json_encode($users)) . '">';
                 }
+            }
 
             // Files of the ticket in the native message form (#5581). The form has no hook: the row is moved into
             // it before the form's own script shows or hides the email rows (.email_line) along the checkbox.
@@ -831,7 +949,7 @@ class ActionsDigiriskdolibarr
                     $signatory = array_shift($signatories);
                     if (dol_strlen( $signatory->signature_url ) > 0) {
                         $picto        = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
-                        $signatureUrl = dol_buildpath('custom/saturne/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=digiriskdolibarr&object_type=' . $object->element . '&document_type=TicketDocument', 3);
+                        $signatureUrl = dol_buildpath('/saturne/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=digiriskdolibarr&object_type=' . $object->element . '&document_type=TicketDocument', 3);
 
                         $out  = '<tr class="trextrafields_collapse_' . $object->id . '"><td class="titlefield">' . $picto . $langs->trans('Signature') . '</td>';
                         $out .= '<td id="ticket_extras_digiriskdolibarr_ticket_signature_'. $object->id . '" class="valuefield ticket_extras_digiriskdolibarr_ticket_signature wordbreak copy-signatureurl-container">';
@@ -925,6 +1043,12 @@ class ActionsDigiriskdolibarr
 			}
 		} elseif (strpos($parameters['context'], 'categoryindex') !== false) {	    // do something only for the context 'somecontext1' or 'somecontext2'
             print '<script src="' . saturne_asset_full_url('/digiriskdolibarr/js/digiriskdolibarr.js') . '"></script>';
+        }
+
+        // List of the registers: quick close modal of the open tickets of the page, after the form of the list
+        if (!empty($this->ticketQuickCloseRows) && $this->isDigiriskTicketList($parameters['context'])) {
+            $ticketQuickCloseListTickets = $this->ticketQuickCloseRows;
+            require __DIR__ . '/../core/tpl/ticket/ticket_quick_close_modal.tpl.php';
         }
 
         if (strpos($parameters['context'], 'ticketlist')) {
@@ -1346,6 +1470,13 @@ class ActionsDigiriskdolibarr
             print dolGetButtonAction($label, '', 'default', $url, '', $user->hasRight('digiriskdolibarr', 'accident', 'write'));
         }
 
+        // Cycle of safety talks or one of its talks: open it in the mobile application
+        $safetyTalkUrl = is_object($object) ? $this->safetyTalkAppUrl($parameters['context'], $object) : '';
+        if (dol_strlen($safetyTalkUrl)) {
+            $label = $conf->browser->layout == 'classic' ? '<i class="fas fa-comments"></i> ' . $langs->trans('SafetyTalkOpenInApp') : '<i class="fas fa-comments fa-2x"></i>';
+            print dolGetButtonAction($label, '', 'default', $safetyTalkUrl, '', $user->hasRight('projet', 'lire'));
+        }
+
         return 0; // or return 1 to replace standard code
     }
 
@@ -1398,7 +1529,7 @@ class ActionsDigiriskdolibarr
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
 		if (strpos($parameters['context'], 'mainloginpage') !== false) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			if ($conf->global->DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION > 0) {
-				$value = dol_buildpath('/custom/digiriskdolibarr/digiriskdolibarrindex.php?idmenu=1319&mainmenu=digiriskdolibarr&leftmenu=', 1);
+				$value = dol_buildpath('/digiriskdolibarr/digiriskdolibarrindex.php?idmenu=1319&mainmenu=digiriskdolibarr&leftmenu=', 1);
 			} else {
 				$value = '';
 			}
@@ -1838,7 +1969,7 @@ class ActionsDigiriskdolibarr
 				} else {
 					$searchCategoryTicket = array($searchCategoryTicketList);
 				}
-				$moreforfilter .= Form::multiselectarray('search_category_ticket_list', $categoriesTicketArr, $searchCategoryTicket, 0, 0, 'minwidth300');
+				$moreforfilter .= Form::multiselectarray('search_category_ticket_list', $categoriesTicketArr, $searchCategoryTicket, 0, 0, 'minwidth300', 0, 0, '', '', $langs->transnoentitiesnoconv('Categories'));
 				$moreforfilter .= '</div>';
 			}
 
@@ -1984,7 +2115,56 @@ class ActionsDigiriskdolibarr
             }
         }
 
+        // A cycle of safety talks, or one of its talks, says so on its card, with the way to its mobile screen
+        if (!in_array($action, ['create', 'edit'], true) && is_object($object)) {
+            $safetyTalkUrl = $this->safetyTalkAppUrl($parameters['context'], $object);
+            if (dol_strlen($safetyTalkUrl)) {
+                $picto = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
+                $this->resprints = '<tr><td class="titlefield">' . $picto . $langs->trans($object instanceof Task ? 'SafetyTalk' : 'SafetyTalkCycle') . '</td>';
+                $this->resprints .= '<td><a href="' . dol_escape_htmltag($safetyTalkUrl) . '"><i class="fas fa-comments pictofixedwidth"></i>' . $langs->trans('SafetyTalkOpenInApp') . '</a></td></tr>';
+            }
+        }
+
         return 0; // or return 1 to replace standard code
+    }
+
+    /**
+     * Mobile screen of a cycle of safety talks (a project with the CAUSERIE tag) or of one of its talks
+     * (a task of such a project), from its Dolibarr card.
+     *
+     * @param  string $context Hook contexts of the page
+     * @param  object $object  Project or task shown
+     * @return string          URL of the screen, empty when the object is no safety talk
+     */
+    private function safetyTalkAppUrl(string $context, object $object): string
+    {
+        global $db, $langs;
+
+        $isProject = strpos($context, 'projectcard') !== false && $object instanceof Project;
+        $isTask    = strpos($context, 'projecttaskcard') !== false && $object instanceof Task;
+        if ((!$isProject && !$isTask) || $object->id <= 0 || !isModEnabled('project')) {
+            return '';
+        }
+
+        require_once __DIR__ . '/../lib/digiriskdolibarr_safetytalk.lib.php';
+
+        $cycle = $object;
+        if ($isTask) {
+            $cycle = new Project($db);
+            if ($cycle->fetch((int) $object->fk_project) <= 0) {
+                return '';
+            }
+        }
+        if (!digiriskSafetyTalkIsCycle($db, $cycle)) {
+            return '';
+        }
+
+        // The cards of the core do not load the translations of the module
+        $langs->load('digiriskdolibarr@digiriskdolibarr');
+
+        return $isTask
+            ? dol_buildpath('/digiriskdolibarr/view/safetytalk/safetytalk_card.php', 1) . '?id=' . $object->id
+            : dol_buildpath('/digiriskdolibarr/view/safetytalk/safetytalk_project.php', 1) . '?id=' . $object->id;
     }
 
     /**
@@ -2617,7 +2797,7 @@ class ActionsDigiriskdolibarr
 
             $position += 10;
             $picto     = 'fontawesome_fa-' . $picto . '_fas_#d35968';
-            $url       = dol_buildpath('custom/digiriskdolibarr/' . $listPath, 1) . (strpos($listPath, '?') !== false ? '&' : '?') . 'mainmenu=digiriskdolibarr';
+            $url       = dol_buildpath('/digiriskdolibarr/' . $listPath, 1) . (strpos($listPath, '?') !== false ? '&' : '?') . 'mainmenu=digiriskdolibarr';
 
             $searchEntries['searchinto' . $rightName] = [
                 'position' => $moduleNum . sprintf('%02d', $position),
@@ -2688,6 +2868,10 @@ class ActionsDigiriskdolibarr
             $objectsMetadata['digiriskdolibarr_' . $objectName]['class_path'] = $modulePath . '/class/riskanalysis/' . $objectName . '.class.php';
             $objectsMetadata['digiriskdolibarr_' . $objectName]['lib_path']   = $modulePath . '/lib/digiriskdolibarr_digiriskelement.lib.php';
         }
+        // The risk has its own card: risk_prepare_head() lives in its library, needed by the pages of other
+        // modules showing the header of a risk (DoliLetter spread tabs)
+        $objectsMetadata['digiriskdolibarr_risk']['lib_path'] = $modulePath . '/lib/digiriskdolibarr_risk.lib.php';
+
         // La table de l'enquete accident ne suit pas la regle de nommage des autres objets : sans
         // cette correction, la metadonnee pointe une table inexistante et plus rien ne matche
         // (les fichiers lies, donc la diffusion, cherchent sur src_object_type = table_element)
@@ -2702,37 +2886,63 @@ class ActionsDigiriskdolibarr
         // A risk has no label: its description tells it apart when medias are assigned to it
         $objectsMetadata['digiriskdolibarr_risk']['label_field'] = 'description';
 
+        // ucfirst() gives Risksign, the translation key is RiskSign
+        $objectsMetadata['digiriskdolibarr_risksign']['langs'] = 'RiskSign';
+
         $this->results = $objectsMetadata;
 
         return 0; // or return 1 to replace standard code
     }
 
     /**
-     * Overloading the saturneMediaAssignTarget function : a risk shows the photos of its last
-     * assessment, so the medias assigned to it from the library must land there
+     * Overloading the saturneMediaAssignTarget function : the medias assigned from the library must land
+     * where the card of the record shows them. A risk shows the photos of its last assessment, a work
+     * unit or a groupment the ones of its <type>/<ref>/ folder, an accident the ones of photos/, an
+     * accident investigation its causality tree
      *
      * @param  array  $parameters Hook metadata (context, etc...)
      * @param  object $object     Record picked in the list of the library medias
-     * @return int                0 to keep that record, 1 to hand over the one holding its medias
+     * @return int                0 to keep the folder Saturne computes, 1 to give the record and the folder
      * @throws Exception
      */
     public function saturneMediaAssignTarget(array $parameters, $object): int
     {
-        if (!($object instanceof Risk)) {
+        global $conf;
+
+        if (($parameters['moduleName'] ?? 'digiriskdolibarr') !== 'digiriskdolibarr' || !is_object($object)) {
             return 0;
         }
 
-        require_once __DIR__ . '/riskanalysis/riskassessment.class.php';
+        $root = $conf->digiriskdolibarr->multidir_output[$conf->entity];
 
-        $riskAssessment  = new RiskAssessment($this->db);
-        $riskAssessments = $riskAssessment->fetchFromParent($object->id, 1, 'DESC');
-        if (!is_array($riskAssessments) || empty($riskAssessments)) {
-            return 0;
+        switch ($object->element) {
+            case 'risk':
+                require_once __DIR__ . '/riskanalysis/riskassessment.class.php';
+
+                $riskAssessment  = new RiskAssessment($this->db);
+                $riskAssessments = $riskAssessment->fetchFromParent($object->id, 1, 'DESC');
+                if (!is_array($riskAssessments) || empty($riskAssessments)) {
+                    return 0;
+                }
+
+                $lastAssessment = array_shift($riskAssessments);
+                $this->results  = ['object' => $lastAssessment, 'dir' => $root . '/riskassessment/' . $lastAssessment->ref];
+                return 1;
+
+            case 'digiriskelement':
+                $this->results = ['object' => $object, 'dir' => $root . '/' . $object->element_type . '/' . $object->ref];
+                return 1;
+
+            case 'accident':
+                $this->results = ['object' => $object, 'dir' => $root . '/accident/' . $object->ref . '/photos'];
+                return 1;
+
+            case 'accidentinvestigation':
+                $this->results = ['object' => $object, 'dir' => $root . '/accidentinvestigation/' . $object->ref . '/causality_tree', 'favorite_field' => 'causality_tree'];
+                return 1;
         }
 
-        $this->results = ['object' => array_shift($riskAssessments)];
-
-        return 1;
+        return 0;
     }
 
     /**
@@ -2767,7 +2977,13 @@ class ActionsDigiriskdolibarr
 
     public function printFieldListValue($parameters, $object, $action)
     {
-        global $db;
+        global $db, $user;
+
+        // List of the registers: the state of an open ticket opens the quick close modal printed by printCommonFooter()
+        if ($object instanceof Ticket && $this->isDigiriskTicketList($parameters['context']) && $user->hasRight('ticket', 'write')
+            && !in_array((int) $object->status, [Ticket::STATUS_CLOSED, Ticket::STATUS_CANCELED], true)) {
+            $this->ticketQuickCloseRows[(int) $object->id] = ['ref' => (string) $object->ref, 'subject' => (string) $object->subject];
+        }
 
         if (strpos($parameters['context'], 'ticketlist') && isModEnabled('categorie')) {
             $obj = $parameters['object'];

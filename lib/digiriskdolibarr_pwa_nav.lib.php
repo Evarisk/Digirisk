@@ -44,7 +44,7 @@ function digiriskPwaNavGetItems(User $user): array
 {
     global $langs;
 
-    $frontendBase = dol_buildpath('/custom/digiriskdolibarr/view/frontend/', 1);
+    $frontendBase = dirname(dol_buildpath('/digiriskdolibarr/view/frontend/index.php', 1)) . '/';
     $items        = [];
 
     $items['home'] = [
@@ -77,6 +77,16 @@ function digiriskPwaNavGetItems(User $user): array
             'page'  => 'pwa_firepermit_rounds.php',
             'icon'  => 'fa-walking',
             'label' => $langs->transnoentities('PwaNavFireWatch'),
+        ];
+    }
+
+    // Safety talks: cycles kept as projects, so reading them is a matter of the project rights
+    if (isModEnabled('project') && $user->hasRight('projet', 'lire')) {
+        $items['safetytalks'] = [
+            'url'   => $frontendBase . 'pwa_safetytalk_list.php',
+            'page'  => 'pwa_safetytalk_list.php',
+            'icon'  => 'fa-comments',
+            'label' => $langs->transnoentities('PwaNavSafetyTalks'),
         ];
     }
 

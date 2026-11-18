@@ -177,21 +177,21 @@ class PreventionPlanDocument extends DigiriskDocuments
 
 		if (!empty($labourinspector->id) && $labourinspector->id > 0) {
 			$json['PreventionPlan']['labour_inspector'] = array();
-			$json['PreventionPlan']['labour_inspector']['id']      = $extsociety->id;
-			$json['PreventionPlan']['labour_inspector']['name']    = $extsociety->name;
-			$json['PreventionPlan']['labour_inspector']['siret']   = $extsociety->idprof2;
-			$json['PreventionPlan']['labour_inspector']['address'] = $extsociety->address;
-			$json['PreventionPlan']['labour_inspector']['postal']  = $extsociety->zip;
-			$json['PreventionPlan']['labour_inspector']['town']    = $extsociety->town;
+			$json['PreventionPlan']['labour_inspector']['id']      = $labourinspector->id;
+			$json['PreventionPlan']['labour_inspector']['name']    = $labourinspector->name;
+			$json['PreventionPlan']['labour_inspector']['siret']   = $labourinspector->idprof2;
+			$json['PreventionPlan']['labour_inspector']['address'] = $labourinspector->address;
+			$json['PreventionPlan']['labour_inspector']['postal']  = $labourinspector->zip;
+			$json['PreventionPlan']['labour_inspector']['town']    = $labourinspector->town;
 		}
 
 		if (!empty($labourinspectorcontact->id) && $labourinspectorcontact->id > 0) {
 			$json['PreventionPlan']['labour_inspector_contact'] = array();
-			$json['PreventionPlan']['labour_inspector_contact']['id']        = $extsocietyresponsible->id;
-			$json['PreventionPlan']['labour_inspector_contact']['firstname'] = $extsocietyresponsible->firstname;
-			$json['PreventionPlan']['labour_inspector_contact']['lastname']  = $extsocietyresponsible->lastname;
-			$json['PreventionPlan']['labour_inspector_contact']['phone']     = $extsocietyresponsible->phone;
-			$json['PreventionPlan']['labour_inspector_contact']['email']     = $extsocietyresponsible->email;
+			$json['PreventionPlan']['labour_inspector_contact']['id']        = $labourinspectorcontact->id;
+			$json['PreventionPlan']['labour_inspector_contact']['firstname'] = $labourinspectorcontact->firstname;
+			$json['PreventionPlan']['labour_inspector_contact']['lastname']  = $labourinspectorcontact->lastname;
+			$json['PreventionPlan']['labour_inspector_contact']['phone']     = $labourinspectorcontact->phone;
+			$json['PreventionPlan']['labour_inspector_contact']['email']     = $labourinspectorcontact->email;
 		}
 
 		$json['PreventionPlan']['ref']   = $preventionplan->ref;

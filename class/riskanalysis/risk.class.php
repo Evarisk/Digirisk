@@ -268,9 +268,10 @@ class Risk extends SaturneObject
         // settings, the risks of the unit, the inherited ones and the shared ones. The setting lost
         // its last reader when this collection was standardised on loadRiskInfos() - issue #5120.
         // Only for a document scoped on one element: the risk assessment document passes no element
-        // filter and already lists every risk of the entity.
+        // filter and already lists every risk of the entity. The models with tables of their own for
+        // inherited and shared risks (includeInheritedAndShared) printed them twice - issue #5739
         $array['inheritedDigiriskElements'] = [];
-        if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS') && ($moreParam['object'] ?? null) instanceof DigiriskElement) {
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS') && ($moreParam['object'] ?? null) instanceof DigiriskElement && empty($moreParam['includeInheritedAndShared'])) {
             $inherited = $this->fetchInheritedRisks($moreParam, $join, $select, $moreSelects);
             if (!empty($inherited['risks'])) {
                 // Both sides are keyed by risk id, so a risk reachable twice is kept once. The
@@ -279,6 +280,25 @@ class Risk extends SaturneObject
                 $array['current']['risks'] += $inherited['risks'];
                 uasort($array['current']['risks'], fn($first, $second) => $second->riskAssessmentCotation <=> $first->riskAssessmentCotation);
                 $array['inheritedDigiriskElements'] = $inherited['digiriskElements'];
+            }
+        }
+
+        // ShowSharedRisksDescription promises "Afficher les risques partagés dans les documents". A
+        // GP/UT sheet printed the risks shared to its element in its own table until the ODT rework
+        // standardised the collection on loadRiskInfos(), since then only the risk assessment
+        // document printed them - issue #5736. Same scope as the inherited risks above, and left to
+        // the models printing shared risks in tables of their own (includeInheritedAndShared). They
+        // come from another entity: $sharedOnElementIDs keeps them, their counters and their tasks
+        // with the risks of the element instead of the "shared" scope of the risk assessment document
+        $array['sharedDigiriskElements'] = [];
+        $sharedOnElementIDs              = [];
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS') && ($moreParam['object'] ?? null) instanceof DigiriskElement && empty($moreParam['includeInheritedAndShared'])) {
+            $sharedOnElement = $this->fetchSharedRisksOfElement($moreParam, $sharedJoin, $sharedSelect, $sharedMoreSelects);
+            if (!empty($sharedOnElement['risks'])) {
+                $array['current']['risks'] += $sharedOnElement['risks'];
+                uasort($array['current']['risks'], fn($first, $second) => $second->riskAssessmentCotation <=> $first->riskAssessmentCotation);
+                $array['sharedDigiriskElements'] = $sharedOnElement['digiriskElements'];
+                $sharedOnElementIDs              = array_fill_keys(array_keys($sharedOnElement['risks']), true);
             }
         }
 
@@ -300,7 +320,7 @@ class Risk extends SaturneObject
 
         foreach ($array['risks'] as $risk) {
             $riskAssessment->cotation = $risk->riskAssessmentCotation;
-            $entity                   = ($risk->entity == $conf->entity || (!isModEnabled('multicompany') && empty($risk->entity))) ? 'current' : 'shared';
+            $entity                   = ($risk->entity == $conf->entity || isset($sharedOnElementIDs[$risk->id]) || (!isModEnabled('multicompany') && empty($risk->entity))) ? 'current' : 'shared';
 
             $scale     = $riskAssessment->getEvaluationScale();
             $fkElement = $risk->fk_element;
@@ -389,7 +409,7 @@ class Risk extends SaturneObject
         }
 
         foreach ($array['tasks'] as $task) {
-            $entity = ($task->entity == $conf->entity) ? 'current' : 'shared';
+            $entity = ($task->entity == $conf->entity || isset($sharedOnElementIDs[$task->array_options['options_fk_risk']])) ? 'current' : 'shared';
 
             $array[$entity]['riskTasks'][$task->array_options['options_fk_risk']][] = $task;
             if ($task->entity != $conf->entity) {
@@ -460,6 +480,55 @@ class Risk extends SaturneObject
         }
 
         return ['risks' => is_array($risks) ? $risks : [], 'digiriskElements' => $ancestorElements];
+    }
+
+    /**
+     * Fetch the risks other entities share to an element
+     *
+     * A shared risk stays attached to its element in its own entity and is linked to the receiving
+     * element through element_element (fk_target). Only the risks whose element the current entity
+     * can see are kept, as the element card does: the row renderer names the line after that element
+     * and would skip it otherwise - issue #5736
+     *
+     * @param  array  $moreParam         More param (object/filterRisk/filterRiskDate)
+     * @param  string $sharedJoin        Join on element_element, the receiving element and the risk assessment
+     * @param  string $sharedSelect      Extra columns the risk segments read
+     * @param  array  $sharedMoreSelects Names of those extra columns
+     * @return array                     ['risks' => risks keyed by id, 'digiriskElements' => the elements they belong to]
+     * @throws Exception
+     */
+    private function fetchSharedRisksOfElement(array $moreParam, string $sharedJoin, string $sharedSelect, array $sharedMoreSelects): array
+    {
+        // The caller filter carries the element condition, which names the receiving element and not
+        // the one the risk belongs to. A date condition is passed apart, in filterRiskDate, and still applies
+        $filter = 't.status = ' . self::STATUS_VALIDATED
+            . ' AND d.status = ' . DigiriskElement::STATUS_VALIDATED
+            . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED
+            . ($moreParam['filterRiskDate'] ?? '')
+            . (!empty($moreParam['filterRisk']) ? $moreParam['filterRisk'] : ' AND t.type = \'risk\'')
+            . ' AND ee.fk_target = ' . ((int) $moreParam['object']->id);
+
+        $risks = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $filter], 'AND', false, true, false, $sharedJoin, [], $sharedSelect, $sharedMoreSelects);
+        if (!is_array($risks) || empty($risks)) {
+            return ['risks' => [], 'digiriskElements' => []];
+        }
+
+        $digiriskElement = new DigiriskElement($this->db);
+        $sharedElements  = $digiriskElement->getActiveDigiriskElements('shared');
+        if (!is_array($sharedElements)) {
+            $sharedElements = [];
+        }
+
+        $sourceElements = [];
+        foreach ($risks as $riskID => $risk) {
+            if (!isset($sharedElements[$risk->fk_element])) {
+                unset($risks[$riskID]);
+                continue;
+            }
+            $sourceElements[$risk->fk_element] = ['object' => $sharedElements[$risk->fk_element], 'depth' => 0];
+        }
+
+        return ['risks' => $risks, 'digiriskElements' => $sourceElements];
     }
 
     /**
@@ -783,7 +852,7 @@ class Risk extends SaturneObject
      */
     public static function getDangerCategories(string $riskType = 'risk'): array
     {
-        $filePath = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/dangerCategories.json';
+        $filePath = dol_buildpath('/digiriskdolibarr/js/json/dangerCategories.json', 0);
 
         if (!file_exists($filePath)) {
             return [];
@@ -808,7 +877,7 @@ class Risk extends SaturneObject
      */
     public static function getDangerSubCategories(): array
     {
-        $filePath = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/dangerSubCategories.json';
+        $filePath = dol_buildpath('/digiriskdolibarr/js/json/dangerSubCategories.json', 0);
 
         if (!file_exists($filePath)) {
             return [];
@@ -908,7 +977,7 @@ class Risk extends SaturneObject
      */
     public static function getPsychosocialRiskGrid(): array
     {
-        $filePath = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/psychosocialRiskGrid.json';
+        $filePath = dol_buildpath('/digiriskdolibarr/js/json/psychosocialRiskGrid.json', 0);
 
         if (!file_exists($filePath)) {
             return [];
@@ -1139,7 +1208,7 @@ class Risk extends SaturneObject
 	 */
 	public function getFirePermitDangerCategories()
 	{
-		$json_categories = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/firePermitDangerCategories.json');
+		$json_categories = file_get_contents(dol_buildpath('/digiriskdolibarr/js/json/firePermitDangerCategories.json', 0));
 		return json_decode($json_categories, true);
 	}
 
@@ -1609,7 +1678,7 @@ class Risk extends SaturneObject
                 $categoryName = '';
             }
             $categoryPictoUrl = ($categoryThumb !== '-1' && $categoryThumb !== '')
-                ? DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . rawurlencode($categoryThumb) . '.png'
+                ? dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . rawurlencode($categoryThumb) . '.png', 1)
                 : DOL_URL_ROOT . '/public/theme/common/nophoto.png';
 
             // 2. Risk assessment photo (or default nophoto placeholder when the assessment has no photo)
@@ -1722,7 +1791,7 @@ class Risk extends SaturneObject
                         ? $raSubDir . '/thumbs/' . $thumbName
                         : $raSubDir . '/' . $fileName;
 
-                    return DOL_URL_ROOT . '/custom/saturne/utils/viewimage.php?modulepart=digiriskdolibarr&entity=' . ((int) $conf->entity) . '&file=' . urlencode($relFile);
+                    return dol_buildpath('/saturne/utils/viewimage.php', 1) . '?modulepart=digiriskdolibarr&entity=' . ((int) $conf->entity) . '&file=' . urlencode($relFile);
                 }
             }
         }

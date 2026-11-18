@@ -44,7 +44,7 @@ $uncountedLines = (int) $cell['value'] - count($cellRisks['risks']) - (int) $cel
         <div class="risk-overview__tooltip-risk">
             <div class="krt-header">
                 <?php if ($showRiskCategory && !empty($cellRisk['categoryPicto'])) : ?>
-                    <img class="risk-overview__tooltip-picto" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . dol_escape_htmltag($cellRisk['categoryPicto']); ?>" alt="">
+                    <img class="risk-overview__tooltip-picto" src="<?php echo dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . dol_escape_htmltag($cellRisk['categoryPicto']), 1); ?>" alt="">
                 <?php endif; ?>
                 <strong><?php echo dol_escape_htmltag($cellRisk['ref']); ?></strong>
                 <?php if ($showRiskCategory && !empty($cellRisk['categoryName'])) : ?>

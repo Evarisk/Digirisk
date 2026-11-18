@@ -258,14 +258,20 @@ if (($action == 'uploadPhoto' || $action == 'deletePhoto') && $permissiontoadd) 
 
     if ($action == 'uploadPhoto' && getDolGlobalInt('MAIN_UPLOAD_DOC')) {
         // The media block only sends images, make sure of it before writing anything
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+
         $isImageUpload = true;
         $uploadedFiles = isset($_FILES['userfile']['tmp_name']) ? (array) $_FILES['userfile']['tmp_name'] : [];
-        foreach ($uploadedFiles as $uploadedTmpName) {
+        $uploadedNames = isset($_FILES['userfile']['name']) ? (array) $_FILES['userfile']['name'] : [];
+
+        foreach ($uploadedFiles as $key => $uploadedTmpName) {
             if (empty($uploadedTmpName)) {
                 continue;
             }
+            $origName = (string) ($uploadedNames[$key] ?? '');
             $fileInfo = new finfo(FILEINFO_MIME_TYPE);
-            if (strpos((string) $fileInfo->file($uploadedTmpName), 'image/') !== 0) {
+            $mimeType = (string) $fileInfo->file($uploadedTmpName);
+            if (strpos($mimeType, 'image/') !== 0 || $mimeType === 'image/svg+xml' || image_format_supported($origName) < 0) {
                 $isImageUpload = false;
                 break;
             }
@@ -877,18 +883,18 @@ if ($action == 'resend_ext_signature_email' && $permissiontoadd) {
 $title    = mb_strtoupper($langs->transnoentities('firepermit'), 'UTF-8');
 $help_url = 'FR:Module_Digirisk';
 $moreJS   = [
-    '/custom/saturne/js/saturne.min.js',
-    '/custom/digiriskdolibarr/js/signature-pad.min.js',
-    '/custom/digiriskdolibarr/js/digiriskdolibarr.min.js',
+    '/saturne/js/saturne.min.js',
+    '/digiriskdolibarr/js/signature-pad.min.js',
+    '/digiriskdolibarr/js/digiriskdolibarr.min.js',
 ];
 $moreCSS  = [
-    '/custom/saturne/css/saturne.min.css',
-    '/custom/digiriskdolibarr/css/digiriskdolibarr.min.css',
+    '/saturne/css/saturne.min.css',
+    '/digiriskdolibarr/css/digiriskdolibarr.min.css',
 ];
 
 $conf->dol_hide_topmenu         = 1;
 $conf->dol_hide_leftmenu        = 1;
-$conf->global->MAIN_FAVICON_URL = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/digiriskdolibarr_color.png';
+$conf->global->MAIN_FAVICON_URL = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
 
 llxHeader('', $title, $help_url, '', 0, 0, $moreJS, $moreCSS, '', 'template-pwa digirisk-mobile-create');
 

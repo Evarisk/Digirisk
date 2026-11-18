@@ -138,7 +138,10 @@ class RiskAssessmentDocument extends DigiriskDocuments
             return -1;
         }
 
-        $digiriskElements = $moreparams['digiriskElement']->fetchDigiriskElementFlat(0);
+        // Elements of the current entity only. The default scope also brings the ones other entities
+        // share, whose sheets came out empty, numbered here and filed with the local element of the
+        // same ref. The risks they share to a local element are in its own sheet - issues #5741, #5736
+        $digiriskElements = $moreparams['digiriskElement']->fetchDigiriskElementFlat(0, [], 'current');
         if (!is_array($digiriskElements) || empty($digiriskElements)) {
             $this->error = $langs->trans('ErrorFailToFetchDigiriskElements');
             return -1;
@@ -224,7 +227,9 @@ class RiskAssessmentDocument extends DigiriskDocuments
                 return -1;
             }
 
-            $fileName = pathinfo($this->last_main_doc, PATHINFO_FILENAME);
+            // The sheet just generated, not the risk assessment document ($this): looking for the PDF
+            // of the latter in the folder of the element never found it - issue #5740
+            $fileName = pathinfo($digiriskElementDocument->last_main_doc, PATHINFO_FILENAME);
             if (file_exists($digiriskElementDocumentPath . '/' . $fileName . '.pdf')) {
                 $result = dol_copy($digiriskElementDocumentPath . '/' . $fileName . '.pdf', $digiriskElementDocumentZipPaths[$digiriskElementSingle['object']->element_type] . '/' . $fileName . '.pdf');
                 if ($result < 0) {

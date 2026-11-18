@@ -42,7 +42,7 @@ $dangerCategoryThumbnail = $object->getDangerCategory($object, $riskType);
 
 $moreHtmlRef = '<span class="risk-card-danger-category">';
 if ($dangerCategoryThumbnail != -1) {
-    $moreHtmlRef .= '<img class="risk-card-danger-category-pic" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategoryThumbnail . '.png" alt="">';
+    $moreHtmlRef .= '<img class="risk-card-danger-category-pic" src="' . dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $dangerCategoryThumbnail . '.png', 1) . '" alt="">';
 }
 $moreHtmlRef .= '<span class="risk-card-danger-category-name">' . $object->getDangerCategoryName($object, $riskType) . '</span>';
 $moreHtmlRef .= '</span>';
@@ -246,7 +246,7 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_TASK_MANAGEMENT') && $taskView == 'gantt')
     if (!empty($relatedTasks)) {
         foreach ($relatedTasks as $relatedTask) {
             print '<tr class="oddeven">';
-            print '<td class="nowrap">' . $relatedTask->getNomUrl(1, 'withproject') . '</td>';
+            print '<td class="nowrap">' . digiriskdolibarr_task_get_nom_url($relatedTask, 1) . '</td>';
             print '<td>' . dol_escape_htmltag($relatedTask->label) . '</td>';
             print '<td class="nowrap">';
             if ($relatedTask->fk_project > 0 && $project->fetch($relatedTask->fk_project) > 0) {

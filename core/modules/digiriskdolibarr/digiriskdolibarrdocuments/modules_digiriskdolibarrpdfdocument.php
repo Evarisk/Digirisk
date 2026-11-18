@@ -1254,7 +1254,7 @@ abstract class ModelePDFDigiriskDolibarrDocument extends SaturneDocumentModel
             return '';
         }
 
-        $path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $picto . '.png';
+        $path = dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $picto . '.png', 0);
 
         return is_readable($path) ? $path : '';
     }

@@ -2161,7 +2161,7 @@ class DigiriskDolibarr extends SaturneApi
 			throw new RestException(401);
 		}
 
-		return exec('cd ../custom/digiriskdolibarr/shell/pull && bash update_version.sh');
+		return exec('cd ' . escapeshellarg(dirname(dol_buildpath('/digiriskdolibarr/shell/pull/update_version.sh', 0))) . ' && bash update_version.sh');
 	}
 
 	// BEGIN ALL API ROUTE FOR DASHBOARD INFO

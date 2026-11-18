@@ -1147,7 +1147,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $protections = !empty($object->array_options['options_mobile_protections'])    ? json_decode($object->array_options['options_mobile_protections'], true)    : [];
         $companies   = !empty($object->array_options['options_mobile_risk_companies']) ? json_decode($object->array_options['options_mobile_risk_companies'], true) : [];
 
-        $signalisationFile = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json';
+        $signalisationFile = dol_buildpath('/digiriskdolibarr/js/json/signalisationCategories.json', 0);
         $signalisationMap  = [];
         if (file_exists($signalisationFile)) {
             foreach ((json_decode(file_get_contents($signalisationFile), true) ?: []) as $signalisationItem) {
@@ -1160,7 +1160,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         foreach ($lines as $riskLine) {
             $category  = (int) $riskLine->category;
             $thumb     = $risk->getDangerCategory($riskLine);
-            $pictoPath = ($thumb != -1) ? DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $thumb . '.png' : '';
+            $pictoPath = ($thumb != -1) ? dol_buildpath('/digiriskdolibarr/img/categorieDangers/' . $thumb . '.png', 0) : '';
             $riskName  = $risk->getDangerCategoryName($riskLine);
 
             $riskProtections = [];
@@ -1170,7 +1170,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
                         continue;
                     }
                     $riskProtections[] = [
-                        'image'   => DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/' . $signalisationMap[$protection['position']]['name_thumbnail'],
+                        'image'   => dol_buildpath('/digiriskdolibarr/img/' . $signalisationMap[$protection['position']]['name_thumbnail'], 0),
                         'name'    => $signalisationMap[$protection['position']]['name'],
                         'comment' => $protection['comment'] ?? '',
                     ];
