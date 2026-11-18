@@ -164,6 +164,14 @@ if ($action == 'setMobileDefaults' && !GETPOST('cancel', 'alpha')) {
 	}
 }
 
+// Phone and email of the public spread shared one switch: each new switch starts from its value, so that
+// it shows what the page already displays. The spread page falls back on it the same way until then
+foreach (['DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_PHONE', 'DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_EMAIL'] as $contactConst) {
+    if ($permissiontowrite && getDolGlobalString($contactConst) === '' && getDolGlobalString('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_CONTACT') !== '') {
+        dolibarr_set_const($db, $contactConst, getDolGlobalInt('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_CONTACT'), 'integer', 0, '', $conf->entity);
+    }
+}
+
 
 /*
  * View
@@ -392,9 +400,14 @@ print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATOR
 print '<td class="center">' . saturne_constant_onoff('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_NAME', $permissiontowrite) . '</td>';
 print '</tr>';
 
-// Contact
-print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_CONTACT">' . $langs->trans('MobilePPSpreadShowContact') . '</label></td>';
-print '<td class="center">' . saturne_constant_onoff('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_CONTACT', $permissiontowrite) . '</td>';
+// Phone
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_PHONE">' . $langs->trans('MobilePPSpreadShowPhone') . '</label></td>';
+print '<td class="center">' . saturne_constant_onoff('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_PHONE', $permissiontowrite) . '</td>';
+print '</tr>';
+
+// Email
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_EMAIL">' . $langs->trans('MobilePPSpreadShowEmail') . '</label></td>';
+print '<td class="center">' . saturne_constant_onoff('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_EMAIL', $permissiontowrite) . '</td>';
 print '</tr>';
 
 // Hide Public Note
