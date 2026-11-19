@@ -175,12 +175,13 @@ if ($action == 'task_create') {
     }
 
     // L'action se rattache au risque de l'evaluation consolidee, comme celles saisies dans l'evaluation
-    $sql  = 'SELECT rowid FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_risk';
-    $sql .= ' WHERE fk_element = ' . $elementId;
-    $sql .= ' AND category = ' . (int) Risk::PSYCHOSOCIAL_CATEGORY_POSITION;
-    $sql .= ' AND status > 0 AND (sub_category IS NULL OR sub_category = -1)';
-    $sql .= ' AND entity IN (' . getEntity('digiriskelement') . ')';
-    $sql .= ' ORDER BY rowid ASC LIMIT 1';
+    $sql  = 'SELECT r.rowid FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_risk as r';
+    $sql .= ' WHERE r.fk_element = ' . $elementId;
+    $sql .= ' AND r.category = ' . (int) Risk::PSYCHOSOCIAL_CATEGORY_POSITION;
+    $sql .= ' AND r.status > 0 AND (r.sub_category IS NULL OR r.sub_category = -1)';
+    $sql .= ' AND ' . Risk::getConsolidatedPsychosocialSqlCondition('r');
+    $sql .= ' AND r.entity IN (' . getEntity('digiriskelement') . ')';
+    $sql .= ' ORDER BY r.rowid ASC LIMIT 1';
 
     $resql  = $db->query($sql);
     $riskId = ($resql && $db->num_rows($resql) > 0) ? (int) $db->fetch_object($resql)->rowid : 0;
@@ -342,7 +343,8 @@ if ($action == 'consolidate') {
     $sql .= ' (SELECT ra.cotation FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_riskassessment ra';
     $sql .= '   WHERE ra.fk_risk = r.rowid AND ra.status > 0 ORDER BY ra.rowid DESC LIMIT 1) AS cotation,';
     $sql .= ' (SELECT ra.date_riskassessment FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_riskassessment ra';
-    $sql .= '   WHERE ra.fk_risk = r.rowid AND ra.status > 0 ORDER BY ra.rowid DESC LIMIT 1) AS dt';
+    $sql .= '   WHERE ra.fk_risk = r.rowid AND ra.status > 0 ORDER BY ra.rowid DESC LIMIT 1) AS dt,';
+    $sql .= ' CASE WHEN ' . Risk::getConsolidatedPsychosocialSqlCondition('r') . ' THEN 1 ELSE 0 END AS consolidated';
     $sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_risk r';
     $sql .= ' WHERE r.fk_element = ' . $elementId;
     $sql .= ' AND r.category = ' . (int) Risk::PSYCHOSOCIAL_CATEGORY_POSITION;
@@ -364,8 +366,9 @@ if ($action == 'consolidate') {
     while ($o = $db->fetch_object($resql)) {
         $sub = ($o->sub_category === null || $o->sub_category === '') ? null : (int) $o->sub_category;
 
-        // Le risque consolide est celui qui ne porte pas de facteur : il est conserve
-        if ($sub === null || $sub < 0) {
+        // Le risque consolide est celui qui ne porte pas de facteur et dont la derniere evaluation vient
+        // du bloc : il est conserve. Un risque saisi avant le bloc, avec sa propre cotation, n'en tient pas lieu.
+        if (($sub === null || $sub < 0) && !empty($o->consolidated)) {
             if ($keepRiskId <= 0) {
                 $keepRiskId = (int) $o->rowid;
                 continue;
@@ -578,14 +581,16 @@ $numberingModuleName = [
 ];
 list($refRiskMod, $refEvaluationMod, $refProjectMod, $refTaskMod) = saturne_require_objects_mod($numberingModuleName, 'digiriskdolibarr');
 
-// Le risque psychosocial consolide de l'unite : celui qui ne porte pas de facteur.
-// Les risques de l'ancienne methode, un par facteur, ne sont pas repris ici.
-$sql  = 'SELECT rowid FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_risk';
-$sql .= ' WHERE fk_element = ' . $elementId;
-$sql .= ' AND category = ' . (int) Risk::PSYCHOSOCIAL_CATEGORY_POSITION;
-$sql .= ' AND status > 0 AND (sub_category IS NULL OR sub_category = -1)';
-$sql .= ' AND entity IN (' . getEntity('digiriskelement') . ')';
-$sql .= ' ORDER BY rowid ASC LIMIT 1';
+// Le risque psychosocial consolide de l'unite : celui qui ne porte pas de facteur et dont la derniere
+// evaluation vient de ce bloc, ou qui n'en a pas encore. Les risques de l'ancienne methode, un par
+// facteur, ne sont pas repris ici, ni ceux saisis avant le bloc avec leur propre cotation.
+$sql  = 'SELECT r.rowid FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_risk as r';
+$sql .= ' WHERE r.fk_element = ' . $elementId;
+$sql .= ' AND r.category = ' . (int) Risk::PSYCHOSOCIAL_CATEGORY_POSITION;
+$sql .= ' AND r.status > 0 AND (r.sub_category IS NULL OR r.sub_category = -1)';
+$sql .= ' AND ' . Risk::getConsolidatedPsychosocialSqlCondition('r');
+$sql .= ' AND r.entity IN (' . getEntity('digiriskelement') . ')';
+$sql .= ' ORDER BY r.rowid ASC LIMIT 1';
 
 $resql  = $db->query($sql);
 $riskId = ($resql && $db->num_rows($resql) > 0) ? (int) $db->fetch_object($resql)->rowid : 0;
