@@ -891,18 +891,21 @@ function digiriskGetQrCodePng(string $data, string $filePath, int $size = 600): 
  * mobile screen of the object: the same list as at the bottom of the spread page.
  *
  * The spread belongs to DoliLetter: its attendance sheet holds the people, and the documents they provided
- * are stored under the certifications of the object. Nothing when DoliLetter is not enabled or nobody joined.
+ * are stored under the certifications of the object. Nothing when DoliLetter is not enabled. Before anybody
+ * joined, the documents each person will be asked for are already known: the block shows them from the start.
  *
  * @param  DoliDB       $db     Database handler
  * @param  CommonObject $object Prevention plan or fire permit, fetched with its lines
- * @return array                people (signatory, cert_states, risks_read, signed), signed_count, risk_count,
- *                              cert_sub_dir (directory of the documents, relative to the module output)
+ * @return array                available (DoliLetter can serve the spread), certifications (code, label,
+ *                              mandatory: what each person will be asked for), people (signatory, cert_states,
+ *                              risks_read, signed), signed_count, risk_count, cert_sub_dir (directory of the
+ *                              documents, relative to the module output)
  */
 function digiriskMobileGetSpreadPeople(DoliDB $db, CommonObject $object): array
 {
     global $conf;
 
-    $spread = ['people' => [], 'signed_count' => 0, 'risk_count' => 0, 'cert_sub_dir' => ''];
+    $spread = ['available' => false, 'certifications' => [], 'people' => [], 'signed_count' => 0, 'risk_count' => 0, 'cert_sub_dir' => ''];
 
     if (!isModEnabled('doliletter')) {
         return $spread;
@@ -918,6 +921,22 @@ function digiriskMobileGetSpreadPeople(DoliDB $db, CommonObject $object): array
     }
     if (!class_exists('DoliletterAttendanceSheet')) {
         return $spread;
+    }
+    $spread['available'] = true;
+
+    $object->fetch_optionals();
+    $certifications = json_decode((string) ($object->array_options['options_mobile_certifications'] ?? ''), true);
+    $certifications = is_array($certifications) ? $certifications : [];
+    // Labels of what the object stores, a certification disabled afterwards included
+    $certificationOptions = digiriskGetCertificationOptions(false);
+    foreach ($certifications as $certification) {
+        if (!empty($certification['code'])) {
+            $spread['certifications'][] = [
+                'code'      => (string) $certification['code'],
+                'label'     => $certificationOptions[$certification['code']] ?? (string) $certification['code'],
+                'mandatory' => !empty($certification['mandatory'])
+            ];
+        }
     }
 
     // Same sheet as the spread page: one per object, found by its type and its id
@@ -946,13 +965,7 @@ function digiriskMobileGetSpreadPeople(DoliDB $db, CommonObject $object): array
         return $b->id <=> $a->id;
     });
 
-    $object->fetch_optionals();
-    $certifications = json_decode((string) ($object->array_options['options_mobile_certifications'] ?? ''), true);
-    $certifications = is_array($certifications) ? $certifications : [];
-    // Labels of what the object stores, a certification disabled afterwards included
-    $certificationOptions = digiriskGetCertificationOptions(false);
-
-    $uploadBase             = !empty($conf->digiriskdolibarr->dir_output) ? $conf->digiriskdolibarr->dir_output : $conf->ecm->dir_output . '/digiriskdolibarr';
+    $uploadBase            = !empty($conf->digiriskdolibarr->dir_output) ? $conf->digiriskdolibarr->dir_output : $conf->ecm->dir_output . '/digiriskdolibarr';
     $spread['cert_sub_dir'] = $object->element . '/' . dol_sanitizeFileName($object->ref) . '/certifications';
 
     $riskCategories       = array_map('intval', array_column((array) $object->lines, 'category'));
