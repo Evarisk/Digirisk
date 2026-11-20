@@ -950,8 +950,13 @@ function digiriskMobileGetSpreadPeople(DoliDB $db, CommonObject $object): array
     if (!is_array($signatories) || empty($signatories)) {
         return $spread;
     }
+    // Grouped by role: every group counts, not only the first one, or the people given a role are left out
+    $allSignatories = [];
+    foreach ($signatories as $roleSignatories) {
+        $allSignatories += $roleSignatories;
+    }
     // A signature nobody was assigned to is not a person of the spread
-    $signatories = array_filter(current($signatories), 'doliletter_spread_signatory_has_identity');
+    $signatories = array_filter($allSignatories, 'doliletter_spread_signatory_has_identity');
 
     // Signed first, the latest on top, then the ones still pending: the order of the spread page
     uasort($signatories, function ($a, $b) {

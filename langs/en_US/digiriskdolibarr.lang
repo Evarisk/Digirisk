@@ -2654,6 +2654,7 @@ PreventionPlanAttendants = Attendants: exterior company (EE) and subcontractors
 Morning = Morning
 Afternoon = Afternoon
 Signatures = Signatures
+DocumentSpreadSignatories = People who signed the spread
 SignaturePending = Pending
 PreventionPlanRiskPhotos = Risk photos
 InterventionPeriodOnly = This plan starts on %s and ends on %s.

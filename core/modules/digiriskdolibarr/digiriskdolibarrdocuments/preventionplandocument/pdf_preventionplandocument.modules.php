@@ -345,10 +345,11 @@ class pdf_preventionplandocument extends SaturneDocumentModel
                 $pdf->SetFont('', $bold ? 'B' : '', $size - 1);
                 $pdf->MultiCell($widths[$index], $maxHeight, (string) $text, 1, $align, false, 0, $x, $y, true, 0, false, true, $maxHeight, 'M');
 
-                // Image centree dans la cellule, dessinee par dessus le cadre
+                // Image dans la cellule, dessinee par dessus le cadre. Contenue dans la cellule en
+                // largeur aussi : une signature est bien plus large que haute et debordait sinon
                 if ($isArray && !empty($cellData['image']) && is_readable($cellData['image'])) {
                     $imageHeight = $maxHeight - 4;
-                    $pdf->Image($cellData['image'], $x + 2, $y + 2, 0, $imageHeight, '', '', '', false, 300, '', false, false, 0, 'LM');
+                    $pdf->Image($cellData['image'], $x + 2, $y + 2, $widths[$index] - 4, $imageHeight, '', '', '', false, 300, '', false, false, 0, 'LM');
                 }
 
                 $pdf->SetXY($x + $widths[$index], $y);
@@ -700,6 +701,7 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $this->sectionImages($pdf, 'risks');
         $this->sectionCertifications($pdf, $object, $outputLangs, $size);
         $this->sectionSignatures($pdf, $object, $outputLangs, $size);
+        $this->sectionSpreadSignatories($pdf, $object, $outputLangs, $size);
         $this->sectionImages($pdf, 'signatures');
     }
 
@@ -1647,6 +1649,76 @@ class pdf_preventionplandocument extends SaturneDocumentModel
 
         $pdf->SetAutoPageBreak(true, self::FOOTER_BAND);
         $pdf->SetY($startY + $boxHeight + 2);
+    }
+
+    /**
+     * Personnes qui ont signe la diffusion publique (DoliLetter), dans l'ordre de leur signature.
+     *
+     * Le document est regenere a chaque signature de la diffusion : il tient ainsi a jour la liste
+     * de ceux qui ont pris connaissance du plan. Rien sans DoliLetter ni tant que personne n'a signe.
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  object    $object      Plan de prevention ou permis de feu
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @return void
+     */
+    protected function sectionSpreadSignatories($pdf, $object, Translate $outputLangs, float $size)
+    {
+        require_once dol_buildpath('/digiriskdolibarr/lib/digiriskdolibarr_mobile.lib.php', 0);
+
+        $spreadPeople = digiriskMobileGetSpreadPeople($this->db, $object);
+        $signedPeople = array_values(array_filter($spreadPeople['people'], function (array $person) {
+            return $person['signed'];
+        }));
+        if (empty($signedPeople)) {
+            return;
+        }
+        usort($signedPeople, function (array $a, array $b) {
+            return $a['signatory']->signature_date <=> $b['signatory']->signature_date;
+        });
+
+        $width  = $this->contentWidth($pdf);
+        $widths = [$width * 0.28, $width * 0.30, $width * 0.17, $width * 0.25];
+        $header = [
+            $outputLangs->transnoentities('Name'),
+            $outputLangs->transnoentities('Email') . ' / ' . $outputLangs->transnoentities('Phone'),
+            $outputLangs->transnoentities('Date'),
+            $outputLangs->transnoentities('Signature')
+        ];
+
+        $rows       = [];
+        $imagePaths = [];
+        foreach ($signedPeople as $person) {
+            $signatory = $person['signatory'];
+            $name      = trim(dol_strtoupper((string) $signatory->lastname) . ' ' . ucfirst((string) $signatory->firstname));
+            $contact   = implode("\n", array_filter([(string) $signatory->email, (string) $signatory->phone], 'dol_strlen'));
+            $imagePath = $this->extractSignature($signatory, $outputLangs);
+            if (dol_strlen($imagePath)) {
+                $imagePaths[] = $imagePath;
+            }
+
+            $rows[] = [
+                dol_strlen($name) ? $name : $contact,
+                $contact,
+                // Same date as on the attendance sheet of the spread
+                dol_print_date($signatory->signature_date, 'dayhour', 'tzuserrel'),
+                ['text' => '', 'image' => $imagePath]
+            ];
+        }
+
+        // Le titre reste avec l'entete du tableau et sa premiere ligne
+        $this->reserveSpace($pdf, 40);
+        $this->sectionTitle($pdf, $outputLangs->transnoentities('DocumentSpreadSignatories'), $size);
+        $this->table($pdf, $header, $rows, $widths, $size);
+
+        // Le document est regenere a chaque signature : sans menage, une image par personne et par
+        // generation resterait dans le dossier temporaire du systeme
+        foreach ($imagePaths as $imagePath) {
+            if (is_file($imagePath)) {
+                unlink($imagePath);
+            }
+        }
     }
 
     /**

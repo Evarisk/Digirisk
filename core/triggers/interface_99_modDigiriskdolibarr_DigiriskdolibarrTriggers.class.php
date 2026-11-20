@@ -898,6 +898,19 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
             return;
         }
 
+        // Signature d'une personne de la diffusion DoliLetter : le document liste les personnes qui ont
+        // signe, il est donc regenere a chacune. L'evenement porte la feuille d'emargement, dont
+        // object_type / fk_object designent l'objet diffuse.
+        if ($action === 'SPREAD_SIGN' && isset($object->object_type) && !empty($object->fk_object)) {
+            if ($object->object_type === 'digiriskdolibarr_preventionplan') {
+                $this->refreshPreventionPlanDocument((int) $object->fk_object, $user, $langs);
+            } elseif ($object->object_type === 'digiriskdolibarr_firepermit') {
+                $this->refreshFirePermitDocument((int) $object->fk_object, $user, $langs);
+            }
+
+            return;
+        }
+
         // Une signature change le document : sans regeneration, la diffusion continue de presenter
         // une version datee a des gens qui n'ont aucun moyen de s'en apercevoir.
         $signatureTriggers = ['SATURNE_SIGNATURE_SIGN', 'SATURNE_SIGNATURE_SIGN_PUBLIC', 'SATURNE_SIGNATURE_PENDING_SIGNATURE'];

@@ -2669,6 +2669,7 @@ PreventionPlanAttendants = Intervenants : Entreprise Extérieure (EE) et sous-tr
 Morning = Matin
 Afternoon = Après-midi
 Signatures = Signatures
+DocumentSpreadSignatories = Personnes ayant signé la diffusion
 SignaturePending = En attente
 PreventionPlanRiskPhotos = Photos du risque
 InterventionPeriodOnly = Ce plan debute le %s et finit le %s.
