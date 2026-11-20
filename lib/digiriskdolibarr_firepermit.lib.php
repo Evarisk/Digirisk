@@ -236,11 +236,11 @@ function digiriskFirePermitSignWithPreventionPlan(DoliDB $db, FirePermit $permit
 
     $permitSignatory->signature      = $planSignatory->signature;
     $permitSignatory->signature_date = dol_now();
-    if ($permitSignatory->update($user, true) <= 0) {
+    if ($permitSignatory->update($user, 1) <= 0) {
         return -1;
     }
 
-    return ($permitSignatory->setSigned($user, false) > 0) ? 1 : -1;
+    return ($permitSignatory->setSigned($user, 0) > 0) ? 1 : -1;
 }
 
 /**
