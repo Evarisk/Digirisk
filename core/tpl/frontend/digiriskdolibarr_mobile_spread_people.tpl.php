@@ -23,8 +23,10 @@
  *          spread page. The documents go through document.php, which checks the read right again.
  *          Shown from the creation of the object: before anybody joined, it already says which documents
  *          each person will be asked for, instead of leaving nothing where one looks for who signed.
+ *          Once somebody signed, the attendance sheet PDF of the spread can be downloaded from here.
  *          Expects: $conf, $langs, $spreadPeople (digiriskMobileGetSpreadPeople()),
- *                   $spreadPeopleShowDetails (the user may read the object), $spreadPeopleRisksLabel.
+ *                   $spreadPeopleShowDetails (the user may read the object), $spreadPeopleRisksLabel,
+ *                   $spreadPeopleShowSigninSheet (the user may read DoliLetter documents, optional).
  */
 
 if (empty($spreadPeople['available'])) {
@@ -148,5 +150,11 @@ $spreadDocumentBaseUrl = DOL_URL_ROOT . '/document.php?modulepart=digiriskdoliba
         </li>
         <?php } ?>
     </ul>
+    <?php } ?>
+
+    <?php if (!empty($spreadPeopleShowSigninSheet) && $spreadPeople['signed_count'] > 0 && dol_strlen($spreadPeople['signin_sheet_url'])) { ?>
+    <a class="digirisk-mobile-spread-people__download" href="<?php print dol_escape_htmltag($spreadPeople['signin_sheet_url']); ?>" target="_blank" rel="noopener">
+        <i class="fas fa-file-pdf"></i> <?php print $langs->trans('MobileSpreadPeopleSigninSheet'); ?>
+    </a>
     <?php } ?>
 </div>

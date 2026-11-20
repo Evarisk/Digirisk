@@ -2514,6 +2514,7 @@ MobileSpreadPeopleDetails = Documents et réponses
 MobileSpreadPeopleRisksRead = %s pris en connaissance : %s sur %s
 MobileSpreadPeopleRequested = Documents demandés à chaque personne
 MobileSpreadPeopleEmpty = Personne n'a encore rejoint la diffusion.
+MobileSpreadPeopleSigninSheet = Télécharger la feuille d'émargement
 MobileSpreadCertProvided = Fourni
 MobileSpreadCertNotProvided = Non fourni
 MobileSpreadCertNotConcerned = Non concerné
