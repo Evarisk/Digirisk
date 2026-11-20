@@ -1655,7 +1655,7 @@ GoBackToTicketCreation                   = Go to the ticket tracking page
 SendEmailOnTicketSubmit                  = Send emails on creation
 CatTicketsList                           = List of the ticket tags/categories
 SendEmailTo                              = Email address to notify
-SendEmailOnTicketSubmitHelp              = Enable the automatic sending of an email when a ticket is created
+SendEmailOnTicketSubmitHelp              = Enable the automatic sending of an email when a ticket is created, to the address to notify below. For the tickets declared on the public page of Digirisk, this mail then replaces the one of the module Ticket (« New ticket created »), which no longer goes to its address shared by every module
 MultipleEmailsSeparator                  = To assign several email addresses to notify, separate them with a ";". For example: "aaaa@bbb.cc;dddd@eee.ff"
 
 # Email template of the declaration notification - issue #5235
