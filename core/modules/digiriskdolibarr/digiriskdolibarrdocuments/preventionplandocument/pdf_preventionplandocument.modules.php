@@ -1692,7 +1692,9 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         foreach ($signedPeople as $person) {
             $signatory = $person['signatory'];
             $name      = trim(dol_strtoupper((string) $signatory->lastname) . ' ' . ucfirst((string) $signatory->firstname));
-            $contact   = implode("\n", array_filter([(string) $signatory->email, (string) $signatory->phone], 'dol_strlen'));
+            $contact   = implode("\n", array_filter([(string) $signatory->email, (string) $signatory->phone], function (string $value): bool {
+                return dol_strlen($value) > 0;
+            }));
             $imagePath = $this->extractSignature($signatory, $outputLangs);
             if (dol_strlen($imagePath)) {
                 $imagePaths[] = $imagePath;
