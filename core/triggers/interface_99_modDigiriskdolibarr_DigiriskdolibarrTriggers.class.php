@@ -353,7 +353,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
             case 'ACCIDENTINVESTIGATION_VALIDATE' :
             case 'FIREPERMIT_PENDINGSIGNATURE' :
 			case 'PREVENTIONPLAN_PENDINGSIGNATURE' :
-				$actioncomm->label = $langs->transnoentities('ObjectValidateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				// A validation trigger runs before the object takes its final ref, kept meanwhile in newref, as in Dolibarr core:
+				// the event is labelled with it, not with the (PROVn) one
+				$objectRef = (preg_match('/_VALIDATE$/', $action) && !empty($object->newref)) ? $object->newref : $object->ref;
+
+				$actioncomm->label = $langs->transnoentities('ObjectValidateTrigger', $langs->transnoentities(ucfirst($object->element)), $objectRef);
 
 				$result = $actioncomm->create($user);
 				break;
