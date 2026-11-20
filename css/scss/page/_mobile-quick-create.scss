@@ -1952,6 +1952,28 @@ body.digirisk-mobile-create {
       color: #64748b;
     }
 
+    &__download {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #2563eb;
+      text-decoration: none;
+      background: #fff;
+      border: 1px solid #2563eb;
+      border-radius: 8px;
+
+      &:hover,
+      &:focus {
+        color: #fff;
+        background: #2563eb;
+      }
+    }
+
     &__list {
       margin: 10px 0 0;
       padding: 0;

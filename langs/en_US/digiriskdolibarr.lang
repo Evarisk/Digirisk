@@ -2499,6 +2499,7 @@ MobileSpreadPeopleDetails = Documents and answers
 MobileSpreadPeopleRisksRead = %s taken note of: %s out of %s
 MobileSpreadPeopleRequested = Documents asked of each person
 MobileSpreadPeopleEmpty = Nobody has joined the spread yet.
+MobileSpreadPeopleSigninSheet = Download the attendance sheet
 MobileSpreadCertProvided = Provided
 MobileSpreadCertNotProvided = Not provided
 MobileSpreadCertNotConcerned = Not concerned

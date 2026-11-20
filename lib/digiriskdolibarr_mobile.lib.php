@@ -899,13 +899,14 @@ function digiriskGetQrCodePng(string $data, string $filePath, int $size = 600): 
  * @return array                available (DoliLetter can serve the spread), certifications (code, label,
  *                              mandatory: what each person will be asked for), people (signatory, cert_states,
  *                              risks_read, signed), signed_count, risk_count, cert_sub_dir (directory of the
- *                              documents, relative to the module output)
+ *                              documents, relative to the module output), signin_sheet_url (download of the
+ *                              attendance sheet PDF by the spread page, empty while the spread has no sheet)
  */
 function digiriskMobileGetSpreadPeople(DoliDB $db, CommonObject $object): array
 {
     global $conf;
 
-    $spread = ['available' => false, 'certifications' => [], 'people' => [], 'signed_count' => 0, 'risk_count' => 0, 'cert_sub_dir' => ''];
+    $spread = ['available' => false, 'certifications' => [], 'people' => [], 'signed_count' => 0, 'risk_count' => 0, 'cert_sub_dir' => '', 'signin_sheet_url' => ''];
 
     if (!isModEnabled('doliletter')) {
         return $spread;
@@ -944,6 +945,10 @@ function digiriskMobileGetSpreadPeople(DoliDB $db, CommonObject $object): array
     if ($attendanceSheet->fetch(0, '', " AND object_type = 'digiriskdolibarr_" . $db->escape($object->element) . "' AND fk_object = " . ((int) $object->id)) <= 0) {
         return $spread;
     }
+
+    // The spread page generates the sheet again before serving it, with the signatures given so far,
+    // and checks the DoliLetter read right itself
+    $spread['signin_sheet_url'] = dol_buildpath('/doliletter/public/spread/add_spread.php', 1) . '?id=' . ((int) $object->id) . '&object_type=digiriskdolibarr_' . urlencode($object->element) . '&action=download_signin_sheet';
 
     $signatory   = new SaturneSignature($db, 'doliletter', $attendanceSheet->element);
     $signatories = $signatory->fetchSignatory('', $attendanceSheet->id, $attendanceSheet->element);
