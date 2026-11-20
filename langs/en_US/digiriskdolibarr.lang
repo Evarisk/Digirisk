@@ -2572,6 +2572,9 @@ MobilePPEmailAutoSend = Automatically send the signature email on creation
 
 # Mobile fire permit quick creation
 MobileFPPreventionPlanHelp = The exterior company and the period of the selected plan are reused automatically.
+MobileFPSignWithPlan = Sign directly with the signature of the prevention plan
+MobileFPSignWithPlanNotApplied = Signature of the prevention plan not used: the responsible of the exterior company of the permit is not the person who signed the plan. Have them sign the permit.
+MobileFPSignWithPlanFailed = The signature of the prevention plan could not be used: have the responsible of the exterior company sign the permit.
 MobileFPPeriod = Location and work period
 MobileFPMaxOneMonthHint = One month maximum between the start and the end of the work.
 MobileFPErrorMaxOneMonth = The duration cannot exceed one month.
