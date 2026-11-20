@@ -136,6 +136,7 @@ class pdf_firepermitdocument extends pdf_preventionplandocument
         $this->sectionCertifications($pdf, $object, $outputLangs, $size);
         $this->sectionLinkedPreventionPlan($pdf, $object, $data, $outputLangs, $size);
         $this->sectionSignatures($pdf, $object, $outputLangs, $size);
+        $this->sectionSpreadSignatories($pdf, $object, $outputLangs, $size);
     }
 
     /**
