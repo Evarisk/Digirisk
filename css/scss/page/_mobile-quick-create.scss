@@ -1891,6 +1891,58 @@ body.digirisk-mobile-create {
     pointer-events: none;
   }
 
+  /* Fire permit: sign directly with the signature the exterior responsible gave to the parent plan */
+  .digirisk-mobile-sign-with-plan {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    cursor: pointer;
+
+    &.hidden {
+      display: none;
+    }
+
+    &.is-checked {
+      background: #eff6ff;
+      border-color: #2b7de9;
+    }
+
+    input[type="checkbox"] {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      accent-color: #2b7de9;
+    }
+
+    &__text {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    &__label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    &__who {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #64748b;
+    }
+  }
+
   /* People of the public spread: who signed, and under each one what they provided */
   .digirisk-mobile-spread-people {
     padding: 16px 14px;

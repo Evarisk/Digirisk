@@ -2587,6 +2587,9 @@ MobilePPEmailAutoSend = Envoyer automatiquement l'email de signature à la créa
 
 # Mobile fire permit quick creation
 MobileFPPreventionPlanHelp = L'entreprise extérieure et la période du plan sélectionné sont reprises automatiquement.
+MobileFPSignWithPlan = Signer directement avec la signature du plan de prévention
+MobileFPSignWithPlanNotApplied = Signature du plan de prévention non reprise : le responsable de l'entreprise extérieure du permis n'est pas celui qui a signé le plan. Faites-lui signer le permis.
+MobileFPSignWithPlanFailed = La signature du plan de prévention n'a pas pu être reprise : faites signer le permis au responsable de l'entreprise extérieure.
 MobileFPPeriod = Lieu et période des travaux
 MobileFPMaxOneMonthHint = Un mois maximum entre le début et la fin des travaux.
 MobileFPErrorMaxOneMonth = La durée ne peut pas dépasser un mois.

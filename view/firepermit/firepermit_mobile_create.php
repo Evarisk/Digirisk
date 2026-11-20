@@ -623,6 +623,14 @@ if ($action == 'add_mobile' && $permissiontoadd) {
 
                 $saveRiskPhotos();
 
+                // Box ticked: the responsible who already signed the parent plan signs the permit with that signature
+                if (GETPOSTINT('sign_with_plan')) {
+                    $signedWithPlan = digiriskFirePermitSignWithPreventionPlan($db, $object, $user);
+                    if ($signedWithPlan <= 0) {
+                        setEventMessages($langs->trans($signedWithPlan < 0 ? 'MobileFPSignWithPlanFailed' : 'MobileFPSignWithPlanNotApplied'), null, 'warnings');
+                    }
+                }
+
                 $db->commit();
 
                 digiriskMobileSaveSchedules($db, $user, 'firepermit', (int) $object->id, $schedules);
@@ -720,6 +728,16 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                     }
                 }
 
+                // Box ticked: the responsible who already signed the parent plan signs the permit with
+                // that signature, once the interior side has signed, so the permit can be locked
+                $signedWithPlan = 0;
+                if (GETPOSTINT('sign_with_plan')) {
+                    $signedWithPlan = digiriskFirePermitSignWithPreventionPlan($db, $object, $user);
+                    if ($signedWithPlan <= 0) {
+                        setEventMessages($langs->trans($signedWithPlan < 0 ? 'MobileFPSignWithPlanFailed' : 'MobileFPSignWithPlanNotApplied'), null, 'warnings');
+                    }
+                }
+
                 digiriskMobileSaveSchedules($db, $user, 'firepermit', (int) $object->id, $schedules);
 
                 // Le document est genere avant le mail : son destinataire arrive sur une page de
@@ -730,8 +748,9 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                 // Ask the exterior responsible to sign by email (email-only, no SMS configured).
                 // L'echec n'annule pas la creation : l'ecran de succes affiche l'etat de l'envoi et
                 // permet de renvoyer le lien ou de faire signer sur le telephone.
+                // Not when the permit is already signed with the signature of the plan
                 $autoSendEmail = getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_EMAIL_AUTO_SEND', 0);
-                if ($autoSendEmail) {
+                if ($autoSendEmail && $signedWithPlan <= 0) {
                     $extSignatories = $signatory->fetchSignatory('ExtSocietyResponsible', $object->id, 'firepermit');
                     if (is_array($extSignatories) && !empty($extSignatories)) {
                         $extSignatory = array_shift($extSignatories);

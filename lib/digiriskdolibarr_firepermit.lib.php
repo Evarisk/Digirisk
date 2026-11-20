@@ -185,6 +185,65 @@ function digiriskRefreshFirePermitDocument(DoliDB $db, int $permitId, User $user
 }
 
 /**
+ * Responsable de l'entreprise exterieure d'un plan de prevention, s'il l'a deja signe.
+ *
+ * @param  DoliDB                $db     Base de donnees
+ * @param  int                   $planId Identifiant du plan de prevention
+ * @return SaturneSignature|null         Son signataire courant, null tant qu'il n'a pas signe
+ */
+function digiriskGetPreventionPlanSignedExtResponsible(DoliDB $db, int $planId): ?SaturneSignature
+{
+    require_once __DIR__ . '/digiriskdolibarr_function.lib.php';
+    dol_include_once('/saturne/class/saturnesignature.class.php');
+
+    if ($planId <= 0) {
+        return null;
+    }
+
+    $signatory = new SaturneSignature($db, 'digiriskdolibarr', 'preventionplan');
+    $current   = digiriskGetCurrentSignatory($signatory, 'ExtSocietyResponsible', $planId, 'preventionplan');
+
+    return (is_object($current) && SaturneSignature::isValidSignatureData((string) $current->signature)) ? $current : null;
+}
+
+/**
+ * Fait signer le responsable de l'entreprise exterieure d'un permis de feu avec la signature qu'il a
+ * deja donnee au plan de prevention rattache : le patron qui a signe le plan n'a pas a signer une
+ * seconde fois le permis qui en decoule.
+ *
+ * Ne fait rien si ce n'est pas la meme personne sur les deux, si elle n'a pas signe le plan ou si
+ * elle a deja signe le permis. La signature passe par le meme declencheur qu'une signature donnee a
+ * la main : evenement d'agenda, verrouillage du permis une fois tout signe, document regenere.
+ *
+ * @param  DoliDB     $db     Base de donnees
+ * @param  FirePermit $permit Permis de feu, avec son plan de prevention rattache
+ * @param  User       $user   Utilisateur qui a coche la case
+ * @return int                1 si signe, 0 si rien a faire, < 0 si KO
+ */
+function digiriskFirePermitSignWithPreventionPlan(DoliDB $db, FirePermit $permit, User $user): int
+{
+    $planSignatory = digiriskGetPreventionPlanSignedExtResponsible($db, (int) $permit->fk_preventionplan);
+    if (!is_object($planSignatory)) {
+        return 0;
+    }
+
+    $signatory       = new SaturneSignature($db, 'digiriskdolibarr', 'firepermit');
+    $permitSignatory = digiriskGetCurrentSignatory($signatory, 'ExtSocietyResponsible', (int) $permit->id, 'firepermit');
+    if (!is_object($permitSignatory) || !empty($permitSignatory->signature)
+        || $permitSignatory->element_type != $planSignatory->element_type || (int) $permitSignatory->element_id !== (int) $planSignatory->element_id) {
+        return 0;
+    }
+
+    $permitSignatory->signature      = $planSignatory->signature;
+    $permitSignatory->signature_date = dol_now();
+    if ($permitSignatory->update($user, true) <= 0) {
+        return -1;
+    }
+
+    return ($permitSignatory->setSigned($user, false) > 0) ? 1 : -1;
+}
+
+/**
  * Lien de signature d'un signataire de permis de feu.
  *
  * Le meme lien sert au mail, au QR code de l'interface mobile et au bouton qui fait signer
