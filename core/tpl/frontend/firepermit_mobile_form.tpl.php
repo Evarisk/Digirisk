@@ -30,6 +30,16 @@ $sirenLookupUrl          = dol_buildpath('/digiriskdolibarr/core/ajax/mobile_sir
 $saveSignatureUrl        = dol_buildpath('/digiriskdolibarr/core/ajax/save_user_signature.php', 1);
 $preventionPlanLookupUrl = dol_buildpath('/digiriskdolibarr/core/ajax/mobile_preventionplan_lookup.php', 1);
 
+// "Sign directly" box: the responsible of the exterior company who already signed the parent plan can
+// have the permit signed with that signature. Picking another plan shows or hides it (lookup).
+$planSignedResponsible = digiriskGetPreventionPlanSignedExtResponsible($db, (int) $prefill['fk_preventionplan']);
+$permitExtSigned       = false;
+if (!empty($isEdit)) {
+    $permitExtSignatory = digiriskGetCurrentSignatory(new SaturneSignature($db, 'digiriskdolibarr', 'firepermit'), 'ExtSocietyResponsible', (int) $object->id, 'firepermit');
+    $permitExtSigned    = is_object($permitExtSignatory) && !empty($permitExtSignatory->signature);
+}
+$showSignWithPlan = !$permitExtSigned && is_object($planSignedResponsible) && (int) $planSignedResponsible->element_id === (int) $prefill['resp_contact_id'];
+
 // Exclude the elements sitting in the trash from the location picker, like the fire permit card does.
 $deletedElements = $digiriskelement->getMultiEntityTrashList();
 if (empty($deletedElements)) {
@@ -276,6 +286,19 @@ foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 's
                 <?php print $preventionplan->select_preventionplan_list($prefill['fk_preventionplan'], 'fk_preventionplan', [], '1', 0, [], 0, 0, 'digirisk-mobile-preventionplan-select'); ?>
             </div>
             <div class="digirisk-mobile-help"><?php print $langs->trans('MobileFPPreventionPlanHelp'); ?></div>
+            <?php // transnoentities() keeps the %s marker: the date is put in by the lookup when another plan is picked ?>
+            <label class="digirisk-mobile-sign-with-plan<?php print $showSignWithPlan ? '' : ' hidden'; ?>"
+                   data-ext-signed="<?php print $permitExtSigned ? '1' : '0'; ?>"
+                   data-signed-label="<?php print dol_escape_htmltag($langs->transnoentities('MobilePPExtAlreadySigned', '%s')); ?>">
+                <input type="checkbox" name="sign_with_plan" value="1">
+                <span class="digirisk-mobile-sign-with-plan__text">
+                    <span class="digirisk-mobile-sign-with-plan__label"><?php print $langs->trans('MobileFPSignWithPlan'); ?></span>
+                    <span class="digirisk-mobile-sign-with-plan__who">
+                        <span class="digirisk-mobile-sign-with-plan__name"><?php print is_object($planSignedResponsible) ? dol_escape_htmltag(trim($planSignedResponsible->firstname . ' ' . $planSignedResponsible->lastname)) : ''; ?></span>
+                        <span class="digirisk-mobile-extsign__signed"><i class="fas fa-check"></i> <span class="digirisk-mobile-sign-with-plan__date"><?php print is_object($planSignedResponsible) ? dol_escape_htmltag($langs->transnoentities('MobilePPExtAlreadySigned', dol_print_date($planSignedResponsible->signature_date, 'dayhour', 'tzuser'))) : ''; ?></span></span>
+                    </span>
+                </span>
+            </label>
         </div>
 
         <!-- Card 4: exterior company, asked to sign by email. Three ways to fill it in: pick it in

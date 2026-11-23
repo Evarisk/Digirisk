@@ -36,7 +36,7 @@ class modDigiriskdolibarr extends DolibarrModules
 	/**
 	 * @var int[] Minimum version of Saturne required by module, same format as need_dolibarr_version: checked by init() and by the Saturne index page
 	 */
-	public $need_saturne_version = [23, 8, 0];
+	public $need_saturne_version = [23, 9, 1];
 
 	/**
 	 * @var DoliDB Database handler
@@ -392,7 +392,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '23.8.0';
+		$this->version         = '23.9.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr_color@digiriskdolibarr';
 
@@ -940,6 +940,10 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_ARCHIVE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_LOCK', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_SENTBYMAIL', 'integer', 1, '', 0, 'current'],
+
+			// CONST JOB SHEET DOCUMENT (fiche de poste, modèle INRS ED 126)
+			$i++ => ['DIGIRISKDOLIBARR_JOBSHEETDOCUMENT_ADDON', 'chaine', 'mod_jobsheetdocument_standard', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_JOBSHEETDOCUMENT_DEFAULT_MODEL', 'chaine', 'jobsheetdocument', '', 0, 'current'],
 
 			// CONST ACCIDENT INVESTIGATION DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATIONDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
@@ -2419,6 +2423,7 @@ class modDigiriskdolibarr extends DolibarrModules
         delDocumentModel('orque_projectdocument', 'project');
         delDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument');
         delDocumentModel('accidentinvestigationdocument', 'accidentinvestigationdocument');
+        delDocumentModel('jobsheetdocument', 'jobsheetdocument');
         delDocumentModel('registerdocument_odt', 'registerdocument');
         delDocumentModel('ticketdocument', 'ticketdocument');
         delDocumentModel('ticketqqoqcpdocument', 'ticketqqoqcpdocument');
@@ -2454,6 +2459,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		addDocumentModel('papripact_a3_paysage_projectdocument', 'project', 'PAPRIPACT-A3-PAYSAGE');
         addDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument', 'ODT templates', 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('accidentinvestigationdocument', 'accidentinvestigationdocument', $langs->transnoentities('AccidentInvestigationDocumentPDF'));
+        addDocumentModel('jobsheetdocument', 'jobsheetdocument', $langs->transnoentities('JobSheetDocumentPDF'));
         addDocumentModel('registerdocument_odt', 'registerdocument', 'ODT templates', 'DIGIRISKDOLIBARR_REGISTERDOCUMENT_ADDON_ODT_PATH');
 
 		// The entity conf may have been cloned from another entity (multicompany): the constants can point
@@ -3201,6 +3207,13 @@ class modDigiriskdolibarr extends DolibarrModules
         }
 
         $result = $this->_init($sql, $options);
+
+        // Files of the objects validated while they stayed under (PROVn) : moved back once the module is enabled,
+        // from Home > Modules as well (Saturne#1939), before the media library looks for them. A Saturne without
+        // the function leaves them
+        if ($result > 0 && function_exists('saturne_recover_prov_directories')) {
+            saturne_recover_prov_directories($this->name);
+        }
 
         // Photos sent straight to a record never reached the media library, where the gallery lists
         // them: they join it, the work folders of the mobile forms and the certificates of the

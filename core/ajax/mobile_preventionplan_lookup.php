@@ -37,6 +37,7 @@ dol_include_once('/saturne/class/saturnesignature.class.php');
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_firepermit.lib.php';
 
 global $db, $moduleNameLowerCase, $user;
 
@@ -94,6 +95,15 @@ if (is_array($extResponsibles) && !empty($extResponsibles)) {
         'phone'     => $extResponsible->phone,
     ];
 }
+
+// The responsible of the exterior company who already signed the plan: the fire permit form offers
+// to sign the permit with this same signature
+$signedResponsible              = digiriskGetPreventionPlanSignedExtResponsible($db, (int) $preventionPlan->id);
+$response['signed_responsible'] = is_object($signedResponsible) ? [
+    'id'   => (int) $signedResponsible->element_id,
+    'name' => trim($signedResponsible->firstname . ' ' . $signedResponsible->lastname),
+    'date' => dol_print_date($signedResponsible->signature_date, 'dayhour', 'tzuser'),
+] : null;
 
 echo json_encode($response);
 exit;
