@@ -268,6 +268,16 @@ StaffRepresentatives = Délégués du personnel
 ElectionDate         = Date d'élection
 ElectionDateCSE      = Date d'élection du CSE
 ElectionDateDP       = Date d'élection des DP
+CHSCT                          = Comité d'Hygiène, de Sécurité et des Conditions de Travail (CHSCT)
+F3SCT                          = Formation Spécialisée en Santé, Sécurité et Conditions de Travail (F3SCT)
+ElectionDateCHSCT              = Date de désignation du CHSCT
+ElectionDateF3SCT              = Date de désignation de la F3SCT
+StaffRepresentativeBodies      = Instances représentatives du personnel
+StaffRepresentativeBodiesHelp  = Instances dont l'entreprise est dotée. Chacune a sa date d'élection, ses titulaires et ses suppléants, à renseigner après l'enregistrement, repris dans la diffusion d'informations.
+StaffBodyMembersCSE            = Membres du Comité social et économique élus le
+StaffBodyMembersCHSCT          = Membres du Comité d'hygiène, de sécurité et des conditions de travail désignés le
+StaffBodyMembersF3SCT          = Membres de la formation spécialisée en santé, sécurité et conditions de travail désignés le
+StaffBodyMembersDP             = Délégués du personnel élus le
 
 Titulars                       = Titulaires
 Alternates                     = Suppléants

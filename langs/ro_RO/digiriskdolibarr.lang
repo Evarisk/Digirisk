@@ -245,6 +245,16 @@ StaffRepresentatives = Reprezentanții personalului
 ElectionDate         = Data alegerilor
 ElectionDateCSE      = Data alegerilor Comitetului Social și Economic
 ElectionDateDP       = Data alegerilor reprezentanților personalului
+CHSCT                          = Comitetul de Igienă, Securitate și Condiții de Muncă (CHSCT)
+F3SCT                          = Formațiunea Specializată în Sănătate, Securitate și Condiții de Muncă (F3SCT)
+ElectionDateCHSCT              = Data desemnării Comitetului de Igienă, Securitate și Condiții de Muncă
+ElectionDateF3SCT              = Data desemnării formațiunii specializate în sănătate, securitate și condiții de muncă
+StaffRepresentativeBodies      = Organisme reprezentative ale personalului
+StaffRepresentativeBodiesHelp  = Organismele de care dispune întreprinderea. Fiecare are data alegerilor, titularii și supleanții săi, de completat după salvare, preluați în difuzarea informațiilor.
+StaffBodyMembersCSE            = Membrii Comitetului Social și Economic aleși la
+StaffBodyMembersCHSCT          = Membrii Comitetului de Igienă, Securitate și Condiții de Muncă desemnați la
+StaffBodyMembersF3SCT          = Membrii formațiunii specializate în sănătate, securitate și condiții de muncă desemnați la
+StaffBodyMembersDP             = Reprezentanții personalului aleși la
 
 Titulars                       = Titulari
 Alternates                     = Supleanți
