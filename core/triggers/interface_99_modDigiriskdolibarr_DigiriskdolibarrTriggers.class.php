@@ -73,7 +73,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
 		$this->version     = '23.8.0';
-		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
+		$this->picto       = 'digiriskdolibarr_color@digiriskdolibarr';
 	}
 
 	/**
@@ -1136,7 +1136,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
         // saturne, qui ne connait ni l'une ni l'autre mais dont seule load() est deja gelee
         // dans la baseline - dont le compteur de ce fichier suit ces deux appels
         $langs->load('saturne@saturne');
-        $langs->load('digiriskdolibarr@digiriskdolibarr');
+        $langs->load('digiriskdolibarr_color@digiriskdolibarr');
 
         $substitutions  = $this->ticketSubmittedSubstitutions($object, $langs);
         $defaultSubject = $langs->transnoentities('ANewTicketHasBeenSubmitted', getDolGlobalString('MAIN_INFO_SOCIETE_NOM'));
