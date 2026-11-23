@@ -112,6 +112,7 @@ window.digiriskdolibarr.mobilequickcreate.event = function() {
     $(document).on('change', '#ext_society_picker', window.digiriskdolibarr.mobilequickcreate.selectSociety);
     $(document).on('change', '.digirisk-mobile-contact-select', window.digiriskdolibarr.mobilequickcreate.selectContact);
     $(document).on('change', '.digirisk-mobile-preventionplan-select', window.digiriskdolibarr.mobilequickcreate.selectPreventionPlan);
+    $(document).on('change', '.digirisk-mobile-sign-with-plan input[type="checkbox"]', window.digiriskdolibarr.mobilequickcreate.checkSignWithPlan);
     $(document).on('change', '.digirisk-mobile-date-start, .digirisk-mobile-date-end', window.digiriskdolibarr.mobilequickcreate.checkDates);
     $(document).on('click', '.digirisk-mobile-schedules-copy', window.digiriskdolibarr.mobilequickcreate.copyCompanyHours);
     $(document).on('click', '.digirisk-mobile-risk-add', window.digiriskdolibarr.mobilequickcreate.openRiskModal);
@@ -528,7 +529,8 @@ window.digiriskdolibarr.mobilequickcreate.selectPreventionPlan = function() {
     var url  = form.data('preventionplan-lookup-url');
     var id   = $(this).val();
 
-    if (!url || !id) {
+    if (!url || !id || id <= 0) {
+        window.digiriskdolibarr.mobilequickcreate.toggleSignWithPlan(null);
         return;
     }
 
@@ -538,8 +540,10 @@ window.digiriskdolibarr.mobilequickcreate.selectPreventionPlan = function() {
         dataType: 'json',
         success: function(resp) {
             if (!resp || !resp.success) {
+                window.digiriskdolibarr.mobilequickcreate.toggleSignWithPlan(null);
                 return;
             }
+            window.digiriskdolibarr.mobilequickcreate.toggleSignWithPlan(resp);
             if (resp.societe && resp.societe.id) {
                 $('.digirisk-mobile-ext-society-id').val(resp.societe.id);
                 $('.digirisk-mobile-ext-society-name').val(resp.societe.name || '');
@@ -563,6 +567,43 @@ window.digiriskdolibarr.mobilequickcreate.selectPreventionPlan = function() {
             window.digiriskdolibarr.mobilequickcreate.checkDates();
         }
     });
+};
+
+/**
+ * Show the "sign directly" box of the fire permit when the responsible of the exterior company has
+ * already signed the picked prevention plan: their signature can then be taken for the permit.
+ * Hidden, and unticked, for a plan they have not signed or a permit they have already signed.
+ *
+ * @param  {Object|null} resp Answer of the prevention plan lookup
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.toggleSignWithPlan = function(resp) {
+    var box = $('.digirisk-mobile-sign-with-plan');
+    if (!box.length) {
+        return;
+    }
+
+    var signed = resp ? resp.signed_responsible : null;
+    // The responsible pre-filled from the plan is the one who signed it
+    var sameResponsible = signed && resp.responsible && String(resp.responsible.id) === String(signed.id);
+    if (!sameResponsible || String(box.data('ext-signed')) === '1') {
+        box.addClass('hidden').removeClass('is-checked').find('input[type="checkbox"]').prop('checked', false);
+        return;
+    }
+
+    box.find('.digirisk-mobile-sign-with-plan__name').text(signed.name);
+    box.find('.digirisk-mobile-sign-with-plan__date').text(String(box.data('signed-label')).replace('%s', signed.date));
+    box.removeClass('hidden');
+};
+
+/**
+ * Ticked "sign directly" box: drawn like a picked option. A class rather than :has(), whose cost on
+ * this page is felt at each change.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.mobilequickcreate.checkSignWithPlan = function() {
+    $(this).closest('.digirisk-mobile-sign-with-plan').toggleClass('is-checked', this.checked);
 };
 
 /**
