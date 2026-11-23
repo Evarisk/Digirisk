@@ -68,61 +68,39 @@ if ($document->harassment_officer->id > 0) {
 }
 print '</td></tr>';
 
-// Harassment officer CSE
-print '<tr>';
-print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("HarassmentOfficerCSE"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
-print '<td>';
-if ($document->harassment_officer_cse->id > 0) {
-	$user->fetch($document->harassment_officer_cse->id);
-	print $user->getNomUrl(1) . ' ';
-	print '<i class="fas fa-phone"></i> ' . $document->harassment_officer_cse->phone;
+// Harassment officer CSE, only with the ESC
+if (isset($activeStaffBodies['CSE'])) {
+	print '<tr>';
+	print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("HarassmentOfficerCSE"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+	print '<td>';
+	if ($document->harassment_officer_cse->id > 0) {
+		$user->fetch($document->harassment_officer_cse->id);
+		print $user->getNomUrl(1) . ' ';
+		print '<i class="fas fa-phone"></i> ' . $document->harassment_officer_cse->phone;
+	}
+	print '</td></tr>';
 }
-print '</td></tr>';
 
-// CSE
+// Staff representative bodies chosen in the social setup (CSE, CHSCT, F3SCT, DP): election date, titulars, alternates
+foreach ($document->staff_bodies ?? [] as $staffBody) {
+	print '<tr>';
+	print '<td class="titlefield"><i class="fas fa-calendar-alt"></i> ' . $form->textwithpicto($langs->trans('ElectionDate' . $staffBody->code), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+	print '<td>';
+	print '<i class="fas fa-calendar-alt"></i> ' . dol_print_date($staffBody->election_date, 'day');
+	print '</td></tr>';
 
-// Date
-print '<tr>';
-print '<td class="titlefield"><i class="fas fa-calendar-alt"></i> ' . $form->textwithpicto($langs->trans("ElectionDateCSE"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
-print '<td>';
-print '<i class="fas fa-calendar-alt"></i> ' . dol_print_date($document->membres_du_comite_entreprise_date, 'day');
-print '</td></tr>';
+	print '<tr>';
+	print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("Titulars"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+	print '<td>';
+	print $staffBody->titularsFullName;
+	print '</td></tr>';
 
-// Titulars
-print '<tr>';
-print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("Titulars"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
-print '<td>';
-print $document->membres_du_comite_entreprise_titulairesFullName;
-print '</td></tr>';
-
-// Alternates
-print '<tr>';
-print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("Alternates"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
-print '<td>';
-print $document->membres_du_comite_entreprise_suppleantsFullName;
-print '</td></tr>';
-
-// DP
-//Date
-print '<tr>';
-print '<td class="titlefield"><i class="fas fa-calendar-alt"></i> ' . $form->textwithpicto($langs->trans("ElectionDateDP"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
-print '<td>';
-print '<i class="fas fa-calendar-alt"></i> ' . dol_print_date($document->delegues_du_personnels_date, 'day');
-print '</td></tr>';
-
-//Titulars
-print '<tr>';
-print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("Titulars"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
-print '<td>';
-print $document->delegues_du_personnels_titulairesFullName;
-print '</td></tr>';
-
-//Alternates
-print '<tr>';
-print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("Alternates"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
-print '<td>';
-print $document->delegues_du_personnels_suppleantsFullName;
-print '</td></tr>';
+	print '<tr>';
+	print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("Alternates"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+	print '<td>';
+	print $staffBody->alternatesFullName;
+	print '</td></tr>';
+}
 
 ?>
 <!-- END PHP TEMPLATE digiriskdolibarr_informationssharingfields_view.tpl -->

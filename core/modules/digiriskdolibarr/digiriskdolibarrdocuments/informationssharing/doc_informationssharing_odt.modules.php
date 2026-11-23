@@ -91,7 +91,52 @@ class doc_informationssharing_odt extends SaturneDocumentModel
 
 		$moreParam['tmparray']         = $tmpArray;
 		$moreParam['hideTemplateName'] = 1;
+		// Staff representative bodies chosen in the social setup, one staffbody segment each
+		$moreParam['staffBodies'] = json_decode((string) $objectDocument->json, true)['InformationsSharing']['staff_bodies'] ?? [];
 
 		return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
+	}
+
+	/**
+	 * Fill all odt tags for segments lines.
+	 *
+	 * The staffbody segment repeats the members of each staff representative body chosen in the social setup
+	 * (CSE, CHSCT, F3SCT, DP): its title, its election date, its titulars and its alternates
+	 *
+	 * @param  Odf       $odfHandler  Object builder odf library.
+	 * @param  Translate $outputLangs Lang object to use for output.
+	 * @param  array     $moreParam   More param (Object/user/etc).
+	 *
+	 * @return int                    1 if OK, <=0 if KO.
+	 * @throws Exception
+	 */
+	public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
+	{
+		$result = parent::fillTagsLines($odfHandler, $outputLangs, $moreParam);
+		if ($result < 0) {
+			return $result;
+		}
+
+		try {
+			$listLines = $odfHandler->setSegment('staffbody');
+		} catch (OdfExceptionSegmentNotFound $e) {
+			// A template without the segment, as the custom ones written before the choice of the bodies
+			dol_syslog($e->getMessage());
+			return 0;
+		}
+
+		foreach ($moreParam['staffBodies'] ?? [] as $staffBody) {
+			$tmpArray = [
+				'staffbody_title'         => dol_strtoupper($outputLangs->transnoentities('StaffBodyMembers' . $staffBody['code'])),
+				'staffbody_election_date' => dol_print_date($staffBody['election_date'], 'day', 'auto', $outputLangs),
+				'staffbody_titulars'      => dol_htmlentitiesbr_decode(strip_tags($staffBody['titulars'], '<br>')),
+				'staffbody_alternates'    => dol_htmlentitiesbr_decode(strip_tags($staffBody['alternates'], '<br>')),
+			];
+			$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+		}
+		// Without any body, the segment is merged empty and the block disappears
+		$odfHandler->mergeSegment($listLines);
+
+		return 0;
 	}
 }
