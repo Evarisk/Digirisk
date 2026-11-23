@@ -73,7 +73,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
 		$this->version     = '23.8.0';
-		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
+		$this->picto       = 'digiriskdolibarr_color@digiriskdolibarr';
 	}
 
 	/**
