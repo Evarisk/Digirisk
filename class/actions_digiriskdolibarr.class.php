@@ -2889,6 +2889,10 @@ class ActionsDigiriskdolibarr
         // ucfirst() gives Risksign, the translation key is RiskSign
         $objectsMetadata['digiriskdolibarr_risksign']['langs'] = 'RiskSign';
 
+        // Digiriskstandard is the technical name of the object ("Standard Digirisk"): the interface calls it the
+        // risk assessment document, and so must the pages of other modules (DoliLetter spread, its emails)
+        $objectsMetadata['digiriskdolibarr_digiriskstandard']['langs'] = 'RiskAssessmentDocument';
+
         $this->results = $objectsMetadata;
 
         return 0; // or return 1 to replace standard code

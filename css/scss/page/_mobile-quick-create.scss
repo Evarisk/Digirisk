@@ -1891,6 +1891,58 @@ body.digirisk-mobile-create {
     pointer-events: none;
   }
 
+  /* Fire permit: sign directly with the signature the exterior responsible gave to the parent plan */
+  .digirisk-mobile-sign-with-plan {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    cursor: pointer;
+
+    &.hidden {
+      display: none;
+    }
+
+    &.is-checked {
+      background: #eff6ff;
+      border-color: #2b7de9;
+    }
+
+    input[type="checkbox"] {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      accent-color: #2b7de9;
+    }
+
+    &__text {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    &__label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    &__who {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #64748b;
+    }
+  }
+
   /* People of the public spread: who signed, and under each one what they provided */
   .digirisk-mobile-spread-people {
     padding: 16px 14px;
@@ -1912,6 +1964,66 @@ body.digirisk-mobile-create {
       letter-spacing: normal;
       text-transform: none;
       color: #64748b;
+    }
+
+    &__requested {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      padding: 8px 10px;
+      font-size: 13px;
+      color: #334155;
+      background: #f8fafc;
+      border-radius: 6px;
+
+      i {
+        color: #64748b;
+      }
+    }
+
+    &__requested-label {
+      width: 100%;
+      font-weight: 600;
+    }
+
+    &__requested-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+    }
+
+    &__empty {
+      margin: 10px 0 0;
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    &__download {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #2563eb;
+      text-decoration: none;
+      background: #fff;
+      border: 1px solid #2563eb;
+      border-radius: 8px;
+
+      &:hover,
+      &:focus {
+        color: #fff;
+        background: #2563eb;
+      }
     }
 
     &__list {
@@ -2030,6 +2142,11 @@ body.digirisk-mobile-create {
       &--not-concerned {
         color: #475569;
         background: #e2e8f0;
+      }
+
+      &--mandatory {
+        color: #1e40af;
+        background: #dbeafe;
       }
     }
 

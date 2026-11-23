@@ -21,11 +21,15 @@
  * \brief   People of the public spread on the mobile screen of the object: who signed, who is still
  *          pending, and under each one the documents and answers they gave, as at the bottom of the
  *          spread page. The documents go through document.php, which checks the read right again.
+ *          Shown from the creation of the object: before anybody joined, it already says which documents
+ *          each person will be asked for, instead of leaving nothing where one looks for who signed.
+ *          Once somebody signed, the attendance sheet PDF of the spread can be downloaded from here.
  *          Expects: $conf, $langs, $spreadPeople (digiriskMobileGetSpreadPeople()),
- *                   $spreadPeopleShowDetails (the user may read the object), $spreadPeopleRisksLabel.
+ *                   $spreadPeopleShowDetails (the user may read the object), $spreadPeopleRisksLabel,
+ *                   $spreadPeopleShowSigninSheet (the user may read DoliLetter documents, optional).
  */
 
-if (empty($spreadPeople['people'])) {
+if (empty($spreadPeople['available'])) {
     return;
 }
 
@@ -34,9 +38,28 @@ $spreadDocumentBaseUrl = DOL_URL_ROOT . '/document.php?modulepart=digiriskdoliba
 <div class="digirisk-mobile-card digirisk-mobile-spread-people">
     <div class="digirisk-mobile-spread-people__title">
         <span><i class="fas fa-users"></i> <?php print $langs->trans('MobileSpreadPeopleTitle'); ?></span>
+        <?php if (!empty($spreadPeople['people'])) { ?>
         <span class="digirisk-mobile-spread-people__count"><?php print $langs->trans('MobileSpreadPeopleCount', $spreadPeople['signed_count'], count($spreadPeople['people'])); ?></span>
+        <?php } ?>
     </div>
 
+    <?php if (!empty($spreadPeople['certifications'])) { ?>
+    <div class="digirisk-mobile-spread-people__requested">
+        <span class="digirisk-mobile-spread-people__requested-label"><i class="fas fa-id-badge"></i> <?php print $langs->trans('MobileSpreadPeopleRequested'); ?></span>
+        <?php foreach ($spreadPeople['certifications'] as $requestedCertification) { ?>
+        <span class="digirisk-mobile-spread-people__requested-item">
+            <?php print dol_escape_htmltag($requestedCertification['label']); ?>
+            <?php if ($requestedCertification['mandatory']) { ?>
+            <span class="digirisk-mobile-spread-people__state digirisk-mobile-spread-people__state--mandatory"><?php print $langs->trans('MobilePPMandatory'); ?></span>
+            <?php } ?>
+        </span>
+        <?php } ?>
+    </div>
+    <?php } ?>
+
+    <?php if (empty($spreadPeople['people'])) { ?>
+    <p class="digirisk-mobile-spread-people__empty"><?php print $langs->trans('MobileSpreadPeopleEmpty'); ?></p>
+    <?php } else { ?>
     <ul class="digirisk-mobile-spread-people__list">
         <?php foreach ($spreadPeople['people'] as $spreadPerson) {
             $spreadSignatory  = $spreadPerson['signatory'];
@@ -127,4 +150,11 @@ $spreadDocumentBaseUrl = DOL_URL_ROOT . '/document.php?modulepart=digiriskdoliba
         </li>
         <?php } ?>
     </ul>
+    <?php } ?>
+
+    <?php if (!empty($spreadPeopleShowSigninSheet) && $spreadPeople['signed_count'] > 0 && dol_strlen($spreadPeople['signin_sheet_url'])) { ?>
+    <a class="digirisk-mobile-spread-people__download" href="<?php print dol_escape_htmltag($spreadPeople['signin_sheet_url']); ?>" target="_blank" rel="noopener">
+        <i class="fas fa-file-pdf"></i> <?php print $langs->trans('MobileSpreadPeopleSigninSheet'); ?>
+    </a>
+    <?php } ?>
 </div>

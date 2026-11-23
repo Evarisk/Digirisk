@@ -1,179 +1,117 @@
-# [Digirisk] [23.8.0] - Causeries sécurité dans l'application mobile - Clôture rapide des tickets
+# [Digirisk] [23.9.0] - Diffusion du plan de prévention suivie depuis le téléphone - Permis de feu signé avec la signature du plan - Fiche de poste INRS ED 126 - Nouveau document QQOQCCP
 
-Description : Les **causeries sécurité** arrivent dans l'application mobile : un cycle de causeries pour une équipe, une causerie par date et par thème, la signature de chacun au QR code et un **planning PDF** à afficher sur le chantier. Les tickets des registres se **clôturent en un clic** depuis la liste ou le kanban, la configuration d'une catégorie montre **l'interface publique en direct**, et les **risques psychosociaux** se qualifient depuis la liste des risques d'une unité.
+Description : Dans l'application mobile, le plan de prévention montre dès sa création les documents demandés à chaque intervenant, puis qui a signé sa diffusion, avec la feuille d'émargement à télécharger ; les PDF du plan et du permis de feu listent ces signataires, et le permis de feu reprend en un clic la signature que l'entreprise extérieure a donnée au plan. Chaque groupement et unité de travail a sa fiche de poste au modèle INRS ED 126, les instances représentatives du personnel (CSE, CHSCT, F3SCT, délégués) se choisissent dans la configuration, l'analyse QQOQCCP d'un ticket sort dans un document au format du document unique, et cette version corrige la liste des risques psychosociaux, la date des temps passés, une notification de ticket en double et plusieurs libellés.
 
-**Cette version demande Saturne 23.8.0 ou supérieur.** Les causeries sont diffusées par **DoliLetter 23.2.0 ou supérieur** ; sans lui, l'application l'indique et le reste de Digirisk fonctionne normalement.
+**Cette version demande Saturne 23.9.1 ou supérieur.** La diffusion des plans de prévention et des permis de feu passe par DoliLetter : sans lui, les blocs et la section qui s'y rapportent n'apparaissent pas, et le reste de Digirisk fonctionne normalement.
 
 ## 🎬 La nouveauté en vidéo
 
-<a href="https://github.com/Evarisk/Digirisk/releases/download/23.8.0/digirisk-23.8.0.mp4"><img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.8.0/video_poster_23.8.0.jpeg" alt="Les causeries sécurité dans l'application mobile, en vidéo (43 s)"></a>
+<a href="https://github.com/Evarisk/Digirisk/releases/download/23.9.0/digirisk-23.9.0-diffusion.mp4"><img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.9.0/video_poster_23.9.0.jpeg" alt="La diffusion du plan de prévention, de bout en bout, en vidéo (33 s)"></a>
 
-*Cliquez sur l'image pour voir la vidéo (43 s).*
+*Cliquez sur l'image pour voir la vidéo (33 s).*
 
 ## Nouvelles fonctionnalités et innovations
 
-### Causeries sécurité dans l'application mobile
+### Plan de prévention : la diffusion suivie depuis le téléphone
 
-* Nouvelle rubrique **Causeries** dans l'application mobile. Un **cycle** réunit une équipe : des utilisateurs de Dolibarr ou des personnes sans compte, saisies à la volée (prénom, nom, e-mail facultatif).
-* Chaque **causerie** a sa date et son **thème**, choisi parmi les catégories de danger, qui préremplit le titre. Photos, vidéos, documents et liens (vidéo en ligne, page web) s'y ajoutent en quelques touches.
-* L'écran de la causerie suit son **avancement** (créée, diffusée, animée, signée) et l'état de la signature de chaque personne. Un **QR code** ouvre la page de signature : chacun signe sur son téléphone, sans compte ni connexion. Une personne présente ce jour-là s'ajoute à cette causerie seulement.
-* Ajouter une personne au cycle l'ajoute à toutes ses causeries ; la retirer la sort de celles qu'elle n'a pas encore signées.
-* L'accueil de l'application affiche deux nouvelles tuiles : les **causeries à venir** et les **signatures en attente**.
+* Le bloc **Personnes de la diffusion** de l'écran du plan s'affiche **dès la création du plan**, et plus seulement une fois que quelqu'un a rejoint la diffusion : on sait tout de suite où regarder.
+* Il commence par les **documents demandés à chaque personne** (CACES, habilitations…), avec la pastille **Obligatoire** pour ceux qu'il faut fournir avant de signer. Tant que personne n'a rejoint la diffusion, il l'indique simplement.
+* Dès qu'une personne a signé, le bouton **Télécharger la feuille d'émargement** donne le PDF de la diffusion, régénéré au moment du clic avec toutes les signatures reçues. Il est proposé à qui a le droit de lecture de DoliLetter.
 
-<img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.8.0/causeries-cycle.png" width="32%" alt="Cycle de causeries sur téléphone : trois causeries, leur date, leur thème et leurs signatures"> <img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.8.0/causeries-causerie.png" width="32%" alt="Écran d'une causerie : avancement, thème, date et signatures des personnes"> <img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.8.0/causeries-accueil.png" width="32%" alt="Accueil de l'application mobile : tuiles Causeries à venir et Signatures de causeries en attente">
+<img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.9.0/pwa-diffusion-plan-cree.png" width="32%" alt="Plan de prévention tout juste créé sur téléphone : bloc Personnes de la diffusion avec les documents demandés, CACES R486 obligatoire et Travail en hauteur, et le message Personne n'a encore rejoint la diffusion"> <img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.9.0/pwa-diffusion-signatures.png" width="32%" alt="Plan de prévention diffusé sur téléphone : 2 signatures sur 3, deux personnes signées avec la date, une en attente, et le bouton Télécharger la feuille d'émargement">
 
-### Planning PDF des causeries
+### Permis de feu : signer directement avec la signature du plan de prévention
 
-* Le **planning** d'un cycle se génère en PDF (A4 paysage) : une frise des causeries par mois, l'état de chacune, et pour chacune un **QR code** et un **lien court** vers sa page de signature. Il s'imprime et s'affiche sur le chantier.
-* La fiche Dolibarr d'un projet ou d'une tâche de cycle l'indique, avec un bouton **Ouvrir dans l'application Causeries**.
+* Dans le formulaire du permis de feu de l'application mobile, une case **Signer directement avec la signature du plan de prévention** apparaît sous le choix du plan, quand le responsable de l'entreprise extérieure a déjà signé ce plan et que c'est la même personne sur le permis. Elle rappelle son nom et la date de sa signature.
+* Cochée, sa signature est reprise sur le permis comme une signature donnée à la main : événement d'agenda, verrouillage automatique une fois tout signé, document régénéré. L'e-mail de demande de signature n'est alors pas envoyé.
+* Elle fonctionne à la création comme à la modification d'un permis ; si la signature ne peut pas être reprise, un avertissement le signale.
 
-<img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.8.0/causeries-planning.png" alt="Planning PDF d'un cycle de trois causeries : frise par mois, état des signatures, QR codes et liens courts">
+<img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.9.0/pwa-permis-signature-plan.png" width="32%" alt="Formulaire du permis de feu sur téléphone : plan de prévention PP3 choisi et case cochée Signer directement avec la signature du plan de prévention, avec le nom du responsable et Signé le 23/11/26">
 
-### Tickets : clôture rapide et liste des registres
+### Les signataires de la diffusion dans le PDF du plan de prévention et du permis de feu
 
-* Un ticket se **clôture en un clic** depuis son état dans la **liste des registres**, ou depuis le pourcentage de sa carte dans le **kanban** : une fenêtre propose l'avancement (à 100 %, le ticket est clôturé) et un commentaire, ajouté au ticket en message privé.
-* La **liste des registres** ouverte depuis le menu Digirisk prend le thème Digirisk et toute la largeur de l'écran : plus de menu de gauche, titres de colonnes qui restent en haut au défilement, tags en pastilles.
+* Le document du plan de prévention gagne une section **Personnes ayant signé la diffusion**, après les signatures des responsables : nom, e-mail et téléphone, date et heure, et signature de chacun, dans l'ordre des signatures. Le permis de feu a la même section.
+* Le document est **régénéré à chaque signature de la diffusion** avec DoliLetter 23.3.0 ou supérieur : il tient à jour la liste de ceux qui ont pris connaissance du plan. Avec une version antérieure de DoliLetter, la liste apparaît à la génération suivante du document.
 
-<img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.8.0/registres-cloture-rapide.png" alt="Fenêtre Clôturer le ticket ouverte depuis la liste des registres : progression à 100 % et commentaire">
+<img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.9.0/pdf-diffusion-signataires.png" alt="PDF d'un plan de prévention : signatures des responsables des entreprises utilisatrice et extérieure, puis la nouvelle section Personnes ayant signé la diffusion avec nom, e-mail et téléphone, date et signature de deux personnes">
 
-### Aperçu en direct de l'interface publique des tickets
+### Fiche de poste au modèle INRS ED 126
 
-* La configuration d'une catégorie de ticket montre, à côté des réglages, **ce que verra le déclarant** : services, catégories, champs et message de succès, mis à jour à chaque réglage, avant même d'enregistrer.
+* Nouvel onglet **Fiche de poste** sur chaque groupement et unité de travail. Il prépare la fiche de poste d'une machine d'après la fiche pratique INRS **ED 126** (« Constituer les fiches de poste machines »), à partir de ce que Digirisk sait déjà : le document unique de l'élément, la fiche d'instruction de la machine et les machines liées dans l'onglet Produits | Services. Sans machine liée, la fiche décrit le poste lui-même.
+* Le tableau **Appui ED 126** indique, rubrique par rubrique, d'où vient l'information, si elle est remplie, partielle, vide ou à compléter à la main, avec le lien pour la compléter.
+* La fiche se génère en **PDF A4**, numérotée et versionnée (« Version 1 du 23/11/2026 - FDP2611-0001 ») : identification et photo de la machine, mise en marche et arrêt d'urgence, EPI obligatoires ou interdits, tâches exposant à un risque avec les risques du document unique et les mesures du plan d'action (celles à venir marquées « prévue »), qualification et numéros de secours. Ce que Digirisk ne connaît pas reste en pointillés, à compléter à la main.
 
-<img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.8.0/categorie-apercu.png" alt="Configuration de la catégorie Santé et sécurité au travail avec l'aperçu de l'interface publique à droite">
+<img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.9.0/fiche-de-poste-onglet.png" width="49%" alt="Onglet Fiche de poste d'une unité de travail : poste sans machine retenu, tableau Appui ED 126 avec l'état de chaque rubrique (remplie, partielle, vide, à la main) et la première version générée"> <img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.9.0/fiche-de-poste-pdf.png" width="49%" alt="Fiche de poste PDF au modèle ED 126 : version, machine et caractéristiques, EPI, tableau des tâches avec les risques du document unique et les mesures du plan d'action, qualification et secours">
 
-### Risques psychosociaux qualifiés depuis la liste des risques
+### Instances représentatives du personnel
 
-* Dans la liste des risques d'une unité de travail, la pastille **Risques psychosociaux** devient la liste de qualification : *Concernée*, *Non concernée* ou *À qualifier*. La page se met à jour sans rechargement, avec un bouton Annuler.
-* Le motif d'une unité non concernée se modifie d'un clic, et la bulle propose les motifs déjà saisis pour les autres unités.
+* Dans **Configuration > Social**, on choisit les instances dont l'entreprise est dotée : **CSE, CHSCT, F3SCT, délégués du personnel**. Chacune a sa section : date d'élection ou de désignation, titulaires et suppléants.
+* La page **Diffusion d'informations** et son document suivent ce choix, une instance par bloc ; le référent harcèlement du CSE n'apparaît qu'avec le CSE.
+* Rien ne se perd : tant que le choix n'est pas enregistré, la page reprend l'existant (le CSE, et les délégués du personnel déjà renseignés), et une instance retirée du choix garde ses données, retrouvées quand on la choisit de nouveau. Les modèles de document personnalisés gardent leurs anciennes balises.
 
-<img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.8.0/rps-qualification.png" alt="Liste des risques d'une unité : la pastille Risques psychosociaux ouverte sur Concernée, Non concernée et À qualifier">
+<img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.9.0/social-instances.png" alt="Configuration Social : instances représentatives du personnel choisies, Comité Social et Économique et F3SCT, avec pour chacune la date d'élection ou de désignation, les titulaires et les suppléants">
 
-### Personnes présentes par GP/UT
+### Tickets : un document QQOQCCP au format du document unique
 
-* La configuration des GP/UT règle, dans une seule fenêtre, la **part des personnes présentes** dans chaque groupement et unité de travail.
+* Le document généré depuis l'onglet **QQOQCCP** d'un ticket est entièrement refait aux couleurs des documents du document unique.
+* En première page : un bandeau (ticket, sujet, projet), les cartes du ticket (date de création, GP/UT, personne assignée, état) et les chiffres clés (questions renseignées, actions correctives, actions préventives, actions terminées).
+* L'**analyse du problème** présente une ligne par question avec sa lettre (Q Q O Q C C P), son aide et la réponse ; « Qui ? » s'affiche en pastilles de noms, une réponse vide en « Non renseigné », et une réponse longue continue sur la page suivante.
+* Nouvelles sections **Actions correctives** et **Actions préventives**, reprises de l'onglet Actions du ticket : un compteur d'actions terminées, puis une carte par action avec son état (terminée, en retard, en cours, à faire), sa référence, la personne assignée, ses dates, son budget, ses tags et sa barre d'avancement. Une carte n'est jamais coupée par un saut de page. Sans action ou sans projet sur le ticket, le document l'indique.
 
-<img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.8.0/gpu-pourcentage.png" alt="Fenêtre Personnes présentes par GP/UT : un pourcentage par groupement et unité de travail">
-
-### Et aussi
-
-* **PAPRIPACT** : le document A3 affiche le libellé des tâches, le pictogramme de la catégorie et la description du risque, dans des colonnes plus étroites.
-* **Plan de prévention** : l'écran du plan dans l'application mobile montre les personnes de la diffusion et leurs documents. Le téléphone et l'e-mail de la diffusion se règlent séparément.
-* **Thème moderne** sur les onglets natifs des tâches et des tickets, et la fiche Digirisk d'une tâche s'ouvre depuis tous les liens vers cette tâche.
+<img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.9.0/qqoqccp-page-1.png" width="49%" alt="Document QQOQCCP, page 1 : bandeau du ticket, cartes date de création, GP/UT, assigné et état, chiffres clés et analyse du problème question par question"> <img src="https://raw.githubusercontent.com/nicolas-eoxia/digiriskdolibarr/refs/heads/assets/release-23.9.0/qqoqccp-page-2.png" width="49%" alt="Document QQOQCCP, page 2 : actions correctives et préventives en cartes, avec leur état en retard, terminée, à faire ou en cours et leur barre d'avancement">
 
 ## Améliorations & corrections
 
-### Tickets
-
-* Une carte déposée dans une autre colonne du kanban enregistre bien le nouvel état du ticket. Le kanban ne construit plus que le tableau affiché, et les utilisateurs et tags de ses cartes ne sont chargés qu'une fois.
-* L'option « Requis » des photos et pièces jointes de l'interface publique est prise en compte, et l'e-mail et les photos ne manquent plus sur l'interface publique des entités créées après coup.
-* La fiche d'un ticket s'affiche sans le droit de suppression, et des utilisateurs s'assignent sans groupe par défaut.
-* En mode transverse de Multicompany, les utilisateurs de l'entité sont assignables et la page des utilisateurs Digirisk s'affiche.
-
-### Document unique et documents
-
-* Les risques hérités ne sortent plus deux fois avec les modèles « hérités » et « complet », et les risques partagés reviennent dans les fiches GP/UT.
-* L'archive ZIP du document unique contient les PDF des fiches GP/UT, et plus de fiches pour les GP/UT d'une autre entité.
-* Le spécimen du listing des risques est dessiné sur le document unique actif.
-
-### Risques et médias
-
-* Les photos des fenêtres d'évaluation ne se chargent qu'à leur ouverture : l'onglet Risques s'ouvre plus vite.
-* La description du risque suit le changement de danger après modification. La pastille d'évaluation n'est plus cachée par sa photo, et le commentaire d'évaluation se lit mieux.
-* Les miniatures des fichiers envoyés sont créées, les photos d'un risque en création restent propres à la session, et le type des médias envoyés est vérifié plus strictement.
-* L'onglet Diffusion d'un risque n'est plus vide.
-
 ### Risques psychosociaux
 
-* Les moyennes s'affichent avec le séparateur décimal de la langue, et tous les textes des écrans RPS sont traduits.
+* Dans la liste des risques d'une unité de travail, **tous les risques psychosociaux saisis avant l'arrivée du bloc RPS sont de nouveau listés** (plusieurs par unité, cotés en méthode standard ou avancée) : seul le premier était affiché, les autres étaient masqués à tort.
+* La pagination et le total de la liste ne comptent plus que les lignes affichées.
+* L'évaluation des RPS d'une unité n'écrase plus la cotation d'un de ces anciens risques : elle crée son propre risque.
 
-### Plans de prévention, permis de feu et accidents
+### Tickets
 
-* Le clonage d'un plan de prévention ou d'un permis de feu avec une seule ressource liée ne finit plus en erreur fatale, ni le clonage d'un accident.
-* Plus d'avertissement PHP à la génération d'un permis de feu, et les intervenants extérieurs ne sont plus écrasés.
-* Les pictogrammes des protections s'affichent sur la fiche d'un plan en brouillon.
-* Dans l'application mobile, un e-mail de demande de signature qui ne part pas affiche sa cause en clair.
+* Une déclaration faite depuis la page publique des registres ne déclenche plus **deux notifications** : quand Digirisk envoie son propre e-mail de déclaration (réglage « Envoyer des emails à la création » avec ses destinataires), le mail « Nouveau ticket créé » du module Ticket ne part plus en double vers l'adresse commune à tous les modules. Sans destinataire Digirisk ou avec cet envoi désactivé, la notification du module Ticket reste la seule, comme avant.
 
-### Outils et divers
+### Plans d'action et temps passés
 
-* Une archive d'import refusée est arrêtée proprement, et ses fichiers extraits sont supprimés.
-* Le menu PAPRIPACT reste sur le kanban quand le projet du document unique change.
-* Les règles de DigiAI ne s'appliquent qu'à sa page, et le libellé des catégories de danger y est retrouvé.
-* L'affichage légal lit les horaires sans après-midi sans avertissement.
-* Le manifeste de l'application mobile n'est servi que sur les pages publiques des tickets.
+* La **date d'un temps passé modifiée depuis la tâche d'un risque** est enfin enregistrée : elle restait au jour d'origine et l'heure retombait à minuit.
+* Les temps passés saisis depuis Digirisk enregistrent leur heure, et un temps passé ajouté sans date est daté de l'heure exacte, sans décalage de fuseau horaire.
 
-### Compatibilité
+### Diffusion et documents
 
-* Digirisk fonctionne dans une racine alternative à `custom/` : liens, chemins sur le disque, synthèse publique, fiche ticket, constantes des modèles ODT et appels JavaScript.
+* Diffusé par DoliLetter, le document unique s'appelle **« Document unique »** sur la page publique de la diffusion, dans la liste des diffusions et dans les e-mails, au lieu de « standard digirisk ».
+* Une personne de la diffusion à qui un rôle a été attribué n'est plus oubliée dans le bloc Personnes de la diffusion de l'écran du plan de prévention.
+
+### Accidents
+
+* L'événement d'agenda de la validation d'une enquête accident porte la **référence définitive** de l'enquête, au lieu de sa référence provisoire « (PROV…) ».
+
+### Fichiers et installation
+
+* Activé seul depuis **Accueil > Modules**, Digirisk replace lui aussi sous leur référence définitive les fichiers de ses objets validés restés dans un dossier provisoire « (PROV…) », avant de ranger leurs photos dans la médiathèque. C'est cette reprise qui demande Saturne 23.9.1.
+* Dans Configuration > Modules > Déclencheurs, l'icône des déclencheurs de Digirisk s'affiche : l'image demandée n'existait pas.
 
 ## Testez les nouveautés maintenant
 
-**Allez tester les causeries sécurité dans l'application mobile sur la démo : [https://demodoli.digirisk.com/](https://demodoli.digirisk.com/)**
+**Allez tester la diffusion du plan de prévention dans l'application mobile sur la démo : [https://demodoli.digirisk.com/](https://demodoli.digirisk.com/)**
 
-## Comparaison des versions [23.7.0](https://github.com/Evarisk/Digirisk/compare/23.7.0...23.8.0) et 23.8.0
+## Comparaison des versions [23.8.0](https://github.com/Evarisk/Digirisk/compare/23.8.0...23.9.0) et 23.9.0
 
-* [#5784] [SafetyTalk] fix: causeries sans erreur fatale avec DoliLetter absent ou antérieur à 23.2.0 [`c42530c2`](https://github.com/Evarisk/Digirisk/commit/c42530c2)
-* [#5779] [PWA] add: personnes de la diffusion et leurs documents sur l'écran du plan de prévention [`62c1716d`](https://github.com/Evarisk/Digirisk/commit/62c1716d)
-* [#5778] [PreventionPlan] add: téléphone et email de la diffusion réglés séparément [`ed841dbd`](https://github.com/Evarisk/Digirisk/commit/ed841dbd)
-* [#5776] [PWA] fix: message clair quand l'email de demande de signature ne part pas [`0363b670`](https://github.com/Evarisk/Digirisk/commit/0363b670)
-* [#5775] [FirePermit] fix: warnings PHP a la generation du document, intervenants exterieurs ecrases [`5bb6793c`](https://github.com/Evarisk/Digirisk/commit/5bb6793c)
-* [#5773] [FirePermit][PreventionPlan] fix: clonage en erreur fatale avec une seule ressource liee [`17aa7c28`](https://github.com/Evarisk/Digirisk/commit/17aa7c28)
-* [#5771] [Risk] fix: blank Spread tab of a risk, its metadata loads the risk library [`3c485bf5`](https://github.com/Evarisk/Digirisk/commit/3c485bf5)
-* [#5769] [Tools] fix: build the temp dir of a rejected import from the always defined upload dir [`a78b9689`](https://github.com/Evarisk/Digirisk/commit/a78b9689)
-* [#5769] [Tools] fix: also drop the files extracted from a rejected import archive [`be80cafb`](https://github.com/Evarisk/Digirisk/commit/be80cafb)
-* [#5769] [Tools] fix: stop an import whose archive does not hold the expected JSON [`c266580a`](https://github.com/Evarisk/Digirisk/commit/c266580a)
-* [#5767] [Medias] fix: create the large and medium thumbs of uploaded files with saturne_vignette [`f3bd4e8b`](https://github.com/Evarisk/Digirisk/commit/f3bd4e8b)
-* [#5765] [ActionPlan] fix: keep the PAPRIPACT menu on the Kanban when the DU project changes [`a852d37b`](https://github.com/Evarisk/Digirisk/commit/a852d37b)
-* [#5762] [JS] chore: rebuild digiriskdolibarr.min.js [`2bdd1392`](https://github.com/Evarisk/Digirisk/commit/2bdd1392)
-* [#5762] [JS] chore: rebuild digiriskdolibarr.min.js [`3bcdb970`](https://github.com/Evarisk/Digirisk/commit/3bcdb970)
-* [#5762] [Ticket] fix: only the board shown is built with the kanban page [`78e60eb7`](https://github.com/Evarisk/Digirisk/commit/78e60eb7)
-* [#5762] [Ticket] fix: users and tags of the kanban cards printed once for the page [`54073cfd`](https://github.com/Evarisk/Digirisk/commit/54073cfd)
-* [#5760] [Ticket] fix: blank ticket card without the delete right (saturne_show_documents got null) [`b164521c`](https://github.com/Evarisk/Digirisk/commit/b164521c)
-* [#5758] [Media] fix: renforcement de la validation des types de médias à l'upload [`807fb5de`](https://github.com/Evarisk/Digirisk/commit/807fb5de)
-* [#5753] [Risk] fix: les photos des modales d'évaluation se chargent à leur ouverture [`c884257f`](https://github.com/Evarisk/Digirisk/commit/c884257f)
-* [#5751] [Ticket] feat: quick close a ticket from its state in the list of the registers [`82403a62`](https://github.com/Evarisk/Digirisk/commit/82403a62)
-* [#5747] [Ticket] feat: register list with the Digirisk theme and without the left menu [`17081f80`](https://github.com/Evarisk/Digirisk/commit/17081f80)
-* [#5748] [Ticket] feat: quick close a ticket from the percentage of its kanban card [`209f96a2`](https://github.com/Evarisk/Digirisk/commit/209f96a2)
-* [#5741] [RiskAssessmentDocument] fix: l'archive ZIP du DU ne génère plus de fiches pour les GP/UT d'une autre entité [`4639f0b9`](https://github.com/Evarisk/Digirisk/commit/4639f0b9)
-* [#5740] [RiskAssessmentDocument] fix: les PDF des fiches GP/UT sont copiés dans l'archive ZIP du DU [`4d0dfb34`](https://github.com/Evarisk/Digirisk/commit/4d0dfb34)
-* [#5739] [Document] fix: les risques hérités ne sortent plus deux fois avec les modèles hérités et complet [`81fea9e3`](https://github.com/Evarisk/Digirisk/commit/81fea9e3)
-* [#5736] [Document] fix: les risques partagés reviennent dans les fiches GP/UT [`01004ca3`](https://github.com/Evarisk/Digirisk/commit/01004ca3)
-* [#5708] [ListingRisks] fix: specimen drawn on the active standard instead of an empty object [`d009ab5b`](https://github.com/Evarisk/Digirisk/commit/d009ab5b)
-* [#5708] [Documents] fix: trigger description no longer fatal when the parent class is elsewhere or missing [`d59a4c23`](https://github.com/Evarisk/Digirisk/commit/d59a4c23)
-* [#5732] [CI] ci: DoliLetter scanned by PHPStan [`5be93f48`](https://github.com/Evarisk/Digirisk/commit/5be93f48)
-* [#5732] [Project] feat: open a safety talk cycle or talk in the mobile application from its card [`729a9224`](https://github.com/Evarisk/Digirisk/commit/729a9224)
-* [#5732] [SafetyTalk] feat: safety talk cycles and talks diffused by DoliLetter in the mobile application [`4a7de17b`](https://github.com/Evarisk/Digirisk/commit/4a7de17b)
-* [#5732] [PDF] feat: planning of a safety talk cycle with QR codes and short links [`f2034aa7`](https://github.com/Evarisk/Digirisk/commit/f2034aa7)
-* [#5729] [PWA] fix: ticket manifest only on the public ticket pages [`609475e8`](https://github.com/Evarisk/Digirisk/commit/609475e8)
-* [#5727] [RPS] feat: qualify psychosocial risks from the work unit risk list [`055de2ff`](https://github.com/Evarisk/Digirisk/commit/055de2ff)
-* [#5407] [Papripact] feat: task label, narrower columns, category picto and risk description in the A3 document [`e9bc7f43`](https://github.com/Evarisk/Digirisk/commit/e9bc7f43)
-* [#5689] [DigiAI] fix: danger category label indexed by picto name [`eee2f374`](https://github.com/Evarisk/Digirisk/commit/eee2f374)
-* [#5722] [Users] fix: Digirisk users page in the transverse mode of Multicompany [`96479c1a`](https://github.com/Evarisk/Digirisk/commit/96479c1a)
-* [#5720] [Ticket] fix: assignable users of the entity in the transverse mode of Multicompany [`569e65b4`](https://github.com/Evarisk/Digirisk/commit/569e65b4)
-* [#5717] [Ticket] fix: users can be assigned on the native ticket card without a default user group [`d9f7d162`](https://github.com/Evarisk/Digirisk/commit/d9f7d162)
-* [#5716] [Ticket] fix: a card dropped in another status column of the kanban saves the status of that ticket [`754b3054`](https://github.com/Evarisk/Digirisk/commit/754b3054)
-* [#5711] [Ticket] feat: live preview of the public interface on the ticket category configuration [`d39fd06b`](https://github.com/Evarisk/Digirisk/commit/d39fd06b)
-* [#5710] [Ticket] fix: email and photos missing from the public interface of the entities created later [`a84eefd7`](https://github.com/Evarisk/Digirisk/commit/a84eefd7)
-* [#5709] [Ticket] fix: "Required" option for the photos / attachments of the public interface [`b029ef86`](https://github.com/Evarisk/Digirisk/commit/b029ef86)
-* [Medias] fix: photos des risques en création propres à la session, dossiers lus par les fiches [`976ef5f4`](https://github.com/Evarisk/Digirisk/commit/976ef5f4)
-* [#5705] [RiskList] fix: make the assessment comment easier to read [`ffd01059`](https://github.com/Evarisk/Digirisk/commit/ffd01059)
-* [#5704] [Module] fix: classpath de getElementProperties relatif à DOL_DOCUMENT_ROOT [`a3182d7a`](https://github.com/Evarisk/Digirisk/commit/a3182d7a)
-* [#5702] [Affichage légal] fix: horaires sans après-midi lus sans avertissement [`d9b07279`](https://github.com/Evarisk/Digirisk/commit/d9b07279)
-* [#5700] [Documents] fix: constantes des modèles ODT écrites depuis la vraie racine du module [`2c00897e`](https://github.com/Evarisk/Digirisk/commit/2c00897e)
-* [#5682] [PreventionPlan] fix: pictogrammes des protections sur la fiche d'un plan en brouillon [`e9368658`](https://github.com/Evarisk/Digirisk/commit/e9368658)
-* [#5682] [JS] fix: URL du module lue côté serveur au lieu de '/custom/digiriskdolibarr' [`03a98660`](https://github.com/Evarisk/Digirisk/commit/03a98660)
-* [#5682] [Module] fix: chemins relatifs confiés au cœur sans custom/ [`4594b2fc`](https://github.com/Evarisk/Digirisk/commit/4594b2fc)
-* [#5682] [Module] fix: chemins disque construits avec DOL_DOCUMENT_ROOT . '/custom/…' [`cac8ac7a`](https://github.com/Evarisk/Digirisk/commit/cac8ac7a)
-* [#5682] [Module] fix: dol_buildpath('/custom/…') sans custom/ [`e1367cea`](https://github.com/Evarisk/Digirisk/commit/e1367cea)
-* [#5682] [Module] fix: URL construites avec DOL_URL_ROOT . '/custom/…' [`8ac9b875`](https://github.com/Evarisk/Digirisk/commit/8ac9b875)
-* [#5697] [Theme] feat: modern theme on the native tabs of tasks and tickets [`583501c3`](https://github.com/Evarisk/Digirisk/commit/583501c3)
-* [#5697] [Task] feat: digirisk task card opened by every task link [`aa8403a3`](https://github.com/Evarisk/Digirisk/commit/aa8403a3)
-* [#5695] [Risque] fix: update risk description on danger change after edit [`035395fc`](https://github.com/Evarisk/Digirisk/commit/035395fc)
-* [#5693] [Accident] fix: après le clonage, ne retirer que la clé createfromclone de context [`6af36f93`](https://github.com/Evarisk/Digirisk/commit/6af36f93)
-* [#5693] [Accident] fix: context de clonage en tableau, comme l'attend Dolibarr [`74f5f9be`](https://github.com/Evarisk/Digirisk/commit/74f5f9be)
-* [#5672] [DigiAI] fix: DigiAI rules scoped to the DigiAI page [`b936a693`](https://github.com/Evarisk/Digirisk/commit/b936a693)
-* [#5691] [RiskList] fix: assessment badge no longer covered by its photo [`e4879c69`](https://github.com/Evarisk/Digirisk/commit/e4879c69)
-* [#5687] [DigiriskElement] feat: people percentage of every GP/UT from the GP/UT setup [`80947b62`](https://github.com/Evarisk/Digirisk/commit/80947b62)
-* [#5685] [RPS] fix: moyennes RPS au séparateur décimal de la langue [`2c91fb94`](https://github.com/Evarisk/Digirisk/commit/2c91fb94)
-* [#5681] [RPS] fix: textes des écrans RPS passés par les traductions [`22becce3`](https://github.com/Evarisk/Digirisk/commit/22becce3)
-* [#5682] [Module] fix: synthèse publique et fiche ticket sans custom/ en dur [`3ddd85ff`](https://github.com/Evarisk/Digirisk/commit/3ddd85ff)
+* [#5811] [Trigger] fix: chargement des traductions rétabli (remplacé à tort avec le picto) [`9027e952`](https://github.com/Evarisk/Digirisk/commit/9027e952)
+* [#5810] [Mod] fix: fichiers des objets validés restés sous (PROVn) repris à l'activation depuis Accueil > Modules [`b450b226`](https://github.com/Evarisk/Digirisk/commit/b450b226)
+* [#5811] [Trigger] fix: picto digiriskdolibarr_color@digiriskdolibarr, l'image digiriskdolibarr@digiriskdolibarr n'existe pas [`9a14ef43`](https://github.com/Evarisk/Digirisk/commit/9a14ef43)
+* [#5808] [PWA] fix: notrigger en entier pour update() et setSigned() (PHPStan) [`388c4fca`](https://github.com/Evarisk/Digirisk/commit/388c4fca)
+* [#5808] [PWA] add: signer directement le permis de feu avec la signature du plan de prévention [`18f723d5`](https://github.com/Evarisk/Digirisk/commit/18f723d5)
+* [#5806] [PWA] add: télécharger la feuille d'émargement de la diffusion depuis l'écran du plan de prévention [`56b0d6ab`](https://github.com/Evarisk/Digirisk/commit/56b0d6ab)
+* [#5804] [Document] fix: filtre de array_filter() qui renvoie un booléen (PHPStan) [`5c426052`](https://github.com/Evarisk/Digirisk/commit/5c426052)
+* [#5804] [Document] add: personnes ayant signé la diffusion dans le PDF du plan de prévention et du permis de feu [`91bc1fde`](https://github.com/Evarisk/Digirisk/commit/91bc1fde)
+* [#5802] [PWA] add: personnes de la diffusion visibles dès la création du plan, avec les documents demandés [`dc459e79`](https://github.com/Evarisk/Digirisk/commit/dc459e79)
+* [#5800] [AccidentInvestigation] fix: événement de validation libellé avec la référence définitive, plus « (PROVn) » [`fc898894`](https://github.com/Evarisk/Digirisk/commit/fc898894)
+* [#5798] [Ticket] feat: QQOQCCP document in the style of the DU documents, with the corrective and preventive actions [`9b7118fd`](https://github.com/Evarisk/Digirisk/commit/9b7118fd)
+* [#5796] [RPS] fix: psychosocial risks filed before the RPS block listed again [`b236f627`](https://github.com/Evarisk/Digirisk/commit/b236f627)
+* [#5792] [Task] fix: modifier la date d'un temps passé depuis la tâche d'un risque [`77145707`](https://github.com/Evarisk/Digirisk/commit/77145707)
+* [#5791] [DigiriskStandard] fix: document unique nommé comme tel dans les métadonnées des objets [`679e154b`](https://github.com/Evarisk/Digirisk/commit/679e154b)
+* [#5756] [Ticket] fix: no mail new ticket of the module Ticket when Digirisk sends its own declaration mail [`6c121573`](https://github.com/Evarisk/Digirisk/commit/6c121573)
+* [#5148] [DigiriskElement] feat: job sheet tab with the ED 126 checklist [`f821ffc2`](https://github.com/Evarisk/Digirisk/commit/f821ffc2)
+* [#5148] [Document] feat: job sheet PDF after the INRS ED 126 model [`073a0c97`](https://github.com/Evarisk/Digirisk/commit/073a0c97)
+* [#5690] [Social] feat: staff representative bodies chosen in the social setup (CSE, CHSCT, F3SCT, DP) [`b6405fc0`](https://github.com/Evarisk/Digirisk/commit/b6405fc0)

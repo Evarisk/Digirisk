@@ -194,6 +194,8 @@ $successExtraBlockFile = [__DIR__ . '/preventionplan_mobile_success_extsign.tpl.
 // it is here that one checks who still has to sign or to bring a document
 $spreadPeople            = digiriskMobileGetSpreadPeople($db, $object);
 $spreadPeopleShowDetails = $user->hasRight('digiriskdolibarr', 'preventionplan', 'read');
+// Same right as the spread page asks for to serve the attendance sheet
+$spreadPeopleShowSigninSheet = $user->hasRight('doliletter', 'lire') || $user->hasRight('doliletter', 'read');
 $spreadPeopleRisksLabel  = 'MobilePPRisks';
 $successExtraBlockFile[] = __DIR__ . '/digiriskdolibarr_mobile_spread_people.tpl.php';
 // Enregistrer comme trame : action secondaire, discrete sous les boutons
