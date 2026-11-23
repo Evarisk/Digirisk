@@ -1136,7 +1136,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
         // saturne, qui ne connait ni l'une ni l'autre mais dont seule load() est deja gelee
         // dans la baseline - dont le compteur de ce fichier suit ces deux appels
         $langs->load('saturne@saturne');
-        $langs->load('digiriskdolibarr_color@digiriskdolibarr');
+        $langs->load('digiriskdolibarr@digiriskdolibarr');
 
         $substitutions  = $this->ticketSubmittedSubstitutions($object, $langs);
         $defaultSubject = $langs->transnoentities('ANewTicketHasBeenSubmitted', getDolGlobalString('MAIN_INFO_SOCIETE_NOM'));
