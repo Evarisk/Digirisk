@@ -3202,6 +3202,13 @@ class modDigiriskdolibarr extends DolibarrModules
 
         $result = $this->_init($sql, $options);
 
+        // Files of the objects validated while they stayed under (PROVn) : moved back once the module is enabled,
+        // from Home > Modules as well (Saturne#1939), before the media library looks for them. A Saturne without
+        // the function leaves them
+        if ($result > 0 && function_exists('saturne_recover_prov_directories')) {
+            saturne_recover_prov_directories($this->name);
+        }
+
         // Photos sent straight to a record never reached the media library, where the gallery lists
         // them: they join it, the work folders of the mobile forms and the certificates of the
         // external workers aside. Only what is still missing is copied. Once the module is active,
