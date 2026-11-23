@@ -86,6 +86,11 @@ function digiriskelement_prepare_head(DigiriskElement $object): array
         $head[$h][2] = 'elementProduct';
         $h++;
 
+        $head[$h][0] = dol_buildpath('digiriskdolibarr/view/digiriskelement/digiriskelement_jobsheet.php', 1) . '?id=' . $object->id;
+        $head[$h][1] = $conf->browser->layout == 'classic' ? '<i class="fas fa-id-card pictofixedwidth"></i>' . $langs->trans('JobSheet') : '<i class="fas fa-id-card"></i>';
+        $head[$h][2] = 'elementJobSheet';
+        $h++;
+
         $head[$h][0] = dol_buildpath('digiriskdolibarr/view/digiriskelement/digiriskelement_informations.php', 1) . '?id=' . $object->id;
         $head[$h][1] = $conf->browser->layout == 'classic' ? '<i class="fas fa-info-circle pictofixedwidth"></i>' . $langs->trans('Informations') : '<i class="fas fa-info-circle pictofixedwidth"></i>';
         $head[$h][2] = 'elementInformations';
