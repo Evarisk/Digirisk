@@ -84,6 +84,10 @@ saturne_check_access($permissiontoread, $object);
 $ticketLogConst = 'DIGIRISKDOLIBARR_TICKET_LOG_MODIFICATIONS';
 $sectionConfig  = digiriskdolibarr_ticket_action_sections();
 $pageUrl        = $_SERVER['PHP_SELF'] . '?id=' . (int) $object->id;
+// The ticket card adds its actions through this page too, then gets back to the card (#5644). GETPOST strips the
+// scheme of a backtopage, so it can only lead to a page of this instance
+$backtopage     = GETPOST('backtopage', 'alpha');
+$addActionUrl   = dol_strlen($backtopage) ? $backtopage : $pageUrl;
 
 $parentTaskId  = digiriskdolibarr_ticket_get_parent_task($db, $object);
 $actionsByType = digiriskdolibarr_ticket_get_actions($db, $parentTaskId);
@@ -104,7 +108,7 @@ if ($action === 'addAction' && $permissiontoadd && isset($sectionConfig[$actionT
     if ($parentTaskId <= 0) {
         $parentTaskId = digiriskdolibarr_ticket_create_parent_task($object, $user, $ticketLogConst);
         if ($parentTaskId <= 0) {
-            header('Location: ' . $pageUrl);
+            header('Location: ' . $addActionUrl);
             exit;
         }
     }
@@ -124,7 +128,7 @@ if ($action === 'addAction' && $permissiontoadd && isset($sectionConfig[$actionT
         $containerTaskId = $containerTask->create($user);
         if ($containerTaskId <= 0) {
             setEventMessages($containerTask->error, $containerTask->errors, 'errors');
-            header('Location: ' . $pageUrl);
+            header('Location: ' . $addActionUrl);
             exit;
         }
     }
@@ -144,7 +148,7 @@ if ($action === 'addAction' && $permissiontoadd && isset($sectionConfig[$actionT
         setEventMessages($newTask->error, $newTask->errors, 'errors');
     }
 
-    header('Location: ' . $pageUrl);
+    header('Location: ' . $addActionUrl);
     exit;
 }
 

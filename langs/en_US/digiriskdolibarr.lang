@@ -2310,6 +2310,7 @@ TicketActionsTabCorrective             = Corrective
 TicketActionsTabPreventive             = Preventive
 TicketActionsSummary                   = Actions summary
 TicketActionsNeedProject               = Link a project to the ticket to add corrective and preventive actions to it
+TicketOtherTasks                       = Other tasks
 BackToTicket                           = Back to the register
 TicketPublicInterfacePin               = Declaration PIN code
 TicketPublicInterfacePinHelp           = Leave empty to let everyone declare. With a code of 4 to 12 digits, the public form asks for it before showing: give it to the people allowed to declare.

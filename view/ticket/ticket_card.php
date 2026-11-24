@@ -67,6 +67,8 @@ if (!$user->hasRight('ticket', 'read')) {
 }
 
 $permissionToWrite = $user->hasRight('ticket', 'write') && !$user->socid;
+// Same right as the actions tab (view/ticket/ticket_actions.php), which saves the actions added from this card
+$permissionToAddAction = $permissionToWrite && isModEnabled('project') && $user->hasRight('projet', 'creer');
 $url_page_current  = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1);
 // Kanban AJAX endpoint (reused for on-the-fly tags & assignee — same server behaviour, incl. kanban event logging).
 $kanbanAjaxUrl     = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_action_card.php', 1);
@@ -520,53 +522,6 @@ if ($action === 'delete_message_ajax' && $permissionToWrite) {
         }
     }
     print json_encode(['success' => 0, 'message' => $langs->trans('NotAllowed')]);
-    exit;
-}
-
-// Action: add a task from the popup (#4881) — the parent task "TKP-<ref>" is created along with the first task
-if ($action === 'add_child_task_modal' && $permissionToWrite && !empty($object->fk_project)) {
-    require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
-    $parentTaskId = digiriskdolibarr_ticket_get_parent_task($db, $object);
-    if ($parentTaskId <= 0) {
-        $parentTaskId = digiriskdolibarr_ticket_create_parent_task($object, $user, $ticketLogConst);
-        if ($parentTaskId <= 0) {
-            header('Location: ' . $url_page_current . '?id=' . $object->id);
-            exit;
-        }
-    }
-    $t = new Task($db);
-    $t->fk_project = $object->fk_project;
-    $t->fk_task_parent = $parentTaskId;
-    $t->label = GETPOST('label', 'alphanohtml');
-    $t->date_start = dol_mktime(0, 0, 0, GETPOST('date_startmonth', 'int'), GETPOST('date_startday', 'int'), GETPOST('date_startyear', 'int'));
-    $t->date_end = dol_mktime(0, 0, 0, GETPOST('date_endmonth', 'int'), GETPOST('date_endday', 'int'), GETPOST('date_endyear', 'int'));
-    
-    // Parse datetime-local from standard input if used
-    $date_start_local = GETPOST('date_start_local', 'alpha');
-    if (!empty($date_start_local)) $t->date_start = strtotime($date_start_local);
-    $date_end_local = GETPOST('date_end_local', 'alpha');
-    if (!empty($date_end_local)) $t->date_end = strtotime($date_end_local);
-
-    $t->planned_workload = 0;
-    $t->progress = 0;
-    $t->budget_amount = GETPOST('budget', 'int');
-    
-    // Auto-generate ref using task numbering module
-    $classnamemodtask = getDolGlobalString('PROJECT_TASK_ADDON', 'mod_task_simple');
-    if (getDolGlobalString('PROJECT_TASK_ADDON') && is_readable(DOL_DOCUMENT_ROOT."/core/modules/project/task/" . getDolGlobalString('PROJECT_TASK_ADDON').".php")) {
-        require_once DOL_DOCUMENT_ROOT."/core/modules/project/task/" . getDolGlobalString('PROJECT_TASK_ADDON').'.php';
-        $modTask = new $classnamemodtask();
-        $t->ref = $modTask->getNextValue($object->thirdparty, $object);
-    }
-    
-    $t->create($user);
-    
-    $executive_id = GETPOST('user_id', 'int');
-    if ($executive_id > 0) {
-        $t->add_contact($executive_id, 'TASKEXECUTIVE', 'internal');
-    }
-    digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketTaskCreated', $t->ref), $t->label, $ticketLogConst);
-    header('Location: ' . $url_page_current . '?id=' . $object->id);
     exit;
 }
 
@@ -1147,87 +1102,113 @@ print '</td></tr>';
 
 print '</tbody></table>';
 
-// ---- Tasks of the ticket (#4881): children of the parent task ----
-$tasksarray = [];
-if ($parentTask) {
-    // The containers of the corrective and preventive actions (#5549) belong to the actions tab
-    $actionContainerIds = [];
-    foreach (array_keys(digiriskdolibarr_ticket_action_sections()) as $actionType) {
-        $actionContainerIds[] = digiriskdolibarr_get_action_container_task($db, $parentTaskId, $actionType);
+// ---- Corrective and preventive actions of the ticket (#5549), the same as on its actions tab (#5644) ----
+// The block lists the actions of the tab and of the summary of the banner, by type, then the tasks left directly under
+// the parent task "TKP-<ref>" before the actions existed (#4881)
+if (isModEnabled('project') && $user->hasRight('projet', 'lire')) {
+    $actionSections  = digiriskdolibarr_ticket_action_sections();
+    $actionsByType   = digiriskdolibarr_ticket_get_actions($db, $parentTaskId);
+    $actionsCounters = digiriskdolibarr_ticket_count_actions($actionsByType);
+    $otherTasks      = digiriskdolibarr_ticket_get_other_tasks($db, $parentTaskId, $actionsByType);
+    $actionsTabUrl   = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_actions.php', 1) . '?id=' . (int) $object->id;
+
+    $actionsTotal = count($otherTasks);
+    foreach ($actionsCounters as $actionsCounter) {
+        $actionsTotal += $actionsCounter['total'];
     }
 
-    $taskObj        = new Task($db);
-    $extrafieldsObj = new ExtraFields($db);
-    $allTasks       = $taskObj->getTasksArray(null, null, $object->fk_project, 0, 0, '', '-1', '', 0, 0, $extrafieldsObj);
-    if (!empty($allTasks)) {
-        foreach ($allTasks as $tsk) {
-            if ($tsk->fk_task_parent == $parentTaskId && !in_array((int) $tsk->id, $actionContainerIds, true)) {
-                $tasksarray[] = $tsk;
-            }
+    // Assignees shown as avatars, each user fetched once
+    $actionUsers   = [];
+    $actionTaskRow = static function (stdClass $row) use ($db, $langs, $object, $permissionToWrite, $url_page_current, &$actionUsers): string {
+        $out  = '<tr>';
+        $out .= '<td class="nowraponall"><a href="' . dol_escape_htmltag(digiriskdolibarr_task_card_url((int) $row->rowid)) . '">' . img_picto('', 'projecttask', 'class="pictofixedwidth"') . dol_escape_htmltag($row->ref) . '</a></td>';
+        $out .= '<td>' . dol_escape_htmltag($row->label) . '</td>';
+        foreach ([$row->dateo, $row->datee] as $dateValue) {
+            $out .= '<td class="center nowraponall">' . (!empty($dateValue) ? dol_print_date($db->jdate($dateValue), 'day') : '') . '</td>';
         }
-    }
-}
 
-print '<table class="border centpercent tableforfield dtc-tasks-table"><tbody>';
-print '<tr class="liste_titre trforfield"><td colspan="6"><div class="dtc-head">' . $fieldPicto('tasks') . $langs->trans('Tasks') . ' <span class="opacitymedium">(' . count($tasksarray) . ')</span>';
-if ($parentTask) {
-    print '<span class="dtc-head-sub">' . digiriskdolibarr_task_get_nom_url($parentTask, 1) . '</span>';
-}
-if ($permissionToWrite && isModEnabled('project')) {
-    print '<span class="dtc-head-edit">';
-    if (!empty($object->fk_project)) {
-        print '<button type="button" class="dtc-head-add modal-open"><input type="hidden" class="modal-options" data-modal-to-open="ticket_task_add_modal"><i class="fas fa-plus"></i> ' . $langs->trans('NewTask') . '</button>';
-    } else {
-        // Tasks live in the ticket project: without one there is nowhere to create them.
-        print '<span class="dtc-head-add is-disabled wpeo-tooltip-event" aria-label="' . dol_escape_htmltag($langs->trans('TicketTaskNeedsProject')) . '"><i class="fas fa-plus"></i> ' . $langs->trans('NewTask') . '</span>';
-    }
-    print '</span>';
-}
-print '</div></td></tr>';
+        // Progress edited in place, as before on this card
+        $out .= '<td class="center dtc-progress" data-ticket-id="' . (int) $row->rowid . '" data-action="set_task_progress_ajax" data-log-ticket-id="' . (int) $object->id . '" data-progress-url="' . dol_escape_htmltag($url_page_current) . '" data-value="' . (int) $row->progress . '">';
+        $out .= '<span class="dtc-progress-value' . ($permissionToWrite ? ' dtc-editable dtc-tabfield' : '') . '"' . ($permissionToWrite ? ' contenteditable="true" tabindex="0"' : '') . '>' . ((int) $row->progress) . '</span> %';
+        $out .= '</td>';
 
-if (!empty($tasksarray)) {
-    print '<tr class="dtc-table-cols">';
-    print '<td>' . $langs->trans('RefTask') . '</td>';
-    print '<td>' . $langs->trans('Label') . '</td>';
-    print '<td class="center">' . $langs->trans('DateStart') . '</td>';
-    print '<td class="center">' . $langs->trans('Deadline') . '</td>';
-    print '<td class="center">' . $langs->trans('Progress') . '</td>';
-    print '<td class="right">' . $langs->trans('Resp') . '</td>';
-    print '</tr>';
-    foreach ($tasksarray as $t) {
-        // The tasks open in the Digirisk task card, laid out as this one
-        $taskUrl = digiriskdolibarr_task_card_url((int) $t->id);
-        print '<tr>';
-        print '<td class="nowraponall"><a href="' . dol_escape_htmltag($taskUrl) . '">' . img_picto('', $t->picto, 'class="pictofixedwidth"') . dol_escape_htmltag($t->ref) . '</a></td>';
-        print '<td>' . dol_escape_htmltag($t->label) . '</td>';
-        print '<td class="center">' . dol_print_date($t->date_start, 'day') . '</td>';
-        print '<td class="center">' . dol_print_date($t->date_end, 'day') . '</td>';
-
-        // Progress inline editable (using dynamic data-action added to JS)
-        print '<td class="center dtc-progress" data-ticket-id="' . (int) $t->id . '" data-action="set_task_progress_ajax" data-log-ticket-id="' . (int) $object->id . '" data-progress-url="' . dol_escape_htmltag($url_page_current) . '" data-value="' . (int) $t->progress . '">';
-        print '<span class="dtc-progress-value' . ($permissionToWrite ? ' dtc-editable dtc-tabfield' : '') . '"' . ($permissionToWrite ? ' contenteditable="true" tabindex="0"' : '') . '>' . ((int) $t->progress) . '</span> %';
-        print '</td>';
-
-        // Responsable (display names/avatars)
-        print '<td class="right">';
-        $contacts = $t->getListContactId('internal');
-        if (!empty($contacts)) {
-            $userstat = new User($db);
-            foreach ($contacts as $contactId) {
-                if ($userstat->fetch($contactId) > 0) {
-                    print $userstat->getNomUrl(-2, '', 0, 0, 24, 0, 'paddingright') . ' ';
-                }
-            }
+        $out .= '<td class="right">';
+        $userId = (int) $row->user_id;
+        if ($userId > 0 && !isset($actionUsers[$userId])) {
+            $actionUsers[$userId] = new User($db);
+            $actionUsers[$userId]->fetch($userId);
+        }
+        if ($userId > 0 && $actionUsers[$userId]->id > 0) {
+            $out .= $actionUsers[$userId]->getNomUrl(-2, '', 0, 0, 24, 0, 'paddingright');
         } else {
-            print '<span class="opacitymedium">' . $langs->trans('NotAssigned') . '</span>';
+            $out .= '<span class="opacitymedium">' . $langs->trans('NotAssigned') . '</span>';
         }
-        print '</td>';
-        print '</tr>';
+        $out .= '</td>';
+        $out .= '</tr>';
+
+        return $out;
+    };
+
+    print '<table class="border centpercent tableforfield dtc-tasks-table"><tbody>';
+    print '<tr class="liste_titre trforfield"><td colspan="6"><div class="dtc-head">' . $fieldPicto('tasks') . $langs->trans('TicketActionsTab') . ' <span class="opacitymedium">(' . $actionsTotal . ')</span>';
+    if ($parentTask) {
+        print '<span class="dtc-head-sub">' . digiriskdolibarr_task_get_nom_url($parentTask, 1) . '</span>';
     }
-} else {
-    print '<tr><td colspan="6"><span class="opacitymedium">' . $langs->trans('NoRecordFound') . '</span></td></tr>';
+    print '<span class="dtc-head-edit"><a class="dtc-head-link" href="' . dol_escape_htmltag($actionsTabUrl) . '">' . $langs->trans('SeeAll') . '</a></span>';
+    print '</div></td></tr>';
+
+    $actionsColumns  = '<tr class="dtc-table-cols">';
+    $actionsColumns .= '<td>' . $langs->trans('RefTask') . '</td>';
+    $actionsColumns .= '<td>' . $langs->trans('Label') . '</td>';
+    $actionsColumns .= '<td class="center">' . $langs->trans('DateStart') . '</td>';
+    $actionsColumns .= '<td class="center">' . $langs->trans('Deadline') . '</td>';
+    $actionsColumns .= '<td class="center">' . $langs->trans('Progress') . '</td>';
+    $actionsColumns .= '<td class="right">' . $langs->trans('Resp') . '</td>';
+    $actionsColumns .= '</tr>';
+
+    foreach ($actionSections as $actionType => $actionSection) {
+        $actionsDone  = $actionsCounters[$actionType]['done'];
+        $actionsCount = $actionsCounters[$actionType]['total'];
+        $actionsState = $actionsCount == 0 ? 'none' : ($actionsDone == $actionsCount ? 'done' : 'open');
+
+        // Header of the type, with the counter of the banner summary and the add button of the tab
+        print '<tr class="dtc-actions-group"><td colspan="6"><div class="dtc-actions-group__head">';
+        print '<span class="dtc-actions-group__title">' . $langs->trans($actionSection['titleKey']) . '</span>';
+        print '<span class="dtc-actions-summary__count dtc-actions-group__count--' . $actionsState . '">' . $actionsDone . ' / ' . $actionsCount . '</span>';
+        if ($permissionToAddAction) {
+            if (!empty($object->fk_project)) {
+                print '<button type="button" class="dtc-head-add modal-open"><input type="hidden" class="modal-options" data-modal-to-open="ticket_action_add_modal_' . $actionType . '"><i class="fas fa-plus"></i> ' . $langs->trans($actionSection['addKey']) . '</button>';
+            } else {
+                // The actions live in the ticket project: without one there is nowhere to create them
+                print '<span class="dtc-head-add is-disabled wpeo-tooltip-event" aria-label="' . dol_escape_htmltag($langs->trans('TicketActionsNeedProject')) . '"><i class="fas fa-plus"></i> ' . $langs->trans($actionSection['addKey']) . '</span>';
+            }
+        }
+        print '</div></td></tr>';
+
+        if (empty($actionsByType[$actionType])) {
+            print '<tr><td colspan="6"><span class="opacitymedium">' . $langs->trans('NoActionsYet') . '</span></td></tr>';
+            continue;
+        }
+
+        print $actionsColumns;
+        foreach ($actionsByType[$actionType] as $actionRow) {
+            print $actionTaskRow($actionRow);
+        }
+    }
+
+    // Tasks of the ticket that are no action, still shown until they are done
+    if (!empty($otherTasks)) {
+        print '<tr class="dtc-actions-group"><td colspan="6"><div class="dtc-actions-group__head">';
+        print '<span class="dtc-actions-group__title">' . $langs->trans('TicketOtherTasks') . '</span>';
+        print '</div></td></tr>';
+        print $actionsColumns;
+        foreach ($otherTasks as $otherTask) {
+            print $actionTaskRow($otherTask);
+        }
+    }
+
+    print '</tbody></table>';
 }
-print '</tbody></table>';
 
 // ---- Accidents linked to this ticket ----
 $linkedAccidents = [];
@@ -1496,55 +1477,69 @@ print dol_get_fiche_end();
 
 print '</div>'; // digirisk-ticket-card
 
-// --- Modal Add Child Task (#4881) ---
-if (!empty($object->fk_project) && $permissionToWrite && isModEnabled('project')) {
-    print '<div class="wpeo-modal modal-task" id="ticket_task_add_modal">';
-    print '<div class="modal-container wpeo-modal-event">';
-    print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
-    print '<input type="hidden" name="token" value="' . newToken() . '">';
-    print '<input type="hidden" name="action" value="add_child_task_modal">';
-    print '<div class="modal-header">';
-    print '<h2 class="modal-title">' . $langs->trans('NewTask') . '</h2>';
-    print '<div class="modal-close"><i class="fas fa-times"></i></div>';
-    print '</div>';
-    print '<div class="modal-content">';
-    print '<div class="riskassessment-task-container">';
-    print '<div class="riskassessment-task">';
-    print '<div class="wpeo-gridlayout flex flex-row items-center">';
-    print '<i class="fas fa-paragraph" style="margin-right:1em;"></i>';
-    print '<input type="text" class="riskassessment-task-label" name="label" required="required" placeholder="' . dol_escape_htmltag($langs->trans('Label')) . '">';
-    print '</div>';
-    print '<div class="riskassessment-task-date wpeo-gridlayout grid-3" style="margin-top: 1em; margin-bottom: 1em;">';
-    print '<div class="flex flex-row items-center">';
-    print '<i class="fas fa-calendar-day" style="margin-right: 1em;"></i>';
-    print '<input type="datetime-local" name="date_start_local" required>';
-    print '</div>';
-    print '<div class="flex flex-row items-center">';
-    print '<i class="fas fa-calendar-check" style="margin-right: 1em;"></i>';
-    print '<input type="datetime-local" name="date_end_local">';
-    print '</div>';
-    print '<div class="flex flex-row items-center paddingright">';
-    print '<i class="fas fa-euro-sign" style="margin-right: 1em;"></i>';
-    print '<input type="number" step="0.01" class="riskassessment-task-budget" name="budget" placeholder="Budget">';
-    print '</div>';
-    print '</div>';
-    print '<div>';
-    print '<div class="flex flex-row items-center justify-center">';
-    print '<i class="fas fa-user-tie" style="margin-right: 1em;"></i>';
-    print $form->select_dolusers(0, 'user_id', 1, null, 0, '', 0, '', 0, 'minwidth200');
-    print '</div>';
-    print '</div>';
-    print '</div>';
-    print '</div>';
-    print '</div>';
-    print '<div class="modal-footer">';
-    print '<button type="submit" class="wpeo-button button-blue" style="color: #fff"><i class="fas fa-plus"></i></button>';
-    print '</div>';
-    print '</form>';
-    print '</div>';
-    print '</div>';
+// --- Modals adding a corrective or preventive action (#5644) ---
+// They post to the actions tab (view/ticket/ticket_actions.php), which creates the action as from its own form, the
+// fields carry the same names, then comes back to this card
+if (!empty($object->fk_project) && $permissionToAddAction) {
+    $actionsFormUrl    = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_actions.php', 1) . '?id=' . (int) $object->id;
+    $actionsTagOptions = isModEnabled('category') ? digiriskdolibarr_get_action_tag_options($form) : [];
+
+    foreach (digiriskdolibarr_ticket_action_sections() as $actionType => $actionSection) {
+        print '<div class="wpeo-modal modal-flex modal-task dtc-action-modal" id="ticket_action_add_modal_' . $actionType . '">';
+        print '<div class="modal-container wpeo-modal-event">';
+        print '<form method="POST" action="' . dol_escape_htmltag($actionsFormUrl) . '">';
+        print '<input type="hidden" name="token" value="' . newToken() . '">';
+        print '<input type="hidden" name="action" value="addAction">';
+        print '<input type="hidden" name="action_type" value="' . $actionType . '">';
+        print '<input type="hidden" name="backtopage" value="' . dol_escape_htmltag($url_page_current . '?id=' . (int) $object->id) . '">';
+
+        print '<div class="modal-header">';
+        print '<h2 class="modal-title">' . $langs->trans($actionSection['addKey']) . '</h2>';
+        print '<div class="modal-close"><i class="fas fa-times"></i></div>';
+        print '</div>';
+
+        print '<div class="modal-content">';
+        print '<div class="dtc-action-modal__field">';
+        print '<label for="action_label' . $actionType . '">' . $langs->trans('ActionLabel') . ' *</label>';
+        print '<input type="text" id="action_label' . $actionType . '" name="action_label" required>';
+        print '</div>';
+
+        print '<div class="dtc-action-modal__row">';
+        print '<div class="dtc-action-modal__field">';
+        print '<label for="actionstart' . $actionType . '">' . $langs->trans('DateStart') . '</label>';
+        print $form->selectDate(dol_now(), 'actionstart' . $actionType, 0, 0, 1, 'cardActionForm' . $actionType);
+        print '</div>';
+        print '<div class="dtc-action-modal__field">';
+        print '<label for="actiondeadline' . $actionType . '">' . $langs->trans('ActionDeadline') . '</label>';
+        print $form->selectDate('', 'actiondeadline' . $actionType, 0, 0, 1, 'cardActionForm' . $actionType);
+        print '</div>';
+        print '<div class="dtc-action-modal__field">';
+        print '<label for="action_budget' . $actionType . '">' . $langs->trans('Budget') . '</label>';
+        print '<input type="number" id="action_budget' . $actionType . '" name="action_budget" min="0" step="1">';
+        print '</div>';
+        print '</div>';
+
+        print '<div class="dtc-action-modal__field">';
+        print '<label for="assigned_user' . $actionType . '">' . $langs->trans('DigiriskActionAssignedTo') . '</label>';
+        print $form->select_dolusers('', 'assigned_user' . $actionType, 1, null, 0, '', '', 0, 0, 0, '', 0, '', 'minwidth200 maxwidth300');
+        print '</div>';
+
+        if (isModEnabled('category')) {
+            print '<div class="dtc-action-modal__field">';
+            print '<label for="action_tags' . $actionType . '">' . $langs->trans('Categories') . '</label>';
+            print $form->multiselectarray('action_tags' . $actionType, $actionsTagOptions, [], 0, 0, 'minwidth200', 0, '100%');
+            print '</div>';
+        }
+        print '</div>';
+
+        print '<div class="modal-footer">';
+        print '<button type="submit" class="wpeo-button button-blue"><i class="fas fa-plus pictofixedwidth"></i>' . $langs->trans('Add') . '</button>';
+        print '</div>';
+        print '</form>';
+        print '</div>';
+        print '</div>';
+    }
 }
-// ------------------------------------
 
 llxFooter();
 $db->close();
