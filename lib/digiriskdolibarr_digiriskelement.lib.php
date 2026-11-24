@@ -112,7 +112,9 @@ function digiriskelement_prepare_head(DigiriskElement $object): array
             $head[$h][0] = dol_buildpath('digiriskdolibarr/view/digiriskelement/digiriskelement_environment.php', 1) . '?id=' . $object->id;
             $head[$h][1] = $conf->browser->layout == 'classic' ? '<i class="fas fa-list pictofixedwidth"></i>' . $langs->trans('Environment') : '<i class="fas fa-list"></i>';
             $head[$h][2] = 'elementEnvironment';
+            $h++;
         }
+
         $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_digiai.php', 1) . '?id=' . $object->id;
         $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-magic pictofixedwidth"></i>' . $langs->trans('DigiAI') : '<i class="fas fa-magic"></i>';
         $head[$h][2] = 'elementDigiAI';
