@@ -84,10 +84,14 @@ class ActionsDigiriskdolibarr
         $error = 0; // Error counter
 
         if (strpos($parameters['context'], 'category') !== false) {
+            // cat_table / cat_fk : link tables of the sql folder (llx_categorie_risk.fk_risk...), without them
+            // Categorie reads llx_categorie_digiriskrisk.fk_digiriskrisk, which does not exist
             $this->results = [
                 'digiriskaccident' => [
                     'id'        => 436302001,
                     'code'      => 'digiriskaccident',
+                    'cat_table' => 'accident',
+                    'cat_fk'    => 'accident',
                     'obj_class' => 'Accident',
                     'obj_table' => 'digiriskdolibarr_accident',
                     'label'     => 'Accident',
@@ -95,6 +99,8 @@ class ActionsDigiriskdolibarr
                 'digiriskpreventionplan' => [
                     'id'        => 436302002,
                     'code'      => 'digiriskpreventionplan',
+                    'cat_table' => 'preventionplan',
+                    'cat_fk'    => 'preventionplan',
                     'obj_class' => 'PreventionPlan',
                     'obj_table' => 'digiriskdolibarr_preventionplan',
                     'label'     => 'PreventionPlan',
@@ -102,6 +108,8 @@ class ActionsDigiriskdolibarr
                 'digiriskfirepermit' => [
                     'id'        => 436302003,
                     'code'      => 'digiriskfirepermit',
+                    'cat_table' => 'firepermit',
+                    'cat_fk'    => 'firepermit',
                     'obj_class' => 'FirePermit',
                     'obj_table' => 'digiriskdolibarr_firepermit',
                     'label'     => 'FirePermit',
@@ -109,6 +117,8 @@ class ActionsDigiriskdolibarr
                 'digiriskrisk' => [
                     'id'        => 436302004,
                     'code'      => 'digiriskrisk',
+                    'cat_table' => 'risk',
+                    'cat_fk'    => 'risk',
                     'obj_class' => 'Risk',
                     'obj_table' => 'digiriskdolibarr_risk',
                     'label'     => 'Risk',
