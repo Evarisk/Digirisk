@@ -2020,10 +2020,16 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
                 $line .= "\n" . $outputLangs->transnoentities('Responsible') . ' : ' . implode(', ', $this->taskResponsibles[$riskTask->id]);
             }
             if (!$options['taskHideDate']) {
-                $startDate = (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_TASK_START_DATE') && !empty($riskTask->dateo)) ? $riskTask->dateo : $riskTask->datec;
-                $line     .= "\n" . $outputLangs->transnoentities('DateStart') . ' : ' . dol_print_date($startDate, 'dayreduceformat', 'tzuser', $outputLangs);
+                // Start and deadline typed in the input timezone, read back in it ('auto') as the risk card does; the creation
+                // date, shown when there is no start, is an instant and stays in the timezone of the user
+                if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_TASK_START_DATE') && !empty($riskTask->dateo)) {
+                    $startDate = dol_print_date($riskTask->dateo, 'dayreduceformat', 'auto', $outputLangs);
+                } else {
+                    $startDate = dol_print_date($riskTask->datec, 'dayreduceformat', 'tzuser', $outputLangs);
+                }
+                $line .= "\n" . $outputLangs->transnoentities('DateStart') . ' : ' . $startDate;
                 if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_TASK_END_DATE') && !empty($riskTask->datee)) {
-                    $line .= ' - ' . $outputLangs->transnoentities('Deadline') . ' : ' . dol_print_date($riskTask->datee, 'dayreduceformat', 'tzuser', $outputLangs);
+                    $line .= ' - ' . $outputLangs->transnoentities('Deadline') . ' : ' . dol_print_date($riskTask->datee, 'dayreduceformat', 'auto', $outputLangs);
                 }
             }
             if (!$options['taskHideBudget']) {

@@ -373,6 +373,61 @@ function digiriskdolibarr_ticket_count_actions(array $actionsByType): array
 }
 
 /**
+ * Return the tasks of a ticket that are no corrective or preventive action: the tasks added under its parent task
+ * "TKP-<ref>" before the actions existed (#4881)
+ *
+ * The rows have the columns of digiriskdolibarr_get_actions_by_type(), so that the ticket card lists both the same way.
+ *
+ * @param  DoliDB                           $db            Database handler
+ * @param  int                              $parentTaskId  Parent task of the ticket, from digiriskdolibarr_ticket_get_parent_task()
+ * @param  array<int, array<int, stdClass>> $actionsByType Actions of each type, from digiriskdolibarr_ticket_get_actions()
+ * @return array<int, stdClass>                            Other tasks of the ticket
+ */
+function digiriskdolibarr_ticket_get_other_tasks(DoliDB $db, int $parentTaskId, array $actionsByType): array
+{
+    require_once __DIR__ . '/digiriskdolibarr_action.lib.php';
+
+    $results = [];
+    if ($parentTaskId <= 0) {
+        return $results;
+    }
+
+    // The containers of the actions and the actions themselves, even those left directly under the parent task
+    $excludedIds = [0];
+    foreach ($actionsByType as $type => $actions) {
+        $excludedIds[] = digiriskdolibarr_get_action_container_task($db, $parentTaskId, (int) $type);
+        foreach ($actions as $action) {
+            $excludedIds[] = (int) $action->rowid;
+        }
+    }
+
+    $sql  = 'SELECT t.rowid, t.ref, t.label, t.datec, t.dateo, t.datee, t.progress, t.fk_statut, t.budget_amount,';
+    $sql .= ' u2.rowid AS user_id, CONCAT(u2.firstname, \' \', u2.lastname) AS user_fullname';
+    $sql .= ' FROM ' . MAIN_DB_PREFIX . 'projet_task t';
+    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'user u2 ON u2.rowid = (';
+    $sql .= '  SELECT ec2.fk_socpeople FROM ' . MAIN_DB_PREFIX . 'element_contact ec2';
+    $sql .= '  INNER JOIN ' . MAIN_DB_PREFIX . 'c_type_contact ctc2';
+    $sql .= '   ON ctc2.rowid = ec2.fk_c_type_contact';
+    $sql .= '   AND ctc2.code = \'TASKEXECUTIVE\' AND ctc2.element = \'project_task\'';
+    $sql .= '  WHERE ec2.element_id = t.rowid ORDER BY ec2.rowid ASC LIMIT 1)';
+    $sql .= ' WHERE t.fk_task_parent = ' . $parentTaskId;
+    $sql .= '   AND t.rowid NOT IN (' . implode(',', array_unique($excludedIds)) . ')';
+    $sql .= ' ORDER BY t.datee ASC, t.rowid ASC';
+
+    $resql = $db->query($sql);
+    if ($resql) {
+        while ($obj = $db->fetch_object($resql)) {
+            $results[] = $obj;
+        }
+        $db->free($resql);
+    } else {
+        dol_syslog(__FUNCTION__ . ': ' . $db->lasterror(), LOG_ERR);
+    }
+
+    return $results;
+}
+
+/**
  * Fields of the QQOQCCP analysis of a ticket (#5549): ticket extrafields, hidden from the native card, shown by the
  * QQOQCCP tab and its document, in the order of the method. Who is a list of users, the six others are free text.
  *
