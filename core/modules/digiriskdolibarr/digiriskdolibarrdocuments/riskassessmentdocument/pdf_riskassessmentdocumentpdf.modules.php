@@ -818,8 +818,10 @@ class pdf_riskassessmentdocumentpdf extends ModelePDFDigiriskDolibarrDocument
                 continue;
             }
             $details   = [((int) $task->progress) . ' %'];
+            // Deadline written by dol_mktime() in the input timezone, at 23:59:59: read back in that timezone ('auto'), as
+            // the risk card does. Read in the browser timezone, it moved to the next day east of the server
             if (!empty($task->datee)) {
-                $details[] = dol_print_date($task->datee, 'day', 'tzuser', $outputLangs);
+                $details[] = dol_print_date($task->datee, 'day', 'auto', $outputLangs);
             }
             $ongoing[] = '- ' . $task->label . ' (' . implode(', ', $details) . ')';
         }
