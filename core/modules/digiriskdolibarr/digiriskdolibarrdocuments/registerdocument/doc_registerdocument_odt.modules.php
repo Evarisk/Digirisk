@@ -189,8 +189,11 @@ class doc_registerdocument_odt extends SaturneDocumentModel
                             $victimData = array_shift($victimArray);
                             $encodedImage = explode(',', $victimData->signature)[1];
                             $decodedImage = base64_decode($encodedImage);
-                            file_put_contents($tempDir . 'signature' . $victimData->id . '.png', $decodedImage);
-                            $tmpArray['register_victim_signature'] = $tempDir . 'signature' . $victimData->id . '.png';
+                            // Names of their own, deleted when the generation ends: signature<id>.png was shared by
+                            // the generations running at the same time
+                            $signaturePath = $this->getTempFilePath($tempDir, 'signature_' . $victimData->id, 'png');
+                            file_put_contents($signaturePath, $decodedImage);
+                            $tmpArray['register_victim_signature'] = $signaturePath;
                         } else {
                             $tmpArray['register_victim_signature'] = '';
                         }
@@ -199,8 +202,9 @@ class doc_registerdocument_odt extends SaturneDocumentModel
                             $tmpArray['register_caregiver_fullname'] = dol_strtoupper($careGiverData->lastname) . ' ' . ucfirst($careGiverData->firstname);
                             $encodedImage = explode(',', $careGiverData->signature)[1];
                             $decodedImage = base64_decode($encodedImage);
-                            file_put_contents($tempDir . 'signature' . $careGiverData->id . '.png', $decodedImage);
-                            $tmpArray['register_caregiver_signature'] = $tempDir . 'signature' . $careGiverData->id . '.png';
+                            $signaturePath = $this->getTempFilePath($tempDir, 'signature_' . $careGiverData->id, 'png');
+                            file_put_contents($signaturePath, $decodedImage);
+                            $tmpArray['register_caregiver_signature'] = $signaturePath;
                         } else {
                             $tmpArray['register_caregiver_fullname'] = '';
                             $tmpArray['register_caregiver_signature'] = '';
@@ -245,8 +249,9 @@ class doc_registerdocument_odt extends SaturneDocumentModel
                                 }
                                 $encodedImage = explode(',', $accidentCaregiver->signature)[1];
                                 $decodedImage = base64_decode($encodedImage);
-                                file_put_contents($tempDir . 'signature' . $accidentCaregiver->id . '.png', $decodedImage);
-                                $tmpArray['caregiver_signature'] = $tempDir . 'signature' . $accidentCaregiver->id . '.png';
+                                $signaturePath = $this->getTempFilePath($tempDir, 'signature_' . $accidentCaregiver->id, 'png');
+                                file_put_contents($signaturePath, $decodedImage);
+                                $tmpArray['caregiver_signature'] = $signaturePath;
 
                                 $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
                             }
@@ -299,8 +304,9 @@ class doc_registerdocument_odt extends SaturneDocumentModel
                                 $tmpArray['register_controller_date'] = dol_print_date($ticketControl->control_date);
                                 $encodedImage = explode(',', $ticketController->signature)[1];
                                 $decodedImage = base64_decode($encodedImage);
-                                file_put_contents($tempDir . 'signature' . $ticketController->id . '.png', $decodedImage);
-                                $tmpArray['register_controller_signature'] = $tempDir . 'signature' . $ticketController->id . '.png';
+                                $signaturePath = $this->getTempFilePath($tempDir, 'signature_' . $ticketController->id, 'png');
+                                file_put_contents($signaturePath, $decodedImage);
+                                $tmpArray['register_controller_signature'] = $signaturePath;
 
                                 $tmpArray['register_controller_note'] = $ticketControl->note_public;
 

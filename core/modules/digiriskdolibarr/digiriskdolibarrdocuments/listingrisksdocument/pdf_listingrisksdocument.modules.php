@@ -1186,8 +1186,13 @@ class pdf_listingrisksdocument extends SaturneDocumentModel
         $qrCodeSide = min(28, $width - 10);
         $qrCodePath = $this->ticketQrCodePath();
 
+        // TCPDF reads the image when it draws it: the file, of this generation only, goes right after, even on an error
         if (dol_strlen($qrCodePath)) {
-            $pdf->Image($qrCodePath, $x + (($width - $qrCodeSide) / 2), $currentY + 2, $qrCodeSide, $qrCodeSide);
+            try {
+                $pdf->Image($qrCodePath, $x + (($width - $qrCodeSide) / 2), $currentY + 2, $qrCodeSide, $qrCodeSide);
+            } finally {
+                dol_delete_file($qrCodePath, 1, 1, 1, null, false, 0);
+            }
         }
 
         $imageHeight = dol_strlen($qrCodePath) ? $qrCodeSide + 4 : 2;
