@@ -71,6 +71,8 @@ saturne_check_access($permissiontoread);
  * Actions
  */
 
+$action = digiriskdolibarr_check_admin_write_action($action, $permissiontowrite);
+
 if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
 	$PPRProject = GETPOST('PPRProject', 'none');
 	$PPRProject = preg_split('/_/', $PPRProject);
@@ -190,6 +192,8 @@ print load_fiche_titre($title, $linkback, 'title_setup');
 // Configuration header
 $head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'preventionplan', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
+
+require_once dol_buildpath('/saturne/core/tpl/admin/admin_write_access_notice.tpl.php');
 
 print load_fiche_titre('<i class="fas fa-info"></i> ' . $langs->trans("PreventionPlanManagement"), '', '');
 print '<hr>';
