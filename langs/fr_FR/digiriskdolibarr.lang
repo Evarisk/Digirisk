@@ -90,6 +90,36 @@ PeoplePercentageNbPeople             = %s personne(s) sur %s
 PeoplePercentageWorkforceMissing     = Nombre de personnes dans l'entreprise non renseigné
 ErrorPeoplePercentageOf              = %s : le pourcentage de personnes présentes doit être compris entre 0 et 100. Rien n'a été enregistré.
 
+# DigiriskElement - Groupes d'exposition (#5644)
+ExposureGroups                       = Groupes d'exposition
+ExposureGroupsIntro                  = Un groupe d'exposition rassemble les personnes qui occupent les mêmes postes, par exemple les agents de collecte ou les agents de déchetterie, avec leur effectif. Chaque groupe se répartit ensuite sur les GP/UT où il travaille.
+NewExposureGroup                     = Nouveau groupe
+NoExposureGroup                      = Aucun groupe d'exposition pour l'instant
+ExposureGroupNbPeople                = Effectif
+ExposureGroupNbPeopleHelp            = Nombre de personnes du groupe. Il se saisit à la main : la plupart des agents n'ont pas de compte utilisateur.
+ExposureGroupNbPeopleShort           = %s pers.
+ExposureGroupTotalShare              = Répartition
+ExposureGroupTotalShareHelp          = Somme des parts du groupe dans les GP/UT. Elle atteint 100 % quand tout le temps de travail du groupe est réparti.
+ExposureGroupGrid                    = Répartition des groupes sur les GP/UT
+ExposureGroupGridHelp                = Pour chaque groupe, la part de son temps de travail passée dans chaque GP/UT, en %. Une part donnée à un groupement vaut pour le groupement lui-même, elle ne se répartit pas sur ses unités. Laisser vide si le groupe n'y travaille pas.
+ExposureGroupElement                 = GP/UT
+ExposureGroupNoElement               = Aucun GP/UT actif
+ExposureGroupExposedPeople           = Effectif exposé
+ExposureGroupExposedPeopleHelp       = Somme, sur les groupes, de l'effectif du groupe multiplié par sa part dans le GP/UT, en équivalent temps plein.
+ExposureGroupSaveShares              = Enregistrer la répartition
+ExposureGroupSharesSaved             = Répartition enregistrée
+ExposureGroupCreated                 = Groupe « %s » créé
+ExposureGroupUpdated                 = Groupe « %s » modifié
+ExposureGroupDeleted                 = Groupe « %s » supprimé
+DeleteExposureGroup                  = Supprimer le groupe
+ConfirmDeleteExposureGroup           = Supprimer le groupe « %s » et sa répartition sur les GP/UT ?
+ErrorExposureGroupNbPeople           = L'effectif doit être un nombre entier de personnes.
+ErrorExposureGroupShare              = %s part(s) invalide(s) : une part est un pourcentage compris entre 0 et 100. Rien n'a été enregistré.
+ExposureGroupsOfElementHelp          = Groupes d'exposition présents dans ce GP/UT, avec leur part et le nombre de personnes qui en découle. La répartition se règle au niveau de la société, onglet Groupes d'exposition.
+ExposureGroupOfElement               = %s : %s, soit %s personne(s)
+ExposureGroupsExposedTotal           = Effectif exposé : %s
+ExposureGroupsEditShares             = Modifier la répartition
+
 # WHSRegister = Registre SST
 TicketsPublicInterfaceConfig         = Configuration de l'interface publique des tickets
 WHSRegister                          = Registre SST

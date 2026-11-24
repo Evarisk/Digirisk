@@ -53,6 +53,14 @@ function digiriskstandard_prepare_head(DigiriskStandard $object): array
         $h++;
     }
 
+    // Groupes d'exposition (#5644) : les personnes qui occupent les memes postes, reparties sur les GP/UT
+    if ($user->hasRight('digiriskdolibarr', 'digiriskelement', 'read')) {
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_exposuregroup.php', 1);
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-users pictofixedwidth"></i>' . $langs->trans('ExposureGroups') : '<i class="fas fa-users"></i>';
+        $head[$h][2] = 'standardExposureGroup';
+        $h++;
+    }
+
     if ($user->rights->digiriskdolibarr->legaldisplay->read) {
         $head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskstandard/digiriskstandard_legaldisplay.php", 1);
         $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-file pictofixedwidth"></i>' . $langs->trans('LegalDisplay') : '<i class="fas fa-file"></i>';
