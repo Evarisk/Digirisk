@@ -1522,6 +1522,15 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'write';
 		$r++;
 
+		/* ADMINPAGE WRITE PERMISSION */
+		// Declared last like the action plan ones. Without it only an administrator changes the setup: a user granted
+		// ReadAdminPage alone reads the settings, switches disabled
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
+		$this->rights[$r][1] = $langs->transnoentities('WriteAdminPage', 'DigiriskDolibarr');
+		$this->rights[$r][4] = 'adminpage';
+		$this->rights[$r][5] = 'write';
+		$r++;
+
 		// The mobile interfaces and the application create the very same objects as the classic cards:
 		// they rely on preventionplan/write and firepermit/write rather than on rights of their own.
 

@@ -57,12 +57,15 @@ $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 
 // Security check - Protection if external user
-$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
 /*
  * Actions
  */
+
+$action = digiriskdolibarr_check_admin_write_action($action, $permissiontowrite);
 
 // Actions update_mask
 require_once dol_buildpath('/saturne/core/tpl/actions/admin_conf_actions.tpl.php');
@@ -121,7 +124,7 @@ if ($action == 'setRiskOverviewPin' && saturne_check_admin_write_access()) {
     exit;
 }
 
-if (GETPOST('action') == 'setmod') {
+if ($action == 'setmod') {
     $value = GETPOST('value');
     $valueArray = explode('_', $value);
     $objectType = $valueArray[1];
@@ -159,6 +162,8 @@ print load_fiche_titre($title, $linkback, 'title_setup');
 // Configuration header
 $head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'riskassessmentdocument', $title, -1, 'digiriskdolibarr_color@digiriskdolibarr');
+
+require_once dol_buildpath('/saturne/core/tpl/admin/admin_write_access_notice.tpl.php');
 
 
 // Risks
@@ -357,7 +362,9 @@ print '</tr>';
 print '<tr class="oddeven">';
 print '<td>' . $langs->trans('RiskOverviewPublicInterface') . '</td>';
 print '<td>' . $langs->trans('RiskOverviewPublicInterfaceHelp') . '</td>';
-print '<td class="center">' . ajax_constantonoff('DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE', [], null, 0, 0, 1, 2, 0, 1, '', '', 'inline-block', 0, '', saturne_check_admin_write_access() ? 0 : 1) . '</td>';
+// The core ajax component only answers to administrators: the others get the link of saturne_constant_onoff(),
+// which reloads the page as well
+print '<td class="center">' . (!empty($user->admin) ? ajax_constantonoff('DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE', [], null, 0, 0, 1, 2, 0, 1) : saturne_constant_onoff('DIGIRISKDOLIBARR_RISK_OVERVIEW_PUBLIC_INTERFACE', $permissiontowrite)) . '</td>';
 print '</tr>';
 // The tabs the overview shows besides the risks, saved at 0 when switched off: absent, a tab is shown.
 // The register tab counts tickets, it needs their module
@@ -372,20 +379,20 @@ foreach ($riskOverviewTabSwitches as $riskOverviewTab => $riskOverviewTabLabels)
     print '<tr class="oddeven">';
     print '<td>' . $langs->trans($riskOverviewTabLabels[0]) . '</td>';
     print '<td>' . $langs->trans($riskOverviewTabLabels[1]) . '</td>';
-    print '<td class="center">' . ajax_constantonoff(DIGIRISK_RISK_OVERVIEW_TAB_CONSTS[$riskOverviewTab], [], null, 0, 0, 0, 2, 0, 1, '', '', 'inline-block', 0, '', saturne_check_admin_write_access() ? 0 : 1) . '</td>';
+    print '<td class="center">' . saturne_constant_onoff(DIGIRISK_RISK_OVERVIEW_TAB_CONSTS[$riskOverviewTab], $permissiontowrite) . '</td>';
     print '</tr>';
 }
 // The same tables as an Excel workbook, for anyone holding the link: on until switched off
 print '<tr class="oddeven">';
 print '<td>' . $langs->trans('RiskOverviewPublicExport') . '</td>';
 print '<td>' . $langs->trans('RiskOverviewPublicExportHelp') . '</td>';
-print '<td class="center">' . ajax_constantonoff(DIGIRISK_RISK_OVERVIEW_EXPORT_CONST, [], null, 0, 0, 0, 2, 0, 1, '', '', 'inline-block', 0, '', saturne_check_admin_write_access() ? 0 : 1) . '</td>';
+print '<td class="center">' . saturne_constant_onoff(DIGIRISK_RISK_OVERVIEW_EXPORT_CONST, $permissiontowrite) . '</td>';
 print '</tr>';
 // A name and a phone number on a public page: off until asked
 print '<tr class="oddeven">';
 print '<td>' . $langs->trans('RiskOverviewPublicResponsible') . '</td>';
 print '<td>' . $langs->trans('RiskOverviewPublicResponsibleHelp') . '</td>';
-print '<td class="center">' . ajax_constantonoff('DIGIRISKDOLIBARR_RISK_OVERVIEW_RESPONSIBLE', [], null, 0, 0, 0, 2, 0, 1, '', '', 'inline-block', 0, '', saturne_check_admin_write_access() ? 0 : 1) . '</td>';
+print '<td class="center">' . saturne_constant_onoff('DIGIRISKDOLIBARR_RISK_OVERVIEW_RESPONSIBLE', $permissiontowrite) . '</td>';
 print '</tr>';
 print '<tr class="oddeven">';
 print '<td>' . $langs->trans('RiskOverviewPublicPin') . '</td>';

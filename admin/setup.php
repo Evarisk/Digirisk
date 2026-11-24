@@ -62,6 +62,8 @@ saturne_check_access($permissiontoread);
  * Actions
  */
 
+$action = digiriskdolibarr_check_admin_write_action($action, $permissiontowrite);
+
 require_once '../core/tpl/digiriskdolibarr_projectcreation_action.tpl.php';
 
 if ($action == 'setredirectafterconnection') {
@@ -120,6 +122,8 @@ print load_fiche_titre($langs->trans($title), $linkback, 'title_setup');
 // Configuration header
 $head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'settings', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
+
+require_once dol_buildpath('/saturne/core/tpl/admin/admin_write_access_notice.tpl.php');
 
 // L'assistant de configuration cree un utilisateur USERAPI et sa cle d'API sans dependre du module API REST :
 // tant que celui-ci est eteint, les routes ne repondent pas et l'application mobile ne peut pas se connecter.
@@ -224,8 +228,17 @@ foreach ($digiriskMenuSettings as $constName => $transKeys) {
     print '</td>';
     print '<td class="center">';
     // Revert the switch: the constant holds the hidden state, the switch shows the visible one
-    // The reverted switch has no saturne_constant_onoff equivalent, so the zero instead of the deletion is asked here
-    print ajax_constantonoff($constName, [], null, 1, 0, 0, 2, 0, 1);
+    // The reverted switch has no saturne_constant_onoff equivalent, so the zero instead of the deletion is asked here.
+    // The core ajax component only answers to administrators: the others get the link that saturne_constant_onoff()
+    // would give, handled by admin_conf_actions.tpl.php
+    if (empty($user->admin) && $permissiontowrite) {
+        $menuHidden = getDolGlobalString($constName);
+        print '<a class="reposition inline-block" href="' . $_SERVER['PHP_SELF'] . '?action=' . ($menuHidden ? 'del_' : 'set_') . $constName . '&token=' . newToken() . '">';
+        print $menuHidden ? img_picto($langs->trans('Disabled'), 'switch_off') : img_picto($langs->trans('Enabled'), 'switch_on');
+        print '</a>';
+    } else {
+        print ajax_constantonoff($constName, [], null, 1, 0, 0, 2, 0, 1, '', '', 'inline-block', 0, '', $permissiontowrite ? 0 : 1);
+    }
     print '</td>';
     print '</tr>';
 }
