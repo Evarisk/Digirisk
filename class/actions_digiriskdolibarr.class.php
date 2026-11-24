@@ -2097,6 +2097,29 @@ class ActionsDigiriskdolibarr
 	}
 
     /**
+     * Overloading the moreHtmlRef function : replacing the parent's function with the one below
+     *
+     * @param  array       $parameters Hook metadata (context, etc...)
+     * @param  object|null $object     The object to process
+     * @return int                     0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function moreHtmlRef(array $parameters, $object): int
+    {
+        global $langs, $user;
+
+        // The native ticket card leads to the Digirisk one, under the ref of its banner (#5644)
+        if (preg_match('/\bticketcard\b/', $parameters['context']) && $object instanceof Ticket && $object->id > 0 && $user->hasRight('ticket', 'read')) {
+            $digiriskCardUrl = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $object->id;
+
+            $this->resprints  = '<div class="refidno">';
+            $this->resprints .= '<a href="' . dol_escape_htmltag($digiriskCardUrl) . '">' . img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictofixedwidth"') . $langs->trans('TicketOpenDigiriskCard') . '</a>';
+            $this->resprints .= '</div>';
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
      * Overloading the formObjectOptions function : replacing the parent's function with the one below
      *
      * @param  array     $parameters Hook metadata (context, etc...)
