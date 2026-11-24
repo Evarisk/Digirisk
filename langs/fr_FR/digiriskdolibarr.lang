@@ -2174,6 +2174,7 @@ NoSubject                             = Sans sujet
 NotAssigned                           = Non assigné
 ConditionMessage                      = Conditions de signature
 TicketTaskNeedsProject                = Associez un projet au ticket pour lui ajouter des tâches
+TicketOpenDigiriskCard                = Ouvrir la fiche en mode Digirisk
 UnknownFieldToUpdate                  = Champ inconnu : %s
 Saved                                 = Enregistré
 SeeAll                                = Voir tout
