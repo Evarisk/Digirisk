@@ -45,6 +45,14 @@ function digiriskstandard_prepare_head(DigiriskStandard $object): array
     $head[$h][2] = 'standardCard';
     $h++;
 
+    // Bibliotheque des risques de l'entite (#5644) : des modeles affectes aux GP/UT concernes, chacun avec son risque
+    if ($user->hasRight('digiriskdolibarr', 'risk', 'read')) {
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_risklibrary.php', 1);
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-book pictofixedwidth"></i>' . $langs->trans('RiskLibrary') : '<i class="fas fa-book"></i>';
+        $head[$h][2] = 'standardRiskLibrary';
+        $h++;
+    }
+
     // Qualification des unites de travail face aux risques psychosociaux, prise une seule fois pour toute l'organisation
     if ($user->rights->digiriskdolibarr->risk->read) {
         $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_psychosocial.php', 1);

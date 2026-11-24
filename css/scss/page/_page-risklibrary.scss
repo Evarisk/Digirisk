@@ -1,0 +1,120 @@
+// Risk library of the company (#5644): view/digiriskstandard/digiriskstandard_risklibrary.php
+// The models of risks, then the grid of their assignment to the GP/UT
+
+.risklibrary {
+    .risklibrary-intro {
+        margin: 8px 0 12px;
+        max-width: 900px;
+    }
+
+    .risklibrary-picto {
+        width: 26px;
+        height: 26px;
+        vertical-align: middle;
+    }
+
+    // Square of the cotation, smaller than in the risk lists
+    .risk-evaluation-cotation.risklibrary-cotation {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 42px;
+        height: 24px;
+        padding: 0 4px;
+        font-size: 11px;
+        line-height: 24px;
+    }
+
+    .risklibrary-form {
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        &__row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+        }
+    }
+
+    .risklibrary-grid {
+        th.risklibrary-grid__model {
+            min-width: 70px;
+            max-width: 110px;
+            vertical-align: bottom;
+            white-space: normal;
+        }
+
+        .risklibrary-grid__label {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            font-size: 11px;
+            font-weight: 400;
+            text-transform: none;
+        }
+
+        td.risklibrary-grid__cell {
+            position: relative;
+            white-space: nowrap;
+        }
+
+        // Pencil of a cell, discreet until hovered
+        .risklibrary-edit {
+            margin-left: 4px;
+            color: #9ca3af;
+            cursor: pointer;
+
+            &:hover {
+                color: #2b6cb0;
+            }
+        }
+    }
+
+    .risklibrary-state {
+        display: inline-block;
+        min-width: 28px;
+        padding: 1px 6px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+
+        &--no {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        &--todo {
+            border: 1px dashed #d1d5db;
+            color: #9ca3af;
+        }
+
+        &--missing {
+            color: #b45309;
+        }
+    }
+}
+
+// Modal qualifying a GP/UT, printed after the page
+.wpeo-modal.risklibrary-modal .modal-container {
+    height: auto;
+}
+
+.risklibrary-modal {
+    .modal-content {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .risklibrary-modal__choice {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+    }
+}
