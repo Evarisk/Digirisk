@@ -1179,16 +1179,27 @@ function digiriskdolibarr_ticket_public_interface_url(): string
  * the configuration printed N/A in its place. The ODT templates resize the image in place to fit their
  * cell, a reason more not to keep it.
  *
- * @param  string $url Address to encode
- * @return string      Path of the PNG image, empty when it could not be drawn
+ * Under a name of its own: ticketqrcode.png was shared by the generations running at the same time, one took the code
+ * of another or lost it. Given a generator, the file is one of its temporary files, deleted when the generation ends;
+ * without, the caller deletes it once drawn.
+ *
+ * @param  string                    $url       Address to encode
+ * @param  SaturneDocumentModel|null $generator ODT generator running, null for a file the caller deletes
+ * @return string                               Path of the PNG image, empty when it could not be drawn
+ * @throws Exception
  */
-function digiriskdolibarr_ticket_qrcode_file(string $url): string
+function digiriskdolibarr_ticket_qrcode_file(string $url, ?SaturneDocumentModel $generator = null): string
 {
     global $conf;
 
     require_once __DIR__ . '/digiriskdolibarr_mobile.lib.php';
 
-    $filePath = $conf->digiriskdolibarr->multidir_output[$conf->entity ?: 1] . '/temp/ticketqrcode.png';
+    $tempDir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?: 1] . '/temp/';
+    if ($generator !== null) {
+        $filePath = $generator->getTempFilePath($tempDir, 'ticketqrcode', 'png');
+    } else {
+        $filePath = $tempDir . 'ticketqrcode_' . uniqid() . bin2hex(random_bytes(4)) . '.png';
+    }
 
     return digiriskGetQrCodePng($url, $filePath) ? $filePath : '';
 }

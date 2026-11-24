@@ -206,14 +206,16 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 
 		if ($foundTagForLines) {
 			if ( ! empty($extsocietyintervenants) && $extsocietyintervenants > 0) {
-				$k         = 3;
 				foreach ($extsocietyintervenants as $line) {
+					$signaturePath = '';
 					if ($line->status == 5) {
 						if (($moreParam['specimen'] == 0 && $object->status >= $object::STATUS_LOCKED)) {
 							$encoded_image = explode(",", $line->signature)[1];
 							$decoded_image = base64_decode($encoded_image);
-							file_put_contents($tempdir . "signature" . $k . ".png", $decoded_image);
-							$tmpArray['intervenants_signature'] = $tempdir . "signature" . $k . ".png";
+							// A name of its own: signature<rank>.png was shared by the generations running at the same time
+							$signaturePath = $this->getTempFilePath($tempdir, 'signature', 'png');
+							file_put_contents($signaturePath, $decoded_image);
+							$tmpArray['intervenants_signature'] = $signaturePath;
 						} else {
 							$tmpArray['intervenants_signature'] = '';
 						}
@@ -228,13 +230,11 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 					$tmpArray['mail']     = $line->email;
 					$tmpArray['status']   = $line->getLibStatut(1);
 
-					$k++;
-
 					$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
 
-
-					if (($moreParam['specimen'] == 0 && $object->status >= $object::STATUS_LOCKED)) {
-						dol_delete_file($tempdir . "signature" . $k . ".png");
+					// The file of this line, the rank was already the next one's and left it behind
+					if ($signaturePath !== '') {
+						dol_delete_file($signaturePath, 1, 1, 1, null, false, 0);
 					}
 				}
 				$odfHandler->mergeSegment($listLines);
@@ -431,8 +431,10 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
             if ($moreParam['specimen'] == 0 || ($moreParam['specimen'] == 1 && $conf->global->DIGIRISKDOLIBARR_SHOW_SIGNATURE_SPECIMEN == 1)) {
                 $encodedImage = explode(',', $masterWorker->signature)[1];
                 $decodedImage = base64_decode($encodedImage);
-                file_put_contents($tempDir . 'signature.png', $decodedImage);
-                $tmpArray['maitre_oeuvre_signature'] = $tempDir . 'signature.png';
+                // Names of their own, deleted when the generation ends: signature.png was shared by every generation
+                $signaturePath = $this->getTempFilePath($tempDir, 'signature', 'png');
+                file_put_contents($signaturePath, $decodedImage);
+                $tmpArray['maitre_oeuvre_signature'] = $signaturePath;
             } elseif ($masterWorker->attendance == $signatory::ATTENDANCE_ABSENT) {
                 $tmpArray['maitre_oeuvre_signature'] = $langs->trans('Absent');
             } else {
@@ -462,8 +464,9 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
             if ($moreParam['specimen'] == 0 || ($moreParam['specimen'] == 1 && $conf->global->DIGIRISKDOLIBARR_SHOW_SIGNATURE_SPECIMEN == 1)) {
                 $encodedImage = explode(',', $extSocietyResponsible->signature)[1];
                 $decodedImage = base64_decode($encodedImage);
-                file_put_contents($tempDir . 'signature2.png', $decodedImage);
-                $tmpArray['intervenant_exterieur_signature'] = $tempDir . 'signature2.png';
+                $signaturePath = $this->getTempFilePath($tempDir, 'signature', 'png');
+                file_put_contents($signaturePath, $decodedImage);
+                $tmpArray['intervenant_exterieur_signature'] = $signaturePath;
             } else {
                 $tmpArray['intervenant_exterieur_signature'] = '';
             }
