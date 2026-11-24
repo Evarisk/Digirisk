@@ -2326,6 +2326,7 @@ TicketActionsTabCorrective             = Correctives
 TicketActionsTabPreventive             = Préventives
 TicketActionsSummary                   = Bilan des actions
 TicketActionsNeedProject               = Associez un projet au ticket pour lui ajouter des actions correctives et préventives
+TicketOtherTasks                       = Autres tâches
 BackToTicket                           = Retour au registre
 TicketPublicInterfacePin               = Code PIN de déclaration
 TicketPublicInterfacePinHelp           = Laissez vide pour que tout le monde puisse déclarer. Avec un code de 4 à 12 chiffres, le formulaire public le demande avant de s'afficher : communiquez-le aux personnes autorisées à déclarer.
