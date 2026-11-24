@@ -2359,6 +2359,21 @@ class modDigiriskdolibarr extends DolibarrModules
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_ACCIDENT_REMOVE_FK_USER_VICTIM', 1, 'integer', 0, '', $conf->entity);
         }
 
+        // Danger categories moved by 9.11.0 and 9.14.0 : only for an entity coming from before that version. In update.sql
+        // they ran at every activation and ended by moving the risks of 18 to 21 (vibrations, heurt, addictions, amiante) into 22.
+        // 21 -> 22 before 20 -> 21, otherwise the risks just moved to 21 go on to 22
+        $previousDbVersion = getDolGlobalString('DIGIRISKDOLIBARR_DB_VERSION');
+        if ($previousDbVersion !== '') {
+            $dangerCategoryMoves = ['9.11.0' => [18 => 20, 19 => 21], '9.14.0' => [21 => 22, 20 => 21]];
+            foreach ($dangerCategoryMoves as $moveVersion => $categoryMoves) {
+                if (versioncompare(explode('.', $previousDbVersion), explode('.', $moveVersion)) < 0) {
+                    foreach ($categoryMoves as $fromCategory => $toCategory) {
+                        $this->db->query('UPDATE ' . MAIN_DB_PREFIX . 'digiriskdolibarr_risk SET category = ' . ((int) $toCategory) . ' WHERE category = ' . ((int) $fromCategory) . ' AND entity = ' . ((int) $conf->entity));
+                    }
+                }
+            }
+        }
+
 		$sql = [];
 		// Load sql sub folders
 		$sqlFolder = scandir(__DIR__ . '/../../sql');

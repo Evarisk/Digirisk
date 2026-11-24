@@ -80,8 +80,8 @@ ALTER TABLE llx_digiriskdolibarr_accident_workstop ADD declaration_link text AFT
 UPDATE llx_c_email_templates SET content = '__(QHSEService)__<br>__MYCOMPANY_NAME__<br>\r\n__MYCOMPANY_FULLADDRESS__<br>\r\n__MYCOMPANY_EMAIL__' WHERE label = '(TicketCreationSubject)';
 
 -- 9.11.0
-UPDATE llx_digiriskdolibarr_risk SET category = 20 WHERE category = 18;
-UPDATE llx_digiriskdolibarr_risk SET category = 21 WHERE category = 19;
+-- Danger category moves of 9.11.0 and 9.14.0 : run once by modDigiriskDolibarr::init() since update.sql is replayed
+-- at every activation, where they moved the risks of 18 to 21 (vibrations, heurt, addictions, amiante) into 22
 
 -- 9.11.1
 ALTER TABLE llx_digiriskdolibarr_firepermitdet CHANGE  `use_equipment` `used_equipment` text;
@@ -225,8 +225,6 @@ DROP TABLE llx_c_accident_investigation_attendants_role;
 DROP TABLE llx_categorie_accident_investigation;
 
 -- 9.14.0
-UPDATE llx_digiriskdolibarr_risk SET category = 21 WHERE category = 20;
-UPDATE llx_digiriskdolibarr_risk SET category = 22 WHERE category = 21;
 ALTER TABLE llx_digiriskdolibarr_accident ADD fk_ticket integer;
 ALTER TABLE llx_digiriskdolibarr_accident DROP COLUMN fk_user_victim;
 
