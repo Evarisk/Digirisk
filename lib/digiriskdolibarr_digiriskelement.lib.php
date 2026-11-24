@@ -121,6 +121,12 @@ function digiriskelement_prepare_head(DigiriskElement $object): array
         $h++;
     }
 
+    // Saturne writes its card tab at index 0 and its own tabs from 10: the tabs of the element, shown before the card,
+    // are renumbered below 0 whatever their number. Numbered from -10, the eleventh one and the next were overwritten
+    if (!empty($head)) {
+        $head = array_combine(range(-count($head), -1), array_values($head));
+    }
+
     $moreParams['showNav']     = 0;
     $moreParams['handlePhoto'] = 'true';
 
