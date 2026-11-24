@@ -1521,7 +1521,7 @@ if (!empty($object->fk_project) && $permissionToAddAction) {
 
         print '<div class="dtc-action-modal__field">';
         print '<label for="assigned_user' . $actionType . '">' . $langs->trans('DigiriskActionAssignedTo') . '</label>';
-        print $form->select_dolusers('', 'assigned_user' . $actionType, 1, null, 0, '', '', 0, 0, 0, '', 0, '', 'minwidth200 maxwidth300');
+        print $form->select_dolusers('', 'assigned_user' . $actionType, 1, null, 0, '', '', '0', 0, 0, '', 0, '', 'minwidth200 maxwidth300');
         print '</div>';
 
         if (isModEnabled('category')) {
