@@ -77,7 +77,7 @@ $hookmanager->initHooks(array('digiriskuserlist', 'globalcard')); // Note that c
 
 // Define value to know what current user can do on users
 $permissiontoadd  = ( ! empty($user->admin) || $user->rights->user->user->creer);
-$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread = $user->hasRight('digiriskdolibarr', 'adminpage', 'read');
 
 // Security check - Protection if external user
 saturne_check_access($permissiontoadd);

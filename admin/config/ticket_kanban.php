@@ -46,7 +46,7 @@ $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 
 // Security check
-$permissiontoread  = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->hasRight('digiriskdolibarr', 'adminpage', 'read');
 $permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
