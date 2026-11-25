@@ -278,12 +278,19 @@ foreach ($models as $model) {
         $counts[isset($scopes[$model->rowid][$activeElementId]) ? $scopes[$model->rowid][$activeElementId]->concerned : -1]++;
     }
 
+    // Category, label and description are cut to keep the actions in the page: the whole text is in the tooltip
+    $categoryName = $dangerCategories[$model->category]['name'] ?? '';
     print '<tr class="oddeven">';
-    print '<td class="nowraponall">' . $categoryPicto($model->category) . ' <span class="opacitymedium">' . dol_escape_htmltag($dangerCategories[$model->category]['name'] ?? '') . '</span></td>';
-    print '<td class="tdoverflowmax200">' . dol_escape_htmltag($model->label) . '</td>';
-    print '<td class="tdoverflowmax300">' . dol_escape_htmltag((string) $model->description) . '</td>';
+    print '<td class="tdoverflowmax200" title="' . dol_escape_htmltag($categoryName) . '">' . $categoryPicto($model->category) . ' <span class="opacitymedium">' . dol_escape_htmltag($categoryName) . '</span></td>';
+    print '<td class="tdoverflowmax200" title="' . dol_escape_htmltag($model->label) . '">' . dol_escape_htmltag($model->label) . '</td>';
+    print '<td class="tdoverflowmax250" title="' . dol_escape_htmltag((string) $model->description) . '">' . dol_escape_htmltag((string) $model->description) . '</td>';
     print '<td class="center">' . $cotationBadge($model->cotation, $standardCotations[$model->cotation] ?? (string) $model->cotation, $langs->trans($cotationLevels[$model->cotation] ?? '')) . '</td>';
-    print '<td class="center">' . $langs->trans('RiskLibraryAssignmentCounts', $counts[1], $counts[0], $counts[-1]) . '</td>';
+    // Assignment: three counters shaped like the cells of the grid, the sentence in the tooltip
+    print '<td class="center nowraponall" title="' . dol_escape_htmltag($langs->transnoentities('RiskLibraryAssignmentCounts', $counts[1], $counts[0], $counts[-1])) . '">';
+    print '<span class="risklibrary-state risklibrary-state--yes"><i class="fas fa-check"></i> ' . $counts[1] . '</span> ';
+    print '<span class="risklibrary-state risklibrary-state--no">' . $langs->trans('RiskLibraryStateNotConcernedShort') . ' ' . $counts[0] . '</span> ';
+    print '<span class="risklibrary-state risklibrary-state--todo">? ' . $counts[-1] . '</span>';
+    print '</td>';
     print '<td class="right nowraponall">';
     if ($permissiontoadd) {
         print '<a class="editfielda paddingright" href="' . $pageUrl . '?action=edit&token=' . newToken() . '&modelid=' . (int) $model->rowid . '#risklibrary-form">' . img_edit() . '</a>';
