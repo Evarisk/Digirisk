@@ -353,6 +353,8 @@ if (empty($reshook)) {
 				} else {
 					setEventMessages($object->error, [], 'errors');
 				}
+				// Back to the edit form: left on 'update', actions_addupdatedelete.inc.php would retry the update
+				$action = 'edit';
 			}
 		} else {
 			$action = 'edit';
