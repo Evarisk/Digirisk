@@ -159,7 +159,8 @@ if (empty($resHook)) {
 
                 if ( ! $error) {
                     $filedir = $upload_dir . '/riskassessmentdocument/siteplans/';
-                    array_map('unlink', array_filter((array) glob($filedir . '*')));
+                    // Files of the previous plan and their thumbnails: glob() also returns the thumbs/ directory, that unlink() refuses
+                    array_map('unlink', array_filter(array_merge((array) glob($filedir . '*'), (array) glob($filedir . 'thumbs/*')), 'is_file'));
                     if ( ! empty($filedir)) {
                         $result = digirisk_dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
                     }
