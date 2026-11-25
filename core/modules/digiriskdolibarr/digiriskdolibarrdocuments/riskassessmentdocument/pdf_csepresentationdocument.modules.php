@@ -1355,9 +1355,11 @@ class pdf_csepresentationdocument extends ModelePDFDigiriskDolibarrDocument
         }
 
         $rows = [];
+        // Deadline written by dol_mktime() in the input timezone, at 23:59:59: read back in that timezone ('auto'), as the
+        // risk card does. Read in the browser timezone, it moved to the next day east of the server
         foreach (array_slice($tasks, 0, self::MAX_NEXT_DEADLINES) as $task) {
             $rows[] = [
-                ['text' => dol_print_date($task->datee, 'day', 'tzuser', $outputLangs), 'align' => 'C', 'bold' => $isLate, 'color' => $isLate ? $this->accentWarn : $this->ink],
+                ['text' => dol_print_date($task->datee, 'day', 'auto', $outputLangs), 'align' => 'C', 'bold' => $isLate, 'color' => $isLate ? $this->accentWarn : $this->ink],
                 dol_trunc($task->label, 90),
                 ['text' => ((int) $task->progress) . ' %', 'align' => 'C']
             ];

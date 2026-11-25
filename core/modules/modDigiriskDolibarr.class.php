@@ -36,7 +36,7 @@ class modDigiriskdolibarr extends DolibarrModules
 	/**
 	 * @var int[] Minimum version of Saturne required by module, same format as need_dolibarr_version: checked by init() and by the Saturne index page
 	 */
-	public $need_saturne_version = [23, 9, 2];
+	public $need_saturne_version = [23, 10, 1];
 
 	/**
 	 * @var DoliDB Database handler
@@ -392,7 +392,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '23.9.1';
+		$this->version         = '23.10.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr_color@digiriskdolibarr';
 
@@ -1522,6 +1522,15 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'write';
 		$r++;
 
+		/* ADMINPAGE WRITE PERMISSION */
+		// Declared last like the action plan ones. Without it only an administrator changes the setup: a user granted
+		// ReadAdminPage alone reads the settings, switches disabled
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
+		$this->rights[$r][1] = $langs->transnoentities('WriteAdminPage', 'DigiriskDolibarr');
+		$this->rights[$r][4] = 'adminpage';
+		$this->rights[$r][5] = 'write';
+		$r++;
+
 		// The mobile interfaces and the application create the very same objects as the classic cards:
 		// they rely on preventionplan/write and firepermit/write rather than on rights of their own.
 
@@ -2357,6 +2366,21 @@ class modDigiriskdolibarr extends DolibarrModules
                 }
             }
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_ACCIDENT_REMOVE_FK_USER_VICTIM', 1, 'integer', 0, '', $conf->entity);
+        }
+
+        // Danger categories moved by 9.11.0 and 9.14.0 : only for an entity coming from before that version. In update.sql
+        // they ran at every activation and ended by moving the risks of 18 to 21 (vibrations, heurt, addictions, amiante) into 22.
+        // 21 -> 22 before 20 -> 21, otherwise the risks just moved to 21 go on to 22
+        $previousDbVersion = getDolGlobalString('DIGIRISKDOLIBARR_DB_VERSION');
+        if ($previousDbVersion !== '') {
+            $dangerCategoryMoves = ['9.11.0' => [18 => 20, 19 => 21], '9.14.0' => [21 => 22, 20 => 21]];
+            foreach ($dangerCategoryMoves as $moveVersion => $categoryMoves) {
+                if (versioncompare(explode('.', $previousDbVersion), explode('.', $moveVersion)) < 0) {
+                    foreach ($categoryMoves as $fromCategory => $toCategory) {
+                        $this->db->query('UPDATE ' . MAIN_DB_PREFIX . 'digiriskdolibarr_risk SET category = ' . ((int) $toCategory) . ' WHERE category = ' . ((int) $fromCategory) . ' AND entity = ' . ((int) $conf->entity));
+                    }
+                }
+            }
         }
 
 		$sql = [];

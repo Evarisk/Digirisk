@@ -221,9 +221,11 @@ class doc_ticketdocument_odt extends SaturneDocumentModel
 
              $encodedImage = explode(',', $signature->signature)[1];
             $decodedImage = base64_decode($encodedImage);
-            file_put_contents($tempDir . 'signature.png', $decodedImage);
+            // A name of its own, deleted when the generation ends: signature.png was shared by every generation
+            $signaturePath = $this->getTempFilePath($tempDir, 'signature', 'png');
+            file_put_contents($signaturePath, $decodedImage);
 
-            $tmpArray['signature'] = $tempDir . 'signature.png';
+            $tmpArray['signature'] = $signaturePath;
         } else {
             $tmpArray['signature'] = $langs->trans('NoSignature');
         }

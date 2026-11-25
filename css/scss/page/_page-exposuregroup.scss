@@ -1,0 +1,57 @@
+// Exposure groups of the company (#5644): view/digiriskstandard/digiriskstandard_exposuregroup.php
+// The list of the groups, then the grid that spreads them over the GP/UT
+
+.exposuregroup {
+    .exposuregroup-intro {
+        margin: 8px 0 12px;
+        max-width: 900px;
+    }
+
+    // Total share of a group: green once fully spread, orange below, red above
+    .exposuregroup-total {
+        display: inline-block;
+        padding: 1px 8px;
+        border-radius: 999px;
+        font-weight: 700;
+        white-space: nowrap;
+
+        &--complete {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        &--partial {
+            background: #fff3cd;
+            color: #8a6d1d;
+        }
+
+        &--over {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    }
+
+    .exposuregroup-form form {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .exposuregroup-grid {
+        th.exposuregroup-grid__group {
+            min-width: 110px;
+        }
+
+        .exposuregroup-share {
+            &.exposuregroup-share--invalid {
+                border-color: #dc2626;
+                background: #fef2f2;
+            }
+        }
+
+        .exposuregroup-exposed {
+            font-weight: 700;
+        }
+    }
+}
