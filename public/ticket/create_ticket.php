@@ -299,6 +299,14 @@ if (empty($resHook) && $publicInterfaceUsable) {
             }
         }
 
+        // The signature pad of the form sends its drawing as a data URL, printed back later as the source of an image:
+        // anything else than an image drawn on the canvas refuses the declaration instead of being recorded
+        $signature = GETPOST('signature');
+        if (dol_strlen($signature) > 0 && !SaturneSignature::isValidSignatureData($signature)) {
+            setEventMessages($langs->trans('ErrorUserSignatureInvalid'), [], 'errors');
+            $error++;
+        }
+
         // Public interface has no third party attached at this point
         $object->ref = $modTicket->getNextValue(null, $object);
 
@@ -423,7 +431,7 @@ if (empty($resHook) && $publicInterfaceUsable) {
                     $signatory->firstname      = $firstname;
                     $signatory->lastname       = $lastname;
                     $signatory->signature_date = dol_now();
-                    $signatory->signature      = GETPOST('signature');
+                    $signatory->signature      = $signature;
                     $signatory->signature_url  = generate_random_id();
                     $signatory->element_type   = 'user';
                     $signatory->element_id     = 0;
