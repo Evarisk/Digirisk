@@ -83,6 +83,12 @@
         font-size: 11px;
         font-weight: 700;
 
+        // Number of GP/UT concerned, in the list of the models
+        &--yes {
+            background: #e7f6ec;
+            color: #1e7b34;
+        }
+
         &--no {
             background: #f3f4f6;
             color: #6b7280;

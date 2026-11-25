@@ -61,7 +61,7 @@ if (isModEnabled('project')) {
 $form = new Form($db);
 
 // Security check - Protection if external user
-$permissiontoread  = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->hasRight('digiriskdolibarr', 'adminpage', 'read');
 $permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
