@@ -1257,6 +1257,11 @@ class Accident extends SaturneObject
     {
         global $langs;
 
+        // Without a loaded accident there is no work stop line to read, and fetchFromParent() only accepts an int id
+        if (empty($this->id)) {
+            return [$langs->trans('RegisterAccident') . '<br>', []];
+        }
+
         $workstopLine      = new AccidentWorkStop($this->db);
         $accidentLines     = $workstopLine->fetchFromParent($this->id);
         $totalWorkStopDays = 0;
