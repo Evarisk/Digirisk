@@ -53,13 +53,15 @@ $project = new Project($db);
 $task    = new Task($db);
 
 // Security check - Protection if external user
-$permissiontoread  = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->hasRight('digiriskdolibarr', 'adminpage', 'read');
 $permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
 /*
  * Actions
  */
+
+$action = digiriskdolibarr_check_admin_write_action($action, $permissiontowrite);
 
 // Initialize ActionPlan logging constants with defaults (label ON, others OFF)
 if (!isset($conf->global->DIGIRISKDOLIBARR_ACTIONPLAN_LOG_LABEL)) {
@@ -141,9 +143,6 @@ require_once dol_buildpath('/saturne/core/tpl/actions/admin_conf_actions.tpl.php
  * View
  */
 
-if (isModEnabled('project')) {
-	$formproject = new FormProjets($db);
-}
 $formcompany = new FormCompany($db);
 $title    = $langs->trans("ModuleSetup", $moduleName);
 $helpUrl = 'FR:Module_Digirisk#Plan_d_action';
@@ -158,6 +157,13 @@ print load_fiche_titre($title, $linkback, 'title_setup');
 // Configuration header
 $head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'actionplan', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
+
+require_once dol_buildpath('/saturne/core/tpl/admin/admin_write_access_notice.tpl.php');
+
+// Built after the notice: an included template makes phpstan forget that isModEnabled('project') was checked
+if (isModEnabled('project')) {
+	$formproject = new FormProjets($db);
+}
 
 // Tasks
 print load_fiche_titre('<i class="fas fa-tasks"></i> ' . $langs->trans("TaskConfig"), '', '');

@@ -50,6 +50,12 @@ window.digiriskdolibarr.evaluator.selectUser = function( event ) {
 	var elementParent = $(this).closest('.modal-container')
 	let userID = elementParent.find('#fk_user_employer').val()
 
+	// La fiche accident a aussi un select #fk_user_employer (employeur) : hors de la modale évaluateur,
+	// la requête écraserait l'action de la page par action=getEvaluatorJob, que seule la page des évaluateurs traite.
+	if (!elementParent.find('input[name="evaluatorJob"]').length) {
+		return;
+	}
+
 	window.saturne.loader.display(elementParent.find('input[name="evaluatorJob"]'));
 
 	$.ajax({

@@ -93,7 +93,8 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTDigiriskDolibarrDoc
                     $tmpArray[$taskType . '_label']       = $actionTask->label;
                     $tmpArray[$taskType . '_description'] = $actionTask->description;
                     $tmpArray[$taskType . '_resp']        = dol_strtoupper($taskExecutive[0]['lastname']) . ' ' . ucfirst($taskExecutive[0]['firstname']);
-                    $tmpArray[$taskType . '_end_date']    = dol_print_date($actionTask->datee, 'dayhour', 'tzuser');
+                    // Deadline written in the input timezone, read back in it ('auto') as the Actions tab does
+                    $tmpArray[$taskType . '_end_date']    = dol_print_date($actionTask->datee, 'dayhour', 'auto');
                     $tmpArray[$taskType . '_budget']      = price($actionTask->budget_amount, 0, '', 1, -1, -1, 'auto');
                     $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
                 }

@@ -65,9 +65,9 @@ if ( ! empty($id) && ! empty($action) && ! empty($htmlname)) {
 	$return                           = array();
 	if (empty($showempty)) $showempty = 0;
 
-	$contacts          = fetchAllSocPeople('',  '',  0,  0, array('customsql' => "s.rowid = " . $id));
-
-	$return['value'] = digirisk_selectcontacts($id, '', $htmlname, $showempty, $contacts_no_email, '', 0, '', true);
+	// Every contact of the thirdparty, with or without email (#2293). The variable of the former exclusion stayed undefined:
+	// its PHP warning, printed before the JSON, left the selector empty
+	$return['value'] = digirisk_selectcontacts($id, '', $htmlname, $showempty, [], '', 0, '', true);
 	$return['num']   = $form->num;
 	$return['error'] = $form->error;
 

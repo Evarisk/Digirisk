@@ -88,7 +88,7 @@ $dangerCategories        = Risk::getDangerCategories();
 $environmentalCategories = Risk::getDangerCategories('riskenvironmental');
 
 // Security check - Protection if external user
-$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread = $user->hasRight('digiriskdolibarr', 'adminpage', 'read');
 $permtoupload     = $user->rights->ecm->upload;
 
 saturne_check_access($permissiontoread);
@@ -1005,7 +1005,7 @@ if (!empty($exportDownloadUrl) && !empty($exportDownloadName)) {
     </script>';
 }
 
-if ($user->rights->digiriskdolibarr->adminpage->read) {
+if ($user->hasRight('digiriskdolibarr', 'adminpage', 'read')) {
 	if ($conf->global->DIGIRISKDOLIBARR_TOOLS_TREE_ALREADY_IMPORTED == 1) : ?>
 		<div class="wpeo-notice notice-info">
 			<div class="notice-content">

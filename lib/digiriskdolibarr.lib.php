@@ -91,6 +91,30 @@ jQuery(document).ready(function() {
 }
 
 /**
+ * Refuse the action sent to a setup page by a user allowed to read the settings but not to change them.
+ *
+ * The actions of the setup pages all write a setting: a reader is told why instead of saving or of
+ * nothing happening. Saturne already shows him the switches disabled and the read-only notice.
+ *
+ * @param  string   $action            Action sent to the page
+ * @param  int      $permissionToWrite Result of saturne_check_admin_write_access()
+ * @param  string[] $otherRightActions Actions of the page checked against another right, left to that check
+ * @return string                      Action to run, empty when refused
+ */
+function digiriskdolibarr_check_admin_write_action(string $action, int $permissionToWrite, array $otherRightActions = []): string
+{
+    global $langs;
+
+    if ($action === '' || $permissionToWrite || in_array($action, $otherRightActions, true)) {
+        return $action;
+    }
+
+    setEventMessages($langs->trans('ReadOnlyAdminAccessMessage'), [], 'errors');
+
+    return '';
+}
+
+/**
  * Prepare admin pages header
  *
  * @return array

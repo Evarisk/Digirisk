@@ -660,9 +660,11 @@ class pdf_ticketqqoqcpdocument extends ModelePDFDigiriskDolibarrDocument
             $details[] = $outputLangs->transnoentities('DigiriskActionAssignedTo') . ' ' . $assignee;
         }
 
+        // Dates written by dol_mktime() in the input timezone, deadline at 23:59:59: read back in that timezone ('auto'),
+        // as the Actions tab does. Read in the browser timezone, the deadline moved to the next day east of the server
         foreach (['DateStart' => $action->dateo, 'ActionDeadline' => $action->datee] as $labelKey => $dateValue) {
             if (!empty($dateValue) && $dateValue !== '0000-00-00 00:00:00') {
-                $details[] = $outputLangs->transnoentities($labelKey) . ' ' . dol_print_date($this->db->jdate($dateValue), 'day', 'tzuser', $outputLangs);
+                $details[] = $outputLangs->transnoentities($labelKey) . ' ' . dol_print_date($this->db->jdate($dateValue), 'day', 'auto', $outputLangs);
             }
         }
 

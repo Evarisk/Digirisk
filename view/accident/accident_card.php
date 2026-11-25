@@ -249,6 +249,8 @@ if (empty($reshook)) {
 				} else {
 					setEventMessages($object->error, [], 'errors');
 				}
+                // Back to the creation form: left on 'add', actions_addupdatedelete.inc.php would retry the creation
+                $action = 'create';
 			}
 		} else {
 			$action = 'create';
@@ -351,6 +353,8 @@ if (empty($reshook)) {
 				} else {
 					setEventMessages($object->error, [], 'errors');
 				}
+				// Back to the edit form: left on 'update', actions_addupdatedelete.inc.php would retry the update
+				$action = 'edit';
 			}
 		} else {
 			$action = 'edit';
@@ -390,8 +394,11 @@ if (empty($reshook)) {
 		if (!$error) {
 			$result = $objectline->create($user, false);
 			if ($result > 0) {
-				// Creation accident line OK
-				rename($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/workstop/temp/', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/workstop/' . $objectline->ref);
+				// Creation accident line OK; temp/ only exists when files were added before saving
+				$workstopDir = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/workstop/';
+				if (is_dir($workstopDir . 'temp/')) {
+					rename($workstopDir . 'temp/', $workstopDir . $objectline->ref);
+				}
 
 				setEventMessages($langs->trans('AddAccidentWorkStop') . ' ' . $object->ref, []);
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -863,8 +870,8 @@ if (($id || $ref) && $action == 'edit') {
 	print '</form>';
 }
 
-// Part to show record
-if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
+// Part to show record: only for a loaded accident, an empty one would end on a fatal error in getBannerTabContent()
+if ($object->id > 0 && (empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$counter = 0;
 
     $userVictim = $object->getUserVictim();

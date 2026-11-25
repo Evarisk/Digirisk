@@ -113,7 +113,7 @@ class doc_groupmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
         // @todo The keyword "signature" is needed because we want the image to be cropped to fit in the table
         // The address printed above the QR code goes without its scheme, as on the sheet shown in the risk assessment document
         $tmpArray['helpUrl']               = preg_replace('#^https?://#i', '', $ticketPublicInterfaceUrl);
-        $tmpArray['signatureQRCodeTicket'] = digiriskdolibarr_ticket_qrcode_file($ticketPublicInterfaceUrl);
+        $tmpArray['signatureQRCodeTicket'] = digiriskdolibarr_ticket_qrcode_file($ticketPublicInterfaceUrl, $this);
         $tmpArray['securityResponsible']   = $userTmp->id > 0 ? dol_strtoupper($userTmp->lastname) . ' ' . ucfirst($userTmp->firstname) : '';
 
         $moreParam['tmparray'] = $tmpArray;

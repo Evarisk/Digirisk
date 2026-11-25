@@ -245,8 +245,9 @@ if ( ! $error && ($massaction == 'delete' || ($action == 'delete' && $confirm ==
 								unlink($file['fullname']);
 							}
 						}
-						dol_delete_dir($pathToEvaluationPhoto . '/thumbs');
-						dol_delete_dir($pathToEvaluationPhoto);
+						// thumbs/ is absent when the evaluation has no thumbnail: no PHP warning, as the other calls of the module
+						dol_delete_dir($pathToEvaluationPhoto . '/thumbs', 1);
+						dol_delete_dir($pathToEvaluationPhoto, 1);
 
                     }
                     $riskRiskAssessment->delete($user, true);
