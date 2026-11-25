@@ -62,8 +62,10 @@ print '<tr>';
 print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("HarassmentOfficer"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
 if ($document->harassment_officer->id > 0) {
-	$user->fetch($document->harassment_officer->id);
-	print $user->getNomUrl(1) . ' ';
+	// Loaded into its own object: $user stays the logged in user for the rest of the page
+	$harassmentOfficer = new User($db);
+	$harassmentOfficer->fetch($document->harassment_officer->id);
+	print $harassmentOfficer->getNomUrl(1) . ' ';
 	print '<i class="fas fa-phone"></i> ' . $document->harassment_officer->phone;
 }
 print '</td></tr>';
@@ -74,8 +76,9 @@ if (isset($activeStaffBodies['CSE'])) {
 	print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("HarassmentOfficerCSE"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 	print '<td>';
 	if ($document->harassment_officer_cse->id > 0) {
-		$user->fetch($document->harassment_officer_cse->id);
-		print $user->getNomUrl(1) . ' ';
+		$harassmentOfficerCSE = new User($db);
+		$harassmentOfficerCSE->fetch($document->harassment_officer_cse->id);
+		print $harassmentOfficerCSE->getNomUrl(1) . ' ';
 		print '<i class="fas fa-phone"></i> ' . $document->harassment_officer_cse->phone;
 	}
 	print '</td></tr>';
