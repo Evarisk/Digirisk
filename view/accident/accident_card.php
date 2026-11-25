@@ -249,6 +249,8 @@ if (empty($reshook)) {
 				} else {
 					setEventMessages($object->error, [], 'errors');
 				}
+                // Back to the creation form: left on 'add', actions_addupdatedelete.inc.php would retry the creation
+                $action = 'create';
 			}
 		} else {
 			$action = 'create';
@@ -863,8 +865,8 @@ if (($id || $ref) && $action == 'edit') {
 	print '</form>';
 }
 
-// Part to show record
-if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
+// Part to show record: only for a loaded accident, an empty one would end on a fatal error in getBannerTabContent()
+if ($object->id > 0 && (empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$counter = 0;
 
     $userVictim = $object->getUserVictim();
