@@ -36,7 +36,7 @@ class modDigiriskdolibarr extends DolibarrModules
 	/**
 	 * @var int[] Minimum version of Saturne required by module, same format as need_dolibarr_version: checked by init() and by the Saturne index page
 	 */
-	public $need_saturne_version = [23, 9, 1];
+	public $need_saturne_version = [23, 9, 2];
 
 	/**
 	 * @var DoliDB Database handler
