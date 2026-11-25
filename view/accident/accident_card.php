@@ -394,8 +394,11 @@ if (empty($reshook)) {
 		if (!$error) {
 			$result = $objectline->create($user, false);
 			if ($result > 0) {
-				// Creation accident line OK
-				rename($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/workstop/temp/', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/workstop/' . $objectline->ref);
+				// Creation accident line OK; temp/ only exists when files were added before saving
+				$workstopDir = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/workstop/';
+				if (is_dir($workstopDir . 'temp/')) {
+					rename($workstopDir . 'temp/', $workstopDir . $objectline->ref);
+				}
 
 				setEventMessages($langs->trans('AddAccidentWorkStop') . ' ' . $object->ref, []);
 				$urltogo = str_replace('__ID__', $result, $backtopage);
