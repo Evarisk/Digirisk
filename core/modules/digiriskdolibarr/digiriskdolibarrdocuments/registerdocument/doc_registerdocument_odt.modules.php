@@ -287,7 +287,7 @@ class doc_registerdocument_odt extends SaturneDocumentModel
 
             if ($foundTagForLines) {
                 if (isModEnabled('digiquali')) {
-                    require_once __DIR__ . '/../../../../../../digiquali/class/control.class.php';
+                    dol_include_once('/digiquali/class/control.class.php');
                     $control = new Control($this->db);
                     $ticketControls = $control->fetchAllWithLeftJoin('DESC','t.control_date', 0,0, ['customsql' => 't.rowid = je.fk_target AND t.status = ' . $control::STATUS_LOCKED], 'AND', true, 'LEFT JOIN '. MAIN_DB_PREFIX .'element_element as je on je.sourcetype = "ticket" AND je.fk_source IN ('. $accidentTicketIds .') AND je.targettype = "digiquali_control" AND je.fk_target = t.rowid' );
 
