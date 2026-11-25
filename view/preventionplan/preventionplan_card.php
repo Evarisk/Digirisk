@@ -276,6 +276,8 @@ if (empty($reshook)) {
 				// Creation prevention plan KO
 				if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 				else setEventMessages($object->error, null, 'errors');
+				// Back to the creation form with what was typed, as for a missing required field
+				$action = 'create';
 			}
 		} else {
 			$action = 'create';
@@ -398,6 +400,8 @@ if (empty($reshook)) {
 				// Update prevention plan KO
 				if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 				else setEventMessages($object->error, null, 'errors');
+				// Back to the edit form with the changes, as for a missing required field
+				$action = 'edit';
 			}
 		} else {
 			$action = 'edit';
