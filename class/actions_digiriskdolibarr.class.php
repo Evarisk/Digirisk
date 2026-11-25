@@ -1148,6 +1148,11 @@ class ActionsDigiriskdolibarr
 				}
 			}
 		} else if (strpos($parameters['context'], 'ticketcard') !== false) {
+            // documents_action.tpl.php, included at the end of this block, runs on the builddoc and remove_file of
+            // every module of the card (GMAO's ticket documents too): only the branches below grant it the rights
+            $permissiontoadd    = 0;
+            $permissiontodelete = 0;
+
             // btn_add_message only comes from the message form of ticket/card.php
             if ($action == 'add_message' && GETPOSTISSET('btn_add_message') && $object instanceof Ticket && $this->addMessageWithTicketFiles($object) > 0) {
                 return 1;
