@@ -42,6 +42,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 
 require_once __DIR__ . '/../class/digiriskresources.class.php';
+require_once __DIR__ . '/../lib/digiriskdolibarr.lib.php';
 
 // Translations
 saturne_load_langs(["admin", "companies"]);
@@ -61,12 +62,15 @@ $activeStaffBodies = $resources->getActiveStaffRepresentativeBodies();
 $hookmanager->initHooks(array('admincompany', 'globaladmin'));
 
 // Security check - Protection if external user
-$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->hasRight('digiriskdolibarr', 'adminpage', 'read');
+$permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
 /*
  * Actions
  */
+
+$action = digiriskdolibarr_check_admin_write_action($action, $permissiontowrite);
 
 $parameters = array();
 $reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action);
@@ -167,6 +171,8 @@ print load_fiche_titre($title, '', 'title_setup');
 $head = company_admin_prepare_head();
 
 print dol_get_fiche_head($head, 'social', '', -1, '');
+
+require_once dol_buildpath('/saturne/core/tpl/admin/admin_write_access_notice.tpl.php');
 
 $form      = new Form($db);
 $resources = new DigiriskResources($db);

@@ -68,13 +68,15 @@ $value      = GETPOST('value', 'alpha');
 $pageY      = GETPOST('page_y', 'int');
 
 // Security check - Protection if external user
-$permissiontoread  = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->hasRight('digiriskdolibarr', 'adminpage', 'read');
 $permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
 /*
  * Actions
  */
+
+$action = digiriskdolibarr_check_admin_write_action($action, $permissiontowrite);
 
 if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
 	$TSProject = GETPOST('TSProject', 'none');
@@ -360,8 +362,14 @@ if ($action == 'deleteTimeRange') {
     exit;
 }
 
+// Written for every entity: only an administrator may change it, as the switch of the entity selector
+if ($action == 'set_multi_company_ticket_public_interface' && empty($user->admin)) {
+    setEventMessages($langs->trans('NotEnoughPermissions'), [], 'errors');
+    $action = '';
+}
+
 if ($action == 'set_multi_company_ticket_public_interface') {
-    $multiCompanyTicketPublicInterfaceTitle    = GETPOST('multiCompanyTicketPublicInterfaceTitle', 'none');
+    $multiCompanyTicketPublicInterfaceTitle   = GETPOST('multiCompanyTicketPublicInterfaceTitle', 'none');
     $multiCompanyTicketPublicInterfaceSubtitle = GETPOST('multiCompanyTicketPublicInterfaceSubtitle', 'none');
     dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_MULTI_COMPANY_PUBLIC_INTERFACE_TITLE', $multiCompanyTicketPublicInterfaceTitle, 'chaine', 0, '', 0);
     dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_MULTI_COMPANY_PUBLIC_INTERFACE_SUBTITLE', $multiCompanyTicketPublicInterfaceSubtitle, 'chaine', 0, '', 0);
@@ -469,6 +477,8 @@ print load_fiche_titre($title, $linkback, 'title_setup');
 $head = digiriskdolibarr_admin_prepare_head();
 
 print dol_get_fiche_head($head, 'ticket', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
+
+require_once dol_buildpath('/saturne/core/tpl/admin/admin_write_access_notice.tpl.php');
 
 $enableDisableHtml = $langs->transnoentities("TicketActivatePublicInterface") . ' ';
 if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
@@ -653,8 +663,9 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 		print '<tr class="oddeven"><td>' . $langs->transnoentities("ShowSelectorOnTicketPublicInterface") . '</td>';
 		print '<td class="center"></td>';
 		print '<td class="center">';
-		// The constant is shared by every entity, so it keeps the ajax component and only asks for the zero instead of the deletion
-		print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', [], 0, 0, 0, 0, 2, 0, 1);
+		// The constant is shared by every entity, so it keeps the ajax component and only asks for the zero instead of the deletion.
+		// That component only answers to administrators: the switch is disabled for the others
+		print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', [], 0, 0, 0, 0, 2, 0, 1, '', '', 'inline-block', 0, '', empty($user->admin) ? 1 : 0);
 		print '</a>';
 		print '</td>';
 		print '<td class="center">';

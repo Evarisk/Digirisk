@@ -84,10 +84,14 @@ class ActionsDigiriskdolibarr
         $error = 0; // Error counter
 
         if (strpos($parameters['context'], 'category') !== false) {
+            // cat_table / cat_fk : link tables of the sql folder (llx_categorie_risk.fk_risk...), without them
+            // Categorie reads llx_categorie_digiriskrisk.fk_digiriskrisk, which does not exist
             $this->results = [
                 'digiriskaccident' => [
                     'id'        => 436302001,
                     'code'      => 'digiriskaccident',
+                    'cat_table' => 'accident',
+                    'cat_fk'    => 'accident',
                     'obj_class' => 'Accident',
                     'obj_table' => 'digiriskdolibarr_accident',
                     'label'     => 'Accident',
@@ -95,6 +99,8 @@ class ActionsDigiriskdolibarr
                 'digiriskpreventionplan' => [
                     'id'        => 436302002,
                     'code'      => 'digiriskpreventionplan',
+                    'cat_table' => 'preventionplan',
+                    'cat_fk'    => 'preventionplan',
                     'obj_class' => 'PreventionPlan',
                     'obj_table' => 'digiriskdolibarr_preventionplan',
                     'label'     => 'PreventionPlan',
@@ -102,6 +108,8 @@ class ActionsDigiriskdolibarr
                 'digiriskfirepermit' => [
                     'id'        => 436302003,
                     'code'      => 'digiriskfirepermit',
+                    'cat_table' => 'firepermit',
+                    'cat_fk'    => 'firepermit',
                     'obj_class' => 'FirePermit',
                     'obj_table' => 'digiriskdolibarr_firepermit',
                     'label'     => 'FirePermit',
@@ -109,6 +117,8 @@ class ActionsDigiriskdolibarr
                 'digiriskrisk' => [
                     'id'        => 436302004,
                     'code'      => 'digiriskrisk',
+                    'cat_table' => 'risk',
+                    'cat_fk'    => 'risk',
                     'obj_class' => 'Risk',
                     'obj_table' => 'digiriskdolibarr_risk',
                     'label'     => 'Risk',
@@ -1138,6 +1148,11 @@ class ActionsDigiriskdolibarr
 				}
 			}
 		} else if (strpos($parameters['context'], 'ticketcard') !== false) {
+            // documents_action.tpl.php, included at the end of this block, runs on the builddoc and remove_file of
+            // every module of the card (GMAO's ticket documents too): only the branches below grant it the rights
+            $permissiontoadd    = 0;
+            $permissiontodelete = 0;
+
             // btn_add_message only comes from the message form of ticket/card.php
             if ($action == 'add_message' && GETPOSTISSET('btn_add_message') && $object instanceof Ticket && $this->addMessageWithTicketFiles($object) > 0) {
                 return 1;
@@ -2085,6 +2100,29 @@ class ActionsDigiriskdolibarr
 			return -1;
 		}
 	}
+
+    /**
+     * Overloading the moreHtmlRef function : replacing the parent's function with the one below
+     *
+     * @param  array       $parameters Hook metadata (context, etc...)
+     * @param  object|null $object     The object to process
+     * @return int                     0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function moreHtmlRef(array $parameters, $object): int
+    {
+        global $langs, $user;
+
+        // The native ticket card leads to the Digirisk one, under the ref of its banner (#5644)
+        if (preg_match('/\bticketcard\b/', $parameters['context']) && $object instanceof Ticket && $object->id > 0 && $user->hasRight('ticket', 'read')) {
+            $digiriskCardUrl = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $object->id;
+
+            $this->resprints  = '<div class="refidno">';
+            $this->resprints .= '<a href="' . dol_escape_htmltag($digiriskCardUrl) . '">' . img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictofixedwidth"') . $langs->trans('TicketOpenDigiriskCard') . '</a>';
+            $this->resprints .= '</div>';
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
 
     /**
      * Overloading the formObjectOptions function : replacing the parent's function with the one below

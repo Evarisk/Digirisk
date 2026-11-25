@@ -47,12 +47,15 @@ $backtopage = GETPOST('backtopage', 'alpha');
 $openAiApiKey = GETPOST('OpenAIApiKey', 'alpha');
 
 // Security check - Protection if external user
-$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->hasRight('digiriskdolibarr', 'adminpage', 'read');
+$permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
 /*
  * Actions
  */
+
+$action = digiriskdolibarr_check_admin_write_action($action, $permissiontowrite);
 
 $error = 0;
 
@@ -86,6 +89,8 @@ print load_fiche_titre($title, $linkback, 'title_setup');
 // Configuration header
 $head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'digiai', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
+
+require_once dol_buildpath('/saturne/core/tpl/admin/admin_write_access_notice.tpl.php');
 
 print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';

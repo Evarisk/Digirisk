@@ -14,6 +14,41 @@ $dtc-border:      #e5e7eb;
 $dtc-hairline:    #f1f3f5;
 $dtc-title:       #111827;
 
+// Add button of a section of the card, pill shaped
+@mixin dtc-add-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0;
+    padding: 4px 11px;
+    border: 0;
+    border-radius: 999px;
+    background: $dtc-blue;
+    color: #fff !important;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0;
+    text-transform: none;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .15s ease, box-shadow .15s ease;
+
+    &:hover {
+        background: darken($dtc-blue, 8%);
+        box-shadow: $dtc-shadow-hov;
+    }
+
+    &.is-disabled {
+        background: $dtc-border;
+        color: $dtc-grey !important;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+}
+
 .digirisk-ticket-card {
 
     // ---- Two-column layout with a real gap (override native float) ----
@@ -90,40 +125,18 @@ $dtc-title:       #111827;
                     white-space: nowrap;
                 }
 
-                // Add button of a section (new task, new accident) — the color and case are forced
+                // Add button of a section (new accident) — the color and case are forced
                 // because the theme styles the links and the text of the section headers
                 .dtc-head-add {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 5px;
-                    margin: 0;
-                    padding: 4px 11px;
-                    border: 0;
-                    border-radius: 999px;
-                    background: $dtc-blue;
-                    color: #fff !important;
-                    font: inherit;
+                    @include dtc-add-button;
+                }
+
+                // Link of a section to its full page (the actions tab)
+                .dtc-head-link {
                     font-size: 12px;
                     font-weight: 600;
-                    line-height: 1.4;
-                    letter-spacing: 0;
                     text-transform: none;
-                    white-space: nowrap;
-                    text-decoration: none;
-                    cursor: pointer;
-                    transition: background .15s ease, box-shadow .15s ease;
-
-                    &:hover {
-                        background: darken($dtc-blue, 8%);
-                        box-shadow: $dtc-shadow-hov;
-                    }
-
-                    &.is-disabled {
-                        background: $dtc-border;
-                        color: $dtc-grey !important;
-                        cursor: not-allowed;
-                        box-shadow: none;
-                    }
+                    color: $dtc-blue !important;
                 }
 
                 // Inline (on-the-fly) editable subject, shown on the same line as the label
@@ -240,13 +253,45 @@ $dtc-title:       #111827;
         &:hover { opacity: 1; color: $dtc-blue; }
     }
 
-    // ---- Tasks section: column labels under the section header ----
+    // ---- Actions section: column labels under the header of each type ----
     table.dtc-tasks-table > tbody > tr.dtc-table-cols > td {
         font-size: 0.78em;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: .04em;
         color: $dtc-grey;
+    }
+
+    // Header of a type of action (#5644): its title, the counter of the banner summary and its add button
+    table.dtc-tasks-table > tbody > tr.dtc-actions-group > td {
+        padding-top: 12px;
+        border-top: 1px solid $dtc-hairline;
+    }
+
+    .dtc-actions-group__head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .dtc-head-add {
+            @include dtc-add-button;
+            margin-left: auto;
+        }
+    }
+
+    .dtc-actions-group__title {
+        font-weight: 600;
+        color: $dtc-title;
+    }
+
+    .dtc-actions-summary__count.dtc-actions-group__count--open {
+        background: #fff3cd;
+        color: #8a6d1d;
+    }
+
+    .dtc-actions-summary__count.dtc-actions-group__count--done {
+        background: #dcfce7;
+        color: #166534;
     }
 
     // ---- Linked tasks table ----
@@ -910,6 +955,41 @@ $dtc-title:       #111827;
     &__item--done .dtc-actions-summary__count {
         background: #dcfce7;
         color: #166534;
+    }
+}
+
+// ---- Modals adding an action from the card (#5644), printed after the card itself ----
+// As high as its fields (the date pickers open outside of it): the height of .wpeo-modal is outranked
+.wpeo-modal.dtc-action-modal .modal-container {
+    height: auto;
+}
+
+.dtc-action-modal {
+    .modal-content {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    &__row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+
+    &__field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        > label {
+            font-weight: 600;
+            color: $dtc-title;
+        }
+
+        > input[type="text"] {
+            width: 100%;
+        }
     }
 }
 

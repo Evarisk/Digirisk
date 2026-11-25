@@ -11,10 +11,10 @@
 
 ### Version
 
-- Version : 23.9.1
+- Version : 23.10.0
 - PHP : 7.4.33
 - Compatibilité : Dolibarr 23.0.0 - 24.0.0
-- Saturne Framework : 23.9.2
+- Saturne Framework : 23.10.1
 
 ## Liens
 
@@ -22,7 +22,7 @@
 - Demo : [Demo Digirisk](https://demodoli.digirisk.com) - ID: demo - Password: demo
 - Documentation : [Wiki Digirisk](https://wiki.dolibarr.org/index.php/Module_DigiriskDolibarr)
 - Projet GitHub : [Projet Digirisk](https://github.com/Evarisk/Digirisk/projects?query=is%3Aopen)
-- Saturne Framework : 23.9.2
+- Saturne Framework : 23.10.1
 - Forum : [Forum Digirisk](https://dolibarr.fr/forum/t/module-digirisk-document-unique/37119)
 - D'autres modules développés par Evarisk disponibles sur [Dolistore.com](https://dolistore.com)
 - Le récapitulatif avec tous les liens [Linktree](https://linktr.ee/DigiRisk)
