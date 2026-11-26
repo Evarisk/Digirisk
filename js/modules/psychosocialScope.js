@@ -101,29 +101,30 @@ window.digiriskdolibarr.psychosocialScope.stateAnchor = function(select) {
 };
 
 /**
- * Écoute les réponses de la grille sur la fenêtre d'évaluation elle-même, et garde leur clic pour
- * elle. Arrivé au document, il passait par les quelque 200 gestionnaires délégués des modules de la
- * page, que jQuery teste un par un : 30 ms par réponse cochée, 2 ms ainsi.
+ * Écoute les réponses de la grille une fois pour toute la page, et garde leur clic pour elle.
+ *
+ * La fenêtre d'évaluation est rendue avec la liste des risques : l'ajout, la modification ou
+ * l'évaluation d'un risque relisent cette liste, et un écouteur posé sur l'ancienne fenêtre partait
+ * avec elle. Les réponses ne réagissaient alors plus jusqu'au rechargement de la page.
+ *
+ * Écouté en capture et arrêté dès le document, le clic ne passe pas non plus par les quelque 200
+ * gestionnaires délégués des modules de la page, que jQuery teste un par un : 30 ms par réponse
+ * cochée, 2 ms ainsi. jQuery ne sait pas écouter en capture, d'où l'écouteur natif.
  *
  * @since   23.5.1
- * @version 23.5.1
+ * @version 23.10.0
  *
  * @return {void}
  */
 window.digiriskdolibarr.psychosocialScope.bindAnswers = function() {
-  const modal = document.getElementById('rps_eval_modal');
-  if (!modal) {
-    return;
-  }
-
-  modal.addEventListener('click', function(event) {
-    const answer = event.target.closest('.rps-grid-answer');
+  document.addEventListener('click', function(event) {
+    const answer = event.target.closest ? event.target.closest('#rps_eval_modal .rps-grid-answer') : null;
     if (!answer) {
       return;
     }
     event.stopPropagation();
     window.digiriskdolibarr.psychosocialScope.pickAnswer.call(answer);
-  });
+  }, true);
 };
 
 /**
@@ -148,7 +149,7 @@ window.digiriskdolibarr.psychosocialScope.detachFilesModals = function() {
  * qualification. Le reste de la page ne bouge pas.
  *
  * @since   23.7.1
- * @version 23.7.1
+ * @version 23.10.0
  *
  * @return {Promise} Résolue une fois la liste remplacée
  */
@@ -162,7 +163,6 @@ window.digiriskdolibarr.psychosocialScope.refreshUnit = function() {
     list.html($(resp).find('#searchFormListRisks'));
     scope.initStateSelects();
     scope.detachFilesModals();
-    scope.bindAnswers();
     scope.restoreDetail();
   }).catch(function() {
     // Liste illisible : la page entière, qui porte déjà la qualification enregistrée
