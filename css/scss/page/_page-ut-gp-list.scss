@@ -40,7 +40,7 @@ body.digirisk-horizontal-scroll > #id-container {
 
 /** Screen */
 .page-ut-gp-list #id-right {
-  padding-left: 300px;
+  padding-left: $ut-gp-navigation__width;
   width: 100%;
   display: block;
   /* Contain wide content (Dolibarr list tables) so it scrolls inside the content area instead of overflowing the whole page, especially when the left menu is expanded */
@@ -68,7 +68,7 @@ body.digirisk-horizontal-scroll > #id-container {
     display: none;
   }
   #id-left {
-    width: 300px;
+    width: $ut-gp-navigation__width;
     padding-top: 0;
   }
   .digirisk-wrap {
@@ -192,20 +192,25 @@ body.digirisk-horizontal-scroll > #id-container {
       margin-right: 8px;
     }
 
+    /* The reference keeps its natural width on one line: shrinking it split UT2410-0001 in two */
     .ref-badge {
+      flex-shrink: 0;
       margin-right: 7px;
       font-size: 10px;
       padding: 3px 6px;
+      white-space: nowrap;
     }
 
-    /* Long GP/UT names wrap onto new lines instead of stretching the row; flex-grow + min-width:0 keep the row within the fixed panel width */
+    /* Long GP/UT names wrap onto new lines instead of stretching the row; flex-grow + min-width:0 keep the row within the fixed panel width.
+       Wrapping happens between words: a word is only split when it cannot fit alone on a line
+       (overflow-wrap: anywhere, or word-break: break-word, cut "Terrassement" anywhere, #5795) */
     .title.element-label {
       font-size: 13px;
       padding-left: 0;
       min-width: 0;
       white-space: normal;
-      overflow-wrap: anywhere;
-      word-break: break-word;
+      overflow-wrap: break-word;
+      word-break: normal;
     }
 
     /* Actions float over the right edge on hover so they never reserve width nor push other elements */
