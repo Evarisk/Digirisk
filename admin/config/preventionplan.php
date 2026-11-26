@@ -63,13 +63,15 @@ if (isModEnabled('project')) {
 $form = new Form($db);
 
 // Security check - Protection if external user
-$permissiontoread  = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->hasRight('digiriskdolibarr', 'adminpage', 'read');
 $permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
 /*
  * Actions
  */
+
+$action = digiriskdolibarr_check_admin_write_action($action, $permissiontowrite);
 
 if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
 	$PPRProject = GETPOST('PPRProject', 'none');
@@ -164,6 +166,14 @@ if ($action == 'setMobileDefaults' && !GETPOST('cancel', 'alpha')) {
 	}
 }
 
+// Phone and email of the public spread shared one switch: each new switch starts from its value, so that
+// it shows what the page already displays. The spread page falls back on it the same way until then
+foreach (['DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_PHONE', 'DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_EMAIL'] as $contactConst) {
+    if ($permissiontowrite && getDolGlobalString($contactConst) === '' && getDolGlobalString('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_CONTACT') !== '') {
+        dolibarr_set_const($db, $contactConst, getDolGlobalInt('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_CONTACT'), 'integer', 0, '', $conf->entity);
+    }
+}
+
 
 /*
  * View
@@ -182,6 +192,8 @@ print load_fiche_titre($title, $linkback, 'title_setup');
 // Configuration header
 $head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'preventionplan', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
+
+require_once dol_buildpath('/saturne/core/tpl/admin/admin_write_access_notice.tpl.php');
 
 print load_fiche_titre('<i class="fas fa-info"></i> ' . $langs->trans("PreventionPlanManagement"), '', '');
 print '<hr>';
@@ -392,9 +404,14 @@ print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATOR
 print '<td class="center">' . saturne_constant_onoff('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_NAME', $permissiontowrite) . '</td>';
 print '</tr>';
 
-// Contact
-print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_CONTACT">' . $langs->trans('MobilePPSpreadShowContact') . '</label></td>';
-print '<td class="center">' . saturne_constant_onoff('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_CONTACT', $permissiontowrite) . '</td>';
+// Phone
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_PHONE">' . $langs->trans('MobilePPSpreadShowPhone') . '</label></td>';
+print '<td class="center">' . saturne_constant_onoff('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_PHONE', $permissiontowrite) . '</td>';
+print '</tr>';
+
+// Email
+print '<tr class="oddeven"><td><label for="DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_EMAIL">' . $langs->trans('MobilePPSpreadShowEmail') . '</label></td>';
+print '<td class="center">' . saturne_constant_onoff('DIGIRISKDOLIBARR_SPREAD_SHOW_SIGNATORY_EMAIL', $permissiontowrite) . '</td>';
 print '</tr>';
 
 // Hide Public Note

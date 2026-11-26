@@ -57,6 +57,12 @@ class ActionsDigiriskdolibarr
 	protected int $ticketXlsxExportBufferLevel = 0;
 
 	/**
+	 * @var array<int, array{ref: string, subject: string}> Open tickets of the page of the list of the registers, whose
+	 *                                                       state opens the quick close modal
+	 */
+	protected array $ticketQuickCloseRows = [];
+
+	/**
 	 * Constructor
 	 *
 	 *  @param		DoliDB		$db      Database handler
@@ -78,10 +84,14 @@ class ActionsDigiriskdolibarr
         $error = 0; // Error counter
 
         if (strpos($parameters['context'], 'category') !== false) {
+            // cat_table / cat_fk : link tables of the sql folder (llx_categorie_risk.fk_risk...), without them
+            // Categorie reads llx_categorie_digiriskrisk.fk_digiriskrisk, which does not exist
             $this->results = [
                 'digiriskaccident' => [
                     'id'        => 436302001,
                     'code'      => 'digiriskaccident',
+                    'cat_table' => 'accident',
+                    'cat_fk'    => 'accident',
                     'obj_class' => 'Accident',
                     'obj_table' => 'digiriskdolibarr_accident',
                     'label'     => 'Accident',
@@ -89,6 +99,8 @@ class ActionsDigiriskdolibarr
                 'digiriskpreventionplan' => [
                     'id'        => 436302002,
                     'code'      => 'digiriskpreventionplan',
+                    'cat_table' => 'preventionplan',
+                    'cat_fk'    => 'preventionplan',
                     'obj_class' => 'PreventionPlan',
                     'obj_table' => 'digiriskdolibarr_preventionplan',
                     'label'     => 'PreventionPlan',
@@ -96,6 +108,8 @@ class ActionsDigiriskdolibarr
                 'digiriskfirepermit' => [
                     'id'        => 436302003,
                     'code'      => 'digiriskfirepermit',
+                    'cat_table' => 'firepermit',
+                    'cat_fk'    => 'firepermit',
                     'obj_class' => 'FirePermit',
                     'obj_table' => 'digiriskdolibarr_firepermit',
                     'label'     => 'FirePermit',
@@ -103,6 +117,8 @@ class ActionsDigiriskdolibarr
                 'digiriskrisk' => [
                     'id'        => 436302004,
                     'code'      => 'digiriskrisk',
+                    'cat_table' => 'risk',
+                    'cat_fk'    => 'risk',
                     'obj_class' => 'Risk',
                     'obj_table' => 'digiriskdolibarr_risk',
                     'label'     => 'Risk',
@@ -245,7 +261,10 @@ class ActionsDigiriskdolibarr
      */
     public function llxHeader(array $parameters): int
     {
-        if (!$this->isDigiriskTicketTab($parameters['context']) && !$this->isDigiriskTaskTab($parameters['context'])) {
+        global $conf, $user;
+
+        $isTicketList = $this->isDigiriskTicketList($parameters['context']);
+        if (!$isTicketList && !$this->isDigiriskTicketTab($parameters['context']) && !$this->isDigiriskTaskTab($parameters['context'])) {
             return 0;
         }
 
@@ -255,11 +274,23 @@ class ActionsDigiriskdolibarr
         if (!preg_match('/(^|\s)saturne-theme(\s|$)/', (string) $parameters['morecssonbody'])) {
             $parameters['morecssonbody'] = trim('saturne-theme ' . $parameters['morecssonbody']);
         }
-        // The lists of the native pages, as the time spent of a task, are wider than the screen: #id-right is a
-        // table-cell, so their own overflow-x never scrolls and the whole page stretches instead.
-        // classforhorizontalscrolloftabs bounds it, digirisk-object-tab fits the height of the list that scrolls
-        // (css/scss/page/_page-object-tabs.scss). The pages of the other modules (fromtype) handle their own lists.
-        if (GETPOST('fromtype', 'alpha') === '') {
+        if ($isTicketList) {
+            // The list of the registers has many columns: the left menu only takes their room, the top menu leads back.
+            // Read by llxHeader() right after this hook, for this page only (the dol_hide_leftmenu parameter would keep
+            // it hidden on every page of the session). Without the left menu, there is no table-cell to bound.
+            $conf->dol_hide_leftmenu = 1;
+            $parameters['morecssonbody'] .= ' digirisk-ticket-list';
+
+            // The state of an open ticket opens the quick close modal printed by printCommonFooter()
+            if ($user->hasRight('ticket', 'write')) {
+                $quickCloseJs            = array_map('saturne_htmlhead_asset_url', ['/saturne/js/saturne.min.js', '/digiriskdolibarr/js/digiriskdolibarr.min.js']);
+                $parameters['arrayofjs'] = array_values(array_unique(array_merge(is_array($parameters['arrayofjs']) ? $parameters['arrayofjs'] : [], $quickCloseJs)));
+            }
+        } elseif (GETPOST('fromtype', 'alpha') === '') {
+            // The lists of the native pages, as the time spent of a task, are wider than the screen: #id-right is a
+            // table-cell, so their own overflow-x never scrolls and the whole page stretches instead.
+            // classforhorizontalscrolloftabs bounds it, digirisk-object-tab fits the height of the list that scrolls
+            // (css/scss/page/_page-object-tabs.scss). The pages of the other modules (fromtype) handle their own lists.
             $parameters['morecssonbody'] .= ' digirisk-object-tab';
             if (!preg_match('/(^|\s)classforhorizontalscrolloftabs(\s|$)/', $parameters['morecssonbody'])) {
                 $parameters['morecssonbody'] .= ' classforhorizontalscrolloftabs';
@@ -269,6 +300,17 @@ class ActionsDigiriskdolibarr
         $parameters['arrayofcss'] = array_values(array_unique(array_merge(is_array($parameters['arrayofcss']) ? $parameters['arrayofcss'] : [], $themeCss)));
 
         return 0;
+    }
+
+    /**
+     * Tell whether the current page is the native list of the tickets browsed from the Digirisk menu (list of the registers)
+     *
+     * @param  string $context Hook contexts of the page
+     * @return bool
+     */
+    private function isDigiriskTicketList(string $context): bool
+    {
+        return ($_SESSION['mainmenu'] ?? '') === 'digiriskdolibarr' && preg_match('/\/ticket\/list\.php$/', $_SERVER['PHP_SELF']) && preg_match('/\bticketlist\b/', $context);
     }
 
     /**
@@ -614,7 +656,7 @@ class ActionsDigiriskdolibarr
                 $fileDir    = $upload_dir . '/' . $dirFiles;
                 $urlSource  = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 
-                $out = saturne_show_documents('digiriskdolibarr:TicketDocument', $dirFiles, $fileDir, $urlSource, $user->rights->ticket->write, $user->rights->ticket->delete, getDolGlobalString('DIGIRISKDOLIBARR_TICKETDOCUMENT_DEFAULT_MODEL'), 1, 0, 0, 0, '', '', '', '', '', $object); ?>
+                $out = saturne_show_documents('digiriskdolibarr:TicketDocument', $dirFiles, $fileDir, $urlSource, $user->hasRight('ticket', 'write'), $user->hasRight('ticket', 'delete'), getDolGlobalString('DIGIRISKDOLIBARR_TICKETDOCUMENT_DEFAULT_MODEL'), 1, 0, 0, 0, '', '', '', '', '', $object); ?>
 
                 <script>
                     jQuery('.fichehalfleft .div-table-responsive-no-min').first().append(<?php echo json_encode($out); ?>);
@@ -1013,6 +1055,12 @@ class ActionsDigiriskdolibarr
             print '<script src="' . saturne_asset_full_url('/digiriskdolibarr/js/digiriskdolibarr.js') . '"></script>';
         }
 
+        // List of the registers: quick close modal of the open tickets of the page, after the form of the list
+        if (!empty($this->ticketQuickCloseRows) && $this->isDigiriskTicketList($parameters['context'])) {
+            $ticketQuickCloseListTickets = $this->ticketQuickCloseRows;
+            require __DIR__ . '/../core/tpl/ticket/ticket_quick_close_modal.tpl.php';
+        }
+
         if (strpos($parameters['context'], 'ticketlist')) {
             ?>
             <script>
@@ -1100,6 +1148,11 @@ class ActionsDigiriskdolibarr
 				}
 			}
 		} else if (strpos($parameters['context'], 'ticketcard') !== false) {
+            // documents_action.tpl.php, included at the end of this block, runs on the builddoc and remove_file of
+            // every module of the card (GMAO's ticket documents too): only the branches below grant it the rights
+            $permissiontoadd    = 0;
+            $permissiontodelete = 0;
+
             // btn_add_message only comes from the message form of ticket/card.php
             if ($action == 'add_message' && GETPOSTISSET('btn_add_message') && $object instanceof Ticket && $this->addMessageWithTicketFiles($object) > 0) {
                 return 1;
@@ -1127,6 +1180,7 @@ class ActionsDigiriskdolibarr
                 $moduleName          = 'DigiriskDolibarr';
                 $moduleNameLowerCase = strtolower($moduleName);
                 $upload_dir          = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
+                $permissiontoadd     = $user->hasRight('ticket', 'write');
 
                 // Action to generate pdf from odt file
                 require dol_buildpath('/saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php');
@@ -1931,7 +1985,7 @@ class ActionsDigiriskdolibarr
 				} else {
 					$searchCategoryTicket = array($searchCategoryTicketList);
 				}
-				$moreforfilter .= Form::multiselectarray('search_category_ticket_list', $categoriesTicketArr, $searchCategoryTicket, 0, 0, 'minwidth300');
+				$moreforfilter .= Form::multiselectarray('search_category_ticket_list', $categoriesTicketArr, $searchCategoryTicket, 0, 0, 'minwidth300', 0, 0, '', '', $langs->transnoentitiesnoconv('Categories'));
 				$moreforfilter .= '</div>';
 			}
 
@@ -2047,6 +2101,29 @@ class ActionsDigiriskdolibarr
 			return -1;
 		}
 	}
+
+    /**
+     * Overloading the moreHtmlRef function : replacing the parent's function with the one below
+     *
+     * @param  array       $parameters Hook metadata (context, etc...)
+     * @param  object|null $object     The object to process
+     * @return int                     0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function moreHtmlRef(array $parameters, $object): int
+    {
+        global $langs, $user;
+
+        // The native ticket card leads to the Digirisk one, under the ref of its banner (#5644)
+        if (preg_match('/\bticketcard\b/', $parameters['context']) && $object instanceof Ticket && $object->id > 0 && $user->hasRight('ticket', 'read')) {
+            $digiriskCardUrl = dol_buildpath('/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $object->id;
+
+            $this->resprints  = '<div class="refidno">';
+            $this->resprints .= '<a href="' . dol_escape_htmltag($digiriskCardUrl) . '">' . img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictofixedwidth"') . $langs->trans('TicketOpenDigiriskCard') . '</a>';
+            $this->resprints .= '</div>';
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
 
     /**
      * Overloading the formObjectOptions function : replacing the parent's function with the one below
@@ -2830,6 +2907,10 @@ class ActionsDigiriskdolibarr
             $objectsMetadata['digiriskdolibarr_' . $objectName]['class_path'] = $modulePath . '/class/riskanalysis/' . $objectName . '.class.php';
             $objectsMetadata['digiriskdolibarr_' . $objectName]['lib_path']   = $modulePath . '/lib/digiriskdolibarr_digiriskelement.lib.php';
         }
+        // The risk has its own card: risk_prepare_head() lives in its library, needed by the pages of other
+        // modules showing the header of a risk (DoliLetter spread tabs)
+        $objectsMetadata['digiriskdolibarr_risk']['lib_path'] = $modulePath . '/lib/digiriskdolibarr_risk.lib.php';
+
         // La table de l'enquete accident ne suit pas la regle de nommage des autres objets : sans
         // cette correction, la metadonnee pointe une table inexistante et plus rien ne matche
         // (les fichiers lies, donc la diffusion, cherchent sur src_object_type = table_element)
@@ -2846,6 +2927,10 @@ class ActionsDigiriskdolibarr
 
         // ucfirst() gives Risksign, the translation key is RiskSign
         $objectsMetadata['digiriskdolibarr_risksign']['langs'] = 'RiskSign';
+
+        // Digiriskstandard is the technical name of the object ("Standard Digirisk"): the interface calls it the
+        // risk assessment document, and so must the pages of other modules (DoliLetter spread, its emails)
+        $objectsMetadata['digiriskdolibarr_digiriskstandard']['langs'] = 'RiskAssessmentDocument';
 
         $this->results = $objectsMetadata;
 
@@ -2935,7 +3020,13 @@ class ActionsDigiriskdolibarr
 
     public function printFieldListValue($parameters, $object, $action)
     {
-        global $db;
+        global $db, $user;
+
+        // List of the registers: the state of an open ticket opens the quick close modal printed by printCommonFooter()
+        if ($object instanceof Ticket && $this->isDigiriskTicketList($parameters['context']) && $user->hasRight('ticket', 'write')
+            && !in_array((int) $object->status, [Ticket::STATUS_CLOSED, Ticket::STATUS_CANCELED], true)) {
+            $this->ticketQuickCloseRows[(int) $object->id] = ['ref' => (string) $object->ref, 'subject' => (string) $object->subject];
+        }
 
         if (strpos($parameters['context'], 'ticketlist') && isModEnabled('categorie')) {
             $obj = $parameters['object'];

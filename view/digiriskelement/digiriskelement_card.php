@@ -45,6 +45,7 @@ require_once __DIR__ . '/../../class/evaluator.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/groupmentdocument.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/workunitdocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_exposuregroup.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_media.lib.php';
 
@@ -509,6 +510,36 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 			print price($object->people_percentage, 0, $langs, 1, 0) . ' % <span class="opacitymedium">' . $langs->trans('PeoplePercentageNoWorkforce') . '</span>';
 		}
 		print '</td></tr>';
+
+		// * Exposure groups - Groupes d'exposition (#5644) *
+
+		$exposureGroups = digiriskdolibarr_exposuregroup_fetch_all($db);
+		if (!empty($exposureGroups)) {
+			$exposureShares = digiriskdolibarr_exposuregroup_fetch_shares($db, $object->id);
+			$exposedPeople  = 0.0;
+			$exposureLines  = [];
+			foreach ($exposureGroups as $exposureGroup) {
+				$exposureShare = $exposureShares[$exposureGroup->rowid][$object->id] ?? 0.0;
+				if ($exposureShare <= 0) {
+					continue;
+				}
+				$groupPeople     = digiriskdolibarr_exposuregroup_people($exposureGroup->nb_people, $exposureShare);
+				$exposedPeople  += $groupPeople;
+				$exposureLines[] = $langs->trans('ExposureGroupOfElement', $exposureGroup->label, digiriskdolibarr_exposuregroup_format_number($exposureShare, 2) . ' %', digiriskdolibarr_exposuregroup_format_number($groupPeople, 1));
+			}
+
+			print '<tr><td class="titlefield tdtop">' . $form->textwithpicto($langs->trans('ExposureGroups'), $langs->trans('ExposureGroupsOfElementHelp')) . '</td><td>';
+			if (!empty($exposureLines)) {
+				print implode('<br>', $exposureLines);
+				print '<br><strong>' . $langs->trans('ExposureGroupsExposedTotal', digiriskdolibarr_exposuregroup_format_number($exposedPeople, 1)) . '</strong>';
+			} else {
+				print '<span class="opacitymedium">&mdash;</span>';
+			}
+			if ($permissiontoadd) {
+				print ' <a class="paddingleft" href="' . dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_exposuregroup.php', 1) . '#exposuregroup-grid">' . img_edit($langs->trans('ExposureGroupsEditShares')) . '</a>';
+			}
+			print '</td></tr>';
+		}
 	}
 
 	print '<tr><td class="titlefield">';

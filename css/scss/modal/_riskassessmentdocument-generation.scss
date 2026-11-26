@@ -1,0 +1,129 @@
+/** Generation modal of the risk assessment document (js/modules/riskAssessmentDocumentGeneration.js).
+    The container hugs its content up to the height of the window: only the list scrolls, however many
+    groupments and workunits it holds. */
+.risk-assessment-document-generation {
+  [hidden] {
+    display: none !important;
+  }
+
+  .modal-container {
+    height: auto;
+    max-height: calc(100% - 4em);
+    max-width: 720px;
+
+    .modal-header, .modal-footer {
+      height: auto;
+      flex: 0 0 auto;
+    }
+    .modal-header {
+      padding-bottom: 0.5em;
+    }
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5em;
+      padding-top: 1em;
+    }
+    /** min-height: 0 lets the flex item shrink below its content so the list can scroll */
+    .modal-content {
+      height: auto;
+      min-height: 0;
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  /** Stop asked: the sheet being generated is finished first */
+  &__stop:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  &__status {
+    margin: 0 0 0.5em;
+    min-height: 1.4em;
+    font-weight: 600;
+  }
+
+  &__bar {
+    flex: 0 0 auto;
+    height: 8px;
+    margin-bottom: 1em;
+    border-radius: 4px;
+    background: $color__grey;
+    overflow: hidden;
+  }
+
+  &__bar-value {
+    display: block;
+    width: 0;
+    height: 100%;
+    background: $color__primary;
+    transition: width 0.3s ease-out;
+  }
+
+  &--failed &__status {
+    color: $color__red;
+  }
+  &--failed &__bar-value {
+    background: $color__red;
+  }
+
+  .modal-container ul.risk-assessment-document-generation__steps {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .modal-container li.risk-assessment-document-generation__step {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.5em;
+    padding: 0.3em 0.5em 0.3em calc(0.5em + var(--depth, 0) * 1.25em);
+    border-bottom: 1px solid $color__grey;
+
+    &:last-child {
+      border-bottom: 0;
+      font-weight: 600;
+    }
+  }
+
+  &__step-icon {
+    flex: 0 0 1.25em;
+    text-align: center;
+  }
+
+  &__step-ref {
+    font-weight: 600;
+  }
+
+  &__step-file {
+    margin-left: auto;
+    word-break: break-all;
+  }
+
+  &__step-error {
+    flex: 1 0 100%;
+    padding-left: 1.75em;
+    color: $color__red;
+  }
+
+  &__step--pending {
+    opacity: 0.6;
+  }
+  &__step--running &__step-icon {
+    color: $color__primary;
+  }
+  &__step--done &__step-icon {
+    color: $color__riskenvironmental;
+  }
+  &__step--error &__step-icon {
+    color: $color__red;
+  }
+  &__step--skipped {
+    opacity: 0.5;
+  }
+}

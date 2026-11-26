@@ -2083,14 +2083,17 @@ function digirisk_dol_add_file_process($upload_dir, $allowoverwrite = 0, $donotu
 					global $maxwidthsmall, $maxheightsmall, $maxwidthmini, $maxheightmini;
 
 					include_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
+					dol_include_once('/saturne/lib/dolibarr.lib.php');
 
 					// Generate thumbs.
 					if ($generatethumbs) {
 						if (image_format_supported($destfull) == 1) {
 							// Create thumbs
 							// We can't use $object->addThumbs here because there is no $object known
-							vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE, '_large', 50, "thumbs");
-							vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM, '_medium', 50, "thumbs");
+							// The core vignette() only accepts '_small' and '_mini': with '_large' or '_medium' it wrote the image
+							// to a file named 'Bad parameter extName' in the current directory, saturne_vignette() accepts them
+							saturne_vignette($destfull, getDolGlobalInt('DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE'), getDolGlobalInt('DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE'), '_large', 50, 'thumbs');
+							saturne_vignette($destfull, getDolGlobalInt('DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM'), getDolGlobalInt('DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM'), '_medium', 50, 'thumbs');
 							// Used on logon for example
 							$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
 							// Create mini thumbs for image (Ratio is near 16/9)
@@ -3351,13 +3354,20 @@ function digiriskPreventionPlanDocumentImagesActions(string $action): void
 
     if ($action == 'uploadPhoto' && getDolGlobalInt('MAIN_UPLOAD_DOC')) {
         // The media block only sends images, make sure of it before writing anything
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+
         $isImageUpload = true;
-        foreach ((array) ($_FILES['userfile']['tmp_name'] ?? []) as $uploadedTmpName) {
+        $tmpNames      = (array) ($_FILES['userfile']['tmp_name'] ?? []);
+        $origNames     = (array) ($_FILES['userfile']['name'] ?? []);
+
+        foreach ($tmpNames as $key => $uploadedTmpName) {
             if (empty($uploadedTmpName)) {
                 continue;
             }
+            $origName = (string) ($origNames[$key] ?? '');
             $fileInfo = new finfo(FILEINFO_MIME_TYPE);
-            if (strpos((string) $fileInfo->file($uploadedTmpName), 'image/') !== 0) {
+            $mimeType = (string) $fileInfo->file($uploadedTmpName);
+            if (strpos($mimeType, 'image/') !== 0 || $mimeType === 'image/svg+xml' || image_format_supported($origName) < 0) {
                 $isImageUpload = false;
                 break;
             }
@@ -3382,4 +3392,48 @@ function digiriskPreventionPlanDocumentImagesActions(string $action): void
 
     print digiriskPreventionPlanDocumentImagesBlock($part, true);
     exit;
+}
+
+/**
+ * Read the JSON data extracted from an import archive
+ *
+ * The archive is expected to hold a JSON file named like itself. A missing, unreadable or malformed file returns null
+ * instead of raising a PHP warning, so that the caller can report it and stop the import
+ *
+ * @param  string     $filePath Full path of the JSON file
+ * @return array|null           Decoded data, null when the file is missing or does not hold a JSON object or array
+ */
+function digirisk_read_import_json(string $filePath): ?array
+{
+    if (!is_file($filePath) || !is_readable($filePath)) {
+        return null;
+    }
+
+    $data = json_decode((string) file_get_contents($filePath), true);
+
+    return is_array($data) ? $data : null;
+}
+
+/**
+ * Delete an uploaded import archive and the files it extracted next to it
+ *
+ * @param  string $dir         Directory holding the archive and its extracted files, with a trailing slash
+ * @param  string $archiveName File name of the archive
+ * @return void
+ */
+function digirisk_delete_import_archive(string $dir, string $archiveName): void
+{
+    $zip = new ZipArchive();
+    if ($zip->open($dir . $archiveName) === true) {
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $entry = $zip->getNameIndex($i);
+            // Folders stay, and an entry climbing out of the directory is never followed
+            if ($entry !== false && substr($entry, -1) !== '/' && strpos($entry, '..') === false) {
+                dol_delete_file($dir . $entry, 1);
+            }
+        }
+        $zip->close();
+    }
+
+    dol_delete_file($dir . $archiveName, 1);
 }

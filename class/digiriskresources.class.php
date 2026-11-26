@@ -342,6 +342,60 @@ class DigiriskResources extends SaturneObject
         return $ids;
     }
 
+    /**
+     * Fetch all the resources linked to an object, grouped by resource reference.
+     *
+     * fetchResourcesFromObject('', $object) ne rend le tableau par reference que s'il y a plus
+     * d'une ligne : l'objet seul pour une ligne, l'entier 0 pour aucune. Un appelant qui lit
+     * $resources['ExtSociety'] part alors en erreur fatale (clonage d'un plan de prevention a une
+     * seule ressource) ou perd la ressource sans bruit. Cette methode rend toujours la meme forme.
+     *
+     * @param  CommonObject $object Linked object
+     * @return array<string, array<int, CommonObject>> Resources indexed by reference then by resource ID, empty if none
+     */
+    public function fetchAllResourcesFromObject(CommonObject $object): array
+    {
+        require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+
+        $resourceClasses = [
+            'user'      => 'User',
+            'socpeople' => 'Contact',
+            'societe'   => 'Societe',
+        ];
+
+        $sql  = 'SELECT rowid, ref, element_type, element_id FROM ' . MAIN_DB_PREFIX . $this->table_element;
+        $sql .= " WHERE object_type = '" . $this->db->escape($object->element) . "'";
+        $sql .= ' AND object_id = ' . ((int) $object->id);
+        $sql .= ' AND status = 1';
+        $sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
+        $sql .= ' ORDER BY rowid ASC';
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $this->error    = $this->db->lasterror();
+            $this->errors[] = $this->error;
+            return [];
+        }
+
+        $resources = [];
+        while ($obj = $this->db->fetch_object($resql)) {
+            if (!isset($resourceClasses[$obj->element_type])) {
+                continue;
+            }
+
+            $resource = new $resourceClasses[$obj->element_type]($this->db);
+            // Une ressource dont le tiers, le contact ou l'utilisateur a ete supprime est ignoree
+            if ($resource->fetch((int) $obj->element_id) > 0) {
+                $resources[$obj->ref][(int) $obj->rowid] = $resource;
+            }
+        }
+        $this->db->free($resql);
+
+        return $resources;
+    }
+
 	/**
 	 * Fetch all resources in database
 	 *
@@ -370,6 +424,50 @@ class DigiriskResources extends SaturneObject
 
 		return $allLinks;
 	}
+
+    /**
+     * Staff representative bodies a company can have, in display order: code => translation key of its name
+     *
+     * The code names the data of the body: the constant DIGIRISKDOLIBARR_<code>_ELECTION_DATE and the
+     * resources Titulars<code> and Alternates<code>. The staff delegates (DP) come last: the ESC replaced
+     * them in 2020, they stay for the companies that filled them in before
+     *
+     * @return array<string, string>
+     */
+    public static function getStaffRepresentativeBodies(): array
+    {
+        return [
+            'CSE'   => 'ESC',
+            'CHSCT' => 'CHSCT',
+            'F3SCT' => 'F3SCT',
+            'DP'    => 'StaffRepresentatives',
+        ];
+    }
+
+    /**
+     * Staff representative bodies chosen in the social setup, in display order: code => translation key of its name
+     *
+     * Until the setup is saved: the ESC, plus the staff delegates of a company that filled them in, so
+     * that nothing entered before the choice existed disappears from the pages and the documents
+     *
+     * @return array<string, string>
+     * @throws Exception
+     */
+    public function getActiveStaffRepresentativeBodies(): array
+    {
+        $setting = getDolGlobalString('DIGIRISKDOLIBARR_STAFF_REPRESENTATIVE_BODIES');
+        if ($setting !== '') {
+            $codes = explode(',', $setting);
+        } else {
+            $codes    = ['CSE'];
+            $allLinks = $this->fetchDigiriskResources();
+            if (!in_array(getDolGlobalString('DIGIRISKDOLIBARR_DP_ELECTION_DATE'), ['', '--']) || !empty($allLinks['TitularsDP']->id) || !empty($allLinks['AlternatesDP']->id)) {
+                $codes[] = 'DP';
+            }
+        }
+
+        return array_intersect_key(self::getStaffRepresentativeBodies(), array_flip($codes));
+    }
 
     /**
      * Load dashboard info digirisk resources

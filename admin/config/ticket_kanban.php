@@ -46,13 +46,15 @@ $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 
 // Security check
-$permissiontoread  = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->hasRight('digiriskdolibarr', 'adminpage', 'read');
 $permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
 /*
  * Actions
  */
+
+$action = digiriskdolibarr_check_admin_write_action($action, $permissiontowrite);
 
 // Initialize ticket logging constants with defaults (per-field kanban toggles OFF, global traceability ON)
 $ticketKanbanLogDefaults = [
@@ -101,6 +103,8 @@ print load_fiche_titre($title, $linkback, 'title_setup');
 // Configuration header
 $head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'ticket_kanban', $title, -1, 'digiriskdolibarr_color@digiriskdolibarr');
+
+require_once dol_buildpath('/saturne/core/tpl/admin/admin_write_access_notice.tpl.php');
 
 print load_fiche_titre('<i class="fas fa-columns"></i> ' . $langs->trans('TicketKanbanLogging'), '', '');
 print '<hr>';

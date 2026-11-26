@@ -226,7 +226,8 @@ if (!empty($rpsAssessmentByElement[(int) $object->id]['id'])) {
             <?php if ($rpsLastAssessment !== null) : ?>
                 <h5 class="rps-detail-title rps-report-title"><?php echo $langs->trans('PsychosocialAssessmentReportOf', dol_print_date($rpsLastAssessment->date_riskassessment, 'day')); ?></h5>
                 <div class="rps-report">
-                    <?php print digiriskRiskAssessmentMediaBlock('riskassessment/' . $rpsLastAssessment->ref, $rpsLastAssessment, true); ?>
+                    <?php // The report unfolds in the page, not in a modal: its thumbnail loads with it
+                    print digiriskRiskAssessmentMediaBlock('riskassessment/' . $rpsLastAssessment->ref, $rpsLastAssessment, true, false); ?>
                 </div>
             <?php endif; ?>
         </div>

@@ -346,13 +346,20 @@ function digiriskFirePermitRoundsMediaActions(FirePermit $object, string $action
 
     if ($action == 'uploadPhoto' && getDolGlobalInt('MAIN_UPLOAD_DOC')) {
         // The page can be opened by anyone holding the link: only actual images are written
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+
         $isImageUpload = true;
-        foreach ((array) ($_FILES['userfile']['tmp_name'] ?? []) as $uploadedTmpName) {
+        $tmpNames      = (array) ($_FILES['userfile']['tmp_name'] ?? []);
+        $origNames     = (array) ($_FILES['userfile']['name'] ?? []);
+
+        foreach ($tmpNames as $key => $uploadedTmpName) {
             if (empty($uploadedTmpName)) {
                 continue;
             }
+            $origName = (string) ($origNames[$key] ?? '');
             $fileInfo = new finfo(FILEINFO_MIME_TYPE);
-            if (strpos((string) $fileInfo->file($uploadedTmpName), 'image/') !== 0) {
+            $mimeType = (string) $fileInfo->file($uploadedTmpName);
+            if (strpos($mimeType, 'image/') !== 0 || $mimeType === 'image/svg+xml' || image_format_supported($origName) < 0) {
                 $isImageUpload = false;
                 break;
             }

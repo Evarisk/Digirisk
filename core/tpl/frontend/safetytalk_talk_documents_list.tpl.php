@@ -25,11 +25,12 @@
 
 global $langs;
 
-$documentModes = [
+// Without DoliLetter 23.2.0 the talk has no document ($documents is empty), but the modes are still read here
+$documentModes = digiriskSafetyTalkSpreadAvailable() ? [
     DOLILETTER_SPREAD_DOCUMENT_READ     => 'SafetyTalkDocumentRead',
     DOLILETTER_SPREAD_DOCUMENT_DOWNLOAD => 'SafetyTalkDocumentDownload',
     DOLILETTER_SPREAD_DOCUMENT_HIDDEN   => 'SafetyTalkDocumentHidden',
-];
+] : [];
 ?>
 <div class="digirisk-safetytalk-documents__content" id="safetytalk-documents-list">
     <?php if (empty($documents)) { ?>

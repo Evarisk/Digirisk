@@ -53,13 +53,15 @@ $project = new Project($db);
 $task    = new Task($db);
 
 // Security check - Protection if external user
-$permissiontoread  = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoread  = $user->hasRight('digiriskdolibarr', 'adminpage', 'read');
 $permissiontowrite = saturne_check_admin_write_access();
 saturne_check_access($permissiontoread);
 
 /*
  * Actions
  */
+
+$action = digiriskdolibarr_check_admin_write_action($action, $permissiontowrite);
 
 // Initialize ActionPlan logging constants with defaults (label ON, others OFF)
 if (!isset($conf->global->DIGIRISKDOLIBARR_ACTIONPLAN_LOG_LABEL)) {
@@ -92,21 +94,10 @@ if ((($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updat
     $EnvironmentProject    = preg_split('/_/', $EnvironmentProject);
 	$taskTimeSpentDuration = GETPOST('TaskTimeSpentDuration', 'alpha');
 
+    // The PAPRIPACT menu entry keeps the Kanban URL declared by the module descriptor: the Kanban page reads
+    // DIGIRISKDOLIBARR_DU_PROJECT by itself, so changing the project must not rewrite the menu
     if ($DUProject[0] > 0 && $DUProject[0] != $conf->global->DIGIRISKDOLIBARR_DU_PROJECT) {
         dolibarr_set_const($db, "DIGIRISKDOLIBARR_DU_PROJECT", $DUProject[0], 'integer', 0, '', $conf->entity);
-
-        $url = '/projet/tasks.php?id=' . $DUProject[0];
-
-        $sql = "UPDATE ".MAIN_DB_PREFIX."menu SET";
-        $sql .= " url='".$db->escape($url)."'";
-        $sql .= " WHERE leftmenu='digiriskactionplan'";
-        $sql .= " AND entity=" . $conf->entity;
-
-        $resql = $db->query($sql);
-        if (!$resql) {
-            $error = "Error ".$db->lasterror();
-            return -1;
-        }
     }
 
     if ($EnvironmentProject[0] > 0 && $EnvironmentProject[0] != $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT) {
@@ -152,9 +143,6 @@ require_once dol_buildpath('/saturne/core/tpl/actions/admin_conf_actions.tpl.php
  * View
  */
 
-if (isModEnabled('project')) {
-	$formproject = new FormProjets($db);
-}
 $formcompany = new FormCompany($db);
 $title    = $langs->trans("ModuleSetup", $moduleName);
 $helpUrl = 'FR:Module_Digirisk#Plan_d_action';
@@ -169,6 +157,13 @@ print load_fiche_titre($title, $linkback, 'title_setup');
 // Configuration header
 $head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'actionplan', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
+
+require_once dol_buildpath('/saturne/core/tpl/admin/admin_write_access_notice.tpl.php');
+
+// Built after the notice: an included template makes phpstan forget that isModEnabled('project') was checked
+if (isModEnabled('project')) {
+	$formproject = new FormProjets($db);
+}
 
 // Tasks
 print load_fiche_titre('<i class="fas fa-tasks"></i> ' . $langs->trans("TaskConfig"), '', '');

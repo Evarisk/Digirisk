@@ -885,3 +885,115 @@ function digiriskGetQrCodePng(string $data, string $filePath, int $size = 600): 
 
     return $written;
 }
+
+/**
+ * People who joined the public spread of a prevention plan or a fire permit, with their answers, for the
+ * mobile screen of the object: the same list as at the bottom of the spread page.
+ *
+ * The spread belongs to DoliLetter: its attendance sheet holds the people, and the documents they provided
+ * are stored under the certifications of the object. Nothing when DoliLetter is not enabled. Before anybody
+ * joined, the documents each person will be asked for are already known: the block shows them from the start.
+ *
+ * @param  DoliDB       $db     Database handler
+ * @param  CommonObject $object Prevention plan or fire permit, fetched with its lines
+ * @return array                available (DoliLetter can serve the spread), certifications (code, label,
+ *                              mandatory: what each person will be asked for), people (signatory, cert_states,
+ *                              risks_read, signed), signed_count, risk_count, cert_sub_dir (directory of the
+ *                              documents, relative to the module output), signin_sheet_url (download of the
+ *                              attendance sheet PDF by the spread page, empty while the spread has no sheet)
+ */
+function digiriskMobileGetSpreadPeople(DoliDB $db, CommonObject $object): array
+{
+    global $conf;
+
+    $spread = ['available' => false, 'certifications' => [], 'people' => [], 'signed_count' => 0, 'risk_count' => 0, 'cert_sub_dir' => '', 'signin_sheet_url' => ''];
+
+    if (!isModEnabled('doliletter')) {
+        return $spread;
+    }
+    dol_include_once('/doliletter/class/doliletterattendancesheet.class.php');
+    dol_include_once('/doliletter/lib/doliletter_spread.lib.php');
+    dol_include_once('/saturne/class/saturnesignature.class.php');
+    // An older DoliLetter may lack part of them: nothing shown rather than a fatal error
+    foreach (['doliletter_spread_signatory_has_identity', 'doliletter_spread_get_certification_states', 'doliletter_spread_get_not_concerned_certifications', 'doliletter_spread_get_acknowledged_risks'] as $spreadFunction) {
+        if (!function_exists($spreadFunction)) {
+            return $spread;
+        }
+    }
+    if (!class_exists('DoliletterAttendanceSheet')) {
+        return $spread;
+    }
+    $spread['available'] = true;
+
+    $object->fetch_optionals();
+    $certifications = json_decode((string) ($object->array_options['options_mobile_certifications'] ?? ''), true);
+    $certifications = is_array($certifications) ? $certifications : [];
+    // Labels of what the object stores, a certification disabled afterwards included
+    $certificationOptions = digiriskGetCertificationOptions(false);
+    foreach ($certifications as $certification) {
+        if (!empty($certification['code'])) {
+            $spread['certifications'][] = [
+                'code'      => (string) $certification['code'],
+                'label'     => $certificationOptions[$certification['code']] ?? (string) $certification['code'],
+                'mandatory' => !empty($certification['mandatory'])
+            ];
+        }
+    }
+
+    // Same sheet as the spread page: one per object, found by its type and its id
+    $attendanceSheet = new DoliletterAttendanceSheet($db, 'doliletter');
+    if ($attendanceSheet->fetch(0, '', " AND object_type = 'digiriskdolibarr_" . $db->escape($object->element) . "' AND fk_object = " . ((int) $object->id)) <= 0) {
+        return $spread;
+    }
+
+    // The spread page generates the sheet again before serving it, with the signatures given so far,
+    // and checks the DoliLetter read right itself
+    $spread['signin_sheet_url'] = dol_buildpath('/doliletter/public/spread/add_spread.php', 1) . '?id=' . ((int) $object->id) . '&object_type=digiriskdolibarr_' . urlencode($object->element) . '&action=download_signin_sheet';
+
+    $signatory   = new SaturneSignature($db, 'doliletter', $attendanceSheet->element);
+    $signatories = $signatory->fetchSignatory('', $attendanceSheet->id, $attendanceSheet->element);
+    if (!is_array($signatories) || empty($signatories)) {
+        return $spread;
+    }
+    // Grouped by role: every group counts, not only the first one, or the people given a role are left out
+    $allSignatories = [];
+    foreach ($signatories as $roleSignatories) {
+        $allSignatories += $roleSignatories;
+    }
+    // A signature nobody was assigned to is not a person of the spread
+    $signatories = array_filter($allSignatories, 'doliletter_spread_signatory_has_identity');
+
+    // Signed first, the latest on top, then the ones still pending: the order of the spread page
+    uasort($signatories, function ($a, $b) {
+        if (!empty($a->signature) && !empty($b->signature)) {
+            return $b->signature_date <=> $a->signature_date;
+        }
+        if (!empty($a->signature) || !empty($b->signature)) {
+            return !empty($a->signature) ? -1 : 1;
+        }
+
+        return $b->id <=> $a->id;
+    });
+
+    $uploadBase            = !empty($conf->digiriskdolibarr->dir_output) ? $conf->digiriskdolibarr->dir_output : $conf->ecm->dir_output . '/digiriskdolibarr';
+    $spread['cert_sub_dir'] = $object->element . '/' . dol_sanitizeFileName($object->ref) . '/certifications';
+
+    $riskCategories       = array_map('intval', array_column((array) $object->lines, 'category'));
+    $spread['risk_count'] = count($riskCategories);
+
+    foreach ($signatories as $spreadSignatory) {
+        $signed = !empty($spreadSignatory->signature);
+        if ($signed) {
+            $spread['signed_count']++;
+        }
+
+        $spread['people'][] = [
+            'signatory'   => $spreadSignatory,
+            'signed'      => $signed,
+            'cert_states' => empty($certifications) ? [] : doliletter_spread_get_certification_states($certifications, $certificationOptions, $uploadBase . '/' . $spread['cert_sub_dir'], $spreadSignatory->id, doliletter_spread_get_not_concerned_certifications($spreadSignatory)),
+            'risks_read'  => count(array_intersect($riskCategories, array_map('intval', doliletter_spread_get_acknowledged_risks($spreadSignatory))))
+        ];
+    }
+
+    return $spread;
+}

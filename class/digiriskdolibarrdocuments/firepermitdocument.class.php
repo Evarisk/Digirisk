@@ -124,7 +124,9 @@ class FirePermitDocument extends DigiriskDocuments
 			$json['FirePermit']['police_number'] = $societe->phone;
 		}
 
-		if ($maitreoeuvre->id > 0) {
+		// Un role sans signataire, une ressource non renseignee : le document se genere a chaque
+		// etape du permis (creation, clonage, signature), chaque lecture non gardee y laissait un warning
+		if (!empty($maitreoeuvre->id) && $maitreoeuvre->id > 0) {
 			$json['FirePermit']['maitre_oeuvre'] = array();
 			$json['FirePermit']['maitre_oeuvre']['user_id']        = $maitreoeuvre->id;
 			$json['FirePermit']['maitre_oeuvre']['phone']          = $maitreoeuvre->phone;
@@ -136,7 +138,7 @@ class FirePermitDocument extends DigiriskDocuments
             $json['FirePermit']['maitre_oeuvre']['attendance']     = $maitreoeuvre->attendance;
 		}
 
-		if (is_object($extsociety) && $extsociety->id > 0) {
+		if (!empty($extsociety->id) && $extsociety->id > 0) {
 			$json['FirePermit']['society_outside'] = array();
 			$json['FirePermit']['society_outside']['id']      = $extsociety->id;
 			$json['FirePermit']['society_outside']['name']    = $extsociety->name;
@@ -146,7 +148,7 @@ class FirePermitDocument extends DigiriskDocuments
 			$json['FirePermit']['society_outside']['town']    = $extsociety->town;
 		}
 
-		if ($extsocietyresponsible->id > 0) {
+		if (!empty($extsocietyresponsible->id) && $extsocietyresponsible->id > 0) {
 			$json['FirePermit']['responsable_exterieur'] = array();
 			$json['FirePermit']['responsable_exterieur']['id']             = $extsocietyresponsible->id;
 			$json['FirePermit']['responsable_exterieur']['firstname']      = $extsocietyresponsible->firstname;
@@ -159,7 +161,8 @@ class FirePermitDocument extends DigiriskDocuments
 
 		if (!empty ($extsocietyintervenants) && $extsocietyintervenants > 0) {
 			foreach ($extsocietyintervenants as $extsocietyintervenant) {
-				$json['FirePermit']['intervenant_exterieur'] = array();
+				// Une entree par intervenant : vider tout le tableau ici ne gardait que le dernier
+				$json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id] = array();
 				$json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['firstname']      = $extsocietyintervenant->firstname;
 				$json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['lastname']       = $extsocietyintervenant->lastname;
 				$json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['phone']          = $extsocietyintervenant->phone;
@@ -170,23 +173,23 @@ class FirePermitDocument extends DigiriskDocuments
 			}
 		}
 
-		if ($labourinspector->id > 0) {
+		if (!empty($labourinspector->id) && $labourinspector->id > 0) {
 			$json['FirePermit']['labour_inspector'] = array();
-			$json['FirePermit']['labour_inspector']['id']      = $extsociety->id;
-			$json['FirePermit']['labour_inspector']['name']    = $extsociety->name;
-			$json['FirePermit']['labour_inspector']['siret']   = $extsociety->idprof2;
-			$json['FirePermit']['labour_inspector']['address'] = $extsociety->address;
-			$json['FirePermit']['labour_inspector']['postal']  = $extsociety->zip;
-			$json['FirePermit']['labour_inspector']['town']    = $extsociety->town;
+			$json['FirePermit']['labour_inspector']['id']      = $labourinspector->id;
+			$json['FirePermit']['labour_inspector']['name']    = $labourinspector->name;
+			$json['FirePermit']['labour_inspector']['siret']   = $labourinspector->idprof2;
+			$json['FirePermit']['labour_inspector']['address'] = $labourinspector->address;
+			$json['FirePermit']['labour_inspector']['postal']  = $labourinspector->zip;
+			$json['FirePermit']['labour_inspector']['town']    = $labourinspector->town;
 		}
 
-		if ($labourinspectorcontact->id > 0) {
+		if (!empty($labourinspectorcontact->id) && $labourinspectorcontact->id > 0) {
 			$json['FirePermit']['labour_inspector_contact'] = array();
-			$json['FirePermit']['labour_inspector_contact']['id']        = $extsocietyresponsible->id;
-			$json['FirePermit']['labour_inspector_contact']['firstname'] = $extsocietyresponsible->firstname;
-			$json['FirePermit']['labour_inspector_contact']['lastname']  = $extsocietyresponsible->lastname;
-			$json['FirePermit']['labour_inspector_contact']['phone']     = $extsocietyresponsible->phone;
-			$json['FirePermit']['labour_inspector_contact']['email']     = $extsocietyresponsible->email;
+			$json['FirePermit']['labour_inspector_contact']['id']        = $labourinspectorcontact->id;
+			$json['FirePermit']['labour_inspector_contact']['firstname'] = $labourinspectorcontact->firstname;
+			$json['FirePermit']['labour_inspector_contact']['lastname']  = $labourinspectorcontact->lastname;
+			$json['FirePermit']['labour_inspector_contact']['phone']     = $labourinspectorcontact->phone;
+			$json['FirePermit']['labour_inspector_contact']['email']     = $labourinspectorcontact->email;
 		}
 
 		$json['FirePermit']['ref']   = $firepermit->ref;
@@ -214,20 +217,21 @@ class FirePermitDocument extends DigiriskDocuments
 		$opening_hours_saturday  = explode(' ', $saturneSchedules->saturday);
 		$opening_hours_sunday    = explode(' ', $saturneSchedules->sunday);
 
-		$json['FirePermit']['lundi_matin']    = $opening_hours_monday[0];
-		$json['FirePermit']['lundi_aprem']    = $opening_hours_monday[1];
-		$json['FirePermit']['mardi_matin']    = $opening_hours_tuesday[0];
-		$json['FirePermit']['mardi_aprem']    = $opening_hours_tuesday[1];
-		$json['FirePermit']['mercredi_matin'] = $opening_hours_wednesday[0];
-		$json['FirePermit']['mercredi_aprem'] = $opening_hours_wednesday[1];
-		$json['FirePermit']['jeudi_matin']    = $opening_hours_thursday[0];
-		$json['FirePermit']['jeudi_aprem']    = $opening_hours_thursday[1];
-		$json['FirePermit']['vendredi_matin'] = $opening_hours_friday[0];
-		$json['FirePermit']['vendredi_aprem'] = $opening_hours_friday[1];
-		$json['FirePermit']['samedi_matin']   = $opening_hours_saturday[0];
-		$json['FirePermit']['samedi_aprem']   = $opening_hours_saturday[1];
-		$json['FirePermit']['dimanche_matin'] = $opening_hours_sunday[0];
-		$json['FirePermit']['dimanche_aprem'] = $opening_hours_sunday[1];
+		// Un jour sans horaire de l'apres-midi (ou un permis sans horaires) n'a qu'une moitie a exploser
+		$json['FirePermit']['lundi_matin']    = $opening_hours_monday[0]    ?? '';
+		$json['FirePermit']['lundi_aprem']    = $opening_hours_monday[1]    ?? '';
+		$json['FirePermit']['mardi_matin']    = $opening_hours_tuesday[0]   ?? '';
+		$json['FirePermit']['mardi_aprem']    = $opening_hours_tuesday[1]   ?? '';
+		$json['FirePermit']['mercredi_matin'] = $opening_hours_wednesday[0] ?? '';
+		$json['FirePermit']['mercredi_aprem'] = $opening_hours_wednesday[1] ?? '';
+		$json['FirePermit']['jeudi_matin']    = $opening_hours_thursday[0]  ?? '';
+		$json['FirePermit']['jeudi_aprem']    = $opening_hours_thursday[1]  ?? '';
+		$json['FirePermit']['vendredi_matin'] = $opening_hours_friday[0]    ?? '';
+		$json['FirePermit']['vendredi_aprem'] = $opening_hours_friday[1]    ?? '';
+		$json['FirePermit']['samedi_matin']   = $opening_hours_saturday[0]  ?? '';
+		$json['FirePermit']['samedi_aprem']   = $opening_hours_saturday[1]  ?? '';
+		$json['FirePermit']['dimanche_matin'] = $opening_hours_sunday[0]    ?? '';
+		$json['FirePermit']['dimanche_aprem'] = $opening_hours_sunday[1]    ?? '';
 
 		if (!empty($preventionplanlines) && $preventionplanlines > 0) {
 			foreach ($preventionplanlines as $line) {

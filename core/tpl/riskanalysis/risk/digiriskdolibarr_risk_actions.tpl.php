@@ -245,8 +245,9 @@ if ( ! $error && ($massaction == 'delete' || ($action == 'delete' && $confirm ==
 								unlink($file['fullname']);
 							}
 						}
-						dol_delete_dir($pathToEvaluationPhoto . '/thumbs');
-						dol_delete_dir($pathToEvaluationPhoto);
+						// thumbs/ is absent when the evaluation has no thumbnail: no PHP warning, as the other calls of the module
+						dol_delete_dir($pathToEvaluationPhoto . '/thumbs', 1);
+						dol_delete_dir($pathToEvaluationPhoto, 1);
 
                     }
                     $riskRiskAssessment->delete($user, true);
@@ -524,8 +525,11 @@ if ( ! $error && $action == 'addRiskAssessmentTaskTimeSpent' && $permissiontoadd
 		$task->timespent_date = dol_time_plus_duree($task->timespent_date, $hour, 'h');
 		$task->timespent_date = dol_time_plus_duree($task->timespent_date, $min, 'i');
 	} else {
-		$task->timespent_date = dol_now('tzuser');
+		// GMT timestamp, like the dates of the form: dol_now('tzuser') shifted it by the timezone of the user
+		$task->timespent_date = dol_now();
 	}
+	// The time spent always carries its start hour: saved as such, an edit from the core page keeps it on 24.0.2+
+	$task->timespent_withhour = 1;
 	$task->timespent_note     = $comment;
 	$task->timespent_duration = $duration * 60;
 	$task->timespent_fk_user  = $user->id;
@@ -560,9 +564,16 @@ if ( ! $error && $action == 'saveRiskAssessmentTaskTimeSpent' && $permissiontoad
 	$task->fetch($taskID);
 
 	if (!empty($date)) {
-		$task->timespent_datehour = strtotime(preg_replace('/\//', '-', $date));
-		$task->timespent_datehour = dol_time_plus_duree($task->timespent_datehour, $hour, 'h');
-		$task->timespent_datehour = dol_time_plus_duree($task->timespent_datehour, $min, 'i');
+		$timeSpentStart = strtotime(preg_replace('/\//', '-', $date));
+		$timeSpentStart = dol_time_plus_duree($timeSpentStart, $hour, 'h');
+		$timeSpentStart = dol_time_plus_duree($timeSpentStart, $min, 'i');
+
+		// Task::updateTimeSpent() puts timespent_date back in place of timespent_datehour as soon as they differ (up to
+		// Dolibarr 24.0.1), or when timespent_withhour is empty (24.0.2+, Dolibarr#39580): with the new start in datehour
+		// only, the date was lost. The start is given as the day too, with its hour, as projet/tasks/time.php does
+		$task->timespent_date     = $timeSpentStart;
+		$task->timespent_datehour = $timeSpentStart;
+		$task->timespent_withhour = 1;
 	}
 	$task->timespent_note     =  $comment;
 	$task->timespent_duration = $duration * 60;

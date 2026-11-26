@@ -56,13 +56,16 @@ const DIGIRISKDOLIBARR_SAFETYTALK_PARTICIPANT = 'PROJECTCONTRIBUTOR';
 const DIGIRISKDOLIBARR_SAFETYTALK_GUESTS_FIELD = 'digirisk_safetytalk_guests';
 
 /**
- * Whether DoliLetter, which serves the spread of the talks, can be used.
+ * Whether DoliLetter, which serves the spread of the talks, can be used: enabled, and recent enough to bring
+ * the documents of a spread (DoliLetter 23.2.0). An older one has the attendance sheet but not the rest, and
+ * the talk screens would stop on an undefined function.
  *
  * @return bool
  */
 function digiriskSafetyTalkSpreadAvailable(): bool
 {
-    return isModEnabled('doliletter') && class_exists('DoliletterAttendanceSheet') && function_exists('doliletter_spread_ensure_attendance_sheet');
+    return isModEnabled('doliletter') && class_exists('DoliletterAttendanceSheet') && function_exists('doliletter_spread_ensure_attendance_sheet')
+        && function_exists('doliletter_spread_get_documents') && defined('DOLILETTER_SPREAD_DOCUMENT_READ');
 }
 
 /**
@@ -1266,7 +1269,16 @@ function digiriskSafetyTalkSendSignatureLinks(DoliDB $db, Task $talk, User $user
             $result['sent'][] = $sendTo;
         } else {
             $result['failed'][] = doliletter_spread_get_signatory_name($signatory);
-            $result['error']    = dol_string_nohtmltag((string) $mailFile->error, 1);
+            // The reason in plain words; the raw error of the mail server, written to the log, is only shown
+            // to an administrator, who can act on it
+            $result['error'] = dol_string_nohtmltag((string) $mailFile->error, 1);
+            if (function_exists('saturne_get_mail_failure')) {
+                $failure         = saturne_get_mail_failure($mailFile, $sendTo);
+                $result['error'] = $failure['reason'];
+                if (dol_strlen($failure['detail']) && !empty($user->admin)) {
+                    $result['error'] .= ' ' . $langs->transnoentities('MailFailureTechnicalDetail', $failure['detail']);
+                }
+            }
         }
     }
 

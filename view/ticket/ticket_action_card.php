@@ -30,6 +30,12 @@ if (!defined('FORCE_CKEDITOR')) {
     define('FORCE_CKEDITOR', 1);
 }
 
+// A kanban board fetched by its tab (#5762) is one more read of this page: it must not renew the CSRF token that the
+// page shown holds, which MAIN_SECURITY_CSRF_TOKEN_RENEWAL_ON_EACH_CALL would do
+if (!empty($_GET['kanban_board']) && !defined('NOTOKENRENEWAL')) {
+    define('NOTOKENRENEWAL', 1);
+}
+
 if (file_exists('../digiriskdolibarr.main.inc.php')) {
     require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
 } elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
@@ -362,6 +368,80 @@ if ($action == 'updateTicketSubject' && !empty(GETPOSTINT('ticket_id'))) {
         dol_syslog('ticket_action_card.php updateTicketSubject: ticket not found ticketId=' . $ticketId, LOG_ERR);
         http_response_code(404);
         print json_encode(['success' => 0, 'error' => 'Ticket not found']);
+    }
+    $db->close();
+    exit;
+}
+
+// AJAX: quick close from the percentage of a kanban card or the state of a row of the list of the registers, the way the
+// to-do board of ReedCRM closes an event (js/modules/ticket_quick_close.js). At 100 % the ticket is closed as the
+// closing button of its card does it (progress 100, closing date, TICKET_CLOSE trigger), below only its progress
+// changes. The comment is added to the ticket as a private message
+if ($action == 'quickCloseTicket' && !empty(GETPOSTINT('ticket_id'))) {
+    header('Content-Type: application/json');
+
+    $ticketId = GETPOSTINT('ticket_id');
+    $progress = GETPOSTISSET('progress') ? min(100, max(0, GETPOSTINT('progress'))) : 100;
+    $comment  = trim(GETPOST('comment', 'restricthtml'));
+
+    $ticketToUpdate = new Ticket($db);
+    if (!$permissionToWrite) {
+        http_response_code(403);
+        print json_encode(['success' => 0, 'error' => $langs->transnoentities('NotEnoughPermissions')]);
+    } elseif ($ticketToUpdate->fetch($ticketId) <= 0) {
+        dol_syslog('ticket_action_card.php quickCloseTicket: ticket not found ticketId=' . $ticketId, LOG_ERR);
+        http_response_code(404);
+        print json_encode(['success' => 0, 'error' => $langs->transnoentities('ErrorRecordNotFound')]);
+    } elseif (in_array((int) $ticketToUpdate->status, [Ticket::STATUS_CLOSED, Ticket::STATUS_CANCELED], true)) {
+        // Closed from another tab or by someone else since the board was loaded
+        http_response_code(409);
+        print json_encode(['success' => 0, 'error' => $langs->transnoentities('TicketQuickCloseAlreadyClosed')]);
+    } else {
+        $closing = $progress === 100;
+        $error   = 0;
+
+        $db->begin();
+
+        if ($closing) {
+            // Same default as the closing form of the ticket card: the third party is told only when the setup asks for it
+            $ticketToUpdate->context['contact_id'] = getDolGlobalString('TICKET_NOTIFY_AT_CLOSING') ? -2 : -3;
+            $result = $ticketToUpdate->close($user);
+        } else {
+            $result = $ticketToUpdate->setProgression($progress);
+        }
+        if ($result <= 0) {
+            $error++;
+        }
+
+        // After the closing, whose emails would otherwise carry the comment as the message of the ticket
+        if (!$error && $comment !== '') {
+            $ticketToUpdate->message = $comment;
+            $ticketToUpdate->private = '1';
+            if ($ticketToUpdate->createTicketMessage($user) <= 0) {
+                $error++;
+            }
+        }
+
+        if (!$error) {
+            $db->commit();
+            createTicketKanbanEvent($db, $user, $ticketToUpdate, 'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_STATUS',
+                $langs->transnoentities($closing ? 'TicketQuickCloseLogClosed' : 'TicketQuickCloseLogProgress'),
+                $langs->transnoentities('TicketQuickCloseLogNote', $progress . ' %'));
+            // The list of the registers shows the new state with the badge of its column
+            print json_encode([
+                'success'     => 1,
+                'progress'    => $progress,
+                'status'      => $closing ? Ticket::STATUS_CLOSED : (int) $ticketToUpdate->status,
+                'status_html' => $ticketToUpdate->getLibStatut(5),
+                'closed'      => $closing ? 1 : 0
+            ]);
+        } else {
+            $db->rollback();
+            $errorMessage = $ticketToUpdate->error ?: implode(', ', $ticketToUpdate->errors ?: []);
+            dol_syslog('ticket_action_card.php quickCloseTicket: failed ticketId=' . $ticketId . ' - ' . $errorMessage, LOG_ERR);
+            http_response_code(500);
+            print json_encode(['success' => 0, 'error' => $errorMessage ?: $langs->transnoentities('TicketQuickCloseError')]);
+        }
     }
     $db->close();
     exit;

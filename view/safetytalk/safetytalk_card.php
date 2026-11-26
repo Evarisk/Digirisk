@@ -240,7 +240,8 @@ if ($action == 'send_links' && $id > 0 && $permissiontoadd) {
         setEventMessages($langs->trans('SafetyTalkLinksNotSent', implode(', ', $sendResult['failed'])), [], 'warnings');
     }
     if (dol_strlen($sendResult['error'])) {
-        setEventMessages($sendResult['error'], [], 'errors');
+        // Plain text: an error of the mail server may quote an address between angle brackets
+        setEventMessages(dol_escape_htmltag($sendResult['error']), [], 'errors');
     } elseif (empty($sendResult['sent']) && empty($sendResult['failed'])) {
         setEventMessages($langs->trans('SafetyTalkLinksNothingToSend'), []);
     }

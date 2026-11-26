@@ -373,6 +373,61 @@ function digiriskdolibarr_ticket_count_actions(array $actionsByType): array
 }
 
 /**
+ * Return the tasks of a ticket that are no corrective or preventive action: the tasks added under its parent task
+ * "TKP-<ref>" before the actions existed (#4881)
+ *
+ * The rows have the columns of digiriskdolibarr_get_actions_by_type(), so that the ticket card lists both the same way.
+ *
+ * @param  DoliDB                           $db            Database handler
+ * @param  int                              $parentTaskId  Parent task of the ticket, from digiriskdolibarr_ticket_get_parent_task()
+ * @param  array<int, array<int, stdClass>> $actionsByType Actions of each type, from digiriskdolibarr_ticket_get_actions()
+ * @return array<int, stdClass>                            Other tasks of the ticket
+ */
+function digiriskdolibarr_ticket_get_other_tasks(DoliDB $db, int $parentTaskId, array $actionsByType): array
+{
+    require_once __DIR__ . '/digiriskdolibarr_action.lib.php';
+
+    $results = [];
+    if ($parentTaskId <= 0) {
+        return $results;
+    }
+
+    // The containers of the actions and the actions themselves, even those left directly under the parent task
+    $excludedIds = [0];
+    foreach ($actionsByType as $type => $actions) {
+        $excludedIds[] = digiriskdolibarr_get_action_container_task($db, $parentTaskId, (int) $type);
+        foreach ($actions as $action) {
+            $excludedIds[] = (int) $action->rowid;
+        }
+    }
+
+    $sql  = 'SELECT t.rowid, t.ref, t.label, t.datec, t.dateo, t.datee, t.progress, t.fk_statut, t.budget_amount,';
+    $sql .= ' u2.rowid AS user_id, CONCAT(u2.firstname, \' \', u2.lastname) AS user_fullname';
+    $sql .= ' FROM ' . MAIN_DB_PREFIX . 'projet_task t';
+    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'user u2 ON u2.rowid = (';
+    $sql .= '  SELECT ec2.fk_socpeople FROM ' . MAIN_DB_PREFIX . 'element_contact ec2';
+    $sql .= '  INNER JOIN ' . MAIN_DB_PREFIX . 'c_type_contact ctc2';
+    $sql .= '   ON ctc2.rowid = ec2.fk_c_type_contact';
+    $sql .= '   AND ctc2.code = \'TASKEXECUTIVE\' AND ctc2.element = \'project_task\'';
+    $sql .= '  WHERE ec2.element_id = t.rowid ORDER BY ec2.rowid ASC LIMIT 1)';
+    $sql .= ' WHERE t.fk_task_parent = ' . $parentTaskId;
+    $sql .= '   AND t.rowid NOT IN (' . implode(',', array_unique($excludedIds)) . ')';
+    $sql .= ' ORDER BY t.datee ASC, t.rowid ASC';
+
+    $resql = $db->query($sql);
+    if ($resql) {
+        while ($obj = $db->fetch_object($resql)) {
+            $results[] = $obj;
+        }
+        $db->free($resql);
+    } else {
+        dol_syslog(__FUNCTION__ . ': ' . $db->lasterror(), LOG_ERR);
+    }
+
+    return $results;
+}
+
+/**
  * Fields of the QQOQCCP analysis of a ticket (#5549): ticket extrafields, hidden from the native card, shown by the
  * QQOQCCP tab and its document, in the order of the method. Who is a list of users, the six others are free text.
  *
@@ -1128,27 +1183,43 @@ function digiriskdolibarr_ticket_public_interface_url(): string
  * code stays out of temp/, which Saturne empties after each ODT document, and out of ticketqrcode/, which
  * the ticket setup shows whole.
  *
- * @param  string $url Address to encode
- * @return string      Path of the PNG image, empty when it could not be drawn
+ * The copy goes under a name of its own: ticketqrcode.png was shared by the generations running at the same time, one
+ * took the code of another or lost it. Given a generator, the copy is one of its temporary files, deleted when the
+ * generation ends; without, the caller deletes it once drawn. For the same reason the code is drawn under a name of
+ * its own, then renamed: a generation never copies a code another one is still drawing.
+ *
+ * @param  string                    $url       Address to encode
+ * @param  SaturneDocumentModel|null $generator ODT generator running, null for a file the caller deletes
+ * @return string                               Path of the PNG image, empty when it could not be drawn
+ * @throws Exception
  */
-function digiriskdolibarr_ticket_qrcode_file(string $url): string
+function digiriskdolibarr_ticket_qrcode_file(string $url, ?SaturneDocumentModel $generator = null): string
 {
     global $conf;
 
     require_once __DIR__ . '/digiriskdolibarr_mobile.lib.php';
 
     $outputDir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?: 1];
-    $filePath  = $outputDir . '/temp/ticketqrcode.png';
-    $drawnDir  = $outputDir . '/qrcodecache';
-    $drawn     = $drawnDir . '/ticketqrcode_' . md5($url . '|' . (int) @filemtime(__DIR__ . '/digiriskdolibarr_mobile.lib.php')) . '.png';
+    $tempDir   = $outputDir . '/temp/';
+    if ($generator !== null) {
+        $filePath = $generator->getTempFilePath($tempDir, 'ticketqrcode', 'png');
+    } else {
+        $filePath = $tempDir . 'ticketqrcode_' . uniqid() . bin2hex(random_bytes(4)) . '.png';
+    }
+    $drawnDir = $outputDir . '/qrcodecache';
+    $drawn    = $drawnDir . '/ticketqrcode_' . md5($url . '|' . (int) @filemtime(__DIR__ . '/digiriskdolibarr_mobile.lib.php')) . '.png';
 
     if (!is_file($drawn)) {
         // Codes of an address or a drawing replaced since
         foreach (glob($drawnDir . '/ticketqrcode_*.png') ?: [] as $staleFile) {
             @unlink($staleFile);
         }
-        if (!digiriskGetQrCodePng($url, $drawn)) {
-            return '';
+        $drawing = $drawnDir . '/drawing_' . uniqid() . bin2hex(random_bytes(4)) . '.png';
+        if (!digiriskGetQrCodePng($url, $drawing) || !@rename($drawing, $drawn)) {
+            @unlink($drawing);
+            if (!is_file($drawn)) {
+                return '';
+            }
         }
     }
 

@@ -268,9 +268,10 @@ class Risk extends SaturneObject
         // settings, the risks of the unit, the inherited ones and the shared ones. The setting lost
         // its last reader when this collection was standardised on loadRiskInfos() - issue #5120.
         // Only for a document scoped on one element: the risk assessment document passes no element
-        // filter and already lists every risk of the entity.
+        // filter and already lists every risk of the entity. The models with tables of their own for
+        // inherited and shared risks (includeInheritedAndShared) printed them twice - issue #5739
         $array['inheritedDigiriskElements'] = [];
-        if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS') && ($moreParam['object'] ?? null) instanceof DigiriskElement) {
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS') && ($moreParam['object'] ?? null) instanceof DigiriskElement && empty($moreParam['includeInheritedAndShared'])) {
             $inherited = $this->fetchInheritedRisks($moreParam, $join, $select, $moreSelects);
             if (!empty($inherited['risks'])) {
                 // Both sides are keyed by risk id, so a risk reachable twice is kept once. The
@@ -889,6 +890,28 @@ class Risk extends SaturneObject
             return [];
         }
         return $riskSubCategories[0];
+    }
+
+    /**
+     * SQL condition true when a psychosocial risk is the consolidated risk of its work unit
+     *
+     * Before the consolidated block, a psychosocial risk was a risk like any other: several per
+     * work unit, each one with its own description and assessed with the standard or advanced
+     * cotation. Such a risk is never the consolidated risk of its unit, which is only a risk whose
+     * latest assessment uses the "rps" method, or a risk not assessed yet. Without this condition
+     * the oldest of those risks was taken for the consolidated one: hidden from the risk list with
+     * all its siblings, and overwritten by the next assessment of the block.
+     *
+     * Only meaningful on a psychosocial risk without factor (sub_category empty or -1).
+     *
+     * @param  string $alias Alias of the risk table in the query
+     * @return string        SQL condition
+     */
+    public static function getConsolidatedPsychosocialSqlCondition(string $alias = 'r'): string
+    {
+        return "COALESCE((SELECT ra_last.method FROM " . MAIN_DB_PREFIX . "digiriskdolibarr_riskassessment ra_last"
+            . " WHERE ra_last.fk_risk = " . $alias . ".rowid AND ra_last.status > 0"
+            . " ORDER BY ra_last.rowid DESC LIMIT 1), 'rps') = 'rps'";
     }
 
     /**

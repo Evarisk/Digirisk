@@ -342,6 +342,57 @@ if (empty($deletedElements)) {
     $deletedElements = [0];
 }
 
+// RPS : la qualification d'une unite de travail se prend sur sa ligne ci-dessous, ou pour plusieurs
+// unites au niveau 0 (onglet Risques psychosociaux de la societe, view/digiriskstandard/
+// digiriskstandard_psychosocial.php), et commande ensuite l'affichage du risque psychosocial de l'unite.
+require __DIR__ . '/digiriskdolibarr_rps_scope_data.tpl.php';
+
+// RPS : lignes psychosociales retirees de la liste. Elles sont ecartees par la requete elle-meme,
+// pour que la pagination et le total ne comptent que les lignes affichees.
+// - Un risque portant un facteur - un par critere avec la grille RPS-DU, un par facteur avec
+//   "Faire le point" - est le detail d'une evaluation : il se lit dans le bloc psychosocial.
+// - Le risque consolide d'une unite n'apparait que si l'unite est declaree concernee, et une seule
+//   fois : les doublons nes de clics repetes ne reviennent pas encombrer la liste.
+// - Les risques psychosociaux saisis avant le bloc consolide, chacun avec sa description et sa
+//   cotation standard ou avancee, sont des risques comme les autres : ils restent listes.
+$rpsHiddenRiskIds = [];
+$sqlRpsHidden     = 'SELECT r.rowid, r.fk_element, r.sub_category,';
+$sqlRpsHidden    .= ' CASE WHEN ' . Risk::getConsolidatedPsychosocialSqlCondition('r') . ' THEN 1 ELSE 0 END AS consolidated';
+$sqlRpsHidden    .= ' FROM ' . MAIN_DB_PREFIX . $risk->table_element . ' as r';
+$sqlRpsHidden    .= ' WHERE r.entity IN (' . getEntity($risk->element) . ')';
+$sqlRpsHidden    .= ' AND r.category = ' . (int) Risk::PSYCHOSOCIAL_CATEGORY_POSITION;
+$sqlRpsHidden    .= " AND r.type = '" . $db->escape($riskType) . "'";
+$sqlRpsHidden    .= ' AND r.status <> ' . Risk::STATUS_DELETED;
+if ($search['status'] === '' || $search['status'] == -1) {
+    $sqlRpsHidden .= ' AND r.status <> ' . Risk::STATUS_ARCHIVED;
+}
+if (!$allRisks) {
+    $sqlRpsHidden .= ' AND r.fk_element = ' . (int) $id;
+}
+// Le plus ancien risque consolide est celui que le bloc psychosocial reprend a chaque evaluation
+$sqlRpsHidden .= ' ORDER BY r.rowid ASC';
+
+$resqlRpsHidden = $db->query($sqlRpsHidden);
+if ($resqlRpsHidden) {
+    $rpsRowShownFor = [];
+    while ($objRpsHidden = $db->fetch_object($resqlRpsHidden)) {
+        $rpsElementId   = (int) $objRpsHidden->fk_element;
+        $rpsSubCategory = ($objRpsHidden->sub_category === null || $objRpsHidden->sub_category === '') ? Risk::SUB_CATEGORY_NOT_SPECIFIED : (int) $objRpsHidden->sub_category;
+
+        if ($rpsSubCategory < 0 && empty($objRpsHidden->consolidated)) {
+            continue;
+        }
+
+        // Le tableau n'est renseigne que pour les unites de travail : un groupement n'est pas filtre
+        if ($rpsSubCategory >= 0 || (isset($rpsStateByUnit[$rpsElementId]) && $rpsStateByUnit[$rpsElementId] !== 1) || !empty($rpsRowShownFor[$rpsElementId])) {
+            $rpsHiddenRiskIds[] = (int) $objRpsHidden->rowid;
+            continue;
+        }
+        $rpsRowShownFor[$rpsElementId] = 1;
+    }
+    $db->free($resqlRpsHidden);
+}
+
 // Build and execute select
 // --------------------------------------------------------------------
 // A sort on a field of the assessments joins the last validated assessment of each risk, see Risk::getListSortSql()
@@ -394,6 +445,9 @@ $sql .= ' AND r.status <> ' . Risk::STATUS_DELETED;
 // unless the status filter explicitly asks for them
 if ($search['status'] === '' || $search['status'] == -1) {
     $sql .= ' AND r.status <> ' . Risk::STATUS_ARCHIVED;
+}
+if (!empty($rpsHiddenRiskIds)) {
+    $sql .= ' AND r.rowid NOT IN (' . implode(',', $rpsHiddenRiskIds) . ')';
 }
 
 foreach ($search as $key => $val) {
@@ -854,10 +908,7 @@ $varpage  = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 $selectedfields  = $form->multiSelectArrayWithCheckbox('risklist_selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 $selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
 
-// RPS : la qualification d'une unite de travail se prend sur sa ligne ci-dessous, ou pour plusieurs
-// unites au niveau 0 (onglet Risques psychosociaux de la societe, view/digiriskstandard/
-// digiriskstandard_psychosocial.php), et commande ensuite l'affichage du risque psychosocial de l'unite.
-require __DIR__ . '/digiriskdolibarr_rps_scope_data.tpl.php';
+// RPS : $rpsLines et $rpsStateByUnit viennent de digiriskdolibarr_rps_scope_data.tpl.php, inclus avant la requete
 if (isset($object) && $object->element == 'digiriskelement' && isset($rpsStateByUnit[(int) $object->id])) {
     // Unite de travail : sa ligne psychosociale, evaluable sur place si elle est concernee,
     // sinon un bandeau de sa qualification, modifiable sur place
@@ -994,7 +1045,6 @@ print '</tr>' . "\n";
 // contenu
 $i               = 0;
 $totalarray      = array('nbfield' => 0);
-$rpsRowShownFor  = [];
 
 while ($i < ($limit ? min($num, $limit) : $num)) {
     $obj = $db->fetch_object($resql);
@@ -1004,33 +1054,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
     // Store properties in $risk
     $risk->setVarsFromFetchObj($obj);
 
-    // RPS : la liste des risques ne montre jamais plus d'une ligne psychosociale par unite.
-    // Les risques portant un facteur - un par critere avec la grille RPS-DU, un par facteur
-    // avec "Faire le point" - sont le detail de l'evaluation, pas des risques a lister : ils
-    // se lisent dans le bloc psychosocial. Seul le risque consolide, celui qui ne porte pas de
-    // facteur, reste dans la liste, et seulement si l'unite est declaree concernee.
-    if ($risk->category == Risk::PSYCHOSOCIAL_CATEGORY_POSITION) {
-        $rpsSubCategory = ($risk->sub_category === null || $risk->sub_category === '') ? -1 : (int) $risk->sub_category;
-
-        if ($rpsSubCategory >= 0) {
-            $i++;
-            continue;
-        }
-
-        // Le tableau n'est renseigne que pour les unites de travail : un groupement n'est pas filtre
-        if (isset($rpsStateByUnit[(int) $object->id]) && $rpsStateByUnit[(int) $object->id] !== 1) {
-            $i++;
-            continue;
-        }
-
-        // Une ligne psychosociale au maximum par element : les doublons nes de clics repetes
-        // sur les anciennes methodes d'ajout ne reviennent pas encombrer la liste.
-        if (!empty($rpsRowShownFor[(int) $risk->fk_element])) {
-            $i++;
-            continue;
-        }
-        $rpsRowShownFor[(int) $risk->fk_element] = 1;
-    }
+    // Les lignes psychosociales a ne pas lister sont deja ecartees par la requete ($rpsHiddenRiskIds)
 
     // Show here line of result
     print '<tr class="oddeven risk-row risk_row_' . $risk->id . ' risk-row-content-' . $risk->id . '" id="risk_row_' . $risk->id . '">';

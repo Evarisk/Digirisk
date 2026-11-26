@@ -72,8 +72,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '23.7.0';
-		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
+		$this->version     = '23.10.0';
+		$this->picto       = 'digiriskdolibarr_color@digiriskdolibarr';
 	}
 
 	/**
@@ -353,7 +353,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
             case 'ACCIDENTINVESTIGATION_VALIDATE' :
             case 'FIREPERMIT_PENDINGSIGNATURE' :
 			case 'PREVENTIONPLAN_PENDINGSIGNATURE' :
-				$actioncomm->label = $langs->transnoentities('ObjectValidateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				// A validation trigger runs before the object takes its final ref, kept meanwhile in newref, as in Dolibarr core:
+				// the event is labelled with it, not with the (PROVn) one
+				$objectRef = (preg_match('/_VALIDATE$/', $action) && !empty($object->newref)) ? $object->newref : $object->ref;
+
+				$actioncomm->label = $langs->transnoentities('ObjectValidateTrigger', $langs->transnoentities(ucfirst($object->element)), $objectRef);
 
 				$result = $actioncomm->create($user);
 				break;
@@ -894,6 +898,19 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
         if (in_array($action, $permitTriggers) && $object->id > 0) {
             $this->refreshFirePermitDocument((int) $object->id, $user, $langs);
+
+            return;
+        }
+
+        // Signature d'une personne de la diffusion DoliLetter : le document liste les personnes qui ont
+        // signe, il est donc regenere a chacune. L'evenement porte la feuille d'emargement, dont
+        // object_type / fk_object designent l'objet diffuse.
+        if ($action === 'SPREAD_SIGN' && isset($object->object_type) && !empty($object->fk_object)) {
+            if ($object->object_type === 'digiriskdolibarr_preventionplan') {
+                $this->refreshPreventionPlanDocument((int) $object->fk_object, $user, $langs);
+            } elseif ($object->object_type === 'digiriskdolibarr_firepermit') {
+                $this->refreshFirePermitDocument((int) $object->fk_object, $user, $langs);
+            }
 
             return;
         }

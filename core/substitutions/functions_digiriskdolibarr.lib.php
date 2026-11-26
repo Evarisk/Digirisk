@@ -129,8 +129,9 @@ function digiriskdolibarr_completesubstitutionarray(array &$substitutionarray, T
 
             $substitutionarray['referant_harcelement_250_nom']       = $informationssharing->harassment_officer->name;
             $substitutionarray['referant_harcelement_250_telephone'] = $informationssharing->harassment_officer->phone;
-            $substitutionarray['referant_harcelement_nom']           = $informationssharing->harassment_officer_cse->name;
-            $substitutionarray['referant_harcelement_telephone']     = $informationssharing->harassment_officer_cse->phone;
+            // Absent when no ESC harassment officer is set, or when the ESC is not one of the staff representative bodies
+            $substitutionarray['referant_harcelement_nom']           = $informationssharing->harassment_officer_cse->name ?? '';
+            $substitutionarray['referant_harcelement_telephone']     = $informationssharing->harassment_officer_cse->phone ?? '';
 
             $substitutionarray['membres_du_comite_entreprise_date']       = dol_print_date($informationssharing->membres_du_comite_entreprise_date, 'day');
             $substitutionarray['membres_du_comite_entreprise_titulaires'] = dol_htmlentitiesbr_decode(strip_tags($informationssharing->membres_du_comite_entreprise_titulaires, '<br>'));

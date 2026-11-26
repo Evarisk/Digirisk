@@ -139,10 +139,11 @@ if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && empty($conf->global->DIGIR
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_PROJECT_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
 }
 
-// Backward compatibility : the project creation below used to overwrite this menu entry with the project task
-// list, which hid the Kanban view added in 23.1.0. The Kanban page resolves the project by itself, so the URL
-// declared by the module descriptor is restored once, on the entity being visited.
-if (empty($conf->global->DIGIRISKDOLIBARR_DU_ACTIONPLAN_MENU_URL_BACKWARD_COMPATIBILITY)) {
+// Backward compatibility : the project creation below (until #5228) and the PAPRIPACT setup page (until #5765)
+// overwrote this menu entry with the project task list, which hid the Kanban view added in 23.1.0. The Kanban page
+// resolves the project by itself, so the URL declared by the module descriptor is restored once, on the entity being
+// visited. Value 2 replays the repair on the entities already set to 1 and broken again by the setup page.
+if (getDolGlobalInt('DIGIRISKDOLIBARR_DU_ACTIONPLAN_MENU_URL_BACKWARD_COMPATIBILITY') < 2) {
 	$sql  = "UPDATE " . MAIN_DB_PREFIX . "menu SET";
 	$sql .= " url = '/digiriskdolibarr/view/digiriskstandard/actionplan_list.php?view=kanban'";
 	$sql .= " WHERE leftmenu = 'digiriskactionplan'";
@@ -154,7 +155,7 @@ if (empty($conf->global->DIGIRISKDOLIBARR_DU_ACTIONPLAN_MENU_URL_BACKWARD_COMPAT
 		return -1;
 	}
 
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_ACTIONPLAN_MENU_URL_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_ACTIONPLAN_MENU_URL_BACKWARD_COMPATIBILITY', 2, 'integer', 0, '', $conf->entity);
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) {
