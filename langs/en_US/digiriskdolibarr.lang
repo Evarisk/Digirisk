@@ -935,6 +935,15 @@ RiskAssessmentDocumentDescription                         = Risk assessment docu
 ErrorFailToFetchDigiriskElements                          = Error: unable to retrieve the groupings and work units to include in the ZIP archive
 ErrorNoDocumentModelFound                                 = Error: no document template available for <b>%s</b>
 ErrorFailToGenerateDigiriskElementDocument                = Error: the document generation for <b>%s</b> failed, it is missing from the ZIP archive
+RiskAssessmentDocumentGenerationListing                   = Listing the groupings and work units of the archive…
+RiskAssessmentDocumentGenerationSheets                    = Sheet %s of %s
+RiskAssessmentDocumentGenerationArchive                   = Risk assessment document and ZIP archive
+RiskAssessmentDocumentGenerationDocument                  = Generating the risk assessment document…
+RiskAssessmentDocumentGenerationStop                      = Stop
+RiskAssessmentDocumentGenerationStopping                  = Stopping after the current sheet…
+RiskAssessmentDocumentGenerationStopped                   = Generation stopped: the risk assessment document was not generated
+RiskAssessmentDocumentGenerationFailed                    = Generation interrupted by an error: the risk assessment document was not generated
+RiskAssessmentDocumentGenerationUnexpected                = Unexpected answer from the server (HTTP %s)
 
 # Boxes - Widget
 NextGenerateDate  = Next generation

@@ -937,6 +937,15 @@ RiskAssessmentDocumentDescription                         = Plan d'action Docume
 ErrorFailToFetchDigiriskElements                          = Erreur : impossible de récupérer les groupements et unités de travail à inclure dans l'archive ZIP
 ErrorNoDocumentModelFound                                 = Erreur : aucun modèle de document disponible pour <b>%s</b>
 ErrorFailToGenerateDigiriskElementDocument                = Erreur : la génération du document de <b>%s</b> a échoué, il est absent de l'archive ZIP
+RiskAssessmentDocumentGenerationListing                   = Liste des groupements et unités de travail de l'archive…
+RiskAssessmentDocumentGenerationSheets                    = Fiche %s sur %s
+RiskAssessmentDocumentGenerationArchive                   = Document unique et archive ZIP
+RiskAssessmentDocumentGenerationDocument                  = Génération du Document unique…
+RiskAssessmentDocumentGenerationStop                      = Arrêter
+RiskAssessmentDocumentGenerationStopping                  = Arrêt après la fiche en cours…
+RiskAssessmentDocumentGenerationStopped                   = Génération arrêtée : le Document unique n'a pas été généré
+RiskAssessmentDocumentGenerationFailed                    = Génération interrompue par une erreur : le Document unique n'a pas été généré
+RiskAssessmentDocumentGenerationUnexpected                = Réponse inattendue du serveur (HTTP %s)
 
 # Boxes - Widget
 NextGenerateDate  = Prochain génération
