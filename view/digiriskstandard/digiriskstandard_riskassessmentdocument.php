@@ -199,6 +199,8 @@ if (empty($resHook)) {
         $moreparams['objectType'] = 'riskassessment';
         $moreparams['uploadDir']  = $upload_dir;
         $moreparams['digiriskElement'] = $digiriskelement;
+        // Sheets the generation modal generated just before, one request each: the archive takes them as they are
+        $moreparams['digiriskElementDocuments'] = GETPOST('digiriskelementdocuments', 'array:alphanohtml');
 
         $result = $document->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
         if ($result <= 0) {
@@ -349,6 +351,12 @@ if ($object->id > 0) {
         $urlSource =  $_SERVER['PHP_SELF'] .'?id=' . $object->id;
 
         print saturne_show_documents($object->module . ':RiskAssessmentDocument', $document->element, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, '', '', '', $langs->defaultlang, '', $object);
+
+        if ($permissiontoadd) {
+            $generationUrl  = dol_buildpath('/digiriskdolibarr/core/ajax/riskassessmentdocument_generation.php', 1);
+            $archiveEnabled = getDolGlobalInt('DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS');
+            require_once __DIR__ . '/../../core/tpl/digiriskdocuments/digiriskdolibarr_riskassessmentdocument_generation_modal.tpl.php';
+        }
     }
 
     // Select mail models is same action as presend

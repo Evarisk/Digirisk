@@ -108,9 +108,78 @@ class RiskAssessmentDocument extends DigiriskDocuments
 	}
 
     /**
+     * Return the model the sheet of each type of element is generated with in the ZIP archive: the default model of
+     * the type, the first one available when none is set
+     *
+     * @return array<string, string> Model by element type ('groupment', 'workunit'), empty if a type has no model
+     */
+    public function getDigiriskElementDocumentModels(): array
+    {
+        global $langs;
+
+        $models                        = [];
+        $digiriskElementDocumentLabels = ['groupment' => 'GroupmentDocument', 'workunit' => 'WorkUnitDocument'];
+        foreach ($digiriskElementDocumentLabels as $digiriskElementObject => $digiriskElementDocumentLabel) {
+            $modelList = saturne_get_list_of_models($this->db, $digiriskElementObject . 'document');
+            if (!is_array($modelList) || empty($modelList)) {
+                $this->error = $langs->trans('ErrorNoDocumentModelFound', $langs->transnoentities($digiriskElementDocumentLabel));
+                return [];
+            }
+
+            $model        = '';
+            $defaultModel = getDolGlobalString(dol_strtoupper($this->module) . '_' . dol_strtoupper($digiriskElementObject . 'document') . '_DEFAULT_MODEL');
+            if (!dol_strlen($defaultModel)) {
+                $model = key($modelList);
+            } else {
+                foreach ($modelList as $modelKey => $modelLabel) {
+                    if (strpos($modelKey, $defaultModel) !== false) {
+                        $model = $modelKey;
+                    }
+                }
+            }
+            $models[$digiriskElementObject] = str_replace($digiriskElementObject . 'document_custom_odt', $digiriskElementObject . 'document_odt', $model);
+        }
+
+        return $models;
+    }
+
+    /**
+     * Generate the sheet of a groupment or a workunit, with the model of its type in the ZIP archive
+     *
+     * @param  DigiriskElement       $digiriskElement Groupment or workunit
+     * @param  array<string, string> $models          Model by element type, from getDigiriskElementDocumentModels()
+     * @param  Translate             $outputLangs     Lang object to use for output
+     * @param  int                   $hideDetails     Do not show line details
+     * @param  int                   $hideDesc        Do not show desc
+     * @param  int                   $hideRef         Do not show ref
+     * @return string                                 Name of the generated file in the folder of the element, empty if KO
+     * @throws Exception
+     */
+    public function generateDigiriskElementDocument(DigiriskElement $digiriskElement, array $models, Translate $outputLangs, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0): string
+    {
+        global $langs, $user;
+
+        $digiriskElementDocument          = new DigiriskDocuments($this->db, $this->module, $digiriskElement->element_type . 'document');
+        $digiriskElementDocument->element = $digiriskElement->element_type . 'document';
+
+        $moreParams = ['object' => $digiriskElement, 'zone' => 'private', 'user' => $user];
+
+        $result = $digiriskElementDocument->generateDocument($models[$digiriskElement->element_type] ?? '', $outputLangs, $hideDetails, $hideDesc, $hideRef, $moreParams);
+        if ($result <= 0 || !dol_strlen($digiriskElementDocument->last_main_doc)) {
+            // Only the document object knows the underlying cause (numbering conflict, missing ODT template, ...)
+            $this->error  = $langs->trans('ErrorFailToGenerateDigiriskElementDocument', $digiriskElement->ref . ' - ' . $digiriskElement->label);
+            $this->errors = array_filter(array_merge([$digiriskElementDocument->error], (array) $digiriskElementDocument->errors));
+            return '';
+        }
+
+        return $digiriskElementDocument->last_main_doc;
+    }
+
+    /**
      * Generate a ZIP archive with the risk assessment document and all the groupment/workunit documents
      *
-     * @param  array     $moreparams  More parameters (digiriskElement, uploadDir, user)
+     * @param  array     $moreparams  More parameters (digiriskElement, uploadDir, user), and digiriskElementDocuments:
+     *                                sheets already generated, [element id => file name in the folder of the element]
      * @param  Translate $outputLangs Lang object to use for output
      * @param  int       $hideDetails Do not show line details
      * @param  int       $hideDesc    Do not show desc
@@ -120,7 +189,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
      */
     public function generateArchiveWithDigiriskElementDocuments($moreparams, $outputLangs, $hideDetails, $hideDesc, $hideRef)
     {
-        global $conf, $langs, $user;
+        global $conf, $langs;
 
         if (!getDolGlobalInt('DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS')) {
             return 0;
@@ -171,29 +240,13 @@ class RiskAssessmentDocument extends DigiriskDocuments
             }
         }
 
-        $digiriskElementObjects        = ['groupment', 'workunit'];
-        $digiriskElementDocumentLabels = ['groupment' => 'GroupmentDocument', 'workunit' => 'WorkUnitDocument'];
-        foreach ($digiriskElementObjects as $digiriskElementObject) {
+        $models = $this->getDigiriskElementDocumentModels();
+        if (empty($models)) {
+            return -1;
+        }
+
+        foreach (array_keys($models) as $digiriskElementObject) {
             $digiriskElementDocumentPaths[$digiriskElementObject] = $moreparams['uploadDir'] . '/' . $digiriskElementObject . 'document';
-
-            $modelLists[$digiriskElementObject] = saturne_get_list_of_models($this->db, $digiriskElementObject . 'document');
-            if (!is_array($modelLists[$digiriskElementObject]) || empty($modelLists[$digiriskElementObject])) {
-                $this->error = $langs->trans('ErrorNoDocumentModelFound', $langs->transnoentities($digiriskElementDocumentLabels[$digiriskElementObject]));
-                return -1;
-            }
-
-            $model[$digiriskElementObject] = '';
-            $defaultModel                  = getDolGlobalString(dol_strtoupper($this->module) . '_' . dol_strtoupper($digiriskElementObject . 'document') . '_DEFAULT_MODEL');
-            if (!dol_strlen($defaultModel)) {
-                $model[$digiriskElementObject] = key($modelLists[$digiriskElementObject]);
-            } else {
-                foreach ($modelLists[$digiriskElementObject] as $modelKey => $modelList) {
-                    if (strpos($modelKey, $defaultModel) !== false) {
-                        $model[$digiriskElementObject] = $modelKey;
-                    }
-                }
-            }
-            $model[$digiriskElementObject] = str_replace($digiriskElementObject . 'document_custom_odt', $digiriskElementObject . 'document_odt', $model[$digiriskElementObject]);
 
             $digiriskElementDocumentZipPaths[$digiriskElementObject] = $zipPath . '/' . $digiriskElementObject . 'document';
             $result                                                  = dol_mkdir($digiriskElementDocumentZipPaths[$digiriskElementObject]);
@@ -203,37 +256,35 @@ class RiskAssessmentDocument extends DigiriskDocuments
             }
         }
 
+        // Sheets the generation modal of the page generated just before, one request each: taken as they are instead
+        // of being generated again. A name that is not a file of the folder of its element is generated here
+        $generatedDocuments = (array) ($moreparams['digiriskElementDocuments'] ?? []);
+
         foreach ($digiriskElements as $digiriskElementSingle) {
-            $digiriskElementDocument = new DigiriskDocuments($this->db, $this->module, $digiriskElementSingle['object']->element_type . 'document');
+            $digiriskElement             = $digiriskElementSingle['object'];
+            $digiriskElementDocumentPath = $digiriskElementDocumentPaths[$digiriskElement->element_type] . '/' . $digiriskElement->ref;
 
-            $digiriskElementDocument->element = $digiriskElementSingle['object']->element_type . 'document';
+            $documentName = $generatedDocuments[$digiriskElement->id] ?? '';
+            if (!is_string($documentName) || !dol_strlen($documentName) || $documentName !== basename($documentName) || !is_file($digiriskElementDocumentPath . '/' . $documentName)) {
+                $documentName = $this->generateDigiriskElementDocument($digiriskElement, $models, $outputLangs, (int) $hideDetails, (int) $hideDesc, (int) $hideRef);
+                if (!dol_strlen($documentName)) {
+                    return -1;
+                }
+            }
 
-            $moreParams['object'] = $digiriskElementSingle['object'];
-            $moreParams['zone']   = 'private';
-            $moreParams['user']   = $user;
-
-            $result = $digiriskElementDocument->generateDocument($model[$digiriskElementSingle['object']->element_type], $outputLangs, $hideDetails, $hideDesc, $hideRef, $moreParams);
+            $result = dol_copy($digiriskElementDocumentPath . '/' . $documentName, $digiriskElementDocumentZipPaths[$digiriskElement->element_type] . '/' . $documentName);
             if ($result < 0) {
-                // Only the document object knows the underlying cause (numbering conflict, missing ODT template, ...)
-                $this->error  = $langs->trans('ErrorFailToGenerateDigiriskElementDocument', $digiriskElementSingle['object']->ref . ' - ' . $digiriskElementSingle['object']->label);
-                $this->errors = array_filter(array_merge([$digiriskElementDocument->error], (array) $digiriskElementDocument->errors));
+                $this->error = $langs->trans('ErrorFailToCopyFile', $digiriskElementDocumentPath . '/' . $documentName, $digiriskElementDocumentZipPaths[$digiriskElement->element_type] . '/' . $documentName);
                 return -1;
             }
 
-            $digiriskElementDocumentPath = $digiriskElementDocumentPaths[$digiriskElementSingle['object']->element_type] . '/' . $digiriskElementSingle['object']->ref;
-            $result                      = dol_copy($digiriskElementDocumentPath . '/' . $digiriskElementDocument->last_main_doc, $digiriskElementDocumentZipPaths[$digiriskElementSingle['object']->element_type] . '/' . $digiriskElementDocument->last_main_doc);
-            if ($result < 0) {
-                $this->error = $langs->trans('ErrorFailToCopyFile', $digiriskElementDocumentPath . '/' . $digiriskElementDocument->last_main_doc, $digiriskElementDocumentZipPaths[$digiriskElementSingle['object']->element_type] . '/' . $digiriskElementDocument->last_main_doc);
-                return -1;
-            }
-
-            // The sheet just generated, not the risk assessment document ($this): looking for the PDF
+            // The sheet of the element, not the risk assessment document ($this): looking for the PDF
             // of the latter in the folder of the element never found it - issue #5740
-            $fileName = pathinfo($digiriskElementDocument->last_main_doc, PATHINFO_FILENAME);
+            $fileName = pathinfo($documentName, PATHINFO_FILENAME);
             if (file_exists($digiriskElementDocumentPath . '/' . $fileName . '.pdf')) {
-                $result = dol_copy($digiriskElementDocumentPath . '/' . $fileName . '.pdf', $digiriskElementDocumentZipPaths[$digiriskElementSingle['object']->element_type] . '/' . $fileName . '.pdf');
+                $result = dol_copy($digiriskElementDocumentPath . '/' . $fileName . '.pdf', $digiriskElementDocumentZipPaths[$digiriskElement->element_type] . '/' . $fileName . '.pdf');
                 if ($result < 0) {
-                    $this->error = $langs->trans('ErrorFailToCopyFile', $digiriskElementDocumentPath . '/' . $fileName . '.pdf', $digiriskElementDocumentZipPaths[$digiriskElementSingle['object']->element_type] . '/' . $fileName . '.pdf');
+                    $this->error = $langs->trans('ErrorFailToCopyFile', $digiriskElementDocumentPath . '/' . $fileName . '.pdf', $digiriskElementDocumentZipPaths[$digiriskElement->element_type] . '/' . $fileName . '.pdf');
                     return -1;
                 }
             }
