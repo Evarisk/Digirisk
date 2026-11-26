@@ -846,10 +846,12 @@ function digiriskRiskOverviewCellRisks(array $row, string $tab, int $position, a
  * @param  array  $rpsLines                  Psychosocial lines of the work units, from digiriskdolibarr_rps_scope_data.tpl.php
  *                                           (which also declares rps_scope_band(), used here)
  * @param  array  $rpsSubCategories          Psychosocial factors F1 to F6, by position
+ * @param  bool   $withRisks                 False for the psychosocial assessment alone: the risk cells stay
+ *                                           empty, and the risks of the entity are not loaded a second time
  * @return array                             Rows, in the order of the tree
  * @throws Exception
  */
-function digiriskRiskOverviewRows(DoliDB $db, array $activeDigiriskElementList, array $rpsLines, array $rpsSubCategories): array
+function digiriskRiskOverviewRows(DoliDB $db, array $activeDigiriskElementList, array $rpsLines, array $rpsSubCategories, bool $withRisks = true): array
 {
     $rows = [];
     foreach (flatten_tree(recurse_tree(0, 0, $activeDigiriskElementList)) as $elementId => $node) {
@@ -880,9 +882,9 @@ function digiriskRiskOverviewRows(DoliDB $db, array $activeDigiriskElementList, 
     // and the risks themselves for the tooltip of the number
     $risk               = new Risk($db);
     $riskAssessment     = new RiskAssessment($db);
-    $riskInfos          = $risk->loadRiskInfos(['filterRisk' => " AND t.type = 'risk'"]);
+    $riskInfos          = $withRisks ? $risk->loadRiskInfos(['filterRisk' => " AND t.type = 'risk'"]) : [];
     $showAssessmentDate = getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE');
-    foreach ($riskInfos['current']['risks'] as $currentRisk) {
+    foreach ($riskInfos['current']['risks'] ?? [] as $currentRisk) {
         $elementId = (int) $currentRisk->fk_element;
         if (!isset($rows[$elementId])) {
             continue;

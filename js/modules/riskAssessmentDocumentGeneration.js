@@ -101,8 +101,13 @@ window.digiriskdolibarr.riskAssessmentDocumentGeneration.start = async function(
     generation.reset($modal);
     $modal.addClass('modal-active');
 
+    // The user guide and the CSE presentation go without the archive (RiskAssessmentDocument::MODELS_WITHOUT_ARCHIVE):
+    // no sheet to generate for them
+    const model       = String($form.find('[name="model"]').val() || '').split(':')[0];
+    const withArchive = parseInt($modal.attr('data-archive'), 10) === 1 && !JSON.parse($modal.attr('data-models-without-archive') || '[]').includes(model);
+
     let elements = [];
-    if (parseInt($modal.attr('data-archive'), 10) === 1) {
+    if (withArchive) {
         generation.setStatus($modal, $modal.attr('data-trans-listing'));
         try {
             const data = await generation.request($modal, {action: 'list'});
@@ -114,7 +119,7 @@ window.digiriskdolibarr.riskAssessmentDocumentGeneration.start = async function(
     }
 
     const $sheetSteps   = elements.map(element => generation.addStep($modal, element));
-    const $documentStep = generation.addStep($modal, {label: $modal.attr('data-label-document'), depth: 0});
+    const $documentStep = generation.addStep($modal, {label: $modal.attr(withArchive ? 'data-label-document' : 'data-label-document-alone'), depth: 0});
     const total         = elements.length + 1;
     const documents     = {};
 

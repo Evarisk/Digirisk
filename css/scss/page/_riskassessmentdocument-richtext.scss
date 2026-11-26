@@ -1,0 +1,172 @@
+@import "../theme/tokens";
+
+// Methodology, sources and important note on the risk assessment document card, laid out as in the PDF
+// document: numbered steps with their bullets, headings, dated entries and links (digiriskstandard_rich_text_html())
+.du-richtext {
+  max-width: 900px;
+  color: $dr-text-soft;
+  line-height: 1.55;
+
+  &__gap {
+    height: 10px;
+  }
+
+  &__step {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    & + & {
+      margin-top: 8px;
+    }
+  }
+
+  // Line from the number down along the bullets of the step
+  &__step--with-items::before {
+    content: '';
+    position: absolute;
+    top: 28px;
+    bottom: 3px;
+    left: 11px;
+    width: 2px;
+    border-radius: 1px;
+    background: rgba($dr-primary, 0.25);
+  }
+
+  &__step-number {
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: $dr-primary;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 24px;
+    text-align: center;
+
+    // A step without a number keeps a dot in the axis of the numbered ones
+    &--dot {
+      flex-basis: 10px;
+      width: 10px;
+      height: 10px;
+      margin: 7px;
+    }
+  }
+
+  &__step-body {
+    flex: 1;
+    min-width: 0;
+    padding-top: 2px;
+  }
+
+  &__step-title {
+    margin-bottom: 4px;
+    color: $dr-text;
+    font-weight: 700;
+  }
+
+  &__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      position: relative;
+      padding-left: 16px;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0.65em;
+        left: 3px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: $dr-primary;
+      }
+    }
+  }
+
+  &__step &__list li::before {
+    background: rgba($dr-primary, 0.45);
+  }
+
+  &__heading {
+    margin-top: 2px;
+    color: $dr-text;
+    font-weight: 700;
+  }
+
+  &__lead {
+    margin-bottom: 4px;
+    color: $dr-text;
+    font-weight: 600;
+  }
+
+  &__dated {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 3px 0;
+  }
+
+  &__date {
+    flex: none;
+    padding: 1px 8px;
+    border-radius: $dr-radius-pill;
+    background: $dr-primary-soft;
+    color: $dr-primary-strong;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  // A web address in a chip: external link icon, the site in bold, the rest of the address greyed
+  &__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    max-width: 100%;
+    margin: 2px 0;
+    padding: 3px 12px 3px 10px;
+    border: 1px solid $dr-border;
+    border-radius: $dr-radius-pill;
+    background: $dr-surface-soft;
+    color: $dr-text;
+    text-decoration: none;
+    transition: border-color $dr-transition, background-color $dr-transition;
+
+    &:hover {
+      border-color: rgba($dr-primary, 0.5);
+      background: $dr-primary-soft;
+    }
+  }
+
+  &__link-icon {
+    flex: none;
+    color: $dr-primary;
+    font-size: 11px;
+  }
+
+  &__link-host {
+    flex: none;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  &__link-path {
+    min-width: 0;
+    overflow: hidden;
+    color: $dr-muted;
+    font-size: 12px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+// The shared theme gives the links of the page its own colour and underline on hover
+#{$dr-scope} .du-richtext a.du-richtext__link {
+  color: $dr-text;
+  text-decoration: none;
+}

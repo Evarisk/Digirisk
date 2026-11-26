@@ -81,10 +81,10 @@ if ( $action == "edit" && $permissiontoadd ) {
 
 	// Disponibilité des plans
 	print '<tr>';
-	print '<td class="titlefield">' . $form->editfieldkey($langs->trans("SitePlans"), 'SitePlans', '', $object, 0) . '</td>';
+	print '<td class="titlefield">' . $langs->trans("SitePlans") . '</td>';
 	print '<td>';
-    print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessmentdocument/siteplans', 'small', '', 0, 0, 0, 200, 200, 0, 0, 0, 'riskassessmentdocument/siteplans', null, '', 0, 0);
-	print '<input class="flat" type="file" name="userfile[]" accept="image/*" id="SitePlans" />';
+	// Bloc média de Saturne : les plans s'ajoutent et se retirent tout de suite, sans le formulaire
+	print digiriskstandard_site_plan_media_block($permissiontoadd);
 	print '</td></tr>';
 } else {
     $userTmp = new User($db);
@@ -111,33 +111,28 @@ if ( $action == "edit" && $permissiontoadd ) {
     }
 	print '</td></tr>';
 
-	// Méthodologie
-	print '<tr>';
-	print '<td class="titlefield">' . $langs->trans("Method") . '</td>';
-	print '<td>';
-	print $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD;
-	print '</td></tr>';
-
-	// Sources
-	print '<tr>';
-	print '<td class="titlefield">' . $langs->trans("Sources") . '</td>';
-	print '<td>';
-	print $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES;
-	print '</td></tr>';
-
-	// Remarque Importante
-	print '<tr>';
-	print '<td class="titlefield">' . $langs->trans("ImportantNote") . '</td>';
-	print '<td>';
-	print $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES;
-	print '</td></tr>';
+	// Méthodologie, sources et remarque importante, mises en forme comme dans le DU en PDF : étapes
+	// numérotées, puces, intertitres, dates et liens. Les valeurs par défaut sont des clés de traduction
+	$richTextFields = [
+		'Method'        => 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD',
+		'Sources'       => 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES',
+		'ImportantNote' => 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES'
+	];
+	foreach ($richTextFields as $richTextLabel => $richTextConst) {
+		print '<tr>';
+		print '<td class="titlefield">' . $langs->trans($richTextLabel) . '</td>';
+		print '<td>';
+		print digiriskstandard_rich_text_html($langs->transnoentities(trim(getDolGlobalString($richTextConst))));
+		print '</td></tr>';
+	}
 
 	// Disponibilité des plans
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("SitePlans") . '</td>';
 	print '<td>';
-    print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessmentdocument/siteplans', 'small', '', 0, 0, 0, 100, 100, 0, 0, 0, 'riskassessmentdocument/siteplans', null, '', 0, 0);
-    print '</td></tr>';
+	// Bloc média de Saturne : galerie des plans, ajout et retrait sans passer par le mode édition
+	print digiriskstandard_site_plan_media_block($permissiontoadd);
+	print '</td></tr>';
 }
 
 ?>

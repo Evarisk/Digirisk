@@ -1172,16 +1172,21 @@ function digiriskdolibarr_ticket_public_interface_url(): string
 }
 
 /**
- * QR code of the public ticket interface, drawn for the document being generated
+ * QR code of the public ticket interface, for the document being generated
  *
- * Drawn again for every document from the address configured at that moment: a code stored once kept
- * pointing to an address changed since, and a document generated before anyone pressed the button of
- * the configuration printed N/A in its place. The ODT templates resize the image in place to fit their
- * cell, a reason more not to keep it.
+ * Follows the address configured at that moment: a code stored once kept pointing to an address changed
+ * since, and a document generated before anyone pressed the button of the configuration printed N/A in its
+ * place. Drawing it takes about half a second though, and the archive of the risk assessment document draws
+ * one per groupment and work unit, all for the same address. So the code is drawn once per address, and
+ * per version of the drawing, under a name made from both, then copied for each document: the ODT
+ * templates resize the image in place to fit their cell, the copy keeps the drawn one intact. The drawn
+ * code stays out of temp/, which Saturne empties after each ODT document, and out of ticketqrcode/, which
+ * the ticket setup shows whole.
  *
- * Under a name of its own: ticketqrcode.png was shared by the generations running at the same time, one took the code
- * of another or lost it. Given a generator, the file is one of its temporary files, deleted when the generation ends;
- * without, the caller deletes it once drawn.
+ * The copy goes under a name of its own: ticketqrcode.png was shared by the generations running at the same time, one
+ * took the code of another or lost it. Given a generator, the copy is one of its temporary files, deleted when the
+ * generation ends; without, the caller deletes it once drawn. For the same reason the code is drawn under a name of
+ * its own, then renamed: a generation never copies a code another one is still drawing.
  *
  * @param  string                    $url       Address to encode
  * @param  SaturneDocumentModel|null $generator ODT generator running, null for a file the caller deletes
@@ -1194,14 +1199,33 @@ function digiriskdolibarr_ticket_qrcode_file(string $url, ?SaturneDocumentModel 
 
     require_once __DIR__ . '/digiriskdolibarr_mobile.lib.php';
 
-    $tempDir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?: 1] . '/temp/';
+    $outputDir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?: 1];
+    $tempDir   = $outputDir . '/temp/';
     if ($generator !== null) {
         $filePath = $generator->getTempFilePath($tempDir, 'ticketqrcode', 'png');
     } else {
         $filePath = $tempDir . 'ticketqrcode_' . uniqid() . bin2hex(random_bytes(4)) . '.png';
     }
+    $drawnDir = $outputDir . '/qrcodecache';
+    $drawn    = $drawnDir . '/ticketqrcode_' . md5($url . '|' . (int) @filemtime(__DIR__ . '/digiriskdolibarr_mobile.lib.php')) . '.png';
 
-    return digiriskGetQrCodePng($url, $filePath) ? $filePath : '';
+    if (!is_file($drawn)) {
+        // Codes of an address or a drawing replaced since
+        foreach (glob($drawnDir . '/ticketqrcode_*.png') ?: [] as $staleFile) {
+            @unlink($staleFile);
+        }
+        $drawing = $drawnDir . '/drawing_' . uniqid() . bin2hex(random_bytes(4)) . '.png';
+        if (!digiriskGetQrCodePng($url, $drawing) || !@rename($drawing, $drawn)) {
+            @unlink($drawing);
+            if (!is_file($drawn)) {
+                return '';
+            }
+        }
+    }
+
+    dol_mkdir(dirname($filePath));
+
+    return @copy($drawn, $filePath) ? $filePath : '';
 }
 
 /**
