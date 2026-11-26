@@ -159,9 +159,10 @@
         }
       }
 
+      /* 15px per level instead of 21px: the deep levels of the narrow panel kept too little room for the names (#5795) */
       .unit > .sub-list {
-        margin-left: 12px;
-        padding-left: 8px;
+        margin-left: 8px;
+        padding-left: 6px;
         border-left: 1px dashed $dr-border;
       }
     }

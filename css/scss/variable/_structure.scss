@@ -1,3 +1,9 @@
 $media__large: 1200px;
 $media__medium: 770px;
 $media__small: 480px;
+
+/* Width of the GP/UT navigation tree panel (digirisk_header), shared by the panel and the content
+   offset beside it. 300px left 53 to 85px to the names of the deep levels (#5795): it grows with
+   the screen, 400px at 1600px, and stays at 300px just above $media__large, where the panel
+   turns into a dropdown. */
+$ut-gp-navigation__width: clamp(300px, 25vw, 420px);
