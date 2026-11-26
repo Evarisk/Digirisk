@@ -304,7 +304,8 @@ class RiskAssessmentDocument extends DigiriskDocuments
         foreach ($files as $file) {
             if (!$file->isDir()) {
                 $filePath     = $file->getRealPath();
-                $relativePath = substr($filePath, strlen($sourceDir) + 1);
+                // A zip only knows "/": realpath() gives "\" on a Windows server
+                $relativePath = str_replace('\\', '/', substr($filePath, strlen($sourceDir) + 1));
 
                 $zipArchive->addFile($filePath, $relativePath);
                 $zipArchive->setCompressionName($relativePath, ZipArchive::CM_DEFLATE);
