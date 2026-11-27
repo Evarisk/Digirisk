@@ -1838,7 +1838,7 @@ SendEmailOnTicketSubmit                  = Envoyer des emails à la création
 CatTicketsList                           = Liste des tags/catégories des tickets
 SendEmailTo                              = Adresse e-mail à notifier
 SendEmailOnTicketSubmitHelp              = Activer l'envoi d'e-mail automatique à la création d'un ticket, à l'adresse à notifier ci-dessous. Pour les tickets déclarés sur la page publique de Digirisk, ce mail remplace alors celui du module Ticket (« Nouveau ticket créé »), qui ne part plus à son adresse commune à tous les modules
-MultipleEmailsSeparator                  = Pour assigner plusieurs e-mail à notifier, séparez par un ";". Par exemple : "aaaa@bbb.cc;dddd@eee.ff"
+MultipleEmailsSeparator                  = Une adresse par ligne, ou plusieurs sur une ligne séparées par un ";" ou une ",". Une adresse invalide est refusée et rien n'est enregistré.
 
 # Modèle d'email du mail de déclaration - issue #5235
 TicketSubmittedMailModel                 = Modèle d'e-mail de la notification
