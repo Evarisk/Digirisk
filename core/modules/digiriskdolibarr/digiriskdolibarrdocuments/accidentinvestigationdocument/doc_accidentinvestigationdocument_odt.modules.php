@@ -266,9 +266,8 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTDigiriskDolibarrDoc
 		$tmpArray['public_note']          = $object->note_public;
 		$tmpArray['relative_location']    = $accidentMetadata->relative_location;
 
-		$pathPhoto                        = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accidentinvestigation/'. $object->ref . '/causality_tree/thumbs/';
-		$causalityTreePath                = $pathPhoto . saturne_get_thumb_name($object->causality_tree, 'medium');
-		$tmpArray['causality_tree_photo'] = $causalityTreePath;
+		// The medium thumb, made when missing, or the photo itself, as in the PDF document (#4436)
+		$tmpArray['causality_tree_photo'] = $object->getCausalityTreePhotoPath();
 
 		$moreParam['tmparray'] = $tmpArray;
 

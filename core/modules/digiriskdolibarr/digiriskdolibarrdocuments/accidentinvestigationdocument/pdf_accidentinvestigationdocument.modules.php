@@ -470,16 +470,7 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
             $data['gp_ut'] = saturne_flatten_wysiwyg_blocks($accident->accident_location, true);
         }
 
-        $data['causality_tree_photo'] = '';
-        if (dol_strlen($object->causality_tree)) {
-            $photoDir  = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accidentinvestigation/' . $object->ref . '/causality_tree/';
-            $thumbName = saturne_get_thumb_name($object->causality_tree, 'medium', $photoDir);
-            if (is_readable($photoDir . 'thumbs/' . $thumbName)) {
-                $data['causality_tree_photo'] = $photoDir . 'thumbs/' . $thumbName;
-            } elseif (is_readable($photoDir . $object->causality_tree)) {
-                $data['causality_tree_photo'] = $photoDir . $object->causality_tree;
-            }
-        }
+        $data['causality_tree_photo'] = $object->getCausalityTreePhotoPath();
 
         return $data;
     }
