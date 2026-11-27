@@ -40,6 +40,7 @@ require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/accident.class.php';
+require_once __DIR__ . '/../../class/accidentinvestigation.class.php';
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
@@ -1338,11 +1339,38 @@ if ($object->id > 0 && (empty($action) || ($action != 'create' && $action != 'ed
 		print '</div>';
 	}
 
-	if ($permissiontoadd) {
-		print '</div><div class="fichehalfright">';
-	} else {
-		print '</div><div class="">';
+	print '</div>';
+
+	// Objects linked to the accident (#4437): its ticket and its investigations, left of the last events
+	print '<div class="fichehalfleft">';
+	print load_fiche_titre($langs->trans('RelatedObjects'), '', '');
+	print '<table class="noborder centpercent">';
+	print '<tr class="liste_titre"><td>' . $langs->trans('Type') . '</td><td>' . $langs->trans('Ref') . '</td><td class="right">' . $langs->trans('Status') . '</td></tr>';
+
+	$linkedRows = 0;
+	if ($object->fk_ticket > 0 && $ticket->fetch($object->fk_ticket) > 0) {
+		print '<tr class="oddeven"><td>' . img_picto('', 'ticket', 'class="pictofixedwidth"') . $langs->trans('Ticket') . '</td>';
+		print '<td>' . $ticket->getNomUrl(1) . '</td><td class="right">' . $ticket->getLibStatut(5) . '</td></tr>';
+		$linkedRows++;
 	}
+
+	$accidentInvestigation = new AccidentInvestigation($db);
+	$investigations        = $accidentInvestigation->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . ((int) $object->id)]);
+	if (is_array($investigations)) {
+		foreach ($investigations as $investigation) {
+			print '<tr class="oddeven"><td>' . img_picto('', $investigation->picto, 'class="pictofixedwidth"') . $langs->trans('AccidentInvestigation') . '</td>';
+			print '<td>' . $investigation->getNomUrl(1) . '</td><td class="right">' . $investigation->getLibStatut(5) . '</td></tr>';
+			$linkedRows++;
+		}
+	}
+
+	if (empty($linkedRows)) {
+		print '<tr class="oddeven"><td colspan="3"><span class="opacitymedium">' . $langs->trans('None') . '</span></td></tr>';
+	}
+	print '</table>';
+	print '</div>';
+
+	print '<div class="fichehalfright">';
 
     $moreHtmlCenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=digiriskdolibarr&object_type=' . $object->element);
 
