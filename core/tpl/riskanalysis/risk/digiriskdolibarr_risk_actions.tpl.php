@@ -409,6 +409,11 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 		$task->date_end = $dateEnd;
 	}
 	$task->budget_amount                    = $budget;
+	// Planned workload entered in hours in the modal (#3018), stored in seconds as everywhere in Dolibarr
+	$plannedWorkload = (float) price2num((string) ($data['plannedWorkload'] ?? ''));
+	if ($plannedWorkload > 0) {
+		$task->planned_workload = (int) round($plannedWorkload * 3600);
+	}
 	$task->fk_task_parent                   = 0;
 	$task->array_options['options_fk_risk'] = $riskID;
 

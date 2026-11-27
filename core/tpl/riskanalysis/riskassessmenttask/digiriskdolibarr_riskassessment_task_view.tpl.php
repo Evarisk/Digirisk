@@ -167,9 +167,11 @@ $tasksDone = count(array_filter($taskProgresses, function ($taskProgress) {
 						</div>
                         <div class="riskassessment-task-container">
                             <div class="riskassessment-task">
+                                <?php // The label is the only mandatory field: named in bold with a star, as on the forms of Dolibarr (#3136) ?>
                                 <div class="wpeo-gridlayout flex flex-row items-center">
                                     <i class="fas fa-paragraph"></i>
-                                    <input type="text" class="riskassessment-task-label" name="label" value="">
+                                    <label class="fieldrequired paddingleft paddingright nowraponall" for="riskassessment-task-label<?php echo $risk->id ?>"><?php echo $langs->trans('Label'); ?> *</label>
+                                    <input type="text" id="riskassessment-task-label<?php echo $risk->id ?>" class="riskassessment-task-label" name="label" value="" aria-required="true">
                                 </div>
                                 <div class="riskassessment-task-date wpeo-gridlayout grid-3" style="margin-top: 1em; margin-bottom: 1em;">
                                     <div class="flex flex-row items-center">
@@ -187,6 +189,9 @@ $tasksDone = count(array_filter($taskProgresses, function ($taskProgress) {
                                 </div>
                                 <div>
                                     <div class="flex flex-row items-center justify-center">
+                                        <?php // Planned workload, in hours (#3018): the task card and the time spent of the task count against it ?>
+                                        <i class="fas fa-hourglass-half" style="margin-right: 1em;"></i>
+                                        <input type="number" min="0" step="0.25" class="riskassessment-task-planned-workload maxwidth100" name="planned_workload" value="" placeholder="<?php echo dol_escape_htmltag($langs->trans('PlannedWorkload')); ?>" title="<?php echo dol_escape_htmltag($langs->trans('PlannedWorkload') . ' : ' . $langs->trans('TaskPlannedWorkloadHours')); ?>" style="margin-right: 2em;">
                                         <i class="fas fa-user-tie 100" style="margin-right: 1em;"></i>
                                         <?php // One id per risk: with the id of the risk add modal, each of these selects re-initialised its select2, closing it if it was open
                                         print saturne_select_users('executive_id' . $risk->id, 0, 1, 'executiveSelect minwidth200'); ?>

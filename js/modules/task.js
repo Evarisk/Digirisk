@@ -139,6 +139,8 @@ window.digiriskdolibarr.riskassessmenttask.createRiskAssessmentTask = function (
 	let minEnd     = single.find('#RiskassessmentTaskDateEnd' + riskToAssign + 'min').val();
 	let budget     = single.find('.riskassessment-task-budget').val();
   let executiveId= single.find('.executiveSelect').val();
+	// Planned workload in hours (#3018), empty when not entered
+	let plannedWorkload = single.find('.riskassessment-task-planned-workload').val();
 
 	window.saturne.loader.display($(this));
 	window.saturne.loader.display($('.riskassessment-tasks' + riskToAssign));
@@ -155,6 +157,7 @@ window.digiriskdolibarr.riskassessmenttask.createRiskAssessmentTask = function (
 			hourEnd: hourEnd,
 			minEnd: minEnd,
 			budget: budget,
+			plannedWorkload: plannedWorkload,
 			riskToAssign: riskToAssign,
       executiveId: executiveId,
 		}),
