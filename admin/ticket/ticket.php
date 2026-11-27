@@ -298,23 +298,28 @@ if ($action == 'setPublicInterfacePin' && $permissiontowrite) {
     exit;
 }
 
-if ($action == 'generateQRCode') {
-	$urlToEncode = GETPOST('urlToEncode');
-	$targetPath = GETPOST('targetPath');
-	$size = '400x400';
+if ($action == 'generateQRCode' && $permissiontowrite) {
+    // Folder and encoded URL are computed here from the QR code type, never read from the form
+    $publicTicketUrl = dol_buildpath('/digiriskdolibarr/public/ticket/create_ticket.php', 2);
+    if (GETPOST('qrcode_type', 'aZ09') == 'multicompany' && isModEnabled('multicompany')) {
+        $targetPath  = DOL_DATA_ROOT . '/digiriskdolibarr/multicompany/ticketqrcode/';
+        $urlToEncode = $publicTicketUrl;
+    } else {
+        $targetPath  = $conf->digiriskdolibarr->multidir_output[$conf->entity ?: 1] . '/ticketqrcode/';
+        $urlToEncode = $publicTicketUrl . '?entity=' . $conf->entity;
+    }
+    $size = '400x400';
 
-	ob_clean();
+    ob_clean();
 
-	$QR = imagecreatefrompng('https://quickchart.io/qr?text=' .urlencode($urlToEncode. '&size='.$size )); // chart.googleapis.com n'existe plus
+    $QR = imagecreatefrompng('https://quickchart.io/qr?text=' . urlencode($urlToEncode . '&size=' . $size)); // chart.googleapis.com n'existe plus
 
-	if (! is_dir($targetPath)) {
-		mkdir($targetPath, 0777, true);
-	}
+    if (!is_dir($targetPath)) {
+        dol_mkdir($targetPath);
+    }
 
-	$targetPath = $targetPath . "ticketQRCode.png";
-
-	imagepng($QR,$targetPath);
-	setEventMessages($langs->transnoentities('QRCodeGenerated'), array());
+    imagepng($QR, $targetPath . 'ticketQRCode.png');
+    setEventMessages($langs->transnoentities('QRCodeGenerated'), []);
 }
 
 if ($action == 'createTimeRange') {
@@ -1054,11 +1059,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("GenerateQRCode") . '</td>';
 
-	$targetPath  = $qrCodePath;
-	$urlToEncode = dol_buildpath('/digiriskdolibarr/public/ticket/create_ticket.php', 2) . '?entity=' . $conf->entity;
-
-	print '<input hidden name="targetPath" value="'. $targetPath .'">';
-	print '<input hidden name="urlToEncode" value="'. $urlToEncode .'">';
+	print '<input type="hidden" name="qrcode_type" value="current">';
 
 	print '<td class="center">';
 	print array_key_exists('fullname', $QRCode) ? $langs->transnoentities('QRCodeAlreadyGenerated') : $langs->transnoentities('NotGenerated');
@@ -1110,11 +1111,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 
 		print '<tr class="oddeven"><td>' . $langs->transnoentities("GenerateQRCode") . '</td>';
 
-		$targetPath = $qrCodePath;
-		$urlToEncode = dol_buildpath('/digiriskdolibarr/public/ticket/create_ticket.php', 2);
-
-		print '<input hidden name="targetPath" value="'. $targetPath .'">';
-		print '<input hidden name="urlToEncode" value="'. $urlToEncode .'">';
+		print '<input type="hidden" name="qrcode_type" value="multicompany">';
 
 		print '<td class="center">';
 		print array_key_exists('fullname', $QRCode) ? $langs->transnoentities('QRCodeAlreadyGenerated') : $langs->transnoentities('NotGenerated');
