@@ -465,7 +465,7 @@ foreach ($search as $key => $val) {
     }
     if ($search[$key] != '') {
         if ($key == 'ref') {
-            $sql .= " AND (r.ref = '$search[$key]')";
+            $sql .= " AND (r.ref = '" . $db->escape($search[$key]) . "')";
         } else {
             $sql .= natural_search('r.'.$key, $search[$key], (($key == 'status') ? 2 : $mode_search));
         }

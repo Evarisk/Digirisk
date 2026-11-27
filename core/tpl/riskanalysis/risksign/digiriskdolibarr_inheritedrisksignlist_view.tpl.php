@@ -62,7 +62,7 @@ if ($object->fk_parent > 0) {
 		}
 		if ($search[$key] != '') {
 			if ($key == 'ref') {
-				$sql .= " AND (t.ref = '$search[$key]')";
+				$sql .= " AND (t.ref = '" . $db->escape($search[$key]) . "')";
 			} else {
 				$sql .= natural_search('t.' . $key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 			}
