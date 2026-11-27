@@ -219,7 +219,7 @@ class DigiriskRiskLibraryExport extends SaturneXlsxExport
         $sheet = $this->addSheet($langs->transnoentities('RiskLibraryModels'), $langs->transnoentities('RiskLibraryXlsxModelsDesc'));
 
         $columns = [
-            ['label' => $langs->transnoentities('RiskCategory'), 'width' => 30],
+            ['label' => $langs->transnoentities('DangerCategory'), 'width' => 30],
             ['label' => $langs->transnoentities('Label'), 'width' => 34],
             ['label' => $langs->transnoentities('Description'), 'width' => 60, 'format' => 'longtext'],
             ['label' => $langs->transnoentities('RiskLibraryCotation'), 'width' => 14],
