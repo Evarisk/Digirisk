@@ -218,6 +218,11 @@ class Evaluator extends SaturneObject
             $sql .= ' WHERE u.entity IN (' . getEntity('user') . ')';
             $sql .= ' AND u.employee = 1';
             $sql .= ' AND u.statut = 1';
+            // In multicompany, users of entity 0 (superadmins, technical accounts such as USERAPI) belong to
+            // every company at once: counting them would add them to the workforce of each entity
+            if (isModEnabled('multicompany')) {
+                $sql .= ' AND u.entity <> 0';
+            }
 
             $resql = $db->query($sql);
             if ($resql) {

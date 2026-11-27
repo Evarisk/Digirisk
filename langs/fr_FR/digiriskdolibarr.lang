@@ -74,7 +74,7 @@ Subtitle                                = Sous-titre
 DigiriskElementDepthGraph            = Niveau de profondeur dans les graphiques des éléments Digirisk
 DigiriskElementDepthGraphDescription = Cette option permet de choisir le niveau de profondeur dans les graphiques des éléments Digirisk <br> Défaut : Niveau 1
 NbPeopleInCompany                    = Nombre de personnes dans l'entreprise
-NbPeopleInCompanyDescription         = Base du pourcentage de personnes présentes saisi sur chaque GP/UT. C'est le nombre de salariés de la configuration de la société, repris aussi par les indicateurs des accidents.<br>Laisser vide pour le calculer à partir des utilisateurs salariés actifs (valeur affichée en grisé).
+NbPeopleInCompanyDescription         = Base du pourcentage de personnes présentes saisi sur chaque GP/UT. C'est le nombre de salariés de la configuration de la société, repris aussi par les indicateurs des accidents.<br>Laisser vide pour le calculer à partir des utilisateurs salariés actifs, hors superadmins en multi-société (valeur affichée en grisé).
 PeoplePercentage                     = Personnes présentes
 PeoplePercentageHelp                 = Pourcentage des personnes de l'entreprise présentes dans ce GP/UT. Le nombre de personnes en est déduit à partir de l'effectif de l'entreprise, réglé dans la configuration des GP/UT.
 PeoplePercentageOfWorkforce          = de l'effectif de l'entreprise (%s personnes)
@@ -1107,7 +1107,7 @@ EvaluatorDurationDescription = Le temps que met l'évaluateur à réaliser son �
 NbEmployeesInvolved          = Salariés impliqués
 NbEmployees                  = Salariés
 NbEmployeesInvolvedTooltip   = Salariés (évaluateurs) uniques
-NbEmployeesTooltip           = Si la gestion centralisée des utilisateurs et des groupes sur l'entité principale est activée.<br>Le nombre de salariés correspond au nombre d'utilisateurs partagés/affectés à un groupe et aussi au nombre d'administrateur de l'entité principale
+NbEmployeesTooltip           = Utilisateurs actifs cochés « Salarié ».<br>En multi-société, les superadmins et les comptes techniques rattachés à toutes les entités (USERAPI) ne sont pas comptés.
 NbEmployeesConfTooltip       = Le nombre de salariés a été saisi manuellement
 
 
