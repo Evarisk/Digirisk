@@ -39,6 +39,42 @@ function digiriskdolibarr_risklibrary_cotations(): array
 }
 
 /**
+ * Labels of the cotations of the standard method, as the risk lists show them: the range of the level
+ *
+ * @return array<int, string> Range of the level, by cotation
+ */
+function digiriskdolibarr_risklibrary_standard_cotations(): array
+{
+    return [0 => '0-47', 48 => '48-50', 51 => '51-80', 100 => '81-100'];
+}
+
+/**
+ * Content of a cell of the grid, shared by the page and the Excel export
+ *
+ * A GP/UT concerned shows the current cotation of its risk; its risk deleted or archived from the risk list, the
+ * cell says the risk is missing. A GP/UT not concerned gives its reason, a GP/UT without qualification is to qualify.
+ *
+ * @param  stdClass|null                                      $scope Assignment, from digiriskdolibarr_risklibrary_fetch_scopes()
+ * @return array{state: string, cotation: int, label: string}        State (risk, missing, notconcerned, toqualify), cotation of the risk and its label
+ */
+function digiriskdolibarr_risklibrary_cell(?stdClass $scope): array
+{
+    require_once __DIR__ . '/../class/riskanalysis/risk.class.php';
+
+    $concerned = $scope ? (int) $scope->concerned : -1;
+    if ($scope && $concerned == 1 && $scope->risk_ref !== '' && $scope->risk_status != Risk::STATUS_ARCHIVED) {
+        $cotation          = (int) $scope->cotation;
+        $standardCotations = digiriskdolibarr_risklibrary_standard_cotations();
+
+        return ['state' => 'risk', 'cotation' => $cotation, 'label' => $scope->method === 'standard' ? ($standardCotations[$cotation] ?? (string) $cotation) : (string) $cotation];
+    }
+
+    $states = [1 => 'missing', 0 => 'notconcerned', -1 => 'toqualify'];
+
+    return ['state' => $states[$concerned] ?? 'toqualify', 'cotation' => 0, 'label' => ''];
+}
+
+/**
  * Return the models of the risk library of the current entity, by label
  *
  * @param  DoliDB               $db Database handler

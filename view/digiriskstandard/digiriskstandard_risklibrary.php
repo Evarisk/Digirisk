@@ -96,6 +96,15 @@ if ($reshook < 0) {
 }
 
 if (empty($reshook)) {
+    // Excel export of the grid, with the right to read the tab: its cells as on the page, then the models
+    if ($action === 'export_xlsx' && !empty($models)) {
+        require_once __DIR__ . '/../../class/digiriskrisklibraryexport.class.php';
+
+        $export = new DigiriskRiskLibraryExport($db);
+        $export->export($models, digiriskdolibarr_risklibrary_fetch_scopes($db), $activeDigiriskElements, $dangerCategories, $langs->transnoentities('RiskLibrary') . '_' . dol_print_date(dol_now(), 'dayhourlog'));
+        exit;
+    }
+
     // Create or update a model: a label and a danger category are required, the cotation is one of the scale
     if (in_array($action, ['addModel', 'updateModel'], true) && $permissiontoadd && !GETPOST('cancel', 'alpha')) {
         $label    = trim(GETPOST('label', 'alphanohtml'));
@@ -206,7 +215,7 @@ $categoryPicto = static function (int $category) use ($dangerCategories): string
 $cotationBadge = static function (int $cotation, string $text, string $title = '') use ($risk): string {
     return '<span class="risk-evaluation-cotation risklibrary-cotation" data-scale="' . $risk->getCotationLevel($cotation) . '"' . ($title !== '' ? ' title="' . dol_escape_htmltag($title) . '"' : '') . '>' . $text . '</span>';
 };
-$standardCotations = [0 => '0-47', 48 => '48-50', 51 => '51-80', 100 => '81-100'];
+$standardCotations = digiriskdolibarr_risklibrary_standard_cotations();
 
 /*
  * The models
@@ -316,7 +325,8 @@ if (!empty($models)) {
     $riskCardUrl  = dol_buildpath('/digiriskdolibarr/view/risk/risk_card.php', 1) . '?id=';
 
     print '<div id="risklibrary-grid"></div>';
-    print load_fiche_titre($langs->trans('RiskLibraryGrid'), '', 'fontawesome_fa-th_fas');
+    $exportButton = !empty($elementNodes) ? dolGetButtonTitle($langs->trans('XlsxExport'), $langs->trans('RiskLibraryXlsxExportHelp'), 'fa fa-file-excel', $pageUrl . '?action=export_xlsx&token=' . newToken()) : '';
+    print load_fiche_titre($langs->trans('RiskLibraryGrid'), $exportButton, 'fontawesome_fa-th_fas');
     print '<div class="opacitymedium risklibrary-intro">' . $langs->trans('RiskLibraryGridHelp') . '</div>';
 
     if (empty($elementNodes)) {
@@ -342,16 +352,15 @@ if (!empty($models)) {
             foreach ($models as $model) {
                 $scope = $scopes[$model->rowid][(int) $nodeElementId] ?? null;
                 $state = $scope ? $scope->concerned : -1;
+                $cell  = digiriskdolibarr_risklibrary_cell($scope);
 
                 $cellTitle = $model->label . ' - ' . $element->ref;
-                if ($state == 1 && $scope->risk_ref !== '' && $scope->risk_status != Risk::STATUS_ARCHIVED) {
+                if ($cell['state'] === 'risk') {
                     // The risk of the GP/UT, at its current cotation
-                    $cotation  = (int) $scope->cotation;
-                    $cellLabel = $scope->method === 'standard' ? ($standardCotations[$cotation] ?? (string) $cotation) : (string) $cotation;
-                    $content   = '<a href="' . $riskCardUrl . (int) $scope->fk_risk . '" target="_blank">' . $cotationBadge($cotation, $cellLabel, $scope->risk_ref . ' - ' . $cellTitle) . '</a>';
-                } elseif ($state == 1) {
+                    $content = '<a href="' . $riskCardUrl . (int) $scope->fk_risk . '" target="_blank">' . $cotationBadge($cell['cotation'], $cell['label'], $scope->risk_ref . ' - ' . $cellTitle) . '</a>';
+                } elseif ($cell['state'] === 'missing') {
                     $content = '<span class="risklibrary-state risklibrary-state--missing" title="' . dol_escape_htmltag($langs->trans('RiskLibraryRiskMissing')) . '"><i class="fas fa-exclamation-triangle"></i></span>';
-                } elseif ($state == 0) {
+                } elseif ($cell['state'] === 'notconcerned') {
                     $content = '<span class="risklibrary-state risklibrary-state--no" title="' . dol_escape_htmltag($langs->trans('RiskLibraryStateNotConcerned') . ' : ' . $scope->reason) . '">' . $langs->trans('RiskLibraryStateNotConcernedShort') . '</span>';
                 } else {
                     $content = '<span class="risklibrary-state risklibrary-state--todo" title="' . dol_escape_htmltag($langs->trans('RiskLibraryStateToQualify')) . '">?</span>';
