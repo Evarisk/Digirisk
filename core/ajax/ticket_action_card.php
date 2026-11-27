@@ -119,6 +119,27 @@ $buildPayload = static function (Ticket $tkt) use ($db, $langs): array {
     ];
 };
 
+/**
+ * Close or abandon the ticket as the native ticket card does it (#5890): closing date, progress 100, TICKET_CLOSE trigger
+ * with its notifications and the closing of the linked interventions. setStatut() would only change the status. A closed
+ * ticket tells the third party as the quick close does (TICKET_NOTIFY_AT_CLOSING), an abandoned one as the native card
+ * does: not at all.
+ *
+ * @param  Ticket $tkt  Ticket
+ * @param  int    $mode 0 to close it solved, 1 to abandon it
+ * @return int          > 0 if OK, 0 if already closed or abandoned, < 0 on error
+ */
+$closeTicket = static function (Ticket $tkt, int $mode) use ($user): int {
+    if (in_array((int) $tkt->fk_statut, [Ticket::STATUS_CLOSED, Ticket::STATUS_CANCELED], true)) {
+        return 0;
+    }
+    if ($mode == 0) {
+        $tkt->context['contact_id'] = getDolGlobalString('TICKET_NOTIFY_AT_CLOSING') ? -2 : -3;
+    }
+
+    return $tkt->close($user, $mode);
+};
+
 $res = 0;
 
 switch ($action) {
@@ -188,20 +209,13 @@ switch ($action) {
         respond(false, $object->error ?: $langs->transnoentities('Error'));
 
     case 'set_closed':
-        $res = $object->setStatut(Ticket::STATUS_CLOSED, null, '', 'TICKET_MODIFY');
-        if ($res > 0) {
-            $object->fetch($ticketId);
-            respond(true, $langs->transnoentities('TicketActionClosedDone'), $buildPayload($object));
-        }
-        respond(false, $object->error ?: $langs->transnoentities('Error'));
-
     case 'set_cancelled':
-        $res = $object->setStatut(Ticket::STATUS_CANCELED, null, '', 'TICKET_MODIFY');
+        $res = $closeTicket($object, $action === 'set_cancelled' ? 1 : 0);
         if ($res > 0) {
             $object->fetch($ticketId);
-            respond(true, $langs->transnoentities('TicketActionCancelledDone'), $buildPayload($object));
+            respond(true, $langs->transnoentities($action === 'set_cancelled' ? 'TicketActionCancelledDone' : 'TicketActionClosedDone'), $buildPayload($object));
         }
-        respond(false, $object->error ?: $langs->transnoentities('Error'));
+        respond(false, $res == 0 ? $langs->transnoentities('TicketQuickCloseAlreadyClosed') : ($object->error ?: $langs->transnoentities('Error')));
 
     case 'assign_self':
         $res = $object->assignUser($user, (int) $user->id, 1);
@@ -627,7 +641,12 @@ switch ($action) {
             $display = !empty($object->message) ? dolPrintHTML($object->message) : '';
         } elseif ($field === 'fk_statut') {
             $newStatus = (int) $rawValue;
-            $res = $object->setStatut($newStatus, null, '', 'TICKET_MODIFY') > 0;
+            if (in_array($newStatus, [Ticket::STATUS_CLOSED, Ticket::STATUS_CANCELED], true)) {
+                // Closed or abandoned as by the buttons of the action bar
+                $res = $closeTicket($object, $newStatus === Ticket::STATUS_CANCELED ? 1 : 0) > 0;
+            } else {
+                $res = $object->setStatut($newStatus, null, '', 'TICKET_MODIFY') > 0;
+            }
             $object->fetch($ticketId);
             $display = $object->getLibStatut(2);
         } elseif ($field === 'fk_user_assign') {
