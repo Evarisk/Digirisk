@@ -36,6 +36,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/categories.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formmail.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
+require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 
 // load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
@@ -101,6 +102,14 @@ if (empty($resHook)) {
         $data['external_link_new_tab'] = GETPOST('external_link_new_tab') ? 1 : 0;
         $data['validate_text']         = GETPOST('validate_text', 'restricthtml');
         $data['success_message']       = GETPOST('success_message', 'restricthtml');
+
+        // The mail of a category goes out only with a template and recipients (#4595): one without the other is
+        // refused rather than saved as a setting that never sends anything. The empty template is posted as -1
+        if (((int) $data['mail_template'] > 0) !== ($data['recipients'] !== '')) {
+            setEventMessages($langs->transnoentities('TicketCategoryMailTemplateAndRecipients'), [], 'errors');
+            header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&type=ticket');
+            exit;
+        }
 
         // A field made visible by another category of the path is rendered as a disabled checkbox, so the
         // browser never posts it: its inherited visibility must be known before clearing the required flag
@@ -348,10 +357,14 @@ foreach ($categoriesConfig as $categoryLabel => $categoryConfig) {
 
 // Success Message
 print '<tr class="oddeven">';
-// The success message is printed as is, it is never run through make_substitutions: the help
-// picto could only ever open an empty tooltip, and $helpforsubstitution was never defined
-print '<td>' . $langs->transnoentities('TicketSuccessMessage') . '</td>';
-print '</td><td class="center">';
+// The success page runs the message through make_substitutions with the ticket created (public/ticket/ticket_success.php,
+// #4396): its help lists those keys (#4595), but those of the user, as the declarant is not logged in
+$helpSubstitution = $langs->trans('AvailableVariables') . ' :<br>';
+foreach (getCommonSubstitutionArray($langs, 2, ['user'], new Ticket($db)) as $substitutionKey => $substitutionValue) {
+    $helpSubstitution .= $substitutionKey . ' -> ' . dol_escape_htmltag((string) $substitutionValue) . '<br>';
+}
+print '<td>' . $form->textwithpicto($langs->transnoentities('TicketSuccessMessage'), $helpSubstitution, 1, 'help', '', 0, 2, 'substittooltip') . '</td>';
+print '<td class="center">';
 $doleditor = new DolEditor('success_message', $ticketCategoryConfig->success_message ?? $successMessage, '100%', 120, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_MAIL, ROWS_2, 70);
 $doleditor->Create();
 print '</td></tr>';
