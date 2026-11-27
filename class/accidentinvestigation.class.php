@@ -300,6 +300,34 @@ class AccidentInvestigation extends SaturneObject
         return $ret;
     }
 
+    /**
+     * Path of the causality tree photo the documents print: its medium thumb, made on the spot when missing, as for a
+     * photo sent before that size existed (#4436), or the photo itself when no thumb can be made
+     *
+     * @return string Path of the photo, empty without a readable photo
+     */
+    public function getCausalityTreePhotoPath(): string
+    {
+        global $conf;
+
+        if (!dol_strlen((string) $this->causality_tree)) {
+            return '';
+        }
+
+        dol_include_once('/saturne/lib/medias.lib.php');
+
+        $photoDir  = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accidentinvestigation/' . $this->ref . '/causality_tree/';
+        $thumbName = saturne_get_thumb_name($this->causality_tree, 'medium', $photoDir);
+        if (is_string($thumbName) && is_readable($photoDir . 'thumbs/' . $thumbName)) {
+            return $photoDir . 'thumbs/' . $thumbName;
+        }
+        if (is_readable($photoDir . $this->causality_tree)) {
+            return $photoDir . $this->causality_tree;
+        }
+
+        return '';
+    }
+
 	/**
 	 * Clone an object into another one.
 	 *
