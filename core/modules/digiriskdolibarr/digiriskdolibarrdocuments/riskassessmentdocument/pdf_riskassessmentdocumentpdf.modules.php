@@ -868,21 +868,24 @@ class pdf_riskassessmentdocumentpdf extends ModelePDFDigiriskDolibarrDocument
                 ['text' => dol_print_date($ticket->datec, 'day', 'tzuser', $outputLangs), 'align' => 'C'],
                 $ticket->digiriskElementRefLabel ?? '',
                 $ticket->subject . (dol_strlen(trim(strip_tags((string) $ticket->message))) ? "\n" . dol_trunc(trim(strip_tags((string) $ticket->message)), 160) : ''),
+                (string) ($ticket->assignedUserName ?? ''),
                 ['text' => ((int) $ticket->progress) . ' %', 'align' => 'C'],
                 dol_strlen($status) ? $outputLangs->transnoentitiesnoconv($status) : ''
             ];
         }
 
         // La date et le statut tiennent sur une ligne : a 11 et 10 % de la largeur, l'annee
-        // passait a la ligne et "Resolu/Ferme" se coupait en deux
+        // passait a la ligne et "Resolu/Ferme" se coupait en deux. Le responsable (#3998) prend
+        // sa place sur le sujet et sur l'avancement, qui ne contient que "100 %"
         $width = $this->contentWidth($pdf);
         $this->table($pdf, [
             $outputLangs->transnoentities('Ref'),
             ['text' => $outputLangs->transnoentities('Date'), 'align' => 'C'],
             $outputLangs->transnoentities('DigiriskDuUnit'),
             $outputLangs->transnoentities('Subject'),
+            $outputLangs->transnoentities('Responsible'),
             ['text' => $outputLangs->transnoentities('DigiriskProgress'), 'align' => 'C'],
             $outputLangs->transnoentities('Status')
-        ], $rows, [$width * 0.13, $width * 0.13, $width * 0.16, $width * 0.31, $width * 0.12, $width * 0.15], $size - 1.5);
+        ], $rows, [$width * 0.13, $width * 0.13, $width * 0.15, $width * 0.22, $width * 0.14, $width * 0.09, $width * 0.14], $size - 1.5);
     }
 }

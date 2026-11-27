@@ -1519,18 +1519,21 @@ class pdf_riskassessmentdocumentclassic extends ModelePDFDigiriskDolibarrDocumen
                 ['text' => dol_print_date($ticket->datec, 'dayhour', 'tzuser', $outputLangs), 'align' => 'C'],
                 ['text' => (string) $ticket->subject, 'style' => 'B'],
                 dol_trunc($this->plainText((string) $ticket->message), 1500),
+                (string) ($ticket->assignedUserName ?? ''),
                 ['chip' => true, 'text' => ((int) $ticket->progress) . ' %', 'chipFill' => $this->tint($this->accent, 0.86), 'color' => $this->accent, 'style' => 'B'],
                 dol_strlen($status) ? $outputLangs->transnoentitiesnoconv($status) : ''
             ];
         }
 
+        // Le responsable du ticket (#3998) prend sa largeur sur le message initial
         $this->gridTable($pdf, [
             ['width' => 24, 'header' => $outputLangs->transnoentities('DigiriskDuClassicRegisterRef')],
             ['width' => 34, 'header' => $outputLangs->transnoentities('DigiriskDuClassicLocation')],
             ['width' => 30, 'header' => $outputLangs->transnoentities('DigiriskDuClassicTags')],
             ['width' => 22, 'header' => $outputLangs->transnoentities('DigiriskDuClassicCreationDate'), 'align' => 'C'],
             ['width' => 40, 'header' => $outputLangs->transnoentities('Subject')],
-            ['width' => 79, 'header' => $outputLangs->transnoentities('DigiriskDuClassicMessage')],
+            ['width' => 53, 'header' => $outputLangs->transnoentities('DigiriskDuClassicMessage')],
+            ['width' => 26, 'header' => $outputLangs->transnoentities('Responsible')],
             ['width' => 16, 'header' => $outputLangs->transnoentities('DigiriskProgress'), 'align' => 'C'],
             ['width' => 24, 'header' => $outputLangs->transnoentities('Status')]
         ], $rows, 7.5, ['valign' => 'T']);
