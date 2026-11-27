@@ -573,6 +573,24 @@ if ($action === 'confirm_set_status' && $permissionToWrite && !GETPOST('cancel')
     setEventMessages($object->error, $object->errors, 'errors');
 }
 
+// Action: close the ticket as the native ticket card does it (#5788): closing date, progress 100, TICKET_CLOSE trigger with
+// its notifications, the third party told as chosen in the confirmation. The status buttons leave this status out, as it
+// needs Ticket::close()
+if ($action === 'confirm_close' && GETPOST('confirm', 'alpha') === 'yes' && $permissionToWrite && $object->id > 0 && $object->status < Ticket::STATUS_CLOSED) {
+    if (GETPOSTISSET('contactid')) {
+        $object->context['contact_id'] = GETPOSTINT('contactid');
+    }
+    $oldStatus = $object->getLibStatut(1);
+    if ($object->close($user) > 0) {
+        $object->fetch($object->id);
+        digiriskdolibarr_ticket_log_field_change($object, $langs->transnoentities('Status'), $oldStatus, $object->getLibStatut(1), $ticketLogConst);
+        setEventMessages($langs->trans('TicketMarkedAsClosed'), []);
+        header('Location: ' . $url_page_current . '?track_id=' . urlencode($object->track_id));
+        exit;
+    }
+    setEventMessages($object->error, $object->errors, 'errors');
+}
+
 // Ticket attached-files boxes, as on the native ticket card: the native one (files of the ticket) and the Digirisk one (TicketDocument, #5593).
 $permissiontoadd     = $permissionToWrite ? 1 : 0;
 $permissiontodelete  = $permissionToWrite ? 1 : 0;
@@ -657,6 +675,27 @@ print '<div class="digirisk-ticket-card">';
 // to this custom card instead of the native /ticket/card.php.
 $head = digiriskdolibarr_ticket_prepare_head($object);
 print dol_get_fiche_head($head, 'tabTicket', $langs->trans('Ticket'), -1, 'ticket');
+
+// Confirmation of the closing, as on the native ticket card: whom of the third party to tell
+if ($action === 'close' && $permissionToWrite && $object->status < Ticket::STATUS_CLOSED) {
+    $contactsSelect = [
+        '-2' => $langs->trans('TicketNotifyAllTiersAtClose'),
+        '-3' => $langs->trans('TicketNotNotifyTiersAtClose'),
+    ];
+    foreach ($object->getInfosTicketExternalContact(1) as $thirdpartyContact) {
+        $contactsSelect[$thirdpartyContact['id']] = trim($thirdpartyContact['civility'] . ' ' . $thirdpartyContact['lastname'] . ' ' . $thirdpartyContact['firstname']);
+    }
+    $formQuestion = [
+        [
+            'name'    => 'contactid',
+            'type'    => 'select',
+            'label'   => $langs->trans('NotifyThirdpartyOnTicketClosing'),
+            'values'  => $contactsSelect,
+            'default' => getDolGlobalString('TICKET_NOTIFY_AT_CLOSING') ? '-2' : '-3',
+        ],
+    ];
+    print $form->formconfirm($url_page_current . '?track_id=' . urlencode($object->track_id), $langs->trans('CloseATicket'), $langs->trans('ConfirmCloseAticket'), 'confirm_close', $formQuestion, '', 1);
+}
 
 // ---- Build morehtmlref (native Dolibarr banner style) ----
 $morehtmlref = '<div class="refidno">';
@@ -1245,6 +1284,11 @@ print '</tbody></table>';
 if ($permissionToWrite && isset($object->status) && $object->status < Ticket::STATUS_CLOSED) {
     $actionobject = new ActionsTicket($db);
     $actionobject->viewStatusActions($object);
+
+    // Closing, which the status buttons leave out (#5788): confirmed first, as on the native ticket card
+    print '<div class="right digirisk-ticket-close">';
+    print dolGetButtonAction('', '<i class="fas fa-check-circle pictofixedwidth"></i>' . $langs->trans('TicketCardClose'), 'default', $url_page_current . '?action=close&token=' . newToken() . '&track_id=' . urlencode($object->track_id), 'ticket-close-button');
+    print '</div>';
 }
 
 // ---- Recent events (native Dolibarr widget) ----

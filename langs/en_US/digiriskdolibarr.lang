@@ -2461,6 +2461,7 @@ TicketQuickCloseCommentPlaceholder     = Added to the ticket as a private messag
 TicketQuickCloseError                  = The ticket could not be updated
 TicketQuickCloseAlreadyClosed          = This ticket is already closed
 TicketQuickCloseLogClosed              = Ticket closed (quick close)
+TicketCardClose                        = Close the ticket
 TicketQuickCloseLogProgress            = Progress changed (quick close)
 TicketQuickCloseLogNote                = Progress → %s
 

@@ -2476,6 +2476,7 @@ TicketQuickCloseCommentPlaceholder     = Ajouté au ticket en message privé (fa
 TicketQuickCloseError                  = Le ticket n'a pas pu être mis à jour
 TicketQuickCloseAlreadyClosed          = Ce ticket est déjà clôturé
 TicketQuickCloseLogClosed              = Ticket clôturé (clôture rapide)
+TicketCardClose                        = Fermer le ticket
 TicketQuickCloseLogProgress            = Avancement modifié (clôture rapide)
 TicketQuickCloseLogNote                = Avancement → %s
 
