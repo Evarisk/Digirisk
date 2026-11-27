@@ -392,12 +392,11 @@ class pdf_accidentinvestigationdocument extends SaturneDocumentModel
         $accidentMetadata->fetch(0, '', 'AND status = 1 AND fk_accident = ' . ((int) $accident->id));
         $victim = $accident->getUserVictim();
 
-        $actionTask           = saturne_fetch_all_object_type('SaturneTask', '', '', 2, 0, ['customsql' => 'fk_task_parent = ' . ((int) $object->fk_task)]);
-        $curativeActionTask   = is_array($actionTask) ? array_shift($actionTask) : null;
-        $preventiveActionTask = is_array($actionTask) ? array_pop($actionTask) : null;
-        $totalCATask          = is_object($curativeActionTask) ? $curativeActionTask->hasChildren() : 0;
-        $totalPATask          = is_object($preventiveActionTask) ? $preventiveActionTask->hasChildren() : 0;
-        $totalBudget          = get_recursive_task_budget((int) $object->fk_task);
+        // A draft investigation has no task yet, hence no action and no budget (#5894)
+        $containers  = digiriskdolibarr_accidentinvestigation_action_containers((int) $object->fk_task);
+        $totalCATask = is_object($containers['curative']) ? $containers['curative']->hasChildren() : 0;
+        $totalPATask = is_object($containers['preventive']) ? $containers['preventive']->hasChildren() : 0;
+        $totalBudget = get_recursive_task_budget((int) $object->fk_task);
 
         $data = [
             'investigation_date_start' => $object->date_start ? dol_print_date($object->date_start, 'dayhour', 'tzuser') : '',

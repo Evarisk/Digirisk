@@ -81,8 +81,9 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTDigiriskDolibarrDoc
             dol_syslog($e->getMessage());
         }
 
-        $taskParentId = $taskType == 'cur_task' ?  $moreParam['curativeTaskId'] : $moreParam['preventiveTaskId'];
-        $actionTasks  = saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, ['customsql' => 'fk_task_parent = ' . $taskParentId]);
+        // Without its container (draft investigation, #5894), no action: the tasks without parent are not its actions
+        $taskParentId = (int) ($taskType == 'cur_task' ? $moreParam['curativeTaskId'] : $moreParam['preventiveTaskId']);
+        $actionTasks  = $taskParentId > 0 ? saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, ['customsql' => 'fk_task_parent = ' . $taskParentId]) : [];
 
         if ($foundTagForLines) {
             if (is_array($actionTasks) && !empty($actionTasks)) {
@@ -174,6 +175,7 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTDigiriskDolibarrDoc
         require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
         require_once __DIR__ . '/../../../../../class/accident.class.php';
         require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
+        require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_accidentinvestigation.lib.php';
         dol_include_once('/saturne/class/task/saturnetask.class.php');
 
 		global $conf;
@@ -190,15 +192,14 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTDigiriskDolibarrDoc
 		$accidentMetadata->fetch(0, '', 'AND status = 1 AND fk_accident = ' . $accident->id);
         $victim = $accident->getUserVictim();
 
-		$actionTask           = saturne_fetch_all_object_type('SaturneTask', '', '', 2, 0, ['customsql' => 'fk_task_parent = ' . $object->fk_task]);
-		$curativeActionTask   = array_shift($actionTask);
-		$preventiveActionTask = array_pop($actionTask);
-		$totalCATask          = $curativeActionTask->hasChildren();
-		$totalPATask          = $preventiveActionTask->hasChildren();
-		$totalBudget          = get_recursive_task_budget($object->fk_task);
+		// A draft investigation has no task yet, hence no action (#5894)
+		$containers  = digiriskdolibarr_accidentinvestigation_action_containers((int) $object->fk_task);
+		$totalCATask = is_object($containers['curative']) ? $containers['curative']->hasChildren() : 0;
+		$totalPATask = is_object($containers['preventive']) ? $containers['preventive']->hasChildren() : 0;
+		$totalBudget = get_recursive_task_budget((int) $object->fk_task);
 
-		$moreParam['curativeTaskId']   = $curativeActionTask->id;
-		$moreParam['preventiveTaskId'] = $preventiveActionTask->id;
+		$moreParam['curativeTaskId']   = is_object($containers['curative']) ? (int) $containers['curative']->id : 0;
+		$moreParam['preventiveTaskId'] = is_object($containers['preventive']) ? (int) $containers['preventive']->id : 0;
 
 		$tmpArray['investigation_date_start'] = dol_print_date($object->date_start, 'dayhour', 'tzuser');
 		$tmpArray['investigation_date_end']   = dol_print_date($object->date_end, 'dayhour', 'tzuser');
