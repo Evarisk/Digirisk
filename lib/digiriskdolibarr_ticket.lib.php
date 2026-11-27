@@ -553,6 +553,7 @@ function load_ticket_infos(array $moreParam = []): array
 
     digiriskdolibarr_ticket_set_digirisk_elements($array['tickets']);
     digiriskdolibarr_ticket_set_status($array['tickets']);
+    digiriskdolibarr_ticket_set_assigned_users($array['tickets']);
 
     $array['nbTickets'] = count($array['tickets']);
 
@@ -577,6 +578,46 @@ function digiriskdolibarr_ticket_set_status(array $tickets): void
         if (!isset($ticket->status) && isset($ticket->fk_statut)) {
             $ticket->status = (int) $ticket->fk_statut;
         }
+    }
+}
+
+/**
+ * Set on each ticket the name of the user it is assigned to, its responsible in the documents — issue #3998
+ *
+ * Every assigned user is read in a single query: a document lists all the registers of the
+ * company. A ticket assigned to nobody, or to a user deleted since, gets an empty name.
+ *
+ * @param  array $tickets Tickets to complete, each one gets an assignedUserName property
+ * @return void
+ */
+function digiriskdolibarr_ticket_set_assigned_users(array $tickets): void
+{
+    global $db;
+
+    $userIds = [];
+    foreach ($tickets as $ticket) {
+        $ticket->assignedUserName = '';
+        if ((int) ($ticket->fk_user_assign ?? 0) > 0) {
+            $userIds[(int) $ticket->fk_user_assign] = (int) $ticket->fk_user_assign;
+        }
+    }
+    if (empty($userIds)) {
+        return;
+    }
+
+    $userNames = [];
+    $resql     = $db->query('SELECT rowid, firstname, lastname FROM ' . MAIN_DB_PREFIX . 'user WHERE rowid IN (' . implode(',', $userIds) . ')');
+    if (!$resql) {
+        dol_syslog(__FUNCTION__ . ' ' . $db->lasterror(), LOG_ERR);
+        return;
+    }
+    while ($obj = $db->fetch_object($resql)) {
+        $userNames[(int) $obj->rowid] = dolGetFirstLastname((string) $obj->firstname, (string) $obj->lastname);
+    }
+    $db->free($resql);
+
+    foreach ($tickets as $ticket) {
+        $ticket->assignedUserName = $userNames[(int) ($ticket->fk_user_assign ?? 0)] ?? '';
     }
 }
 

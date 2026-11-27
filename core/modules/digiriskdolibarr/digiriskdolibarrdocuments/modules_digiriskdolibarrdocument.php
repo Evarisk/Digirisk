@@ -491,6 +491,7 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                     'message'                   => ' ',
                     'progress'                  => ' ',
                     'digiriskelement_ref_label' => ' ',
+                    'responsible'               => ' ',
                     'status'                    => ' ',
                 ];
 
@@ -524,6 +525,8 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                     'message'                   => $ticket->message,
                     'progress'                  => ($ticket->progress ?: 0) . ' %',
                     'digiriskelement_ref_label' => $ticket->digiriskElementRefLabel ?? '',
+                    // The user the ticket is assigned to, set by load_ticket_infos()
+                    'responsible'               => $ticket->assignedUserName ?? '',
                     'status'                    => $ticket->getLibStatut()
                 ];
 
