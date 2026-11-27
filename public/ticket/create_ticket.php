@@ -845,11 +845,21 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] .'">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 
-	print '<h1>' . $langs->transnoentities(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_MULTI_COMPANY_PUBLIC_INTERFACE_TITLE', 0)) ?: $langs->trans('WelcomeToPublicTicketInterface') . '</h1>';
-	print '<h2>' . $langs->transnoentities(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_MULTI_COMPANY_PUBLIC_INTERFACE_SUBTITLE', 0)) ?: $langs->trans('PleaseSelectAnEntity') . '</h2>';
+	$hideEntities   = dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_HIDE_ENTITIES', 0);
+	$publicTitle    = (string) dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_MULTI_COMPANY_PUBLIC_INTERFACE_TITLE', 0);
+	$publicSubtitle = (string) dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_MULTI_COMPANY_PUBLIC_INTERFACE_SUBTITLE', 0);
+	// The default title and subtitle used to be lost to the precedence of ?: below the concatenation, which printed an
+	// empty title left open; with the entities hidden (#4489), the subtitle no longer asks to pick one of them
+	print '<h1>' . ($publicTitle !== '' ? $langs->transnoentities($publicTitle) : $langs->trans('WelcomeToPublicTicketInterface')) . '</h1>';
+	if ($publicSubtitle !== '' || !$hideEntities) {
+		print '<h2>' . ($publicSubtitle !== '' ? $langs->transnoentities($publicSubtitle) : $langs->trans('PleaseSelectAnEntity')) . '</h2>';
+	}
 
 	$multi_entity_selector = dolibarr_get_const($db, 'DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', 0);
-	if ($multi_entity_selector) {
+	if ($hideEntities) {
+		// The entities are not listed (#4489): a declarant comes through the link or the QR code of their own entity
+		print '<div class="opacitymedium">' . $langs->trans('TicketPublicInterfaceUseEntityLink') . '</div>';
+	} elseif ($multi_entity_selector) {
 		print $mc->select_entities('', 'entity');
 		print '<input class="wpeo-button button-blue" type="submit" value="'. $langs->trans('Go') .'">';
 	} else {

@@ -675,6 +675,19 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 		print $form->textwithpicto('', $langs->transnoentities("ShowSelectorOnTicketPublicInterfaceHelp"));
 		print '</td>';
 		print '</tr>';
+
+		// The page without entity lists every entity, so every client of a partner (#4489): it can list none, each
+		// declarant then coming through the link of their own entity. Shared by every entity, as the switch above
+		print '<tr class="oddeven"><td>' . $langs->transnoentities('HideEntitiesOnTicketPublicInterface') . '</td>';
+		print '<td class="center"></td>';
+		print '<td class="center">';
+		print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_HIDE_ENTITIES', [], 0, 0, 0, 0, 2, 0, 1, '', '', 'inline-block', 0, '', empty($user->admin) ? 1 : 0);
+		print '</td>';
+		print '<td class="center"></td>';
+		print '<td class="center">';
+		print $form->textwithpicto('', $langs->transnoentities('HideEntitiesOnTicketPublicInterfaceHelp'));
+		print '</td>';
+		print '</tr>';
 	}
 
 	//Envoi d'emails automatique
