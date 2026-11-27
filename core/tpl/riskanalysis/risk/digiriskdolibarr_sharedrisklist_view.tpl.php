@@ -146,13 +146,13 @@ foreach ($search as $key => $val) {
 	}
 	if ($search[$key] != '') {
 		if ($key == 'ref') {
-			$sql .= " AND (r.ref = '$search[$key]')";
+			$sql .= " AND (r.ref = '" . $db->escape($search[$key]) . "')";
 		} elseif ($key == 'fk_element') {
 			if ( $search[$key] > 0){
-				$sql .= " AND (e.rowid = '$search[$key]')";
+				$sql .= " AND (e.rowid = " . ((int) $search[$key]) . ")";
 			}
 		} elseif ($key == 'entity') {
-			$sql .= " AND (e.entity = '$search[$key]')";
+			$sql .= " AND (e.entity = " . ((int) $search[$key]) . ")";
 		} else {
 			$sql .= natural_search('r.'.$key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 		}

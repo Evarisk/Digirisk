@@ -126,15 +126,15 @@ foreach ($search as $key => $val) {
 
 	if ($search[$key] != '' && $key != 'fk_element') {
 		if ($key == 'ref') {
-			$sql .= " AND (t.ref = '$search[$key]')";
+			$sql .= " AND (t.ref = '" . $db->escape($search[$key]) . "')";
 		} elseif ($key == 'fk_element') {
 			if ( $search[$key] > 0){
-				$sql .= " AND (e.rowid = '$search[$key]')";
+				$sql .= " AND (e.rowid = " . ((int) $search[$key]) . ")";
 			}
 		} elseif ($key == 'entity') {
-			$sql .= " AND (e.entity = '$search[$key]')";
+			$sql .= " AND (e.entity = " . ((int) $search[$key]) . ")";
 		} elseif ($key == 'fk_element_shared') {
-			$sql .= " AND (t.fk_element = '$search[$key]')";
+			$sql .= " AND (t.fk_element = " . ((int) $search[$key]) . ")";
 		} else {
 			$sql .= natural_search('t.'.$key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 		}
