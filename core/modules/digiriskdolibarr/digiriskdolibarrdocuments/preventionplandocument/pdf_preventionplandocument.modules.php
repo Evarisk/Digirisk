@@ -20,8 +20,8 @@
  * \ingroup digiriskdolibarr
  * \brief   Plan de prevention en PDF natif.
  *          Suit section par section le gabarit template_preventionplandocument.odt : entreprises,
- *          numeros d'urgence, moyens et consignes, inspection commune prealable, intervention et
- *          horaires, analyse des risques, intervenants, signatures.
+ *          analyse des risques (en tete depuis #4616), numeros d'urgence, moyens et consignes,
+ *          inspection commune prealable, intervention et horaires, intervenants, signatures.
  */
 
 // Load Saturne libraries
@@ -689,6 +689,9 @@ class pdf_preventionplandocument extends SaturneDocumentModel
     {
         $this->sectionCompanies($pdf, $data, $outputLangs, $size);
         $this->sectionImages($pdf, 'companies');
+        // The risks and their prevention measures come first, right after the companies (#4616)
+        $this->sectionRisks($pdf, $object, $outputLangs, $size);
+        $this->sectionImages($pdf, 'risks');
         $this->sectionEmergency($pdf, $data, $outputLangs, $size);
         $this->sectionImages($pdf, 'emergency');
         $this->sectionMeansAndRules($pdf, $data, $outputLangs, $size);
@@ -697,8 +700,6 @@ class pdf_preventionplandocument extends SaturneDocumentModel
         $this->sectionImages($pdf, 'priorvisit');
         $this->sectionIntervention($pdf, $object, $outputLangs, $size);
         $this->sectionImages($pdf, 'intervention');
-        $this->sectionRisks($pdf, $object, $outputLangs, $size);
-        $this->sectionImages($pdf, 'risks');
         $this->sectionCertifications($pdf, $object, $outputLangs, $size);
         $this->sectionSignatures($pdf, $object, $outputLangs, $size);
         $this->sectionSpreadSignatories($pdf, $object, $outputLangs, $size);
