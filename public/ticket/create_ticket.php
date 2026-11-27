@@ -849,7 +849,10 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 	print '<h2>' . $langs->transnoentities(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_MULTI_COMPANY_PUBLIC_INTERFACE_SUBTITLE', 0)) ?: $langs->trans('PleaseSelectAnEntity') . '</h2>';
 
 	$multi_entity_selector = dolibarr_get_const($db, 'DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', 0);
-	if ($multi_entity_selector) {
+	if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_HIDE_ENTITIES', 0)) {
+		// The entities are not listed (#4489): a declarant comes through the link or the QR code of their own entity
+		print '<div class="opacitymedium">' . $langs->trans('TicketPublicInterfaceUseEntityLink') . '</div>';
+	} elseif ($multi_entity_selector) {
 		print $mc->select_entities('', 'entity');
 		print '<input class="wpeo-button button-blue" type="submit" value="'. $langs->trans('Go') .'">';
 	} else {
