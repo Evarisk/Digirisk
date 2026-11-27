@@ -63,7 +63,8 @@ if (empty($page) || $page == -1) { $page = 0; }
 $offset                       = $limit * $page;
 $pageprev                     = $page - 1;
 $pagenext                     = $page + 1;
-if ( ! $sortfield) $sortfield = "u.login";
+// The groups are no longer a column of the query (#4433): an old link sorted on them falls back on the login
+if ( ! $sortfield || $sortfield == 'g.fk_usergroup') $sortfield = "u.login";
 if ( ! $sortorder) $sortorder = "ASC";
 
 // Initialize technical objects
@@ -320,8 +321,7 @@ $sql .= " u.datelastlogin, u.datepreviouslogin,";
 $sql .= " u.ldap_sid, u.statut, u.entity,";
 $sql .= " u.tms as date_update, u.datec as date_creation,";
 $sql .= " u2.rowid as id2, u2.login as login2, u2.firstname as firstname2, u2.lastname as lastname2, u2.admin as admin2, u2.fk_soc as fk_soc2, u2.email as email2, u2.gender as gender2, u2.photo as photo2, u2.entity as entity2, u2.statut as statut2,";
-$sql .= " s.nom as name, s.canvas,";
-$sql .= " g.fk_usergroup as fk_usergroup";
+$sql .= " s.nom as name, s.canvas";
 // Add fields from extrafields
 if ( ! empty($extrafields->attributes[$object->table_element]['label'])) {
 	foreach ($extrafields->attributes[$object->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$object->table_element]['type'][$key] != 'separate' ? ", ef." . $key . ' as options_' . $key : '');
@@ -334,10 +334,8 @@ $sql                                                                            
 if (is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $object->table_element . "_extrafields as ef on (u.rowid = ef.fk_object)";
 $sql                                                                                                                                              .= " LEFT JOIN " . MAIN_DB_PREFIX . "societe as s ON u.fk_soc = s.rowid";
 $sql                                                                                                                                              .= " LEFT JOIN " . MAIN_DB_PREFIX . "user as u2 ON u.fk_user = u2.rowid";
-$sql                                                                                                                                              .= " LEFT JOIN " . MAIN_DB_PREFIX . "usergroup_user as g ON u.rowid = g.fk_user";
-// In the transverse mode of Multicompany the memberships of a user are given per entity: only those of this one (#5722)
+// One row per user (#4433): the groups are read apart, joining the memberships gave a user once per group
 $isTransverseMode = isModEnabled('multicompany') && getDolGlobalInt('MULTICOMPANY_TRANSVERSE_MODE');
-if ($isTransverseMode) $sql                                                                                                                       .= " AND g.entity IN (" . getEntity('usergroup') . ")";
 if ( ! empty($search_categ) || ! empty($catid)) $sql                                                                                              .= ' LEFT JOIN ' . MAIN_DB_PREFIX . "categorie_user as cu ON u.rowid = cu.fk_user"; // We'll need this table joined to the select in order to filter by categ
 // Add fields from hooks
 $parameters = array();
@@ -375,7 +373,7 @@ if ($catid > 0)     $sql                              .= " AND cu.fk_categorie =
 if ($catid == -2)   $sql                              .= " AND cu.fk_categorie IS NULL";
 if ($search_categ > 0)   $sql                         .= " AND cu.fk_categorie = " . $db->escape($search_categ);
 if ($search_categ == -2) $sql                         .= " AND cu.fk_categorie IS NULL";
-if ($search_fk_usergroup > 0)   $sql                  .= " AND g.fk_usergroup IN (" . $db->escape($search_fk_usergroup) . ")";
+if ($search_fk_usergroup > 0)   $sql                  .= " AND u.rowid IN (SELECT ugf.fk_user FROM " . MAIN_DB_PREFIX . "usergroup_user as ugf WHERE ugf.fk_usergroup IN (" . $db->escape($search_fk_usergroup) . "))";
 
 $user->fetchAll('','','','', "(login:=:'USERAPI')");
 
@@ -408,8 +406,34 @@ if ( ! $result) {
 
 $num = $db->num_rows($result);
 
+// The users of the page, read first so that their groups come in one query
+$rows = [];
+while (count($rows) < min($num, $limit) && ($row = $db->fetch_object($result))) {
+	$rows[] = $row;
+}
+
+// Groups of each user of the page, among those of this entity (#4433): neither a row per group, nor the groups of
+// another entity, nor a query per row
+$userGroupLinks = [];
+if ( ! empty($arrayfields['g.fk_usergroup']['checked']) && ! empty($rows)) {
+	$sqlGroups  = 'SELECT ug.fk_user, ug.fk_usergroup, ugr.nom AS name FROM ' . MAIN_DB_PREFIX . 'usergroup_user as ug';
+	$sqlGroups .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'usergroup as ugr ON ugr.rowid = ug.fk_usergroup';
+	$sqlGroups .= ' WHERE ug.fk_user IN (' . implode(',', array_map('intval', array_column($rows, 'rowid'))) . ')';
+	$sqlGroups .= ' AND ug.entity IN (' . getEntity('usergroup') . ')';
+	$sqlGroups .= ' ORDER BY ugr.nom ASC';
+	$resGroups  = $db->query($sqlGroups);
+	if ($resGroups) {
+		while ($objGroup = $db->fetch_object($resGroups)) {
+			$usergroupstatic->id   = (int) $objGroup->fk_usergroup;
+			$usergroupstatic->name = $objGroup->name;
+			$userGroupLinks[(int) $objGroup->fk_user][(int) $objGroup->fk_usergroup] = $usergroupstatic->getNomUrl(1);
+		}
+		$db->free($resGroups);
+	}
+}
+
 if ($num == 1 && !headers_sent() && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $sall) {
-	$obj = $db->fetch_object($resql);
+	$obj = $rows[0];
 	$id  = $obj->rowid;
 	header("Location: " . DOL_URL_ROOT . '/user/card.php?id=' . $id);
 	exit;
@@ -598,7 +622,7 @@ if ( ! empty($arrayfields['u.job']['checked']))          print_liste_field_titre
 if ( ! empty($arrayfields['u.api_key']['checked']))        print_liste_field_titre("ApiKey", $_SERVER['PHP_SELF'], "u.api_key", $param, "", "", $sortfield, $sortorder);
 if ( ! empty($arrayfields['u.fk_soc']['checked']))         print_liste_field_titre("Company", $_SERVER['PHP_SELF'], "u.fk_soc", $param, "", "", $sortfield, $sortorder);
 if ( ! empty($arrayfields['u.entity']['checked']))         print_liste_field_titre("Entity", $_SERVER['PHP_SELF'], "u.entity", $param, "", "", $sortfield, $sortorder);
-if ( ! empty($arrayfields['g.fk_usergroup']['checked']))         print_liste_field_titre("UserGroup", $_SERVER['PHP_SELF'], "g.fk_usergroup", $param, "", "", $sortfield, $sortorder);
+if ( ! empty($arrayfields['g.fk_usergroup']['checked']))         print_liste_field_titre("UserGroup", $_SERVER['PHP_SELF'], "", $param, "", "", $sortfield, $sortorder);
 if ( ! empty($arrayfields['u.fk_user']['checked']))        print_liste_field_titre("HierarchicalResponsible", $_SERVER['PHP_SELF'], "u.fk_user", $param, "", "", $sortfield, $sortorder);
 if ( ! empty($arrayfields['u.datelastlogin']['checked']))  print_liste_field_titre("LastConnexion", $_SERVER['PHP_SELF'], "u.datelastlogin", $param, "", '', $sortfield, $sortorder, 'center ');
 if ( ! empty($arrayfields['u.datepreviouslogin']['checked'])) print_liste_field_titre("PreviousConnexion", $_SERVER['PHP_SELF'], "u.datepreviouslogin", $param, "", '', $sortfield, $sortorder, 'center ');
@@ -616,8 +640,8 @@ print "</tr>\n";
 
 $i          = 0;
 $totalarray = ['nbfield' => 0];
-while ($i < min($num, $limit)) {
-	$obj = $db->fetch_object($result);
+while ($i < count($rows)) {
+	$obj = $rows[$i];
 
 	$userstatic->id        = $obj->rowid;
 	$userstatic->admin     = $obj->admin;
@@ -712,11 +736,7 @@ while ($i < min($num, $limit)) {
 	}
 	if ( ! empty($arrayfields['g.fk_usergroup']['checked'])) {
 		print '<td>';
-		if ($obj->fk_usergroup) {
-			$usergroupstatic->id = $obj->fk_usergroup;
-			$usergroupstatic->fetch($usergroupstatic->id);
-			print $usergroupstatic->getNomUrl(1);
-		}
+		print implode('<br>', $userGroupLinks[(int) $obj->rowid] ?? []);
 		print '</td>';
 		if ( ! $i) $totalarray['nbfield']++;
 	}
