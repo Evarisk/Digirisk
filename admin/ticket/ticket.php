@@ -148,10 +148,23 @@ if ($action == 'update_ticket_public_interface_url') {
 }
 
 if ($action == 'setEmails') {
-	// 'chaine' et non 'integer' : la valeur est une liste d'adresses, le type etait mal renseigne
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', GETPOST('emails'), 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SUBMITTED_MAIL_MODEL', GETPOST('ticket_submitted_mail_model', 'restricthtml'), 'chaine', 0, '', $conf->entity);
-	setEventMessages($langs->transnoentities('EmailsToNotifySet'), array());
+	// One address per line, or several separated by ";" or "," (#3013): saved as the ";" list the declaration mail splits
+	$emails        = preg_split('/[;,\s]+/', GETPOST('emails', 'alphanohtml'), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+	$emails        = array_values(array_unique($emails));
+	$invalidEmails = array_filter($emails, function ($email) {
+		return !isValidEmail($email);
+	});
+	if (!empty($invalidEmails)) {
+		// Nothing saved: the declaration mail would go nowhere for these addresses. The entered list is shown again
+		$langs->load('errors');
+		setEventMessages($langs->transnoentities('ErrorBadEMail', implode(', ', $invalidEmails)), [], 'errors');
+		$emailsToShow = implode("\n", $emails);
+	} else {
+		// 'chaine' et non 'integer' : la valeur est une liste d'adresses, le type etait mal renseigne
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', implode(';', $emails), 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SUBMITTED_MAIL_MODEL', GETPOST('ticket_submitted_mail_model', 'restricthtml'), 'chaine', 0, '', $conf->entity);
+		setEventMessages($langs->transnoentities('EmailsToNotifySet'), array());
+	}
 }
 
 if ($action == 'generateExtrafields') {
@@ -719,7 +732,9 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("SendEmailTo") . '</td>';
 	print '<td class="center"></td>';
 	print '<td class="center">';
-	print '<input name="emails" id="emails" value="' . $conf->global->DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO . '">';
+	// One address per line, easier to read and to change than a single line of addresses (#3013)
+	$emailsToShow = $emailsToShow ?? implode("\n", preg_split('/[;,\s]+/', getDolGlobalString('DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO'), -1, PREG_SPLIT_NO_EMPTY) ?: []);
+	print '<textarea name="emails" id="emails" rows="' . ROWS_3 . '" class="quatrevingtpercent">' . dol_escape_htmltag($emailsToShow, 0, 1) . '</textarea>';
 	print '</td>';
 	print '<td class="center">';
 	print '<input type="submit" class="button reposition" value="'. $langs->transnoentities('Save').'">';
