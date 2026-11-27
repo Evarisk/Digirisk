@@ -61,6 +61,14 @@ function digiriskstandard_prepare_head(DigiriskStandard $object): array
         $h++;
     }
 
+    // Questionnaires RPS (#5324) : les salaries d'une categorie de poste repondent eux-memes a la grille RPS-DU par un lien public
+    if ($user->hasRight('digiriskdolibarr', 'risk', 'read')) {
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_rpsquestionnaire.php', 1);
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-clipboard-check pictofixedwidth"></i>' . $langs->trans('PsychosocialQuestionnaires') : '<i class="fas fa-clipboard-check"></i>';
+        $head[$h][2] = 'standardRpsQuestionnaire';
+        $h++;
+    }
+
     // Groupes d'exposition (#5644) : les personnes qui occupent les memes postes, reparties sur les GP/UT
     if ($user->hasRight('digiriskdolibarr', 'digiriskelement', 'read')) {
         $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_exposuregroup.php', 1);

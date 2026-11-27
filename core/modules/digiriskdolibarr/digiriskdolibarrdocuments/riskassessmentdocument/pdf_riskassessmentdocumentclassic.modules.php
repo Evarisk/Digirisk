@@ -683,6 +683,10 @@ class pdf_riskassessmentdocumentclassic extends ModelePDFDigiriskDolibarrDocumen
         $this->text($pdf, $outputLangs->transnoentities('DigiriskDuClassicRpsCotationIntro'), $size - 1);
         $this->psychosocialCotationTable($pdf, $outputLangs, $size);
 
+        // Questionnaires RPS des salaries (#5324) : la methode, puis les unites evaluees par leurs reponses
+        $this->heading($pdf, 2, $outputLangs->transnoentities('DigiriskDuRpsQuestionnaires'), $outputLangs, $size, 40);
+        $this->psychosocialQuestionnaireTable($pdf, $outputLangs, $size);
+
         $this->heading($pdf, 2, $outputLangs->transnoentities('DigiriskDuClassicRpsAssessment'), $outputLangs, $size, 40);
         $this->psychosocialAssessmentTable($pdf, $outputLangs, $size, $data);
 
@@ -986,6 +990,61 @@ class pdf_riskassessmentdocumentclassic extends ModelePDFDigiriskDolibarrDocumen
 
         $this->gridTable($pdf, $columns, $rows, 7);
         $this->text($pdf, $outputLangs->transnoentities('DigiriskDuClassicRpsLegend'), $size - 2.5, 'I', $this->inkMuted);
+    }
+
+    /**
+     * Questionnaires RPS des salaries (#5324) : la methode, puis une ligne par unite de travail d'une session
+     * qui a recu des reponses, avec leur nombre, leur periode et leur moyenne
+     *
+     * @param  TCPDF     $pdf         PDF handler
+     * @param  Translate $outputLangs Lang object
+     * @param  float     $size        Taille de police
+     * @return void
+     */
+    protected function psychosocialQuestionnaireTable($pdf, Translate $outputLangs, float $size)
+    {
+        require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_riskoverview.lib.php';
+        require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_rpsquestionnaire.lib.php';
+
+        $this->text($pdf, $outputLangs->transnoentities('DigiriskDuRpsQuestionnaireMethod'), $size - 1);
+
+        $questionnaireRows = digiriskRpsQuestionnaireDocumentRows($this->db, $outputLangs);
+        if (empty($questionnaireRows)) {
+            $this->emptyNote($pdf, $outputLangs->transnoentities('DigiriskDuRpsQuestionnaireNone'), $size);
+            return;
+        }
+
+        $rows = [];
+        foreach ($questionnaireRows as $questionnaireRow) {
+            $band = (int) $questionnaireRow['band'];
+            if ($questionnaireRow['average'] === null) {
+                $average = ['chip' => true, 'text' => '-', 'chipFill' => $this->rpsEmpty['fill'], 'color' => $this->rpsEmpty['ink']];
+            } else {
+                $average = ['chip' => true, 'text' => digiriskRiskOverviewFormatLevel((float) $questionnaireRow['average'], $outputLangs), 'style' => 'B', 'chipFill' => $this->rpsFill[$band] ?? $this->rpsFill[1], 'color' => $this->rpsInk[$band] ?? $this->rpsInk[1]];
+            }
+
+            $rows[] = [
+                ['text' => $questionnaireRow['element'], 'style' => 'B'],
+                $questionnaireRow['group'],
+                $questionnaireRow['session'],
+                $questionnaireRow['answers'],
+                $questionnaireRow['period'],
+                $average,
+                $questionnaireRow['status'],
+            ];
+        }
+
+        $columns = [
+            ['width' => $this->contentWidth($pdf) - 136, 'header' => $outputLangs->transnoentities('DigiriskDuUnit')],
+            ['width' => 30, 'header' => $outputLangs->transnoentities('DigiriskDuRpsQuestionnaireGroup')],
+            ['width' => 34, 'header' => $outputLangs->transnoentities('DigiriskDuRpsQuestionnaireSession')],
+            ['width' => 16, 'header' => $outputLangs->transnoentities('DigiriskDuRpsQuestionnaireAnswers'), 'align' => 'C'],
+            ['width' => 26, 'header' => $outputLangs->transnoentities('DigiriskDuRpsQuestionnairePeriod'), 'align' => 'C'],
+            ['width' => 16, 'header' => $outputLangs->transnoentities('DigiriskDuClassicAverage'), 'align' => 'C'],
+            ['width' => 14, 'header' => $outputLangs->transnoentities('DigiriskDuRpsQuestionnaireStatus'), 'align' => 'C'],
+        ];
+
+        $this->gridTable($pdf, $columns, $rows, 7);
     }
 
     /**

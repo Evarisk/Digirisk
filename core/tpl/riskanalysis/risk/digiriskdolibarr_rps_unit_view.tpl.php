@@ -30,10 +30,24 @@ global $db, $langs, $user;
 
 // The actions open in the Digirisk task card
 require_once __DIR__ . '/../../../../lib/digiriskdolibarr_task.lib.php';
+require_once __DIR__ . '/../../../../lib/digiriskdolibarr_rpsquestionnaire.lib.php';
 
 if (empty($rpsUnitLine)) {
     return;
 }
+
+// Questionnaires that the employees of the work unit are answering (#5324), with their number of answers
+$rpsQuestionnaireNotices = [];
+foreach (digiriskRpsSessionsOfElement($db, (int) $object->id) as $rpsSession) {
+    $rpsSessionCount = $rpsSession['elements'][(int) $object->id]['count'];
+    // The label is typed by a user: the whole sentence is escaped, not only translated
+    if ($rpsSession['max_answers'] > 0) {
+        $rpsQuestionnaireNotices[] = dol_escape_htmltag($langs->transnoentities('PsychosocialQuestionnaireUnitNoticeMax', $rpsSession['label'], $rpsSessionCount, $rpsSession['max_answers']));
+    } else {
+        $rpsQuestionnaireNotices[] = dol_escape_htmltag($langs->transnoentities('PsychosocialQuestionnaireUnitNotice', $rpsSession['label'], $rpsSessionCount));
+    }
+}
+$rpsQuestionnaireUrl = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_rpsquestionnaire.php', 1);
 
 $rpsUnitState = (int) $rpsUnitLine['state'];
 // Le lien vers le tableau de toutes les unites suit les droits de l'onglet du niveau 0
@@ -102,6 +116,14 @@ if ($rpsUnitState !== 1) : ?>
                     <?php echo $langs->trans('PsychosocialUnitToQualifyNotice'); ?>
                 <?php endif; ?>
             </span>
+            <?php foreach ($rpsQuestionnaireNotices as $rpsQuestionnaireNotice) : ?>
+                <span class="rps-head-sub rps-unit-questionnaire">
+                    <i class="fas fa-clipboard-check"></i> <?php echo $rpsQuestionnaireNotice; ?>
+                    <?php if ($rpsRootAccess) : ?>
+                        · <a href="<?php echo $rpsQuestionnaireUrl; ?>"><?php echo $langs->trans('PsychosocialQuestionnaireSeeSessions'); ?></a>
+                    <?php endif; ?>
+                </span>
+            <?php endforeach; ?>
         </div>
         <?php if ($rpsRootAccess) : ?>
             <a class="wpeo-button button-grey button-size-small" href="<?php echo $rpsRootUrl; ?>">
@@ -284,6 +306,17 @@ if (!empty($rpsAssessmentByElement[(int) $object->id]['id'])) {
             <?php endif; ?>
         </div>
     </div>
+
+    <?php foreach ($rpsQuestionnaireNotices as $rpsQuestionnaireNotice) : ?>
+        <div class="rps-note rps-note--questionnaire">
+            <span><i class="fas fa-clipboard-check"></i> <?php echo $rpsQuestionnaireNotice; ?></span>
+            <?php if ($rpsRootAccess) : ?>
+                <a class="wpeo-button button-grey button-size-small" href="<?php echo $rpsQuestionnaireUrl; ?>">
+                    <?php echo $langs->trans('PsychosocialQuestionnaireSeeSessions'); ?> <i class="fas fa-arrow-right"></i>
+                </a>
+            <?php endif; ?>
+        </div>
+    <?php endforeach; ?>
 
     <?php if (count($rpsUnitLine['orphans']) > 1) :
         // Les references des risques sont des donnees : echappees a part, puis glissees a la place du second %s

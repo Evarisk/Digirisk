@@ -1,0 +1,25 @@
+-- Copyright (C) 2026 EVARISK <technique@evarisk.com>
+--
+-- This program is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU General Public License as published by
+-- the Free Software Foundation, either version 3 of the License, or
+-- (at your option) any later version.
+--
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+--
+-- You should have received a copy of the GNU General Public License
+-- along with this program.  If not, see https://www.gnu.org/licenses/.
+
+-- Unites de travail d'une session de questionnaire RPS (#5324), une ligne par unite.
+-- fk_riskassessment : l'evaluation psychosociale de l'unite tiree de la moyenne de ses reponses, a la
+-- cloture de la session ; c'est elle qui dit au document unique que l'unite a ete evaluee par questionnaire.
+CREATE TABLE llx_digiriskdolibarr_rpssession_element(
+  rowid              integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+  entity             integer DEFAULT 1 NOT NULL,
+  fk_session         integer NOT NULL,
+  fk_element         integer NOT NULL,
+  fk_riskassessment  integer NULL
+) ENGINE=innodb;
