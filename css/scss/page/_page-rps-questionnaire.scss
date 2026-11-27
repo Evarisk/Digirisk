@@ -1,0 +1,847 @@
+@import "../theme/tokens";
+
+// Psychosocial risk questionnaires (#5324): the public questionnaire answered by the employees, mostly on a
+// phone reached by the QR code, then the tab of the company that manages the sessions
+// (core/tpl/riskanalysis/rpsquestionnaire/*).
+
+$rps-questionnaire-phone: 600px;
+
+// ---- Public questionnaire: outside the shared theme, as the other public pages ----
+
+body#mainbody.page-public-card.digirisk-rps-questionnaire-public {
+  @media (max-width: $rps-questionnaire-phone) {
+    margin-top: 0;
+    padding: 10px 6px 24px;
+  }
+
+  .public-card__container.rps-questionnaire {
+    max-width: 820px;
+    padding: 28px;
+    color: $dr-text;
+
+    &.rps-questionnaire--message {
+      max-width: 560px;
+    }
+
+    @media (max-width: $rps-questionnaire-phone) {
+      padding: 18px 14px;
+    }
+  }
+
+  .rps-questionnaire__header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0 0 18px;
+    padding: 0 0 16px;
+    border-bottom: 1px solid $dr-border;
+  }
+
+  .rps-questionnaire__logo {
+    flex: none;
+    max-width: 110px;
+    max-height: 60px;
+    object-fit: contain;
+
+    @media (max-width: $rps-questionnaire-phone) {
+      max-width: 64px;
+      max-height: 44px;
+    }
+  }
+
+  .rps-questionnaire__title {
+    color: $dr-primary;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.25;
+
+    @media (max-width: $rps-questionnaire-phone) {
+      font-size: 17px;
+    }
+  }
+
+  .rps-questionnaire__company {
+    font-weight: 600;
+  }
+
+  .rps-questionnaire__session {
+    color: $dr-muted;
+    font-size: 13px;
+  }
+
+  .rps-questionnaire__message {
+    padding: 28px 8px 12px;
+    text-align: center;
+    font-size: 15px;
+    line-height: 1.55;
+
+    .fas {
+      display: block;
+      margin: 0 0 12px;
+      color: $dr-primary;
+      font-size: 40px;
+    }
+
+    &--done .fas,
+    &--full .fas {
+      color: $dr-success;
+    }
+
+    &--invalid .fas,
+    &--closed .fas {
+      color: $dr-faint;
+    }
+  }
+
+  .rps-questionnaire__intro {
+    font-size: 14px;
+    line-height: 1.55;
+
+    p {
+      margin: 0 0 10px;
+    }
+  }
+
+  .rps-questionnaire__anonymous {
+    padding: 10px 12px;
+    border-radius: $dr-radius-sm;
+    background: $dr-primary-soft;
+    color: $dr-navy;
+    font-size: 13px;
+
+    .fas {
+      margin-right: 4px;
+      color: $dr-primary;
+    }
+  }
+
+  .rps-questionnaire__errors {
+    margin: 14px 0 0;
+    padding: 10px 12px;
+    border-radius: $dr-radius-sm;
+    background: $dr-danger-soft;
+    color: #991b1b;
+    font-size: 13px;
+    font-weight: 600;
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  // eldy frames every fieldset with an !important border and a padding: the steps are not boxes
+  .rps-questionnaire__step {
+    min-width: 0;
+    margin: 24px 0 0;
+    padding: 0;
+    padding-inline: 0;
+    border: 0 !important;
+
+    legend {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 10px;
+      padding: 0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+  }
+
+  .rps-questionnaire__step-number {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: $dr-primary;
+    color: #ffffff;
+    font-size: 13px;
+  }
+
+  .rps-questionnaire__hint {
+    margin: -4px 0 4px;
+    color: $dr-muted;
+    font-size: 13px;
+  }
+
+  // A work unit to pick: the radio sits under its card, the card shows the choice
+  .rps-questionnaire__units {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 8px;
+  }
+
+  .rps-questionnaire__unit {
+    position: relative;
+    display: block;
+    cursor: pointer;
+
+    input {
+      position: absolute;
+      inset: 0;
+      margin: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    input:checked + .rps-questionnaire__unit-card {
+      border-color: $dr-primary;
+      background: $dr-primary-soft;
+      box-shadow: inset 0 0 0 1px $dr-primary;
+    }
+
+    input:focus-visible + .rps-questionnaire__unit-card {
+      box-shadow: $dr-ring;
+    }
+
+    &.is-full {
+      cursor: not-allowed;
+
+      .rps-questionnaire__unit-card {
+        background: $dr-surface-soft;
+        color: $dr-faint;
+      }
+    }
+  }
+
+  .rps-questionnaire__unit-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 52px;
+    padding: 8px 12px;
+    border: 1px solid $dr-border-strong;
+    border-radius: $dr-radius;
+    background: #ffffff;
+    transition: border-color $dr-transition, background $dr-transition;
+  }
+
+  .rps-questionnaire__unit-name {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    small {
+      color: $dr-muted;
+    }
+  }
+
+  .rps-questionnaire__unit-full {
+    flex: none;
+    padding: 1px 8px;
+    border-radius: $dr-radius-pill;
+    background: $dr-bg;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .rps-questionnaire__unit-fixed {
+    padding: 10px 12px;
+    border-radius: $dr-radius-sm;
+    background: $dr-surface-soft;
+    font-weight: 600;
+
+    .fas {
+      margin-right: 6px;
+      color: $dr-primary;
+    }
+  }
+
+  .rps-questionnaire__group,
+  textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid $dr-border-strong;
+    border-radius: $dr-radius-sm;
+    background: #ffffff;
+    font: inherit;
+    font-size: 14px;
+  }
+
+  .rps-questionnaire__family {
+    margin: 24px 0 2px;
+    color: $dr-primary;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .rps-questionnaire__question {
+    padding: 14px 0;
+    border-bottom: 1px solid $dr-border;
+    scroll-margin: 90px;
+
+    &.is-missing {
+      margin: 0 -10px;
+      padding: 14px 10px;
+      border-left: 3px solid $dr-danger;
+      background: $dr-danger-soft;
+    }
+  }
+
+  .rps-questionnaire__question-text {
+    display: flex;
+    gap: 10px;
+    margin: 0 0 10px;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.45;
+  }
+
+  .rps-questionnaire__question-number {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: $dr-bg;
+    color: $dr-muted;
+    font-size: 12px;
+  }
+
+  // The four answers: one row on a computer, two by two on a phone, each large enough for a thumb
+  .rps-questionnaire__answers {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    padding-left: 36px;
+
+    @media (max-width: $rps-questionnaire-phone) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding-left: 0;
+    }
+  }
+
+  .rps-questionnaire__answer {
+    position: relative;
+    display: block;
+
+    input {
+      position: absolute;
+      inset: 0;
+      margin: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 6px 8px;
+      border: 1px solid $dr-border-strong;
+      border-radius: $dr-radius-sm;
+      background: #ffffff;
+      font-size: 13px;
+      line-height: 1.25;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color $dr-transition, background $dr-transition, color $dr-transition;
+    }
+
+    input:hover + span {
+      border-color: $dr-primary;
+    }
+
+    input:checked + span {
+      border-color: $dr-primary;
+      background: $dr-primary;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    input:focus-visible + span {
+      box-shadow: $dr-ring;
+    }
+  }
+
+  // Progress and sending stay at the bottom of the screen while the questions scroll
+  .rps-questionnaire__footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 24px -28px -28px;
+    padding: 14px 28px;
+    border-top: 1px solid $dr-border;
+    border-radius: 0 0 10px 10px;
+    background: #ffffff;
+    box-shadow: 0 -6px 12px -8px rgba(15, 23, 42, 0.18);
+
+    @media (max-width: $rps-questionnaire-phone) {
+      margin: 24px -14px -18px;
+      padding: 12px 14px;
+    }
+  }
+
+  .rps-questionnaire__progress {
+    flex: 1;
+    min-width: 170px;
+    color: $dr-text-soft;
+    font-size: 13px;
+  }
+
+  .rps-questionnaire__progress-bar {
+    display: block;
+    height: 6px;
+    margin-top: 6px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: $dr-bg;
+  }
+
+  .rps-questionnaire__progress-fill {
+    display: block;
+    width: 0;
+    height: 100%;
+    background: $dr-primary;
+    transition: width 0.2s ease;
+  }
+
+  .rps-questionnaire__form.is-complete .rps-questionnaire__progress-fill {
+    background: $dr-success;
+  }
+
+  .rps-questionnaire__send {
+    padding: 10px 18px;
+    font-size: 14px;
+
+    @media (max-width: $rps-questionnaire-phone) {
+      justify-content: center;
+      width: 100%;
+    }
+  }
+}
+
+// ---- Tab of the company: the sessions, their link and the averages of their work units ----
+
+#{$dr-scope} {
+  .rps-questionnaires__intro {
+    @include dr-card;
+    display: flex;
+    gap: 14px;
+    margin: 0 0 18px;
+    padding: 14px 18px;
+    font-size: 13px;
+    line-height: 1.55;
+
+    > .fas {
+      margin-top: 2px;
+      color: $dr-primary;
+      font-size: 22px;
+    }
+
+    p {
+      margin: 0 0 4px;
+    }
+  }
+
+  .rps-questionnaires__empty {
+    @include dr-card;
+    padding: 30px;
+    color: $dr-muted;
+    text-align: center;
+
+    .fas {
+      display: block;
+      margin-bottom: 8px;
+      color: $dr-faint;
+      font-size: 28px;
+    }
+  }
+
+  .rps-session-form {
+    @include dr-card;
+    margin: 0 0 18px;
+    padding: 18px;
+
+    &__title {
+      margin: 0 0 14px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    &__grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px 18px;
+
+      @media (max-width: 768px) {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    &__field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+
+      > span {
+        @include dr-label;
+      }
+
+      &--wide {
+        grid-column: 1 / -1;
+      }
+
+      input[type="text"],
+      select {
+        width: 100%;
+      }
+    }
+
+    &__buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 16px;
+    }
+  }
+
+  .rps-session {
+    @include dr-card;
+    margin: 0 0 18px;
+    overflow: hidden;
+
+    &__head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px 16px;
+      padding: 14px 18px;
+      border-bottom: 1px solid $dr-border;
+
+      @media (max-width: 768px) {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    &__heading {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    &__title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    &__status {
+      padding: 2px 10px;
+      border-radius: $dr-radius-pill;
+      background: $dr-success-soft;
+      color: $dr-success;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    &.is-closed &__status {
+      background: $dr-bg;
+      color: $dr-muted;
+    }
+
+    &__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 16px;
+      color: $dr-text-soft;
+      font-size: 12px;
+
+      .fas {
+        margin-right: 4px;
+        color: $dr-faint;
+      }
+    }
+
+    &__actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: flex-end;
+      gap: 6px;
+      grid-column: 2;
+      grid-row: 1 / span 2;
+
+      @media (max-width: 768px) {
+        justify-content: flex-start;
+        grid-column: 1;
+        grid-row: auto;
+      }
+    }
+
+    &__share {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 18px;
+      border-bottom: 1px solid $dr-border;
+      background: $dr-surface-soft;
+    }
+
+    &__qr {
+      flex: none;
+      width: 112px;
+      height: 112px;
+      padding: 6px;
+      border: 1px solid $dr-border;
+      border-radius: $dr-radius-sm;
+      background: #ffffff;
+    }
+
+    &__share-text {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    &__share-label {
+      @include dr-label;
+    }
+
+    // The table scrolls in its card rather than widening the column of the page: without its own width, it adds
+    // nothing to the minimum width of the flex layout around the card
+    &__table {
+      width: 0;
+      min-width: 100%;
+      overflow-x: auto;
+    }
+
+    &__units {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+
+      th {
+        @include dr-label;
+        padding: 8px 10px;
+        border-bottom: 1px solid $dr-border;
+        background: $dr-surface-soft;
+        text-align: left;
+      }
+
+      td {
+        padding: 8px 10px;
+        border-bottom: 1px solid $dr-border;
+        vertical-align: middle;
+      }
+
+      th.center,
+      td.center {
+        text-align: center;
+      }
+
+      abbr {
+        text-decoration: none;
+        cursor: help;
+      }
+    }
+
+    &__unit-name a {
+      color: $dr-text;
+
+      b {
+        margin-right: 4px;
+        color: $dr-primary;
+      }
+    }
+
+    &__unit-answers {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px 8px;
+      margin-top: 4px;
+      color: $dr-text-soft;
+      font-size: 12px;
+    }
+
+    // The six factors side by side, their number under each level
+    &__factors {
+      display: flex;
+      gap: 6px;
+    }
+
+    &__factor {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      cursor: help;
+    }
+
+    &__factor-key {
+      color: $dr-faint;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    &__unit-average {
+      white-space: nowrap;
+    }
+
+    &__unit-assessment {
+      margin-top: 4px;
+      font-size: 12px;
+    }
+
+    .rps-session-unit-toggle[aria-expanded="true"] .fa-chevron-down {
+      transform: rotate(180deg);
+    }
+
+    &__progress {
+      width: 56px;
+      height: 6px;
+      accent-color: $dr-primary;
+    }
+
+    &__full {
+      padding: 1px 8px;
+      border-radius: $dr-radius-pill;
+      background: $dr-warning-soft;
+      color: #92400e;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    &__recorded {
+      color: $dr-success;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    &__detail > td {
+      padding: 12px 18px 16px;
+      background: $dr-surface-soft;
+    }
+
+    &__groups {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      margin: 0 0 10px;
+      font-size: 12px;
+    }
+
+    &__criteria {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+
+      th {
+        @include dr-label;
+        padding: 6px 8px;
+        text-align: left;
+      }
+
+      th.center,
+      td.center {
+        text-align: center;
+      }
+
+      td {
+        padding: 5px 8px;
+        border-top: 1px solid $dr-border;
+        background: #ffffff;
+      }
+
+      .rps-band {
+        padding: 2px 8px;
+      }
+    }
+
+    &__criterion-factor {
+      display: inline-block;
+      min-width: 24px;
+      color: $dr-faint;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    &__spread {
+      white-space: nowrap;
+
+      .rps-cell {
+        width: 26px;
+        height: 22px;
+        margin-right: 3px;
+        font-size: 11px;
+      }
+    }
+
+    &__comments {
+      margin-top: 12px;
+      font-size: 12px;
+
+      blockquote {
+        margin: 6px 0 0;
+        padding: 6px 10px;
+        border-left: 3px solid $dr-border-strong;
+        background: #ffffff;
+      }
+
+      small {
+        display: block;
+        margin-top: 2px;
+        color: $dr-faint;
+      }
+    }
+  }
+
+  .rps-session-link {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+
+    .rps-session-url {
+      flex: 1;
+      min-width: 240px;
+      font-size: 12px;
+    }
+  }
+
+  .rps-session-copy {
+    .rps-session-copied-label {
+      display: none;
+    }
+
+    &.is-copied {
+      .rps-session-copy-label {
+        display: none;
+      }
+
+      .rps-session-copied-label {
+        display: inline;
+      }
+    }
+  }
+
+  // A questionnaire in progress, under the psychosocial block of the work unit
+  .rps-note.rps-note--questionnaire {
+    border-top-color: rgba(13, 138, 255, 0.3);
+    background: $dr-primary-soft;
+    color: $dr-navy;
+
+    .fas {
+      color: $dr-primary;
+    }
+  }
+}

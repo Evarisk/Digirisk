@@ -605,6 +605,66 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
     }
 
     /**
+     * Set psychosocial questionnaire segment
+     *
+     * The method of the questionnaires answered by the employees (#5324), then one line per work unit of a session
+     * that got answers: job category, session, number of answers, period, average and status. The average is a
+     * chip in the colour of the psychosocial scale, as in the cotation table.
+     *
+     * @param Odf       $odfHandler  Object builder odf library
+     * @param Translate $outputLangs Lang object to use for output
+     * @param array     $moreParam   More param (segmentName)
+     *
+     * @throws OdfException
+     * @throws Exception
+     */
+    private static function setPsychosocialQuestionnaireSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
+    {
+        global $db;
+
+        try {
+            $listLines = $odfHandler->setSegment($moreParam['segmentName']);
+        } catch (OdfExceptionSegmentNotFound $e) {
+            // A template without the table: the questionnaires are not even read
+            dol_syslog($e->getMessage());
+            return;
+        }
+
+        require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_riskoverview.lib.php';
+        require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_rpsquestionnaire.lib.php';
+
+        $questionnaireRows = digiriskRpsQuestionnaireDocumentRows($db, $outputLangs);
+        $answersCount      = 0;
+        foreach ($questionnaireRows as $questionnaireRow) {
+            // The value goes into the document as it is ('' and not false: odtphp types $encode as a string)
+            $chip = '-';
+            if ($questionnaireRow['average'] !== null) {
+                $chip = '<text:span text:style-name="RPS_20_niveau_20_' . (int) $questionnaireRow['band'] . '">' . "\u{00A0}" . digiriskRiskOverviewFormatLevel((float) $questionnaireRow['average'], $outputLangs) . "\u{00A0}" . '</text:span>';
+            }
+            $listLines->setVars('questionnaireAverage', $chip, '', 'UTF-8');
+
+            $tmpArray = [
+                'questionnaireElement' => $questionnaireRow['element'],
+                'questionnaireGroup'   => $questionnaireRow['group'],
+                'questionnaireSession' => $questionnaireRow['session'],
+                'questionnaireAnswers' => $questionnaireRow['answers'],
+                'questionnairePeriod'  => $questionnaireRow['period'],
+                'questionnaireStatus'  => $questionnaireRow['status'],
+            ];
+            static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+
+            $answersCount += (int) $questionnaireRow['count'];
+        }
+        $odfHandler->mergeSegment($listLines);
+
+        $tmpArray = [
+            'psychosocialQuestionnaireMethod'  => $outputLangs->transnoentities('DigiriskDuRpsQuestionnaireMethod'),
+            'psychosocialQuestionnaireSummary' => empty($questionnaireRows) ? $outputLangs->transnoentities('DigiriskDuRpsQuestionnaireNone') : $outputLangs->transnoentities('DigiriskDuRpsQuestionnaireSummary', (string) count(array_unique(array_column($questionnaireRows, 'element'))), (string) $answersCount),
+        ];
+        static::setTmpArrayVars($tmpArray, $odfHandler, $outputLangs, false);
+    }
+
+    /**
      * Set risk by entities segment
      *
      * @param Odf       $odfHandler  Object builder odf library
@@ -762,6 +822,10 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
             // The psychosocial scope belongs to the entity: no table for the shared elements
             $moreParam['segmentName'] = 'currentPsychosocialCotationByGPUT';
             self::setPsychosocialCotationByGPUTSegment($odfHandler, $outputLangs, $moreParam);
+
+            // The questionnaires answered by the employees (#5324): the method, then the work units they assessed
+            $moreParam['segmentName'] = 'psychosocialQuestionnaires';
+            self::setPsychosocialQuestionnaireSegment($odfHandler, $outputLangs, $moreParam);
 
             if (!empty($moreParam['tmparray']['showSharedRisk_nocheck'])) {
                 $moreParam['entity']           = 'shared';
