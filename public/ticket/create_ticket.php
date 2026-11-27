@@ -100,6 +100,8 @@ if ($entity > 0) {
     $upload_dir = $conf->categorie->multidir_output[isset($entity) ? $entity : 1];
 }
 
+digiriskdolibarr_ticket_public_set_browser_lang(['companies', 'other', 'mails', 'ticket']);
+
 // Read once the entity is loaded: closed, the interface processes no action and its view only says so
 $publicInterfaceOpen = $entity <= 0 || getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE');
 
@@ -559,7 +561,7 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 				}
 				if ($cat->id == GETPOST('parentCategory')) {
 					$mainCategoryChildrenExtrafields = $catArrayOptions ?: new stdClass();
-                    $categoryDescription             = $cat->description;
+                    $categoryDescription             = digiriskdolibarr_ticket_category_translation($cat, 'description');
 					$mainCategoryChildrenItem        = $cat;
 					print '<div class="ticket-parentCategory ticket-parentCategory'. $cat->id .' active" id="' . $cat->id . '" data-rowid="' . $cat->id . '">';
 				} else {
@@ -568,7 +570,7 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 				print '<div class="wpeo-button" style="background:#'. $cat->color.'; border-color:#'. $cat->color .'">';
 
 				show_category_image($cat, $upload_dir);
-				print '<span class="button-label">' . $cat->label . '</span>';
+				print '<span class="button-label">' . digiriskdolibarr_ticket_category_translation($cat, 'label') . '</span>';
 				print '</div>';
 
 				print '</div>';
@@ -595,14 +597,14 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 							print '<a href="' . $subCategoryExtrafieldsTmp->external_link . '" class="category-redirect"' . (!empty($subCategoryExtrafieldsTmp->external_link_new_tab) ? 'target="_blank"' : '') . '>';
 						}
 						if ($subCategory->id == GETPOSTINT('subCategory')) {
-							$categoryDescription    = $subCategory->description;
+							$categoryDescription    = digiriskdolibarr_ticket_category_translation($subCategory, 'description');
 							$subCategoryExtrafields = $subCategoryExtrafieldsTmp ?: new stdClass();
 							print '<div class="ticket-subCategory ticket-subCategory'. $subCategory->id .' center active" id="' . $subCategory->id . '" data-rowid="' . $subCategory->id . '">';
 						} else {
 							print '<div class="ticket-subCategory ticket-subCategory'. $subCategory->id .' center" id="' . $subCategory->id . '" data-rowid="' . $subCategory->id . '" style="background:#ffffff">';
 						}
 						show_category_image($subCategory, $upload_dir);
-						print '<span class="button-label">' . $subCategory->label . '</span>';
+						print '<span class="button-label">' . digiriskdolibarr_ticket_category_translation($subCategory, 'label') . '</span>';
 						print '</div>';
 						if (!empty($subCategoryExtrafieldsTmp->external_link)) {
 							print '</a>';
@@ -705,7 +707,7 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 
 					switch ($key) {
 						case 'message':
-							$out .= '<label class="form-field-container">' . ucfirst($key) . '<span style="color:red"> *</span></label>' ;
+							$out .= '<label class="form-field-container">' . $langs->trans('Message') . '<span style="color:red"> *</span></label>' ;
                             $out .= '<textarea name="message" id="message" required>' . GETPOST('message') . '</textarea>';
 							break;
 						case 'photo':

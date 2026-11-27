@@ -57,12 +57,14 @@ require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
 
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs;
 
 // Load translation files required by the page
 saturne_load_langs();
+digiriskdolibarr_ticket_public_set_browser_lang();
 
 // Get parameters
 $trackID = GETPOST('track_id', 'alpha');

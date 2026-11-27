@@ -1084,6 +1084,70 @@ function digiriskdolibarr_ticket_complete_category_config(int $categoryId, array
 }
 
 /**
+ * Speak the language of the browser on the public ticket interface (#2577)
+ *
+ * With the multilingual support enabled, the declarant reads the interface, and the categories translated on their
+ * card, in the language of the browser rather than in the default language of the instance. A language forced on
+ * the URL keeps priority, as everywhere in Dolibarr. Without the multilingual support, nothing changes.
+ *
+ * To be called once the entity of the interface is loaded: its own setup decides.
+ *
+ * @param  string[] $domains Language files the page needs besides those of the modules
+ * @return void
+ */
+function digiriskdolibarr_ticket_public_set_browser_lang(array $domains = []): void
+{
+    global $conf, $langs;
+
+    if (!getDolGlobalInt('MAIN_MULTILANGS') || GETPOST('lang', 'aZ09') || empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+        return;
+    }
+
+    $browserLangs = new Translate('', $conf);
+    $browserLangs->setDefaultLang('auto');
+    if ($browserLangs->getDefaultLang() === $langs->getDefaultLang()) {
+        return;
+    }
+
+    // The files already loaded stay in the former language: a new object loads them again, the core ones first as
+    // main.inc.php does, so the same definition wins as before
+    $langs = $browserLangs;
+    $langs->loadLangs(['main', 'dict']);
+    saturne_load_langs($domains);
+}
+
+/**
+ * Label or description of a ticket category, in the language of the page (#2577)
+ *
+ * Categorie::fetch() already swaps them for their translation, but on the exact language code only: a browser in
+ * en_US would miss a category translated in en_GB. The first translation in the same language is taken then, the
+ * value of the card when there is none.
+ *
+ * @param  Categorie $category Category fetched with its translations
+ * @param  string    $field    'label' or 'description'
+ * @return string              Text to show
+ */
+function digiriskdolibarr_ticket_category_translation(Categorie $category, string $field): string
+{
+    global $langs;
+
+    $value = (string) ($field === 'description' ? $category->description : $category->label);
+
+    $translations = is_array($category->multilangs) ? $category->multilangs : [];
+    if (!empty($translations[$langs->getDefaultLang()][$field])) {
+        return $value;
+    }
+
+    foreach ($translations as $lang => $translation) {
+        if (strpos((string) $lang, $langs->shortlang . '_') === 0 && !empty($translation[$field])) {
+            return (string) $translation[$field];
+        }
+    }
+
+    return $value;
+}
+
+/**
  * Whether the public ticket interface of the entity may be used by the visitor (#5549)
  *
  * Without a PIN code set for the entity, everyone may declare. With one, only the session that typed it: the
