@@ -271,7 +271,8 @@ if ($action == 'create') {
 	$object->fetch($fkParent);
 	print load_fiche_titre($title, '', $object->picto);
 
-	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	// digiriskelement-create-form: a second submission (double tap on a tablet) is ignored by digiriskorganization.js (#2626)
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" class="digiriskelement-create-form">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="action" value="add">';
 	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
