@@ -886,6 +886,6 @@ class pdf_riskassessmentdocumentpdf extends ModelePDFDigiriskDolibarrDocument
             $outputLangs->transnoentities('Responsible'),
             ['text' => $outputLangs->transnoentities('DigiriskProgress'), 'align' => 'C'],
             $outputLangs->transnoentities('Status')
-        ], $rows, [$width * 0.12, $width * 0.13, $width * 0.15, $width * 0.23, $width * 0.14, $width * 0.09, $width * 0.14], $size - 1.5);
+        ], $rows, [$width * 0.13, $width * 0.13, $width * 0.15, $width * 0.22, $width * 0.14, $width * 0.09, $width * 0.14], $size - 1.5);
     }
 }
