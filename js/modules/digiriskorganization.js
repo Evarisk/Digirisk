@@ -58,6 +58,40 @@ window.digiriskdolibarr.organization.event = function() {
 	$(document).on('click', '#confirm-delete-yes', window.digiriskdolibarr.organization.confirmDelete);
 	$(document).on('click', '.confirm-delete-cancel', window.digiriskdolibarr.organization.closeDelete);
 	$(document).on('click', '.organization-tree .ref-badge', window.digiriskdolibarr.organization.navigateToElement);
+	$(document).on('submit', '#quick-add-dialog form, form.digiriskelement-create-form', window.digiriskdolibarr.organization.preventDoubleSubmit);
+	// A page restored from the back-forward cache keeps the flag of its last submission
+	$(window).on('pageshow', function(event) {
+		if (event.originalEvent && event.originalEvent.persisted) {
+			$('#quick-add-dialog form, form.digiriskelement-create-form').removeData('submitting');
+		}
+	});
+};
+
+/**
+ * Ignore le second envoi d'un formulaire de création de GP/UT tant que le premier est en cours.
+ *
+ * Un double toucher sur tablette envoyait deux fois le formulaire, et créait deux GP/UT identiques (#2626).
+ * Le bouton n'est pas désactivé : son nom ferait défaut aux données envoyées.
+ *
+ * @since   24.0.0
+ * @version 24.0.0
+ *
+ * @param  {SubmitEvent} event L'envoi du formulaire.
+ * @return {boolean|void}      false pour un second envoi.
+ */
+window.digiriskdolibarr.organization.preventDoubleSubmit = function(event) {
+	let $form = $(this);
+	if ($form.data('submitting')) {
+		event.preventDefault();
+		return false;
+	}
+	$form.data('submitting', true);
+	// Un autre script peut encore annuler cet envoi : le formulaire doit alors rester utilisable
+	setTimeout(function() {
+		if (event.isDefaultPrevented()) {
+			$form.removeData('submitting');
+		}
+	}, 0);
 };
 
 /**
@@ -246,6 +280,7 @@ window.digiriskdolibarr.organization.openQuickAdd = function(event) {
 	$('#quick-add-label-input').val('');
 	$('#quick-add-description-input').val('');
 	$('#quick-add-selector-input').prop('checked', true);
+	$('#quick-add-dialog form').removeData('submitting');
 
 	if (dialog && typeof dialog.showModal === 'function') {
 		dialog.showModal();
