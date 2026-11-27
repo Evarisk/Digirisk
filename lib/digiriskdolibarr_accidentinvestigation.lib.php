@@ -53,6 +53,11 @@ function accidentinvestigation_prepare_head(AccidentInvestigation $object): arra
  * @throws Exception
  */
 function get_recursive_task_budget(int $taskId): int {
+	// No task, as for a draft investigation: the tasks without parent are those of the whole instance, not its children (#5894)
+	if ($taskId <= 0) {
+		return 0;
+	}
+
 	$totalBudget  = 0;
 	$childrenTask = saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, ['customsql' => 'fk_task_parent = ' . $taskId]);
 
@@ -67,4 +72,29 @@ function get_recursive_task_budget(int $taskId): int {
 	}
 
 	return $totalBudget;
+}
+
+/**
+ * Return the containers of the actions of an accident investigation, the curative then the preventive task under its
+ * task. The task is made at the validation: a draft investigation has no container, rather than the first tasks
+ * without parent of the whole instance (#5894)
+ *
+ * @param  int                                                          $taskId Task of the investigation
+ * @return array{curative: SaturneTask|null, preventive: SaturneTask|null}        Containers, null when missing
+ * @throws Exception
+ */
+function digiriskdolibarr_accidentinvestigation_action_containers(int $taskId): array
+{
+    $containers = ['curative' => null, 'preventive' => null];
+    if ($taskId <= 0) {
+        return $containers;
+    }
+
+    $tasks = saturne_fetch_all_object_type('SaturneTask', '', '', 2, 0, ['customsql' => 'fk_task_parent = ' . $taskId]);
+    if (is_array($tasks) && !empty($tasks)) {
+        $containers['curative']   = array_shift($tasks);
+        $containers['preventive'] = array_pop($tasks);
+    }
+
+    return $containers;
 }
